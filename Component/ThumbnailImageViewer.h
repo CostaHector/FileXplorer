@@ -7,14 +7,14 @@
 #include <QFileInfo>
 #include <QToolBar>
 #include <QCheckBox>
+#include <QMenu>
 #include "FolderNxtAndLastIterator.h"
 
 class ThumbnailImageViewer : public QScrollArea {
   Q_OBJECT
- public:
+public:
   explicit ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent = nullptr);
   ~ThumbnailImageViewer();
-  void wheelEvent(QWheelEvent* event) override;
   int GetCurImageSizeScale() const { return mCurIconScaledSizeIndex; }
   QPixmap pixmap() const { return mLabel->pixmap(Qt::ReturnByValue); }
   static bool IsFileAbsPathImage(const QString& fileAbsPath);
@@ -22,11 +22,12 @@ class ThumbnailImageViewer : public QScrollArea {
   static bool IsGifFile(const QString& fileAbsPath);
 
   void adjustButtonPosition();
+  void wheelEvent(QWheelEvent* event) override;
 
- signals:
+signals:
   void onImageScaledIndexChanged(int newScaledIndex);
 
- public slots:
+public slots:
   void resizeEvent(QResizeEvent* event) override;
   void showEvent(QShowEvent* event) override;
 
@@ -41,7 +42,9 @@ class ThumbnailImageViewer : public QScrollArea {
 
   bool NavigateIntoSubdirectoryChanged(bool bInclude);
 
- private:
+  void onCustomContextMenuRequested(const QPoint& pos);
+
+private:
   void ReadSetting();
 
   bool UpdatePixmapAndTitle();
@@ -58,7 +61,9 @@ class ThumbnailImageViewer : public QScrollArea {
     QString parentPath;
     QString rel2image;
     qint64 imageBytes;
-    bool operator==(const FromPath& rhs) const { return parentPath == rhs.parentPath && rel2image == rhs.rel2image && imageBytes == rhs.imageBytes; }
+    bool operator==(const FromPath& rhs) const {
+      return parentPath == rhs.parentPath && rel2image == rhs.rel2image && imageBytes == rhs.imageBytes;
+    }
 
     QString GetImageAbsPath() const;
     void clear() {
@@ -82,7 +87,11 @@ class ThumbnailImageViewer : public QScrollArea {
   QToolBar* mControlToolBar{nullptr};
   QPushButton *m_prevButton{nullptr}, *m_nextButton{nullptr};
   QLabel* mLabel{nullptr};
+
+  QAction *_OPEN_IN_SYSTEM_APPLICATION{nullptr}, *_REVEAL_IN_FILE_EXPLORER{nullptr}, *_COPY_FILE_NAME{nullptr};
+  QMenu* mMenu{nullptr};
+
   std::unique_ptr<QMovie> mPMovie;
 };
 
-#endif  // THUMBNAILIMAGEVIEWER_H
+#endif // THUMBNAILIMAGEVIEWER_H

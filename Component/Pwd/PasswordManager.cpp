@@ -1,14 +1,16 @@
 ﻿#include "PasswordManager.h"
-#include <QDateTime>
-#include <QDesktopServices>
-#include <QFileInfo>
-#include <QPlainTextEdit>
 #include "PublicVariable.h"
+#include "PublicTool.h"
 #include "PwdPublicVariable.h"
 #include "PwdTableEditActions.h"
 #include "NotificatorMacro.h"
 #include "StyleSheet.h"
 #include "MemoryKey.h"
+
+#include <QDateTime>
+#include <QFileInfo>
+#include <QPlainTextEdit>
+
 
 PasswordManager::PasswordManager(QWidget* parent) : QMainWindow{parent} {
   setObjectName("PasswordManager");
@@ -189,7 +191,7 @@ bool PasswordManager::openEncFileLocatedIn() const {
 #ifdef RUNNING_UNIT_TESTS
   bRet = QFile::exists(locatedIn);
 #else
-  bRet = QDesktopServices::openUrl(url);
+  bRet = FileTool::OpenLocalFileUsingDesktopService(url.toLocalFile());
 #endif
   LOG_OE_P(bRet, "Open enc located in", "path:%s,ret:%d", qPrintable(locatedIn), bRet);
   return bRet;

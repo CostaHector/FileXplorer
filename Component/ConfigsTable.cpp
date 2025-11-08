@@ -3,9 +3,9 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "FileLeafAction.h"
+#include "PublicTool.h"
 
 #include <QDialogButtonBox>
-#include <QDesktopServices>
 #include <QIcon>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -102,13 +102,7 @@ bool ConfigsTable::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
     LOG_INFO_P("[Skip] current row is not a path", "row:%d, contents:%s", clickedIndex.row(), qPrintable(path));
     return false;
   }
-  const bool ret = QDesktopServices::openUrl(url);
-  if (!ret) {
-    LOG_ERR_NP("[Failed] open path failed", path);
-    return false;
-  }
-  LOG_OK_NP("[ok] Open path succeed", path);
-  return true;
+  return FileTool::OpenLocalFile(path);
 }
 
 void ConfigsTable::onEditPreferenceSetting() const {
@@ -117,10 +111,5 @@ void ConfigsTable::onEditPreferenceSetting() const {
     LOG_ERR_P("[Failed] Cannot edit", ".ini file[%s] not found", qPrintable(iniFileAbsPath));
     return;
   }
-  bool openRet = QDesktopServices::openUrl(QUrl::fromLocalFile(iniFileAbsPath));
-  if (!openRet) {
-    LOG_ERR_P("[Failed] Cannot edit", ".ini file[%s] has no default editor program set", qPrintable(iniFileAbsPath));
-    return;
-  }
-  LOG_OK_NP("[Ok] Opened init file succeed", "Changes will take effect until next time reopen");
+  FileTool::OpenLocalFile(iniFileAbsPath);
 }

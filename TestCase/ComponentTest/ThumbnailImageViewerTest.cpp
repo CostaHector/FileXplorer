@@ -10,6 +10,7 @@
 #include "StyleSheet.h"
 #include "MouseKeyboardEventHelper.h"
 #include "ImageTestPrecoditionTools.h"
+#include "ClipboardGuard.h"
 #include "TDir.h"
 
 using namespace MouseKeyboardEventHelper;
@@ -17,18 +18,23 @@ using namespace ImageTestPrecoditionTools;
 
 class ThumbnailImageViewerTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   const QString THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME = "ThumbnailImageViewer";
-
- private slots:
-  void default_constructor_ok() {  //
+  const ClipboardGuard clipGuard;
+private slots:
+  void default_constructor_ok() { //
     // should not crash down
     Configuration().setValue(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME + "_ICON_SIZE_INDEX", 1);
     ThumbnailImageViewer viewer(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME);
     QCOMPARE(viewer.m_memoryKeyName, THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME);
-
     // 验证默认值
     QCOMPARE(viewer.GetCurImageSizeScale(), 1);
+
+    QVERIFY(viewer.mNavigateIntoSub != nullptr);
+    QVERIFY(viewer.mMenu == nullptr);
+    QVERIFY(viewer._OPEN_IN_SYSTEM_APPLICATION == nullptr);
+    QVERIFY(viewer._REVEAL_IN_FILE_EXPLORER == nullptr);
+    QVERIFY(viewer._COPY_FILE_NAME == nullptr);
 
     const QPixmap emptyPixmap = viewer.pixmap();
     QVERIFY(emptyPixmap.isNull());
@@ -38,11 +44,11 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     QCOMPARE(viewer.mWidth, IMAGE_SIZE::ICON_SIZE_CANDIDATES[1].width());
     QCOMPARE(viewer.mHeight, IMAGE_SIZE::ICON_SIZE_CANDIDATES[1].height());
 
-    viewer.setPixmapByByteArrayData("");  // emptyByteData
+    viewer.setPixmapByByteArrayData(""); // emptyByteData
     QVERIFY(viewer.mDataFromArchive.isEmpty());
     viewer.refreshPixmapSize();
 
-    viewer.setIconSizeScaledIndex(-1);  // invalid value should not work
+    viewer.setIconSizeScaledIndex(-1); // invalid value should not work
     QCOMPARE(viewer.GetCurImageSizeScale(), 1);
 
     viewer.clearPixmap();
@@ -54,7 +60,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
 
     QByteArray imageData = GetPNGImage(800, 600, "PNG");
     {
-      viewer.mWidth = 8;  // modify to test scaledByWidth
+      viewer.mWidth = 8; // modify to test scaledByWidth
       viewer.mHeight = 100;
       viewer.setPixmapByByteArrayData(imageData);
       QCOMPARE(viewer.mDataFromArchive, imageData);
@@ -65,7 +71,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     }
 
     {
-      viewer.mWidth = 100;  // modify to test scaledByHeight
+      viewer.mWidth = 100; // modify to test scaledByHeight
       viewer.mHeight = 9;
       viewer.setPixmapByByteArrayData(imageData);
       QCOMPARE(viewer.mDataFromArchive, imageData);
@@ -84,21 +90,21 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     const QPoint upAngelDelta{0, -8 * 15};
 
     QSignalSpy spy(&viewer, &ThumbnailImageViewer::onImageScaledIndexChanged);
-    {  // +1 accept
+    { // +1 accept
       QVERIFY(SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
       QCOMPARE(viewer.GetCurImageSizeScale(), 6);
       QCOMPARE(spy.count(), 1);
       QCOMPARE(spy.back()[0].toInt(), 6);
     }
 
-    {  // -1 accept
+    { // -1 accept
       QVERIFY(SendWheelEvent(viewer, upAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
       QCOMPARE(viewer.GetCurImageSizeScale(), 5);
       QCOMPARE(spy.count(), 2);
       QCOMPARE(spy.back()[0].toInt(), 5);
     }
 
-    {  // already 0, cannot -1. not accept
+    { // already 0, cannot -1. not accept
       viewer.setIconSizeScaledIndex(0);
       QVERIFY(SendWheelEvent(viewer, upAngelDelta, Qt::KeyboardModifier::ControlModifier, false));
       QCOMPARE(viewer.GetCurImageSizeScale(), 0);
@@ -113,7 +119,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
       QCOMPARE(spy.count(), 2);
     }
 
-    {  // not with control modifier, will not change icon size, don't expect here
+    { // not with control modifier, will not change icon size, don't expect here
       SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::NoModifier, true);
       QCOMPARE(viewer.GetCurImageSizeScale(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
       QCOMPARE(spy.count(), 2);
@@ -141,13 +147,13 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
 
   void test_clearPixmap() {
     ThumbnailImageViewer viewer("testKey");
-    QVERIFY(!viewer.setPixmapByByteArrayData(""));  // invalid image
+    QVERIFY(!viewer.setPixmapByByteArrayData("")); // invalid image
     QCOMPARE(viewer.mImageFrom, ThumbnailImageViewer::ImageFrom::ARCHIVE);
 
-    QByteArray imageData = GetPNGImage(800, 600, "PNG");  // valid image
+    QByteArray imageData = GetPNGImage(800, 600, "PNG"); // valid image
     QVERIFY(viewer.setPixmapByByteArrayData(imageData));
 
-    QVERIFY(!viewer.NavigateImageNext());  // only support in from path
+    QVERIFY(!viewer.NavigateImageNext()); // only support in from path
     QVERIFY(!viewer.NavigateImagePrevious());
     QVERIFY(!viewer.mImgIt.IsIncludingSubDirectory());
     QVERIFY(!viewer.NavigateIntoSubdirectoryChanged(true));
@@ -167,20 +173,18 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     TDir tDir;
     QVERIFY(tDir.IsValid());
     QList<FsNodeEntry> nodes{
-        {"a/img 1.jpg", false, GetPNGImage(100, 100, "jpg")},  //
-        {"0/img 20.gif", false, ""},                           // invalid gif
-        {"0/img 21.gif", false, GetTestGif()},                 // valid gif
-        {"0/img 3.mp4", false, ""},                            //
-        {"b/img 4.webp", false, GetPNGImage(40, 40, "webp")},  //
-        {"img 6 broken.png", false, ""},                       //
-        {"img 5.png", false, GetPNGImage(50, 50, "png")},      //
-        {"img 7.png", false, GetPNGImage(70, 70, "png")},      //
+        {"a/img 1.jpg", false, GetPNGImage(100, 100, "jpg")}, //
+        {"0/img 20.gif", false, ""},                          // invalid gif
+        {"0/img 21.gif", false, GetTestGif()},                // valid gif
+        {"0/img 3.mp4", false, ""},                           //
+        {"b/img 4.webp", false, GetPNGImage(40, 40, "webp")}, //
+        {"img 6 broken.png", false, ""},                      //
+        {"img 5.png", false, GetPNGImage(50, 50, "png")},     //
+        {"img 7.png", false, GetPNGImage(70, 70, "png")},     //
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
 
     ThumbnailImageViewer viewer{"testImagePath"};
-    QVERIFY(viewer.mNavigateIntoSub != nullptr);
-
     const ThumbnailImageViewer::FromPath expectImagea_1{tDir.itemPath("a"), "img 1.jpg", tDir.fileSize("a/img 1.jpg")};
 
     const ThumbnailImageViewer::FromPath expectImage0_20{tDir.path(), "0/img 20.gif", tDir.fileSize("0/img 20.gif")};
@@ -190,20 +194,20 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     const ThumbnailImageViewer::FromPath expectImage6{tDir.path(), "img 6 broken.png", tDir.fileSize("img 6 broken.png")};
     const ThumbnailImageViewer::FromPath expectImage7{tDir.path(), "img 7.png", tDir.fileSize("img 7.png")};
 
-    {  // not including subdirectory
+    { // not including subdirectory
       // image: [5, 6, 7]
       QVERIFY(!viewer.mNavigateIntoSub->isChecked());
 
-      QVERIFY(!viewer.setPixmapByAbsFilePath(tDir.path(), "img 6 broken.png"));  // broken file
+      QVERIFY(!viewer.setPixmapByAbsFilePath(tDir.path(), "img 6 broken.png")); // broken file
       QCOMPARE(viewer.mImageFrom, ThumbnailImageViewer::ImageFrom::PATH);
 
-      QVERIFY(viewer.setPixmapByAbsFilePath(tDir.path(), "img 5.png"));  // valid file
+      QVERIFY(viewer.setPixmapByAbsFilePath(tDir.path(), "img 5.png")); // valid file
       QCOMPARE(viewer.mDataFromPath, expectImage5);
 
       emit viewer.m_nextButton->clicked();
       QCOMPARE(viewer.mDataFromPath, expectImage6);
 
-      QVERIFY(viewer.NavigateImageNext());  // 7 wrap to one
+      QVERIFY(viewer.NavigateImageNext()); // 7 wrap to one
       QCOMPARE(viewer.mDataFromPath, expectImage7);
 
       QVERIFY(viewer.NavigateImageNext());
@@ -216,10 +220,10 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
       viewer.mNavigateIntoSub->setChecked(true);
       emit viewer.mNavigateIntoSub->toggled(true);
 
-      QVERIFY(!viewer.NavigateImageNext());  // 0/20, but this gif is broken
+      QVERIFY(!viewer.NavigateImageNext()); // 0/20, but this gif is broken
       QCOMPARE(viewer.mDataFromPath, expectImage0_20);
 
-      QVERIFY(viewer.NavigateImageNext());  // 0/21, this gif is ok
+      QVERIFY(viewer.NavigateImageNext()); // 0/21, this gif is ok
       QCOMPARE(viewer.mDataFromPath, expectImage0_21);
 
       // to a folder contains only 1 image and has no subdirectory, no need navigate at all
@@ -228,6 +232,21 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
       QCOMPARE(viewer.mDataFromPath, expectImagea_1);
       QVERIFY(viewer.NavigateImagePrevious());
       QCOMPARE(viewer.mDataFromPath, expectImagea_1);
+    }
+
+    // text copied ok
+    {
+      viewer.onCustomContextMenuRequested(QPoint{0, 0});
+      QVERIFY(viewer.mMenu != nullptr);
+      QVERIFY(viewer._OPEN_IN_SYSTEM_APPLICATION != nullptr);
+      QVERIFY(viewer._REVEAL_IN_FILE_EXPLORER != nullptr);
+      QVERIFY(viewer._COPY_FILE_NAME != nullptr);
+
+      emit viewer._OPEN_IN_SYSTEM_APPLICATION->triggered();
+      emit viewer._REVEAL_IN_FILE_EXPLORER->triggered();
+      emit viewer._COPY_FILE_NAME->triggered();
+
+      QCOMPARE(clipGuard.getCurText(), tDir.itemPath("a/img 1.jpg"));
     }
   }
 

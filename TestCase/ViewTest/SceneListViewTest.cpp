@@ -21,7 +21,7 @@ using namespace ImageTestPrecoditionTools;
 
 class SceneListViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   const QString scnAbsPath = SceneInfoManager::ScnMgr::GetScnAbsFilePath(tDir.path());
   QList<QVariant> expectCurrentSceneChangedArgs_ChrisEvans;
@@ -30,7 +30,7 @@ class SceneListViewTest : public PlainTestSuite {
   static constexpr int rateChrisEvans = 3;
   static constexpr int rateHenryCavill = 8;
 
- private slots:
+private slots:
   void initTestCase() {
     // precondition here
     QVERIFY(tDir.IsValid());
@@ -49,25 +49,25 @@ class SceneListViewTest : public PlainTestSuite {
     QByteArray henryCavillJsonBA = JsonKey::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, details, uploaded, rateHenryCavill);
 
     QList<FsNodeEntry> nodes{
-        {"Chris Evans.json", false, chrisEvansJsonBA},             // batch 1
-        {"Chris Evans.jpg", false, GetPNGImage(100, 50, "jpg")},   //
-        {"Chris Evans.mp4", false, ""},                            //
-        {"Henry Cavill.json", false, henryCavillJsonBA},           // batch 2
-        {"Henry Cavill.png", false, GetPNGImage(50, 100, "png")},  //
-        {"Henry Cavill.mp4", false, ""},                           //
+        {"Chris Evans.json", false, chrisEvansJsonBA},            // batch 1
+        {"Chris Evans.jpg", false, GetPNGImage(100, 50, "jpg")},  //
+        {"Chris Evans.mp4", false, ""},                           //
+        {"Henry Cavill.json", false, henryCavillJsonBA},          // batch 2
+        {"Henry Cavill.png", false, GetPNGImage(50, 100, "png")}, //
+        {"Henry Cavill.mp4", false, ""},                          //
     };
     QCOMPARE(tDir.createEntries(nodes), 6);
 
     expectCurrentSceneChangedArgs_ChrisEvans = QList<QVariant>{
-        "Chris Evans",                                  //
-        tDir.itemPath("Chris Evans.json"),              //
-        QStringList{tDir.itemPath("Chris Evans.jpg")},  //
+        "Chris Evans",                                 //
+        tDir.itemPath("Chris Evans.json"),             //
+        QStringList{tDir.itemPath("Chris Evans.jpg")}, //
         QStringList{tDir.itemPath("Chris Evans.mp4")},
     };
     expectCurrentSceneChangedArgs_HenryCavill = QList<QVariant>{
-        "Henry Cavill",                                  //
-        tDir.itemPath("Henry Cavill.json"),              //
-        QStringList{tDir.itemPath("Henry Cavill.png")},  //
+        "Henry Cavill",                                 //
+        tDir.itemPath("Henry Cavill.json"),             //
+        QStringList{tDir.itemPath("Henry Cavill.png")}, //
         QStringList{tDir.itemPath("Henry Cavill.mp4")},
     };
 
@@ -78,10 +78,10 @@ class SceneListViewTest : public PlainTestSuite {
   void init() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_MOVIE_PATH->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(false);  // by name ascending chris -> henry
+    sceneAct._REVERSE_SORT->setChecked(false); // by name ascending chris -> henry
   }
 
-  void cleanupTestCase() {  //
+  void cleanupTestCase() { //
     SceneListViewMocker::MockSetRootPathQuery() = true;
     SceneInfoManager::mockScenesInfoList().clear();
   }
@@ -96,7 +96,7 @@ class SceneListViewTest : public PlainTestSuite {
     QVERIFY(sceneView.OPEN_CORRESPONDING_FOLDER == nullptr);
     QVERIFY(sceneView.mAlignDelegate == nullptr);
     // call onClickEvent with invalid index should not crash down
-    sceneView.onClickEvent(QModelIndex(), QModelIndex());
+    sceneView.onClickEvent(QModelIndex());
   }
 
   void IsPathAtShallowDepth_ok() {
@@ -127,7 +127,7 @@ class SceneListViewTest : public PlainTestSuite {
       QVERIFY(sceneModel.rootPath() != "C:/home");
     }
 
-    {  // 2. setRootPath on a test directory ok
+    { // 2. setRootPath on a test directory ok
       SceneListViewMocker::MockSetRootPathQuery() = true;
       sceneView.setRootPath(tDir.path());
       QCOMPARE(sceneModel.rootPath(), tDir.path());
@@ -138,11 +138,11 @@ class SceneListViewTest : public PlainTestSuite {
     QVERIFY(!QFile::exists(scnAbsPath));
     {
       // 3.1 update json/generate scn file rejected (update on a shallow depth)
-      sceneModel.mRootPath = "/";  // force set this path to be root in linux
+      sceneModel.mRootPath = "/"; // force set this path to be root in linux
       QCOMPARE(sceneView.onUpdateJsonFiles(), -1);
       QCOMPARE(sceneView.onUpdateScnFiles(), -1);
 
-      sceneModel.mRootPath = "C:/";  // force set this path to be root in windows
+      sceneModel.mRootPath = "C:/"; // force set this path to be root in windows
       QCOMPARE(sceneView.onUpdateJsonFiles(), -1);
       QCOMPARE(sceneView.onUpdateScnFiles(), -1);
     }
@@ -154,15 +154,15 @@ class SceneListViewTest : public PlainTestSuite {
       emit sceneActInst._UPDATE_JSON->triggered();
       emit sceneActInst._UPDATE_SCN->triggered();
       QVERIFY(QFile::exists(scnAbsPath));
-      QCOMPARE(sceneModel.rowCount(), 2);  // 2 json one for chris evans, another for henry cavill
+      QCOMPARE(sceneModel.rowCount(), 2); // 2 json one for chris evans, another for henry cavill
     }
 
     {
       // 3.3 update Json again, update Scn again, clear scn, update Scn
-      QCOMPARE(sceneView.onUpdateJsonFiles(), 0);  // already updated. no need again
-      QCOMPARE(sceneView.onUpdateScnFiles(), 1);   // ignore whether json changed. update scn using json updated
+      QCOMPARE(sceneView.onUpdateJsonFiles(), 0); // already updated. no need again
+      QCOMPARE(sceneView.onUpdateScnFiles(), 1);  // ignore whether json changed. update scn using json updated
 
-      QVERIFY(sceneView.onClearScnFiles() > 0);  // clear scn files
+      QVERIFY(sceneView.onClearScnFiles() > 0); // clear scn files
       QVERIFY(!QFile::exists(scnAbsPath));
 
       QVERIFY(sceneView.onUpdateScnFiles() > 0);
@@ -195,39 +195,35 @@ class SceneListViewTest : public PlainTestSuite {
     QSignalSpy spy(&sceneView, &SceneListView::currentSceneChanged);
     {
       // invalid index
-      QVERIFY(!sceneView.onClickEvent(QModelIndex{}, QModelIndex{}));
-      QCOMPARE(spy.count(), 0);
+      QVERIFY(!sceneView.onClickEvent(QModelIndex{}));
+      QCOMPARE(spy.count(), 1);
 
       // currentSceneChanged emit ok
-      sceneView.setCurrentIndex(firstIndex);
-      QCOMPARE(spy.count(), 1);
-      QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_ChrisEvans);
-
-      QVERIFY(sceneView.onClickEvent(firstIndex, QModelIndex{}));
+      QVERIFY(sceneView.onClickEvent(firstIndex));
       QCOMPARE(spy.count(), 2);
       QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_ChrisEvans);
 
-      sceneView.setCurrentIndex(secondIndex);
+      QVERIFY(sceneView.onClickEvent(secondIndex));
       QCOMPARE(spy.count(), 3);
       QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_HenryCavill);
     }
 
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(true);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_SORT->setChecked(true); // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Henry Cavill");
     QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), "Chris Evans");
-    QVERIFY(sceneView.onClickEvent(firstIndex, QModelIndex{}));
+    QVERIFY(sceneView.onClickEvent(firstIndex));
     QCOMPARE(spy.count(), 4);
     QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_HenryCavill);
 
-    sceneAct._REVERSE_SORT->setChecked(false);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_SORT->setChecked(false); // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Chris Evans");
     QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), "Henry Cavill");
-    QVERIFY(sceneView.onClickEvent(secondIndex, QModelIndex{}));
+    QVERIFY(sceneView.onClickEvent(secondIndex));
     QCOMPARE(spy.count(), 5);
     QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_HenryCavill);
   }
@@ -249,7 +245,7 @@ class SceneListViewTest : public PlainTestSuite {
 
     sceneView.setCurrentIndex(QModelIndex{});
     QVERIFY(!sceneView.currentIndex().isValid());
-    QVERIFY(!sceneView.onCopyBaseName());  // current index invalid
+    QVERIFY(!sceneView.onCopyBaseName()); // current index invalid
 
     sceneView.setCurrentIndex(firstIndex);
     {
@@ -263,7 +259,7 @@ class SceneListViewTest : public PlainTestSuite {
       // auto recover
     }
 
-    {  // open folder
+    { // open folder
       sceneView.setCurrentIndex(QModelIndex{});
       QVERIFY(!sceneView.onOpenCorrespondingFolder());
 
@@ -275,14 +271,14 @@ class SceneListViewTest : public PlainTestSuite {
   void delegate_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(false);  // by rate ascending
+    sceneAct._REVERSE_SORT->setChecked(false); // by rate ascending
 
     ScenesListModel sceneModel;
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
     sceneView.setFlow(QListView::Flow::LeftToRight);
-    sceneView.setFixedSize(RateHelper::RATING_BAR_HEIGHT * 9, RateHelper::RATING_BAR_HEIGHT * 3);  // show two item in one row
+    sceneView.setFixedSize(RateHelper::RATING_BAR_HEIGHT * 9, RateHelper::RATING_BAR_HEIGHT * 3); // show two item in one row
     sceneModel.onIconSizeChange(listViewImageSize);
 
     QCOMPARE(sceneModel.rowCount(), 0);
@@ -303,19 +299,19 @@ class SceneListViewTest : public PlainTestSuite {
 
       const QRect vRect0 = sceneView.visualRect(firstIndex);
       imgRect0 = sceneView.mAlignDelegate->GetRealImageVisualRect(firstIndex, vRect0);
-      pnt0Out = QPoint{imgRect0.left() + 2, imgRect0.top() + 5};  // rate 1 postion
+      pnt0Out = QPoint{imgRect0.left() + 2, imgRect0.top() + 5}; // rate 1 postion
       pnt0In = QPoint{imgRect0.left() + 2, imgRect0.bottom() - 5};
 
       const QRect vRect1 = sceneView.visualRect(secondIndex);
       imgRect1 = sceneView.mAlignDelegate->GetRealImageVisualRect(secondIndex, vRect1);
-      pnt1Out = QPoint{imgRect1.right() - 2, imgRect1.top() + 5};  // rate 10 postion
+      pnt1Out = QPoint{imgRect1.right() - 2, imgRect1.top() + 5}; // rate 10 postion
       pnt1In = QPoint{imgRect1.right() - 2, imgRect1.bottom() - 5};
     };
 
     InitPntAndRect();
     QVERIFY(imgRect0.height() > RateHelper::RATING_BAR_HEIGHT);
     QVERIFY(imgRect1.height() > RateHelper::RATING_BAR_HEIGHT);
-    QCOMPARE(imgRect0.y(), imgRect1.y());  // in a same row
+    QCOMPARE(imgRect0.y(), imgRect1.y()); // in a same row
     QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt0In, imgRect0));
     QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt1In, imgRect1));
     QVERIFY(!RateHelper::isClickPointInsideRatingBar(pnt0Out, imgRect0));
@@ -340,22 +336,34 @@ class SceneListViewTest : public PlainTestSuite {
 
       SceneInfoList parsedScenes = SceneHelper::ParseAScnFile(scnAbsPath, "/");
       QCOMPARE(parsedScenes.size(), 2);
-      std::sort(parsedScenes.begin(), parsedScenes.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
+      std::sort(parsedScenes.begin(), parsedScenes.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool { //
         return lhs.lessThanName(rhs);
       });
       QCOMPARE(parsedScenes[0].rate, expectChrisRate);
       QCOMPARE(parsedScenes[1].rate, expectHenryRate);
     };
 
-    QMouseEvent in0Event(QEvent::MouseButtonPress, pnt0In,  //
-                         Qt::MouseButton::LeftButton, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
-    QMouseEvent out0Event(QEvent::MouseButtonPress, pnt0Out,  //
-                          Qt::MouseButton::LeftButton, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
+    QMouseEvent in0Event(QEvent::MouseButtonPress,
+                         pnt0In, //
+                         Qt::MouseButton::LeftButton,
+                         Qt::MouseButton::LeftButton,
+                         Qt::KeyboardModifier::NoModifier);
+    QMouseEvent out0Event(QEvent::MouseButtonPress,
+                          pnt0Out, //
+                          Qt::MouseButton::LeftButton,
+                          Qt::MouseButton::LeftButton,
+                          Qt::KeyboardModifier::NoModifier);
 
-    QMouseEvent in1Event(QEvent::MouseButtonPress, pnt1In,  //
-                         Qt::MouseButton::LeftButton, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
-    QMouseEvent out1Event(QEvent::MouseButtonPress, pnt1Out,  //
-                          Qt::MouseButton::LeftButton, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
+    QMouseEvent in1Event(QEvent::MouseButtonPress,
+                         pnt1In, //
+                         Qt::MouseButton::LeftButton,
+                         Qt::MouseButton::LeftButton,
+                         Qt::KeyboardModifier::NoModifier);
+    QMouseEvent out1Event(QEvent::MouseButtonPress,
+                          pnt1Out, //
+                          Qt::MouseButton::LeftButton,
+                          Qt::MouseButton::LeftButton,
+                          Qt::KeyboardModifier::NoModifier);
 
     // mouse click ok
     {
@@ -383,8 +391,7 @@ class SceneListViewTest : public PlainTestSuite {
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", rateHenryCavill);
 
       // click same in rate when show <=> ClickSameOneRateBarWhenShow
-      sceneView.mousePressEvent(&in1Event);  // in the middle
-      machine.mRateData;
+      sceneView.mousePressEvent(&in1Event); // in the middle
       QCOMPARE(machine.mRateData, (RateData{secondIndex, RatingState::SELECTED_SHOW, rateHenryCavill, 10}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
       // check json, check scn now
@@ -392,49 +399,41 @@ class SceneListViewTest : public PlainTestSuite {
 
       // click same out rate when show <=> ClickSameOneNotRateBarWhenShow
       sceneView.mousePressEvent(&out1Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{secondIndex, RatingState::SELECTED_HIDE, 10, 10}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // click same out rate when hide <=> ClickSameOneNotRateBarWhenHide
       sceneView.mousePressEvent(&out1Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{secondIndex, RatingState::SELECTED_HIDE, 10, 10}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // ClickOtherOneRateBarWhenHide
       sceneView.mousePressEvent(&in0Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{firstIndex, RatingState::SELECTED_SHOW, rateChrisEvans, rateChrisEvans}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // ClickOtherOneNotRateBarWhenShow
       sceneView.mousePressEvent(&out1Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{secondIndex, RatingState::SELECTED_HIDE, 10, 10}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // ClickSameOneNotRateBarWhenHide
       sceneView.mousePressEvent(&in1Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{secondIndex, RatingState::SELECTED_SHOW, 10, 10}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // ClickOtherOneRateBarWhenShow
       sceneView.mousePressEvent(&in0Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{firstIndex, RatingState::SELECTED_SHOW, rateChrisEvans, rateChrisEvans}));
       checkNameAndRate("Chris Evans", rateChrisEvans, "Henry Cavill", 10);
 
       // ClickSameOneRateBarWhenShow
       sceneView.mousePressEvent(&in0Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{firstIndex, RatingState::SELECTED_SHOW, rateChrisEvans, 1}));
       checkNameAndRate("Chris Evans", 1, "Henry Cavill", 10);
 
       // ClickSameOneNotRateBarWhenShow
       sceneView.mousePressEvent(&out0Event);
-      machine.mRateData;
       QCOMPARE(machine.mRateData, (RateData{firstIndex, RatingState::SELECTED_HIDE, 1, 1}));
       checkNameAndRate("Chris Evans", 1, "Henry Cavill", 10);
       checkJsonScnRate(1, 10);

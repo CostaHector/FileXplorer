@@ -2,19 +2,16 @@
 #include "FileOperatorPub.h"
 #include "DuplicateVideosFinderActions.h"
 #include "PublicMacro.h"
+#include "PublicTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
 
-#include <QApplication>
-#include <QClipboard>
-#include <QDesktopServices>
-
-RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent)//
+RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
   : CustomTableView{"RightVideoDuplicatesDetails", parent} {
   m_detailsModel = new (std::nothrow) RightVideoDuplicatesModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_detailsModel);
 
-  m_rightSortProxy = new (std::nothrow) QSortFilterProxyModel {this};
+  m_rightSortProxy = new (std::nothrow) QSortFilterProxyModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_rightSortProxy);
 
   m_rightSortProxy->setSourceModel(m_detailsModel);
@@ -35,10 +32,7 @@ bool RightVideoDuplicatesDetails::on_effectiveNameCopiedForEverything(const QMod
     return false;
   }
   const QString& name = m_detailsModel->fileNameUsedForToolEverything(srcIndex);
-  auto* cb = QApplication::clipboard();
-  CHECK_NULLPTR_RETURN_FALSE(cb);
-  cb->setText(name, QClipboard::Mode::Clipboard);
-  return true;
+  return FileTool::CopyTextToSystemClipboard(name);
 }
 
 bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) const {
@@ -56,10 +50,11 @@ bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) c
 #ifdef RUNNING_UNIT_TESTS
   return true;
 #endif
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+  return FileTool::OpenLocalFileUsingDesktopService(filepath);
 }
 
-bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGroupedVidsList, DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType) {
+bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGroupedVidsList,
+                                                  DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType) {
   CHECK_NULLPTR_RETURN_FALSE(pGroupedVidsList);
   CHECK_NULLPTR_RETURN_FALSE(pCurDifferType);
   return m_detailsModel->SyncFrom(pGroupedVidsList, pCurDifferType);

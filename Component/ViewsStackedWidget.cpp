@@ -9,10 +9,9 @@
 #include "ViewTypeTool.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
+#include "PublicTool.h"
 
-#include <QDesktopServices>
 #include <QRegularExpression>
-#include <QUrl>
 #include <QCache>
 
 using namespace ViewTypeTool;
@@ -241,10 +240,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 
   if (fi.isFile()) {
     if (ThumbnailImageViewer::IsFileImage(fi)) {
-      auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
-      pImageViewer->setPixmapByAbsFilePath(fi.absolutePath(), fi.fileName());
-      pImageViewer->show();
-      return true;
+      return FileTool::OpenLocalImageFile(fi.absoluteFilePath());
     } else if (ArchiveFilesReader::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
@@ -252,7 +248,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_viewActions()._HAR_VIEW->triggered();
       return true;
     }
-    return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+    return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
   }
 
   if (fi.isDir()) {
@@ -265,7 +261,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_viewActions()._TABLE_VIEW->triggered(true);  // both 2 signals: 1) undo stack+1 and 2) view Switched happen
       return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
     }
-    return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+    return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
   }
   return true;
 }

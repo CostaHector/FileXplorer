@@ -7,9 +7,9 @@
 constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
 ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)
-    :  //
-      QWidget{parent},
-      mMemoryName{memoryName} {
+  : //
+  QWidget{parent}
+  , mMemoryName{memoryName} {
   mImgVidOtherSplitter = new (std::nothrow) QSplitter{this};
   CHECK_NULLPTR_RETURN_VOID(mImgVidOtherSplitter)
   mImgVidOtherSplitter->setOrientation(Qt::Orientation::Vertical);
@@ -24,8 +24,8 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);
   }
-  const bool visibility[(int)PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
-  for (int mediaTypeInd : mMediaSequence) {  // hide or show each widget in splitter
+  const bool visibility[(int) PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
+  for (int mediaTypeInd : mMediaSequence) { // hide or show each widget in splitter
     (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
   }
   mImgVidOtherSplitter->restoreState(Configuration().value("FLOATING_PREVIEW_STATE").toByteArray());
@@ -54,7 +54,7 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   CHECK_NULLPTR_RETURN_VOID(mTypeToDisplayTB)
   mTypeToDisplayTB->setOrientation(Qt::Orientation::Vertical);
   mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
+  QAction* MEDIA_TYPE_2_ACTS[(int) PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
   for (int mediaTypeInd : mMediaSequence) {
     mTypeToDisplayTB->addAction(MEDIA_TYPE_2_ACTS[mediaTypeInd]);
   }
@@ -74,7 +74,7 @@ ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {
   SaveState();
 }
 
-void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file system view
+void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
     _IMG_ACT->setText(QString::number(imgCnt));
@@ -89,7 +89,10 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file syste
   }
 }
 
-void ImgVidOthInFolderPreviewer::operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+void ImgVidOthInFolderPreviewer::operator()(const QString& name,
+                                            const QString& jsonAbsFilePath,
+                                            const QStringList& imgPthLst,
+                                            const QStringList& vidsLst) { // scene view
   if (NeedUpdateImgs()) {
     UpdateImgs(name, imgPthLst);
   }
@@ -97,7 +100,11 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& name, const QString& 
     UpdateVids(vidsLst);
   }
   if (NeedUpdateOthers()) {
-    UpdateOthers({jsonAbsFilePath});
+    QStringList othersList;
+    if (!jsonAbsFilePath.isEmpty()) {
+      othersList << jsonAbsFilePath;
+    }
+    UpdateOthers(othersList);
   }
 }
 
@@ -118,7 +125,7 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   mVidsModel->UpdateData(vidsLst);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {  // no usage now
+void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
   if (!NeedUpdateOthers()) {
     return;
   }

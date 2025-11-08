@@ -11,7 +11,6 @@
 #include "TableFields.h"
 #include "QuickWhereClauseHelper.h"
 
-#include <QDesktopServices>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMessageBox>

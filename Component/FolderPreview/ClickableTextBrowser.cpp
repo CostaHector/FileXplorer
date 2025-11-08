@@ -8,13 +8,13 @@
 #include "JsonRenameRegex.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "PublicTool.h"
 #include "TableFields.h"
 #include "StringTool.h"
 #include "StyleSheet.h"
 
 #include <QKeySequence>
 #include <QInputDialog>
-#include <QDesktopServices>
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QSqlField>
@@ -62,7 +62,9 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   connect(inst.SEARCH_MULTIPLE_TEXTS, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
   connect(inst.CLEAR_ALL_SELECTIONS, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(inst.EDITOR_MODE, &QAction::triggered, this, [this](bool bEditable) { setReadOnly(!bEditable); });
-  connect(inst.COPY_SELECTED_TEXT, &QAction::triggered, this, &ClickableTextBrowser::CopySelectedTextToClipboard);
+  connect(inst.COPY_SELECTED_TEXT, &QAction::triggered, this, [this](){
+    FileTool::CopyTextToSystemClipboard(GetCurrentSelectedText());
+  });
   connect(inst.ADD_SELECTIONS_2_CAST_TABLE, &QAction::triggered, this, &ClickableTextBrowser::onAppendMultiSelectionToCastDbReq);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
@@ -103,7 +105,7 @@ void ClickableTextBrowser::wheelEvent(QWheelEvent* event) {
 
 bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
   if (url.isLocalFile()) {
-    return QDesktopServices::openUrl(url);
+    return FileTool::OpenLocalFile(url.toLocalFile());
   }
   bool hideOrShowRelated{false};
   if (url.toString() == "hideRelatedVideos") {
@@ -395,14 +397,4 @@ QString& ClickableTextBrowser::UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const
   htmlSrc.replace(widthFixedRepRegex, QString(R"(<img\1width="%1"\3>)").arg(newSize.width()));
   htmlSrc.replace(heightFixedRepRegex, QString(R"(<img\1height="%1"\3>)").arg(newSize.height()));
   return htmlSrc;
-}
-
-void ClickableTextBrowser::CopySelectedTextToClipboard() const {
-  QClipboard* pClipboard = QApplication::clipboard();
-  if (pClipboard == nullptr) {
-    LOG_ERR_NP("Copy failed", "pClipboard is nullptr");
-    return;
-  }
-  pClipboard->clear();
-  pClipboard->setText(GetCurrentSelectedText());
 }

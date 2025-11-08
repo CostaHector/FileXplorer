@@ -6,7 +6,6 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
-#include <QDesktopServices>
 #include <QUrl>
 #include <QFile>
 #include <tuple>

@@ -1,6 +1,8 @@
 #include "DbManager.h"
 #include "MountHelper.h"
+#include "PublicTool.h"
 #include "Logger.h"
+
 #include <QSet>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -9,8 +11,6 @@
 #include <QDirIterator>
 #include <QVariant>
 #include <QRegularExpression>
-#include <QDesktopServices>
-#include <QUrl>
 
 SafeTransaction::SafeTransaction(QSqlDatabase db) : m_db(db) {
   if (!DbManager::CheckValidAndOpen(m_db)) {
@@ -371,7 +371,7 @@ bool DbManager::onShowInFileSystemView() const {
 #ifdef RUNNING_UNIT_TESTS
   return true;
 #endif
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(mDbName));
+  return FileTool::OpenLocalFileUsingDesktopService(mDbName);
 }
 
 QString DbManager::GetDeleteInPlaceholders(int n) {

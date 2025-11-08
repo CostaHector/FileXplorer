@@ -2,9 +2,9 @@
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
+#include "PublicTool.h"
 #include "PublicVariable.h"
-#include <QDesktopServices>
-#include <QUrl>
+
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -108,13 +108,10 @@ bool Logger::OpenLogFile() {
     LOG_W("log file[%s] not exist", qPrintable(logAbsPath));
     return false;
   }
-#ifndef RUNNING_UNIT_TESTS
-  if (!QDesktopServices::openUrl(QUrl::fromLocalFile(logAbsPath))) {
-    LOG_W("Open log file[%s] failed", qPrintable(logAbsPath));
-    return false;
-  }
-#endif
+#ifdef RUNNING_UNIT_TESTS
   return true;
+#endif
+  return FileTool::OpenLocalFileUsingDesktopService(logAbsPath);
 }
 
 bool Logger::OpenLogFolder() {
@@ -124,13 +121,10 @@ bool Logger::OpenLogFolder() {
     LOG_W("log file located in folder[%s] not exist", qPrintable(logsFolderPath));
     return false;
   }
-#ifndef RUNNING_UNIT_TESTS
-  if (!QDesktopServices::openUrl(QUrl::fromLocalFile(logsFolderPath))) {
-    LOG_W("Open log folder[%s] failed", qPrintable(logsFolderPath));
-    return false;
-  }
-#endif
+#ifdef RUNNING_UNIT_TESTS
   return true;
+#endif
+  return FileTool::OpenLocalFileUsingDesktopService(logsFolderPath);
 }
 
 void Logger::SetPrintLevel(LOG_LVL_E newLevel) {

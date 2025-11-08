@@ -1,13 +1,12 @@
 #include "PlayVideo.h"
 #include "PublicVariable.h"
+#include "PublicTool.h"
 #include "Logger.h"
-#include <QDesktopServices>
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
-#include <QString>
-#include <QUrl>
 
 bool PlayADir(const QString& dirPath) {
 #ifdef RUNNING_UNIT_TESTS
@@ -38,5 +37,5 @@ bool on_ShiftEnterPlayVideo(const QString& path) {
 #ifdef RUNNING_UNIT_TESTS
   return true;
 #endif
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+  return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
 }
