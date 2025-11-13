@@ -21,6 +21,7 @@ public:
 
   QString InitialValueToString() const;
   QString valueToString(const QVariant& v_) const;
+  bool isPath() const {return checker.isPath();}
 
   QString name;
   QVariant v;

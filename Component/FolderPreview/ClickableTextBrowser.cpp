@@ -221,7 +221,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
 #ifdef RUNNING_UNIT_TESTS
   insertOrUpdateCnt = perfsText.split('\n', Qt::SplitBehaviorFlags::SkipEmptyParts).size();
 #else
-  CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION"};
+  CastBaseDb castDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION_ADD_ONLY"};
   const auto db = castDb.GetDb();
   if (!db.tables().contains(DB_TABLE::PERFORMERS)) {
     LOG_ERR_NP("[Abort] Cast Table not exist", DB_TABLE::PERFORMERS);

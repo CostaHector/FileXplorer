@@ -10,6 +10,7 @@
 #include "StringTool.h"
 #include "TableFields.h"
 #include "QuickWhereClauseHelper.h"
+#include "PathTool.h"
 
 #include <QInputDialog>
 #include <QItemSelectionModel>
@@ -332,6 +333,7 @@ int CastDBView::onMigrateCastTo() {
   destPath = CastDbViewMocker::MockMigrateToPath();
 #else
   destPath = QFileDialog::getExistingDirectory(this, cfmTitleText, mImageHost);
+  destPath = PathTool::normPath(destPath);
 #endif
   if (destPath.isEmpty()) {
     LOG_OK_NP("[Skip] User cancel migrate", "return");
