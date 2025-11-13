@@ -24,7 +24,10 @@ QVariantHash PerformerJsonJoiner(const QString& name,
                                  const QString& ori = DEFAULT_ORIENTATION,
                                  const QString& vids = "",
                                  const QString& imgs = "",
-                                 const QString& detail = "");
+                                 const QString& detail = "",
+                                 const int heightInt = -1,
+                                 const int sizeInt = -1,
+                                 const QString& birthStr = "");
 QByteArray CastValues2PsonStr(const QString& name,
                               const int rate = DEFAULT_RATE,
                               const QString& aka = "",
@@ -32,7 +35,10 @@ QByteArray CastValues2PsonStr(const QString& name,
                               const QString& ori = DEFAULT_ORIENTATION,
                               const QString& vids = "",
                               const QString& imgs = "",
-                              const QString& detail = "");
+                              const QString& detail = "",
+                              const int heightInt = -1,
+                              const int sizeInt = -1,
+                              const QString& birthStr = "");
 }
 
 #endif  // CASTPSONFILEHELPER_H

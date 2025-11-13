@@ -27,6 +27,9 @@ const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
 `%8` TEXT DEFAULT "",
 `%9` TEXT DEFAULT "",
 `%10` TEXT DEFAULT "",
+`%11` INT DEFAULT -1,
+`%12` INT DEFAULT -1,
+`%13` TEXT DEFAULT "",
  PRIMARY KEY (%1)
 );)")
            .arg(ENUM_2_STR(Name))
@@ -38,13 +41,16 @@ const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
            .arg(CastPsonFileHelper::DEFAULT_ORIENTATION)
            .arg(ENUM_2_STR(Vids))
            .arg(ENUM_2_STR(Imgs))
-           .arg(ENUM_2_STR(Detail))};
+           .arg(ENUM_2_STR(Detail))
+           .arg(ENUM_2_STR(Height))
+           .arg(ENUM_2_STR(Size))
+           .arg(ENUM_2_STR(Birth))};
 
 const QString INSERT_FULL_FIELDS_TEMPLATE  //
     {"REPLACE INTO `%1` "                  //
      + QString(R"(
-(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`)
-VALUES(:1, :2, :3, :4, :5, :6, :7, :8);)")
+(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`, `%11`)
+VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11);)")
            .arg(ENUM_2_STR(Name))
            .arg(ENUM_2_STR(Rate))
            .arg(ENUM_2_STR(AKA))
@@ -52,7 +58,10 @@ VALUES(:1, :2, :3, :4, :5, :6, :7, :8);)")
            .arg(ENUM_2_STR(Ori))
            .arg(ENUM_2_STR(Vids))
            .arg(ENUM_2_STR(Imgs))
-           .arg(ENUM_2_STR(Detail))};
+           .arg(ENUM_2_STR(Detail))
+           .arg(ENUM_2_STR(Height))
+           .arg(ENUM_2_STR(Size))
+           .arg(ENUM_2_STR(Birth))};
 
 enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name = 0,
@@ -63,6 +72,9 @@ enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Height,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Size,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Birth,
 };
 
 /* When Name is the only primary key and no other fields.
@@ -188,6 +200,9 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[ENUM_2_STR(Vids)].toString());
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[ENUM_2_STR(Imgs)].toString());
     qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[ENUM_2_STR(Detail)].toString());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Height, pson[ENUM_2_STR(Height)].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Size, pson[ENUM_2_STR(Size)].toInt());
+    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Birth, pson[ENUM_2_STR(Birth)].toString());
 
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
