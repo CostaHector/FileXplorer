@@ -12,6 +12,7 @@ public:
   static bool isDbValidAndOpened(const QSqlDatabase& db);
 
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
   bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
     if (orientation == Qt::Vertical && role == Qt::TextAlignmentRole) {
@@ -39,14 +40,14 @@ public:
   int DumpRecordsIntoPsonFile(const QModelIndexList& selectedRows);
   int DeleteSelectionRange(const QItemSelection& selectionRangeList);
   int RefreshVidsForRecords(const QModelIndexList& indices, QSqlDatabase videoDb);
-  int MigrateCastsTo(const QModelIndexList& selectedRows, const QString& destinationPath);
 
   bool submitSaveAllChanges();
   bool repopulate();
   bool onRevert();
 
   static constexpr int MAX_RATE{10};
-private:  
+private:
+  bool MigrateCastsOriFolder(const QModelIndex& ind, const QString& newOri) const;
   const QString m_imageHostPath;
 };
 

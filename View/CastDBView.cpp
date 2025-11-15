@@ -70,7 +70,6 @@ void CastDBView::subscribe() {
   connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onRefreshAllVidsField);
 
   connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::onShowInFileSystemView);
-  connect(castInst.MIGRATE_CAST_TO, &QAction::triggered, this, &CastDBView::onMigrateCastTo);
 
   connect(castInst.APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
   connect(castInst.APPEND_FROM_PSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPsonDirectory);
@@ -162,7 +161,9 @@ bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDe
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
   LOG_OE_P(rmvedTableCnt >= 0, "Drop/Delete", "Table[%s] %s count:%d", qPrintable(DB_TABLE::PERFORMERS), DbManagerHelper::c_str(dropOrDelete),
            rmvedTableCnt);
-  onModelRepopulate();
+  if (dropOrDelete == DbManagerHelper::DropOrDeleteE::DELETE) {
+    onModelRepopulate();
+  }
   return rmvedTableCnt >= 0;
 }
 
@@ -319,29 +320,6 @@ void CastDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const 
   }
   const auto& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
-}
-
-int CastDBView::onMigrateCastTo() {
-  const QModelIndexList& selectedRowIndexes = selectionModel()->selectedRows();
-  if (selectedRowIndexes.isEmpty()) {
-    LOG_INFO_NP("Nothing was selected.", "Select at least one row before migrate");
-    return 0;
-  }
-  const QString cfmTitleText{"Migrate to (folder under[" + mImageHost + "])"};
-  QString destPath;
-#ifdef RUNNING_UNIT_TESTS
-  destPath = CastDbViewMocker::MockMigrateToPath();
-#else
-  destPath = QFileDialog::getExistingDirectory(this, cfmTitleText, mImageHost);
-  destPath = PathTool::normPath(destPath);
-#endif
-  if (destPath.isEmpty()) {
-    LOG_OK_NP("[Skip] User cancel migrate", "return");
-    return 0;
-  }
-  int migrateCastCnt = _castModel->MigrateCastsTo(selectedRowIndexes, destPath);
-  LOG_OE_P(migrateCastCnt >= 0, "Migrate cast", "%d casts from to %s", selectedRowIndexes.size(), qPrintable(destPath));
-  return migrateCastCnt;
 }
 
 void CastDBView::RefreshCurrentRowHtmlContents() {

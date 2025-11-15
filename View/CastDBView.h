@@ -79,7 +79,6 @@ class CastDBView : public CustomTableView {
   int onRefreshVidsFieldCore(const QModelIndexList& selectedRowsIndexes);
 
   void EmitCurrentCastRecordChanged(const QModelIndex& current, const QModelIndex& /*previous*/);
-  int onMigrateCastTo();
 
   static void setQueryConfirmIfRowSelectedCountAbove(int newValue);
  private:

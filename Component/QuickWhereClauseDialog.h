@@ -11,27 +11,52 @@
 #include <QFormLayout>
 #include <QStringListModel>
 
+class NoEnterLineEdit : public QLineEdit {
+public:
+  using QLineEdit::QLineEdit;
+  void keyPressEvent(QKeyEvent* event) override;
+};
+
 class QuickWhereClauseDialog : public QDialog {
 public:
   explicit QuickWhereClauseDialog(QWidget* parent = nullptr);
   ~QuickWhereClauseDialog();
+  void Init();
+
   int WriteUniqueHistoryToQSetting();
-
-  QSize sizeHint() const override { return QSize{800, 200}; }
-  virtual void accept() override;
-
-  void onConditionsChanged();
-
   QString GetWhereString() const { return m_whereLineEdit->text(); }
-  void subscribe();
+
+protected:
+  virtual void CreatePrivateWidget() {}
+  virtual void InitPrivateLayout() {}
+  virtual void PrivateSubscribe() {}
+  virtual void onConditionsChanged() {}
+
+  QFormLayout* m_Layout{nullptr};
+  QComboBox* m_strFilterPatternCB{nullptr};
+  QAction* AUTO_COMPLETE_AKA_SWITCH{nullptr};
+  QLineEdit* m_whereLineEdit{nullptr};
+
+#ifdef RUNNING_UNIT_TESTS
+  inline void ClearLineEditsListText() {
+    for (auto* pLE : mLineEditsList) {
+      if (pLE != nullptr) {
+        pLE->clear();
+      }
+    }
+  }
+  QList<QLineEdit*> mLineEditsList;
+  QStringList newWhereHistsList;
+#endif
+
 private:
+  void subscribe();
+
   void SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen);
   bool onRemoveAHistory();
   int onClearHistory();
   bool onAddAHistory();
   int onEditHistory();
-
-  QAction* AUTO_COMPLETE_AKA_SWITCH{nullptr};
 
   QAction* _RMV_WHERE_CLAUSE_FROM_HISTORY{nullptr};
   QAction* _CLEAR_WHERE_CLAUSE_FROM_HISTORY{nullptr};
@@ -43,35 +68,12 @@ private:
   QToolButton* mWhereClauseHistoryIncTb{nullptr};
   QMenu* mWhereClauseHistoryIncMenu{nullptr};
 
-  /* DB_TABLE::MOVIES exclusive */
-  QLineEdit* m_Name{nullptr}; // shared
-  QLineEdit* m_Size{nullptr};
-  QLineEdit* m_Duration{nullptr};
-  QLineEdit* m_Studio{nullptr};
-  QLineEdit* m_Cast{nullptr};
-  QLineEdit* m_Tags{nullptr}; // shared
-  /* DB_TABLE::PERFORMERS exclusive */
-  QLineEdit* m_Rate{nullptr};
-  QLineEdit* m_Ori{nullptr};
-
-#ifdef RUNNING_UNIT_TESTS
-  inline void ClearLineEditsListText() {
-    for (auto* pLE: mLineEditsList) {
-      if (pLE != nullptr) { pLE->clear(); }
-    }
-  }
-  QList<QLineEdit*> mLineEditsList;
-  QStringList newWhereHistsList;
-#endif
-  QComboBox* m_strFilterPatternCB{nullptr};
   QComboBox* m_whereHistComboBox{nullptr};
-  QLineEdit* m_whereLineEdit{nullptr};
   QDialogButtonBox* mDialogButtonBox{nullptr};
 
   QStringListModel* mStrListModel{nullptr};
 
-  QFormLayout* m_Layout{nullptr};
   static constexpr char WHERE_HIST_SPLIT_CHAR{'\n'};
 };
 
-#endif  // QUICKWHERECLAUSEDIALOG_H
+#endif // QUICKWHERECLAUSEDIALOG_H

@@ -19,8 +19,6 @@ class CastBaseDb : public DbManager {
   static bool UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath);
   static QString GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
   static QString GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
-  static bool IsNewOriFolderPathValid(const QString& destPath, const QString& imageHost, QString& newOri);
-  static int MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageHostDir, const QString& newOriFolder);
   static auto FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs;
   static int WhenCastNameRenamed(const QString& imgsHostOriPath, const QString& oldName, const QString& newName);
 };

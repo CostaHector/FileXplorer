@@ -5,6 +5,7 @@
 #include "PublicVariable.h"
 #include "Logger.h"
 #include "TableFields.h"
+#include "CastPsonFileHelper.h"
 #include <QPainter>
 #include <QFile>
 #include <QDirIterator>
@@ -25,13 +26,13 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOv
 
   using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
-  if (itRate != data.cend()) {  // Rate already exist
+  if (itRate != data.cend()) { // Rate already exist
     if (!bOverrideForce) {
-      return true;  // no need override Rate
+      return true; // no need override Rate
     }
 
     int beforeValue = itRate.value().toInt();
-    if (afterValue == beforeValue) {  // same, skip
+    if (afterValue == beforeValue) { // same, skip
       return true;
     }
     itRate->setValue(afterValue);
@@ -143,18 +144,33 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
     LOG_D("rate[%d] out bound", r);
     return {};
   }
-  static constexpr int WIDTH = 100, HEIGHT = (int)(WIDTH * 0.618);
+  static constexpr int WIDTH = 100, HEIGHT = (int) (WIDTH * 0.618);
   QPixmap mp{WIDTH, HEIGHT};
   int orangeWidth = WIDTH * r / sliceCount;
+
   static constexpr QColor OPAGUE{0, 0, 0, 0};
-  static constexpr QColor STD_ORANGE{255, 165, 0, 255};
-  mp.fill(OPAGUE);  // opague
+  mp.fill(OPAGUE);
+
   QPainter painter{&mp};
-  painter.setPen(STD_ORANGE);  // standard orange
-  painter.setBrush(STD_ORANGE);
-  painter.drawRect(0, 0, orangeWidth, HEIGHT);
+  {
+    static constexpr QColor STD_ORANGE{255, 165, 0, 255};
+    painter.setPen(STD_ORANGE);
+    painter.setBrush(STD_ORANGE);
+    painter.drawRect(0, 0, orangeWidth, HEIGHT);
+  }
+
+  {
+    static constexpr QColor STD_GRAY{0xAF, 0xAF, 0xAF, 168};
+    painter.setPen(STD_GRAY);
+    painter.drawLine(QLine{20, 0, 20, HEIGHT});
+    painter.drawLine(QLine{40, 0, 40, HEIGHT});
+    painter.drawLine(QLine{60, 0, 60, HEIGHT});
+    painter.drawLine(QLine{80, 0, 80, HEIGHT});
+  }
+
   if (hasBorder) {
-    painter.setPen(QColor{0, 0, 0, 255});  // standard black
+    static constexpr QColor STD_BLACK{0, 0, 0, 255};
+    painter.setPen(STD_BLACK);
     painter.setBrush(OPAGUE);
     painter.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
   }
@@ -165,19 +181,19 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
 const QPixmap& RateHelper::GetRatePixmap(int rate) {
   static_assert(MIN_V == 0, "Minumum rate value should be 0");
   static_assert(MAX_V == 10, "Maximum rate value should be 10");
-  static const QPixmap SCORE_BOARD[BUTT_V]  //
+  static const QPixmap SCORE_BOARD[BUTT_V] //
       {
-          GenerateRatePixmap(0, MAX_V),   //
-          GenerateRatePixmap(1, MAX_V),   //
-          GenerateRatePixmap(2, MAX_V),   //
-          GenerateRatePixmap(3, MAX_V),   //
-          GenerateRatePixmap(4, MAX_V),   //
-          GenerateRatePixmap(5, MAX_V),   //
-          GenerateRatePixmap(6, MAX_V),   //
-          GenerateRatePixmap(7, MAX_V),   //
-          GenerateRatePixmap(8, MAX_V),   //
-          GenerateRatePixmap(9, MAX_V),   //
-          GenerateRatePixmap(10, MAX_V),  //
+          GenerateRatePixmap(0, MAX_V),  //
+          GenerateRatePixmap(1, MAX_V),  //
+          GenerateRatePixmap(2, MAX_V),  //
+          GenerateRatePixmap(3, MAX_V),  //
+          GenerateRatePixmap(4, MAX_V),  //
+          GenerateRatePixmap(5, MAX_V),  //
+          GenerateRatePixmap(6, MAX_V),  //
+          GenerateRatePixmap(7, MAX_V),  //
+          GenerateRatePixmap(8, MAX_V),  //
+          GenerateRatePixmap(9, MAX_V),  //
+          GenerateRatePixmap(10, MAX_V), //
       };
   return SCORE_BOARD[clampRate(rate)];
 }

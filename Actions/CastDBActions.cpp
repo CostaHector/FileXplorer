@@ -78,20 +78,12 @@ CastDBActions::CastDBActions(QObject* parent)  //
   _SYNC_VIDS_OP->addAction(SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   _SYNC_VIDS_OP->addAction(SYNC_ALL_RECORDS_VIDS_FROM_DB);
 
-  MIGRATE_CAST_TO = new (std::nothrow) QAction{QIcon(":img/MIGRATE_CAST_TO"), "Migrate to", this};
-  CHECK_NULLPTR_RETURN_VOID(MIGRATE_CAST_TO);
-  MIGRATE_CAST_TO->setToolTip(QString("<b>%1 (%2)</b><br/> Migrate selected cast path to user specified one")
-                                  .arg(MIGRATE_CAST_TO->text(), MIGRATE_CAST_TO->shortcut().toString()));
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "Open Database", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
   OPEN_DB_WITH_LOCAL_APP->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open *.db file in local app(DB Browser sqlite). Precondition: It has been set as default app")
           .arg(OPEN_DB_WITH_LOCAL_APP->text(), OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
-  FILE_SYSTEM_OP = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(FILE_SYSTEM_OP);
-  FILE_SYSTEM_OP->addAction(MIGRATE_CAST_TO);
-  FILE_SYSTEM_OP->addAction(OPEN_DB_WITH_LOCAL_APP);
 
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, "Dump records", this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
@@ -126,8 +118,6 @@ QMenu* CastDBActions::GetRightClickMenu(QWidget* parent) const {
   castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
   castTableMenu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  castTableMenu->addSeparator();
-  castTableMenu->addAction(MIGRATE_CAST_TO);
   castTableMenu->setToolTipsVisible(true);
   return castTableMenu;
 }
