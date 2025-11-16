@@ -27,11 +27,12 @@ void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
-    : CustomTableView{"PERFORMERS_TABLE", parent},  //
-      _castDbSearchBar{castDbSearchBar_},
-      _castModel{castDbModel_},
-      _castDb{castDb_},
-      mImageHost{castDbModel_->rootPath()} {
+  : CustomTableView{"PERFORMERS_TABLE", parent}
+  , //
+  _castDbSearchBar{castDbSearchBar_}
+  , _castModel{castDbModel_}
+  , _castDb{castDb_}
+  , mImageHost{castDbModel_->rootPath()} {
   if (!QFileInfo{mImageHost}.isDir()) {
     QString titleMsg{QString{"ImageHostPath[%1] not exist"}.arg(mImageHost)};
     LOG_CRIT_NP(titleMsg, mImageHost);
@@ -144,14 +145,15 @@ int CastDBView::onDeleteRecords() {
 bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete) {
   QMessageBox::StandardButton stdCfmDeleteBtn = QMessageBox::StandardButton::No;
   const QString cfmTitleText{QString::asprintf("Confirm %s?", DbManagerHelper::c_str(dropOrDelete))};
-  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable",  //
-                                           DbManagerHelper::c_str(dropOrDelete), qPrintable(DB_TABLE::PERFORMERS))};
+  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable", //
+                                           DbManagerHelper::c_str(dropOrDelete),
+                                           qPrintable(DB_TABLE::PERFORMERS))};
 #ifdef RUNNING_UNIT_TESTS
   stdCfmDeleteBtn = CastDbViewMocker::MockDropDeleteTable() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                          //
-                                         cfmTitleText,                                                                  //
-                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
+  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                         //
+                                         cfmTitleText,                                                                 //
+                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable", //
                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
 #endif
   if (stdCfmDeleteBtn != QMessageBox::StandardButton::Yes) {
@@ -159,7 +161,11 @@ bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDe
     return true;
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
-  LOG_OE_P(rmvedTableCnt >= 0, "Drop/Delete", "Table[%s] %s count:%d", qPrintable(DB_TABLE::PERFORMERS), DbManagerHelper::c_str(dropOrDelete),
+  LOG_OE_P(rmvedTableCnt >= 0,
+           "Drop/Delete",
+           "Table[%s] %s count:%d",
+           qPrintable(DB_TABLE::PERFORMERS),
+           DbManagerHelper::c_str(dropOrDelete),
            rmvedTableCnt);
   if (dropOrDelete == DbManagerHelper::DropOrDeleteE::DELETE) {
     onModelRepopulate();
@@ -181,17 +187,17 @@ int CastDBView::onLoadFromFileSystemStructure() {
 }
 
 bool CastDBView::onModelRepopulate() {
-  const QModelIndex oldIndex = currentIndex();
+  mIndexRecover.stash(currentIndex());
   bool bRepopulateRet = _castModel->repopulate();
-  if (oldIndex.isValid() && currentIndex() != oldIndex) {
-    setCurrentIndex(oldIndex);
-  }
+  mIndexRecover.stashPop(*this, currentIndex());
   LOG_OE_P(bRepopulateRet, "Repopulate", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
   return bRepopulateRet;
 }
 
 bool CastDBView::onModelSubmitAll() {
+  mIndexRecover.stash(currentIndex());
   bool submitRet = _castModel->submitSaveAllChanges();
+  mIndexRecover.stashPop(*this, currentIndex());
   LOG_OE_P(submitRet, "Model submit", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
   return submitRet;
 }
@@ -329,4 +335,27 @@ void CastDBView::RefreshCurrentRowHtmlContents() {
   }
   const auto& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
+}
+
+void IndexRecoverHelper::stashPop(QAbstractItemView& itemView, const QModelIndex& currentIndex) {
+  if (!mNeedRecover) {
+    return;
+  }
+  if (currentIndex == mOldIndex) {
+    return;
+  }
+  if (mOldIndex.isValid()) { // old still valid
+    itemView.setCurrentIndex(mOldIndex);
+    return;
+  }
+  const int beforeRow = mOldIndex.row();
+  if (const QAbstractItemModel* pModel = mOldIndex.model()) { // may get deleted
+    const int rowCnt = pModel->rowCount();
+    if (rowCnt == 0) {
+      return;
+    }
+    if (beforeRow >= rowCnt) {
+      itemView.setCurrentIndex(mOldIndex.siblingAtRow(rowCnt - 1));
+    }
+  }
 }

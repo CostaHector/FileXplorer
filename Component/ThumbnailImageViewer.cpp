@@ -12,6 +12,7 @@
 #include <QPixmap>
 #include <QWheelEvent>
 #include <QPainter>
+#include <QShortcut>
 
 bool ThumbnailImageViewer::IsFileAbsPathImage(const QString& fileAbsPath) {
   const QString dotExt = PathTool::GetDotFileExtension(fileAbsPath);
@@ -44,13 +45,13 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
 
   m_prevButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_LAST"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
-  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
+  m_prevButton->setShortcut(QKeySequence(Qt::Key_Left));
   m_prevButton->setToolTip(
       QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
 
   m_nextButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_NEXT"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
-  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
+  m_nextButton->setShortcut(QKeySequence(Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
 
   mLabel = new (std::nothrow) QLabel{this};
@@ -75,6 +76,9 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
     connect(m_nextButton, &QPushButton::clicked, this, &ThumbnailImageViewer::NavigateImageNext);
     connect(mNavigateIntoSub, &QCheckBox::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
     connect(mLabel, &QLabel::customContextMenuRequested, this, &ThumbnailImageViewer::onCustomContextMenuRequested);
+
+    QShortcut *escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    connect(escShortcut, &QShortcut::activated, this, &ThumbnailImageViewer::close);
   }
 }
 

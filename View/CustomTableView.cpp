@@ -113,6 +113,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
 
   SubscribeHeaderActions();
+  // setAutoScroll(false);
 }
 
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {

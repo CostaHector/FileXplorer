@@ -42,6 +42,16 @@ inline QString& MockMigrateToPath() {
 }  // namespace CastDbViewMocker
 #endif
 
+struct IndexRecoverHelper {
+public:
+  void stash(const QModelIndex& oldIndex) { mNeedRecover = oldIndex.isValid(); mOldIndex = oldIndex;}
+  void stashPop(QAbstractItemView& itemView, const QModelIndex& currentIndex);
+
+private:
+  QModelIndex mOldIndex;
+  bool mNeedRecover{false};
+};
+
 class FileFolderPreviewer;
 
 class CastDBView : public CustomTableView {
@@ -90,6 +100,8 @@ class CastDBView : public CustomTableView {
   const QString mImageHost;
   CastBaseDb& _castDb;
   static int QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE;
+
+  IndexRecoverHelper mIndexRecover;
 };
 
 #endif  // CASTDBVIEW_H
