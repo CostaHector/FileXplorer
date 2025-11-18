@@ -35,10 +35,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-  setViewMode(QListView::ViewMode::IconMode);
-  setTextElideMode(Qt::TextElideMode::ElideLeft);
-  setResizeMode(QListView::ResizeMode::Fixed);
-  setWrapping(true);
 
   mAlignDelegate = new (std::nothrow) SceneStyleDelegate{this};
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)

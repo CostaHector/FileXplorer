@@ -86,7 +86,8 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   }
   if (role == Qt::DecorationRole) {
     QPixmap pm;
-    if (mPixCache.find(mDataLst[rw], &pm)) {
+    const QString imgKey = StringTool::PathJoinPixmapSize(mDataLst[rw], mWidth, mHeight);
+    if (mPixCache.find(imgKey, &pm)) {
       return pm;
     }
     if (QFile{mDataLst[rw]}.size() > 10 * 1024 * 1024) { // 10MB
@@ -100,7 +101,7 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     } else {
       pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
     }
-    mPixCache.insert(mDataLst[rw], pm);
+    mPixCache.insert(imgKey, pm);
     return pm;
   }
   return {};

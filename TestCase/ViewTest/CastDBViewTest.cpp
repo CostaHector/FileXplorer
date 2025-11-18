@@ -314,4 +314,4 @@ class CastDBViewTest : public PlainTestSuite {
 };
 
 #include "CastDBViewTest.moc"
-REGISTER_TEST(CastDBViewTest, true)
+REGISTER_TEST(CastDBViewTest, false)

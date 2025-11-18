@@ -21,7 +21,6 @@
 #include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
 
-extern template struct EnumIntAction<QListView::Flow>;
 extern template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
 extern template struct EnumIntAction<Style::StyleE>;
@@ -85,11 +84,6 @@ class EnumIntActionTest : public PlainTestSuite {
 
  private slots:
   void enum_in_action_exclusive() {
-    EnumIntActionChecker<QListView::Flow>(QListView::Flow::LeftToRight,               //
-                                          QListView::Flow::TopToBottom,               //
-                                          QListView::Flow::LeftToRight,               //
-                                          QActionGroup::ExclusionPolicy::Exclusive);  //
-
     EnumIntActionChecker<ViewTypeTool::ViewType>(  //
         ViewTypeTool::ViewType::TABLE,             //
         ViewTypeTool::ViewType::SEARCH,            //

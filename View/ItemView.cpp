@@ -10,13 +10,7 @@
 
 ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
     : CustomListView{itemViewName, parent} {
-  setViewMode(QListView::ViewMode::ListMode);
-  setTextElideMode(Qt::TextElideMode::ElideMiddle);
-  setUniformItemSizes(false);
-
-  setResizeMode(QListView::ResizeMode::Adjust);
   setMovement(QListView::Movement::Free);
-  setWrapping(true);
 
   _PLAY_ITEM = new (std::nothrow) QAction{"Play", this};
   mItemMenu = new (std::nothrow) QMenu{"Item Menu", this};
