@@ -33,6 +33,7 @@ file(GLOB SOURCES
     Component/FolderPreview/*.cpp
     Component/RenameWidgets/*.cpp
     Component/Pwd/*.cpp
+    Component/HeaderView/*.cpp
     FileOperation/*.cpp
     Model/*.cpp
     public/*.cpp
@@ -61,6 +62,7 @@ set(SRV_HEADER_PATH
     Component/FolderPreview
     Component/RenameWidgets
     Component/Pwd
+    Component/HeaderView
     FileOperation
     lib
     Model
@@ -83,6 +85,7 @@ file(GLOB HEADERS
     Component/*.h
     Component/FolderPreview/*.h
     Component/RenameWidgets/*.h
+    Component/HeaderView/*.h
     FileOperation/*.h
     lib/*.h
     Model/*.h

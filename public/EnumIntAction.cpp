@@ -8,6 +8,7 @@
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
 #include "ScenePageNaviHelper.h"
+#include <QHeaderView>
 #include <QCryptographicHash>
 
 template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
@@ -22,3 +23,5 @@ template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 template struct EnumIntAction<Qt::TextElideMode>;
+template struct EnumIntAction<QHeaderView::ResizeMode>;
+template struct EnumIntAction<Qt::ScrollBarPolicy>;

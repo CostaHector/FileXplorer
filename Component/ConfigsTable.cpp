@@ -9,6 +9,8 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QFile>
+#include <QUrl>
 
 ConfigsTable::ConfigsTable(QWidget* parent)
   : QDialog{parent} {

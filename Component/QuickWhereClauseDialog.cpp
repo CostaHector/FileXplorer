@@ -8,19 +8,11 @@
 #include "StringTool.h"
 #include "TableFields.h"
 #include "CastPsonFileHelper.h"
+#include "NoEnterLineEdit.h"
 #include <QHash>
 #include <QPushButton>
 #include <QInputDialog>
 #include <QKeyEvent>
-
-void NoEnterLineEdit::keyPressEvent(QKeyEvent* event) {
-  if (event->key() == Qt::Key::Key_Enter || event->key() == Qt::Key::Key_Return) {
-    event->accept();
-    emit returnPressed();
-    return;
-  }
-  QLineEdit::keyPressEvent(event);
-}
 
 constexpr char QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR;
 

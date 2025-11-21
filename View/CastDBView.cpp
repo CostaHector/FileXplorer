@@ -79,6 +79,11 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::EmitCurrentCastRecordChanged);
+
+  connect(this, &CustomTableView::searchSqlStatementChanged, this, [this](const QString& s) {
+    _castDbSearchBar->SetWhereClause(s);
+    _castModel->SetFilterAndSelect(s);
+  });
 }
 
 void CastDBView::onInitATable() {

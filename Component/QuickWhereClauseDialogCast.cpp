@@ -5,6 +5,7 @@
 #include "PublicVariable.h"
 #include "QuickWhereClauseHelper.h"
 #include "CastAkasManager.h"
+#include "NoEnterLineEdit.h"
 
 void QuickWhereClauseDialogCast::CreatePrivateWidget() {
   m_Name = new (std::nothrow) NoEnterLineEdit{this}; // shared

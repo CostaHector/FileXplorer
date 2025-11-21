@@ -1,6 +1,7 @@
 ﻿#include "AdvanceSearchTableView.h"
 #include "FileOpActs.h"
 #include "ViewActions.h"
+#include <QKeyEvent>
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
     : CustomTableView{"ADVANCE_SEARCH_SYSTEM", parent} {

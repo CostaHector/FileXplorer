@@ -5,6 +5,7 @@
 #include "PublicTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
+#include <QFile>
 
 RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
   : CustomTableView{"RightVideoDuplicatesDetails", parent} {

@@ -10,6 +10,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
+#include <QDragEnterEvent>
 #include <QLineEdit>
 #include <QMimeData>
 #include <QUrl>

@@ -11,6 +11,8 @@
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 
+#include <QKeyEvent>
+
 using namespace DuplicateVideoDetectionCriteria;
 
 DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{parent} {

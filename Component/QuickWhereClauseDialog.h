@@ -11,12 +11,6 @@
 #include <QFormLayout>
 #include <QStringListModel>
 
-class NoEnterLineEdit : public QLineEdit {
-public:
-  using QLineEdit::QLineEdit;
-  void keyPressEvent(QKeyEvent* event) override;
-};
-
 class QuickWhereClauseDialog : public QDialog {
 public:
   explicit QuickWhereClauseDialog(QWidget* parent = nullptr);

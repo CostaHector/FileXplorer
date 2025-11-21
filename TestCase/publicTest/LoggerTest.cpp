@@ -42,7 +42,7 @@ private slots:
     QVERIFY(Logger::OpenLogFile());
     QVERIFY(Logger::OpenLogFolder());
 
-    // open log file failed, and open it's parent ok
+    // // open log file failed, and open it's parent ok
     QVERIFY(QFile::rename(logAbsFilePath, logAbsFilePath+"Renamed"));
     ON_SCOPE_EXIT {
       QVERIFY(QFile::rename(logAbsFilePath+"Renamed", logAbsFilePath));

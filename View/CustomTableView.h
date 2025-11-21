@@ -1,115 +1,56 @@
 #ifndef CUSTOMTABLEVIEW_H
 #define CUSTOMTABLEVIEW_H
 
-#include <QContextMenuEvent>
-#include <QMenu>
 #include <QTableView>
-
-#ifdef RUNNING_UNIT_TESTS
-namespace UserSpecifiedIntValueMock {
-inline bool& mockBoolOk() {
-  static bool bOk = false;
-  return bOk;
-}
-inline int& mockIntValue() {
-  static int intValue = 0;
-  return intValue;
-}
-inline void MockQInputDialogGetInt(bool bOk, int iValue) {
-  mockBoolOk() = bOk;
-  mockIntValue() = iValue;
-}
-inline QString& mockColumnsShowSwitch() {
-  static QString columnsShowSwitch01Chars = ""; // e.g. "010101" means even column hide. odd columns is show
-  return columnsShowSwitch01Chars;
-}
-}
-#endif
+#include "VerMenuInHeader.h"
+#include "DoubleRowHeader.h"
+#include "ScrollBarPolicyMenu.h"
 
 class CustomTableView : public QTableView {
- public:
+  Q_OBJECT
+public:
   explicit CustomTableView(const QString& name, QWidget* parent = nullptr);
+  ~CustomTableView();
 
   virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
   void BindMenu(QMenu* menu);
-  void AppendVerticalHeaderMenuAGS(QActionGroup* extraAgs);
-  void AppendHorizontalHeaderMenuAGS(QActionGroup* extraAgs);
-  inline int GetClickedHorIndex() const { return m_horizontalHeaderSectionClicked; }
 
   bool ShowOrHideColumnCore();
-  bool onColumnVisibilityAdjust();
-  bool onHideThisColumn();
-
-  void onStretchLastSection(const bool checked);
-
-  void onResizeRowToContents(const bool checked);
-  void onResizeColumnToContents(const bool checked);
-
-  void onHorizontalHeaderMenuRequest(const QPoint& pnt);
-  void onVerticalHeaderMenuRequest(const QPoint& pnt);
-
-  bool onSetRowMaxHeight();
-  bool onSetRowDefaultSectionSize();
-  bool onSetColumnDefaultSectionSize();
-
-  void onShowHorizontalHeader(bool showChecked);
-  void onShowVerticalHeader(bool showChecked);
-  void onEnableColumnSort(const bool enableChecked);
-
-  void onHorizontalHeaderChanged() const;
-  void onVerticalHeaderChanged() const;
 
   void InitTableView(const bool bHideShowCol = true);
   void SubscribeHeaderActions();
 
   void mousePressEvent(QMouseEvent* event) override;
 
- private:
-  QAction* COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, "column visibility", this);
-  QAction* HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, "hide this column", this);
-  QAction* STRETCH_DETAIL_SECTION = new (std::nothrow) QAction("stretch last column", this);
-  QAction* ENABLE_COLUMN_SORT = new (std::nothrow) QAction("enable column sort", this);
-  QAction* RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "resize cols to content", this);
-  QAction* SET_COLS_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(":img/DEFAULT_COLUMN_WIDTH"), "set default cols section size", this);
+signals:
+  void searchSqlStatementChanged(const QString& sqlStatement);
 
-  QAction* SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction("show horizontal header", this);
-  QAction* SHOW_VERTICAL_HEADER = new (std::nothrow) QAction("show vertical header", this);
-  QAction* RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), "resize rows to content", this);
-  QAction* SET_ROWS_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(":img/DEFAULT_ROW_HEIGHT"), "set default rows section size", this);
-  QAction* SET_MAX_ROWS_SECTION_SIZE = new (std::nothrow) QAction("set max row section size", this);
+protected:
+  void scrollContentsBy(int dx, int dy) override;
 
-  QString m_name;
-  QString m_columnVisibiltyKey;
-  QString m_stretchLastSectionKey;
-  const QString m_DEFAULT_SECTION_SIZE_KEY;
-  const QString m_DEFAULT_COLUMN_SECTION_SIZE_KEY;
-  QString m_horizontalHeaderStateKey;
-  QString m_showHorizontalHeaderKey;
-  QString m_showVerticalHeaderKey;
-  QString m_sortByColumnSwitchKey;
-  QString m_rowResizeToContentKey;
+private:
+  QMenu* m_menu{nullptr};
 
-  int m_defaultTableRowHeight;
-  int m_defaultTableColumnWidth;
+  const QString m_name;
+  const QString m_showHorizontalHeaderKey;
+  const QString m_showVerticalHeaderKey;
+  const QString m_autoScrollKey;
+  const QString m_alternatingRowColorsKey;
+  const QString m_showGridKey;
 
-  QStringList m_horHeaderTitles;
-  QString m_columnsShowSwitch;  // 111110000011111
-  static constexpr int SWITCHS_BATCH_COUNT = 5;
-  QMenu* m_menu = nullptr;
-  QMenu* m_verMenu = new QMenu{"vertical header menu", this};
-  QMenu* m_horMenu = new QMenu{"horizontal header menu", this};
+  QAction *_SHOW_HORIZONTAL_HEADER{nullptr}, *_SHOW_VERTICAL_HEADER{nullptr};
+  QAction *_RESIZE_ROW_TO_CONTENTS{nullptr}, *_RESIZE_COLUMN_TO_CONTENTS{nullptr};
+  QAction* _AUTO_SCROLL{nullptr};
+  QAction* _ALTERNATING_ROW_COLORS{nullptr};
+  QAction* _SHOW_GRID{nullptr};
+  ScrollBarPolicyMenu *m_horScrollBarPolicyMenu{nullptr}, *m_verScrollBarPolicyMenu{nullptr};
 
-  bool m_enableDefaultSectionSize {true};
+  DoubleRowHeader* m_horHeader{nullptr};
+  VerMenuInHeader* m_verHeader{nullptr};
 
   inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
   static QSet<QString> TABLES_SET;
-
-  static constexpr int INVALID_SECTION_INDEX{-1};
-  inline void invalidHoricontalHeaderSectionClicked() {
-    m_horizontalHeaderSectionClicked = INVALID_SECTION_INDEX;
-  }
-  int m_horizontalHeaderSectionClicked = INVALID_SECTION_INDEX;
 };
 
-#endif  // CUSTOMTABLEVIEW_H
+#endif // CUSTOMTABLEVIEW_H
