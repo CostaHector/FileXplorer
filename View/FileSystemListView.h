@@ -10,7 +10,6 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QListView>
-#include <QMenu>
 #include <QMouseEvent>
 
 class FileSystemListView : public CustomListView {
@@ -35,7 +34,6 @@ class FileSystemListView : public CustomListView {
 
  private:
   FileSystemModel* _fsModel {nullptr};
-  QMenu* m_fsMenu {nullptr};
   QPoint mDragStartPosition;
 };
 

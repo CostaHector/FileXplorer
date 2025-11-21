@@ -5,6 +5,7 @@
 #include "VerMenuInHeader.h"
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
+#include "AddableMenu.h"
 
 class CustomTableView : public QTableView {
   Q_OBJECT
@@ -28,10 +29,10 @@ signals:
 
 protected:
   void scrollContentsBy(int dx, int dy) override;
+  void AddItselfAction2Menu();
+  AddableMenu* m_menu{nullptr};
 
 private:
-  QMenu* m_menu{nullptr};
-
   const QString m_name;
   const QString m_showHorizontalHeaderKey;
   const QString m_showVerticalHeaderKey;

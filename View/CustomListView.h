@@ -3,7 +3,7 @@
 
 #include <QAction>
 #include <QListView>
-#include <QMenu>
+#include "AddableMenu.h"
 #include "EnumIntAction.h"
 
 extern template struct EnumIntAction<Qt::TextElideMode>;
@@ -17,6 +17,7 @@ public:
   void wheelEvent(QWheelEvent *event) override;
 
   void BindMenu(QMenu* menu);
+  void AddItselfAction2Menu();
 
   void InitListView();
   void mousePressEvent(QMouseEvent* event) override;
@@ -39,6 +40,7 @@ protected:
   QAction* _WRAPING_ACTIONS{nullptr};
   QAction* _UNIFORM_ITEM_SIZES{nullptr};
 
+  AddableMenu* m_menu {nullptr};
 private:
   void SubscribePublicActions();
 
@@ -48,8 +50,6 @@ private:
   void onResizeModeToggled(const bool bchecked);
   void onWrapingToggled(const bool bchecked);
   void onUniformItemSizedToggled(const bool bchecked);
-
-  QMenu* m_menu {nullptr};
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
   static QSet<QString> LISTS_SET;

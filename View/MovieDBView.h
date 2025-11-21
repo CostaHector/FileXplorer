@@ -2,8 +2,6 @@
 #define MOVIEDBVIEW_H
 
 #include "DatabaseSearchToolBar.h"
-#include "MovieDatabaseMenu.h"
-
 #include "FdBasedDb.h"
 #include "FdBasedDbModel.h"
 #include "CustomTableView.h"
@@ -94,7 +92,6 @@ private:
   bool IsHasSelection(const QString& msg = "") const;
 
   FdBasedDbModel* _dbModel{nullptr};
-  MovieDatabaseMenu* m_movieMenu{nullptr};
   MovieDBSearchToolBar* _movieDbSearchBar{nullptr};
 
   FdBasedDb& _fdBasedDb;

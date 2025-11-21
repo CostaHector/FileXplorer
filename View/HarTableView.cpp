@@ -28,12 +28,9 @@ HarTableView::HarTableView(QWidget* parent)
   mQUICK_PREVIEW->setCheckable(true);
   mQUICK_PREVIEW->setChecked(mShowImagePreview);
 
-  mMenu = new (std::nothrow) QMenu{"Har Operation Menu", this};
-  CHECK_NULLPTR_RETURN_VOID(mMenu)
-  mMenu->addAction(mEXPORT_TO);
-  mMenu->addAction(mQUICK_PREVIEW);
-  mMenu->setToolTipsVisible(true);
-  BindMenu(mMenu);
+  m_menu->addAction(mEXPORT_TO);
+  m_menu->addAction(mQUICK_PREVIEW);
+  AddItselfAction2Menu();
 
   subscribe();
   updateWindowsSize();

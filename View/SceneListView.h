@@ -5,7 +5,6 @@
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
 #include "SceneStyleDelegate.h"
-#include <QMenu>
 
 class ScenesListModel;
 

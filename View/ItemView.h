@@ -16,7 +16,6 @@ class ItemView : public CustomListView {
  private:
   FloatingModels* mModels{nullptr};
   QAction* _PLAY_ITEM{nullptr};
-  QMenu* mItemMenu{nullptr};
 };
 
 #endif // ITEMVIEW_H

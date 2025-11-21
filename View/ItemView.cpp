@@ -13,9 +13,8 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
   setMovement(QListView::Movement::Free);
 
   _PLAY_ITEM = new (std::nothrow) QAction{"Play", this};
-  mItemMenu = new (std::nothrow) QMenu{"Item Menu", this};
-  mItemMenu->addAction(_PLAY_ITEM);
-  BindMenu(mItemMenu);
+  m_menu->addAction(_PLAY_ITEM);
+  AddItselfAction2Menu();
 
   subscribe();
 }

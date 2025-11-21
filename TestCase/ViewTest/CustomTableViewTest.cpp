@@ -371,6 +371,22 @@ private slots:
       key2ExpectValue[horHeader.m_stretchLastSectionKey] = true;
       key2ExpectValue[verHeader.m_stretchLastSectionKey] = false;
 
+      UserSpecifiedIntValueMock::MockQInputDialogGetInt(false, 66);
+      emit horHeader._SET_DEFAULT_SECTION_SIZE->triggered(false);
+      QVERIFY(horHeader.defaultSectionSize() != 66);
+      UserSpecifiedIntValueMock::MockQInputDialogGetInt(true, 66);
+      emit horHeader._SET_DEFAULT_SECTION_SIZE->triggered(false);
+      key2ExpectValue[horHeader.m_defaultSectionSizeKey] = 66;
+      QCOMPARE(horHeader.defaultSectionSize(), 66);
+
+      UserSpecifiedIntValueMock::MockQInputDialogGetInt(false, 888);
+      emit horHeader._SET_MAX_SECTION_SIZE->triggered(false);
+      QVERIFY(horHeader.maximumSectionSize() != 888);
+      UserSpecifiedIntValueMock::MockQInputDialogGetInt(true, 888);
+      emit horHeader._SET_MAX_SECTION_SIZE->triggered(false);
+      QCOMPARE(horHeader.maximumSectionSize(), 888);
+      key2ExpectValue[horHeader.m_maxSectionSizeKey] = 888;
+
       QCOMPARE(horHeader.getTitles(), mTitles);
     }
 
@@ -421,6 +437,9 @@ private slots:
 
       QVERIFY(horHeader.stretchLastSection());
       QVERIFY(!verHeader.stretchLastSection());
+
+      QCOMPARE(horHeader.defaultSectionSize(), 66);
+      QCOMPARE(horHeader.maximumSectionSize(), 888);
 
       // search signal ok
       horHeader.m_filterEditors[0]->setText("Chris Evans"); // Name

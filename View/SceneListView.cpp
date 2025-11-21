@@ -40,16 +40,14 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  QMenu* m_menu = new (std::nothrow) QMenu{"Scene list view menu", this};
-  CHECK_NULLPTR_RETURN_VOID(m_menu)
-  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy basename", m_menu};
+  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy basename", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", m_menu};
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
 
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
-  BindMenu(m_menu);
+  AddItselfAction2Menu();
   subscribe();
 
   // setMouseTracking(true);

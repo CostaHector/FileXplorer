@@ -113,15 +113,6 @@ QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* parent) {
   return tb;
 }
 
-QMenu* CastDBActions::GetRightClickMenu(QWidget* parent) const {
-  auto* castTableMenu = new (std::nothrow) QMenu{"Cast book RightClickMenu", parent};
-  castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
-  castTableMenu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
-  castTableMenu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  castTableMenu->setToolTipsVisible(true);
-  return castTableMenu;
-}
-
 CastDBActions& g_castAct() {
   static CastDBActions CastManagerActIns;
   return CastManagerActIns;

@@ -16,11 +16,19 @@
 #include <QUrl>
 
 DuplicateVideosMetaInfoTable::DuplicateVideosMetaInfoTable(QWidget* parent)
-  : CustomTableView{"AiMediaDupTableView", parent}
-  , mDupVidMngr{} {
-  m_aiMediaDupMenu = g_dupVidFinderAg().GetMenu(this);
-  CHECK_NULLPTR_RETURN_VOID(m_aiMediaDupMenu);
-  BindMenu(m_aiMediaDupMenu);
+  : CustomTableView{"AiMediaDupTableView", parent} {
+
+  auto& agInst = g_dupVidFinderAg();
+  m_menu->addAction(agInst.ANALYSE_THESE_TABLES);
+  m_menu->addSeparator();
+  m_menu->addAction(agInst.SCAN_A_PATH);
+  m_menu->addAction(agInst.FORCE_RELOAD_TABLES);
+  m_menu->addAction(agInst.AUDIT_THESE_TABLES);
+  m_menu->addSeparator();
+  m_menu->addAction(agInst.DROP_THESE_TABLES);
+  m_menu->addSeparator();
+  m_menu->addAction(agInst.CLEAR_ANALYSIS_LIST);
+  AddItselfAction2Menu();
 
   m_aiMediaTblModel = new (std::nothrow) DuplicateVideosMetaInfoModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_aiMediaTblModel);

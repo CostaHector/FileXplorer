@@ -43,7 +43,11 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
   CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
   CHECK_NULLPTR_RETURN_VOID(_castModel);
 
-  BindMenu(g_castAct().GetRightClickMenu(this));
+  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
+  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
+  m_menu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
+  AddItselfAction2Menu();
+
   setModel(_castModel);
   InitTableView();
 

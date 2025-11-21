@@ -11,7 +11,6 @@ class DuplicateVideosFinderActions : public QObject {
   DuplicateVideosFinderActions(QObject* parent = nullptr);
 
   QToolBar* GetAiMediaToolBar(QLineEdit* tableNameFilterLE, QLineEdit* sizeDevLE, QLineEdit* durationDevLE, QWidget* parent);
-  QMenu* GetMenu(QWidget* parent);
 
   QAction* DIFFER_BY_DURATION{nullptr};
   QAction* DIFFER_BY_SIZE{nullptr};

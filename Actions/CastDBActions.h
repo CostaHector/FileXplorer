@@ -39,8 +39,6 @@ class CastDBActions : public QObject {
   QAction* DUMP_SELECTED_RECORDS_INTO_PSON_FILE{nullptr};
   QAction* DUMP_ALL_RECORDS_INTO_PSON_FILE{nullptr};
   QActionGroup* EXPORT_OP{nullptr};
-
-  QMenu* GetRightClickMenu(QWidget* parent) const;
 };
 
 CastDBActions& g_castAct();

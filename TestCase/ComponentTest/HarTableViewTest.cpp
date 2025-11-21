@@ -45,7 +45,6 @@ class HarTableViewTest : public PlainTestSuite {
     HarTableView harView;
     QVERIFY(harView.mHarModel != nullptr);
     QVERIFY(harView.mSortProxyModel != nullptr);
-    QVERIFY(harView.mMenu != nullptr);
     QVERIFY(harView.mEXPORT_TO != nullptr);
     QVERIFY(harView.mQUICK_PREVIEW != nullptr);
     QVERIFY(harView.mPreviewLabel == nullptr);

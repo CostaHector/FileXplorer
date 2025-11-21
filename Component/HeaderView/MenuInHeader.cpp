@@ -54,7 +54,7 @@ MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget 
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_FIXED);
     _RESIZE_MODE_FIXED->setCheckable(true);
 
-    _RESIZE_MODE_RESIZE_TO_CONTENTS = new (std::nothrow) QAction{"Resize To Contents", this};
+    _RESIZE_MODE_RESIZE_TO_CONTENTS = new (std::nothrow) QAction{"Resize to contents", this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_RESIZE_TO_CONTENTS);
     _RESIZE_MODE_RESIZE_TO_CONTENTS->setCheckable(true);
 
@@ -77,7 +77,7 @@ MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget 
     m_menu->addAction(_SET_DEFAULT_SECTION_SIZE);
     m_menu->addAction(_SET_MAX_SECTION_SIZE);
     m_menu->addAction(_STRETCH_DETAIL_SECTION);
-    QMenu *sectionResizeModeMenu = m_menu->addMenu("Section Resize Mode");
+    QMenu *sectionResizeModeMenu = m_menu->addMenu("Section resize mode");
     CHECK_NULLPTR_RETURN_VOID(sectionResizeModeMenu);
     sectionResizeModeMenu->addActions(mResizeModeIntAction.getActionEnumAscendingList());
 

@@ -9,14 +9,14 @@ QSet<QString> CustomTableView::TABLES_SET;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
 
 CustomTableView::CustomTableView(const QString& name, QWidget* parent)
-  : QTableView(parent)
-  , m_name{name}
-  , m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"}
-  , m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"}
-  , m_autoScrollKey{m_name + "_AUTO_SCROLL"}
-  , m_alternatingRowColorsKey{m_name + "_ALTERNATING_ROW_COLORS"}
-  , m_showGridKey{m_name + "_SHOW_GRID"} {
-  if (isNameExists(m_name)) { // not in sharing list, but name already find
+    : QTableView(parent),
+      m_name{name},
+      m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"},
+      m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
+      m_autoScrollKey{m_name + "_AUTO_SCROLL"},
+      m_alternatingRowColorsKey{m_name + "_ALTERNATING_ROW_COLORS"},
+      m_showGridKey{m_name + "_SHOW_GRID"} {
+  if (isNameExists(m_name)) {  // not in sharing list, but name already find
     LOG_D("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
   }
   TABLES_SET.insert(m_name);
@@ -35,12 +35,12 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
   // 1.
-  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction("Show Horizontal Header", this);
+  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, "Show Horizontal Header", this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_HORIZONTAL_HEADER);
   _SHOW_HORIZONTAL_HEADER->setCheckable(true);
   _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, true).toBool());
   _SHOW_HORIZONTAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the horizontal header")
-                                         .arg(_SHOW_HORIZONTAL_HEADER->text(), _SHOW_HORIZONTAL_HEADER->shortcut().toString()));
+                                          .arg(_SHOW_HORIZONTAL_HEADER->text(), _SHOW_HORIZONTAL_HEADER->shortcut().toString()));
   m_horHeader = new DoubleRowHeader{m_name + "_HorHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_horHeader);
   if (!_SHOW_HORIZONTAL_HEADER->isChecked()) {
@@ -50,12 +50,12 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   setSortingEnabled(m_horHeader->isSortingEnabled());
 
   // 2.
-  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction("Show Vertical Header", this);
+  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction(QIcon{":img/VERTICAL_HEADER"}, "Show Vertical Header", this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_VERTICAL_HEADER);
   _SHOW_VERTICAL_HEADER->setCheckable(true);
   _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, true).toBool());
-  _SHOW_VERTICAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header")
-                                       .arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
+  _SHOW_VERTICAL_HEADER->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header").arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
   m_verHeader = new (std::nothrow) VerMenuInHeader{m_name + "_VerHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_verHeader);
   if (!_SHOW_VERTICAL_HEADER->isChecked()) {
@@ -72,21 +72,21 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
       QString("<b>%1</b><br/>Adjust column widths to fit content (one-time operation)").arg(_RESIZE_COLUMN_TO_CONTENTS->text()));
 
   // 3.
-  _AUTO_SCROLL = new (std::nothrow) QAction("Auto Scroll", this);
+  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, "Auto Scroll", this);
   CHECK_NULLPTR_RETURN_VOID(_AUTO_SCROLL);
   _AUTO_SCROLL->setCheckable(true);
   _AUTO_SCROLL->setChecked(Configuration().value(m_autoScrollKey, true).toBool());
   setAutoScroll(_AUTO_SCROLL->isChecked());
 
   // 4.
-  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction("Alternating row colors", this);
+  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, "Alternating row colors", this);
   CHECK_NULLPTR_RETURN_VOID(_ALTERNATING_ROW_COLORS);
   _ALTERNATING_ROW_COLORS->setCheckable(true);
   _ALTERNATING_ROW_COLORS->setChecked(Configuration().value(m_alternatingRowColorsKey, true).toBool());
   setAlternatingRowColors(_ALTERNATING_ROW_COLORS->isChecked());
 
   // 5.
-  _SHOW_GRID = new (std::nothrow) QAction("Show grid", this);
+  _SHOW_GRID = new (std::nothrow) QAction(QIcon{":img/VIEW_GRID_ON"}, "Show grid", this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_GRID);
   _SHOW_GRID->setCheckable(true);
   _SHOW_GRID->setChecked(Configuration().value(m_showGridKey, false).toBool());
@@ -94,10 +94,15 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
 
   // 6.
   m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_HOR_SCROLL_BAR_POLICY", this};
+  CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_VER_SCROLL_BAR_POLICY", this};
+  CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
 
+  m_menu = new (std::nothrow) AddableMenu{m_name + "_menu", this};
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->setToolTipsVisible(true);
   SubscribeHeaderActions();
 }
 
@@ -111,9 +116,12 @@ CustomTableView::~CustomTableView() {
 
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
   if (m_menu != nullptr) {
     QPoint pnt = event->globalPos();
-    m_menu->popup(pnt); // or QCursor::pos()
+#ifndef RUNNING_UNIT_TESTS
+    m_menu->popup(pnt);  // or QCursor::pos()
+#endif
     event->accept();
     return;
   }
@@ -121,15 +129,19 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void CustomTableView::BindMenu(QMenu* menu) {
-  CHECK_NULLPTR_RETURN_VOID(menu)
-  m_menu = menu;
+  CHECK_NULLPTR_RETURN_VOID(menu);
+  m_menu->operator+=(*menu);
+  AddItselfAction2Menu();
+}
+
+void CustomTableView::AddItselfAction2Menu() {
   m_menu->addSeparator();
   m_menu->addAction(_SHOW_HORIZONTAL_HEADER);
-  m_menu->addAction(_RESIZE_ROW_TO_CONTENTS);
+  m_menu->addAction(_RESIZE_COLUMN_TO_CONTENTS);
   m_menu->addMenu(m_horScrollBarPolicyMenu);
   m_menu->addSeparator();
   m_menu->addAction(_SHOW_VERTICAL_HEADER);
-  m_menu->addAction(_RESIZE_COLUMN_TO_CONTENTS);
+  m_menu->addAction(_RESIZE_ROW_TO_CONTENTS);
   m_menu->addMenu(m_verScrollBarPolicyMenu);
   m_menu->addSeparator();
   m_menu->addAction(_AUTO_SCROLL);

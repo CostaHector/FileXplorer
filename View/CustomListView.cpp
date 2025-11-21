@@ -103,6 +103,9 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(m_name + "_UNIFORM_ITEM_SIZES", false).toBool());
   }
 
+  m_menu = new (std::nothrow) AddableMenu{name + "_menu", this};
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+
   InitListView();
   SubscribePublicActions();
 }
@@ -172,11 +175,12 @@ void CustomListView::BindMenu(QMenu* menu) {
     LOG_W("Don't bind a nullptr menu");
     return;
   }
-  if (m_menu != nullptr) {
-    LOG_W("Don't rebind menu. m_menu is already not nullptr");
-    return;
-  }
-  m_menu = menu;
+
+  m_menu->operator+=(*menu);
+  AddItselfAction2Menu();
+}
+
+void CustomListView::AddItselfAction2Menu() {
   m_menu->addSeparator();
   m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
   m_menu->addAction(_FLOW_ORIENTATION);
