@@ -1,8 +1,9 @@
 ﻿#include "AddressELineEdit.h"
 #include "ViewHelper.h"
 #include "PublicMacro.h"
+#include "PublicTool.h"
 #include "NotificatorMacro.h"
-#include <QDesktopServices>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -140,8 +141,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
   const QFileInfo fi{pth};
   if (fi.isFile()) {
     m_pathComboBox->setCurrentText(pth);
-    const bool bRet = QDesktopServices::openUrl(QUrl::fromLocalFile(pth));
-    LOG_OE_P(bRet, "Open file [%s]: bRet[%d]", qPrintable(pth), bRet);
+    return FileTool::OpenLocalFile(pth);
   } else {
     updateAddressToolBarPathActions(pth);
     emit pathActionsTriggeredOrLineEditReturnPressed(pth);

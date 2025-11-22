@@ -20,7 +20,6 @@ class FileSystemListViewTest : public PlainTestSuite {
 
     // 验证基本属性
     QVERIFY(listView._fsModel != nullptr);
-    QVERIFY(listView.m_fsMenu != nullptr);
     QCOMPARE(listView.dragDropMode(), QAbstractItemView::DragDrop);
     QVERIFY(listView.acceptDrops());
     QVERIFY(listView.dragEnabled());

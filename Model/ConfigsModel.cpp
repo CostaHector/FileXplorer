@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "Logger.h"
+#include "PathTool.h"
 #include <QIcon>
 
 const QStringList ConfigsModel::CONFIGS_TABLE_HEADER{"Name", "Current value", "Initial value"};
@@ -58,7 +59,12 @@ bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int 
       return false;
     }
     static auto& curCfg = Configuration();
-    curCfg.setValue(record->name, value);
+    if (record->isPath()) {
+      const QString& stdPath = PathTool::normPath(value.toString());
+      curCfg.setValue(record->name, stdPath);
+    } else {
+      curCfg.setValue(record->name, value);
+    }
     emit dataChanged(index, index, {Qt::DisplayRole});
     return true;
   }

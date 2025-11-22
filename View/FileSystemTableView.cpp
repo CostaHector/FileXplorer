@@ -14,10 +14,7 @@ FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* par
   : CustomTableView{"FILE_SYSTEM", parent}
   , _fsModel{fsmModel} { //
   CHECK_NULLPTR_RETURN_VOID(_fsModel)
-  m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
-  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
-
-  BindMenu(m_fsMenu);
+  BindMenu(new (std::nothrow) RightClickMenu("Right click menu", this));
   setModel(_fsModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);

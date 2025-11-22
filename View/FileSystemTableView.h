@@ -34,7 +34,6 @@ class FileSystemTableView : public CustomTableView {
 
  private:
   FileSystemModel* _fsModel {nullptr};
-  QMenu* m_fsMenu {nullptr};
   QPoint mDragStartPosition;
 };
 

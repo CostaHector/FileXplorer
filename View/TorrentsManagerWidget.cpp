@@ -7,7 +7,6 @@
 #include "TableFields.h"
 #include "NotificatorMacro.h"
 
-#include <QDesktopServices>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSqlError>

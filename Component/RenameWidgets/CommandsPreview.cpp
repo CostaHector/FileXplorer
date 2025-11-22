@@ -2,13 +2,13 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
+#include "PublicTool.h"
 
-#include <QClipboard>
-#include <QApplication>
 #include <QResizeEvent>
 
-CommandsPreview::CommandsPreview(const QString& name, QWidget* parent)  //
-  : QPlainTextEdit{parent}, mName{name}                       //
+CommandsPreview::CommandsPreview(const QString& name, QWidget* parent) //
+  : QPlainTextEdit{parent}
+  , mName{name} //
 {
   COPY_TEXT = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_TEXT);
@@ -62,16 +62,7 @@ void CommandsPreview::adjustButtonPosition() {
 }
 
 void CommandsPreview::subscribe() {
-  connect(COPY_TEXT, &QAction::triggered, this, [this]() {
-    QClipboard* pClipboard = QApplication::clipboard();
-    if (pClipboard == nullptr) {
-      LOG_WARN_NP("Cannot copy", "pClipboard copied succeed");
-      return;
-    }
-    const QString text = toPlainText();
-    pClipboard->setText(text);
-    LOG_OK_P("Copied succeed", "%d char(s)", text.size());
-  });
+  connect(COPY_TEXT, &QAction::triggered, this, [this]() { FileTool::CopyTextToSystemClipboard(toPlainText()); });
   connect(STAY_ON_TOP, &QAction::toggled, this, [this](const bool checked) {
     setWindowFlag(Qt::WindowStaysOnTopHint, checked);
     show();

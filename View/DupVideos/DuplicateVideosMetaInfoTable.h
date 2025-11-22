@@ -40,7 +40,6 @@ class DuplicateVideosMetaInfoTable : public CustomTableView {
 
   DupVidsManager mDupVidMngr;
   DuplicateVideosMetaInfoModel* m_aiMediaTblModel{nullptr};
-  QMenu* m_aiMediaDupMenu{nullptr};
   QSortFilterProxyModel* m_sortProxy{nullptr};
 };
 

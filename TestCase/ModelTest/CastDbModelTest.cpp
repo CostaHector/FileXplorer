@@ -22,19 +22,19 @@ using namespace SqlTableTestPreconditionTool;
 
 class CastDbModelTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
   void default_initialized_ok() {
     Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, "Path/to/inexists/path");
     CastDbModel castModel;
-    {  // precondition
+    { // precondition
       QVERIFY(!QFileInfo("Path/to/inexists/path").isDir());
       QVERIFY(!castModel.database().isValid());
       QVERIFY(!castModel.database().isOpen());
       QVERIFY(!CastDbModel::isDbValidAndOpened(castModel.database()));
     }
 
-    {  // basic setting and property
+    { // basic setting and property
       QCOMPARE(castModel.editStrategy(), QSqlTableModel::EditStrategy::OnManualSubmit);
       QCOMPARE(castModel.m_imageHostPath, "Path/to/inexists/path");
       QCOMPARE(castModel.rootPath(), "Path/to/inexists/path");
@@ -44,14 +44,14 @@ class CastDbModelTest : public PlainTestSuite {
       QVERIFY(!castModel.isDirty());
     }
 
-    {  // header access
+    { // header access
       QCOMPARE(castModel.headerData(1, Qt::Horizontal).toInt(), 2);
       QCOMPARE(castModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 0 + 1);
       QCOMPARE(castModel.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 1 + 1);
-      QCOMPARE(castModel.headerData(1000, Qt::Vertical, Qt::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+      QCOMPARE(castModel.headerData(1000, Qt::Vertical, Qt::TextAlignmentRole).toInt(), (int) Qt::AlignRight);
     }
 
-    {  // data retrieve
+    { // data retrieve
       QModelIndex invalidIndex;
       QVERIFY(!invalidIndex.isValid());
       QVERIFY(castModel.data(invalidIndex, Qt::ItemDataRole::DisplayRole).isNull());
@@ -65,7 +65,7 @@ class CastDbModelTest : public PlainTestSuite {
       QCOMPARE(castModel.psonFilePath(invalidIndex), "");
     }
 
-    {  // batch modification
+    { // batch modification
       QModelIndexList emptyIndexes;
       QItemSelection emptySelectionList;
       QCOMPARE(castModel.SyncImageFieldsFromImageHost(emptyIndexes), 0);
@@ -73,16 +73,16 @@ class CastDbModelTest : public PlainTestSuite {
       QCOMPARE(castModel.DeleteSelectionRange(emptySelectionList), 0);
       QSqlDatabase emptyMovieDb;
       QCOMPARE(castModel.RefreshVidsForRecords(emptyIndexes, emptyMovieDb), 0);
-      QCOMPARE(castModel.MigrateCastsTo(emptyIndexes, QFileInfo(__FILE__).absolutePath()), 0);
+      QCOMPARE(castModel.MigrateCastsOriFolder(QModelIndex{}, "any_ori"), 0);
     }
 
-    {  // property
+    { // property
       QVERIFY(!castModel.isDirty());
       QVERIFY(castModel.submitSaveAllChanges());
     }
-    {  // call me in the view, not in the model itself
+    { // call me in the view, not in the model itself
       QVERIFY(!castModel.repopulate());
-      QVERIFY(!castModel.onRevert());  // no need
+      QVERIFY(!castModel.onRevert()); // no need
     }
   }
 
@@ -96,7 +96,7 @@ class CastDbModelTest : public PlainTestSuite {
 
     CastBaseDb castDb{dbName, connName};
     QVERIFY(castDb.IsValid());
-    {  // database exist but table not exist
+    { // database exist but table not exist
       CastDbModel castModelNoTable{nullptr, castDb.GetDb()};
       QVERIFY(castModelNoTable.database().isValid());
       QVERIFY(castModelNoTable.database().isOpen());
@@ -118,7 +118,7 @@ class CastDbModelTest : public PlainTestSuite {
     // prepare folder precondition
     QVERIFY(CreateFileStructure(tDir));
 
-    QCOMPARE(castDb.ReadFromImageHost(tDir.path()), 5);  // 5 cast in total
+    QCOMPARE(castDb.ReadFromImageHost(tDir.path()), 5); // 5 cast in total
 
     QCOMPARE(castModel.rowCount(), 0);
     castModel.select();
@@ -127,23 +127,29 @@ class CastDbModelTest : public PlainTestSuite {
     QCOMPARE(castModel.GetAllRowsIndexes().size(), 5);
 
     using namespace PERFORMER_DB_HEADER_KEY;
-    {  // data retrieve and setData ok
+    { // data retrieve and setData ok
       QModelIndexList indexesNames{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Name)};
-      QVERIFY(
-          CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesNames,  //
-                                             QStringList{"Chris Evans", "Chris Hemsworth", "Chris Pine", "Cristiano Ronaldo", "Michael Fassbender"}));
+      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel,
+                                                 indexesNames, //
+                                                 QStringList{"Chris Evans",
+                                                             "Chris Hemsworth",
+                                                             "Chris Pine",
+                                                             "Cristiano Ronaldo",
+                                                             "Michael Fassbender"}));
 
       QModelIndexList indexesOris{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Ori)};
-      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesOris,  //
+      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel,
+                                                 indexesOris, //
                                                  QStringList{"SuperHero", "SuperHero", "SuperHero", "X-MEN", "Football"}));
 
       QModelIndexList indexesRates{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Rate)};
       QVERIFY(CastPsonFileHelper::DEFAULT_RATE != 99);
-      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesRates,                      //
-                                                 QList<int>{CastPsonFileHelper::DEFAULT_RATE,  //
-                                                            CastPsonFileHelper::DEFAULT_RATE,  //
-                                                            CastPsonFileHelper::DEFAULT_RATE,  //
-                                                            CastPsonFileHelper::DEFAULT_RATE,  //
+      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel,
+                                                 indexesRates,                                //
+                                                 QList<int>{CastPsonFileHelper::DEFAULT_RATE, //
+                                                            CastPsonFileHelper::DEFAULT_RATE, //
+                                                            CastPsonFileHelper::DEFAULT_RATE, //
+                                                            CastPsonFileHelper::DEFAULT_RATE, //
                                                             CastPsonFileHelper::DEFAULT_RATE}));
       // Rate DecorationRole correct
       const QVariant pixmapVar = castModel.data(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), Qt::DecorationRole);
@@ -155,35 +161,37 @@ class CastDbModelTest : public PlainTestSuite {
       // Rate setData correct
       QVERIFY(castModel.flags(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate)).testFlag(Qt::ItemIsEditable));
       QCOMPARE(castModel.fieldIndex(ENUM_2_STR(Rate)), PERFORMER_DB_HEADER_KEY::Rate);
-      QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), 99, Qt::EditRole));  // rate: 99
-      QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), 99, Qt::EditRole));  // already 99, set 99 will return true
-      QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 5, Qt::EditRole));   // rate: 5
+      QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), 99, Qt::EditRole)); // rate: 99
+      QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), 99, Qt::EditRole)); // already 99, set 99 will return true
+      QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 5, Qt::EditRole));  // rate: 5
       QVERIFY(castModel.isDirty());
       QVERIFY(castModel.submitSaveAllChanges());
       QVERIFY(!castModel.isDirty());
-      QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 79, Qt::EditRole));  // rate: 79
+      QVERIFY(castModel.setData(castModel.index(4, PERFORMER_DB_HEADER_KEY::Rate), 79, Qt::EditRole)); // rate: 79
       QVERIFY(castModel.isDirty());
-      QVERIFY(castModel.onRevert());  // onRevert ok
+      QVERIFY(castModel.onRevert()); // onRevert ok
       QVERIFY(!castModel.isDirty());
       QModelIndexList indexesRatesEditRole{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Rate)};
-      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesRatesEditRole,  //
-                                                 QList<int>{0, 0, 0, 5, 99}, Qt::EditRole));
+      QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel,
+                                                 indexesRatesEditRole, //
+                                                 QList<int>{0, 0, 0, 5, 99},
+                                                 Qt::EditRole));
     }
 
-    {  // rename ok => leads to cast_name/cast_name.pson,cast_name.img also get renamed
+    { // rename ok => leads to cast_name/cast_name.pson,cast_name.img also get renamed
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       const QModelIndex firstEleNameIndex = castModel.index(0, PERFORMER_DB_HEADER_KEY::Name);
 
       QVERIFY(tDir.exists("SuperHero/Chris Evans"));
       QCOMPARE(tDir.SnapshotAtPath(tDir.itemPath("SuperHero/Chris Evans")), (QSet<QString>{"Chris Evans 1.jpg", "Chris Evans 2.jpg"}));
       QCOMPARE(castModel.data(firstEleNameIndex, Qt::DisplayRole).toString(), "Chris Evans");
-      QVERIFY(castModel.setData(firstEleNameIndex, "Kaka", Qt::EditRole));  // rename cast name and its related files
+      QVERIFY(castModel.setData(firstEleNameIndex, "Kaka", Qt::EditRole)); // rename cast name and its related files
       QCOMPARE(castModel.data(firstEleNameIndex, Qt::DisplayRole).toString(), "Kaka");
       QVERIFY(!tDir.exists("SuperHero/Chris Evans"));
       QVERIFY(tDir.exists("SuperHero/Kaka"));
       QCOMPARE(tDir.SnapshotAtPath(tDir.itemPath("SuperHero/Kaka")), (QSet<QString>{"Kaka 1.jpg", "Kaka 2.jpg"}));
-      QVERIFY(!castModel.setData(firstEleNameIndex, "Kaka", Qt::EditRole));        // already kaka
-      QVERIFY(castModel.setData(firstEleNameIndex, "Chris Evans", Qt::EditRole));  // rename back to "Chris Evans"
+      QVERIFY(!castModel.setData(firstEleNameIndex, "Kaka", Qt::EditRole));       // already kaka
+      QVERIFY(castModel.setData(firstEleNameIndex, "Chris Evans", Qt::EditRole)); // rename back to "Chris Evans"
 
       QCOMPARE(castModel.fileName(firstEleNameIndex), "Chris Evans");
       QCOMPARE(castModel.filePath(firstEleNameIndex), tDir.itemPath("SuperHero/Chris Evans"));
@@ -191,12 +199,12 @@ class CastDbModelTest : public PlainTestSuite {
       QCOMPARE(castModel.oriPath(firstEleNameIndex), tDir.itemPath("SuperHero"));
       QCOMPARE(castModel.psonFilePath(firstEleNameIndex), tDir.itemPath("SuperHero/Chris Evans/Chris Evans.pson"));
 
-      QVERIFY(!castModel.setData(firstEleNameIndex, "Chris Pine", Qt::EditRole));        // Chris Pine is already occupied
-      QVERIFY(!castModel.setData(firstEleNameIndex, "/Chris/../ Evans", Qt::EditRole));  // invalid new Name
-      QCOMPARE(castModel.fileName(firstEleNameIndex), "Chris Evans");                    // not change
+      QVERIFY(!castModel.setData(firstEleNameIndex, "Chris Pine", Qt::EditRole));       // Chris Pine is already occupied
+      QVERIFY(!castModel.setData(firstEleNameIndex, "/Chris/../ Evans", Qt::EditRole)); // invalid new Name
+      QCOMPARE(castModel.fileName(firstEleNameIndex), "Chris Evans");                   // not change
     }
 
-    {  // SyncImageFieldsFromImageHost. sync 2 records that need sync only
+    { // SyncImageFieldsFromImageHost. sync 2 records that need sync only
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       const QModelIndex firstEleImgsIndex = castModel.index(0, PERFORMER_DB_HEADER_KEY::Imgs);
       const QModelIndex secondEleImgsIndex = castModel.index(1, PERFORMER_DB_HEADER_KEY::Imgs);
@@ -212,16 +220,18 @@ class CastDbModelTest : public PlainTestSuite {
       QVERIFY(castModel.setData(thirdEleImgsIndex, "Chris  Pine invalid.jpg", Qt::EditRole));
       QCOMPARE(castModel.data(thirdEleImgsIndex, Qt::DisplayRole).toString(), "Chris  Pine invalid.jpg");
 
-      QCOMPARE(castModel.SyncImageFieldsFromImageHost({firstEleImgsIndex, secondEleImgsIndex, thirdEleImgsIndex}), 3 - 1);  // only 2/3 record changed
+      QCOMPARE(castModel.SyncImageFieldsFromImageHost({firstEleImgsIndex, secondEleImgsIndex, thirdEleImgsIndex}),
+               3 - 1); // only 2/3 record changed
 
       QCOMPARE(castModel.data(firstEleImgsIndex, Qt::DisplayRole).toString(), "Chris Evans 1.jpg\nChris Evans 2.jpg");
       QCOMPARE(castModel.data(secondEleImgsIndex, Qt::DisplayRole).toString(), "Chris Hemsworth.jpg");
       QCOMPARE(castModel.data(thirdEleImgsIndex, Qt::DisplayRole).toString(), "Chris Pine.jpg");
 
-      QCOMPARE(castModel.SyncImageFieldsFromImageHost({firstEleImgsIndex, secondEleImgsIndex, thirdEleImgsIndex}), 0);  // only 0/3 record need sync
+      QCOMPARE(castModel.SyncImageFieldsFromImageHost({firstEleImgsIndex, secondEleImgsIndex, thirdEleImgsIndex}),
+               0); // only 0/3 record need sync
     }
 
-    {  // DumpRecordsIntoPsonFile ok
+    { // DumpRecordsIntoPsonFile ok
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       const QModelIndex firstEleImgsIndex = castModel.index(0, PERFORMER_DB_HEADER_KEY::Imgs);
       const QModelIndex secondEleImgsIndex = castModel.index(1, PERFORMER_DB_HEADER_KEY::Imgs);
@@ -230,26 +240,27 @@ class CastDbModelTest : public PlainTestSuite {
       QCOMPARE(castModel.DumpRecordsIntoPsonFile({firstEleImgsIndex, secondEleImgsIndex}), 2);
       QVERIFY(tDir.exists("SuperHero/Chris Evans/Chris Evans.pson"));
       QVERIFY(tDir.exists("SuperHero/Chris Hemsworth/Chris Hemsworth.pson"));
-      QCOMPARE(castModel.DumpRecordsIntoPsonFile({firstEleImgsIndex, secondEleImgsIndex}), 0);  // unchange
+      QCOMPARE(castModel.DumpRecordsIntoPsonFile({firstEleImgsIndex, secondEleImgsIndex}), 0); // unchange
     }
 
-    {  // DeleteSelectionRange
+    { // DeleteSelectionRange
       QCOMPARE(castModel.rowCount(), 5);
-      const QItemSelection allSelection(castModel.index(0, PERFORMER_DB_HEADER_KEY::Name),  //
+      const QItemSelection allSelection(castModel.index(0, PERFORMER_DB_HEADER_KEY::Name), //
                                         castModel.index(4, PERFORMER_DB_HEADER_KEY::Name));
       QCOMPARE(castModel.DeleteSelectionRange(allSelection), 5);
       QCOMPARE(castModel.rowCount(), 0);
-      QCOMPARE(castModel.DeleteSelectionRange(allSelection), 0);  // already delete
+      QCOMPARE(castModel.DeleteSelectionRange(allSelection), 0); // already delete
       QCOMPARE(castModel.rowCount(), 0);
-      QCOMPARE(castDb.ReadFromImageHost(tDir.path()), 5);  // recover to 5 cast
-      QVERIFY(castModel.select());                         // select first
+      QCOMPARE(castDb.ReadFromImageHost(tDir.path()), 5); // recover to 5 cast
+      QVERIFY(castModel.select());                        // select first
       QCOMPARE(castModel.rowCount(), 5);
     }
 
-    {  // RefreshVidsForRecords
+    { // RefreshVidsForRecords
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       QModelIndexList indexesVids{GetIndexessAtOneRow(castModel, 0, 5, PERFORMER_DB_HEADER_KEY::Vids)};
-      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, QSqlDatabase()), FD_ERROR_CODE::FD_DB_OPEN_FAILED);  // default constructor not update
+      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, QSqlDatabase()),
+               FD_ERROR_CODE::FD_DB_OPEN_FAILED); // default constructor not update
 
       const QString movieDbName{tDir.itemPath("MovieCaseDbModelTest.db")};
       const QString movieConnName{"MovieCaseDbModelTestConn"};
@@ -260,10 +271,10 @@ class CastDbModelTest : public PlainTestSuite {
       QVERIFY(movieDb.IsTableExist(movieTableName));
       QVERIFY(movieDb.IsTableEmpty(movieTableName));
 
-      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 0);  // no records not update
+      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 0); // no records not update
 
       {
-        QSet<qint64> needInsertFds = {1001, 1002, 1003};  // 三个唯一的文件描述符
+        QSet<qint64> needInsertFds = {1001, 1002, 1003}; // 三个唯一的文件描述符
         QHash<qint64, QString> newFd2Pth = {
             // 3 records, 2 of Chris Evans and 1 of Chris Hemsworth
             {1001, "videos/superhero/Chris Evans 1.mp4"},
@@ -278,8 +289,8 @@ class CastDbModelTest : public PlainTestSuite {
       }
       QCOMPARE(movieDb.CountRow(movieTableName, ""), 3);
 
-      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 2);  // affected rows count = 2. and sorted
-      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 0);  // unchange at all skip
+      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 2); // affected rows count = 2. and sorted
+      QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 0); // unchange at all skip
 
       const QModelIndex firstEleVidsIndex = castModel.index(0, PERFORMER_DB_HEADER_KEY::Vids);
       const QModelIndex secondEleVidsIndex = castModel.index(1, PERFORMER_DB_HEADER_KEY::Vids);
@@ -299,26 +310,59 @@ class CastDbModelTest : public PlainTestSuite {
       QCOMPARE(castModel.data(thirdEleVidsIndex, Qt::DisplayRole).toString(), "");
     }
 
-    {  // MigrateCastsTo ok
+    { // MigrateCastsTo ok
+
+      // precondition should correct
+      // Chris Evans < Chris Hemsworth
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
-      const QModelIndex firstOriIndex = castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori);
-      const QModelIndex secondOriIndex = castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori);
-      QCOMPARE(castModel.data(firstOriIndex, Qt::DisplayRole).toString(), "SuperHero");
-      QCOMPARE(castModel.data(secondOriIndex, Qt::DisplayRole).toString(), "SuperHero");
-      QCOMPARE(castModel.MigrateCastsTo({firstOriIndex, secondOriIndex}, "path/not/exist/path"), FD_CAST_NEW_ORI_PATH_INVALID);
+      QVERIFY(castModel.rowCount() >= 2);
 
-      QVERIFY(tDir.mkpath("CaptainAmerica"));  // new ori
-      QString absPath = tDir.itemPath("CaptainAmerica");
-      QCOMPARE(castModel.MigrateCastsTo({firstOriIndex, secondOriIndex}, absPath), 2);  // two ori get updated
+      QCOMPARE(castModel.index(0, PERFORMER_DB_HEADER_KEY::Name).data(Qt::DisplayRole).toString(), "Chris Evans");
+      QCOMPARE(castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "SuperHero");
+      QCOMPARE(castModel.index(1, PERFORMER_DB_HEADER_KEY::Name).data(Qt::DisplayRole).toString(), "Chris Hemsworth");
+      QCOMPARE(castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "SuperHero");
+      QVERIFY(tDir.exists("SuperHero/Chris Evans"));
+      QVERIFY(tDir.exists("SuperHero/Chris Hemsworth"));
+      QVERIFY(!tDir.exists("not_exist_ori"));
 
-      QCOMPARE(castModel.data(firstOriIndex, Qt::DisplayRole).toString(), "CaptainAmerica");
-      QCOMPARE(castModel.data(secondOriIndex, Qt::DisplayRole).toString(), "CaptainAmerica");
+      const QModelIndex ind0 = castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori);
+      const QModelIndex ind1 = castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori);
 
-      QCOMPARE(castModel.MigrateCastsTo({firstOriIndex, secondOriIndex}, absPath), 0);  // already there
-      QCOMPARE(castModel.MigrateCastsTo({firstOriIndex, secondOriIndex}, absPath), 0);  // already there
+      // s1. migrate to an inexist ori: failed!
+      QVERIFY(!castModel.MigrateCastsOriFolder(ind0, "not_exist_ori"));
+      QVERIFY(!castModel.MigrateCastsOriFolder(ind1, "not_exist_ori"));
+      QVERIFY(!castModel.setData(ind0, "not_exist_ori"));
+      QVERIFY(!castModel.setData(ind1, "not_exist_ori"));
+
+      // s2. migrate to an exist ori: succeed!
+      QVERIFY(tDir.mkpath("CaptainAmerica"));
+      QVERIFY(castModel.setData(ind0, "CaptainAmerica"));
+      QVERIFY(castModel.setData(ind1, "CaptainAmerica"));
+      QVERIFY(tDir.exists("CaptainAmerica/Chris Evans"));
+      QVERIFY(tDir.exists("CaptainAmerica/Chris Hemsworth"));
+      QCOMPARE(castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "CaptainAmerica");
+      QCOMPARE(castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "CaptainAmerica");
+
+      // s3. migrate to an itself: skip!
+      QCOMPARE(castModel.MigrateCastsOriFolder(ind0, "CaptainAmerica"), true); // already there
+      QCOMPARE(castModel.MigrateCastsOriFolder(ind1, "CaptainAmerica"), true);
+
+      // s4. call MigrateCastsTo will only move the ori folder, but not modify the table. leading table differ with folder
+      QCOMPARE(castModel.MigrateCastsOriFolder(ind0, "SuperHero"), true);
+      QCOMPARE(castModel.MigrateCastsOriFolder(ind1, "SuperHero"), true);
+      QVERIFY(tDir.exists("SuperHero/Chris Evans"));
+      QVERIFY(tDir.exists("SuperHero/Chris Hemsworth"));
+      QCOMPARE(castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "CaptainAmerica");
+      QCOMPARE(castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "CaptainAmerica");
+
+      // s5. fix the table/folder differ manually
+      castModel.QSqlTableModel::setData(ind0, "SuperHero");
+      castModel.QSqlTableModel::setData(ind1, "SuperHero");
+      QCOMPARE(castModel.index(0, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "SuperHero");
+      QCOMPARE(castModel.index(1, PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString(), "SuperHero");
     }
 
-    {  // after db closed
+    { // after db closed
       QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Name), "ChrisEvans.jpg", Qt::EditRole));
       QVERIFY(castModel.isDirty());
       castModel.database().close();

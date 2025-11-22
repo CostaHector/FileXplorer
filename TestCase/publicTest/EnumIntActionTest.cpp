@@ -11,6 +11,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include <QListView>
+#include <QHeaderView>
 #include "PreviewTypeTool.h"
 #include "ViewTypeTool.h"
 #include "StyleEnum.h"
@@ -21,7 +22,6 @@
 #include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
 
-extern template struct EnumIntAction<QListView::Flow>;
 extern template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
 extern template struct EnumIntAction<Style::StyleE>;
@@ -33,6 +33,9 @@ extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteria
 extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 extern template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
+extern template struct EnumIntAction<Qt::TextElideMode>;
+extern template struct EnumIntAction<QHeaderView::ResizeMode>;
+extern template struct EnumIntAction<Qt::ScrollBarPolicy>;
 
 class EnumIntActionTest : public PlainTestSuite {
   Q_OBJECT
@@ -85,15 +88,10 @@ class EnumIntActionTest : public PlainTestSuite {
 
  private slots:
   void enum_in_action_exclusive() {
-    EnumIntActionChecker<QListView::Flow>(QListView::Flow::LeftToRight,               //
-                                          QListView::Flow::TopToBottom,               //
-                                          QListView::Flow::LeftToRight,               //
-                                          QActionGroup::ExclusionPolicy::Exclusive);  //
-
     EnumIntActionChecker<ViewTypeTool::ViewType>(  //
         ViewTypeTool::ViewType::TABLE,             //
         ViewTypeTool::ViewType::SEARCH,            //
-        ViewTypeTool::DEFAULT_VIEW_TYPE,             //
+        ViewTypeTool::DEFAULT_VIEW_TYPE,           //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<Style::StyleE>(     //
@@ -111,13 +109,13 @@ class EnumIntActionTest : public PlainTestSuite {
     EnumIntActionChecker<SearchTools::SearchModeE>(  //
         SearchTools::SearchModeE::REGEX,             //
         SearchTools::SearchModeE::FILE_CONTENTS,     //
-        SearchTools::DEFAULT_SEARCH_MODE,             //
+        SearchTools::DEFAULT_SEARCH_MODE,            //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<BytesRangeTool::BytesRangeE>(  //
         BytesRangeTool::BytesRangeE::FIRST_16,          //
         BytesRangeTool::BytesRangeE::ENTIRE_FILE,       //
-        BytesRangeTool::DEFAULT_BYTE_RANGE,       //
+        BytesRangeTool::DEFAULT_BYTE_RANGE,             //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<QCryptographicHash::Algorithm>(  //
@@ -129,7 +127,7 @@ class EnumIntActionTest : public PlainTestSuite {
     EnumIntActionChecker<DuplicateImageDetectionCriteria::DICriteriaE>(  //
         DuplicateImageDetectionCriteria::DICriteriaE::LIBRARY,           //
         DuplicateImageDetectionCriteria::DICriteriaE::MD5,               //
-        DuplicateImageDetectionCriteria::DEFAULT_DI_CRITERIA_E,           //
+        DuplicateImageDetectionCriteria::DEFAULT_DI_CRITERIA_E,          //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<FileStructurePolicy::FileStuctureModeE>(  //
@@ -139,9 +137,27 @@ class EnumIntActionTest : public PlainTestSuite {
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<SceneSortOrderHelper::SortDimE>(  //
-        SceneSortOrderHelper::SortDimE::MOVIE_PATH,                //
-        SceneSortOrderHelper::SortDimE::MOVIE_SIZE,                //
-        SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER,            //
+        SceneSortOrderHelper::SortDimE::MOVIE_PATH,        //
+        SceneSortOrderHelper::SortDimE::MOVIE_SIZE,        //
+        SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER,    //
+        QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<Qt::TextElideMode>(  //
+        Qt::TextElideMode::ElideLeft,         //
+        Qt::TextElideMode::ElideRight,        //
+        Qt::TextElideMode::ElideNone,         //
+        QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<QHeaderView::ResizeMode>(  //
+        QHeaderView::ResizeMode::Interactive,       //
+        QHeaderView::ResizeMode::Stretch,           //
+        QHeaderView::ResizeMode::Interactive,       //
+        QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<Qt::ScrollBarPolicy>(    //
+        Qt::ScrollBarPolicy::ScrollBarAsNeeded,   //
+        Qt::ScrollBarPolicy::ScrollBarAlwaysOff,  //
+        Qt::ScrollBarPolicy::ScrollBarAsNeeded,   //
         QActionGroup::ExclusionPolicy::Exclusive);
   }
 
@@ -149,15 +165,15 @@ class EnumIntActionTest : public PlainTestSuite {
     EnumIntActionChecker<PreviewTypeTool::PREVIEW_TYPE_E>(  //
         PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY,          //
         PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD,  //
-        PreviewTypeTool::DEFULT_PREVIEW_TYPE_E,              //
+        PreviewTypeTool::DEFULT_PREVIEW_TYPE_E,             //
         QActionGroup::ExclusionPolicy::ExclusiveOptional);  //
   }
 
   void enum_in_action_exclusive_none() {
     EnumIntActionChecker<ScenePageNaviHelper::PageNaviE>(  //
-        ScenePageNaviHelper::PageNaviE::FRONT,                     //
-        ScenePageNaviHelper::PageNaviE::PREVIOUS,                  //
-        ScenePageNaviHelper::PageNaviE::BEGIN_DEFAULT,             //
+        ScenePageNaviHelper::PageNaviE::FRONT,             //
+        ScenePageNaviHelper::PageNaviE::PREVIOUS,          //
+        ScenePageNaviHelper::PageNaviE::BEGIN_DEFAULT,     //
         QActionGroup::ExclusionPolicy::None);
   }
 };

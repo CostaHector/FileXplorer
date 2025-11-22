@@ -1,15 +1,20 @@
 ﻿#include "PublicTool.h"
 #include "PublicVariable.h"
+#include "PathTool.h"
 #include "MemoryKey.h"
-#include "Logger.h"
+#include "NotificatorMacro.h"
+#include "ThumbnailImageViewer.h"
 
 #include <QAction>
+#include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QCoreApplication>
-#include <QDesktopServices>
-#include <QDir>
+#include <QApplication>
 #include <QTextStream>
+#include <QClipboard>
+#include <QDesktopServices>
+#include <QProcess>
 
 namespace FileTool {
 QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
@@ -101,11 +106,11 @@ QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk) {
 bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
   QFile fi{fileName};
   if (!fi.open(openMode)) {
-    LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int)openMode);
+    LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int) openMode);
     return false;
   }
 
-  QTextStream stream(&fi);  // "\n" will be replace with "\r\n"
+  QTextStream stream(&fi); // "\n" will be replace with "\r\n"
   stream.setCodec("UTF-8");
   stream << content;
   stream.flush();
@@ -120,26 +125,86 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
     return false;
   }
   QTextStream stream(&fi);
-  stream.setCodec("UTF-8");  // must set here
+  stream.setCodec("UTF-8"); // must set here
   stream << ba;
   stream.flush();
   fi.close();
   return true;
 }
 
-bool OpenLocalFileUsingDesktopService(const QString& localFilePath) {
-  if (!QFile::exists(localFilePath)) {
-    LOG_W("Cannot open. File [%s] not exist.", qPrintable(localFilePath));
+bool OpenLocalFile(const QString& localFilePath) {
+  const QFileInfo fi{localFilePath};
+  if (!fi.exists()) {
+    LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
     return false;
   }
-#ifndef RUNNING_UNIT_TESTS
-  return QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
-#else
-  return true;
-#endif
+  if (ThumbnailImageViewer::IsFileAbsPathImage(localFilePath)) {
+    return OpenLocalImageFile(localFilePath);
+  }
+  return OpenLocalFileUsingDesktopService(localFilePath);
 }
 
-}  // namespace FileTool
+bool OpenLocalImageFile(const QString& localFilePath) {
+  auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
+  QString prepath, name;
+  name = PathTool::GetPrepathAndFileName(localFilePath, prepath);
+  bool openResult = pImageViewer->setPixmapByAbsFilePath(prepath, name);
+  pImageViewer->show();
+  return openResult;
+}
+
+bool OpenLocalFileUsingDesktopService(const QString& localFilePath) {
+  if (!QFile::exists(localFilePath)) {
+    LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
+    return false;
+  }
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
+  return QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
+}
+
+bool RevealInSystemExplorer(const QString& localFilePath) {
+  if (!QFile::exists(localFilePath)) {
+    LOG_WARN_NP("Reveal path not exists", localFilePath);
+    return false;
+  }
+#ifdef RUNNING_UNIT_TESTS
+  return true;
+#endif
+  QProcess process;
+  QStringList args;
+#ifdef _WIN32
+  process.setProgram("explorer.exe");
+  args << "/e,"
+       << "/select,";
+  args << PathTool::sysPath(localFilePath);
+#else
+  process.setProgram("xdg-open");
+  if (QFileInfo(localFilePath).isDir()) {
+    args << PathTool::sysPath(localFilePath);
+  } else {
+    args << PathTool::absolutePath(localFilePath);
+  }
+#endif
+  process.setArguments(args);
+  process.startDetached(); // Start the process in detached mode instead of start
+  LOG_W("on_revealInExplorer with program[%s] parms [%s]", qPrintable(process.program()), qPrintable(args.join(',')));
+  return true;
+}
+
+bool CopyTextToSystemClipboard(const QString& text) {
+  QClipboard* pClipboard = QApplication::clipboard();
+  if (pClipboard == nullptr) {
+    LOG_WARN_NP("Cannot copy", "pClipboard copied succeed");
+    return false;
+  }
+  pClipboard->setText(text);
+  LOG_OK_P("Copied succeed", "%d char(s)", text.size());
+  return true;
+}
+
+} // namespace FileTool
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
@@ -149,7 +214,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
 #ifndef RUNNING_UNIT_TESTS
   selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
 #endif
-  QFileInfo dstFi(selectPath);  // system may return back slash seperated path
+  QFileInfo dstFi(selectPath); // system may return back slash seperated path
   if (!dstFi.isDir()) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";
@@ -163,11 +228,11 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
     LOG_C("oldAG is nullptr");
     return "";
   }
-  QString i_1_path = first_path;              // first and (i-1) path
-  foreach (QAction* act, oldAG->actions()) {  // i path
+  QString i_1_path = first_path;             // first and (i-1) path
+  foreach (QAction* act, oldAG->actions()) { // i path
     QString i_path = act->text();
     if (i_path == first_path) {
-      act->setText(i_1_path);  // finish
+      act->setText(i_1_path); // finish
       break;
     }
     act->setText(i_1_path);
@@ -199,7 +264,8 @@ bool CreateUserPath() {
     return true;
   }
   if (!QDir{}.mkpath(SystemPath::WORK_PATH())) {
-    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path", qPrintable(SystemPath::WORK_PATH()));
+    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path",
+          qPrintable(SystemPath::WORK_PATH()));
     return false;
   }
   return true;

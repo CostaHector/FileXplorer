@@ -15,11 +15,14 @@
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent)     //
-    : CustomListView{"SCENES_TABLE", parent},     //
-      _sceneModel{sceneModel},                    //
-      _sceneSortProxyModel{sceneSortProxyModel},  //
-      _scenePageControl{scenePageControl}         //
+                             QWidget* parent) //
+  : CustomListView{"SCENES_TABLE", parent}
+  , //
+  _sceneModel{sceneModel}
+  , //
+  _sceneSortProxyModel{sceneSortProxyModel}
+  ,                                   //
+  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -32,25 +35,19 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
-  setViewMode(QListView::ViewMode::IconMode);
-  setTextElideMode(Qt::TextElideMode::ElideLeft);
-  setResizeMode(QListView::ResizeMode::Fixed);
-  setWrapping(true);
 
   mAlignDelegate = new (std::nothrow) SceneStyleDelegate{this};
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  QMenu* m_menu = new (std::nothrow) QMenu{"Scene list view menu", this};
-  CHECK_NULLPTR_RETURN_VOID(m_menu)
-  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy basename", m_menu};
+  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy basename", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", m_menu};
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
 
   m_menu->addAction(COPY_BASENAME_FROM_SCENE);
   m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
-  BindMenu(m_menu);
+  AddItselfAction2Menu();
   subscribe();
 
   // setMouseTracking(true);
@@ -86,7 +83,6 @@ bool SceneListView::onOpenCorrespondingFolder() {
 void SceneListView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
-  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SceneListView::onClickEvent);
   connect(this, &CustomListView::iconSizeChanged, _sceneModel, &ScenesListModel::onIconSizeChange);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
@@ -104,19 +100,21 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
+  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
     LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
     const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg =
-        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-        "Loading it could cause performance issues.\n\n"
-        "Directory: " +
-        rootPath + "\n\n Do you want to proceed?";
+    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+                            "Loading it could cause performance issues.\n\n"
+                            "Directory: "
+                            + rootPath + "\n\n Do you want to proceed?";
     QMessageBox::StandardButton retBtn;
 #ifdef RUNNING_UNIT_TESTS
     retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+    retBtn = QMessageBox::warning(this,
+                                  cfmTitle,
+                                  hintMsg,
+                                  QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
                                   QMessageBox::StandardButton::No);
 #endif
     if (retBtn != QMessageBox::StandardButton::Yes) {
@@ -140,9 +138,12 @@ int SceneListView::onUpdateJsonFiles() {
   using namespace SceneInfoManager;
   ScnMgr scnMgr;
   Counter cnt = scnMgr(workPath);
-  LOG_OK_P("Json file K-V updated", "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]",  //
-           cnt.m_jsonUpdatedCnt, cnt.m_jsonUsedCnt,                                                     //
-           cnt.m_ImgNameKeyFieldUpdatedCnt, cnt.m_VidNameKeyFieldUpdatedCnt,                            //
+  LOG_OK_P("Json file K-V updated",
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
+           cnt.m_jsonUpdatedCnt,
+           cnt.m_jsonUsedCnt, //
+           cnt.m_ImgNameKeyFieldUpdatedCnt,
+           cnt.m_VidNameKeyFieldUpdatedCnt, //
            qPrintable(workPath));
   return cnt.m_jsonUpdatedCnt;
 }
@@ -172,8 +173,9 @@ int SceneListView::onClearScnFiles() {
   return deleteCnt;
 }
 
-bool SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& previous) {
+bool SceneListView::onClickEvent(const QModelIndex& current) {
   if (!current.isValid()) {
+    emit currentSceneChanged("Nothing selected", "", {}, {});
     return false;
   }
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
@@ -185,9 +187,9 @@ bool SceneListView::onClickEvent(const QModelIndex& current, const QModelIndex& 
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
 #else
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
 }
@@ -195,11 +197,12 @@ bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   const QPoint pos = event->pos();
-  const QModelIndex proIndex = indexAt(pos);
-  const QModelIndex srcIndex = _sceneSortProxyModel->mapToSource(proIndex);
-
+  const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
+  if (mLastClickedIndex != proIndex) {
+    onClickEvent(proIndex);
+  }
+  mLastClickedIndex = proIndex;
   const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(proIndex, visualRect(proIndex))};
-
   emit sceneGridClicked(proIndex, imageRect, pos);
   QListView::mousePressEvent(event);
 }

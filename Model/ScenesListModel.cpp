@@ -3,6 +3,7 @@
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
+#include "StringTool.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -41,8 +42,9 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
         return {};
       }
       const QString imgAbsPath = mCurBegin[linearInd].GetFirstImageAbsPath(mRootPath);
+      const QString imgKey = StringTool::PathJoinPixmapSize(imgAbsPath, mWidth, mHeight);
       QPixmap pm;
-      if (mPixCache.find(imgAbsPath, &pm)) {
+      if (mPixCache.find(imgKey, &pm)) {
         return pm;
       }
       if (QFile{imgAbsPath}.size() > 10 * 1024 * 1024) {  // 10MB
@@ -56,7 +58,7 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       } else {
         pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
       }
-      mPixCache.insert(imgAbsPath, pm);
+      mPixCache.insert(imgKey, pm);
       return pm;
     }
     case Qt::ItemDataRole::BackgroundRole: {
@@ -292,13 +294,11 @@ bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
   const int beforeRowCnt = rowCount();
   const int afterRowCnt = endIndex - startIndex;
   LOG_OK_P("Page Changed", "Now page:%d rowCnt:%d->%d", newPageIndex, beforeRowCnt, afterRowCnt);
-  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
+  // Don't use RowsCountBeginChange, RowsCountEndChange(); here. QPixmap Image varies here
+  beginResetModel();
   mPageIndex = newPageIndex;
   mCurBegin = lst.cbegin() + startIndex;
   mCurEnd = lst.cbegin() + endIndex;
-  RowsCountEndChange();
-
-  emit dataChanged(index(0, 0), index(beforeRowCnt),
-                   {Qt::ItemDataRole::DisplayRole, Qt::ItemDataRole::DecorationRole, Qt::ItemDataRole::BackgroundRole});
+  endResetModel();
   return true;
 }

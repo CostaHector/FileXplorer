@@ -32,7 +32,6 @@ private:
   bool mShowImagePreview;
   HarModel* mHarModel{nullptr};
   QSortFilterProxyModel* mSortProxyModel{nullptr};
-  QMenu *mMenu {nullptr};
   QAction *mEXPORT_TO {nullptr};
   QAction *mQUICK_PREVIEW{nullptr};
   QLabel *mPreviewLabel{nullptr};

@@ -300,6 +300,10 @@
     <file alias="ALIGN_VERTICAL_TOP">View/ALIGN_VERTICAL_TOP.svg</file>
     <file alias="_VIEW_BACK_TO">View/_VIEW_BACK_TO.svg</file>
     <file alias="_VIEW_FORWARD_TO">View/_VIEW_FORWARD_TO.svg</file>
+    <file alias="HORIZONTAL_HEADER">View/HORIZONTAL_HEADER.svg</file>
+    <file alias="VERTICAL_HEADER">View/VERTICAL_HEADER.svg</file>
+    <file alias="ALTERNATING_ROW_COLORS">View/ALTERNATING_ROW_COLORS.svg</file>
+    <file alias="AUTO_SCROLL">View/AUTO_SCROLL.svg</file>
 
     <!--Database icon here-->
     <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

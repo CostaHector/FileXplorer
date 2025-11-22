@@ -11,6 +11,7 @@
 #include "QuickWhereClauseHelper.h"
 #include "StringTool.h"
 #include "RateHelper.h"
+#include "JsonRenameRegex.h"
 #include <QPainter>
 #include <QPixmap>
 #include <QSqlError>
@@ -20,11 +21,11 @@
 constexpr int CastDbModel::MAX_RATE;
 
 CastDbModel::CastDbModel(QObject* parent, QSqlDatabase db)
-  : SqlTableModelPub{parent, db},
-  m_imageHostPath{Configuration()                                              //
-                      .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name,  //
-                             MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)     //
-                      .toString()} {
+  : SqlTableModelPub{parent, db}
+  , m_imageHostPath{Configuration()                                             //
+                        .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, //
+                               MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)    //
+                        .toString()} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 
   if (isDbValidAndOpened(db)) {
@@ -79,7 +80,13 @@ bool CastDbModel::setData(const QModelIndex& index, const QVariant& value, int r
     // rename folder and files
     const QString imgOriPath{oriPath(index)};
     if (CastBaseDb::WhenCastNameRenamed(imgOriPath, oldName, newName) < 0) {
-      LOG_C("Rename failed, not write into db");
+      LOG_C("Rename failed, will not write into db");
+      return false;
+    }
+  } else if (index.column() == PERFORMER_DB_HEADER_KEY::Ori) {
+    const QString newOri{value.toString()};
+    if (!MigrateCastsOriFolder(index, newOri)) {
+      LOG_C("Migrate failed, will not write into db");
       return false;
     }
   }
@@ -137,7 +144,7 @@ int CastDbModel::SyncImageFieldsFromImageHost(const QModelIndexList& selectedRow
   for (const auto& indr : selectedRowsIndexes) {
     const int r = indr.row();
     QSqlRecord imgUpdatedRec = record(r);
-    if (!CastBaseDb::UpdateRecordImgsField(imgUpdatedRec, m_imageHostPath)) {  // skipped
+    if (!CastBaseDb::UpdateRecordImgsField(imgUpdatedRec, m_imageHostPath)) { // skipped
       continue;
     }
     if (!setRecord(r, imgUpdatedRec)) {
@@ -175,7 +182,7 @@ int CastDbModel::DumpRecordsIntoPsonFile(const QModelIndexList& selectedRowsInde
     const QVariantHash pson = CastPsonFileHelper::PerformerJsonJoiner(needDumpRec);
     if (QFile::exists(psonPath) && JsonHelper::MovieJsonLoader(psonPath) == pson) {
       LOG_D("pson[%s] unchange at skip it", qPrintable(psonPath));
-      continue;  // unchange
+      continue; // unchange
     }
     succeedCnt += JsonHelper::DumpJsonDict(pson, psonPath);
   }
@@ -190,16 +197,16 @@ int CastDbModel::DeleteSelectionRange(const QItemSelection& selectionRangeList) 
   }
   int rowN = rowCount();
   // [beg, end) should in [0, rowN)
-  const auto checkIfRangeValid = [rowN](int rowBegin, int rowEnd) -> bool {  //
-    return (rowBegin <= rowEnd)                                              //
-           && (0 <= rowBegin)                                                //
+  const auto checkIfRangeValid = [rowN](int rowBegin, int rowEnd) -> bool { //
+    return (rowBegin <= rowEnd)                                             //
+           && (0 <= rowBegin)                                               //
            && (rowEnd <= rowN);
   };
 
   int totalValidRowCnt = 0;
   int succeedCnt = 0;
   for (auto it = selectionRangeList.crbegin(); it != selectionRangeList.crend(); ++it) {
-    const int startRow = it->top();  // [top, bottom]
+    const int startRow = it->top(); // [top, bottom]
     const int bottomRow = it->bottom();
     if (!checkIfRangeValid(startRow, bottomRow + 1)) {
       LOG_W("row:[%d, %d) out of range [0, %d)", startRow, bottomRow + 1, rowN);
@@ -269,7 +276,7 @@ int CastDbModel::RefreshVidsForRecords(const QModelIndexList& selectedRowsIndexe
 
     // 更新记录
     if (rec.value(PERFORMER_DB_HEADER_KEY::Vids).toString() == vidPaths) {
-      continue;  // unchange no need update
+      continue; // unchange no need update
     }
     rec.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPaths);
     if (!setRecord(row, rec)) {
@@ -288,38 +295,40 @@ int CastDbModel::RefreshVidsForRecords(const QModelIndexList& selectedRowsIndexe
   return affectedRecordCnt;
 }
 
-int CastDbModel::MigrateCastsTo(const QModelIndexList& selectedRowsIndexes, const QString& destinationPath) {
-  if (selectedRowsIndexes.isEmpty()) {
-    LOG_D("No need to migrate. nothing selected");
-    return 0;
+bool CastDbModel::MigrateCastsOriFolder(const QModelIndex& ind, const QString& newOri) const {
+  if (!ind.isValid()) {
+    LOG_W("invalid ind");
+    return false;
+  }
+  if (newOri.isEmpty()) {
+    LOG_W("new Ori cannot be empty");
+    return false;
+  }
+  if (newOri.contains(JSON_RENAME_REGEX::INVALID_CHARS_IN_FILENAME)) {
+    LOG_W("Abort Migrate, Ori Folder Name[%s] invalid", qPrintable(newOri));
+    return false;
   }
 
-  QString newOri;
-  if (!CastBaseDb::IsNewOriFolderPathValid(destinationPath, m_imageHostPath, newOri)) {
-    LOG_E("Abort Migrate destPath[%s] or newOri[%s] invalid", qPrintable(destinationPath), qPrintable(newOri));
-    return FD_CAST_NEW_ORI_PATH_INVALID;
+  const QString& oldOri = ind.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString();
+  if (newOri == oldOri) {
+    LOG_D("Skip Migrate, Old/New Ori Name equals to[%s] ", qPrintable(newOri));
+    return true;
   }
 
+  const QString& castName = ind.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Name).data(Qt::DisplayRole).toString();
   QDir imageHostDir{m_imageHostPath};
-  int migrateCastCnt{0};
-  for (const auto& indr : selectedRowsIndexes) {
-    const int r = indr.row();
-    QSqlRecord rec = record(r);
-    const int ret = CastBaseDb::MigrateToNewOriFolder(rec, imageHostDir, newOri);
-    if (ret < FD_ERROR_CODE::FD_SKIP) {
-      return -1;
-    }
-    if (ret == FD_ERROR_CODE::FD_SKIP) {
-      continue;
-    }
-    ++migrateCastCnt;
-    setRecord(r, rec);
+  if (!imageHostDir.exists(oldOri + '/' + castName)) {
+    LOG_W("Migrate abort. folder[oldOri:%s/castName:%s] not exist", qPrintable(oldOri), qPrintable(castName));
+    return false;
   }
-  if (migrateCastCnt >= 0) {
-    submitSaveAllChanges();
+
+  if (!imageHostDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
+    LOG_W("Migrate oldOri[%s]/castName[%s] to newOri[%s] failed", qPrintable(oldOri), qPrintable(castName), qPrintable(newOri));
+    return false;
   }
-  LOG_D("%d cast migrate to newOri[%s] succeed", migrateCastCnt, qPrintable(newOri));
-  return migrateCastCnt;
+
+  LOG_OK_P("Migrate ok", "cast[%s] migrate from[%s] to newOri[%s] succeed", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
+  return true;
 }
 
 bool CastDbModel::submitSaveAllChanges() {
@@ -337,7 +346,7 @@ bool CastDbModel::submitSaveAllChanges() {
     LOG_W("Begin transaction failed: %s", qPrintable(db.lastError().text()));
     return false;
   }
-  if (!submitAll()) {  // todo: cause view lose selection
+  if (!submitAll()) { // todo: cause view lose selection
     LOG_W("SubmitAll failed[%s], rollback now", qPrintable(lastError().text()));
     if (!db.rollback()) {
       LOG_W("Rollback also failed: %s", qPrintable(db.lastError().text()));

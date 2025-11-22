@@ -8,9 +8,9 @@
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
 #include "ScenePageNaviHelper.h"
+#include <QHeaderView>
 #include <QCryptographicHash>
 
-template struct EnumIntAction<QListView::Flow>;
 template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 template struct EnumIntAction<ViewTypeTool::ViewType>;
 template struct EnumIntAction<Style::StyleE>;
@@ -22,3 +22,6 @@ template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
+template struct EnumIntAction<Qt::TextElideMode>;
+template struct EnumIntAction<QHeaderView::ResizeMode>;
+template struct EnumIntAction<Qt::ScrollBarPolicy>;

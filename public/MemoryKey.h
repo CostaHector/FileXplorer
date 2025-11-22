@@ -21,6 +21,7 @@ public:
 
   QString InitialValueToString() const;
   QString valueToString(const QVariant& v_) const;
+  bool isPath() const {return checker.isPath();}
 
   QString name;
   QVariant v;
@@ -62,9 +63,6 @@ struct MemoryKey {
 
   static const KV MENU_RIBBON_CURRENT_TAB_INDEX;
   static const KV COMPLETE_JSON_FILE_MIN_PERFORMERS_COUNT;
-
-  static const KV TABLE_DEFAULT_SECTION_SIZE;
-  static const KV TABLE_DEFAULT_COLUMN_SECTION_SIZE;
 
   static const KV VIDS_LAST_TABLE_NAME;
 

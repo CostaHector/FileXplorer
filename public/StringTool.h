@@ -25,6 +25,8 @@ inline void ImgsSortNameFirst(QStringList& imgs) {
 int RemoveDuplicateKeepSequence(QStringList& hists);
 int TrimEachElementAndRemoveEmpty(QStringList& keywords);
 void SearchHistoryListProc(QStringList& hists);
+
+QString PathJoinPixmapSize(QString path, int width, int height);
 }
 
 #endif // STRINGTOOL_H

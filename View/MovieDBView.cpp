@@ -9,6 +9,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "JsonRenameRegex.h"
+#include "ViewActions.h"
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -27,9 +28,11 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
   CHECK_NULLPTR_RETURN_VOID(model_);
   CHECK_NULLPTR_RETURN_VOID(dbSearchBar_);
 
-  m_movieMenu = new (std::nothrow) MovieDatabaseMenu{"Movie Right click menu", this};
-  CHECK_NULLPTR_RETURN_VOID(m_movieMenu)
-  BindMenu(m_movieMenu);
+  m_menu->addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
+  m_menu->addActions(FileOpActs::GetInst().OPEN_AG->actions());
+  m_menu->addSeparator();
+  m_menu->addActions(FileOpActs::GetInst().COPY_PATH_AG->actions());
+  AddItselfAction2Menu();
 
   setModel(_dbModel);
 

@@ -17,49 +17,40 @@
 using namespace PERFORMER_DB_HEADER_KEY;
 
 const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
-    {"CREATE TABLE IF NOT EXISTS `%1`"                //
-     + QString(R"((
-`%1` TEXT NOT NULL,
-`%2` INT DEFAULT %3,
-`%4` TEXT DEFAULT "",
-`%5` TEXT DEFAULT "",
-`%6` TEXT DEFAULT "%7",
-`%8` TEXT DEFAULT "",
-`%9` TEXT DEFAULT "",
-`%10` TEXT DEFAULT "",
- PRIMARY KEY (%1)
-);)")
-           .arg(ENUM_2_STR(Name))
-           .arg(ENUM_2_STR(Rate))
-           .arg(CastPsonFileHelper::DEFAULT_RATE)
-           .arg(ENUM_2_STR(AKA))
-           .arg(ENUM_2_STR(Tags))
-           .arg(ENUM_2_STR(Ori))
-           .arg(CastPsonFileHelper::DEFAULT_ORIENTATION)
-           .arg(ENUM_2_STR(Vids))
-           .arg(ENUM_2_STR(Imgs))
-           .arg(ENUM_2_STR(Detail))};
+    {"CREATE TABLE IF NOT EXISTS `%1` ("                //
+#define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) + tblFieldDefinition.arg(ENUM_2_STR(enu)).arg(defaultValue)
+      PSON_MODEL_FIELD_MAPPING
+#undef PSON_KEY_ITEM
+     + QString(R"( PRIMARY KEY (%1));)").arg(ENUM_2_STR(Name))
+    };
 
 const QString INSERT_FULL_FIELDS_TEMPLATE  //
     {"REPLACE INTO `%1` "                  //
      + QString(R"(
-(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`)
-VALUES(:1, :2, :3, :4, :5, :6, :7, :8);)")
+(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`, `%11`)
+VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11);)")
            .arg(ENUM_2_STR(Name))
            .arg(ENUM_2_STR(Rate))
            .arg(ENUM_2_STR(AKA))
            .arg(ENUM_2_STR(Tags))
            .arg(ENUM_2_STR(Ori))
+           .arg(ENUM_2_STR(Height))
+           .arg(ENUM_2_STR(Size))
+           .arg(ENUM_2_STR(Birth))
            .arg(ENUM_2_STR(Vids))
            .arg(ENUM_2_STR(Imgs))
-           .arg(ENUM_2_STR(Detail))};
+           .arg(ENUM_2_STR(Detail))
+    };
 
 enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name = 0,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags,
-  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Ori,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Height,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Size,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_Birth,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail,
@@ -76,9 +67,9 @@ const QString INSERT_NAME_ORI_IMGS_TEMPLATE  //
 
 enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4; must!
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name = 0,
-  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Ori,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs,
-  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE,
+  INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Ori_VALUE,
   INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE,
 };
 
@@ -128,9 +119,9 @@ int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
     const QString& ori = mpIt.value().first;
     const QString& imgsStr = mpIt.value().second.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);  // img seperated by \n
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Name, perf);
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation, ori);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Ori, ori);
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs, imgsStr);
-    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Orientation_VALUE, ori);
+    qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Ori_VALUE, ori);
     qry.bindValue(INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD_Imgs_VALUE, imgsStr);
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
@@ -180,14 +171,10 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
       LOG_D("psonPath[%s] is empty", qPrintable(psonPath));
       continue;
     }
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name, pson[ENUM_2_STR(Name)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate, pson[ENUM_2_STR(Rate)].toInt());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA, pson[ENUM_2_STR(AKA)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags, pson[ENUM_2_STR(Tags)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation, pson[ENUM_2_STR(Ori)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Vids, pson[ENUM_2_STR(Vids)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Imgs, pson[ENUM_2_STR(Imgs)].toString());
-    qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Detail, pson[ENUM_2_STR(Detail)].toString());
+
+#define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) qry.bindValue(INSERT_FULL_FIELDS_TEMPLATE_FIELD_##enu, pson[ENUM_2_STR(enu)]);
+    PSON_MODEL_FIELD_MAPPING
+#undef PSON_KEY_ITEM
 
     if (!qry.exec()) {
       LOG_W("replace[%s] failed: %s",  //
@@ -292,7 +279,7 @@ bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& ima
 
 QString CastBaseDb::GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
   return imageHostPath + '/'                                                                        //
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Orientation).value().toString() + '/'  //
+         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Ori).value().toString() + '/'  //
          + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();              //
 }
 
@@ -300,41 +287,6 @@ QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& 
   return GetCastPath(sqlRecord, imageHostPath) + '/'                                   //
          + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()  //
          + ".pson";
-}
-
-bool CastBaseDb::IsNewOriFolderPathValid(const QString& destPath, const QString& imageHost, QString& newOri) {
-  if (!QFileInfo{destPath}.isDir()) {
-    LOG_D("Abort Migrate, path[%s] not a directory", qPrintable(destPath));
-    return false;
-  }
-  if (!destPath.startsWith(imageHost + '/')) {
-    LOG_W("Abort Migrate, Path[%s] not under imageHost[%s]", qPrintable(destPath), qPrintable(imageHost));
-    return false;
-  }
-  QString newOriFolder = destPath.mid(imageHost.size() + 1);
-  if (newOriFolder.contains(JSON_RENAME_REGEX::INVALID_CHARS_IN_FILENAME)) {
-    LOG_W("Abort Migrate, Ori Folder Name[%s] invalid", qPrintable(newOriFolder));
-    return false;
-  }
-  newOri.swap(newOriFolder);
-  return true;
-}
-
-int CastBaseDb::MigrateToNewOriFolder(QSqlRecord& sqlRecord, QDir& imageoriDir, const QString& newOri) {
-  const QString oldOri{sqlRecord.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
-  if (newOri == oldOri) {
-    return FD_ERROR_CODE::FD_SKIP;
-  }
-  // Migrate old folder from oldOri to newOri
-  const QString castName{sqlRecord.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  if (imageoriDir.exists(oldOri + '/' + castName)) {  // folder oldOri not exist
-    if (!imageoriDir.rename(oldOri + '/' + castName, newOri + '/' + castName)) {
-      LOG_W("Migrate folder failed, castName[%s] from oldOri[%s] to newOri[%s]", qPrintable(castName), qPrintable(oldOri), qPrintable(newOri));
-      return FD_ERROR_CODE::FD_RENAME_FAILED;
-    }
-  }
-  sqlRecord.setValue(PERFORMER_DB_HEADER_KEY::Ori, newOri);
-  return FD_ERROR_CODE::FD_OK;
 }
 
 auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCast2OriImgs {

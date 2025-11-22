@@ -5,7 +5,6 @@
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
 #include "SceneStyleDelegate.h"
-#include <QMenu>
 
 class ScenesListModel;
 
@@ -27,7 +26,7 @@ public:
   void subscribe();
   bool onCopyBaseName();
   bool onOpenCorrespondingFolder();
-  bool onClickEvent(const QModelIndex &idx, const QModelIndex &previous);
+  bool onClickEvent(const QModelIndex &idx);
 
 signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
@@ -47,6 +46,8 @@ private:
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   SceneStyleDelegate* mAlignDelegate{nullptr};
   ScenePageControl* _scenePageControl{nullptr};
+
+  mutable QModelIndex mLastClickedIndex;
 };
 
 #endif  // SCENELISTVIEW_H

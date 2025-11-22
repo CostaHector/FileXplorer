@@ -10,8 +10,8 @@
 #include "StringTool.h"
 #include "TableFields.h"
 #include "QuickWhereClauseHelper.h"
+#include "PathTool.h"
 
-#include <QDesktopServices>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMessageBox>
@@ -27,11 +27,12 @@ void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
-    : CustomTableView{"PERFORMERS_TABLE", parent},  //
-      _castDbSearchBar{castDbSearchBar_},
-      _castModel{castDbModel_},
-      _castDb{castDb_},
-      mImageHost{castDbModel_->rootPath()} {
+  : CustomTableView{"PERFORMERS_TABLE", parent}
+  , //
+  _castDbSearchBar{castDbSearchBar_}
+  , _castModel{castDbModel_}
+  , _castDb{castDb_}
+  , mImageHost{castDbModel_->rootPath()} {
   if (!QFileInfo{mImageHost}.isDir()) {
     QString titleMsg{QString{"ImageHostPath[%1] not exist"}.arg(mImageHost)};
     LOG_CRIT_NP(titleMsg, mImageHost);
@@ -42,7 +43,11 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
   CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
   CHECK_NULLPTR_RETURN_VOID(_castModel);
 
-  BindMenu(g_castAct().GetRightClickMenu(this));
+  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
+  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
+  m_menu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
+  AddItselfAction2Menu();
+
   setModel(_castModel);
   InitTableView();
 
@@ -70,7 +75,6 @@ void CastDBView::subscribe() {
   connect(castInst.SYNC_ALL_RECORDS_VIDS_FROM_DB, &QAction::triggered, this, &CastDBView::onRefreshAllVidsField);
 
   connect(castInst.OPEN_DB_WITH_LOCAL_APP, &QAction::triggered, &_castDb, &DbManager::onShowInFileSystemView);
-  connect(castInst.MIGRATE_CAST_TO, &QAction::triggered, this, &CastDBView::onMigrateCastTo);
 
   connect(castInst.APPEND_FROM_FILE_SYSTEM_STRUCTURE, &QAction::triggered, this, &CastDBView::onLoadFromFileSystemStructure);
   connect(castInst.APPEND_FROM_PSON_FILES, &QAction::triggered, this, &CastDBView::onLoadFromPsonDirectory);
@@ -79,6 +83,11 @@ void CastDBView::subscribe() {
   connect(castInst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, &QAction::triggered, this, &CastDBView::onDumpIntoPsonFile);
 
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &CastDBView::EmitCurrentCastRecordChanged);
+
+  connect(this, &CustomTableView::searchSqlStatementChanged, this, [this](const QString& s) {
+    _castDbSearchBar->SetWhereClause(s);
+    _castModel->SetFilterAndSelect(s);
+  });
 }
 
 void CastDBView::onInitATable() {
@@ -145,14 +154,15 @@ int CastDBView::onDeleteRecords() {
 bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete) {
   QMessageBox::StandardButton stdCfmDeleteBtn = QMessageBox::StandardButton::No;
   const QString cfmTitleText{QString::asprintf("Confirm %s?", DbManagerHelper::c_str(dropOrDelete))};
-  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable",  //
-                                           DbManagerHelper::c_str(dropOrDelete), qPrintable(DB_TABLE::PERFORMERS))};
+  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable", //
+                                           DbManagerHelper::c_str(dropOrDelete),
+                                           qPrintable(DB_TABLE::PERFORMERS))};
 #ifdef RUNNING_UNIT_TESTS
   stdCfmDeleteBtn = CastDbViewMocker::MockDropDeleteTable() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                          //
-                                         cfmTitleText,                                                                  //
-                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
+  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                         //
+                                         cfmTitleText,                                                                 //
+                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable", //
                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
 #endif
   if (stdCfmDeleteBtn != QMessageBox::StandardButton::Yes) {
@@ -160,9 +170,15 @@ bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDe
     return true;
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
-  LOG_OE_P(rmvedTableCnt >= 0, "Drop/Delete", "Table[%s] %s count:%d", qPrintable(DB_TABLE::PERFORMERS), DbManagerHelper::c_str(dropOrDelete),
+  LOG_OE_P(rmvedTableCnt >= 0,
+           "Drop/Delete",
+           "Table[%s] %s count:%d",
+           qPrintable(DB_TABLE::PERFORMERS),
+           DbManagerHelper::c_str(dropOrDelete),
            rmvedTableCnt);
-  onModelRepopulate();
+  if (dropOrDelete == DbManagerHelper::DropOrDeleteE::DELETE) {
+    onModelRepopulate();
+  }
   return rmvedTableCnt >= 0;
 }
 
@@ -180,17 +196,17 @@ int CastDBView::onLoadFromFileSystemStructure() {
 }
 
 bool CastDBView::onModelRepopulate() {
-  const QModelIndex oldIndex = currentIndex();
+  mIndexRecover.stash(currentIndex());
   bool bRepopulateRet = _castModel->repopulate();
-  if (oldIndex.isValid() && currentIndex() != oldIndex) {
-    setCurrentIndex(oldIndex);
-  }
+  mIndexRecover.stashPop(*this, currentIndex());
   LOG_OE_P(bRepopulateRet, "Repopulate", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
   return bRepopulateRet;
 }
 
 bool CastDBView::onModelSubmitAll() {
+  mIndexRecover.stash(currentIndex());
   bool submitRet = _castModel->submitSaveAllChanges();
+  mIndexRecover.stashPop(*this, currentIndex());
   LOG_OE_P(submitRet, "Model submit", "Table: %s", qPrintable(DB_TABLE::PERFORMERS));
   return submitRet;
 }
@@ -321,28 +337,6 @@ void CastDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const 
   emit currentRecordChanged(record, mImageHost);
 }
 
-int CastDBView::onMigrateCastTo() {
-  const QModelIndexList& selectedRowIndexes = selectionModel()->selectedRows();
-  if (selectedRowIndexes.isEmpty()) {
-    LOG_INFO_NP("Nothing was selected.", "Select at least one row before migrate");
-    return 0;
-  }
-  const QString cfmTitleText{"Migrate to (folder under[" + mImageHost + "])"};
-  QString destPath;
-#ifdef RUNNING_UNIT_TESTS
-  destPath = CastDbViewMocker::MockMigrateToPath();
-#else
-  destPath = QFileDialog::getExistingDirectory(this, cfmTitleText, mImageHost);
-#endif
-  if (destPath.isEmpty()) {
-    LOG_OK_NP("[Skip] User cancel migrate", "return");
-    return 0;
-  }
-  int migrateCastCnt = _castModel->MigrateCastsTo(selectedRowIndexes, destPath);
-  LOG_OE_P(migrateCastCnt >= 0, "Migrate cast", "%d casts from to %s", selectedRowIndexes.size(), qPrintable(destPath));
-  return migrateCastCnt;
-}
-
 void CastDBView::RefreshCurrentRowHtmlContents() {
   auto current = currentIndex();
   if (!current.isValid()) {
@@ -350,4 +344,27 @@ void CastDBView::RefreshCurrentRowHtmlContents() {
   }
   const auto& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
+}
+
+void IndexRecoverHelper::stashPop(QAbstractItemView& itemView, const QModelIndex& currentIndex) {
+  if (!mNeedRecover) {
+    return;
+  }
+  if (currentIndex == mOldIndex) {
+    return;
+  }
+  if (mOldIndex.isValid()) { // old still valid
+    itemView.setCurrentIndex(mOldIndex);
+    return;
+  }
+  const int beforeRow = mOldIndex.row();
+  if (const QAbstractItemModel* pModel = mOldIndex.model()) { // may get deleted
+    const int rowCnt = pModel->rowCount();
+    if (rowCnt == 0) {
+      return;
+    }
+    if (beforeRow >= rowCnt) {
+      itemView.setCurrentIndex(mOldIndex.siblingAtRow(rowCnt - 1));
+    }
+  }
 }

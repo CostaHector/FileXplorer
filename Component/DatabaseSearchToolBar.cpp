@@ -7,13 +7,16 @@
 #include "MountHelper.h"
 #include "MovieDBActions.h"
 #include "CastDBActions.h"
+#include "QuickWhereClauseDialogMovie.h"
+#include "QuickWhereClauseDialogCast.h"
 #include <QLineEdit>
 #include <QCompleter>
 #include <QInputDialog>
 #include <QLayout>
 
 // -------------------------------- DatabaseSearchToolBar --------------------------------
-DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
+DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* parent)
+  : QToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
   m_whereCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_whereCB);
@@ -34,8 +37,8 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   _QUICK_WHERE_CLAUSE_ACT = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_FILTERS"), "Where clause", this);
   CHECK_NULLPTR_RETURN_VOID(_QUICK_WHERE_CLAUSE_ACT);
   _QUICK_WHERE_CLAUSE_ACT->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_H));
-  _QUICK_WHERE_CLAUSE_ACT->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE/CAST` table;"}.arg(
-      _QUICK_WHERE_CLAUSE_ACT->text(), _QUICK_WHERE_CLAUSE_ACT->shortcut().toString()));
+  _QUICK_WHERE_CLAUSE_ACT->setToolTip(QString{"<b>%1 (%2)</b><br/> Construct where clause quickly for `MOVIE/CAST` table;"}
+                                          .arg(_QUICK_WHERE_CLAUSE_ACT->text(), _QUICK_WHERE_CLAUSE_ACT->shortcut().toString()));
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   addWidget(m_whereCB);
@@ -47,8 +50,9 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
 
 void DatabaseSearchToolBar::onQuickWhereClause() {
   if (m_quickWhereClause == nullptr) {
-    m_quickWhereClause = new (std::nothrow) QuickWhereClauseDialog{this};
-    CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause)
+    m_quickWhereClause = CreateQuickWhereClauseDialog();
+    CHECK_NULLPTR_RETURN_VOID(m_quickWhereClause);
+    m_quickWhereClause->Init();
   }
   int dlgRetCode = QDialog::DialogCode::Rejected;
 #ifdef RUNNING_UNIT_TESTS
@@ -77,8 +81,8 @@ void DatabaseSearchToolBar::EmitWhereClauseChangedSignal() {
 }
 
 // -------------------------------- MovieDBSearchToolBar --------------------------------
-MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent)  //
-    : DatabaseSearchToolBar{title, parent} {
+MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent) //
+  : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
 
   m_whereCB->addItem(QString{R"(`%1` LIKE "%%" AND `%1` LIKE "%%")"}.arg(ENUM_2_STR(PrePathRight)));
@@ -88,17 +92,21 @@ MovieDBSearchToolBar::MovieDBSearchToolBar(const QString& title, QWidget* parent
   m_whereCB->addItem(QString{R"(`%1` BETWEEN 0 AND 1000000)"}.arg(ENUM_2_STR(Size)));
   m_whereCB->addItem(QString{R"(`%1` = "E:/")"}.arg(ENUM_2_STR(Driver)));
   m_whereCB->addItem(QString{R"(`%1` IN ("Comedy", "Documentary"))"}.arg(ENUM_2_STR(Tags)));
-  m_whereCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast)));  // Don't use leading wildcard!
+  m_whereCB->addItem(QString{R"(`%1` LIKES "Chris Evans%")"}.arg(ENUM_2_STR(Cast))); // Don't use leading wildcard!
 
   m_tablesCB = new (std::nothrow) QComboBox;
   CHECK_NULLPTR_RETURN_VOID(m_tablesCB);
   m_tablesCB->setEditable(false);
-  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom);  // not editable
+  m_tablesCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtBottom); // not editable
   m_tablesCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   m_tablesCB->setMaxVisibleItems(15);
   auto* tblAct = insertWidget(_QUICK_WHERE_CLAUSE_ACT, m_tablesCB);
   insertSeparator(tblAct);
   MovieDBSearchToolBar::extraSignalSubscribe();
+}
+
+QuickWhereClauseDialog* MovieDBSearchToolBar::CreateQuickWhereClauseDialog() {
+  return new (std::nothrow) QuickWhereClauseDialogMovie{this};
 }
 
 void MovieDBSearchToolBar::extraSignalSubscribe() {
@@ -129,8 +137,13 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
 #ifdef RUNNING_UNIT_TESTS
   std::tie(okUserSelect, drpTbl) = MovieDBSearchToolBarMock::QryDropWhichTableMock();
 #else
-  drpTbl = QInputDialog::getItem(this, dropWhichTableTitle, dropWhichTableMsgs, candidates, defaultDropIndex,  //
-                                 false, &okUserSelect);
+  drpTbl = QInputDialog::getItem(this,
+                                 dropWhichTableTitle,
+                                 dropWhichTableMsgs,
+                                 candidates,
+                                 defaultDropIndex, //
+                                 false,
+                                 &okUserSelect);
 #endif
   if (!okUserSelect) {
     LOG_OK_NP("[skip] Drop table", "User cancel");
@@ -145,12 +158,12 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
 
 void MovieDBSearchToolBar::AddATable(const QString& newTableName) {
   m_tablesCB->addItem(newTableName);
-  m_tablesCB->setCurrentIndex(m_tablesCB->count() - 1);  // todo this line mat can be removed
+  m_tablesCB->setCurrentIndex(m_tablesCB->count() - 1); // todo this line mat can be removed
 }
 
 void MovieDBSearchToolBar::InitTables(const QStringList& tbls) {
   m_tablesCB->clear();
-  for (const QString& tableName : tbls) {  // in underscore
+  for (const QString& tableName : tbls) { // in underscore
     m_tablesCB->addItem(tableName);
   }
   LOG_D("Tables count:%d", tbls.size());
@@ -175,8 +188,8 @@ QStringList MovieDBSearchToolBar::toMovieTableCandidates() const {
 }
 
 // -------------------------------- CastDatabaseSearchToolBar --------------------------------
-CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent)  //
-    : DatabaseSearchToolBar{title, parent} {
+CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent) //
+  : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(m_whereCB) {
     using namespace PERFORMER_DB_HEADER_KEY;
     for (const auto& field : CAST_TABLE_HEADERS) {
@@ -186,4 +199,8 @@ CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidg
     m_whereCB->addItem(QString{R"(`%1`="")"}.arg(ENUM_2_STR(Ori)));
   }
   CastDatabaseSearchToolBar::extraSignalSubscribe();
+}
+
+QuickWhereClauseDialog* CastDatabaseSearchToolBar::CreateQuickWhereClauseDialog() {
+  return new (std::nothrow) QuickWhereClauseDialogCast{this};
 }

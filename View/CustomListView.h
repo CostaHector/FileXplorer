@@ -3,10 +3,10 @@
 
 #include <QAction>
 #include <QListView>
-#include <QMenu>
+#include "AddableMenu.h"
 #include "EnumIntAction.h"
 
-extern template struct EnumIntAction<QListView::Flow>;
+extern template struct EnumIntAction<Qt::TextElideMode>;
 
 class CustomListView : public QListView {
   Q_OBJECT
@@ -17,7 +17,7 @@ public:
   void wheelEvent(QWheelEvent *event) override;
 
   void BindMenu(QMenu* menu);
-  void onOrientationChange(const QAction* pAct);
+  void AddItselfAction2Menu();
 
   void InitListView();
   void mousePressEvent(QMouseEvent* event) override;
@@ -26,13 +26,30 @@ public:
   bool setIconSizeScaledIndex(int newScaledIndex);
 protected:
   QString m_name;
-  QMenu* _FLOW_ORIENTATION_MENU{nullptr};
-  QAction* _FLOW_ORIENTATION_LEFT_TO_RIGHT{nullptr};
-  QAction* _FLOW_ORIENTATION_TOP_TO_BOTTOM{nullptr};
-  EnumIntAction<QListView::Flow> mflowIntAction;
 
+  QAction* _TEXT_ELIDE_MODE_LEFT{nullptr};
+  QAction* _TEXT_ELIDE_MODE_RIGHT{nullptr};
+  QAction* _TEXT_ELIDE_MODE_MIDDLE{nullptr};
+  QAction* _TEXT_ELIDE_MODE_NONE{nullptr};
+  EnumIntAction<Qt::TextElideMode> mTextEditModeIntAction;
+  QMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
+
+  QAction* _FLOW_ORIENTATION;
+  QAction* _VIEW_MODE_LIST_ICON{nullptr};
+  QAction* _RESIZED_MODE_FIXED_OR_ADJUST{nullptr};
+  QAction* _WRAPING_ACTIONS{nullptr};
+  QAction* _UNIFORM_ITEM_SIZES{nullptr};
+
+  AddableMenu* m_menu {nullptr};
 private:
-  QMenu* m_menu {nullptr};
+  void SubscribePublicActions();
+
+  void onTextElideModeChanged(const QAction* pAct);
+  void onOrientationChanged(const bool bchecked);
+  void onViewModeListIconToggled(const bool bchecked);
+  void onResizeModeToggled(const bool bchecked);
+  void onWrapingToggled(const bool bchecked);
+  void onUniformItemSizedToggled(const bool bchecked);
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
   static QSet<QString> LISTS_SET;

@@ -45,6 +45,7 @@ class ValueChecker {
   bool operator()(const QVariant& v) const;
   QString valueToString(const QVariant& v) const;
   QVariant strToQVariant(const QString& v) const;
+  bool isPath() const {return valueType == VALUE_CHECKER_TYPE::VALUE_TYPE::FILE_PATH || valueType == VALUE_CHECKER_TYPE::VALUE_TYPE::FOLDER_PATH;}
 
  private:
   ValueChecker() = delete;

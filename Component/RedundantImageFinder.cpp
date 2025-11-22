@@ -7,22 +7,22 @@
 #include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "PublicMacro.h"
+#include "PublicTool.h"
 #include "SpacerWidget.h"
 #include "PathTool.h"
 
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QItemSelectionModel>
-#include <QDesktopServices>
 #include <QMenu>
 
 constexpr char RedundantImageFinder::GEOMETRY_KEY[];
 
-RedundantImageFinder::RedundantImageFinder(QWidget* parent)  //
-    : QMainWindow{parent}                                    //
+RedundantImageFinder::RedundantImageFinder(QWidget* parent) //
+  : QMainWindow{parent}                                     //
 {
-  mResultAlsoContainEmptyImage =
-      Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
+  mResultAlsoContainEmptyImage
+      = Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
 
   auto& redunInst = g_redunImgFinderAg();
   QMenu* findByMenu = new (std::nothrow) QMenu{"Find by Menu", this};
@@ -106,15 +106,13 @@ void RedundantImageFinder::subscribe() {
   ImagesInfoManager& redunImgLibInst = ImagesInfoManager::getInst();
   connect(inst.OPEN_BENCHMARK_FOLDER, &QAction::triggered, this, [&redunImgLibInst]() {
     const QString benchmarkPath = redunImgLibInst.GetDynRedunPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(benchmarkPath));
+    FileTool::OpenLocalImageFile(benchmarkPath);
   });
-  connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() {
-    redunImgLibInst.ForceReloadImpl();
-  });
+  connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() { redunImgLibInst.ForceReloadImpl(); });
   connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& proxyClickedIndex) {
     const QModelIndex srcClickedInd = m_imgProxy->mapToSource(proxyClickedIndex);
     const QString imgPath{m_imgModel->filePath(srcClickedInd)};
-    QDesktopServices::openUrl(QUrl::fromLocalFile(imgPath));
+    FileTool::OpenLocalImageFile(imgPath);
   });
 }
 

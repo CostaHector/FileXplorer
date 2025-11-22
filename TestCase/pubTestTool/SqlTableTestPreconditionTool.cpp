@@ -96,12 +96,12 @@ bool CreateFileStructurePsonFiles(TDir& tDir) {
   }
 
   QByteArray chrisEvansPsonContents =
-      CastPsonFileHelper::CastValues2PsonStr("Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero", "Chris Evans in captain america.mp4",
+      CastPsonFileHelper::CastValues2PsonStr("Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero", -1, -1, "", "Chris Evans in captain america.mp4",
                                              "Chris Evans portait.jpg", "Chris Evans, American movie star");
   QByteArray chrisHemesworthPsonContents =
-      CastPsonFileHelper::CastValues2PsonStr("Chris Hemsworth", 9, "Thor", "hero,movie star", "SuperHero", "Chris Hemsworth in captain america.mp4",
+      CastPsonFileHelper::CastValues2PsonStr("Chris Hemsworth", 9, "Thor", "hero,movie star", "SuperHero", -1, -1, "", "Chris Hemsworth in captain america.mp4",
                                              "Chris Hemsworth portait.jpg", "Chris Hemsworth, Australia movie star");
-  QByteArray jamesCaviezelPsonContents = CastPsonFileHelper::CastValues2PsonStr("James Caviezel", 9, "General Zod", "hero,movie star", "Action",
+  QByteArray jamesCaviezelPsonContents = CastPsonFileHelper::CastValues2PsonStr("James Caviezel", 9, "General Zod", "hero,movie star", "Action", -1, -1, "",
                                                                                 "James Caviezel in Man of Steel - General Zod.mp4",
                                                                                 "James Caviezel portait.jpg", "James Caviezel, American movie star");
 

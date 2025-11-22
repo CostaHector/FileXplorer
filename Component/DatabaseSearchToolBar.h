@@ -27,6 +27,7 @@ protected:
   void onQuickWhereClause();
   void subscribe();
   virtual void extraSignalSubscribe() = 0;
+  virtual QuickWhereClauseDialog* CreateQuickWhereClauseDialog() = 0;
   QComboBox* m_whereCB{nullptr};
   QuickWhereClauseDialog* m_quickWhereClause{nullptr};
   QAction* _QUICK_WHERE_CLAUSE_ACT{nullptr};
@@ -57,6 +58,7 @@ public:
 signals:
   void movieTableChanged(const QString& newTable);
 private:
+  QuickWhereClauseDialog* CreateQuickWhereClauseDialog() override;
   void extraSignalSubscribe() override;
   QComboBox* m_tablesCB{nullptr};
 };
@@ -65,6 +67,7 @@ class CastDatabaseSearchToolBar: public DatabaseSearchToolBar {
 public:
   explicit CastDatabaseSearchToolBar(const QString& title, QWidget* parent);
 private:
+  QuickWhereClauseDialog* CreateQuickWhereClauseDialog() override;
   void extraSignalSubscribe() override {}
 };
 #endif // DATABASESEARCHTOOLBAR_H

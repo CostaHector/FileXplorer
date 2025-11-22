@@ -81,8 +81,6 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     ctb.setPlainText("Hello world");
     ctb.selectAll();
     QCOMPARE(ctb.GetCurrentSelectedText(), "Hello world");
-    ctb.CopySelectedTextToClipboard();
-    // QCOMPARE(clipboardGuard.getCurText(), "Hello world"); // clipboard always not stable
   }
 
   void test_UpdateImagesSizeInHtmlSrc() {

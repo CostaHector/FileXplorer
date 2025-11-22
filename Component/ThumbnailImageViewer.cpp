@@ -12,6 +12,7 @@
 #include <QPixmap>
 #include <QWheelEvent>
 #include <QPainter>
+#include <QShortcut>
 
 bool ThumbnailImageViewer::IsFileAbsPathImage(const QString& fileAbsPath) {
   const QString dotExt = PathTool::GetDotFileExtension(fileAbsPath);
@@ -26,9 +27,10 @@ bool ThumbnailImageViewer::IsGifFile(const QString& fileAbsPath) {
   return fileAbsPath.endsWith(".gif", Qt::CaseInsensitive);
 }
 
-ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent)  //
-    : QScrollArea{parent},                                                                 //
-      m_memoryKeyName{memoryKeyName} {
+ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent) //
+  : QScrollArea{parent}
+  , //
+  m_memoryKeyName{memoryKeyName} {
   int iconSizeIndexHint = Configuration().value(m_memoryKeyName + "_ICON_SIZE_INDEX", mCurIconScaledSizeIndex).toInt();
   setIconSizeScaledIndex(iconSizeIndexHint);
 
@@ -43,17 +45,20 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
 
   m_prevButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_LAST"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
-  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
-  m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
+  m_prevButton->setShortcut(QKeySequence(Qt::Key_Left));
+  m_prevButton->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
 
   m_nextButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_NEXT"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
-  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
+  m_nextButton->setShortcut(QKeySequence(Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
 
   mLabel = new (std::nothrow) QLabel{this};
   CHECK_NULLPTR_RETURN_VOID(mLabel);
   mLabel->setAlignment(Qt::AlignCenter);
+  mLabel->setContextMenuPolicy(Qt::CustomContextMenu);
+
   setWidget(mLabel);
   setWidgetResizable(true);
 
@@ -64,12 +69,17 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
     setAttribute(Qt::WA_DeleteOnClose);
   }
 
-  connect(m_prevButton, &QPushButton::clicked, this, &ThumbnailImageViewer::NavigateImagePrevious);
-  connect(m_nextButton, &QPushButton::clicked, this, &ThumbnailImageViewer::NavigateImageNext);
-  connect(mNavigateIntoSub, &QCheckBox::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
-
+  setWindowIcon(QIcon{":img/IMAGE"});
   ReadSetting();
-  adjustButtonPosition();
+  {
+    connect(m_prevButton, &QPushButton::clicked, this, &ThumbnailImageViewer::NavigateImagePrevious);
+    connect(m_nextButton, &QPushButton::clicked, this, &ThumbnailImageViewer::NavigateImageNext);
+    connect(mNavigateIntoSub, &QCheckBox::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
+    connect(mLabel, &QLabel::customContextMenuRequested, this, &ThumbnailImageViewer::onCustomContextMenuRequested);
+
+    QShortcut *escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    connect(escShortcut, &QShortcut::activated, this, &ThumbnailImageViewer::close);
+  }
 }
 
 ThumbnailImageViewer::~ThumbnailImageViewer() {
@@ -128,7 +138,7 @@ bool ThumbnailImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteAr
   return UpdatePixmapAndTitle();
 }
 
-QString ThumbnailImageViewer::FromPath::GetImageAbsPath() const {  //
+QString ThumbnailImageViewer::FromPath::GetImageAbsPath() const { //
   return PathTool::join(parentPath, rel2image);
 }
 
@@ -163,7 +173,7 @@ bool ThumbnailImageViewer::GetPixmap(QPixmap& pm, QString& winTitle) const {
       break;
     }
     default: {
-      LOG_W("ImageFrom[%d] not support", (int)mImageFrom);
+      LOG_W("ImageFrom[%d] not support", (int) mImageFrom);
       return false;
     }
   }
@@ -287,8 +297,48 @@ bool ThumbnailImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
     return false;
   }
   mImgIt.setIncludingSubDirectory(bInclude);
-  mImgIt(mDataFromPath.parentPath, true);  // force refresh images in folder structure
+  mImgIt(mDataFromPath.parentPath, true); // force refresh images in folder structure
   return true;
+}
+
+void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
+  if (mMenu == nullptr) {
+    _OPEN_IN_SYSTEM_APPLICATION = new (std::nothrow) QAction{QIcon{":img/LARGE"}, "Open in system application", this};
+    CHECK_NULLPTR_RETURN_VOID(_OPEN_IN_SYSTEM_APPLICATION);
+    _OPEN_IN_SYSTEM_APPLICATION->setShortcutVisibleInContextMenu(true);
+
+    _REVEAL_IN_FILE_EXPLORER = new (std::nothrow) QAction{QIcon{":img/REVEAL_IN_EXPLORER"}, "Reveal in explorer", this};
+    CHECK_NULLPTR_RETURN_VOID(_REVEAL_IN_FILE_EXPLORER);
+    _REVEAL_IN_FILE_EXPLORER->setShortcutVisibleInContextMenu(true);
+
+    _COPY_FILE_NAME = new (std::nothrow) QAction{QIcon{":img/COPY_TEXT"}, "Copy file name", this};
+    CHECK_NULLPTR_RETURN_VOID(_COPY_FILE_NAME);
+    _COPY_FILE_NAME->setShortcutVisibleInContextMenu(true);
+
+    mMenu = new (std::nothrow) QMenu{"Image viewer system menu", nullptr};
+    CHECK_NULLPTR_RETURN_VOID(mMenu);
+    mMenu->addAction(_OPEN_IN_SYSTEM_APPLICATION);
+    mMenu->addAction(_REVEAL_IN_FILE_EXPLORER);
+    mMenu->addAction(_COPY_FILE_NAME);
+
+    connect(_OPEN_IN_SYSTEM_APPLICATION, &QAction::triggered, this, [this]() {
+      if (mImageFrom == ImageFrom::PATH) {
+        FileTool::OpenLocalFileUsingDesktopService(mDataFromPath.GetImageAbsPath());
+      }
+    });
+    connect(_REVEAL_IN_FILE_EXPLORER, &QAction::triggered, this, [this]() {
+      if (mImageFrom == ImageFrom::PATH) {
+        FileTool::RevealInSystemExplorer(mDataFromPath.GetImageAbsPath());
+      }
+    });
+    connect(_COPY_FILE_NAME, &QAction::triggered, this, [this]() { //
+      if (mImageFrom == ImageFrom::PATH) {
+        FileTool::CopyTextToSystemClipboard(mDataFromPath.GetImageAbsPath());
+      }
+    });
+  }
+  CHECK_NULLPTR_RETURN_VOID(mMenu);
+  mMenu->popup(mapToGlobal(pos));
 }
 
 void ThumbnailImageViewer::wheelEvent(QWheelEvent* event) {

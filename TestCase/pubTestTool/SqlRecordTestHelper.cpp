@@ -17,6 +17,9 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   rec.append(QSqlField(ENUM_2_STR(AKA), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Tags), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Ori), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(Height), QVariant::Int));
+  rec.append(QSqlField(ENUM_2_STR(Size), QVariant::Int));
+  rec.append(QSqlField(ENUM_2_STR(Birth), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Vids), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Imgs), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Detail), QVariant::String));
@@ -26,6 +29,9 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   rec.setValue(AKA, "Thor");
   rec.setValue(Tags, "Man");
   rec.setValue(Ori, ori);
+  rec.setValue(Height, -1);
+  rec.setValue(Size, -1);
+  rec.setValue(Birth, "");
   rec.setValue(Vids, vids);
   rec.setValue(Imgs, imgs);
   rec.setValue(Detail, "The Australian actor first appeared as Thor in 2011 and has since reprised the role in numerous MCU films");
@@ -33,17 +39,17 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
 }
 
 bool CheckRecordIfEqual(const QSqlRecord& actualRec,
-                        const QString& name,
-                        const int rate,
-                        const QString& aka,
-                        const QString& tags,
-                        const QString& ori,
-                        const QString& vids,
-                        const QString& imgs,
-                        const QString& detail,
+#define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) const decltype(defaultValue)& _##enu,
+                        PSON_MODEL_FIELD_MAPPING
+#undef PSON_KEY_ITEM
                         bool fullMatch) {
   using namespace PERFORMER_DB_HEADER_KEY;
-  const QVariantHash expectedValues = CastPsonFileHelper::PerformerJsonJoiner(name, rate, aka, tags, ori, vids, imgs, detail);
+
+  const QVariantHash expectedValues {CastPsonFileHelper::PerformerJsonJoiner(
+#define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) _##enu,
+      PSON_MODEL_FIELD_MAPPING
+#undef PSON_KEY_ITEM
+      nullptr)};
 
   bool allMatch = true;
   const QStringList& expectKeys = expectedValues.keys();

@@ -84,21 +84,6 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QLineEdit* tableNameFi
   return m_tb;
 }
 
-QMenu* DuplicateVideosFinderActions::GetMenu(QWidget* parent) {
-  auto* menu = new (std::nothrow) QMenu{"Ai Media Duplicate Menu", parent};
-  CHECK_NULLPTR_RETURN_NULLPTR(menu);
-  menu->addAction(ANALYSE_THESE_TABLES);
-  menu->addSeparator();
-  menu->addAction(SCAN_A_PATH);
-  menu->addAction(FORCE_RELOAD_TABLES);
-  menu->addAction(AUDIT_THESE_TABLES);
-  menu->addSeparator();
-  menu->addAction(DROP_THESE_TABLES);
-  menu->addSeparator();
-  menu->addAction(CLEAR_ANALYSIS_LIST);
-  return menu;
-}
-
 DuplicateVideosFinderActions& g_dupVidFinderAg() {
   static DuplicateVideosFinderActions ins;
   return ins;

@@ -88,7 +88,6 @@ private:
   void AppendASelection(const QTextCursor &cursor);
   void ClearAllSelections();
   void SearchAndAppendParagraphOfResult(const QString& searchText);
-  void CopySelectedTextToClipboard() const;
   bool onAnchorClicked(const QUrl& url);
 
   QMenu *mBrowserMenu{nullptr};

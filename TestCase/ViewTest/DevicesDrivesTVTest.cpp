@@ -25,7 +25,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
 
   void constructor_ok() {
     DevicesDrivesTVMock::DiskInfoListMock() = {{"C:", 50000000000, 30000000000},  //
-                                               {"D:", 100000000000, 60000000000}};
+                                               {"D:", 100000000000, 80000000000}};
     QCOMPARE(DevicesDrivesTVMock::DiskInfoListMock().size(), 2);
 
     DevicesDrivesTV devicesDrivesTV;
@@ -44,6 +44,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
 
     QCOMPARE(model->rowCount(), 2);
+    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
 
     QModelIndex rootPathIndex = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
     QModelIndex totalBytesIndex = model->index(0, DEV_DRV_TABLE::TOTAL_BYTES);
@@ -59,6 +60,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
     ProgressDelegate delegate(model);
 
+    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
     QModelIndex index = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
     float percentage = delegate.GetUsedPercentage(index);
     QCOMPARE(percentage, 0.6f);  // 30GB / 50GB = 0.6
@@ -91,6 +93,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     DevicesDrivesTV devicesDrivesTV;
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
     QCOMPARE(model->rowCount(), 1);
+    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
 
     QModelIndex rootPathIndex = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
     QCOMPARE(model->data(rootPathIndex).toString(), QString("/"));

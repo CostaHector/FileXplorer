@@ -54,7 +54,6 @@ class CastDBViewTest : public PlainTestSuite {
 
       QCOMPARE(castView.onRefreshVidsFieldCore({}), 0);
       castView.EmitCurrentCastRecordChanged(QModelIndex{}, QModelIndex{});
-      castView.onMigrateCastTo();
       castView.RefreshCurrentRowHtmlContents();
 
       QCOMPARE(castModel.rowCount(), 0);
@@ -122,7 +121,6 @@ class CastDBViewTest : public PlainTestSuite {
       QVERIFY(castModel.columnCount() > 0);
       QVERIFY(castDb.IsTableExist(tableName));
       QVERIFY(castView.onDropDeleteTable(DbManagerHelper::DropOrDeleteE::DROP));
-      QVERIFY(castModel.columnCount() == 0);
       QVERIFY(!castDb.IsTableExist(tableName));
     }
 
@@ -167,14 +165,14 @@ class CastDBViewTest : public PlainTestSuite {
 
       CastDbViewMocker::MockLoadFromPsonDirectory() = false;                                             // user cancel
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", DEFAULT_RATE, "", "", "SuperHero",  //
-                                 "", "Chris Evans 1.jpg\nChris Evans 2.jpg", "", true));
+                                 -1, -1, "", "", "Chris Evans 1.jpg\nChris Evans 2.jpg", "", true));
       QVERIFY(CheckRecordIfEqual(castModel.record(1), "Chris Hemsworth", DEFAULT_RATE, "", "", "SuperHero",  //
-                                 "", "Chris Hemsworth.jpg", "", true));
+                                 -1, -1, "", "", "Chris Hemsworth.jpg", "", true));
       QCOMPARE(castView.onLoadFromPsonDirectory(), 0);
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", DEFAULT_RATE, "", "", "SuperHero",  //
-                                 "", "Chris Evans 1.jpg\nChris Evans 2.jpg", "", true));
+                                 -1, -1, "", "", "Chris Evans 1.jpg\nChris Evans 2.jpg", "", true));
       QVERIFY(CheckRecordIfEqual(castModel.record(1), "Chris Hemsworth", DEFAULT_RATE, "", "", "SuperHero",  //
-                                 "", "Chris Hemsworth.jpg", "", true));
+                                 -1, -1, "", "", "Chris Hemsworth.jpg", "", true));
 
       CastDbViewMocker::MockLoadFromPsonDirectory() = true;  // user accept
       QCOMPARE(castView.onLoadFromPsonDirectory(), 3);       // 3 pson find out and updated
@@ -183,13 +181,13 @@ class CastDBViewTest : public PlainTestSuite {
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       // Chris Evans(0), Chris Hemsworth(1), Chris Pine, Cristiano Ronaldo, James Caviezel(4), Michael Fassbender
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero",
-                                 "Chris Evans in captain america.mp4", "Chris Evans portait.jpg",  //
+                                 -1, -1, "", "Chris Evans in captain america.mp4", "Chris Evans portait.jpg",  //
                                  "Chris Evans, American movie star", true));                       //
       QVERIFY(CheckRecordIfEqual(castModel.record(1), "Chris Hemsworth", 9, "Thor", "hero,movie star", "SuperHero",
-                                 "Chris Hemsworth in captain america.mp4", "Chris Hemsworth portait.jpg",               //
+                                 -1, -1, "", "Chris Hemsworth in captain america.mp4", "Chris Hemsworth portait.jpg",               //
                                  "Chris Hemsworth, Australia movie star", true));                                       //
       QVERIFY(CheckRecordIfEqual(castModel.record(4), "James Caviezel", 9, "General Zod", "hero,movie star", "Action",  //
-                                 "James Caviezel in Man of Steel - General Zod.mp4", "James Caviezel portait.jpg",      //
+                                 -1, -1, "", "James Caviezel in Man of Steel - General Zod.mp4", "James Caviezel portait.jpg",      //
                                  "James Caviezel, American movie star", true));
     }
 
@@ -206,13 +204,13 @@ class CastDBViewTest : public PlainTestSuite {
       QCOMPARE(castView.currentIndex(), firstInd);
 
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero",
-                                 "Chris Evans in captain america.mp4", "Chris Evans 1.jpg\nChris Evans 2.jpg",  //
+                                 -1, -1, "", "Chris Evans in captain america.mp4", "Chris Evans 1.jpg\nChris Evans 2.jpg",  //
                                  "Chris Evans, American movie star", true));                                    //
       QVERIFY(CheckRecordIfEqual(castModel.record(1), "Chris Hemsworth", 9, "Thor", "hero,movie star", "SuperHero",
-                                 "Chris Hemsworth in captain america.mp4", "Chris Hemsworth.jpg",                       //
+                                 -1, -1, "", "Chris Hemsworth in captain america.mp4", "Chris Hemsworth.jpg",                       //
                                  "Chris Hemsworth, Australia movie star", true));                                       //
       QVERIFY(CheckRecordIfEqual(castModel.record(4), "James Caviezel", 9, "General Zod", "hero,movie star", "Action",  //
-                                 "James Caviezel in Man of Steel - General Zod.mp4", "",                                //
+                                 -1, -1, "", "James Caviezel in Man of Steel - General Zod.mp4", "",                                //
                                  "James Caviezel, American movie star", true));
 
       QVERIFY(!castModel.isDirty());
@@ -287,14 +285,14 @@ class CastDBViewTest : public PlainTestSuite {
       castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
       // Chris Evans(0), Chris Hemsworth(1), Chris Pine, Cristiano Ronaldo, James Caviezel(4), Michael Fassbender
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero",
-                                 "videos/superhero/Chris Evans Captain America.mp4\nvideos/superhero/Chris Evans Steve.mp4",  //
+                                 -1, -1, "", "videos/superhero/Chris Evans Captain America.mp4\nvideos/superhero/Chris Evans Steve.mp4",  //
                                  "Chris Evans 1.jpg\nChris Evans 2.jpg",                                                      //
                                  "Chris Evans, American movie star", true));                                                  //
       QVERIFY(CheckRecordIfEqual(castModel.record(1), "Chris Hemsworth", 9, "Thor", "hero,movie star", "SuperHero",           //
-                                 "", "Chris Hemsworth.jpg",                                                                   //
+                                 -1, -1, "", "", "Chris Hemsworth.jpg",                                                                   //
                                  "Chris Hemsworth, Australia movie star", true));                                             //
       QVERIFY(CheckRecordIfEqual(castModel.record(4), "James Caviezel", 9, "General Zod", "hero,movie star", "Action",        //
-                                 "", "",                                                                                      //
+                                 -1, -1, "", "", "",                                                                                      //
                                  "James Caviezel, American movie star", true));
       QCOMPARE(castView.onRefreshAllVidsField(), 0);  // already all updated
       // QCOMPARE(currentRecordChangedByVidUpdSig.count(), 1);   // signal should not emit so still 1
@@ -302,16 +300,7 @@ class CastDBViewTest : public PlainTestSuite {
     }
 
     {  // onMigrateCastTo ok
-      castView.selectionModel()->clearSelection();
-      QVERIFY(!castView.selectionModel()->hasSelection());
-      QCOMPARE(castView.onMigrateCastTo(), 0);
 
-      castView.selectAll();
-      CastDbViewMocker::MockMigrateToPath() = "";
-      QCOMPARE(castView.onMigrateCastTo(), 0);
-
-      CastDbViewMocker::MockMigrateToPath() = "Path/to/Inexists/Path";
-      QCOMPARE(castView.onMigrateCastTo(), FD_ERROR_CODE::FD_CAST_NEW_ORI_PATH_INVALID);
     }
 
     {  // currentRecordChanged ok

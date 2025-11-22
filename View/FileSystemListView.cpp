@@ -15,7 +15,7 @@ FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* paren
     : CustomListView{"FILE_SYSTEM_LIST", parent}, _fsModel{fsmModel}                                       //
 {
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
-  m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
+  QMenu* m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
   CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
 
   BindMenu(m_fsMenu);
