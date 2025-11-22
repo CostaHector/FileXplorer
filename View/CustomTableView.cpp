@@ -9,14 +9,14 @@ QSet<QString> CustomTableView::TABLES_SET;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
 
 CustomTableView::CustomTableView(const QString& name, QWidget* parent)
-    : QTableView(parent),
-      m_name{name},
-      m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"},
-      m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"},
-      m_autoScrollKey{m_name + "_AUTO_SCROLL"},
-      m_alternatingRowColorsKey{m_name + "_ALTERNATING_ROW_COLORS"},
-      m_showGridKey{m_name + "_SHOW_GRID"} {
-  if (isNameExists(m_name)) {  // not in sharing list, but name already find
+  : QTableView(parent)
+  , m_name{name}
+  , m_showHorizontalHeaderKey{m_name + "_SHOW_HORIZONTAL_HEADER"}
+  , m_showVerticalHeaderKey{m_name + "_SHOW_VERTICAL_HEADER"}
+  , m_autoScrollKey{m_name + "_AUTO_SCROLL"}
+  , m_alternatingRowColorsKey{m_name + "_ALTERNATING_ROW_COLORS"}
+  , m_showGridKey{m_name + "_SHOW_GRID"} {
+  if (isNameExists(m_name)) { // not in sharing list, but name already find
     LOG_D("Instance Name[%s] already exist, QSetting may conflict", qPrintable(m_name));
   }
   TABLES_SET.insert(m_name);
@@ -54,8 +54,8 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(_SHOW_VERTICAL_HEADER);
   _SHOW_VERTICAL_HEADER->setCheckable(true);
   _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, true).toBool());
-  _SHOW_VERTICAL_HEADER->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header").arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
+  _SHOW_VERTICAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header")
+                                        .arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
   m_verHeader = new (std::nothrow) VerMenuInHeader{m_name + "_VerHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_verHeader);
   if (!_SHOW_VERTICAL_HEADER->isChecked()) {
@@ -93,11 +93,14 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   setShowGrid(_SHOW_GRID->isChecked());
 
   // 6.
-  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_HOR_SCROLL_BAR_POLICY", this};
+  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_HorScrollBarPolicy", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
-  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_VER_SCROLL_BAR_POLICY", this};
-  CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
+  m_horScrollBarPolicyMenu->setIcon(QIcon{":img/SCROLL_BAR_POLICY_HOR"});
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
+
+  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{m_name + "_VerScrollBarPolicy", this};
+  CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
+  m_verScrollBarPolicyMenu->setIcon(QIcon{":img/SCROLL_BAR_POLICY_VER"});
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
 
   m_menu = new (std::nothrow) AddableMenu{m_name + "_menu", this};
@@ -120,7 +123,7 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   if (m_menu != nullptr) {
     QPoint pnt = event->globalPos();
 #ifndef RUNNING_UNIT_TESTS
-    m_menu->popup(pnt);  // or QCursor::pos()
+    m_menu->popup(pnt); // or QCursor::pos()
 #endif
     event->accept();
     return;

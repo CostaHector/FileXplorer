@@ -2,6 +2,7 @@
 #include "AddressBarActions.h"
 #include "RightClickMenuActions.h"
 #include "PublicMacro.h"
+#include <QLayout>
 #include <QKeySequence>
 
 SplitToolButton::SplitToolButton(QWidget* parent) : QToolButton{parent} {

@@ -1,7 +1,7 @@
-#include "NoEnterLineEdit.h"
+#include "ReturnEventConsumingLineEdit.h"
 #include <QKeyEvent>
 
-void NoEnterLineEdit::keyPressEvent(QKeyEvent* event) {
+void ReturnEventConsumingLineEdit::keyPressEvent(QKeyEvent* event) {
   if (event->key() == Qt::Key::Key_Enter || event->key() == Qt::Key::Key_Return) {
     event->accept();
     emit returnPressed();

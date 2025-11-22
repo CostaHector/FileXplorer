@@ -9,16 +9,27 @@
 #include <QVariant>
 
 namespace QuickWhereClauseHelper {
-const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"};  // Case Sensitive Search. %1 is field, %2 is value
-const QString FUZZY_LIKE{R"(`%1` LIKE "%%2%")"};     // Case Insensitive. `Name%1` like "%Henry%2%"
-const QString OPEATOR_RELATION{R"(`%1`%2)"};         // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
-const QHash<QChar, QString> op2Str = {{'&', "AND"}, {'|', "OR"}};
+const QString FUZZY_INSTR{R"(INSTR(`%1`,"%2")>0)"}; // use Case Sensitive Search. %1 is field, %2 is value
+const QString FUZZY_LIKE{R"(`%1` LIKE "%%2%")"};    // Case Insensitive. `Name%1` like "%Henry%2%"
+const QString OPEATOR_RELATION{R"(`%1`%2)"};        // >10 => `Rate%1`>8%2. here %1 is field, %2 is value
 
-QString InfixNotation2RPN2Value(const QString& fieldName,        //
-                                const QString& infixNot,         //
-                                const QString& binaryCondition,  //
+void OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops) {
+  QString val2 = values.top();
+  values.pop();
+
+  QString val1 = values.top();
+  values.pop();
+
+  QChar op = ops.top();
+  ops.pop();
+  static const QHash<QChar, QString> op2Str = {{'&', "AND"}, {'|', "OR"}};
+  values << QString("(%1 %2 %3)").arg(val1).arg(op2Str[op]).arg(val2);
+}
+
+QString InfixNotation2RPN2Value(const QString& infixNot,       //
+                                const QString& unaryCondition, //
                                 const QHash<QString, QString>& ALIAS_MAP) {
-  if (fieldName.isEmpty() || infixNot.isEmpty()) {
+  if (unaryCondition.isEmpty() || infixNot.isEmpty()) {
     return "";
   }
   static const QSet<QChar> CONTROL_CHAR = {'(', ')', '&', '|'};
@@ -30,10 +41,10 @@ QString InfixNotation2RPN2Value(const QString& fieldName,        //
     if (c == '|') {
       return 1;
     }
-    return 0;  // like open bracket '('
+    return 0; // like open bracket '('
   };
 
-  QStack<QString> values;  // reverse poland expr
+  QStack<QString> values; // reverse poland expr
   QStack<QChar> ops;
 
   for (int i = 0; i < infixNot.size(); ++i) {
@@ -56,7 +67,7 @@ QString InfixNotation2RPN2Value(const QString& fieldName,        //
       }
       // autoCompleteAka
       const QString& perf = infixNot.mid(startIndex, i - startIndex);
-      values << binaryCondition.arg(fieldName, ALIAS_MAP.value(perf, perf));
+      values << unaryCondition.arg(ALIAS_MAP.value(perf, perf));
 
       // right now the i points to
       // the character next to the digit,
@@ -85,19 +96,6 @@ QString InfixNotation2RPN2Value(const QString& fieldName,        //
   return values.top();
 }
 
-void OperatorJoinOperands(QStack<QString>& values, QStack<QChar>& ops) {
-  QString val2 = values.top();
-  values.pop();
-
-  QString val1 = values.top();
-  values.pop();
-
-  QChar op = ops.top();
-  ops.pop();
-
-  values << QString("(%1 %2 %3)").arg(val1).arg(op2Str[op]).arg(val2);
-}
-
 QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& akas, const QString& tableName) {
   // movies table
   using namespace MOVIE_TABLE;
@@ -110,21 +108,21 @@ QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& a
     QString castNames{aCastName};
     castNames += LOGIC_OR_CHAR;
     castNames += QString{akas}.replace(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR, LOGIC_OR_CHAR);
-    whereClause = InfixNotation2RPN2Value(ENUM_2_STR(Name), castNames, FUZZY_LIKE);
+    whereClause = InfixNotation2RPN2Value(castNames, FUZZY_LIKE.arg(ENUM_2_STR(Name), "%1"));
   }
-  static const QString SELECT_NAME_TEMPLATE{                                    //
-                                            QString{"SELECT `%1`, `%2`, `%3`"}  //
-                                                .arg(ENUM_2_STR(PrePathLeft))   //
-                                                .arg(ENUM_2_STR(PrePathRight))  //
+  static const QString SELECT_NAME_TEMPLATE{                                   //
+                                            QString{"SELECT `%1`, `%2`, `%3`"} //
+                                                .arg(ENUM_2_STR(PrePathLeft))  //
+                                                .arg(ENUM_2_STR(PrePathRight)) //
                                                 .arg(ENUM_2_STR(Name))};
   return SELECT_NAME_TEMPLATE + " FROM `" + tableName + "` WHERE " + whereClause;
 }
 
 QString GetMovieFullPathFromSqlQry(QSqlQuery& query) {
   using namespace MOVIE_TABLE;
-  return PathTool::RMFComponent::join(query.value(ENUM_2_STR(PrePathLeft)).toString(),   //
-                                                  query.value(ENUM_2_STR(PrePathRight)).toString(),  //
-                                                  query.value(ENUM_2_STR(Name)).toString());
+  return PathTool::RMFComponent::join(query.value(ENUM_2_STR(PrePathLeft)).toString(),  //
+                                      query.value(ENUM_2_STR(PrePathRight)).toString(), //
+                                      query.value(ENUM_2_STR(Name)).toString());
 }
 
-}  // namespace QuickWhereClauseHelper
+} // namespace QuickWhereClauseHelper

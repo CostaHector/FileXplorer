@@ -8,7 +8,6 @@
 #include "StringTool.h"
 #include "TableFields.h"
 #include "CastPsonFileHelper.h"
-#include "NoEnterLineEdit.h"
 #include <QHash>
 #include <QPushButton>
 #include <QInputDialog>
@@ -17,10 +16,6 @@
 constexpr char QuickWhereClauseDialog::WHERE_HIST_SPLIT_CHAR;
 
 void QuickWhereClauseDialog::Init() {
-  AUTO_COMPLETE_AKA_SWITCH = new (std::nothrow) QAction{"Name Alias", this};
-  AUTO_COMPLETE_AKA_SWITCH->setCheckable(true);
-  AUTO_COMPLETE_AKA_SWITCH->setChecked(false);
-
   _RMV_WHERE_CLAUSE_FROM_HISTORY = new (std::nothrow) QAction{QIcon{":img/WHERE_CLAUSE_HISTORY_REMOVED"}, "Remove", this};
   _CLEAR_WHERE_CLAUSE_FROM_HISTORY = new (std::nothrow) QAction{QIcon{":img/WHERE_CLAUSE_HISTORY_CLEAR"}, "Clear", this};
   mWhereClauseHistoryDecMenu = new (std::nothrow) QMenu{"Where Clause Edit(Dec) Menu", this};
@@ -40,12 +35,6 @@ void QuickWhereClauseDialog::Init() {
   mWhereClauseHistoryIncTb->setMenu(mWhereClauseHistoryIncMenu);
   mWhereClauseHistoryIncTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mWhereClauseHistoryIncTb->setPopupMode(QToolButton::ToolButtonPopupMode::MenuButtonPopup);
-
-  m_strFilterPatternCB = new (std::nothrow) QComboBox{this};
-  CHECK_NULLPTR_RETURN_VOID(m_strFilterPatternCB)
-  m_strFilterPatternCB->setEditable(false);
-  m_strFilterPatternCB->insertItem((int) Qt::CaseSensitivity::CaseInsensitive, QuickWhereClauseHelper::FUZZY_LIKE);
-  m_strFilterPatternCB->insertItem((int) Qt::CaseSensitivity::CaseSensitive, QuickWhereClauseHelper::FUZZY_INSTR);
 
   m_whereHistComboBox = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_whereHistComboBox)
@@ -70,7 +59,7 @@ void QuickWhereClauseDialog::Init() {
   mStrListModel->setStringList(hists.split(WHERE_HIST_SPLIT_CHAR));
   m_whereHistComboBox->setModel(mStrListModel);
 
-  m_whereLineEdit = new (std::nothrow) NoEnterLineEdit{this};
+  m_whereLineEdit = new (std::nothrow) ReturnEventConsumingLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_whereLineEdit)
   m_whereLineEdit->setPlaceholderText("Where Clause here");
 
@@ -90,7 +79,6 @@ void QuickWhereClauseDialog::Init() {
   InitPrivateLayout();
 
   m_Layout->addRow("WHERE clause:", (QWidget*) nullptr);
-  m_Layout->addRow("Pattern:", m_strFilterPatternCB);
   m_Layout->addRow(mWhereClauseHistoryDecTb, m_whereHistComboBox);
   m_Layout->addRow(mWhereClauseHistoryIncTb, m_whereLineEdit);
   m_Layout->addWidget(mDialogButtonBox);
@@ -116,9 +104,18 @@ int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   return hists.size();
 }
 
-void QuickWhereClauseDialog::subscribe() {
-  connect(m_strFilterPatternCB, &QComboBox::currentTextChanged, this, &QuickWhereClauseDialog::onConditionsChanged);
+void QuickWhereClauseDialog::InitPrivateLayout() {
+  for (ColumnFilterLineEdit* pLe : mColumnEditors) {
+    m_Layout->addRow(pLe->GetLineEditName(), pLe);
+  }
+}
 
+void QuickWhereClauseDialog::onConditionsChanged() {
+  const QString& whereClause{ColumnFilterLineEdit::BuildCombinedWhereClause(mColumnEditors)};
+  m_whereLineEdit->setText(whereClause);
+}
+
+void QuickWhereClauseDialog::subscribe() {
   connect(mDialogButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(mDialogButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -128,16 +125,10 @@ void QuickWhereClauseDialog::subscribe() {
   connect(_EDIT_WHERE_CLAUSE_HISTORY, &QAction::triggered, this, &QuickWhereClauseDialog::onEditHistory);
 
   connect(m_whereHistComboBox, &QComboBox::textActivated, m_whereLineEdit, &QLineEdit::setText);
-  PrivateSubscribe();
-}
 
-void QuickWhereClauseDialog::SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen) {
-  const int patternsCnt = m_strFilterPatternCB->count();
-  if (caseSen >= patternsCnt) {
-    LOG_W("Name str pattern index[%d] out of range[0, %d)", (int) caseSen, patternsCnt);
-    return;
+  for (QLineEdit* pLe : mColumnEditors) {
+    connect(pLe, &QLineEdit::returnPressed, this, &QuickWhereClauseDialog::onConditionsChanged);
   }
-  m_strFilterPatternCB->setCurrentIndex((int) caseSen);
 }
 
 bool QuickWhereClauseDialog::onRemoveAHistory() {
@@ -175,10 +166,13 @@ bool QuickWhereClauseDialog::onAddAHistory() {
   mStrListModel->setData(mStrListModel->index(0), newHistLine);
   return true;
 }
+
 int QuickWhereClauseDialog::onEditHistory() {
   int beforeRowCnt = mStrListModel->rowCount();
   QString curHists = mStrListModel->stringList().join(WHERE_HIST_SPLIT_CHAR);
-#ifndef RUNNING_UNIT_TESTS
+#ifdef RUNNING_UNIT_TESTS
+  const QStringList newHists = QuickWhereClauseDialogMock::mockWhereHistsList();
+#else
   bool editOk{false};
   curHists = QInputDialog::getMultiLineText(this,
                                             "Edit where history Below",
@@ -190,10 +184,16 @@ int QuickWhereClauseDialog::onEditHistory() {
     return 0;
   }
   const QStringList newHists{curHists.split(WHERE_HIST_SPLIT_CHAR)};
-#else
-  const QStringList newHists = newWhereHistsList;
 #endif
   int afterRowCnt = newHists.size();
   mStrListModel->setStringList(newHists);
   return afterRowCnt - beforeRowCnt;
+}
+
+void QuickWhereClauseDialog::ClearLineEditsListText() {
+  for (QLineEdit* pLE : mColumnEditors) {
+    if (pLE != nullptr) {
+      pLE->clear();
+    }
+  }
 }

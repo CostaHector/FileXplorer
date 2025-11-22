@@ -4,12 +4,13 @@
 #include "PublicTool.h"
 #include "NotificatorMacro.h"
 
+#include <QCompleter>
+#include <QKeyEvent>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QToolTip>
 #include <Qt>
-#include <QCompleter>
 #include <QApplication>
 #include <QStyle>
 

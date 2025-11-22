@@ -9,16 +9,13 @@ public:
 
 private:
   void CreatePrivateWidget() override;
-  void InitPrivateLayout() override;
-  void PrivateSubscribe() override;
-  void onConditionsChanged() override;
 
-  QLineEdit* m_Name{nullptr}; // shared
-  QLineEdit* m_Size{nullptr};
-  QLineEdit* m_Duration{nullptr};
-  QLineEdit* m_Studio{nullptr};
-  QLineEdit* m_Cast{nullptr};
-  QLineEdit* m_Tags{nullptr}; // shared
+  ColumnFilterLineEdit* m_Name{nullptr}; // shared
+  ColumnFilterLineEdit* m_Size{nullptr};
+  ColumnFilterLineEdit* m_Duration{nullptr};
+  ColumnFilterLineEdit* m_Studio{nullptr};
+  ColumnFilterLineEdit* m_Cast{nullptr};
+  ColumnFilterLineEdit* m_Tags{nullptr}; // shared
 };
 
 #endif // QUICKWHERECLAUSEDIALOGMOVIE_H
