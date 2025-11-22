@@ -1,15 +1,24 @@
 #ifndef QUICKWHERECLAUSEDIALOG_H
 #define QUICKWHERECLAUSEDIALOG_H
 
+#include "ColumnFilterLineEdit.h"
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QAction>
 #include <QMenu>
 #include <QToolButton>
 #include <QComboBox>
-#include <QLineEdit>
 #include <QFormLayout>
 #include <QStringListModel>
+
+#ifdef RUNNING_UNIT_TESTS
+namespace QuickWhereClauseDialogMock {
+inline QStringList& mockWhereHistsList() {
+  static QStringList newWhereHistsList;
+  return newWhereHistsList;
+}
+} // namespace QuickWhereClauseDialogMock
+#endif
 
 class QuickWhereClauseDialog : public QDialog {
 public:
@@ -21,36 +30,26 @@ public:
   QString GetWhereString() const { return m_whereLineEdit->text(); }
 
 protected:
-  virtual void CreatePrivateWidget() {}
-  virtual void InitPrivateLayout() {}
-  virtual void PrivateSubscribe() {}
-  virtual void onConditionsChanged() {}
-
+  void onConditionsChanged();
   QFormLayout* m_Layout{nullptr};
-  QComboBox* m_strFilterPatternCB{nullptr};
-  QAction* AUTO_COMPLETE_AKA_SWITCH{nullptr};
   QLineEdit* m_whereLineEdit{nullptr};
 
-#ifdef RUNNING_UNIT_TESTS
-  inline void ClearLineEditsListText() {
-    for (auto* pLE : mLineEditsList) {
-      if (pLE != nullptr) {
-        pLE->clear();
-      }
-    }
+  void AppendColumnFilterLineEdit(ColumnFilterLineEdit* lineEdit) {
+    mColumnEditors.push_back(lineEdit);
   }
-  QList<QLineEdit*> mLineEditsList;
-  QStringList newWhereHistsList;
-#endif
 
 private:
+  virtual void CreatePrivateWidget() {}
+  void InitPrivateLayout();
+
   void subscribe();
 
-  void SetStrPatternCaseSensitive(Qt::CaseSensitivity caseSen);
   bool onRemoveAHistory();
   int onClearHistory();
   bool onAddAHistory();
   int onEditHistory();
+
+  void ClearLineEditsListText();
 
   QAction* _RMV_WHERE_CLAUSE_FROM_HISTORY{nullptr};
   QAction* _CLEAR_WHERE_CLAUSE_FROM_HISTORY{nullptr};
@@ -67,6 +66,7 @@ private:
 
   QStringListModel* mStrListModel{nullptr};
 
+  QList<ColumnFilterLineEdit*> mColumnEditors;
   static constexpr char WHERE_HIST_SPLIT_CHAR{'\n'};
 };
 

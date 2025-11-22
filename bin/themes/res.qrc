@@ -304,6 +304,12 @@
     <file alias="VERTICAL_HEADER">View/VERTICAL_HEADER.svg</file>
     <file alias="ALTERNATING_ROW_COLORS">View/ALTERNATING_ROW_COLORS.svg</file>
     <file alias="AUTO_SCROLL">View/AUTO_SCROLL.svg</file>
+    <file alias="SCROLL_BAR_POLICY_HOR">View/SCROLL_BAR_POLICY_HOR.svg</file>
+    <file alias="SCROLL_BAR_POLICY_VER">View/SCROLL_BAR_POLICY_VER.svg</file>
+    <file alias="RESIZE_MODE">View/RESIZE_MODE.svg</file>
+    <file alias="RESIZE_MODE_FIXED">View/RESIZE_MODE_FIXED.svg</file>
+    <file alias="RESIZE_MODE_RESIZE_TO_CONTENTS">View/RESIZE_MODE_RESIZE_TO_CONTENTS.svg</file>
+    <file alias="RESIZE_MODE_STRETCH">View/RESIZE_MODE_STRETCH.svg</file>
 
     <!--Database icon here-->
     <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

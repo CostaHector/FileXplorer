@@ -1,17 +1,15 @@
 #ifndef DOUBLEROWHEADER_H
 #define DOUBLEROWHEADER_H
 
+#include "ColumnFilterLineEdit.h"
 #include "HorMenuInHeader.h"
 #include <QMetaObject>
-#include <QLineEdit>
 
 class DoubleRowHeader : public HorMenuInHeader {
   Q_OBJECT
 public:
   explicit DoubleRowHeader(const QString& proName, QWidget* parent = nullptr);
   ~DoubleRowHeader();
-
-  static QString GetColumn2SearchTemplate(const QString& columnName);
 
   void UpdateSearchStatement();
 
@@ -37,7 +35,7 @@ private:
   QAction* _ENABLE_FILTERS{nullptr};
   const QString m_enableFilterKey;
 
-  QVector<QLineEdit*> m_filterEditors;
+  QList<ColumnFilterLineEdit*> m_filterEditors;
   QMetaObject::Connection m_connSectionResized;
 };
 

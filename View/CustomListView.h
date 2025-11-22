@@ -53,7 +53,7 @@ private:
 
   inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
   static QSet<QString> LISTS_SET;
-  int mCurIconSizeIndex = 1;
+  int mCurIconSizeIndex{14};
 };
 
 #endif  // CUSTOMLISTVIEW_H

@@ -1,22 +1,13 @@
 ﻿#ifndef ADDRESSELINEEDIT_H
 #define ADDRESSELINEEDIT_H
 
-#include "PathTool.h"
-#include "PathComboBox.h"
-#include <QComboBox>
-#include <QLabel>
+#include <QStackedWidget>
 #include <QToolBar>
-#include <QWidget>
-
 #include <QAction>
 #include <QLineEdit>
+#include "PathTool.h"
+#include "PathComboBox.h"
 
-#include <QFileInfo>
-#include <QHBoxLayout>
-#include <QKeyEvent>
-#include <QMimeData>
-
-#include <QStackedWidget>
 
 namespace PathActionHelper {
 bool Path2Actions(QToolBar& outTb, const QString& fullpath);

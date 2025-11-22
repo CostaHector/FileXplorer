@@ -1,6 +1,5 @@
 #include "DoubleRowHeader.h"
 #include "MemoryKey.h"
-#include "NoEnterLineEdit.h"
 #include "PublicMacro.h"
 
 DoubleRowHeader::DoubleRowHeader(const QString &parentTableName, QWidget *parent)
@@ -23,42 +22,11 @@ DoubleRowHeader::~DoubleRowHeader() {
   Configuration().setValue(m_enableFilterKey, isFilterEnabled());
 }
 
-QString DoubleRowHeader::GetColumn2SearchTemplate(const QString &columnName) {
-  static QMap<QString, QString> columnName2SearchTemplate{
-      //
-      {"Name", R"(`Name` LIKE "%%1%")"},   //
-      {"Rate", R"(`Rate` %1)"},            //
-      {"Tags", R"(`Tags` LIKE "%%1%")"},   //
-      {"Ori", R"(`Ori` LIKE "%%1%")"},     //
-      {"Height", R"(`Height` %1)"},        //
-      {"Size", R"(`Size` %1)"},            //
-      {"Birth", R"(`Birth` LIKE "%%1%")"}, //
-  };
-  return columnName2SearchTemplate.value(columnName, "");
-}
-
 void DoubleRowHeader::UpdateSearchStatement() {
   if (!isFilterEnabled()) {
     return;
   }
-
-  QStringList searchStatements;
-  searchStatements.reserve(m_filterEditors.size());
-  for (const QLineEdit *pLe : m_filterEditors) {
-    const QString fieldFilterStatementTemplate = pLe->placeholderText();
-    const QString fieldValue = pLe->text();
-    if (fieldValue.isEmpty() || fieldFilterStatementTemplate.isEmpty()) {
-      continue;
-    }
-    searchStatements.push_back(fieldFilterStatementTemplate.arg(fieldValue));
-  }
-
-  QString searchCmd;
-  if (!searchStatements.isEmpty()) {
-    searchCmd += "(";
-    searchCmd += searchStatements.join(") AND (");
-    searchCmd += ")";
-  }
+  const QString& searchCmd {ColumnFilterLineEdit::BuildCombinedWhereClause(m_filterEditors)};
   emit searchStatementChanged(searchCmd);
 }
 
@@ -125,14 +93,14 @@ void DoubleRowHeader::InitFilterEditors() {
   CHECK_NULLPTR_RETURN_VOID(pModel);
   QStringList titlesTempList;
   const int columnCount = pModel->columnCount();
+  m_filterEditors.reserve(columnCount);
   for (int col = 0; col < columnCount; ++col) {
     const QString &headTitle = pModel->headerData(col, Qt::Orientation::Horizontal, Qt::DisplayRole).toString();
     titlesTempList.push_back(headTitle);
-    QLineEdit *filterEdit = new NoEnterLineEdit{this};
-    if (isColumnHidden(col)) { // hide it right now if column in hidden
+    ColumnFilterLineEdit *filterEdit = new ColumnFilterLineEdit{headTitle, this};
+    if (isColumnHidden(col)) {
       filterEdit->hide();
     }
-    filterEdit->setPlaceholderText(GetColumn2SearchTemplate(headTitle));
     filterEdit->setClearButtonEnabled(true);
     connect(filterEdit, &QLineEdit::returnPressed, this, &DoubleRowHeader::UpdateSearchStatement);
     m_filterEditors.append(filterEdit);

@@ -442,7 +442,7 @@ private slots:
       QCOMPARE(horHeader.maximumSectionSize(), 888);
 
       // search signal ok
-      horHeader.m_filterEditors[0]->setText("Chris Evans"); // Name
+      horHeader.m_filterEditors[0]->setText("Chris Evans|Henry Cavill"); // Name
       horHeader.m_filterEditors[1]->setText(">1024"); // Size: 1024 B
 
       QSignalSpy searchStatementChangedSpy{&horHeader, &DoubleRowHeader::searchStatementChanged};
@@ -450,7 +450,7 @@ private slots:
       QCOMPARE(searchStatementChangedSpy.count(), 1);
       QList<QVariant> actualParams = searchStatementChangedSpy.takeLast();
       QList<QVariant> expectParams {
-        R"((`Name` LIKE "%Chris Evans%") AND (`Size` >1024))"
+        R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"
       };
       QCOMPARE(actualParams, expectParams);
     }

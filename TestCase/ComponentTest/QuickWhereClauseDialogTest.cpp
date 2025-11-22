@@ -14,6 +14,7 @@ class QuickWhereClauseDialogTest : public PlainTestSuite {
   Q_OBJECT
 public:
   ~QuickWhereClauseDialogTest() {
+    QuickWhereClauseDialogMock::mockWhereHistsList().clear();
     if (dialog != nullptr) {
       delete dialog;
     }
@@ -44,47 +45,30 @@ private slots:
     dialogCast->sizeHint();
   }
 
-  void testConditionGeneration_movie() {
-    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
-    dialog->m_Name->setText("Henry Cavill");
+  void conditionGeneration_movie() {
+    // dialog->m_Name->setText("Henry Cavill");
     dialog->m_Size->setText(">1000000000");
-    emit dialog->m_Size->returnPressed();
-    QCOMPARE(dialog->GetWhereString(), R"(INSTR(`Name`,"Henry Cavill")>0 AND `Size`>1000000000)");
+    // emit dialog->m_Size->returnPressed();
+    // QCOMPARE(dialog->GetWhereString(), R"(INSTR(`Name`,"Henry Cavill")>0 AND `Size`>1000000000)");
 
-    dialog->m_Name->setText("A&B");
-    emit dialog->m_Name->returnPressed();
-    QCOMPARE(dialog->GetWhereString(), R"((INSTR(`Name`,"A")>0 AND INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
+    // dialog->m_Name->setText("A&B");
+    // emit dialog->m_Name->returnPressed();
+    // QCOMPARE(dialog->GetWhereString(), R"((INSTR(`Name`,"A")>0 AND INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
 
     dialog->m_Name->setText("A|B");
     emit dialog->m_Name->returnPressed();
-    QCOMPARE(dialog->GetWhereString(), R"((INSTR(`Name`,"A")>0 OR INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
-
-    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     QCOMPARE(dialog->GetWhereString(), R"((`Name` LIKE "%A%" OR `Name` LIKE "%B%") AND `Size`>1000000000)");
   }
 
-  void testConditionGeneration_cast() {
-    dialogCast->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
-    dialogCast->m_Name->setText("Henry Cavill");
-    dialogCast->m_Size->setText(">1000000000");
-    emit dialogCast->m_Size->returnPressed();
-    QCOMPARE(dialogCast->GetWhereString(), R"(INSTR(`Name`,"Henry Cavill")>0 AND `Size`>1000000000)");
-
-    dialogCast->m_Name->setText("A&B");
-    emit dialogCast->m_Name->returnPressed();
-    QCOMPARE(dialogCast->GetWhereString(), R"((INSTR(`Name`,"A")>0 AND INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
-
+  void conditionGeneration_cast() {
     dialogCast->m_Name->setText("A|B");
+    dialogCast->m_Size->setText(">1000000000");
     emit dialogCast->m_Name->returnPressed();
-    QCOMPARE(dialogCast->GetWhereString(), R"((INSTR(`Name`,"A")>0 OR INSTR(`Name`,"B")>0) AND `Size`>1000000000)");
-
-    dialogCast->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseInsensitive);
     QCOMPARE(dialogCast->GetWhereString(), R"((`Name` LIKE "%A%" OR `Name` LIKE "%B%") AND `Size`>1000000000)");
   }
 
   void test_History_Management_add() {
-    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
-    dialog->newWhereHistsList.clear();
+    QuickWhereClauseDialogMock::mockWhereHistsList().clear();
     dialog->onEditHistory();
     QCOMPARE(dialog->mStrListModel->rowCount(), 0);
 
@@ -100,8 +84,7 @@ private slots:
   }
 
   void test_History_Management_remove() {
-    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
-    dialog->newWhereHistsList = QStringList{"A", "B"};
+    QuickWhereClauseDialogMock::mockWhereHistsList() = QStringList{"A", "B"};
     dialog->onEditHistory();
     QCOMPARE(dialog->mStrListModel->rowCount(), 2);
 
@@ -139,12 +122,11 @@ private slots:
   }
 
   void test_WriteUniqueHistoryToQSetting() {
-    dialog->SetStrPatternCaseSensitive(Qt::CaseSensitivity::CaseSensitive);
     const QString beforeCfg = Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
     ON_SCOPE_EXIT {
       Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
     };
-    dialog->newWhereHistsList = QStringList{"\t  \n", "", " A", "C ", "A \t", "\t B", "A"};
+    QuickWhereClauseDialogMock::mockWhereHistsList() = QStringList{"\t  \n", "", " A", "C ", "A \t", "\t B", "A"};
     dialog->onEditHistory();
     QCOMPARE(dialog->WriteUniqueHistoryToQSetting(), 3);
 
