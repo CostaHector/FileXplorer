@@ -3,6 +3,7 @@
 #include "CastPsonFileHelper.h"
 #include "VideoDurationGetter.h"
 #include "PathTool.h"
+#include "PublicTool.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
 #include <QBuffer>
@@ -96,25 +97,34 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     }
   }
   const QFileInfo fi{fileAbsPath};
+  const qint64 filesz = fi.size();
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<font size="+2">)");
-  detail += QString(R"(Size: %1<br/>)").arg(DataFormatter::formatFileSizeWithBytes(fi.size()));
+  detail += QString(R"(Size: %1<br/>)").arg(DataFormatter::formatFileSizeWithBytes(filesz));
   detail += QString(R"(Date created: %1<br/>)").arg(fi.lastModified().toString(Qt::ISODate));
   detail += QString(R"(Date modified: %1<br/>)").arg(fi.birthTime().toString(Qt::ISODate));
   detail += QString(R"(Full path: %1<br/>)").arg(fileAbsPath);
+  if (filesz < 100 * 1024 && FileTool::IsTorrentTxtFile(fileAbsPath)) {
+    bool bReadOk{false};
+    QString torrentTextContents = FileTool::TextReader(fileAbsPath, &bReadOk);
+    if (bReadOk) {
+      detail += "Contents:<br/>";
+      detail += torrentTextContents.replace("\n", "<br/><br/>");
+    }
+  }
   detail += QString(R"(</font>)");
   detail += QString(R"(</body>)");
   return detail;
 }
 
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE) {
-  const QString castName {record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  const QString orientation {record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
-  const QStringList& vidsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
-  const QStringList& imgsLst {StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
+  const QString castName{record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
+  const QString orientation{record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
+  const QStringList& vidsLst{StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
+  const QStringList& imgsLst{StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
 
-  static const QString CAST_BRIEF_INTRODUCTION_TEMPLATE//
-      { R"(
+  static const QString CAST_BRIEF_INTRODUCTION_TEMPLATE //
+      {R"(
   <table width="100%" border="0" cellspacing="0" cellpadding="10">
     <h1 style="margin:0;">%1 | %2 | %3</h1>
     <hr style="border-top:1px solid #ccc;margin:5px 0">
@@ -134,27 +144,35 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
 
   // Videos here
   const int vidCnt{vidsLst.size()};
-  QString vidsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedVideos"> %1 )" + QString::number(vidCnt) + R"( Related Videos</a></h3>)" "\n"};
+  QString vidsPartHead{R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedVideos"> %1 )" + QString::number(vidCnt)
+                       + R"( Related Videos</a></h3>)"
+                         "\n"};
   QString vidsPartBody;
   vidsPartBody.reserve(50 * vidCnt);
-  vidsPartBody += R"(<div style="margin-top:15px;">)" "\n";
+  vidsPartBody += R"(<div style="margin-top:15px;">)"
+                  "\n";
   foreach (const QString vidPath, vidsLst) {
     vidsPartBody += VID_LINK_TEMPLATE.arg(vidPath, PathTool::forSearchPath(vidPath));
     vidsPartBody += "<br/>";
   }
-  vidsPartBody += R"(</div>)" "\n";
+  vidsPartBody += R"(</div>)"
+                  "\n";
 
   // Images here
-  const QString imgPrePath {imgHost + '/' + orientation + '/' + castName};
+  const QString imgPrePath{imgHost + '/' + orientation + '/' + castName};
   const int imgsCnt{imgsLst.size()};
-  QString imgsPartHead {R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages"> %1 )" + QString::number(imgsCnt) + R"( Related Images</a></h3>)" "\n"};
+  QString imgsPartHead{R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages"> %1 )" + QString::number(imgsCnt)
+                       + R"( Related Images</a></h3>)"
+                         "\n"};
   QString imgsPartBody;
   imgsPartBody.reserve(50 * imgsCnt);
-  imgsPartBody += R"(<div style="margin-top:20px;">)" "\n";
+  imgsPartBody += R"(<div style="margin-top:20px;">)"
+                  "\n";
   foreach (const QString imgRelPath, imgsLst) {
     imgsPartBody += GenerateSingleImageInHtml(imgPrePath + '/' + imgRelPath, imgRelPath, ICON_SIZE);
   }
-  imgsPartBody += "</div>" "\n";
+  imgsPartBody += "</div>"
+                  "\n";
   return {htmlSrc, {vidsPartHead, vidsPartBody}, {imgsPartHead, imgsPartBody}};
 }
-}
+} // namespace CastBrowserHelper

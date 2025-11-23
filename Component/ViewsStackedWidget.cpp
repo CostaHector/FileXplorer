@@ -210,28 +210,30 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     return false;
   }
   QFileInfo fi = getFileInfo(clickedIndex);
+  const QString absItemPath {fi.absoluteFilePath()};
   LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
-    LOG_ERR_NP("path not exist", fi.absoluteFilePath());
+    LOG_ERR_NP("path not exist", absItemPath);
     return false;
   }
   if (fi.isSymLink()) {
 #ifdef _WIN32
     const QString tarPath{fi.symLinkTarget()};
 #else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
-    const QString tarPath{fi.absoluteFilePath()};
+    const QString tarPath{absItemPath};
 #endif
     fi.setFile(tarPath);
     if (!fi.exists()) {
       LOG_ERR_NP("link not exists double click not work", tarPath);
       return false;
     }
-    LOG_D("linked to[%s]", qPrintable(fi.absoluteFilePath()));
+    LOG_D("linked to[%s]", qPrintable(absItemPath));
   }
 
   // For File
   // qz File Open in QZ Archive always
   // har File Open in Har Viewer always
+  // torrent File Open in torrent editor
   // other file: open in QDesktopService
 
   // For Folder
@@ -240,30 +242,28 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
 
   if (fi.isFile()) {
     if (ThumbnailImageViewer::IsFileImage(fi)) {
-      return FileTool::OpenLocalImageFile(fi.absoluteFilePath());
+      return FileTool::OpenLocalImageFile(absItemPath);
     } else if (ArchiveFilesReader::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
       emit g_viewActions()._HAR_VIEW->triggered();
       return true;
+    } else if (FileTool::IsTorrentFile(absItemPath)) {
+      return FileTool::OpenLocalTorrentFile(absItemPath);
     }
-    return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
-  }
-
-  if (fi.isDir()) {
+  } else if (fi.isDir()) {
     ViewTypeTool::ViewType vt = GetVt();
     if (ViewTypeTool::isFSView(vt)) {
-      return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
+      return onActionAndViewNavigate(absItemPath, true, true);
     }
     if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
       g_viewActions()._TABLE_VIEW->setChecked(true);
       emit g_viewActions()._TABLE_VIEW->triggered(true);  // both 2 signals: 1) undo stack+1 and 2) view Switched happen
-      return onActionAndViewNavigate(fi.absoluteFilePath(), true, true);
+      return onActionAndViewNavigate(absItemPath, true, true);
     }
-    return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
   }
-  return true;
+  return FileTool::OpenLocalFileUsingDesktopService(absItemPath);
 }
 
 void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, const QModelIndex& /*previous*/) {

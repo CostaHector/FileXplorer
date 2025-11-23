@@ -204,6 +204,39 @@ bool CopyTextToSystemClipboard(const QString& text) {
   return true;
 }
 
+bool IsTorrentFile(const QString& localFilePath) {
+  return localFilePath.endsWith(".torrent", Qt::CaseSensitivity::CaseInsensitive);
+}
+
+bool IsTorrentTxtFile(const QString& localFilePath) {
+  return localFilePath.endsWith(".torrent.txt", Qt::CaseSensitivity::CaseInsensitive);
+}
+
+bool OpenLocalTorrentFile(const QString& localFilePath) {
+  // Precondition: program torrent-file-
+  // link https://torrent-file-editor.github.io/
+
+  // If it was build it by your self:
+  // git clone git@github.com:torrent-file-editor/torrent-file-editor.git
+  // set debug path as follows:
+  // C:\home\aria\code\torrent-file-editor\build\Debug
+  // the program name will be like torrent-file-editor.exe for windows or torrent-file-editor for linux.
+  static const QString torrentEditorPath {PathTool::GetPathByApplicationDirPath(PathTool::FILE_REL_PATH::TORRENT_EDITOR_PROG_PATH)};
+  // Otherwise download torrent-file-editor-1.0.0-x64.exe and place it in userpath directly
+  // static const QString torrentEditorPath{SystemPath::HOME_PATH() + "/torrent-file-editor-1.0.0-x64.exe"};
+  if (!QFile::exists(torrentEditorPath)) {
+    LOG_D("torrent editor[%s] not exist", qPrintable(torrentEditorPath));
+    return false;
+  }
+  QProcess process;
+  QStringList args;
+  process.setProgram(torrentEditorPath);
+  args << PathTool::sysPath(localFilePath);
+  process.setArguments(args);
+  process.startDetached(); // Start the process in detached mode instead of start
+  return true;
+}
+
 } // namespace FileTool
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {

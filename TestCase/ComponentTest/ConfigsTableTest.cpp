@@ -46,7 +46,7 @@ class ConfigsTableTest : public PlainTestSuite {
     cfgTbl.show();
     QCOMPARE(QTest::qWaitForWindowExposed(&cfgTbl), true);
 
-    QCOMPARE(cfgTbl.m_alertModel->rowCount(), USER_CFG_COUNT);
+    QCOMPARE(cfgTbl.m_alertModel->rowCount(), KV::mEditableKVs.size());
     QCOMPARE(cfgTbl.m_alertModel->failCount(), 2);
 
     QModelIndex imageHostValueIndex = cfgTbl.m_alertModel->index(0, ConfigsModel::VALUE_COLUMN);
