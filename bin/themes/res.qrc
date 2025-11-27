@@ -50,6 +50,7 @@
     <file alias="LIKE">Media/LIKE.svg</file>
     <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
     <file alias="RENAME_THUMBNAILS">Media/RENAME_THUMBNAILS.svg</file>
+    <file alias="IMAGE_NOT_FOUND">Media/IMAGE_NOT_FOUND.svg</file>
 
     <!--FramelessWindow Icon here-->
     <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>

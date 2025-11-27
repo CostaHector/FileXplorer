@@ -10,8 +10,8 @@
 #include <QDir>
 #include <QBrush>
 
-ScenesListModel::ScenesListModel(QObject* object)  //
-    : QAbstractListModelPub(object) {
+ScenesListModel::ScenesListModel(QObject* object) //
+  : QAbstractListModelPub(object) {
   int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
   mScenesCountPerPage = sceneCnt1Page > 0 ? sceneCnt1Page : 1000;
 }
@@ -38,20 +38,20 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       return mCurBegin[linearInd].name;
     }
     case Qt::ItemDataRole::DecorationRole: {
-      if (mCurBegin[linearInd].imgs.isEmpty()) {
-        return {};
-      }
-      const QString imgAbsPath = mCurBegin[linearInd].GetFirstImageAbsPath(mRootPath);
-      const QString imgKey = StringTool::PathJoinPixmapSize(imgAbsPath, mWidth, mHeight);
+      const QString imgAbsPath{mCurBegin[linearInd].imgs.isEmpty() ? //
+                                   ":img/IMAGE_NOT_FOUND"            //
+                                                                   : //
+                                   mCurBegin[linearInd].GetFirstImageAbsPath(mRootPath)};
+      const QString imgKey{StringTool::PathJoinPixmapSize(imgAbsPath, mWidth, mHeight)};
       QPixmap pm;
       if (mPixCache.find(imgKey, &pm)) {
         return pm;
       }
-      if (QFile{imgAbsPath}.size() > 10 * 1024 * 1024) {  // 10MB
-        return {};                                        // files too large
+      if (QFile{imgAbsPath}.size() > 10 * 1024 * 1024) { // 10MB
+        return {};                                       // files too large
       }
       if (!pm.load(imgAbsPath)) {
-        return {};  // load failed
+        return {}; // load failed
       }
       if (pm.width() * mHeight >= pm.height() * mWidth) {
         pm = pm.scaledToWidth(mWidth, Qt::FastTransformation);
@@ -107,9 +107,15 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
   const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
   const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
 
-  LOG_OE_P(bothUpdatedOk, "Rate Modify", "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]",  //
-           qPrintable(eleRel2Scn), qPrintable(eleBaseName),                                 //
-           beforeRate, newRate, bScnUpdatedOk, bJsonUpdatedOk);
+  LOG_OE_P(bothUpdatedOk,
+           "Rate Modify",
+           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]", //
+           qPrintable(eleRel2Scn),
+           qPrintable(eleBaseName), //
+           beforeRate,
+           newRate,
+           bScnUpdatedOk,
+           bJsonUpdatedOk);
   return bothUpdatedOk;
 }
 
@@ -202,7 +208,7 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
     return {};
   }
   const QString vidAbsPath = mCurBegin[linearInd].GetVideoAbsPath(mRootPath);
-  return {vidAbsPath};  // may return an inexist video
+  return {vidAbsPath}; // may return an inexist video
 }
 
 QString ScenesListModel::GetJson(const QModelIndex& index) const {
@@ -240,7 +246,7 @@ void ScenesListModel::onIconSizeChange(const QSize& newSize) {
   mPixCache.clear();
 }
 
-bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) {  // -1 means all, > 0 means count
+bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) { // -1 means all, > 0 means count
   const int beforeRowCnt = rowCount();
   int startIndex{-1}, endIndex{-1};
 
