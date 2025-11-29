@@ -7,6 +7,8 @@
 #include <QToolTip>
 #include <QGraphicsEffect>
 
+constexpr QColor SceneStyleDelegate::GRAY_AND_HALF_TRANS;
+
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
   option->decorationPosition = QStyleOptionViewItem::Position::Top;
   option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
@@ -30,17 +32,24 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   // 1. plot basic image and text
   QStyledItemDelegate::paint(painter, option, index);
   // 2. only when index = curIndex and display = true. plot rating bar is needed
+  painter->save();
   if (mRateMachine.status() == RatingState::SELECTED_SHOW && index == mRateMachine.curIndex()) {
     QRect imageRect{GetRealImageVisualRect(index, option.rect)};
     drawRatingGrid(painter, RateHelper::getRatingRect(imageRect), mRateMachine.oldRate(), mRateMachine.newRate());
   }
+  const int rating = index.data(ScenesListModel::RatingRole).toInt();
+  QRect currentRateTextRect = option.rect;
+  currentRateTextRect.setHeight(32);
+  currentRateTextRect.setWidth(32);
+  painter->fillRect(currentRateTextRect, GRAY_AND_HALF_TRANS); // gray and half transparent
+  painter->setPen(Qt::white);
+  painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));
+  painter->restore();
 }
 
 void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) const {
-  painter->save();
-
   // 绘制半透明背景层
-  painter->fillRect(rect, QColor{0, 0, 0, 150}); // gray and half transparent
+  painter->fillRect(rect, GRAY_AND_HALF_TRANS); // gray and half transparent
 
   int gridHeight = rect.height() - 10;
   int gridTop = rect.top() + 5;
@@ -51,7 +60,6 @@ void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, in
   // 悬浮点对应评分条
   const QColor beforeHoverGridColor{QColor{255, 200, 0, 220}}; // yellow
   painter->setBrush(beforeHoverGridColor);
-  painter->setPen(QPen(Qt::darkGray, 1));
   painter->drawRect(beforeHoverRect);
 
   // 均匀分布9条垂直线，从左侧开始
@@ -77,8 +85,6 @@ void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, in
 
   painter->setPen(Qt::white);
   painter->drawText(beforeHoverRect, Qt::AlignCenter, QString::asprintf("%d(%d)", hoverRating, rating));
-
-  painter->restore();
 }
 
 void SceneStyleDelegate::onSceneClicked(const QModelIndex& nowInd, const QRect& visualRect, const QPoint& clickedPnt) {
