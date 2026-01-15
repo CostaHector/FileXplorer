@@ -6,6 +6,7 @@
 #include <QObject>
 
 class MovieDBActions : public QObject {
+  Q_OBJECT
  public:
   explicit MovieDBActions(QObject* parent = nullptr);
 

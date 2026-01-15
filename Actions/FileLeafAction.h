@@ -5,6 +5,7 @@
 #include <QToolButton>
 
 class FileLeafActions : public QObject {
+  Q_OBJECT
  public:
   explicit FileLeafActions(QObject* parent = nullptr);
 

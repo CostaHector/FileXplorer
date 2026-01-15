@@ -7,36 +7,24 @@
 namespace JsonKey {
 /* Performers deprecated, Use Cast instead */
 #define JSON_MODEL_FIELD_MAPPING                                                                                                                                        \
-  JSON_KEY_ITEM(Prepath, 0, QString{}, QString{}, /*                          */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, \
-                DataFormatter::writeJsonObjectQString)                                                                                                                  \
+  JSON_KEY_ITEM(Prepath, 0, QString{}, QString{}, /*                          */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
   JSON_FILE_KEY_MAPPING
 
 #define JSON_FILE_KEY_MAPPING                                                                                                                                                                      \
-  JSON_KEY_ITEM(Name, 1, QString{}, QString{}, /*                             */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst,                          \
-                DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
-  JSON_KEY_ITEM(Studio, 3, QString{}, QString{}, /*                           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initStudioQString,                      \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Tags, 4, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                              \
-                DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
-  JSON_KEY_ITEM(Detail, 5, QString{}, QString{}, /*                           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Uploaded, 6, QString{}, QString{}, /*                         */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Rate, 7, (int)0, (int)0, /*                                   */ DataFormatter::formatDefault, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
-  JSON_KEY_ITEM(Size, 8, (int)0, (int)0, /*                                   */ DataFormatter::formatDefault, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
-  JSON_KEY_ITEM(Resolution, 9, QString{}, QString{}, /*                       */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Bitrate, 10, QString{}, QString{}, /*                         */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)                                                                                                                                             \
-  JSON_KEY_ITEM(Hot, 11, QStringList{}, SortedUniqStrLst{}, /*        */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst,                              \
-                DataFormatter::writeJsonObjectSortedStrLst)                                                                                                                                        \
-  JSON_KEY_ITEM(Duration, 12, (int)0, (int)0, /*                              */ DataFormatter::formatDefault, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::initInt)            \
-  JSON_KEY_ITEM(ImgName, 13, QStringList{}, QStringList{}, /*                 */ DataFormatter::formatQStringLst, DataFormatter::writeQStringLst, DataFormatter::initQStringLst,                   \
-                DataFormatter::writeJsonObjectQStringLst)                                                                                                                                          \
-  JSON_KEY_ITEM(VidName, 14, QString{}, QString{}, /*                         */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString,                            \
-                DataFormatter::writeJsonObjectQString)
+  JSON_KEY_ITEM(Name, 1, QString{}, QString{}, /*              */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
+  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /* */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst, DataFormatter::writeJsonObjectSortedStrLst) \
+  JSON_KEY_ITEM(Studio, 3, QString{}, QString{}, /*            */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initStudioQString, DataFormatter::writeJsonObjectQString) \
+  JSON_KEY_ITEM(Tags, 4, QStringList{}, SortedUniqStrLst{}, /* */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst, DataFormatter::writeJsonObjectSortedStrLst) \
+  JSON_KEY_ITEM(Uploaded, 5, QString{}, QString{}, /*          */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
+  JSON_KEY_ITEM(Rate, 6, (int)0, (int)0, /*                    */ DataFormatter::formatDefault, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
+  JSON_KEY_ITEM(Size, 7, (int)0, (int)0, /*                    */ DataFormatter::formatFileSizeGMKB, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
+  JSON_KEY_ITEM(Resolution, 8, QString{}, QString{}, /*        */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString)     \
+  JSON_KEY_ITEM(Bitrate, 9, QString{}, QString{}, /*           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString)      \
+  JSON_KEY_ITEM(Hot, 10, QStringList{}, SortedUniqStrLst{}, /* */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst, DataFormatter::writeJsonObjectSortedStrLst)  \
+  JSON_KEY_ITEM(Duration, 11, (int)0, (int)0, /*               */ DataFormatter::formatDurationISO, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
+  JSON_KEY_ITEM(ImgName, 12, QStringList{}, QStringList{}, /*  */ DataFormatter::formatQStringLst, DataFormatter::writeQStringLst, DataFormatter::initQStringLst, DataFormatter::writeJsonObjectQStringLst)   \
+  JSON_KEY_ITEM(VidName, 13, QString{}, QString{}, /*          */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
+  JSON_KEY_ITEM(Detail, 14, QString{}, QString{}, /*           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
 
 // Key, enum like Name=0, Cast=1, ...,
 enum JSON_KEY_E {

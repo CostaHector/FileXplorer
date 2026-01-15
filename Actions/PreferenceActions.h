@@ -12,6 +12,7 @@ extern template struct EnumIntAction<Style::StyleE>;
 extern template struct EnumIntAction<Style::StyleSheetE>;
 
 class PreferenceActions : public QObject {
+  Q_OBJECT
 public:
   explicit PreferenceActions(QObject *parent = nullptr);
   ~PreferenceActions();

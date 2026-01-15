@@ -5,6 +5,7 @@
 #include "DataFormatter.h"
 #include "CastManager.h"
 #include "PathTool.h"
+#include "VideoDurationGetter.h"
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
@@ -503,6 +504,49 @@ int JsonTableModel::FormatCast(const QModelIndexList& rowIndexes) {
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Cast Field of %d/%d row(s) range [%d, %d) format ok", affectedRows, rowIndexes.size(), minRow, maxRow);
   return affectedRows;
+}
+
+int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
+  QHash<QString, QString> vidBaseName2FullPath;
+  if (rowIndexes.size() >= 50) {
+    QDirIterator it{mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+    while (it.hasNext()) {
+      QString vidFullPath = it.next();
+      QString vidBaseName = PathTool::GetFileNameExtRemoved(vidFullPath);
+      vidBaseName2FullPath[vidBaseName] = vidFullPath;
+    }
+  }
+
+  int affectedRows{0};
+  int row{-1};
+  int minRow{INT_MAX}, maxRow{-1};
+  for (const QModelIndex& ind : rowIndexes) {
+    row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range [0,%d)", row, rowCount());
+      return affectedRows;
+    }
+    const QString& jsonFullPath = mCachedJsons[row].GetAbsPath();
+    const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
+    const QString& vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
+    affectedRows += (int)mCachedJsons[row].UpdateDurationField(vidFullPath);
+    setModifiedNoEmit(row);
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    LOG_W("Cast Field of %d row(s) NO format at all", rowIndexes.size());
+    return 0;
+  }
+  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Duration, {});
+  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Duration, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
+  emit headerDataChanged(Qt::Vertical, minRow, maxRow);
+  return 0;
 }
 
 int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes) {

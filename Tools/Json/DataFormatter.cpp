@@ -276,4 +276,4 @@ QString formatMd5ByPathFirst1MillionByte(const QString& fileAbspath) {
 QString formatMd5ByPath(const QString& fileAbspath) {
   return MD5Calculator::GetFileMD5(fileAbspath, -1); // entire file
 }
-};  // namespace DataFormatter
+}  // namespace DataFormatter

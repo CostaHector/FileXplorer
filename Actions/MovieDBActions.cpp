@@ -9,39 +9,39 @@ MovieDBActions& g_dbAct() {
 MovieDBActions::MovieDBActions(QObject* parent)  //
     : QObject{parent}                            //
 {
-  SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), "Submit", this);
+  SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), tr("Submit"), this);
   CHECK_NULLPTR_RETURN_VOID(SUBMIT);
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));
 
-  REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), "Revert", this);
+  REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), tr("Revert"), this);
   CHECK_NULLPTR_RETURN_VOID(REVERT);
 
-  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), "Init Database", this);
+  INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), tr("Init Database"), this);
   CHECK_NULLPTR_RETURN_VOID(INIT_A_DATABASE);
   INIT_A_DATABASE->setToolTip("CREATE DATABASE `DB_NAME`;");
 
-  INIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/CREATE_TABLE"), "Create Table", this);
+  INIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/CREATE_TABLE"), tr("Create Table"), this);
   CHECK_NULLPTR_RETURN_VOID(INIT_A_TABLE);
   INIT_A_TABLE->setToolTip("CREATE TABLE IF NOT EXISTS `DB_TABLE::MOVIES`(`COLUMN_NAME` TEXT NOT NULL, PRIMARY KEY (COLUMN_NAME));");
 
-  DROP_A_TABLE = new (std::nothrow) QAction(QIcon(":img/DROP_TABLE"), "Drop Table", this);
+  DROP_A_TABLE = new (std::nothrow) QAction(QIcon(":img/DROP_TABLE"), tr("Drop Table"), this);
   CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
   DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
 
-  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), "Insert Into", this);
+  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Insert Into"), this);
   CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
   INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::MOVIES`(COLUMN_NAME) VALUES (VALUE);");
 
-  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), "Delete Where", this);
+  DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete Where"), this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
   DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
 
-  UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), "Union Into", this);
+  UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), tr("Union Into"), this);
   CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
   UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
 
-  AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), "Audit This Table", this);
+  AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), tr("Audit This Table"), this);
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
   AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
 
@@ -58,9 +58,9 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
   DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  READ_DURATION_BY_VIDEO = new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), "Read Duration", this);
+  READ_DURATION_BY_VIDEO = new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), tr("Read Duration"), this);
   CHECK_NULLPTR_RETURN_VOID(READ_DURATION_BY_VIDEO);
-  EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON = new (std::nothrow) QAction(QIcon(":img/DUMP_INTO_PSON_FILE"), "Export to Json", this);
+  EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON = new (std::nothrow) QAction(QIcon(":img/DUMP_INTO_PSON_FILE"), tr("Export to Json"), this);
   CHECK_NULLPTR_RETURN_VOID(EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON);
   EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON->setToolTip("Export Duration/Studio/Cast/Tags to json file, if any field value is valid");
   UPDATE_STUDIO_CAST_TAGS_BY_JSON = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), "Update by Json", this);
@@ -74,27 +74,27 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   EX_FUNCTION_ACTIONS->addAction(UPDATE_STUDIO_CAST_TAGS_BY_JSON);
   EX_FUNCTION_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  _COUNT = new (std::nothrow) QAction(QIcon(":img/COUNTER"), "COUNT", this);
+  _COUNT = new (std::nothrow) QAction(QIcon(":img/COUNTER"), tr("COUNT"), this);
   CHECK_NULLPTR_RETURN_VOID(_COUNT);
   _COUNT->setToolTip("SELECT COUNT(COLUMN) FROM TABLE WHERE 1;");
 
-  _SUM = new (std::nothrow) QAction(QIcon(":img/SUM"), "SUM", this);
+  _SUM = new (std::nothrow) QAction(QIcon(":img/SUM"), tr("SUM"), this);
   CHECK_NULLPTR_RETURN_VOID(_SUM);
   _SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 
-  _OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "&Open with local app", this};
+  _OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("&Open with local app"), this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_DB_WITH_LOCAL_APP);
   _OPEN_DB_WITH_LOCAL_APP->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")
           .arg(_OPEN_DB_WITH_LOCAL_APP->text(), _OPEN_DB_WITH_LOCAL_APP->shortcut().toString()));
 
-  SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), "Set Studio", this);
+  SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), tr("Set Studio"), this);
 
-  SET_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), "Set Cast", this);
-  APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), "Add Cast", this);
-  REMOVE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), "Rmv Cast", this);
+  SET_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Set Cast"), this);
+  APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), tr("Add Cast"), this);
+  REMOVE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), tr("Rmv Cast"), this);
 
-  SET_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), "Set Tags", this);
-  APPEND_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), "Add Tags", this);
-  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), "Rmv Tag", this);
+  SET_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), tr("Set Tags"), this);
+  APPEND_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), tr("Add Tags"), this);
+  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), tr("Rmv Tag"), this);
 }

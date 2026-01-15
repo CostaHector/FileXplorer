@@ -280,9 +280,6 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
 }
 
 bool LoadCNLanguagePack(QTranslator& translator, QString qmName) {
-#ifndef RUNNING_UNIT_TESTS
-  qmName = PROJECT_NAME "_zh_CN.qm";
-#endif
   if (!translator.load(qmName)) {
     LOG_C("Load language[%s] pack failed", qPrintable(qmName));
     return false;

@@ -8,6 +8,7 @@
 class QToolBar;
 
 class PropertiesWindowActions : QObject {
+  Q_OBJECT
  public:
   explicit PropertiesWindowActions(QObject* parent = nullptr);
   QToolBar* getPropertiesToolBar(QWidget* parent);

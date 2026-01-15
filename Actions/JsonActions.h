@@ -27,12 +27,11 @@ public:
   QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
 
   // **Studio/Cast/Tags Field Operation**
-  QAction* _CLEAR_CAST{nullptr};
-  QAction* _CLEAR_STUDIO{nullptr};
-  QAction* _CLEAR_TAGS{nullptr};
-
   QAction* _AI_HINT_CAST_STUDIO{nullptr};
   QAction* _FORMATTER{nullptr};
+  QAction* _UPDATE_DURATION_FIELD{nullptr};
+  QAction* _UPDATE_SIZE_FIELD{nullptr};
+  QAction* _UPDATE_HASH_FIELD{nullptr};
 
   QAction* _INIT_STUDIO_CAST{nullptr};
   QAction* _STUDIO_FIELD_SET{nullptr};
@@ -44,6 +43,10 @@ public:
   QAction* _TAGS_FIELD_SET{nullptr};
   QAction* _TAGS_FIELD_APPEND{nullptr};
   QAction* _TAGS_FIELD_RMV{nullptr};
+
+  QAction* _CLEAR_CAST{nullptr};
+  QAction* _CLEAR_STUDIO{nullptr};
+  QAction* _CLEAR_TAGS{nullptr};
 
   QAction* _ADD_SELECTED_CAST_SENTENCE{nullptr};
   QAction* _EXTRACT_UPPERCASE_CAST{nullptr};

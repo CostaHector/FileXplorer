@@ -303,15 +303,15 @@ bool ThumbnailImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
 
 void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
   if (mMenu == nullptr) {
-    _OPEN_IN_SYSTEM_APPLICATION = new (std::nothrow) QAction{QIcon{":img/LARGE"}, "Open in system application", this};
+    _OPEN_IN_SYSTEM_APPLICATION = new (std::nothrow) QAction{QIcon{":img/LARGE"}, tr("Open in system application"), this};
     CHECK_NULLPTR_RETURN_VOID(_OPEN_IN_SYSTEM_APPLICATION);
     _OPEN_IN_SYSTEM_APPLICATION->setShortcutVisibleInContextMenu(true);
 
-    _REVEAL_IN_FILE_EXPLORER = new (std::nothrow) QAction{QIcon{":img/REVEAL_IN_EXPLORER"}, "Reveal in explorer", this};
+    _REVEAL_IN_FILE_EXPLORER = new (std::nothrow) QAction{QIcon{":img/REVEAL_IN_EXPLORER"}, tr("Reveal in explorer"), this};
     CHECK_NULLPTR_RETURN_VOID(_REVEAL_IN_FILE_EXPLORER);
     _REVEAL_IN_FILE_EXPLORER->setShortcutVisibleInContextMenu(true);
 
-    _COPY_FILE_NAME = new (std::nothrow) QAction{QIcon{":img/COPY_TEXT"}, "Copy file name", this};
+    _COPY_FILE_NAME = new (std::nothrow) QAction{QIcon{":img/COPY_TEXT"}, tr("Copy file name"), this};
     CHECK_NULLPTR_RETURN_VOID(_COPY_FILE_NAME);
     _COPY_FILE_NAME->setShortcutVisibleInContextMenu(true);
 

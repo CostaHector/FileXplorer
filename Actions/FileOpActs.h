@@ -13,6 +13,7 @@ class QToolBar;
 extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 
 class FileOpActs : public QObject {
+Q_OBJECT
  public:
   static FileOpActs& GetInst();
   explicit FileOpActs(QObject* parent = nullptr);

@@ -37,36 +37,38 @@ void MenuToolButton::SetCaption(const QIcon& icon, const QString& text, const QS
 
 void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePersistentBehavior) {
   const QString& memoryKey = kv.name;
-  const QString& initalValue = Configuration().value(kv.name, kv.v).toString();
   if (memoryKey.isEmpty()) {
-    LOG_W("memoryKey[%s]:memoryValue[%s] is Empty", qPrintable(memoryKey), qPrintable(initalValue));
+    LOG_W("memoryKey[%s] is Empty", qPrintable(memoryKey));
   }
-
-  auto* pMenu = menu();
+  QMenu* pMenu = menu();
   if (pMenu == nullptr || pMenu->isEmpty()) {
     LOG_W("No menu attached to tool button or No action attached to Menu");
     return;
   }
   const auto& actsList = pMenu->actions();
-  foreach(QAction* act, actsList) {
-    if (act->text() == initalValue) {
-      setDefaultAction(act);
-      break;
-    }
+  if (actsList.isEmpty()) {
+    LOG_W("No action in QMenu at all");
+    return;
   }
-
-  if (defaultAction() == nullptr) {
-    LOG_W("Action[%s] not find from %d actions in menu, use first by default", qPrintable(initalValue), actsList.size());
-    setDefaultAction(actsList.front());
+  int initalActionIndex = Configuration().value(memoryKey, kv.v).toInt();
+  if (initalActionIndex < 0 || initalActionIndex >= actsList.size()) {
+    LOG_W("Action[%s] not find from %d actions in menu, use first by default", qPrintable(memoryKey), initalActionIndex);
+    initalActionIndex = 0;
   }
+  setDefaultAction(actsList[initalActionIndex]);
 
   if (!enablePersistentBehavior) {
     return;
   }
-  connect(this, &QToolButton::triggered, this, [this, memoryKey](QAction* pAct){
+  connect(this, &QToolButton::triggered, this, [this, memoryKey, actsList](QAction* pAct){
     CHECK_NULLPTR_RETURN_VOID(pAct);
     setDefaultAction(pAct);
-    Configuration().setValue(memoryKey, pAct->text());
+    const int defIndNxtTime = actsList.indexOf(pAct);
+    if (defIndNxtTime == -1) {
+      LOG_E("Cannot find action[%s] int the menus", qPrintable(pAct->text()));
+      return;
+    }
+    Configuration().setValue(memoryKey, defIndNxtTime);
   });
 }
 

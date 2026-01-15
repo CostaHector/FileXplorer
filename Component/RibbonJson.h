@@ -11,11 +11,12 @@ class RibbonJson : public QToolBar {
   QToolBar* syncCacheFileSystemTB{nullptr};
   QToolBar* caseControlTB{nullptr};
   QToolBar* studioCastTagsFieldfOperationTB{nullptr};
-  QToolBar* constructFieldsTB{nullptr};
   QToolBar* hintFieldsTB{nullptr};
+  QToolBar* updateFieldTB{nullptr};
   QToolBar* studioTB{nullptr};
   QToolBar* castEditTB{nullptr};
   QToolBar* tagsEditTB{nullptr};
+  QToolBar* castStudioTagsClearTB{nullptr};
   QToolBar* castFromSentenceTb{nullptr};
 };
 

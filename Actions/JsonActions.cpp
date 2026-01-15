@@ -14,7 +14,7 @@ JsonActions::JsonActions(QObject* parent)  //
                                         .arg(_SAVE_CURRENT_CHANGES->shortcut().toString()));
 
   // **Sync cache/file system**
-  _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":img/NAME_FROM_JSON_FILENAME"), "Sync Json Name Value");
+  _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":img/NAME_FROM_JSON_FILENAME"), tr("Sync Json Name Value"));
   _SYNC_NAME_FIELD_BY_FILENAME->setToolTip(QString("<b>%1 (%2)</b><br/>Sync Name Field from json file base name.")  //
                                                .arg(_SYNC_NAME_FIELD_BY_FILENAME->text(), _SYNC_NAME_FIELD_BY_FILENAME->shortcut().toString()));
 
@@ -38,7 +38,7 @@ JsonActions::JsonActions(QObject* parent)  //
                                                         .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text())
                                                         .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
 
-  _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lower"), this);
+  _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase"), this);
   _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
   _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
   _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentence.")  //
@@ -46,11 +46,11 @@ JsonActions::JsonActions(QObject* parent)  //
                                    .arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
   // **File Operation**
-  _OPEN_THIS_FILE = new (std::nothrow) QAction("Open this file", this);
+  _OPEN_THIS_FILE = new (std::nothrow) QAction{QIcon{":img/OPEN_JSON_FILE"}, tr("Open this json file"), this};
   _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
   _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
   _OPEN_THIS_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Open this json file in system default app.").arg(_OPEN_THIS_FILE->text()).arg(_OPEN_THIS_FILE->shortcut().toString()));
-  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this);
+  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction{QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this};
   _REVEAL_IN_EXPLORER->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::AltModifier | Qt::Key_R));
   _REVEAL_IN_EXPLORER->setShortcutVisibleInContextMenu(true);
   _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal this json in its parent folder.").arg(_REVEAL_IN_EXPLORER->text()).arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
@@ -62,13 +62,6 @@ JsonActions::JsonActions(QObject* parent)  //
                                                  .arg(_RENAME_JSON_AND_RELATED_FILES->shortcut().toString()));
 
   // **Studio/Cast/Tags Field Operation**
-  _CLEAR_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_CLEAR"), "Clear Cast");
-  _CLEAR_CAST->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Cast in selected rows.").arg(_CLEAR_CAST->text(), _CLEAR_CAST->shortcut().toString()));
-  _CLEAR_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIO_CLEAR"), "Clear Studio");
-  _CLEAR_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Studio in selected rows.").arg(_CLEAR_STUDIO->text(), _CLEAR_STUDIO->shortcut().toString()));
-  _CLEAR_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_CLEAR"), "Clear Tags");
-  _CLEAR_TAGS->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Tags in selected rows.").arg(_CLEAR_TAGS->text(), _CLEAR_TAGS->shortcut().toString()));
-
   _AI_HINT_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":img/AI_IDEA"), tr("Cast/Studio Hint"), this);
   _AI_HINT_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _AI_HINT_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint")  //
@@ -81,30 +74,50 @@ JsonActions::JsonActions(QObject* parent)  //
                                  "e.g., A,B -> A, B.")
                              .arg(_FORMATTER->text())
                              .arg(_FORMATTER->shortcut().toString()));
+  _UPDATE_DURATION_FIELD = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, tr("Update duration"), this};
+  _UPDATE_DURATION_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the duration information from video file and write into json file")
+                             .arg(_UPDATE_DURATION_FIELD->text())
+                             .arg(_UPDATE_DURATION_FIELD->shortcut().toString()));
+  _UPDATE_SIZE_FIELD = new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, tr("Update size"), this};
+  _UPDATE_SIZE_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Update size field")
+                                         .arg(_UPDATE_SIZE_FIELD->text())
+                                         .arg(_UPDATE_SIZE_FIELD->shortcut().toString()));
+  _UPDATE_HASH_FIELD = new (std::nothrow) QAction{QIcon{":img/MD5_FILE_IDENTIFIER_PATH"}, tr("Update hash"), this};
+  _UPDATE_HASH_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Update hash field")
+                                         .arg(_UPDATE_HASH_FIELD->text())
+                                         .arg(_UPDATE_HASH_FIELD->shortcut().toString()));
 
-  _INIT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/CAST"), "Init Cast/Studio");
+  _INIT_STUDIO_CAST = new (std::nothrow) QAction(QIcon(":img/CAST"), tr("Init Cast/Studio"), this);
   _INIT_STUDIO_CAST->setToolTip(QString("<b>%1 (%2)</b><br/>Init Cast/Studio Fields if empty.").arg(_INIT_STUDIO_CAST->text(), _INIT_STUDIO_CAST->shortcut().toString()));
-  _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/STUDIO"), "Set Studio");
+  _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/STUDIO"), tr("Set Studio"));
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field")  //
                                     .arg(_STUDIO_FIELD_SET->text(), _STUDIO_FIELD_SET->shortcut().toString()));
-  _CAST_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), "Set Cast");
+
+  _CAST_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Set Cast"), this);
   _CAST_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence used to set Cast field")  //
                                   .arg(_CAST_FIELD_SET->text(), _CAST_FIELD_SET->shortcut().toString()));
-  _CAST_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), "Add Cast");
+  _CAST_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), tr("Add Cast"), this);
   _CAST_FIELD_APPEND->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence append to Cast field")  //
                                      .arg(_CAST_FIELD_APPEND->text(), _CAST_FIELD_APPEND->shortcut().toString()));
-  _CAST_FIELD_RMV = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), "Rmv Cast");
+  _CAST_FIELD_RMV = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), tr("Rmv Cast"), this);
   _CAST_FIELD_RMV->setToolTip(QString("<b>%1 (%2)</b><br/>Input a cast used to remove from Cast field")  //
                                   .arg(_CAST_FIELD_RMV->text(), _CAST_FIELD_RMV->shortcut().toString()));
-  _TAGS_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), "Set Tags");
+  _TAGS_FIELD_SET = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), tr("Set Tags"), this);
   _TAGS_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence used to set Tags field")  //
                                   .arg(_TAGS_FIELD_SET->text(), _TAGS_FIELD_SET->shortcut().toString()));
-  _TAGS_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), "Add Tags");
+  _TAGS_FIELD_APPEND = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), tr("Add Tags"), this);
   _TAGS_FIELD_APPEND->setToolTip(QString("<b>%1 (%2)</b><br/>Input a sentence append to Tags field")  //
                                      .arg(_TAGS_FIELD_APPEND->text(), _TAGS_FIELD_APPEND->shortcut().toString()));
-  _TAGS_FIELD_RMV = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), "Rmv Tag");
+  _TAGS_FIELD_RMV = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), tr("Rmv Tag"), this);
   _TAGS_FIELD_RMV->setToolTip(QString("<b>%1 (%2)</b><br/>Input a tag used to remove from Tags field")  //
                                   .arg(_TAGS_FIELD_RMV->text(), _TAGS_FIELD_RMV->shortcut().toString()));
+
+  _CLEAR_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_CLEAR"), tr("Clear Cast"), this);
+  _CLEAR_CAST->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Cast in selected rows.").arg(_CLEAR_CAST->text(), _CLEAR_CAST->shortcut().toString()));
+  _CLEAR_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIO_CLEAR"), tr("Clear Studio"), this);
+  _CLEAR_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Studio in selected rows.").arg(_CLEAR_STUDIO->text(), _CLEAR_STUDIO->shortcut().toString()));
+  _CLEAR_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_CLEAR"), tr("Clear Tags"), this);
+  _CLEAR_TAGS->setToolTip(QString("<b>%1 (%2)</b><br/>Clear Tags in selected rows.").arg(_CLEAR_TAGS->text(), _CLEAR_TAGS->shortcut().toString()));
 
   _ADD_SELECTED_CAST_SENTENCE = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_FROM_SENTENCE"), tr("Cast from sentence"), this);
   _ADD_SELECTED_CAST_SENTENCE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));

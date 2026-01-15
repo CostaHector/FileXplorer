@@ -27,12 +27,12 @@ RateActions::RateActions(QObject* parent)
 
   RATE_ACTIONS_LIST += nullptr;
 
-  _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, "Rate Recusively", this};
+  _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate Recusively"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY);
   _RATE_RECURSIVELY->setToolTip("Rate only unrated movies in selected folder and its subfolders");
   RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
 
-  _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{"Rate Recusively(Force)", this};
+  _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{tr("Rate Recusively(Force)"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY_OVERRIDE);
   _RATE_RECURSIVELY_OVERRIDE->setToolTip("Rate all movies, overwriting existing ratings");
   RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;

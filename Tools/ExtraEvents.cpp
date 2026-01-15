@@ -66,7 +66,8 @@ void ExtraEvents::subscribe() {
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
-    LOG_INFO_NP("Language switch", "work after reopen");
+    const char* languageName{cnEnabled ? "zh-cn" : "us-en"};
+    LOG_INFO_P("Language switch", "[%s] work after reopen", languageName);
   });
 
   connect(leafInst._ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU, &QAction::triggered, &SystemContextMenuControl::Add);

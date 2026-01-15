@@ -1,23 +1,23 @@
 #include "RenameActions.h"
 
 RenameActions::RenameActions(QObject* parent) : QObject{parent} {
-  _NUMERIZER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), "Rename (ith)");
-  _SECTIONS_ARRANGE = new (std::nothrow) QAction(QIcon(":img/NAME_SECTIONS_ARRANGE"), "Sections Arrange");
-  _REVERSE_NAMES_LIST = new (std::nothrow) QAction(QIcon(":img/RENAME_REVERSE_NAMES_LIST"), "Reverse names list");
-  _CASE_NAME = new (std::nothrow) QAction(QIcon(":img/NAME_STR_CASE"), "Case Change");
-  _STR_INSERTER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), "String Insert");
-  _STR_DELETER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_DELETER_PATH"), "String Delete");
-  _STR_REPLACER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), "String Replace");
-  _CONTINUOUS_NUMBERING = new (std::nothrow) QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), "Name Continous");
-  _CONVERT_UNICODE_TO_ASCII = new (std::nothrow) QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), "Unicode Char to ASCII");
-  _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{QIcon{":img/PREPEND_PARENT_FOLDER_NAMES"}, "Prepend parent folder names"};
+  _NUMERIZER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"), this);
+  _SECTIONS_ARRANGE = new (std::nothrow) QAction(QIcon(":img/NAME_SECTIONS_ARRANGE"), tr("Sections Arrange"), this);
+  _REVERSE_NAMES_LIST = new (std::nothrow) QAction(QIcon(":img/RENAME_REVERSE_NAMES_LIST"), tr("Reverse names list"), this);
+  _CASE_NAME = new (std::nothrow) QAction(QIcon(":img/NAME_STR_CASE"), tr("Case Change"), this);
+  _STR_INSERTER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("String Insert"), this);
+  _STR_DELETER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_DELETER_PATH"), tr("String Delete"), this);
+  _STR_REPLACER = new (std::nothrow) QAction(QIcon(":img/NAME_STR_REPLACER_PATH"), tr("String Replace"), this);
+  _CONTINUOUS_NUMBERING = new (std::nothrow) QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), tr("Name Continous"), this);
+  _CONVERT_UNICODE_TO_ASCII = new (std::nothrow) QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), tr("Unicode Char to ASCII"), this);
+  _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{QIcon{":img/PREPEND_PARENT_FOLDER_NAMES"}, tr("Prepend parent folder names"), this};
   RENAME_RIBBONS = Get_Rename_Actions();
 
-  _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), "Uppercase");
-  _LOWER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), "Lowercase");
-  _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), "Capitalize first and keep other");
-  _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), "Capitalize first and lower other");
-  _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), "Toggle Case");
+  _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), tr("Uppercase"), this);
+  _LOWER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase"), this);
+  _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), tr("Capitalize first and keep other"), this);
+  _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), tr("Capitalize first and lower other"), this);
+  _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), tr("Toggle Case"), this);
   NAME_CASE = Get_CASE_Actions();
 }
 

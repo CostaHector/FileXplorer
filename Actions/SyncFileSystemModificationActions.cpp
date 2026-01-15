@@ -10,13 +10,13 @@ SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {
 }
 
 SyncFileSystemModificationActions::SyncFileSystemModificationActions(QObject* /*parent*/) {
-  _SYNC_MOD_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_MODIFICATION_SWITCH"), "Sync", this};
+  _SYNC_MOD_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_MODIFICATION_SWITCH"), tr("Sync"), this};
   _SYNC_MOD_SWITCH->setCheckable(true);
   _SYNC_MOD_SWITCH->setToolTip(
       "Modification on basic path will also syncronized to destination path,"
       "including\n1.file rename\n2.file move/into into\n3.file recycle\n4.file delete\nWarning: When copy/cut items out of these 2 paths, only first commands will succeed.");
 
-  _SYNC_REVERSE_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_REVERSE_SWITCH"), "reverse back", this};
+  _SYNC_REVERSE_SWITCH = new (std::nothrow) QAction{QIcon(":img/SYNC_REVERSE_SWITCH"), tr("reverse back"), this};
   _SYNC_REVERSE_SWITCH->setCheckable(true);
   _SYNC_REVERSE_SWITCH->setToolTip("Also sync modification reverse back to basic path");
 

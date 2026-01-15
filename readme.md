@@ -243,6 +243,12 @@ find ./ -name "RemovedFileName*" -delete
 ## Update translate files is needed
 
 ```bash
+cd path_to_project
+# windows
+lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
+linguist ./Translate/FileXplorer_zh_CN.ts
+lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
+# linux
 /home/ariel/Qt/5.15.2/gcc_64/bin/lupdate ../publicTest/PublicToolTest.cpp -ts test_zh_CN.ts
 /home/ariel/Qt/5.15.2/gcc_64/bin/lrelease test_zh_CN.ts -qm test_zh_CN.qm
 ```
