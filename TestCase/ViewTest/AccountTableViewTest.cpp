@@ -77,7 +77,7 @@ class AccountTableViewTest : public PlainTestSuite {
     {
       // 步骤2: 插入新行
       QCOMPARE(view.mPwdModel->rowCount(), 3);
-      view.verticalHeader()->setCurrentIndex({});  // vertical invalid index
+      view.verticalHeader()->setCurrentIndex({});  // vertical invalid index, 禁止插入
       AccountTableViewMock::getIntFromUserInputMock() = std::pair<bool, int>{true, 1};
       emit ins.INSERT_A_ROW->triggered();
       QCOMPARE(view.mPwdModel->rowCount(), 3);

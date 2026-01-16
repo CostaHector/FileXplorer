@@ -22,6 +22,8 @@ inline void clear() {
 }
 #endif
 
+QString GetCredTargetName();
+
 class LoginWid : public QWidget {
   Q_OBJECT
  public:
@@ -38,6 +40,13 @@ class LoginWid : public QWidget {
 
   void AutoLoginTimeoutCallback();
 
+  bool isAutoLoginEnabled() const {
+    return autoLogin->isChecked();
+  }
+  bool isRememberEnabled() const {
+    return remeberKey->isChecked();
+  }
+
  signals:
   void timeoutAccepted();
 
@@ -45,6 +54,7 @@ class LoginWid : public QWidget {
   QLineEdit* inputKeyLe{nullptr};
   QCheckBox* remeberKey{nullptr};
   QCheckBox* autoLogin{nullptr};
+  QLabel* mMessage{nullptr};
   QFormLayout* loginLo{nullptr};
   QTimer* autoLoginTimer{nullptr};
 };

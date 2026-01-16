@@ -109,7 +109,7 @@ void AccountTableView::InsertNRows(int rowCnt) {
     LOG_WARN_NP("No row selected", "Select a row at first");
     return;
   }
-  int insertIndexBefore = verHeaderIndex.row();
+  const int insertIndexBefore = verHeaderIndex.row();
   LOG_INFO_P("Insert at", "Index %d with %d row(s)", insertIndexBefore, rowCnt);
   mPwdModel->InsertNRows(insertIndexBefore, rowCnt);
 }

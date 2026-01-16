@@ -10,6 +10,14 @@
 #include <QPushButton>
 #include <QTimer>
 
+QString GetCredTargetName() {
+#ifdef RUNNING_UNIT_TESTS
+  return "PASSWORD_MANAGER_AES_KEY_TEST";
+#else
+  return "PASSWORD_MANAGER_AES_KEY";
+#endif
+}
+
 QLineEdit* CreateKeyLineEdit(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   QLineEdit* keyLe = new (std::nothrow) QLineEdit{parent};
@@ -28,22 +36,25 @@ LoginWid::LoginWid(QWidget* parent) : QWidget{parent} {
   inputKeyLe = CreateKeyLineEdit(this);
   CHECK_NULLPTR_RETURN_VOID(inputKeyLe);
   inputKeyLe->setPlaceholderText("Enter AES decryption key");
-  remeberKey = new (std::nothrow) QCheckBox{"Remember key", this};
+  remeberKey = new (std::nothrow) QCheckBox{tr("Remember key"), this};
   CHECK_NULLPTR_RETURN_VOID(remeberKey);
   remeberKey->setTristate(false);
   const int rememberState = Configuration().value("REMEMBER_KEY", Qt::CheckState::Unchecked).toInt();
   remeberKey->setCheckState(rememberState == Qt::CheckState::Checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
-  autoLogin = new (std::nothrow) QCheckBox{"Log in automatically", this};
+  autoLogin = new (std::nothrow) QCheckBox{tr("Log in automatically"), this};
   CHECK_NULLPTR_RETURN_VOID(autoLogin);
   autoLogin->setTristate(false);
   const int autoLoginState = Configuration().value("LOG_IN_AUTOMATICALLY", Qt::CheckState::Unchecked).toInt();
   autoLogin->setCheckState(autoLoginState == Qt::CheckState::Checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
+  mMessage = new (std::nothrow) QLabel{this};
+
   loginLo = new (std::nothrow) QFormLayout{this};
   CHECK_NULLPTR_RETURN_VOID(loginLo);
-  loginLo->addRow("Decryption Key:", inputKeyLe);
+  loginLo->addRow(tr("Decryption Key"), inputKeyLe);
   loginLo->addRow(remeberKey, autoLogin);
+  loginLo->addRow(mMessage);
 
   InitState();
   subscribe();
@@ -61,19 +72,21 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
   const QString& keyNow = GetKey();
   switch (rememberState) {
     case Qt::CheckState::Checked: {  // update into credential
-      bool saveResult = credUtil.savePassword("PASSWORD_MANAGER_AES_KEY", keyNow);
+      bool saveResult = credUtil.savePassword(GetCredTargetName(), keyNow);
       if (!saveResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
         return false;
       }
+      mMessage->setText("Password <b>saved</b> to system credential succeed");
       break;
     }
     default: {  // delete from credential
-      bool deleteResult = credUtil.deletePassword("PASSWORD_MANAGER_AES_KEY");
+      bool deleteResult = credUtil.deletePassword(GetCredTargetName());
       if (!deleteResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
         return false;
       }
+      mMessage->setText("Password <b>delete</b> from system credential");
       break;
     }
   }
@@ -81,6 +94,9 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
 }
 
 void LoginWid::onAutoLoginSwitchChanged(int autoLoginState) {
+  if (autoLoginState == Qt::Checked) {
+    remeberKey->setChecked(true);
+  }
   Configuration().setValue("LOG_IN_AUTOMATICALLY", autoLoginState);
   LOG_INFO_NP("Auto login switch", (autoLoginState == Qt::Checked ? "on" : "off"));
 }
@@ -93,7 +109,7 @@ void LoginWid::InitState() {
     // 3.0 uncheck rememberKey/AutoLogin
     // 4.0 messageText: must register at first,
     this->setEnabled(false);
-    credUtil.deletePassword("PASSWORD_MANAGER_AES_KEY");
+    credUtil.deletePassword(GetCredTargetName());
 
     Configuration().setValue("REMEMBER_KEY", Qt::CheckState::Unchecked);
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::CheckState::Unchecked);
@@ -106,7 +122,7 @@ void LoginWid::InitState() {
 
   // allowed login below
   if (remeberKey->checkState() == Qt::CheckState::Checked) {
-    const QString& aesKey = credUtil.readPassword("PASSWORD_MANAGER_AES_KEY");
+    const QString& aesKey = credUtil.readPassword(GetCredTargetName());
     // key may not in system credential
     if (!aesKey.isEmpty()) {
       inputKeyLe->setText(aesKey);
@@ -115,7 +131,8 @@ void LoginWid::InitState() {
 
   if (autoLogin->checkState() == Qt::CheckState::Checked && !GetKey().isEmpty()) {  // empty key. skip right now
     static constexpr int TIMER_LENGTH_MS = 2000;                                    // time count down
-    LOG_INFO_P("Auto login...", "in %d ms", TIMER_LENGTH_MS);
+    mMessage->setText(QString("Will auto Login in %1(ms)").arg(TIMER_LENGTH_MS));
+
     autoLoginTimer = new (std::nothrow) QTimer(this);
     CHECK_NULLPTR_RETURN_VOID(autoLoginTimer);
     autoLoginTimer->setInterval(TIMER_LENGTH_MS);
@@ -128,14 +145,15 @@ void LoginWid::InitState() {
 }
 
 void LoginWid::AutoLoginTimeoutCallback() {
+  mMessage->setText("");
   // user may uncheck autoLogin before timeout, so check again here
-  bool isStillChecked = false;
+  bool isAutoLoginStillChecked = false;
 #ifdef RUNNING_UNIT_TESTS
-  isStillChecked = LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock();
+  isAutoLoginStillChecked = LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock();
 #else
-  isStillChecked = autoLogin->isChecked();
+  isAutoLoginStillChecked = isAutoLoginEnabled();
 #endif
-  if (isStillChecked) {
+  if (isAutoLoginStillChecked) {
     emit timeoutAccepted();
   }
 }
@@ -153,8 +171,8 @@ RegisterWid::RegisterWid(QWidget* parent) : QWidget{parent} {
 
   registerLo = new (std::nothrow) QFormLayout{this};
   CHECK_NULLPTR_RETURN_VOID(registerLo);
-  registerLo->addRow("Encryption Key:", inputKeyLe);
-  registerLo->addRow("Confirm Key:", inputKeyAgainLe);
+  registerLo->addRow(tr("Encryption Key"), inputKeyLe);
+  registerLo->addRow(tr("Confirm Key"), inputKeyAgainLe);
 
   InitState();
 }
@@ -230,6 +248,10 @@ void LoginQryWidget::onOkButtonClicked() {
   switch (curWidType) {
     case LOGIN: {
       this->accept();
+      if (mLoginWid->isRememberEnabled()) {
+        const CredentialUtil& credUtil = CredentialUtil::GetInst();
+        credUtil.savePassword(GetCredTargetName(), getAESKey());
+      }
       return;
     }
     case REGISTER: {

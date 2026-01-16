@@ -2,6 +2,49 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>AccountDetailView</name>
+    <message>
+        <location filename="../Component/Pwd/AccountDetailView.cpp" line="+22"/>
+        <source>Recover</source>
+        <translation>恢复</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Type</source>
+        <translation>类型</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Account</source>
+        <translation>账号</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pwd</source>
+        <translation>密钥</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Others</source>
+        <translation>其它</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Detail View</source>
+        <translation>详细内容</translation>
+    </message>
+</context>
+<context>
     <name>ActionsSearcher</name>
     <message>
         <location filename="../Actions/ActionsSearcher.cpp" line="+11"/>
@@ -604,6 +647,24 @@
     </message>
 </context>
 <context>
+    <name>LoginWid</name>
+    <message>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+39"/>
+        <source>Remember key</source>
+        <translation>记住密码</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Log in automatically</source>
+        <translation>自动登录</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Decryption Key</source>
+        <translation>密钥</translation>
+    </message>
+</context>
+<context>
     <name>MovieDBActions</name>
     <message>
         <location filename="../Actions/MovieDBActions.cpp" line="+12"/>
@@ -788,6 +849,59 @@
     </message>
 </context>
 <context>
+    <name>PwdTableEditActions</name>
+    <message>
+        <location filename="../Actions/PwdTableEditActions.cpp" line="+5"/>
+        <source>Insert a row</source>
+        <translation>插入一行</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Insert rows</source>
+        <translation>插入多行</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Append rows</source>
+        <translation>尾后添加多行</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Delete rows</source>
+        <translation>删除多行</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Load from input</source>
+        <translation>从输入框导入</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Open directory</source>
+        <translation>打开存储路径</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show CSV contents</source>
+        <translation>展示CSV内容</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Export to plain CSV</source>
+        <translation>导出到明文CSV</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Search by</source>
+        <translation>查找</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Save changes</source>
+        <translation>写入变更</translation>
+    </message>
+</context>
+<context>
     <name>RateActions</name>
     <message>
         <location filename="../Actions/RateActions.cpp" line="+30"/>
@@ -798,6 +912,19 @@
         <location line="+5"/>
         <source>Rate Recusively(Force)</source>
         <translation>递归设置评分(强制)</translation>
+    </message>
+</context>
+<context>
+    <name>RegisterWid</name>
+    <message>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+118"/>
+        <source>Encryption Key</source>
+        <translation>设置密钥</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Confirm Key</source>
+        <translation>再次确认密钥</translation>
     </message>
 </context>
 <context>
