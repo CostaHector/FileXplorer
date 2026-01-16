@@ -10,14 +10,22 @@
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
-  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), ENUM_2_STR(LIST), this);
-  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), ENUM_2_STR(TABLE), this);
-  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), ENUM_2_STR(TREE), this);
-  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), ENUM_2_STR(SEARCH), this);
-  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/MOVIES_VIEW"), ENUM_2_STR(MOVIE), this);
-  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENES_VIEW"), ENUM_2_STR(SCENE), this);
-  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/CAST_VIEW"), ENUM_2_STR(CAST), this);
-  _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), ENUM_2_STR(JSON), this);
+  _LIST_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_LARGE_THUMBNAILS"), tr("LIST"), this);
+  _LIST_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(LIST));
+  _TABLE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_DETAIL_INFOMATIONS"), tr("TABLE"), this);
+  _TABLE_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(TABLE));
+  _TREE_VIEW = new (std::nothrow) QAction(QIcon(":img/DISPLAY_TREE_VIEW"), tr("TREE"), this);
+  _TREE_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(TREE));
+  _ADVANCE_SEARCH_VIEW = new (std::nothrow) QAction(QIcon(":img/SEARCH"), tr("SEARCH"), this);
+  _ADVANCE_SEARCH_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(SEARCH));
+  _MOVIE_VIEW = new (std::nothrow) QAction(QIcon(":img/MOVIES_VIEW"), tr("MOVIE"), this);
+  _MOVIE_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(MOVIE));
+  _SCENE_VIEW = new (std::nothrow) QAction(QIcon(":img/SCENES_VIEW"), tr("SCENE"), this);
+  _SCENE_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(SCENE));
+  _CAST_VIEW = new (std::nothrow) QAction(QIcon(":img/CAST_VIEW"), tr("CAST"), this);
+  _CAST_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(CAST));
+  _JSON_VIEW = new (std::nothrow) QAction(QIcon(":img/JSON_EDITOR"), tr("JSON"), this);
+  _JSON_VIEW->setProperty("ViewTypeTool::ViewType", ENUM_2_STR(JSON));
   _ALL_VIEWS += _LIST_VIEW;
   _ALL_VIEWS += _TABLE_VIEW;
   _ALL_VIEWS += _TREE_VIEW;

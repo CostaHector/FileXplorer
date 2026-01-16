@@ -773,6 +773,19 @@
     </message>
 </context>
 <context>
+    <name>NavigationAndAddressBar</name>
+    <message>
+        <location filename="../Component/NavigationAndAddressBar.cpp" line="+58"/>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Folder Iterater</source>
+        <translation>文件夹遍历</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceActions</name>
     <message>
         <location filename="../Actions/PreferenceActions.cpp" line="+44"/>
@@ -917,7 +930,7 @@
 <context>
     <name>RegisterWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+118"/>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+119"/>
         <source>Encryption Key</source>
         <translation>设置密钥</translation>
     </message>
@@ -1003,6 +1016,29 @@
         <location line="+1"/>
         <source>Toggle Case</source>
         <translation>大小写互换</translation>
+    </message>
+</context>
+<context>
+    <name>RibbonMenu</name>
+    <message>
+        <location filename="../Component/RibbonMenu.cpp" line="+42"/>
+        <source>&amp;FILE</source>
+        <translation>文件(&amp;F)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;HOME</source>
+        <translation>主页(&amp;H)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;VIEW</source>
+        <translation>视图(&amp;V)</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>&amp;ARRANGE</source>
+        <translation>处理(&amp;A)</translation>
     </message>
 </context>
 <context>
@@ -1207,9 +1243,57 @@
     </message>
 </context>
 <context>
+    <name>TypeFilterButton</name>
+    <message>
+        <location filename="../Component/TypeFilterButton.cpp" line="+12"/>
+        <source>Filter</source>
+        <translation>过滤</translation>
+    </message>
+</context>
+<context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.cpp" line="+69"/>
+        <location filename="../Actions/ViewActions.cpp" line="+13"/>
+        <source>LIST</source>
+        <translation>单列文件视图</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>TABLE</source>
+        <translation>表格文件视图</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>TREE</source>
+        <translation>树形文件视图</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>SEARCH</source>
+        <translation>搜索视图</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>MOVIE</source>
+        <translation>电影库</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>SCENE</source>
+        <translation>场景库</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>CAST</source>
+        <translation>偶像库</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JSON</source>
+        <translation>JSON视图</translation>
+    </message>
+    <message>
+        <location line="+50"/>
         <source>View back</source>
         <translation>上一个视图</translation>
     </message>

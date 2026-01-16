@@ -9,6 +9,7 @@
 class LogFloatingPreviewer;
 
 class RibbonMenu : public QTabWidget {
+  Q_OBJECT
  public:
   explicit RibbonMenu(QWidget *parent = nullptr);
   QToolBar* GetMenuRibbonCornerWid(QWidget* attached = nullptr);

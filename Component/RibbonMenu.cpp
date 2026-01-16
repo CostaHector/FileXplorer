@@ -39,9 +39,9 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   m_leafJson = LeafJson();
   m_leafMedia = LeafMediaTools();
   {
-    addTab(m_leafFile, "&FILE");
-    addTab(m_leafHome, "&HOME");
-    addTab(m_leafView, "&VIEW");
+    addTab(m_leafFile, tr("&FILE"));
+    addTab(m_leafHome, tr("&HOME"));
+    addTab(m_leafView, tr("&VIEW"));
     const auto& viewIns = g_viewActions();
     using namespace ViewTypeTool;
     std::fill(mViewType2LeafTabIndex, mViewType2LeafTabIndex + (int) ViewType::VIEW_TYPE_BUTT, -1);
@@ -49,7 +49,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
     mViewType2LeafTabIndex[(int) ViewType::CAST] = addTab(m_leafCast, "&" + viewIns._CAST_VIEW->text());
     mViewType2LeafTabIndex[(int) ViewType::SCENE] = addTab(m_leafScenes, "&" + viewIns._SCENE_VIEW->text());
     mViewType2LeafTabIndex[(int) ViewType::JSON] = addTab(m_leafJson, "&" + viewIns._JSON_VIEW->text());
-    addTab(m_leafMedia, "&ARRANGE");
+    addTab(m_leafMedia, tr("&ARRANGE"));
   }
   auto& inst = ActionsRecorder::GetInst();
   inst.FromToolbar(m_leafFile);

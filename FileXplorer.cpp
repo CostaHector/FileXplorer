@@ -192,7 +192,8 @@ void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum)
 void FileXplorer::onViewWidgetChanged(const QAction* pViewAct) {
   using namespace ViewTypeTool;
   CHECK_NULLPTR_RETURN_VOID(pViewAct);
-  ViewType vt = GetViewTypeByActionText(pViewAct->text());
+  const QString& viewText = pViewAct->property("ViewTypeTool::ViewType").toString();
+  ViewType vt = GetViewTypeByActionText(viewText);
   LOG_D("actionTriggered[%s] in CustomStatusBar/QToolbar", c_str(vt));
   m_viewSwitchHelper->onSwitchByViewType(vt);
   m_ribbonMenu->whenViewTypeChanged(vt);
