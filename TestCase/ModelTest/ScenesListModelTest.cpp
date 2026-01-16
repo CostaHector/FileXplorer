@@ -50,7 +50,7 @@ bool GetSceneInfoList(int count, SceneSortOrderHelper::SortDimE sortDim, bool is
     siBasic.vidSize = rndInt * 1000;
     siBasic.rate = rndInt * 100;
     siBasic.uploaded = "uploaded" + rnd;
-    // 一个dimension有序
+    // 只有入参指定一个dimension有序
     const int valueForDistinguish = isReverse ? count - i - 1 : i;
     switch (sortDim) {
       case SceneSortOrderHelper::SortDimE::MOVIE_PATH: {
@@ -350,16 +350,23 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.rowCount(), 10);
       // 升
       sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
-      checkIndexMatch(slm, 0, sspm, 0);
-      checkIndexMatch(slm, 1, sspm, 1);
-      checkIndexMatch(slm, 8, sspm, 8);
-      checkIndexMatch(slm, 9, sspm, 9);
+      QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
+      QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
+      QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
+      QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
       // 降
       sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
-      checkIndexMatch(slm, 0, sspm, 9);
-      checkIndexMatch(slm, 1, sspm, 8);
-      checkIndexMatch(slm, 8, sspm, 1);
-      checkIndexMatch(slm, 9, sspm, 0);
+      QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
+      QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
+      QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
+      QVERIFY(checkIndexMatch(slm, 9, sspm, 0));
+
+      // 强化用例: 只更改维度, 不改变降序(aka 在Rate+降序情况下), 预期按照Rate降序
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
+      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(0, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(1, 0))));
+      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(1, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(2, 0))));
+      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(2, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(3, 0))));
+      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(8, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(9, 0))));
     }
 
     // 测试MOVIE_SIZE排序

@@ -143,6 +143,18 @@ QString ScenesListModel::fileName(const QModelIndex& index) const {
   return mCurBegin[linearInd].vidName;
 }
 
+int ScenesListModel::GetRate(const QModelIndex& index) const {
+  int linearInd{-1};
+  if (!isIndexValid(index, linearInd)) {
+    return {};
+  }
+  if (mCurBegin[linearInd].vidName.isEmpty()) {
+    LOG_D("vidName is empty");
+    return {};
+  }
+  return mCurBegin[linearInd].rate;
+}
+
 QString ScenesListModel::baseName(const QModelIndex& index) const {
   int linearInd{-1};
   if (!isIndexValid(index, linearInd)) {
