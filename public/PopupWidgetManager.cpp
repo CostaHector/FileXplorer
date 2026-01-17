@@ -9,6 +9,7 @@
 #include "ConfigsTable.h"
 #include "Archiver.h"
 #include "LoginQryWidget.h"
+#include "ResourceMonitorPanel.h"
 #include "MemoryKey.h"
 #include "Logger.h"
 
@@ -22,6 +23,7 @@ template class PopupWidgetManager<TorrentsManagerWidget>;
 template class PopupWidgetManager<ConfigsTable>;
 template class PopupWidgetManager<Archiver>;
 template class PopupWidgetManager<LoginQryWidget>;
+template class PopupWidgetManager<ResourceMonitorPanel>;
 
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent, const QString& geometryCfgKey)

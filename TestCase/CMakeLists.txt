@@ -27,8 +27,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Search for Qt libraries in the order of Qt6, Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools)
 
 file(GLOB SOURCES
     # service module sources
@@ -130,6 +130,18 @@ file(GLOB HEADERS
     pubTestTool/*.h
 )
 
+SET(MOCKCPP_SRC_ROOT ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-src)
+SET(FETCH_CONTENT_QUIET OFF)
+include(FetchContent)
+FetchContent_Declare(
+  mockcpp
+  GIT_REPOSITORY git@github.com:CostaHector/mockcpp.git
+  GIT_TAG v2.8
+  GIT_SHALLOW TRUE
+  GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(mockcpp)
+
 set(READ_TR_FROM_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/PublicToolTest.cpp
 )
@@ -179,6 +191,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Charts
+    mockcpp
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
