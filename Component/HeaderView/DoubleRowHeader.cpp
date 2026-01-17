@@ -90,7 +90,9 @@ void DoubleRowHeader::InitFilterEditors() {
     return;
   }
   const QAbstractItemModel *pModel = model();
-  CHECK_NULLPTR_RETURN_VOID(pModel);
+  if (pModel == nullptr) {
+    return; // silent
+  }
   QStringList titlesTempList;
   const int columnCount = pModel->columnCount();
   m_filterEditors.reserve(columnCount);

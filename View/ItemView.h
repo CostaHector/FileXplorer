@@ -12,10 +12,12 @@ class ItemView : public CustomListView {
   }
   void subscribe();
   bool onCellDoubleClicked(const QModelIndex& clickedIndex) const;
+  bool onRecycleSelections() const;
 
  private:
   FloatingModels* mModels{nullptr};
   QAction* _PLAY_ITEM{nullptr};
+  QAction* _RECYCLE_ITEM{nullptr};
 };
 
 #endif // ITEMVIEW_H

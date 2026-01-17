@@ -14,20 +14,20 @@ PreferenceActions::PreferenceActions(QObject* parent)//
   mStyleIntAction{this},//
   mStyleSheetIntAction{this} {
 
-  STYLE_WINDOWS_VISTA = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "WindowsVista"};
+  STYLE_WINDOWS_VISTA = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_VISTA"), "WindowsVista", this};
   STYLE_WINDOWS_VISTA->setCheckable(true);
   STYLE_WINDOWS_VISTA->setChecked(true);
   STYLE_WINDOWS_VISTA->setToolTip("Change UI style to Windows Vista");
 
-  STYLE_WINDOWS = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_TRADITIONAL"), "Windows"};
+  STYLE_WINDOWS = new (std::nothrow) QAction{QIcon(":img/STYLE_WINDOWS_TRADITIONAL"), "Windows", this};
   STYLE_WINDOWS->setCheckable(true);
   STYLE_WINDOWS->setToolTip("Change UI style to Windows Traditional (win98)");
 
-  STYLE_FUSION = new (std::nothrow) QAction{QIcon(":img/STYLE_FUSION"), "Fusion"};
+  STYLE_FUSION = new (std::nothrow) QAction{QIcon(":img/STYLE_FUSION"), "Fusion", this};
   STYLE_FUSION->setCheckable(true);
   STYLE_FUSION->setToolTip("Change UI style to Fusion");
 
-  STYLE_MACOS = new (std::nothrow) QAction{QIcon(":img/STYLE_MACOS"), "MacOS"};
+  STYLE_MACOS = new (std::nothrow) QAction{QIcon(":img/STYLE_MACOS"), "MacOS", this};
   STYLE_MACOS->setCheckable(true);
   STYLE_MACOS->setToolTip("Change UI style to Macos (not supported in windows)");
 
@@ -41,12 +41,12 @@ PreferenceActions::PreferenceActions(QObject* parent)//
   auto* checkedStyleAct = mStyleIntAction.setCheckedIfActionExist(styleInt);
   onSetAppStyle(checkedStyleAct);
 
-  STYLESHEET_DEFAULT_LIGHT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), "Light"};
+  STYLESHEET_DEFAULT_LIGHT = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_LIGHT_THEME_SUN"), tr("Light"), this};
   STYLESHEET_DEFAULT_LIGHT->setCheckable(true);
   STYLESHEET_DEFAULT_LIGHT->setChecked(true);
   STYLESHEET_DEFAULT_LIGHT->setToolTip("Change stylesheet to default");
 
-  STYLESHEET_DARK_THEME_MOON_FOG = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), "Dark"};
+  STYLESHEET_DARK_THEME_MOON_FOG = new (std::nothrow) QAction{QIcon(":img/STYLESHEET_DARK_THEME_MOON_FOG"), tr("Dark"), this};
   STYLESHEET_DARK_THEME_MOON_FOG->setCheckable(true);
   STYLESHEET_DARK_THEME_MOON_FOG->setToolTip("Change stylesheet to dark");
 
@@ -110,7 +110,7 @@ QToolBar *PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget *parent) {
       IMAGE_SIZE::TABS_ICON_IN_MENU_24,
       parent);
   CHECK_NULLPTR_RETURN_NULLPTR(uiStyleToolButton);
-  uiStyleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, "App UI Style", "Change application style (Windows Vista, Windows, Fusion, macOS)");
+  uiStyleToolButton->SetCaption(QIcon{":img/STYLE_SETTING"}, tr("App UI Style"), "Change application style (Windows Vista, Windows, Fusion, macOS)");
   uiStyleToolButton->UpdateCaptionForInstantPopMode();
 
   MenuToolButton* colorThemeToolButton = new (std::nothrow) MenuToolButton(
@@ -120,7 +120,7 @@ QToolBar *PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget *parent) {
       IMAGE_SIZE::TABS_ICON_IN_MENU_24,
       parent);
   CHECK_NULLPTR_RETURN_NULLPTR(colorThemeToolButton);
-  colorThemeToolButton->SetCaption(QIcon{":img/STYLESHEET_SETTING"}, "Color Theme", "Toggle between Light and Dark color schemes");
+  colorThemeToolButton->SetCaption(QIcon{":img/STYLESHEET_SETTING"}, tr("Color Theme"), "Toggle between Light and Dark color schemes");
   colorThemeToolButton->UpdateCaptionForInstantPopMode();
 
   QToolBar* styleAndStylesheetToolbar = new (std::nothrow) QToolBar{"Style/Stylesheet", parent};

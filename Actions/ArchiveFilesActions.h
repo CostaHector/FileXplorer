@@ -7,19 +7,20 @@
 #include <QToolBar>
 
 class ArchiveFilesActions : public QObject {
+  Q_OBJECT
  public:
   explicit ArchiveFilesActions(QObject* parent = nullptr);
   QToolBar* GetArchiveTooBar();
 
-  QAction* COMPRESSED_HERE{new (std::nothrow) QAction{QIcon(":img/COMPRESSED"), "Compressd here", this}};
-  QAction* COMPRESSED_TO{new (std::nothrow) QAction{"Compressd to", this}};
+  QAction* COMPRESSED_HERE{nullptr};
+  QAction* COMPRESSED_TO{nullptr};
 
-  QAction* DECOMPRESSED_TO{new (std::nothrow) QAction{"Decompressd to", this}};
-  QAction* DECOMPRESSED_HERE{new (std::nothrow) QAction{QIcon{":img/EXTRACT_ITEM"}, "Decompressd here", this}};
+  QAction* DECOMPRESSED_TO{nullptr};
+  QAction* DECOMPRESSED_HERE{nullptr};
 
-  QAction* COMPRESSED_IMAGES{new (std::nothrow) QAction{"Compress Images", this}};
+  QAction* COMPRESSED_IMAGES{nullptr};
 
-  QAction* ARCHIVE_PREVIEW{new (std::nothrow) QAction{QIcon(":img/COMPRESS_ITEM"), "Archive", this}};
+  QAction* ARCHIVE_PREVIEW{nullptr};
 };
 
 ArchiveFilesActions& g_AchiveFilesActions();

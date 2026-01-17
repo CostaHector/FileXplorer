@@ -45,8 +45,12 @@ private slots:
     QString details;
     QString uploaded;
 
-    QByteArray chrisEvansJsonBA = JsonKey::ConstructJsonByteArray("Chris Evans", casts, studios, tags, details, uploaded, rateChrisEvans);
-    QByteArray henryCavillJsonBA = JsonKey::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, details, uploaded, rateHenryCavill);
+    QByteArray chrisEvansJsonBA = JsonKey::ConstructJsonByteArray("Chris Evans", casts, studios, tags, uploaded, rateChrisEvans,//
+                                                                  0, "", "", {}, 0, {}, "",//
+                                                                  details);
+    QByteArray henryCavillJsonBA = JsonKey::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, uploaded, rateHenryCavill,//
+                                                                   0, "", "", {}, 0, {}, "",//
+                                                                   details);
 
     QList<FsNodeEntry> nodes{
         {"Chris Evans.json", false, chrisEvansJsonBA},            // batch 1

@@ -6,6 +6,7 @@
 #include <QObject>
 
 class FileRenameRulerActions : public QObject {
+  Q_OBJECT
  public:
   explicit FileRenameRulerActions(QObject* parent = nullptr);
   void subscribe();

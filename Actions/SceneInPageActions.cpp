@@ -9,7 +9,7 @@ SceneInPageActions& g_SceneInPageActions() {
 }
 
 SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
-  _UPDATE_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON"), "Update K-V", this);
+  _UPDATE_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON"), tr("Update K-V"), this);
   CHECK_NULLPTR_RETURN_VOID(_UPDATE_JSON);
   _UPDATE_JSON->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                    "Insert or update key-value pairs in JSON files recursively. "
@@ -17,7 +17,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                    "This operation will update the actual JSON file contents.")
                                .arg(_UPDATE_JSON->text(), _UPDATE_JSON->shortcut().toString()));
 
-  _UPDATE_SCN = new (std::nothrow) QAction(QIcon(":img/UPDATE_SCN_FILE"), "Update scn", this);
+  _UPDATE_SCN = new (std::nothrow) QAction(QIcon(":img/UPDATE_SCN_FILE"), tr("Update scn"), this);
   CHECK_NULLPTR_RETURN_VOID(_UPDATE_SCN);
   _UPDATE_SCN->setShortcut(QKeySequence(Qt::Key_F5));
   _UPDATE_SCN->setShortcutVisibleInContextMenu(true);
@@ -26,7 +26,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
-  _CLEAR_SCN_FILE = new (std::nothrow) QAction(QIcon(":img/CLEAR_SCN_FILES"), "Clear scn", this);
+  _CLEAR_SCN_FILE = new (std::nothrow) QAction(QIcon(":img/CLEAR_SCN_FILES"), tr("Clear scn"), this);
   CHECK_NULLPTR_RETURN_VOID(_CLEAR_SCN_FILE);
   _CLEAR_SCN_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                       "Remove all scene cache files (.scn) recursively from the selected directory. "
@@ -50,7 +50,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(_BY_UPLOADED_TIME);
   _BY_UPLOADED_TIME->setCheckable(true);
 
-  _REVERSE_SORT = new (std::nothrow) QAction("Reverse", this);
+  _REVERSE_SORT = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Descending"), this);
   CHECK_NULLPTR_RETURN_VOID(_REVERSE_SORT);
   _REVERSE_SORT->setCheckable(true);
   _REVERSE_SORT->setChecked(Configuration().value(MemoryKey::SCENE_SORT_ORDER.name, MemoryKey::SCENE_SORT_ORDER.v).toInt() ==
@@ -102,7 +102,7 @@ QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
                                                             IMAGE_SIZE::TABS_ICON_IN_MENU_48,                  //
                                                             parent);
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
-  orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, "Sort Dimension");
+  orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, tr("Sort Dimension"));
 
   auto* orderTB = new (std::nothrow) QToolBar{"Scene Order", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(orderTB);

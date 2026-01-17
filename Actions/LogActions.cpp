@@ -6,44 +6,44 @@
 #include <QHash>
 
 LogActions::LogActions(QObject* parent) : QObject{parent} {
-  _LOG_FILE = new (std::nothrow) QAction{QIcon{":img/LOG_FILES"}, "Open logs file", this};
+  _LOG_FILE = new (std::nothrow) QAction{QIcon{":img/LOG_FILES"}, tr("Open logs file"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FILE)
   _LOG_FILE->setCheckable(false);
   _LOG_FILE->setShortcutVisibleInContextMenu(true);
   _LOG_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>Call FFlush first then open log file in system default editor").arg(_LOG_FILE->text(), _LOG_FILE->shortcut().toString()));
   _DROPDOWN_LIST += _LOG_FILE;
 
-  _LOG_FOLDER = new (std::nothrow) QAction{QIcon{":img/LOG_FOLDERS"}, "Open logs folder", this};
+  _LOG_FOLDER = new (std::nothrow) QAction{QIcon{":img/LOG_FOLDERS"}, tr("Open logs folder"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_FOLDER)
   _LOG_FOLDER->setCheckable(false);
   _LOG_FOLDER->setShortcutVisibleInContextMenu(true);
   _LOG_FOLDER->setToolTip(QString("<b>%1 (%2)</b><br/>Open folder logs where located in.").arg(_LOG_FOLDER->text(), _LOG_FOLDER->shortcut().toString()));
   _DROPDOWN_LIST += _LOG_FOLDER;
 
-  _LOG_ROTATION = new (std::nothrow) QAction{QIcon(":img/LOG_ROTATION"), "Rotate log file", this};
+  _LOG_ROTATION = new (std::nothrow) QAction{QIcon(":img/LOG_ROTATION"), tr("Rotate log file"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_ROTATION)
   _LOG_ROTATION->setCheckable(false);
   _LOG_ROTATION->setShortcutVisibleInContextMenu(true);
   _LOG_ROTATION->setToolTip(QString("<b>%1 (%2)</b><br/>Rotate log files if they exceed 10 MB in size").arg(_LOG_ROTATION->text(), _LOG_ROTATION->shortcut().toString()));
   _DROPDOWN_LIST += _LOG_ROTATION;
 
-  _LOG_PRINT_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), "Debug", this};
+  _LOG_PRINT_LEVEL_DEBUG = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_DEBUG"), tr("Debug"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_DEBUG)
   _LOG_PRINT_LEVEL_DEBUG->setCheckable(true);
   _LOG_PRINT_LEVEL_DEBUG->setChecked(true);
   _LOG_PRINT_LEVEL_DEBUG->setToolTip("Log messages below Debug level will be ignored.");
 
-  _LOG_PRINT_LEVEL_INFO = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_INFO"), "Info", this};
+  _LOG_PRINT_LEVEL_INFO = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_INFO"), tr("Info"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_INFO)
   _LOG_PRINT_LEVEL_INFO->setCheckable(true);
   _LOG_PRINT_LEVEL_INFO->setToolTip("Log messages below Info level will be ignored.");
 
-  _LOG_PRINT_LEVEL_WARNING = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_WARNING"), "Warning", this};
+  _LOG_PRINT_LEVEL_WARNING = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_WARNING"), tr("Warning"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_WARNING)
   _LOG_PRINT_LEVEL_WARNING->setCheckable(true);
   _LOG_PRINT_LEVEL_WARNING->setToolTip("Log messages below Warning level will be ignored.");
 
-  _LOG_PRINT_LEVEL_ERROR = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_ERROR"), "Error", this};
+  _LOG_PRINT_LEVEL_ERROR = new (std::nothrow) QAction{QIcon(":img/LOG_LEVEL_ERROR"), tr("Error"), this};
   CHECK_NULLPTR_RETURN_VOID(_LOG_PRINT_LEVEL_ERROR)
   _LOG_PRINT_LEVEL_ERROR->setCheckable(true);
   _LOG_PRINT_LEVEL_ERROR->setToolTip("Log messages below Error level will be ignored.");
@@ -65,7 +65,7 @@ LogActions::LogActions(QObject* parent) : QObject{parent} {
        {_LOG_PRINT_LEVEL_ERROR, LOG_LVL_E::E},
        };
 
-  _AUTO_FLUSH_IGNORE_LEVEL = new (std::nothrow) QAction{"Auto FFlush ignore level", this};
+  _AUTO_FLUSH_IGNORE_LEVEL = new (std::nothrow) QAction{tr("Auto FFlush ignore level"), this};
   CHECK_NULLPTR_RETURN_VOID(_AUTO_FLUSH_IGNORE_LEVEL)
   _AUTO_FLUSH_IGNORE_LEVEL->setToolTip(QString("<b>%1 (%2)</b><br/>Auto flush log to local files no matter what log level it is.").arg(_AUTO_FLUSH_IGNORE_LEVEL->text(), _AUTO_FLUSH_IGNORE_LEVEL->shortcut().toString()));
   _AUTO_FLUSH_IGNORE_LEVEL->setCheckable(true);
@@ -96,7 +96,7 @@ QToolButton *LogActions::GetLogToolButton(QWidget *parent) {
       Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
       IMAGE_SIZE::TABS_ICON_IN_MENU_16,
       parent);
-  logToolButton->SetCaption(QIcon{":img/LOG_SETTINGS"}, "Log settings", "Open logs/Change Log print level/auto fflush level");
+  logToolButton->SetCaption(QIcon{":img/LOG_SETTINGS"}, tr("Log settings"), "Open logs/Change Log print level/auto fflush level");
   return logToolButton;
 }
 

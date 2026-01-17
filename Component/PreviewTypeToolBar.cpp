@@ -5,18 +5,18 @@
 PreviewTypeToolBar::PreviewTypeToolBar(const QString &title, QWidget *parent)://
   QToolBar{title, parent}
 {
-  CATEGORY_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CATEGORY"), "Category Preview", this};
+  CATEGORY_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CATEGORY"), tr("Category Preview"), this};
   CATEGORY_PRE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_P));
   CATEGORY_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through 3 QListViews and Items that group file by type(IMAGE/VIDEO/OTHER)")  //
                                .arg(CATEGORY_PRE->text(), CATEGORY_PRE->shortcut().toString()));
   CATEGORY_PRE->setCheckable(true);
 
-  PROGRESSIVE_LOAD_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_PROGRESSIVE_LOAD"), "Progressive Load Preview", this};
+  PROGRESSIVE_LOAD_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_PROGRESSIVE_LOAD"), tr("Progressive Load Preview"), this};
   PROGRESSIVE_LOAD_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QTextBrowser(images count dynamic expansion).")  //
                                        .arg(PROGRESSIVE_LOAD_PRE->text(), PROGRESSIVE_LOAD_PRE->shortcut().toString()));
   PROGRESSIVE_LOAD_PRE->setCheckable(true);
 
-  CAROUSEL_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CAROUSEL"), "Carousel Preview", this};
+  CAROUSEL_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CAROUSEL"), tr("Carousel Preview"), this};
   CAROUSEL_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QLabels(Slidershow and a periodic timer).")  //
                                .arg(CAROUSEL_PRE->text(), CAROUSEL_PRE->shortcut().toString()));
   CAROUSEL_PRE->setCheckable(true);

@@ -43,8 +43,8 @@ void FileFolderPreviewer::SaveSettings() {
 
 void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost) {
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
+  mDetailsPane->setHtml("");
   if (record.isEmpty()) {
-    mDetailsPane->setHtml("");
     return;
   }
 

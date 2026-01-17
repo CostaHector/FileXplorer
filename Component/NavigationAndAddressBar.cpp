@@ -18,6 +18,7 @@ SplitToolButton::SplitToolButton(QWidget* parent) : QToolButton{parent} {
 QString SplitToolButton::GetToolTipString(const QString& topAction, const QString& bottomAction) const {
   QString shortCutString;
   shortCutString.reserve(topAction.size() + bottomAction.size() + 30);
+  shortCutString += QString("<b>%1</b><br/>").arg(text());
   shortCutString += topAction;
   shortCutString += "(";
   shortCutString += topShortcut->key().toString();
@@ -54,6 +55,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   mFsSearchLE->setClearButtonEnabled(true);
   mFsSearchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
   mFsSearchLE->setToolTip(
+      QString("<b>%1</b><br/>").arg(tr("Search")) +
       "For FileSystemModel(wildcard) e.g., *target*\n"
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
@@ -63,9 +65,9 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   mLastNextFolderTb = new (std::nothrow) SplitToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
+  mLastNextFolderTb->setText(tr("Folder Iterater"));
   mLastNextFolderTb->setIcon(QIcon(":img/NEXT_OR_LAST_FOLDER"));
-  QString iteratorToolbuttonTooltip = "Into ";
-  iteratorToolbuttonTooltip += mLastNextFolderTb->GetToolTipString("Last folder", "Next Folder");
+  const QString& iteratorToolbuttonTooltip = mLastNextFolderTb->GetToolTipString("Last folder", "Next Folder");
   mLastNextFolderTb->setToolTip(iteratorToolbuttonTooltip);
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());

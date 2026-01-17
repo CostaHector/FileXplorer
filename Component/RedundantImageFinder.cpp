@@ -106,7 +106,7 @@ void RedundantImageFinder::subscribe() {
   ImagesInfoManager& redunImgLibInst = ImagesInfoManager::getInst();
   connect(inst.OPEN_BENCHMARK_FOLDER, &QAction::triggered, this, [&redunImgLibInst]() {
     const QString benchmarkPath = redunImgLibInst.GetDynRedunPath();
-    FileTool::OpenLocalImageFile(benchmarkPath);
+    FileTool::OpenLocalFileUsingDesktopService(benchmarkPath);
   });
   connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() { redunImgLibInst.ForceReloadImpl(); });
   connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& proxyClickedIndex) {

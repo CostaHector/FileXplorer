@@ -38,6 +38,7 @@ struct JsonPr {
   };
   int RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles = true);
   bool SyncNameValueFromFileBaseName();
+  bool UpdateDurationField(QString videoAbsPath="");
   bool ConstructCastStudioValue();  // contruct cast/studio
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);

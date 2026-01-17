@@ -41,15 +41,11 @@ const KV MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR("EXPAND_OFFICE_STYLE_MENUBAR", t
 const KV MemoryKey::QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA("QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA", false, ValueChecker{PLAIN_BOOL});
 
 const KV MemoryKey::ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
-const KV MemoryKey::DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", "New folder", ValueChecker{{"New folder", "New text", "New json", "New folder html"}, CANDIDATE_STRING});
-const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", "Copy fullpath", ValueChecker{{"Copy fullpath", "Copy path", "Copy name", "Copy the path"}, CANDIDATE_STRING});
-const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE",
-                                          "Rename (ith)",
-                                          ValueChecker{{"Rename (ith)", "swap 1-2-3 to 1-3-2", "Case", "Str Inserter", "Str Deleter", "Str Replacer"}, CANDIDATE_STRING});
+const KV MemoryKey::DEFAULT_NEW_CHOICE("DEFAULT_NEW_CHOICE", 0, ValueChecker{0, 100 + 1});
+const KV MemoryKey::DEFAULT_COPY_CHOICE("DEFAULT_COPY_CHOICE", 0, ValueChecker{0, 100 + 1});
+const KV MemoryKey::DEFAULT_RENAME_CHOICE("DEFAULT_RENAME_CHOICE", 0, ValueChecker{0, 100 + 1});
 const KV MemoryKey::DEFAULT_THUMBNAILS_DIMENSION("DEFAULT_THUMBNAILS_DIMENSION", "Create 2x2 thumbnail", ValueChecker{PLAIN_STR});
-const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE",
-                                           "Extract [0, 2) imgs",
-                                           ValueChecker{{"Thumbnail Extractor", "Extract [0, 2) imgs", "Extract [0, 4) imgs", "Extract [b, e) imgs"}, CANDIDATE_STRING});
+const KV MemoryKey::DEFAULT_EXTRACT_CHOICE("DEFAULT_EXTRACT_CHOICE", 0, ValueChecker{0, 100 + 1});
 
 const KV MemoryKey::MOVE_TO_PATH_HISTORY("MOVE_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});
 const KV MemoryKey::COPY_TO_PATH_HISTORY("COPY_TO_PATH_HISTORY", ".\n..\n\\", ValueChecker{PLAIN_STR});

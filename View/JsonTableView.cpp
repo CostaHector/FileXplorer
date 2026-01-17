@@ -28,7 +28,19 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
 
+
+  m_jsonMenu = new (std::nothrow) QMenu{this};
+  CHECK_NULLPTR_RETURN_VOID(m_jsonMenu);
+  {
+    auto& jsonInst = g_JsonActions();
+    m_jsonMenu->addAction(jsonInst._OPEN_THIS_FILE);
+    m_jsonMenu->addAction(jsonInst._REVEAL_IN_EXPLORER);
+    m_jsonMenu->addAction(jsonInst._RENAME_JSON_AND_RELATED_FILES);
+    BindMenu(m_jsonMenu);
+  }
+
   InitTableView();
+
   setWindowTitle("Json Table View");
   setWindowIcon(QIcon(":img/JSON_EDITOR"));
 
@@ -219,6 +231,18 @@ int JsonTableView::onFormatCast() {
   const int cnt = _JsonModel->FormatCast(indexes);
 
   LOG_OK_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
+  return indexes.size();
+}
+
+int JsonTableView::onUpdateDuration() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("[Skip]nothing selected", "skip duration update");
+    return 0;
+  }
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Duration);
+  const int cnt = _JsonModel->UpdateDuration(indexes);
+
+  LOG_OK_P("Duration field has been update", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -458,6 +482,7 @@ void JsonTableView::subscribe() {
 
   connect(inst._AI_HINT_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
   connect(inst._FORMATTER, &QAction::triggered, this, &JsonTableView::onFormatCast);
+  connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
 
   connect(inst._INIT_STUDIO_CAST, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);

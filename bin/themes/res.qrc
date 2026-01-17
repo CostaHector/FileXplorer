@@ -34,6 +34,8 @@
     <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
     <file alias="UPDATE_JSON">Media/UPDATE_JSON.svg</file>
     <file alias="CLEAR_SCN_FILES">Media/CLEAR_SCN_FILES.svg</file>
+    <file alias="ORDER_ASCENDING">Media/ORDER_ASCENDING.svg</file>
+    <file alias="ORDER_DESCENDING">Media/ORDER_DESCENDING.svg</file>
     <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
     <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
     <file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
@@ -50,6 +52,7 @@
     <file alias="LIKE">Media/LIKE.svg</file>
     <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
     <file alias="RENAME_THUMBNAILS">Media/RENAME_THUMBNAILS.svg</file>
+    <file alias="IMAGE_NOT_FOUND">Media/IMAGE_NOT_FOUND.svg</file>
 
     <!--FramelessWindow Icon here-->
     <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
@@ -168,6 +171,7 @@
     <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
 
     <!--JsonEditor Icon here        -->
+    <file alias="OPEN_JSON_FILE">JsonEditor/OPEN_JSON_FILE.svg</file>
     <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
     <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
     <file alias="CAST">JsonEditor/CAST.svg</file>
@@ -381,5 +385,8 @@
     <qresource prefix="/img">
         <file alias="SAVED">pwd/SUCCESS.svg</file>
         <file alias="NOT_SAVED">pwd/FAILURE.svg</file>
+    </qresource>
+    <qresource prefix="/language">
+        <file alias="ZH_CN">../../Translate/FileXplorer_zh_CN.qm</file>
     </qresource>
 </RCC>

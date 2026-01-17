@@ -7,23 +7,23 @@
 
 ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   : QToolBar{title, parent} {
-  _THE_FRONT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), "First Page", this);
+  _THE_FRONT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), tr("First Page"), this);
   CHECK_NULLPTR_RETURN_VOID(_THE_FRONT_PAGE);
   _THE_FRONT_PAGE->setToolTip(
       QString("<b>%1 (%2)</b><br/>Go to first page").arg(_THE_FRONT_PAGE->text(), _THE_FRONT_PAGE->shortcut().toString()));
 
-  _PREVIOUS_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_LAST"), "Previous Page", this);
+  _PREVIOUS_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_LAST"), tr("Previous Page"), this);
   CHECK_NULLPTR_RETURN_VOID(_PREVIOUS_PAGE);
   _PREVIOUS_PAGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Comma));
   _PREVIOUS_PAGE->setToolTip(
       QString("<b>%1 (%2)</b><br/>Go to previous page").arg(_PREVIOUS_PAGE->text(), _PREVIOUS_PAGE->shortcut().toString()));
 
-  _NEXT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_NEXT"), "Next Page", this);
+  _NEXT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_NEXT"), tr("Next Page"), this);
   CHECK_NULLPTR_RETURN_VOID(_NEXT_PAGE);
   _NEXT_PAGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Period));
   _NEXT_PAGE->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next page").arg(_NEXT_PAGE->text(), _NEXT_PAGE->shortcut().toString()));
 
-  _THE_BACK_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_END"), "Last Page", this);
+  _THE_BACK_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_END"), tr("Last Page"), this);
   CHECK_NULLPTR_RETURN_VOID(_THE_BACK_PAGE);
   _THE_BACK_PAGE->setToolTip(
       QString("<b>%1 (%2)</b><br/>Go to last page").arg(_THE_BACK_PAGE->text(), _THE_BACK_PAGE->shortcut().toString()));
@@ -62,7 +62,7 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   mPagesSelectTB->setStyleSheet("QToolBar { max-width: 512px; }");
   mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
 
-  QLabel* pPageNavi = new (std::nothrow) QLabel{"Page Navigation", this};
+  QLabel* pPageNavi = new (std::nothrow) QLabel{tr("Page Navigation"), this};
   CHECK_NULLPTR_RETURN_VOID(pPageNavi);
   pPageNavi->setAlignment(Qt::AlignmentFlag::AlignHCenter);
 

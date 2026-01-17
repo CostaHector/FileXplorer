@@ -11,6 +11,7 @@
 #include "AccountStorage.h"
 #include "CredentialUtil.h"
 #include <QPushButton>
+#include <QSignalSpy>
 
 class LoginQryWidgetTest : public PlainTestSuite {
   Q_OBJECT
@@ -21,12 +22,11 @@ class LoginQryWidgetTest : public PlainTestSuite {
   const CredentialUtil& credUtil = CredentialUtil::GetInst();
 
   void simulateRegister(LoginQryWidget& widget, const QString& key) {
-    // 切换到注册页
-    QVERIFY(widget.mRegisterWid != nullptr);
-    RegisterWid* registerPage = widget.mRegisterWid;
-
     widget.mLoginRegisterTab->setCurrentIndex(LoginQryWidget::REGISTER);
     QCOMPARE(widget.mLoginRegisterStk->currentIndex(), LoginQryWidget::REGISTER);
+
+    RegisterWid* registerPage = widget.mRegisterWid;
+    QVERIFY(registerPage != nullptr);
 
     QLineEdit* keyInput = registerPage->inputKeyLe;
     QVERIFY(keyInput != nullptr);
@@ -35,49 +35,65 @@ class LoginQryWidgetTest : public PlainTestSuite {
     QDialogButtonBox* buttonBox = widget.mDlgBtnBox;
     QVERIFY(buttonBox != nullptr);
 
+    QSignalSpy regSpy{registerPage, &RegisterWid::registerAccepted};
+
     keyInput->setText(key);
     confirmInput->setText("mismatch key");
     emit buttonBox->button(QDialogButtonBox::Ok)->clicked();
     QVERIFY(widget.result() != QDialog::Accepted);
+    QCOMPARE(regSpy.count(), 0);
 
     keyInput->setText("mismatch key");
     confirmInput->setText(key);
     emit buttonBox->button(QDialogButtonBox::Ok)->clicked();
     QVERIFY(widget.result() != QDialog::Accepted);
+    QCOMPARE(regSpy.count(), 0);
 
     keyInput->setText(key);
     confirmInput->setText(key);
     emit buttonBox->button(QDialogButtonBox::Ok)->clicked();
     QCOMPARE(widget.result(), QDialog::Accepted);
+    QCOMPARE(regSpy.count(), 1);
   }
 
   void simulateAutoLogin(LoginQryWidget& widget, const QString& key) {
-    // actually the key here will not get checked to see if it is correct
-    // the check if key correct task is delivered to SimpleAES decrpyt.
-    QVERIFY(widget.mLoginWid != nullptr);
-    LoginWid* loginPage = widget.mLoginWid;
-
-    // 确保在登录页
     widget.mLoginRegisterTab->setCurrentIndex(LoginQryWidget::LOGIN);
     QCOMPARE(widget.mLoginRegisterStk->currentIndex(), LoginQryWidget::LOGIN);
+    LoginWid* loginPage = widget.mLoginWid;
+    QVERIFY(loginPage != nullptr);
 
     loginPage->inputKeyLe->setText(key);
     QVERIFY(loginPage->autoLoginTimer != nullptr);
 
+    QSignalSpy timeoutSpy(loginPage, &LoginWid::timeoutAccepted);
+    QSignalSpy acceptSpy(&widget, &LoginQryWidget::accepted);
     // user uncheck AutoLogin before timeout
     LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock() = false;
     loginPage->AutoLoginTimeoutCallback();
 
     QVERIFY(widget.result() != QDialog::Accepted);
+    QCOMPARE(timeoutSpy.count(), 0);
+    QCOMPARE(acceptSpy.count(), 0);
 
-    // user click ok directly before timeout
+    // user click ok directly before timeout, 点击登录 将会触发自动保存密钥
+#ifdef _WIN32
+    QVERIFY(credUtil.deletePassword(GetCredTargetName()));
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");
+#endif
     emit widget.mDlgBtnBox->button(QDialogButtonBox::Ok)->clicked();
     QCOMPARE(widget.result(), QDialog::Accepted);
+    QCOMPARE(timeoutSpy.count(), 0);
+    QCOMPARE(acceptSpy.count(), 1);
+#ifdef _WIN32
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), key);
+#endif
 
-    // user checked AutoLogin before timeout
+    // timeout trigger accept, 超时自动登录, 不会触发自动保存密钥
     LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock() = true;  // user accept before timeout
     loginPage->AutoLoginTimeoutCallback();
     QCOMPARE(widget.result(), QDialog::Accepted);
+    QCOMPARE(timeoutSpy.count(), 1);
+    QCOMPARE(acceptSpy.count(), 2);
   }
 
  private slots:
@@ -88,15 +104,14 @@ class LoginQryWidgetTest : public PlainTestSuite {
     LoginQryWidgetMock::clear();
     Configuration().clear();  //
 
-
-    backUpCredKey = credUtil.readPassword("PASSWORD_MANAGER_AES_KEY");
+    backUpCredKey = credUtil.readPassword(GetCredTargetName());
   }
 
   void cleanupTestCase() {
     LoginQryWidgetMock::clear();
     Configuration().clear();  //
 
-    credUtil.savePassword("PASSWORD_MANAGER_AES_KEY", backUpCredKey);
+    credUtil.savePassword(GetCredTargetName(), backUpCredKey);
   }
 
   void firstTime_registerNeeded() {
@@ -139,8 +154,8 @@ class LoginQryWidgetTest : public PlainTestSuite {
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::Checked);
 
     // 3. 保存密钥到凭证管理器
-    QVERIFY(credUtil.savePassword("PASSWORD_MANAGER_AES_KEY", testKey));
-    QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), testKey);
+    QVERIFY(credUtil.savePassword(GetCredTargetName(), testKey));
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), testKey);
 
     // 4. 创建登录窗口
     LoginQryWidget widget;
@@ -163,7 +178,7 @@ class LoginQryWidgetTest : public PlainTestSuite {
 
   void firstTime_secondTime_manualClickLogin() {
     // last time used key
-    QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), "AutoLoginKey456");
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "AutoLoginKey456");
 
     // 1. user input a new key
     const QString newTestKey = "AutoLoginKeyNew";
@@ -189,15 +204,15 @@ class LoginQryWidgetTest : public PlainTestSuite {
       QCOMPARE(autoLogin->isChecked(), false);
     }
     {  // when check state changed. it will be write into system credUtil, can QSettings
-      QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), "AutoLoginKey456");
+      QCOMPARE(credUtil.readPassword(GetCredTargetName()), "AutoLoginKey456");
       remeberKey->setChecked(true);
       emit remeberKey->stateChanged(Qt::CheckState::Checked);
-      QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), newTestKey);  // get updated
+      QCOMPARE(credUtil.readPassword(GetCredTargetName()), newTestKey);  // get updated
       QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Checked);
 
       remeberKey->setChecked(false);
       emit remeberKey->stateChanged(Qt::CheckState::Unchecked);
-      QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), "");  // get removed
+      QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");  // get removed
       QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Unchecked);
 
       autoLogin->setChecked(true);
@@ -235,7 +250,7 @@ class LoginQryWidgetTest : public PlainTestSuite {
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::Checked);
 
     LoginQryWidget widget;
-    QCOMPARE(credUtil.readPassword("PASSWORD_MANAGER_AES_KEY"), "");                 // AES key cleared
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");                 // AES key cleared
     QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Unchecked);          // unchecked
     QCOMPARE(Configuration().value("LOG_IN_AUTOMATICALLY").toInt(), Qt::Unchecked);  // unchecked
     QCheckBox* remeberKey = widget.mLoginWid->remeberKey;

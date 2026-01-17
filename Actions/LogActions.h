@@ -7,6 +7,7 @@
 #include <QToolButton>
 
 class LogActions : public QObject {
+  Q_OBJECT
  public:
   explicit LogActions(QObject* parent = nullptr);
 

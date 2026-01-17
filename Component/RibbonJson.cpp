@@ -25,7 +25,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
   caseControlTB = new (std::nothrow) QToolBar{"Case Control", this};
   CHECK_NULLPTR_RETURN_VOID(caseControlTB);
   caseControlTB->addAction(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
-  caseControlTB->addSeparator();
   caseControlTB->addAction(inst._LOWER_ALL_WORDS);
   caseControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   caseControlTB->setOrientation(Qt::Orientation::Vertical);
@@ -35,26 +34,27 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
 
   studioCastTagsFieldfOperationTB = new (std::nothrow) QToolBar{"Studio/Cast/Tags Field Operation", this};
   CHECK_NULLPTR_RETURN_VOID(studioCastTagsFieldfOperationTB);
-  constructFieldsTB = new (std::nothrow) QToolBar{"Clear fields Operation", studioCastTagsFieldfOperationTB};
-  CHECK_NULLPTR_RETURN_VOID(constructFieldsTB);
-  constructFieldsTB->addAction(inst._CLEAR_CAST);
-  constructFieldsTB->addAction(inst._CLEAR_STUDIO);
-  constructFieldsTB->addAction(inst._CLEAR_TAGS);
-  constructFieldsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  constructFieldsTB->setOrientation(Qt::Orientation::Vertical);
-  constructFieldsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  constructFieldsTB->setStyleSheet("QToolBar { max-width: 256px; }");
-  SetLayoutAlightment(constructFieldsTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   hintFieldsTB = new (std::nothrow) QToolBar{"Hint and Format", studioCastTagsFieldfOperationTB};
   CHECK_NULLPTR_RETURN_VOID(hintFieldsTB);
   hintFieldsTB->addAction(inst._AI_HINT_CAST_STUDIO);
-  hintFieldsTB->addSeparator();
   hintFieldsTB->addAction(inst._FORMATTER);
   hintFieldsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   hintFieldsTB->setOrientation(Qt::Orientation::Vertical);
   hintFieldsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
   hintFieldsTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(hintFieldsTB->layout(), Qt::AlignmentFlag::AlignLeft);
+
+  updateFieldTB = new (std::nothrow) QToolBar{"field update", studioCastTagsFieldfOperationTB};
+  CHECK_NULLPTR_RETURN_VOID(updateFieldTB);
+  updateFieldTB->addAction(inst._UPDATE_DURATION_FIELD);
+  updateFieldTB->addAction(inst._UPDATE_SIZE_FIELD);
+  updateFieldTB->addAction(inst._UPDATE_HASH_FIELD);
+  updateFieldTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  updateFieldTB->setOrientation(Qt::Orientation::Vertical);
+  updateFieldTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  updateFieldTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(updateFieldTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   studioTB = new (std::nothrow) QToolBar("Studio Edit Toolbar", studioCastTagsFieldfOperationTB);
   CHECK_NULLPTR_RETURN_VOID(studioTB);
@@ -64,6 +64,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
   studioTB->setOrientation(Qt::Orientation::Vertical);
   studioTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
   studioTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(studioTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   castEditTB = new (std::nothrow) QToolBar("Cast Edit Toolbar", studioCastTagsFieldfOperationTB);
   CHECK_NULLPTR_RETURN_VOID(castEditTB);
@@ -87,10 +88,20 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
   tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(tagsEditTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  castStudioTagsClearTB = new (std::nothrow) QToolBar{"Clear fields Operation", studioCastTagsFieldfOperationTB};
+  CHECK_NULLPTR_RETURN_VOID(castStudioTagsClearTB);
+  castStudioTagsClearTB->addAction(inst._CLEAR_CAST);
+  castStudioTagsClearTB->addAction(inst._CLEAR_STUDIO);
+  castStudioTagsClearTB->addAction(inst._CLEAR_TAGS);
+  castStudioTagsClearTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  castStudioTagsClearTB->setOrientation(Qt::Orientation::Vertical);
+  castStudioTagsClearTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
+  castStudioTagsClearTB->setStyleSheet("QToolBar { max-width: 256px; }");
+  SetLayoutAlightment(castStudioTagsClearTB->layout(), Qt::AlignmentFlag::AlignLeft);
+
   castFromSentenceTb = new (std::nothrow) QToolBar("Cast from sentence Toolbar", studioCastTagsFieldfOperationTB);
   CHECK_NULLPTR_RETURN_VOID(castFromSentenceTb);
   castFromSentenceTb->addAction(inst._ADD_SELECTED_CAST_SENTENCE);
-  castFromSentenceTb->addSeparator();
   castFromSentenceTb->addAction(inst._EXTRACT_UPPERCASE_CAST);
   castFromSentenceTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   castFromSentenceTb->setOrientation(Qt::Orientation::Vertical);
@@ -98,13 +109,13 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent)  //
   castFromSentenceTb->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(castFromSentenceTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  studioCastTagsFieldfOperationTB->addWidget(constructFieldsTB);
-  studioCastTagsFieldfOperationTB->addSeparator();
   studioCastTagsFieldfOperationTB->addWidget(hintFieldsTB);
+  studioCastTagsFieldfOperationTB->addWidget(updateFieldTB);
   studioCastTagsFieldfOperationTB->addSeparator();
   studioCastTagsFieldfOperationTB->addWidget(studioTB);
   studioCastTagsFieldfOperationTB->addWidget(castEditTB);
   studioCastTagsFieldfOperationTB->addWidget(tagsEditTB);
+  studioCastTagsFieldfOperationTB->addWidget(castStudioTagsClearTB);
   studioCastTagsFieldfOperationTB->addWidget(castFromSentenceTb);
 
   addAction(g_viewActions()._JSON_VIEW);

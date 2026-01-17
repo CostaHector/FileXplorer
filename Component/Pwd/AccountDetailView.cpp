@@ -19,9 +19,9 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
   etOthers = new (std::nothrow) QTextEdit{mFormWid};
   CHECK_NULLPTR_RETURN_VOID(etOthers);
 
-  mBtnRecover = new (std::nothrow) QPushButton{"恢复", nullptr};
+  mBtnRecover = new (std::nothrow) QPushButton{tr("Recover"), nullptr};
   CHECK_NULLPTR_RETURN_VOID(mBtnRecover);
-  mBtnApply = new (std::nothrow) QPushButton{"应用", nullptr};
+  mBtnApply = new (std::nothrow) QPushButton{tr("Apply"), nullptr};
   CHECK_NULLPTR_RETURN_VOID(mBtnApply);
   mBtnApply->setShortcut(QKeySequence(Qt::Key_F10));
   mBtnApply->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.") //
@@ -29,11 +29,11 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
 
   mForm = new (std::nothrow) QFormLayout;
   CHECK_NULLPTR_RETURN_VOID(mForm);
-  mForm->addRow("类型:", etType);
-  mForm->addRow("名称:", etName);
-  mForm->addRow("账户:", etAccount);
-  mForm->addRow("密码:", etPwd);
-  mForm->addRow("其他:", etOthers);
+  mForm->addRow(tr("Type"), etType);
+  mForm->addRow(tr("Name"), etName);
+  mForm->addRow(tr("Account"), etAccount);
+  mForm->addRow(tr("Pwd"), etPwd);
+  mForm->addRow(tr("Others"), etOthers);
   mForm->addRow(mBtnRecover, mBtnApply);
 
   mFormWid->setLayout(mForm);
@@ -41,7 +41,7 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
   setFont(StyleSheet::TEXT_EDIT_FONT);
   Subscribe();
   editNotHappen();
-  setWindowTitle("Detail View");
+  setWindowTitle(tr("Detail View"));
 }
 
 void AccountDetailView::Subscribe() {

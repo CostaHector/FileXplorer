@@ -612,15 +612,15 @@ bool FileExplorerEvent::__FocusNewItem(const QString& itemPath) {
 bool FileExplorerEvent::on_revealInExplorer() const {
   // hasSelection: reveal with selection
   // noSelection: folder -> open, file -> open its dir
-  QString absPth;
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
-    absPth = _contentPane->getRootPath();
+    QString absPth = _contentPane->getRootPath();
+    return FileTool::OpenLocalFileUsingDesktopService(absPth);
   } else {
     const QModelIndex curIndex{view->selectionModel()->currentIndex()};
-    absPth = _contentPane->getFilePath(curIndex);
+    QString absPth = _contentPane->getFilePath(curIndex);
+    return FileTool::RevealInSystemExplorer(absPth);
   }
-  return FileTool::RevealInSystemExplorer(absPth);
 }
 
 bool FileExplorerEvent::on_OpenInTerminal() const {

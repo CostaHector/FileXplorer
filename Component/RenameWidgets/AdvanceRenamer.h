@@ -16,6 +16,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include "StateLabel.h"
+#include "MultiCursorEditor.h"
 
 class FileOsWalker;
 
@@ -71,7 +72,7 @@ protected:
   QPlainTextEdit* m_oBaseTE{nullptr};
   QPlainTextEdit* m_oExtTE{nullptr};
   // absolutefilepath = m_pre + m_relNameTE + m_oBaseTE + m_oExtTE
-  QPlainTextEdit* m_nBaseTE{nullptr};
+  MultiCursorEditor* m_nBaseTE{nullptr};
   QPlainTextEdit* m_nExtTE{nullptr};
 
 private:

@@ -9,6 +9,7 @@
 #include "AccountInfo.h"
 
 class AccountDetailView : public QDockWidget {
+  Q_OBJECT
 public:
   using QDockWidget::QDockWidget;
   explicit AccountDetailView(const QString &title, QWidget *parent = nullptr);

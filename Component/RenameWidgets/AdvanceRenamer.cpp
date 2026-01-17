@@ -78,7 +78,7 @@ QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   CHECK_NULLPTR_RETURN_NULLPTR(m_oBaseTE)
   m_oExtTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_oExtTE)
-  m_nBaseTE = new (std::nothrow) QPlainTextEdit{this};
+  m_nBaseTE = new (std::nothrow) MultiCursorEditor{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_nBaseTE)
   m_nExtTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_nExtTE)

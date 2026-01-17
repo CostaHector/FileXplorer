@@ -5,6 +5,7 @@
 #include <QObject>
 
 class PwdTableEditActions : public QObject {
+  Q_OBJECT
 public:
   explicit PwdTableEditActions(QObject *parent = nullptr);
 

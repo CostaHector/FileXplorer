@@ -56,6 +56,7 @@ public:
       {"2.zip", "contents 22", "2025/11/20 00:00:00.000", "zip"},  //
       {"3.txt", "contents 1", "2025/11/20 00:00:00.003", "txt"},   //
   };
+  //
   const QStringList mTitles{"Name", "Size", "Create Time", "File Extenstion"};
   static constexpr int EXPECT_COL_CNT = 4;
   void InitModel(QStandardItemModel& model) {
@@ -95,6 +96,25 @@ private slots:
     QCOMPARE(tv.horizontalHeader()->count(), EXPECT_COL_CNT);
     QVERIFY(tv.horizontalHeader()->model() != nullptr);
     QCOMPARE(tv.horizontalHeader()->model()->columnCount(), EXPECT_COL_CNT);
+
+    tv.setSortingEnabled(false);
+    QCOMPARE(model.index(0, 0).data(Qt::DisplayRole).toString(), "1.txt");
+    QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "2.zip");
+    QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "3.txt");
+
+    tv.setSortingEnabled(true);
+    tv.sortByColumn(0, Qt::SortOrder::DescendingOrder);
+    QCOMPARE(model.index(0, 0).data(Qt::DisplayRole).toString(), "3.txt");
+    QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "2.zip");
+    QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "1.txt");
+
+    tv.sortByColumn(2, Qt::SortOrder::AscendingOrder); // sort by size
+    QCOMPARE(model.index(0, 0).data(Qt::DisplayRole).toString(), "2.zip");
+    QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "1.txt");
+    QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "3.txt");
+    QCOMPARE(model.index(0, 2).data(Qt::DisplayRole).toString(), "2025/11/20 00:00:00.000");
+    QCOMPARE(model.index(1, 2).data(Qt::DisplayRole).toString(), "2025/11/20 00:00:00.001");
+    QCOMPARE(model.index(2, 2).data(Qt::DisplayRole).toString(), "2025/11/20 00:00:00.003");
 
     QCOMPARE(tv.verticalHeader()->count(), nodes.size());
     QVERIFY(tv.verticalHeader()->model() != nullptr);
@@ -443,15 +463,13 @@ private slots:
 
       // search signal ok
       horHeader.m_filterEditors[0]->setText("Chris Evans|Henry Cavill"); // Name
-      horHeader.m_filterEditors[1]->setText(">1024"); // Size: 1024 B
+      horHeader.m_filterEditors[1]->setText(">1024");                    // Size: 1024 B
 
       QSignalSpy searchStatementChangedSpy{&horHeader, &DoubleRowHeader::searchStatementChanged};
       emit horHeader.m_filterEditors[0]->returnPressed();
       QCOMPARE(searchStatementChangedSpy.count(), 1);
       QList<QVariant> actualParams = searchStatementChangedSpy.takeLast();
-      QList<QVariant> expectParams {
-        R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"
-      };
+      QList<QVariant> expectParams{R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"};
       QCOMPARE(actualParams, expectParams);
     }
   }

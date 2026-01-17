@@ -27,6 +27,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
+  int GetRate(const QModelIndex& index) const;
   QString baseName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   QStringList GetImgs(const QModelIndex& index) const;

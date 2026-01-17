@@ -5,19 +5,19 @@
 PropertiesWindowActions::PropertiesWindowActions(QObject* parent)  //
     : QObject{parent}                                              //
 {
-  SHOW_FILES_SIZE = new (std::nothrow) QAction{QIcon(":img/FILE_SIZE"), "Files Size", this};
+  SHOW_FILES_SIZE = new (std::nothrow) QAction{QIcon(":img/FILE_SIZE"), tr("Files Size"), this};
   CHECK_NULLPTR_RETURN_VOID(SHOW_FILES_SIZE)
   SHOW_FILES_SIZE->setCheckable(true);
   SHOW_FILES_SIZE->setChecked(true);
   SHOW_FILES_SIZE->setToolTip("Display both total files size and each file");
 
-  SHOW_VIDS_DURATION = new (std::nothrow) QAction{QIcon(":img/VIDEO_DURATION"), "Videos Duration", this};
+  SHOW_VIDS_DURATION = new (std::nothrow) QAction{QIcon(":img/VIDEO_DURATION"), tr("Videos Duration"), this};
   CHECK_NULLPTR_RETURN_VOID(SHOW_VIDS_DURATION)
   SHOW_VIDS_DURATION->setCheckable(true);
   SHOW_VIDS_DURATION->setChecked(false);
   SHOW_VIDS_DURATION->setToolTip("Display videos duration in million-second");
 
-  SHOW_FILES_MD5 = new (std::nothrow) QAction{QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), "Files Identifier", this};
+  SHOW_FILES_MD5 = new (std::nothrow) QAction{QIcon(":img/MD5_FILE_IDENTIFIER_PATH"), tr("Files Identifier"), this};
   CHECK_NULLPTR_RETURN_VOID(SHOW_FILES_MD5)
   SHOW_FILES_MD5->setCheckable(true);
   SHOW_FILES_MD5->setChecked(false);

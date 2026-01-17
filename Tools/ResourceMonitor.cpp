@@ -1,83 +1,17 @@
 #include "ResourceMonitor.h"
 #include "Logger.h"
-#include "PublicMacro.h"
-#include <QDir>
-#include <QDateTime>
 
-constexpr int ResourceMonitor::SAMPLE_PERIOD;
-
-ResourceMonitor::ResourceMonitor(const QString& csvFileLocatedIn, QObject *parent)//
-  : QObject{parent} {
-  mValid = QDir(csvFileLocatedIn).exists();
-  CHECK_FALSE_RETURN_VOID(mValid);
-
-  char timestamp[LOG_TIME_PATTERN_LEN]{0};
-  get_timestamp(timestamp, LOG_TIME_PATTERN_LEN);
-  mCpuMemoryCsvFile = QString::asprintf("cpu_memory_%s.csv", timestamp);
-  mCpuMemoryCsvFile.replace('/', '_');
-  mCpuMemoryCsvFile.replace(':', '_');
-
-  mCsvFile.setFileName(QDir(csvFileLocatedIn).absoluteFilePath(mCpuMemoryCsvFile));
-  mValid = mCsvFile.open(QIODevice::WriteOnly|QIODevice::Append); // no text here
-  CHECK_FALSE_RETURN_VOID(mValid);
-
-  mCpuMemoryCsvStream.setDevice(&mCsvFile);
-  mValid = mCpuMemoryCsvStream.status() == QTextStream::Status::Ok;
-  CHECK_FALSE_RETURN_VOID(mValid);
-  mCpuMemoryCsvStream << "Timestamp,CPU(%),Memory(KB)\n";
-  mCpuMemoryCsvStream.flush();
-}
-
-ResourceMonitor::~ResourceMonitor() {
-  if (m_timer.isActive()) {
-    m_timer.stop();
-  }
-  if (mTimeroutConn) {
-    ResourceMonitor::disconnect(mTimeroutConn);
-  }
-  if (mCpuMemoryCsvStream.device() != nullptr) {
-    mCpuMemoryCsvStream.flush();
-    mCpuMemoryCsvStream.setDevice(nullptr);
-  }
-  if (mCpuMemoryCsvStream.device() != nullptr) {
-    mCpuMemoryCsvStream.flush();
-  }
-}
-
-void ResourceMonitor::onStart() {
-  m_lastCpuTime = getProcessCpuTime();
-#ifndef RUNNING_UNIT_TESTS
-  mTimeroutConn = connect(&m_timer, &QTimer::timeout, this, &ResourceMonitor::onMeasureUsage);
-  m_timer.start(SAMPLE_PERIOD);
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <psapi.h>
+#elif defined(Q_OS_LINUX)
+#include <sys/resource.h>
+#include <unistd.h>
 #endif
-}
 
-void ResourceMonitor::onStop() {
-  if (m_timer.isActive()) {
-    m_timer.stop();
-  }
-  if (mTimeroutConn) {
-    ResourceMonitor::disconnect(mTimeroutConn);
-  }
-}
+namespace ResourceMonitor {
 
-void ResourceMonitor::WriteCpuMemoryIntoCsvFile(double cpuUsage, double memUsage) {
-  char timestamp[LOG_TIME_PATTERN_LEN]{0};
-  get_timestamp(timestamp, LOG_TIME_PATTERN_LEN);
-  mCpuMemoryCsvStream << timestamp << ","
-                      << QString::number(cpuUsage, 'f', 2) << ","
-                      << QString::number(memUsage, 'f', 2) << "\n";
-#ifdef RUNNING_UNIT_TESTS
-  mCpuMemoryCsvStream.flush();
-  return;
-#endif
-  if (++mSampleTimes % 10 == 0) {
-    // flush every 10 * SAMPLE_PERIOD
-    mCpuMemoryCsvStream.flush();
-  }
-}
-
-int ResourceMonitor::GetNumbersCore() {
+int GetNumbersCore() {
 #ifdef Q_OS_WIN
   SYSTEM_INFO sysInfo;
   GetSystemInfo(&sysInfo);
@@ -86,63 +20,64 @@ int ResourceMonitor::GetNumbersCore() {
   return sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 }
-
-void ResourceMonitor::onMeasureUsage() {
-  // memory usage in KB
-  const double memUsage = getMemoryUsage();
-
-  // cpu usage rate
-  double cpuUsage = 0.0;
-  {
-    quint64 currentCpuTime = getProcessCpuTime();
-    if (m_lastCpuTime != 0) { // m_lastCpuTime should not be empty
-      quint64 cpuDelta = currentCpuTime - m_lastCpuTime;
-      static const int numCores = GetNumbersCore();
-      static const quint64 maxCpuTime = SAMPLE_PERIOD * numCores;  // max cpu available time in ms
-      if (maxCpuTime > 0) {
-        cpuUsage = (static_cast<double>(cpuDelta) / maxCpuTime) * 100.0;
-      }
-    }
-    m_lastCpuTime = currentCpuTime;
-  }
-  LOG_D("%f,%f", cpuUsage, memUsage);
-  WriteCpuMemoryIntoCsvFile(cpuUsage, memUsage);
-}
-
-double ResourceMonitor::getMemoryUsage() {
+// return value unit: kB
+double getMemoryUsage(const bool bPrivate) {
 #ifdef Q_OS_WIN
-  PROCESS_MEMORY_COUNTERS pmc;
-  if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-    return pmc.WorkingSetSize / 1024.0; // 总工作集 kB
+  HANDLE hProcess = GetCurrentProcess();
+  if (bPrivate) {
+    // Private Bytes 进程分配的私有内存总量，包括提交的虚拟内存。
+    PROCESS_MEMORY_COUNTERS_EX pmcex;
+    if (!GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmcex, sizeof(pmcex))) {
+    }
+    return pmcex.PrivateUsage / 1024.0;
+    // Private Working Set：工作集中私有（非共享）的部分。
+  } else {
+     // Working Set 进程当前在物理内存中的内存。
+    PROCESS_MEMORY_COUNTERS pmc;
+    if (!GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+      return 0.0;
+    }
+    return pmc.WorkingSetSize / 1024.0;
   }
-  // PROCESS_MEMORY_COUNTERS_EX pmc;
-  // if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
-  //   return pmc.PrivateUsage / 1024.0; // 专用工作集 KB
-  // }
 #elif defined(Q_OS_LINUX)
   QFile file("/proc/self/status");
-  if (file.open(QIODevice::ReadOnly)) {
-    while (!file.atEnd()) {
-      QByteArray line = file.readLine();
+  if (!file.open(QIODevice::ReadOnly)) {
+    LOG_W("Open failed[%s]", qPrintable(file.fileName()));
+    return 0.0;
+  }
+  double memoryKB = 0;
+  while (!file.atEnd()) {
+    const QByteArray& line = file.readLine();
+    if (bPrivate) {
+      // 接近Windows的Private Working Set
+      if (line.startsWith("VmData:") || line.startsWith("VmStk:") || line.startsWith("VmExe:")) {
+        const QStringList& parts = line.split(' ', Qt::SkipEmptyParts);
+        if (parts.size() >= 2) {
+          memoryKB += parts[1].toDouble();
+        }
+      }
+    } else {
+      // 获取物理内存使用（驻留集大小Resident Set Size）
       if (line.startsWith("VmRSS:")) {
-        // 手动过滤数字部分
-        QList<QByteArray> parts = line.split(' ');
+        const QList<QByteArray>& parts = line.split(' ', Qt::SkipEmptyParts);
         for (const QByteArray &part : parts) {
-          if (!part.isEmpty() && part[0] >= '0' && part[0] <= '9') {
-            return part.toDouble(); // 直接返回数字部分（单位 kB）
+          if (part[0] >= '0' && part[0] <= '9') {
+            return part.toDouble(); // 直接返回单位 kB
           }
         }
       }
     }
   }
+  return memoryKB;
 #endif
   return 0.0;
 }
-
-quint64 ResourceMonitor::getProcessCpuTime() {
+// cpu used
+quint64 getProcessCpuTime() {
 #ifdef Q_OS_WIN
+  HANDLE hProcess = GetCurrentProcess();
   FILETIME createTime, exitTime, kernelTime, userTime;
-  if (GetProcessTimes(GetCurrentProcess(), &createTime, &exitTime, &kernelTime, &userTime)) {
+  if (GetProcessTimes(hProcess, &createTime, &exitTime, &kernelTime, &userTime)) {
     ULARGE_INTEGER ulUser, ulKernel;
 
     // 用户时间
@@ -166,4 +101,6 @@ quint64 ResourceMonitor::getProcessCpuTime() {
   }
 #endif
   return 0;
+}
+
 }

@@ -17,6 +17,7 @@ struct ThumbnailExtractIndexRange {
 };
 
 class ThumbnailProcessActions : public QObject {
+  Q_OBJECT
  public:
   explicit ThumbnailProcessActions(QObject* parent = nullptr);
 

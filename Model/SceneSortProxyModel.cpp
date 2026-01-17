@@ -17,21 +17,25 @@ void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
   if (sourceModel() == nullptr) {
     return;
   }
-  bool anyChange = false;
+  bool dimChanged = false, orderChanged = false;
   if (newColumn != (int)m_sortDimension) {  // need update mComparator when dimension changed
     m_sortDimension = SceneSortOrderHelper::toEnum(newColumn);
     mComparator = SceneInfo::getCompareFunc(m_sortDimension);
-    anyChange = true;
+    dimChanged = true;
   }
   if (newOrder != sortOrder()) {
-    anyChange = true;
+    orderChanged = true;
   }
-  if (!anyChange) {
+  if (!dimChanged && !orderChanged) {
     LOG_D("Sort policy unchange at all remains[dimension:%s, order:%d]", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
     return;
   }
-  LOG_D("Sort dimension changed to[%s] order: %d", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
-  QSortFilterProxyModel::sort(0, newOrder);
+  LOG_D("Sort dimension[%s] or order[%d] changed succeed", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
+  const bool bNeedResetModel{!orderChanged};
+  static constexpr int ONLY_1_COLUMN_INDEX = 0;
+  if (bNeedResetModel) beginResetModel();
+  QSortFilterProxyModel::sort(ONLY_1_COLUMN_INDEX, newOrder);
+  if (bNeedResetModel) endResetModel();
 #ifdef RUNNING_UNIT_TESTS
   ForceCompleteSort();
 #endif

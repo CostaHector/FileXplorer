@@ -23,7 +23,7 @@ void FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
 }
 
 FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent} {
-  _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), "Name Ruler");
+  _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), tr("Name Ruler"));
   _NAME_RULER->setToolTip(
       "<b>Standardized Files/Folders Name under current view path</b><br/>"
       "Given: [A..mp4, A (1).jpg, A -- 2.json]<br/>"
@@ -31,25 +31,25 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
   NAME_RULES_ACTIONS_LIST += _NAME_RULER;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), "Edit studios list file", this);
+  _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), tr("Edit studios list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_STUDIOS;
   _RELOAD_STUDIOS = new (std::nothrow) QAction("Reload studios", this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_STUDIOS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), "Edit performers list file", this);
+  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Edit performers list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_PERFS;
   _RELOAD_PERFS = new (std::nothrow) QAction("Reload performers", this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_PERFS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), "Edit performers AKA list file", this);
+  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), tr("Edit performers AKA list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_PERF_AKA;
   _RELOAD_PERF_AKA = new (std::nothrow) QAction("Reload performers AKA", this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_PERF_AKA;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_CAST_STUDIO_STATISTIC"), "Rename rule statistics", this);
+  _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_CAST_STUDIO_STATISTIC"), tr("Rename rule statistics"), this);
   NAME_RULES_ACTIONS_LIST += _RENAME_RULE_STAT;
 
   subscribe();

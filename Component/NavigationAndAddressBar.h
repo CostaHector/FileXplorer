@@ -29,6 +29,7 @@ private:
 };
 
 class NavigationAndAddressBar : public QToolBar {
+  Q_OBJECT
 public:
   explicit NavigationAndAddressBar(const QString& title, QWidget* parent);
 

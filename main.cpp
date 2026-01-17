@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
   const QStringList& args = app.arguments();
   QTranslator translator;  // cannot define in local. will be release.
   if (Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool()) {
-    LoadCNLanguagePack(translator);
+    LoadCNLanguagePack(translator, ":/language/ZH_CN");
   }
 
   FileXplorer fileExplorer{args, nullptr};

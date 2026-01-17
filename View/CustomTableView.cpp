@@ -120,15 +120,12 @@ CustomTableView::~CustomTableView() {
 void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   CHECK_NULLPTR_RETURN_VOID(m_menu);
-  if (m_menu != nullptr) {
-    QPoint pnt = event->globalPos();
 #ifndef RUNNING_UNIT_TESTS
-    m_menu->popup(pnt); // or QCursor::pos()
+  QPoint pnt = event->globalPos();
+  m_menu->popup(pnt); // or QCursor::pos()
 #endif
-    event->accept();
-    return;
-  }
-  QTableView::contextMenuEvent(event);
+  event->accept();
+  return;
 }
 
 void CustomTableView::BindMenu(QMenu* menu) {

@@ -5,6 +5,7 @@
 #include <QActionGroup>
 
 class RenameActions : public QObject {
+  Q_OBJECT
  public:
   explicit RenameActions(QObject* parent = nullptr);
 

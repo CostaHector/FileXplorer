@@ -24,6 +24,7 @@ class SceneStyleDelegate : public QStyledItemDelegate {
   void drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating = 0) const;
 
   RatingStateMachine mRateMachine;
+  static constexpr QColor GRAY_AND_HALF_TRANS{0, 0, 0, 150};
 };
 
 #endif  // SCENESTYLEDELEGATE_H
