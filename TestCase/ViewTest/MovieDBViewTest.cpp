@@ -3,7 +3,9 @@
 #include "OnScopeExit.h"
 #include <QTestEventList>
 #include <QSignalSpy>
-
+#include <QInputDialog>
+#include <QFileDialog>
+#include <QMessageBox>
 #include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
@@ -20,22 +22,32 @@
 #include "MovieDBActions.h"
 #include "AutoRollbackRename.h"
 
+#include "UserInteractiveMock.h"
+#include "MountPathTableNameMapperMock.h"
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
 class MovieDBViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   const QString dbName{tDir.itemPath("MovieViewTest.db")};
   const QString connName{"MovieViewTestConn"};
   QString tableName1, tableName2;
   const QString path1 = tDir.itemPath("path1");
   const QString path2 = tDir.itemPath("path2");
- private slots:
+private slots:
   void initTestCase() {
+    using namespace MountPathTableNameMapperMock;
+
     Configuration().clear();
     QVERIFY(tDir.IsValid());
 
     const QList<FsNodeEntry> nodes{
-        {"path1/Chris Evans.mp4", false, "Chris Evans"},  // 3 videos in path1, tableName1
+        {"path1/Chris Evans.mp4", false, "Chris Evans"}, // 3 videos in path1, tableName1
         {"path1/Chris Hemsworth.mp4", false, "Chris Hemsworth"},
         {"path1/Chris Pine.mp4", false, "Chris Pine"},
         // 2 videos(-1 second Michael Fassbender.mp4 and 5 second Morata.mp4) in path2, tableName2
@@ -43,24 +55,26 @@ class MovieDBViewTest : public PlainTestSuite {
         {"path2/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
     };
     QCOMPARE(tDir.createEntries(nodes), 5);
-    const QString morataVidAbsPath = tDir.itemPath("path2/Morata.mp4");  // 5second
+    const QString morataVidAbsPath = tDir.itemPath("path2/Morata.mp4"); // 5second
     bool bVidGenOk = false;
     QByteArray morataVidBa = VideoTestPrecoditionTools::CreateVideoContentNormal(morataVidAbsPath, 5000, &bVidGenOk);
     QVERIFY(!morataVidBa.isEmpty());
     QVERIFY(bVidGenOk);
     QVERIFY(tDir.exists("path2/Morata.mp4"));
 
-    bool bPath1ToTableName{false};
-    tableName1 = MountPathTableNameMapper::toTableNameMock(path1, &bPath1ToTableName);
-    QVERIFY(bPath1ToTableName);
-    QCOMPARE(MountPathTableNameMapper::toMountPathMock(tableName1, &bPath1ToTableName), path1);
-    QVERIFY(bPath1ToTableName);
+    { // path -> table name -> path. 预期:可逆
+      bool bPath1ToTableName{false};
+      tableName1 = invokeToTableName(path1, &bPath1ToTableName);
+      QVERIFY(bPath1ToTableName);
+      QCOMPARE(invokeToMountPath(tableName1, &bPath1ToTableName), path1);
+      QVERIFY(bPath1ToTableName);
 
-    bool bPath2ToTableName{false};
-    tableName2 = MountPathTableNameMapper::toTableNameMock(path2, &bPath2ToTableName);
-    QVERIFY(bPath2ToTableName);
-    QCOMPARE(MountPathTableNameMapper::toMountPathMock(tableName2, &bPath2ToTableName), path2);
-    QVERIFY(bPath2ToTableName);
+      bool bPath2ToTableName{false};
+      tableName2 = invokeToTableName(path2, &bPath2ToTableName);
+      QVERIFY(bPath2ToTableName);
+      QCOMPARE(invokeToMountPath(tableName2, &bPath2ToTableName), path2);
+      QVERIFY(bPath2ToTableName);
+    }
 
     MovieDBViewMock::clear();
   }
@@ -70,7 +84,32 @@ class MovieDBViewTest : public PlainTestSuite {
     MovieDBViewMock::clear();
   }
 
+  void init() {
+    GlobalMockObject::reset();
+    using namespace MountPathTableNameMapperMock;
+    MOCKER(MountPathTableNameMapper::toMountPath).stubs().will(invoke(invokeToMountPath));
+    MOCKER(MountPathTableNameMapper::toTableName).stubs().will(invoke(invokeToTableName));
+    MOCKER(QInputDialog::getItem).stubs().will(invoke(UserInteractiveMock::InputDialog::invoke_getItem));
+  }
+
+  void cleanup() {
+    GlobalMockObject::verify();
+  }
+
   void movie_view_behavior_correct() {
+    MOCKER(QFileDialog::getExistingDirectory).stubs()
+        .will(returnValue(QString())) // 2.4.1
+        .then(returnValue(QString("/path/not/start/with/mountPathOfTableName1"))) // 2.4.2
+        .then(returnValue(path1)) // 2.4.3
+        .then(returnValue(path1)) // 2.4.4
+        //
+        .then(returnValue(path2)) // 1.5.2
+        .then(returnValue(path2))
+        .then(returnValue(path2))
+        .then(returnValue(path1))
+        .then(returnValue(path2))
+        .then(returnValue(path2));
+
     QWidget parent;
 
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
@@ -80,41 +119,41 @@ class MovieDBViewTest : public PlainTestSuite {
 
     QVERIFY(dbToolBar.m_tablesCB != nullptr);
     QCOMPARE(dbToolBar.m_tablesCB->count(), 0);
-    QVERIFY(!dbToolBar.m_tablesCB->isEditable());  // tableNames can only insert via addItem
+    QVERIFY(!dbToolBar.m_tablesCB->isEditable()); // tableNames can only insert via addItem
     QVERIFY(dbToolBar.m_whereCB != nullptr);
-    QVERIFY(dbToolBar.m_whereCB->isEditable());  // where clause can be modified by user input
+    QVERIFY(dbToolBar.m_whereCB->isEditable()); // where clause can be modified by user input
 
     QVERIFY(fdDb.IsValid());
     QVERIFY(!fdDb.IsTableExist(tableName1));
     QVERIFY(!fdDb.IsTableExist(tableName2));
 
     QCOMPARE(dbModel.rowCount(), 0);
-    QCOMPARE(movieView.onExportToJson(), -1);  // no tables at all
-    QCOMPARE(movieView.onUpdateByJson(), -1);  // no tables at all
-    QVERIFY(!movieView.onAuditATable());       // no tables at all
+    QCOMPARE(movieView.onExportToJson(), -1); // no tables at all
+    QCOMPARE(movieView.onUpdateByJson(), -1); // no tables at all
+    QVERIFY(!movieView.onAuditATable());      // no tables at all
 
-    QVERIFY(movieView.onInitDataBase());  // usually we don't need call it
+    QVERIFY(movieView.onInitDataBase()); // usually we don't need call it
 
     {
       // 1 create a table
       // 1.1 user cancel
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(false, tableName1);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, tableName1);
       QVERIFY(!movieView.onCreateATable());
       QVERIFY(!fdDb.IsTableExist(tableName1));
 
       // 1.2 table name empty
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(true, "");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
       QVERIFY(!movieView.onCreateATable());
       QVERIFY(!fdDb.IsTableExist(tableName1));
 
       // 1.3 create tableName1 succeed
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(true, tableName1);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
       QVERIFY(movieView.onCreateATable());
       QVERIFY(fdDb.IsTableExist(tableName1));
       QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName1);
 
       // 1.4 table name occupied
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(true, tableName1);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
       QVERIFY(!movieView.onCreateATable());
       QVERIFY(fdDb.IsTableExist(tableName1));
 
@@ -132,7 +171,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(!movieView.onUnionTables());
 
       // 2.2 only 1 table except `DB_TABLE::MOVIES` no need union at all
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(true, DB_TABLE::MOVIES);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, DB_TABLE::MOVIES);
       QVERIFY(movieView.onCreateATable());
       QCOMPARE(dbToolBar.m_tablesCB->findText(DB_TABLE::MOVIES), dbToolBar.m_tablesCB->count() - 1);
       QVERIFY(fdDb.IsTableExist(DB_TABLE::MOVIES));
@@ -143,7 +182,7 @@ class MovieDBViewTest : public PlainTestSuite {
 
       // 2.3 user cancel, skip
       MovieDBViewMock::ConfirmUnionIntoMock() = false;
-      MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(true, tableName2);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
       QVERIFY(movieView.onCreateATable());  // once create table, m_tablesCB will insert it at the bottom, then update currentText to new table name
       QCOMPARE(dbToolBar.m_tablesCB->findText(tableName2), dbToolBar.m_tablesCB->count() - 1);
       QCOMPARE(dbToolBar.m_tablesCB->currentText(), tableName2);
@@ -161,19 +200,16 @@ class MovieDBViewTest : public PlainTestSuite {
       {
         QVERIFY(dbToolBar.m_tablesCB->findText(tableName1) != -1);
         dbToolBar.m_tablesCB->setCurrentText(tableName1);
-        emit dbToolBar.movieTableChanged(tableName1);  // signal-slot setCurrentMovieTable should connected
+        emit dbToolBar.movieTableChanged(tableName1); // signal-slot setCurrentMovieTable should connected
         QCOMPARE(dbModel.tableName(), tableName1);
 
         // 2.4.1 empty path skip
-        MovieDBViewMock::GetAPathFromFileDialogMock() = "";
         QVERIFY(!movieView.onInsertIntoTable());
 
         // 2.4.2 path user specified differ from mount path from table name, skip
-        MovieDBViewMock::GetAPathFromFileDialogMock() = "/path/not/start/with/mountPathOfTableName1";
         QVERIFY(!movieView.onInsertIntoTable());
 
         // 2.4.3 path start with mount path from table name, but user cancel, skip
-        MovieDBViewMock::GetAPathFromFileDialogMock() = path1;
         MovieDBViewMock::ConfirmInsertIntoMock() = false;
         QVERIFY(!movieView.onInsertIntoTable());
 
@@ -192,9 +228,8 @@ class MovieDBViewTest : public PlainTestSuite {
       {
         QVERIFY(dbToolBar.m_tablesCB->findText(tableName2) != -1);
         dbToolBar.m_tablesCB->setCurrentText(tableName2);
-        emit dbToolBar.movieTableChanged(tableName2);  // aka setCurrentMovieTable
+        emit dbToolBar.movieTableChanged(tableName2); // aka setCurrentMovieTable
         QCOMPARE(dbModel.tableName(), tableName2);
-        MovieDBViewMock::GetAPathFromFileDialogMock() = path2;
         MovieDBViewMock::ConfirmInsertIntoMock() = true;
         QVERIFY(movieView.onInsertIntoTable());
         QCOMPARE(fdDb.CountRow(tableName2), 2);
@@ -223,7 +258,7 @@ class MovieDBViewTest : public PlainTestSuite {
       dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "%all rows not contains me%")").arg(ENUM_2_STR(Name)));
       dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.rowCount(), 0);
-      dbToolBar.m_whereCB->setCurrentText(R"(`Name` LIKE "%")");  // all
+      dbToolBar.m_whereCB->setCurrentText(R"(`Name` LIKE "%")"); // all
       dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
       QCOMPARE(dbModel.rowCount(), 2);
     }
@@ -233,14 +268,14 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.tableName(), tableName2);
       QCOMPARE(dbModel.rowCount(), 2);
       // call sort only if no special char exist in table Name
-      if (!tableName2.contains("-")) {  // desc
-        dbModel.sort((int)MOVIE_TABLE::Name, Qt::SortOrder::DescendingOrder);
+      if (!tableName2.contains("-")) { // desc
+        dbModel.sort((int) MOVIE_TABLE::Name, Qt::SortOrder::DescendingOrder);
         LOG_D("Generated SQL: %s", qPrintable(dbModel.query().lastQuery()));
         // Generated SQL: SELECT "Fd", "PrePathLeft", "PrePathRight", "Name", "Size", "Duration", "Studio", "Cast", "Tags", "PathHash" FROM
         // "_tmp_FileXplorerTest-IThoEl_path2" WHERE `Name` LIKE "%" ORDER BY _tmp_FileXplorerTest-IThoEl_path2."Name" ASC
         QVERIFY2(dbModel.select(), qPrintable(dbModel.lastError().text()));
         // no such column: _tmp_FileXplorerTest Unable to execute statement
-      } else {  // desc
+      } else { // desc
         QSqlQuery sqlQry(QString("SELECT * FROM `%1` ORDER BY `%2` DESC").arg(tableName2).arg(ENUM_2_STR(Name)), dbModel.database());
         dbModel.setQuery(sqlQry);
         QVERIFY2(dbModel.lastError().type() == QSqlError::NoError, qPrintable(dbModel.lastError().text()));
@@ -263,7 +298,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Morata.mp4");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Duration).toInt(), 5000);
-      QVERIFY(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt() <= 0);  // invalid video file linux return -1, windows return 0
+      QVERIFY(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt() <= 0); // invalid video file linux return -1, windows return 0
     }
 
     auto& inst = g_dbAct();
@@ -279,7 +314,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
       // 1.2.1 set studio no selection
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Marvel");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Marvel");
       movieView.selectionModel()->clear();
       QCOMPARE(movieView.onSetStudio(), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
@@ -287,19 +322,19 @@ class MovieDBViewTest : public PlainTestSuite {
 
       // 1.2.2 set studio user cancel
       movieView.selectAll();
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(false, "Marvel");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Marvel");
       QCOMPARE(movieView.onSetStudio(), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
 
       // 1.2.3 set studio user accept, ok
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Marvel");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Marvel");
       QCOMPARE(movieView.onSetStudio(), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Marvel");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Marvel");
 
       // 1.2.4 set studio to empty(be regard as clear). user accept, ok
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
       QCOMPARE(movieView.onSetStudio(), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
@@ -313,60 +348,62 @@ class MovieDBViewTest : public PlainTestSuite {
 
       // 1.2 user cancel cast set
       movieView.selectAll();
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(false, "Cast Morata");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Cast Morata");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
 
       // 1.3.1 user accept cast set empty "", ignored
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "");
       // 1.3.1 user accept cast set non empty "Cast Morata", ok
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Cast Morata");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
 
       // 1.4.1 user accept cast add empty "", ignored
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
       // 1.4.2 user accept cast add non empty "Cast Morata 2", ok
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Cast Morata 2");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata 2");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
 
       // 1.5 user accept cast remove empty "", ignored
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
       // 1.5 user accept cast remove non empty "Cast Morata"(full match), ok
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Cast Morata");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
 
       // 1.6 user cancel cast clear
-      MovieDBViewMock::clearTagsOrCastsMock() = false;
+      MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs()
+          .will(returnValue((int)QMessageBox::StandardButton::No))
+          .then(returnValue((int)QMessageBox::StandardButton::Yes))
+          .then(returnValue((int)QMessageBox::StandardButton::Yes))
+          .then(returnValue((int)QMessageBox::StandardButton::Yes));
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 0);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
       // 1.7 user accept cast clear
-      MovieDBViewMock::clearTagsOrCastsMock() = true;
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "");
 
       // 1.8 user accept tags set
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Football,Spanish");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Football,Spanish");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "Football,Spanish");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "Football,Spanish");
       // 1.9 user accept tags clear
-      MovieDBViewMock::clearTagsOrCastsMock() = true;
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "");
@@ -377,15 +414,15 @@ class MovieDBViewTest : public PlainTestSuite {
 
       // 1.1 modifed studio/cast/tags field to both valid
       movieView.selectAll();
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Real Madrid");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Real Madrid");
       QCOMPARE(movieView.onSetStudio(), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Cast Morata");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-      MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "FootBall");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "FootBall");
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "FootBall");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "FootBall");
@@ -406,8 +443,8 @@ class MovieDBViewTest : public PlainTestSuite {
 
       // 1.4 modify them Studio mod then revert, cast/tags mod ok
       movieView.selectAll();
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "X-Men");
-      QCOMPARE(movieView.onSetStudio(), 2);  // it has not been write into db
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "X-Men");
+      QCOMPARE(movieView.onSetStudio(), 2); // it has not been write into db
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "X-Men");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "X-Men");
       QSet<QString> expectStudiosInDatabase{"Real Madrid"};
@@ -415,11 +452,10 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(fdDb.QueryPK(tableName2, ENUM_2_STR(Studio), actualStudiosInDatabase));
       QCOMPARE(actualStudiosInDatabase, expectStudiosInDatabase);
       QVERIFY(dbModel.isDirty());
-      QVERIFY(movieView.onRevert());  // revert can also let it not dirty
+      QVERIFY(movieView.onRevert()); // revert can also let it not dirty
       QVERIFY(!dbModel.isDirty());
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      MovieDBViewMock::clearTagsOrCastsMock() = true;
       QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 2);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "");
@@ -427,12 +463,12 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "");
       QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "");
 
-      // 1.4 table dirty cannot Update By Json, skip
+      // 1.5.1 table dirty cannot Update By Json, skip
       QVERIFY(dbModel.isDirty());
       QCOMPARE(movieView.onUpdateByJson(), -1);
       //
 
-      // Update By Json, contents of studio/cast/tags in table should in consistence with json
+      // 1.5.2 Update By Json, contents of studio/cast/tags in table should in consistence with json
       QVERIFY(movieView.onSubmit());
       QVERIFY(!dbModel.isDirty());
       QCOMPARE(movieView.onUpdateByJson(), 2);
@@ -450,20 +486,20 @@ class MovieDBViewTest : public PlainTestSuite {
       const QString delete1RecordWhereClause = QString(R"(`%1` LIKE "%2")").arg(ENUM_2_STR(Name)).arg("Morata%");
       const QString deleteAllRecordWhereClause = "";
       // user cancel
-      MovieDBViewMock::InputADeleteWhereClauseMock() = std::pair<bool, QString>(false, delete1RecordWhereClause);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, delete1RecordWhereClause);
       QCOMPARE(movieView.onDeleteFromTable(), -1);
       QCOMPARE(dbModel.rowCount(), 2);
 
       // user accept
-      MovieDBViewMock::InputADeleteWhereClauseMock() = std::pair<bool, QString>(true, delete0RecordWhereClause);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, delete0RecordWhereClause);
       QCOMPARE(movieView.onDeleteFromTable(), 0);
       QCOMPARE(dbModel.rowCount(), 2);
 
-      MovieDBViewMock::InputADeleteWhereClauseMock() = std::pair<bool, QString>(true, delete1RecordWhereClause);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, delete1RecordWhereClause);
       QCOMPARE(movieView.onDeleteFromTable(), 1);
       QCOMPARE(dbModel.rowCount(), 1);
 
-      MovieDBViewMock::InputADeleteWhereClauseMock() = std::pair<bool, QString>(true, deleteAllRecordWhereClause);
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, deleteAllRecordWhereClause);
       QCOMPARE(movieView.onDeleteFromTable(), 1);
       QCOMPARE(dbModel.rowCount(), 0);
     }
@@ -474,8 +510,7 @@ class MovieDBViewTest : public PlainTestSuite {
       // files new added(if Fds not exist before) will be insert into this table
       // files renamed(if Fds unchange but name changed) will be updated into this table
 
-      // recover tables
-      MovieDBViewMock::GetAPathFromFileDialogMock() = path2;
+      // 1.6.1 recover tables
       MovieDBViewMock::ConfirmInsertIntoMock() = true;
       QVERIFY(movieView.onInsertIntoTable());
       QCOMPARE(dbModel.rowCount(), 2);
@@ -483,7 +518,6 @@ class MovieDBViewTest : public PlainTestSuite {
       // 1.0 path not match table mount path, cannot audit
       QVERIFY(movieView.onRevert());
       QVERIFY(!dbModel.isDirty());
-      MovieDBViewMock::GetAPathFromFileDialogMock() = path1;
       QVERIFY(!movieView.onAuditATable());
 
       AutoRollbackRename autoRollRenamer(tDir.path(), "path2/Morata.mp4", "path2/Alvaro Morata.mp4");
@@ -494,18 +528,16 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(dir.remove("path2/Michael Fassbender.mp4"));
       QVERIFY(!tDir.exists("path2/Michael Fassbender.mp4"));
 
-      MovieDBViewMock::GetAPathFromFileDialogMock() = path2;
       QVERIFY(movieView.onAuditATable());
-      QCOMPARE(dbModel.rowCount(), 1);                           // now it been recovered
-      QSet<QString> expectNamesInDatabase{"Alvaro Morata.mp4"};  // no Morata.mp4 anymore, no Michael Fassbender.mp4 anymore
+      QCOMPARE(dbModel.rowCount(), 1);                          // now it been recovered
+      QSet<QString> expectNamesInDatabase{"Alvaro Morata.mp4"}; // no Morata.mp4 anymore, no Michael Fassbender.mp4 anymore
       QSet<QString> actualNamesInDatabase;
       QVERIFY(fdDb.QueryPK(tableName2, ENUM_2_STR(Name), actualNamesInDatabase));
       QCOMPARE(actualNamesInDatabase, expectNamesInDatabase);
 
       // 2.0 dirty cannot audit
-      MovieDBViewMock::GetAPathFromFileDialogMock() = path2;
       movieView.selectAll();
-      MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Spanish Real Madrid");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Spanish Real Madrid");
       QCOMPARE(movieView.onSetStudio(), 1);
       QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Spanish Real Madrid");
       QVERIFY(dbModel.isDirty());
@@ -517,7 +549,7 @@ class MovieDBViewTest : public PlainTestSuite {
       MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(false, tableName2);
       QVERIFY(!movieView.onDropATable());
 
-      MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(true, "");  // empty tablename
+      MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(true, ""); // empty tablename
       QVERIFY(!movieView.onDropATable());
 
       MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(true, "inexist table");
@@ -528,7 +560,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(movieView.onDropATable());
       QVERIFY(!fdDb.IsTableExist(tableName2));
 
-      QVERIFY(!movieView.onDropATable());  // table already dropped
+      QVERIFY(!movieView.onDropATable()); // table already dropped
     }
 
     {
@@ -538,7 +570,7 @@ class MovieDBViewTest : public PlainTestSuite {
     movieView.close();
   }
 };
-
+// todo: testcase too large. need extract
 // sudo fdisk -l
 // find in Device colums
 // mkdir -p /mnt/DISKS/DD2_4T

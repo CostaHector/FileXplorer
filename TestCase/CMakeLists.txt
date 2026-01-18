@@ -136,9 +136,11 @@ include(FetchContent)
 FetchContent_Declare(
   mockcpp
   GIT_REPOSITORY git@github.com:CostaHector/mockcpp.git
-  GIT_TAG v2.8
+  GIT_TAG v2.9
   GIT_SHALLOW TRUE
   GIT_PROGRESS TRUE
+  SOURCE_DIR ${MOCKCPP_SRC_ROOT}
+  BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-build
 )
 FetchContent_MakeAvailable(mockcpp)
 

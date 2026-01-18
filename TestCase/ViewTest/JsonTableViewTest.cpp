@@ -9,10 +9,18 @@
 #include "EndToExposePrivateMember.h"
 #include "JsonActions.h"
 #include "TDir.h"
+#include "UserInteractiveMock.h"
 
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QTextEdit>
+#include <QMessageBox>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 #include "JsonTestPrecoditionTools.h"
 using namespace JsonTestPrecoditionTools;
@@ -43,12 +51,15 @@ class JsonTableViewTest : public PlainTestSuite {
     StudiosManager& studioInst = StudiosManager::getInst();
     studioInst.ResetStateForTestImpl(tDir.itemPath("studios_list_test.txt"));
     studioInst.ProStudioMap().clear();
-
-    JsonTableViewMock::clear();
   }
 
-  void cleanupTestCase() {
-    JsonTableViewMock::clear();  //
+  void init() {
+    GlobalMockObject::reset();
+    MOCKER(QInputDialog::getItem).stubs().will(invoke(UserInteractiveMock::InputDialog::invoke_getItem));
+  }
+
+  void cleanup() {
+    GlobalMockObject::verify();
   }
 
   void jsonView_behavior_ok() {
@@ -276,13 +287,13 @@ class JsonTableViewTest : public PlainTestSuite {
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Studio).data().toString(), "");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Studio).data().toString(), "");
 
-      JsonTableViewMock::InputStudioNameMock() = std::pair<bool, QString>(false, "Michael Fassbender");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Michael Fassbender");
       QCOMPARE(jsonView.onSetStudio(), 0);
 
-      JsonTableViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "");  // empty reject
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");  // empty reject
       QCOMPARE(jsonView.onSetStudio(), 0);
 
-      JsonTableViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Michael Fassbender");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Michael Fassbender");
       QCOMPARE(jsonView.onSetStudio(), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Studio).data().toString(), "Michael Fassbender");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Studio).data().toString(), "Michael Fassbender");
@@ -298,11 +309,13 @@ class JsonTableViewTest : public PlainTestSuite {
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 0);
 
       jsonView.selectAll();
-
-      JsonTableViewMock::clearTagsOrCastsMock() = false;
+      MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs()
+          .will(returnValue(QMessageBox::StandardButton::No))
+          .then(returnValue(QMessageBox::StandardButton::No))
+          .then(returnValue(QMessageBox::StandardButton::Yes))
+          .then(returnValue(QMessageBox::StandardButton::Yes));
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 0);
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR), 0);
-      JsonTableViewMock::clearTagsOrCastsMock() = true;
       QVERIFY(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR) >= 0);
       QVERIFY(jsonView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR) >= 0);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "");
@@ -310,47 +323,47 @@ class JsonTableViewTest : public PlainTestSuite {
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Tags).data().toString(), "");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Tags).data().toString(), "");
 
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(false, "Chris Evans");  // user ignored
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Chris Evans");  // user ignored
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 0);
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 0);
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Chris Evans,Henry Cavill");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans,Henry Cavill");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Chris Evans");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Henry Cavill");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Henry Cavill");
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Michael Fassbender");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Michael Fassbender");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Michael Fassbender");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Michael Fassbender");
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "");  // empty reject
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");  // empty reject
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Michael Fassbender");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Michael Fassbender");
 
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "SuperHero");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "SuperHero");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Tags).data().toString(), "SuperHero");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Tags).data().toString(), "SuperHero");
     }
 
     {
-      JsonTableViewMock::InputStudioNameMock() = std::pair<bool, QString>(true, "Marvel");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Marvel");
       jsonView.selectAll();
       QCOMPARE(jsonView.onSetStudio(), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Studio).data().toString(), "Marvel");
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Studio).data().toString(), "Marvel");
 
       jsonView.selectRow(0);
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Chris Evans,Michael Fassbender");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans,Michael Fassbender");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 1);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Michael Fassbender");
 
       jsonView.selectRow(1);
-      JsonTableViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(true, "Henry Cavill");
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Henry Cavill");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 1);
       QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Henry Cavill");
 
@@ -391,13 +404,13 @@ class JsonTableViewTest : public PlainTestSuite {
       QVERIFY(tDir.exists("a.mp4"));
 
       jsonView.selectRow(0);
-      JsonTableViewMock::QryNewJsonBaseNameMock() = std::pair<bool, QString>(false, "Super Hero - Captain America");  // user reject
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Super Hero - Captain America");  // user reject
       QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
 
-      JsonTableViewMock::QryNewJsonBaseNameMock() = std::pair<bool, QString>(true, "");  // empty new name, rejected
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");  // empty new name, rejected
       QCOMPARE(jsonView.onRenameJsonAndRelated(), -1);
 
-      JsonTableViewMock::QryNewJsonBaseNameMock() = std::pair<bool, QString>(true, "Super Hero - Captain America");  // empty new name, rejected
+      UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Super Hero - Captain America");  // empty new name, rejected
       QCOMPARE(jsonView.onRenameJsonAndRelated(), 2);                                                                // two file get renamed
       QVERIFY(!tDir.exists("a.json"));
       QVERIFY(!tDir.exists("a.mp4"));
