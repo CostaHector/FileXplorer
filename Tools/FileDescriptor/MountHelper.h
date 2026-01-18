@@ -45,30 +45,6 @@ namespace MountPathTableNameMapper {
 QString toTableName(const QString& mountPath, bool* bConversionOk = nullptr);
 QString toMountPath(const QString& tableName, bool* bConversionOk = nullptr);
 QStringList CandidateTableNamesList();
-
-#ifdef RUNNING_UNIT_TESTS
-inline QString toTableNameMock(const QString& mountPath, bool* bConversionOk = nullptr) { // "/tmp/File-xx", "C:/temp/File-xx"
-  if (bConversionOk != nullptr) {
-    *bConversionOk = true;
-  }
-  QString tableName = mountPath;
-  return tableName.replace('/', '_').replace(':', '_');
-}
-inline QString toMountPathMock(const QString& tableName, bool* bConversionOk = nullptr) { // "_tmp_File_xx", "C__tmp_File-xx"
-  if (bConversionOk != nullptr) {
-    *bConversionOk = true;
-  }
-  QString mountPath = tableName;
-  if (mountPath.size() >= 3 && mountPath[0] == 'C' && mountPath[1] == '_' && mountPath[2] == '_') {
-    mountPath[1] = ':';
-  }
-  return mountPath.replace('_', '/');
-}
-inline QStringList& CandidateTableNamesListMock() {
-  static QStringList candidateTableNamesList;
-  return candidateTableNamesList;
-}
-#endif
 }  // namespace MountPathTableNameMapper
 
 #endif  // MOUNTHELPER_H

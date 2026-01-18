@@ -14,11 +14,7 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 
 void FdBasedDbModel::setTable(const QString& tableName) {
   QSqlTableModel::setTable(tableName);
-#ifdef RUNNING_UNIT_TESTS
-  m_rootPath = MountPathTableNameMapper::toMountPathMock(tableName);
-#else
   m_rootPath = MountPathTableNameMapper::toMountPath(tableName);
-#endif
   LOG_D("tableName:%s, m_rootPath:%s", qPrintable(tableName), qPrintable(m_rootPath));
 }
 

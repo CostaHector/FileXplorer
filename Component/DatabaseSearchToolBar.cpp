@@ -114,11 +114,7 @@ void MovieDBSearchToolBar::extraSignalSubscribe() {
 }
 
 QString MovieDBSearchToolBar::GetMovieTableMountPath() const {
-#ifdef RUNNING_UNIT_TESTS
-  return MountPathTableNameMapper::toMountPathMock(m_tablesCB->currentText());
-#else
   return MountPathTableNameMapper::toMountPath(m_tablesCB->currentText());
-#endif
 }
 
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {

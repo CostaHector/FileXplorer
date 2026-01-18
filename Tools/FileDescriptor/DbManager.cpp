@@ -354,12 +354,7 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
 }
 
 bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
-  QString mountPath;
-#ifdef RUNNING_UNIT_TESTS
-  mountPath = MountPathTableNameMapper::toMountPathMock(tableName);
-#else
-  mountPath = MountPathTableNameMapper::toMountPath(tableName);
-#endif
+  QString mountPath = MountPathTableNameMapper::toMountPath(tableName);
   return QFileInfo(mountPath).isDir();
 }
 
