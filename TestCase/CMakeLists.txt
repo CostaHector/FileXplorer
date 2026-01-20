@@ -63,6 +63,7 @@ file(GLOB SOURCES
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
+    MockTool/*.cpp
     ModelTest/*.cpp
     publicTest/*.cpp
     pubTestTool/*.cpp
@@ -103,6 +104,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/View/DupVideos
     ./
     pubTestTool
+    MockTool
 )
 
 file(GLOB HEADERS
@@ -128,6 +130,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/View/DupVideos/*.h
     pubTestTool/*.h
+    MockTool/*.h
 )
 
 SET(MOCKCPP_SRC_ROOT ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-src)

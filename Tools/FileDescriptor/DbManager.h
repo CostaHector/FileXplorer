@@ -78,8 +78,6 @@ class DbManager : public QObject {
  public:
 #ifdef RUNNING_UNIT_TESTS
   static bool DropAllTablesForTest(const QString& connName);
-  static bool DropDatabaseForTest(const QString& dbFullName, const bool bRecycle = true);
-  bool DeleteDatabaseIselfForTest(bool bRecyle = true);
 #endif
 
   DbManager(const QString& dbName, const QString& connName, QObject* parent = nullptr);
@@ -107,12 +105,12 @@ class DbManager : public QObject {
   int UpdateForTest(const QString& qryCmd) const;
   bool QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const;
   bool QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const;
-  bool QueryPK(const QString& tableName, const QString& pk, QSet<qint64>& vals) const;
+  bool QueryPK(const QString& tableName, const QString& pk, QSet<QByteArray>& vals) const;
 
   int CountRow(const QString& tableName, const QString& whereClause = "");
   int DeleteByWhereClause(const QString& tableName, const QString& whereClause);
 
-  bool IsTableVolumeOnline(const QString& tableName) const;
+  static bool IsTableVolumeOnline(const QString& tableName);
 
   void setSkipGetVideosDuration(bool bSkip) { mSkipGetVideosDuration = bSkip; }
   bool isSkipGetVideosDuration() const { return mSkipGetVideosDuration; }

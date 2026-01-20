@@ -261,11 +261,11 @@ class CastDBViewTest : public PlainTestSuite {
         QVERIFY(movieDb.CreateTable(movieTableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
         QVERIFY(movieDb.IsTableExist(movieTableName));
         {
-          QSet<qint64> needInsertFds = {1001, 1002};
+          QSet<QByteArray> needInsertFds = {"1001", "1002"};
           // 2 videos of Chris Evans
-          QHash<qint64, QString> newFd2Pth = {
-              {1001, "videos/superhero/Chris Evans Steve.mp4"},
-              {1002, "videos/superhero/Chris Evans Captain America.mp4"},
+          QHash<QByteArray, QString> newFd2Pth = {
+              {"1001", "videos/superhero/Chris Evans Steve.mp4"},
+              {"1002", "videos/superhero/Chris Evans Captain America.mp4"},
           };
           int insertCnt = 0;
           QVERIFY(movieDb.Insert(movieTableName, needInsertFds, newFd2Pth, insertCnt) == FD_OK);

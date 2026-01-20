@@ -16,8 +16,8 @@
 
 struct UsageReport {
   QString timePoint;
-  float memoryUsed; // kB
-  float cpuUsageRate; // %
+  float memoryUsed{0}; // kB
+  float cpuUsageRate{0}; // %
   QByteArray toByteArray() const;
 };
 

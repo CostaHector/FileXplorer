@@ -14,9 +14,9 @@ struct IMG_INFO_DATA_T {
     m_commonFileSizeSet.swap(rhs.m_commonFileSizeSet);
   }
 
-  bool contains(const QString& hash) const { return m_commonFileHash.contains(hash); }
-  void insert(const QString& hash) { m_commonFileHash.insert(hash); }
-  QSet<QString> m_commonFileHash;
+  bool contains(const QByteArray& hash) const { return m_commonFileHash.contains(hash); }
+  void insert(const QByteArray& hash) { m_commonFileHash.insert(hash); }
+  QSet<QByteArray> m_commonFileHash;
 
   bool contains(const qint64& sz) const { return m_commonFileSizeSet.contains(sz); }
   void insert(const qint64& sz) { m_commonFileSizeSet.insert(sz); }

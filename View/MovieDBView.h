@@ -40,7 +40,7 @@ public:
 
   // should not call ~destructure after getDb() and pass to QSqlTableModel
 private:
-  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
+  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const;
   bool IsHasSelection(const QString& msg = "") const;
 
   FdBasedDbModel* _dbModel{nullptr};

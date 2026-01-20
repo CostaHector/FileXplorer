@@ -13,14 +13,10 @@
 
 using namespace MOVIE_TABLE;
 
-QStringList FdBasedDb::VIDEOS_FILTER = TYPE_FILTER::VIDEO_TYPE_SET;
-bool FdBasedDb::mSkipGetDuration{false};
-bool FdBasedDb::CHECK_TABLE_VOLUME_ONLINE{true};
-
 const QString FdBasedDb::CREATE_TABLE_TEMPLATE  //
     {
         "CREATE TABLE IF NOT EXISTS `%1` ("          // TABLE_NAME
-        + QString{"`%1` BIGINT NOT NULL, "           // fd BIGINT
+        + QString{"`%1` BLOB NOT NULL, "             // fd BIGINT
                   "`%2` NCHAR(260) DEFAULT '', "     // PrePathLeft
                   "`%3` NCHAR(260) DEFAULT '', "     // PrePathRight
                   "`%4` NCHAR(260) NOT NULL, "       // Name
@@ -218,35 +214,34 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   }
 
   // 1. query fd(s) from table
-  QSet<qint64> existedFds;
+  QSet<QByteArray> existedFds;
   if (!QueryPK(tableName, ENUM_2_STR(Fd), existedFds)) {
     LOG_W("Qry fds(s) at table[%s] failed", qPrintable(tableName));
     return FD_QRY_PK_FAILED;
   }
 
   // 2. fd->absolute file path
-  FileDescriptor fd;
-  QHash<qint64, QString> newFd2Pth;
-  qint64 fdVal{0};
-  QDirIterator it{folderAbsPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
+  QHash<QByteArray, QString> newFd2Pth;
+  QByteArray fdVal{0};
+  QDirIterator it{folderAbsPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   while (it.hasNext()) {
     it.next();
     absFilePath = it.filePath();
-    fdVal = fd.GetFileUniquedId(absFilePath);
-    if (fdVal <= 0) {
+    fdVal = FileDescriptor::GetFileUniquedId(absFilePath);
+    if (fdVal.isEmpty()) {
       continue;
     }
     newFd2Pth[fdVal] = absFilePath;
   }
-  const QList<qint64>& newFdLst = newFd2Pth.keys();
-  const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
+  const QList<QByteArray>& newFdLst = newFd2Pth.keys();
+  const QSet<QByteArray> newFds{newFdLst.cbegin(), newFdLst.cend()};
 
   auto needInsertFds{newFds};
   needInsertFds.subtract(existedFds);
 
   int insertCnt = 0;
-  auto ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
+  FD_ERROR_CODE ret = Insert(tableName, needInsertFds, newFd2Pth, insertCnt);
   if (ret != FD_OK) {
     LOG_W("Incremental insert failed errorCode:%d", ret);
     return ret;
@@ -256,9 +251,9 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   return insertCnt;
 }
 
-FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
-                                const QSet<qint64>& needInsertFds,        //
-                                const QHash<qint64, QString>& newFd2Pth,  //
+FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                     //
+                                const QSet<QByteArray>& needInsertFds,        //
+                                const QHash<QByteArray, QString>& newFd2Pth,  //
                                 int& insertCnt) {
   auto db = GetDb();
   insertCnt = 0;
@@ -280,7 +275,7 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
 
   int count = 0;
   QString absFilePath;
-  for (const qint64 fdVal : needInsertFds) {
+  for (const QByteArray& fdVal : needInsertFds) {
     absFilePath = newFd2Pth[fdVal];
     const PathTool::RMFComponent& rmf = PathTool::RMFComponent::FromPath(absFilePath);
     // 绑定参数
@@ -327,7 +322,7 @@ FD_ERROR_CODE FdBasedDb::Insert(const QString& tableName,                 //
   return FD_OK;
 }
 
-FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& needDeleteFds, int& deleteCnt) {
+FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<QByteArray>& needDeleteFds, int& deleteCnt) {
   auto db = GetDb();
   deleteCnt = 0;
   if (needDeleteFds.isEmpty()) {
@@ -345,7 +340,7 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
     return FD_PREPARE_FAILED;
   }
 
-  for (const qint64& fdVal : needDeleteFds) {
+  for (const QByteArray& fdVal : needDeleteFds) {
     query.addBindValue(fdVal);
   }
 
@@ -355,15 +350,15 @@ FD_ERROR_CODE FdBasedDb::Delete(const QString& tableName, const QSet<qint64>& ne
           qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_INVALID;
   }
-  query.finish();
   deleteCnt = needDeleteFds.size();
-  LOG_D("%d record(s) to be deleted...", deleteCnt);
+  LOG_D("%d record(s) to be deleted(real affected %d row(s))...", deleteCnt, query.numRowsAffected());
+  query.finish();
   return FD_OK;
 }
 
 FD_ERROR_CODE FdBasedDb::Update(const QString& tableName,
-                                const QSet<qint64>& needUpdateFds,
-                                const QHash<qint64, QString>& newFd2Pth,
+                                const QSet<QByteArray>& needUpdateFds,
+                                const QHash<QByteArray, QString>& newFd2Pth,
                                 int& updateCnt) {
   auto db = GetDb();
   updateCnt = 0;
@@ -384,7 +379,7 @@ FD_ERROR_CODE FdBasedDb::Update(const QString& tableName,
   }
   int count = 0;
   QString absFilePath;
-  for (const qint64& fdVal : needUpdateFds) {
+  for (const QByteArray& fdVal : needUpdateFds) {
     absFilePath = newFd2Pth[fdVal];
     const PathTool::RMFComponent& rmf = PathTool::RMFComponent::FromPath(absFilePath);
     query.bindValue(UPDATE_PATH_FILED_PrePathLeft, rmf.rootPart);
@@ -444,29 +439,28 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
   }
 
   // 1. query fd(s) from table
-  QSet<qint64> existedFds;
+  QSet<QByteArray> existedFds;
   if (!QueryPK(tableName, ENUM_2_STR(Fd), existedFds)) {
     LOG_W("Qry fds(s) at table[%s] failed", qPrintable(tableName));
     return FD_QRY_PK_FAILED;
   }
 
   // 2. fd->absolute file path
-  FileDescriptor fd;
-  QHash<qint64, QString> newFd2Pth;
-  qint64 fdVal{0};
-  QDirIterator it{peerPath, VIDEOS_FILTER, QDir::Files, QDirIterator::Subdirectories};
+  QHash<QByteArray, QString> newFd2Pth;
+  QByteArray fdVal{0};
+  QDirIterator it{peerPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   while (it.hasNext()) {
     it.next();
     absFilePath = it.filePath();
-    fdVal = fd.GetFileUniquedId(absFilePath);
-    if (fdVal <= 0) {
+    fdVal = FileDescriptor::GetFileUniquedId(absFilePath);
+    if (fdVal.isEmpty()) {
       continue;
     }
     newFd2Pth[fdVal] = absFilePath;
   }
-  const QList<qint64>& newFdLst = newFd2Pth.keys();
-  const QSet<qint64> newFds{newFdLst.cbegin(), newFdLst.cend()};
+  const QList<QByteArray>& newFdLst = newFd2Pth.keys();
+  const QSet<QByteArray> newFds{newFdLst.cbegin(), newFdLst.cend()};
 
   auto needInsertFds{newFds};
   needInsertFds.subtract(existedFds);
@@ -509,9 +503,6 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
 }
 
 int FdBasedDb::SetDuration(const QString& tableName) {
-  if (mSkipGetDuration) {
-    return FD_OK;
-  }
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return FD_DB_OPEN_FAILED;
@@ -526,7 +517,7 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     return FD_INVALID;
   }
 
-  // 1. start to query
+  // 1. 查询并立即更新，避免使用中间哈希表
   QSqlQuery query{db};
   query.setForwardOnly(true);
   if (!query.exec(SELECT_DURATION_0_TEMPLATE.arg(tableName))) {
@@ -535,62 +526,68 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     return FD_EXEC_FAILED;
   }
 
-  QMap<qint64, int> fd2Duration;
-  QString absFilePath;
-  qint64 fdVal{0};
-  while (query.next()) {
-    absFilePath = PathTool::RMFComponent::join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),   //
-                                               query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),  //
-                                               query.value(QUERY_DURATION_0_FILED_Name).toString());
-    fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toLongLong();
-    fd2Duration[fdVal] = mSkipGetDuration ? 0 : mi.GetLengthQuick(absFilePath);
-  }
-  query.clear();
-  if (fd2Duration.isEmpty()) {
-    LOG_D("no duration need update at all, skip");
-    return 0;
-  }
-
-  // 2. start to update
-  if (!query.prepare(UPDATE_DURATION_0_TEMPLATE.arg(tableName))) {
+  // 准备更新语句
+  QSqlQuery updateQuery{db};
+  if (!updateQuery.prepare(UPDATE_DURATION_0_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
-          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+          qPrintable(updateQuery.executedQuery()), qPrintable(updateQuery.lastError().text()));
     return FD_PREPARE_FAILED;
   }
 
+  // 开始事务
   if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s",  //
-          1, qPrintable(db.lastError().text()));
+    LOG_W("start transaction failed: %s",  //
+          qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
   int count = 0;
-  for (auto it = fd2Duration.cbegin(); it != fd2Duration.cend(); ++it) {
-    query.bindValue(UPDATE_DURATION_0_FILED_Duration, it.value());
-    query.bindValue(UPDATE_DURATION_0_FILED_Fd, it.key());
-    if (!query.exec()) {
+  QString absFilePath;
+  QByteArray fdVal;
+  int duration = 0;
+
+  while (query.next()) {
+    // 构建文件路径
+    absFilePath = PathTool::RMFComponent::join(query.value(QUERY_DURATION_0_FILED_PrePathLeft).toString(),
+                                               query.value(QUERY_DURATION_0_FILED_PrePathRight).toString(),
+                                               query.value(QUERY_DURATION_0_FILED_Name).toString());
+
+    fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toByteArray();
+
+    // 计算时长
+    duration = VideoDurationGetter::GetLengthQuickStatic(mi, absFilePath);
+
+    // 立即更新
+    updateQuery.bindValue(UPDATE_DURATION_0_FILED_Duration, duration);
+    updateQuery.bindValue(UPDATE_DURATION_0_FILED_Fd, fdVal);
+
+    if (!updateQuery.exec()) {
       db.rollback();
-      LOG_W("replace[%s] failed: %s",  //
-            qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+      LOG_W("update[%s] failed: %s",  //
+            qPrintable(updateQuery.executedQuery()), qPrintable(updateQuery.lastError().text()));
       return FD_EXEC_FAILED;
     }
 
     count++;
+
     // 分批提交
     if (count % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
         db.rollback();
         LOG_W("commit the %dth batch record(s) failed: %s",  //
-              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE, qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) {
         LOG_W("start the %dth transaction failed: %s",  //
-              count / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
+              count / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
     }
   }
+
+  query.clear();
+  updateQuery.finish();
 
   // 提交剩余记录
   if (!db.commit()) {
@@ -598,9 +595,9 @@ int FdBasedDb::SetDuration(const QString& tableName) {
     LOG_W("remain record(s) commit failed: %s", qPrintable(db.lastError().text()));
     return FD_COMMIT_FAILED;
   }
-  query.finish();
-  LOG_D("%d record(s) to be updated", fd2Duration.size());
-  return fd2Duration.size();
+
+  LOG_D("%d record(s) to be updated", count);
+  return count;
 }
 
 struct DurStudioCastTags {
@@ -611,10 +608,8 @@ struct DurStudioCastTags {
 };
 
 int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) const {
-  if (CHECK_TABLE_VOLUME_ONLINE) {
-    if (!IsTableVolumeOnline(tableName)) {
-      return FD_DISK_OFFLINE;
-    }
+  if (!IsTableVolumeOnline(tableName)) {
+    return FD_DISK_OFFLINE;
   }
 
   auto db = GetDb();
@@ -677,11 +672,9 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
 }
 
 int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const {
-  if (CHECK_TABLE_VOLUME_ONLINE) {
-    if (!IsTableVolumeOnline(tableName)) {
-      LOG_W("Table Volum offline");
-      return FD_DISK_OFFLINE;
-    }
+  if (!IsTableVolumeOnline(tableName)) {
+    LOG_W("Table Volum offline");
+    return FD_DISK_OFFLINE;
   }
   using namespace JsonHelper;
   const QMap<uint, JsonDict2Table>& fileNameHash2Dict = ReadStudioCastTagsOut(peerPath);

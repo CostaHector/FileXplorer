@@ -31,6 +31,7 @@ extern template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 extern template struct EnumIntAction<QCryptographicHash::Algorithm>;
 
 class MD5Window : public QDialog {
+  Q_OBJECT
 public:
   explicit MD5Window(QWidget* parent = nullptr);
   int operator()(const QStringList& absPaths);
@@ -46,9 +47,10 @@ private:
   int GetBytesRange() const;
   void Recalculate();
 
-  QAction* _ONLY_FIRST_8_BYTES{nullptr};
   QAction* _ONLY_FIRST_16_BYTES{nullptr};
-  QAction* _ONLY_ENTIRE_FILE_BYTES{nullptr};
+  QAction* _SAMPLED_128_KB{nullptr};
+  QAction* _SAMPLED_512_KB{nullptr};
+  QAction* _ENTIRE_FILE_BYTES{nullptr};
   EnumIntAction<BytesRangeTool::BytesRangeE> mBytesRangeIntAct;
 
   QAction* _MD5 {nullptr};
@@ -65,7 +67,7 @@ private:
   QVBoxLayout* mMainLayout{nullptr};
 
   QStringList mPathsList;
-  QMap<AbsFilePathBytesRangeHashAlgorithmKey, QString> mAlreadyCalculatedHashMap;
+  QMap<AbsFilePathBytesRangeHashAlgorithmKey, QByteArray> mAlreadyCalculatedHashMap;
 };
 
 #endif  // MD5WINDOW_H

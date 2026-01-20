@@ -2,11 +2,12 @@
 #define BYTESRANGETOOL_H
 
 #include "PublicMacro.h"
-
 #define BYTES_RANGE_ENUM_VALUE_MAPPING \
-BYTES_RANGE_ITEM(FIRST_8,  0, 8)    \
-    BYTES_RANGE_ITEM(FIRST_16,  1, 16)    \
-    BYTES_RANGE_ITEM(ENTIRE_FILE, 2, -1)    \
+BYTES_RANGE_ITEM(FIRST_16_BYTES, 0, 16)           \
+BYTES_RANGE_ITEM(FIRST_1_KB,     1, 1*1024)    \
+BYTES_RANGE_ITEM(SAMPLED_128_KB,   2, 128*1024)    \
+BYTES_RANGE_ITEM(SAMPLED_512_KB,   3, 512*1024)    \
+BYTES_RANGE_ITEM(ENTIRE_FILE,    4, -1)           \
 
     namespace BytesRangeTool {
   enum class BytesRangeE{
@@ -18,7 +19,7 @@ BYTES_RANGE_ITEM(FIRST_8,  0, 8)    \
         // add before BUTT
         END_INVALID,
   };
-  static constexpr BytesRangeE DEFAULT_BYTE_RANGE = BytesRangeE::FIRST_8;
+  static constexpr BytesRangeE DEFAULT_BYTE_RANGE = BytesRangeE::SAMPLED_512_KB;
 
   inline const char* c_str(BytesRangeE byteRange) {
     if (byteRange < BytesRangeE::BEGIN || byteRange >= BytesRangeE::END_INVALID) {

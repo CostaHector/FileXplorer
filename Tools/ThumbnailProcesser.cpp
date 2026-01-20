@@ -195,7 +195,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
       continue;
     }
 
-    const int dur = mi.GetLengthQuick(pth);                // unit: ms
+    const int dur = VideoDurationGetter::GetLengthQuickStatic(mi, pth);                // unit: ms
     int timePeriod = dur / dimensionX / dimensionY / 1000; // unit: second
 #ifdef RUNNING_UNIT_TESTS
     const double startTime = 0;

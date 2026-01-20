@@ -1,13 +1,9 @@
 <svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-  <!-- 8x8网格 -->
-  <rect width="256" height="256" fill="#f0f0f0" />
-    
-  <!-- 前8字节（第一行）填充黑色 -->
-  <rect x="0" y="0" width="256" height="32" fill="#000000" />
+  <rect width="256" height="256" fill="#4CAF50" />
   
-  <!-- 灰色网格线 -->
-  <g stroke="#cccccc" stroke-width="1">
-    <!-- 垂直线 -->
+  <!-- 8x8 grid -->
+  <g stroke="#dddddd" stroke-width="1">
+    <!-- vertical lines -->
     <line x1="32" y1="0" x2="32" y2="256" />
     <line x1="64" y1="0" x2="64" y2="256" />
     <line x1="96" y1="0" x2="96" y2="256" />
@@ -16,7 +12,7 @@
     <line x1="192" y1="0" x2="192" y2="256" />
     <line x1="224" y1="0" x2="224" y2="256" />
     
-    <!-- 水平线 -->
+    <!-- horizontal lines -->
     <line x1="0" y1="32" x2="256" y2="32" />
     <line x1="0" y1="64" x2="256" y2="64" />
     <line x1="0" y1="96" x2="256" y2="96" />

@@ -112,7 +112,7 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   return true;
 }
 
-bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) {
+bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const {
   const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
 
   const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
@@ -122,7 +122,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   }
   const QString caption{QString{"Choose a path %1(contains %2) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
 
-  QString selectPath = QFileDialog::getExistingDirectory(this, caption, lastPath, QFileDialog::ShowDirsOnly);
+  QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
     LOG_WARN_NP("User cancel insert, path is not directory", selectPath);
     return false;

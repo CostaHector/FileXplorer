@@ -112,7 +112,7 @@ bool DupVidsManager::ScanALocation(const QString& path) {
     const QFileInfo file_info{file_path};
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME, PathTool::GetEffectiveName(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_SIZE, file_info.size());
-    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : mi.GetLengthQuick(file_path));
+    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : VideoDurationGetter::GetLengthQuickStatic(mi, file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DATE, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_ABSOLUTE_PATH, file_path);
     if (!query.exec()) {
@@ -316,7 +316,7 @@ int DupVidsManager::FillHashFieldIfSizeConflict(const QString& path) {
       continue;
     }
     for (const QString& abspath : pths) {
-      setHash.bindValue(UPDATE_HASH_BY_PRIMARY_KEY_FIELD_FIRST_1024_HASH, GetFileMD5(abspath, 1024));
+      setHash.bindValue(UPDATE_HASH_BY_PRIMARY_KEY_FIELD_FIRST_1024_HASH, GetFileMD5(abspath, BytesRangeTool::BytesRangeE::FIRST_1_KB));
       setHash.bindValue(UPDATE_HASH_BY_PRIMARY_KEY_FIELD_ABSOLUTE_PATH, abspath);
       if (!setHash.exec()) {
         LOG_W("set field md5 of[`%s`] failed", qPrintable(abspath));

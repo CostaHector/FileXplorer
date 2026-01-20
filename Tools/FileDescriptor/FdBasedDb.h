@@ -29,13 +29,10 @@ class FdBasedDb : public DbManager {
   };
   static const QString QUERY_KEY_INFO_TEMPLATE;
   static const QString WHERE_NAME_CORE_TEMPLATE;
-  static QStringList VIDEOS_FILTER;
-  static bool mSkipGetDuration;
-  static bool CHECK_TABLE_VOLUME_ONLINE;
 
  private:
-  FD_ERROR_CODE Insert(const QString& tableName, const QSet<qint64>&needInsertFds, const QHash<qint64, QString>& newFd2Pth, int& insertCnt);
-  FD_ERROR_CODE Delete(const QString& tableName, const QSet<qint64>&needDeleteFds, int& deleteCnt);
-  FD_ERROR_CODE Update(const QString& tableName, const QSet<qint64>& needUpdateFds, const QHash<qint64, QString>& newFd2Pth, int& updateCnt);
+  FD_ERROR_CODE Insert(const QString& tableName, const QSet<QByteArray>&needInsertFds, const QHash<QByteArray, QString>& newFd2Pth, int& insertCnt);
+  FD_ERROR_CODE Delete(const QString& tableName, const QSet<QByteArray>&needDeleteFds, int& deleteCnt);
+  FD_ERROR_CODE Update(const QString& tableName, const QSet<QByteArray>& needUpdateFds, const QHash<QByteArray, QString>& newFd2Pth, int& updateCnt);
 };
 #endif  // FDBASEDDB_H

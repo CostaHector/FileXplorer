@@ -41,26 +41,26 @@ private slots:
     const QString expectHash = GetHashPlatformDependent(fileAbsPath);
     QVERIFY(!expectHash.isEmpty());
 
-    const QString actualHash = GetFileMD5(fileAbsPath, -1, QCryptographicHash::Algorithm::Md5);
+    const QString actualHash = GetFileMD5(fileAbsPath, BytesRangeTool::BytesRangeE::ENTIRE_FILE, QCryptographicHash::Algorithm::Md5);
     QCOMPARE(actualHash, expectHash);
   }
 
   // 测试字节数组MD5计算
   void test_ByteArrayMD5() {
     // 空数组
-    QString s1 = MD5Calculator::GetByteArrayMD5(QByteArray{});
-    QCOMPARE(s1, QString("d41d8cd98f00b204e9800998ecf8427e"));
+    QByteArray s1 = MD5Calculator::GetByteArrayMD5(QByteArray{});
+    QCOMPARE(s1, "d41d8cd98f00b204e9800998ecf8427e");
 
     // 短数组
-    QString s2 = MD5Calculator::GetByteArrayMD5(QByteArray{"Hello"});
-    QCOMPARE(s2, QString("8b1a9953c4611296a827abf8c47804d7"));
+    QByteArray s2 = MD5Calculator::GetByteArrayMD5(QByteArray{"Hello"});
+    QCOMPARE(s2, "8b1a9953c4611296a827abf8c47804d7");
 
     // 相同内容应产生相同MD5
-    QString s3 = MD5Calculator::GetByteArrayMD5(QByteArray{"Hello"});
+    QByteArray s3 = MD5Calculator::GetByteArrayMD5(QByteArray{"Hello"});
     QCOMPARE(s2, s3);
 
     // 不同内容应产生不同MD5
-    QString s4 = MD5Calculator::GetByteArrayMD5(QByteArray{"World"});
+    QByteArray s4 = MD5Calculator::GetByteArrayMD5(QByteArray{"World"});
     QVERIFY(s2 != s4);
   }
 
@@ -72,7 +72,7 @@ private slots:
     QVERIFY(tDir.touch(filePath, content));
 
     // 计算MD5
-    QString md5 = MD5Calculator::GetFileMD5(tDir.itemPath(filePath));
+    QByteArray md5 = MD5Calculator::GetFileMD5(tDir.itemPath(filePath));
 
     // 验证结果
     QCOMPARE(md5, MD5Calculator::GetByteArrayMD5(content));
@@ -97,7 +97,7 @@ private slots:
     }
 
     // 计算批量MD5
-    QStringList md5s = MD5Calculator::GetBatchFileMD5(absPaths);
+    QList<QByteArray> md5s = MD5Calculator::GetBatchFileMD5(absPaths);
 
     // 验证结果
     QCOMPARE(md5s.size(), 3);
@@ -120,7 +120,7 @@ private slots:
     QString html = MD5Calculator::DisplayFilesMD5({absPath});
 
     // 验证结果
-    QString expectedMD5 = MD5Calculator::GetByteArrayMD5(content);
+    QByteArray expectedMD5 = MD5Calculator::GetByteArrayMD5(content);
     QVERIFY(html.contains(expectedMD5));
     QVERIFY(html.contains("file(s)"));
     QVERIFY(html.contains("<table>"));
