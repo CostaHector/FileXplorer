@@ -665,6 +665,29 @@
     </message>
 </context>
 <context>
+    <name>MD5Window</name>
+    <message>
+        <location filename="../Component/MD5Window.cpp" line="+25"/>
+        <source>First 16 Bytes</source>
+        <translation>首16字节</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Sample 128 kBytes</source>
+        <translation>均匀128kB</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Sample 512 kBytes (Balanced)</source>
+        <translation>均匀512kB</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Entire File</source>
+        <translation>全文件字节</translation>
+    </message>
+</context>
+<context>
     <name>MovieDBActions</name>
     <message>
         <location filename="../Actions/MovieDBActions.cpp" line="+12"/>

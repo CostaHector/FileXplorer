@@ -113,7 +113,7 @@ class EnumIntActionTest : public PlainTestSuite {
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<BytesRangeTool::BytesRangeE>(  //
-        BytesRangeTool::BytesRangeE::FIRST_16,          //
+        BytesRangeTool::BytesRangeE::FIRST_16_BYTES,          //
         BytesRangeTool::BytesRangeE::ENTIRE_FILE,       //
         BytesRangeTool::DEFAULT_BYTE_RANGE,             //
         QActionGroup::ExclusionPolicy::Exclusive);

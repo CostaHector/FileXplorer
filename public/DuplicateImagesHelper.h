@@ -7,7 +7,7 @@
 #define DUP_IMAGE_META_INFO_KEY_MAPPING \
   DUP_IMAGE_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \
   DUP_IMAGE_META_INFO_KEY_ITEM(Size, 1, qint64, DataFormatter::formatFileSizeGMKB) \
-  DUP_IMAGE_META_INFO_KEY_ITEM(MD5, 2, QString, DataFormatter::formatDefault) \
+  DUP_IMAGE_META_INFO_KEY_ITEM(MD5, 2, QByteArray, DataFormatter::formatDefault) \
   DUP_IMAGE_META_INFO_KEY_ITEM(AbsPath, 3, QString, DataFormatter::formatDefault)
 
 namespace DuplicateImageMetaInfo {

@@ -7,7 +7,7 @@
 
 namespace MD5Calculator {
 
-QString GetFileMD5(const QString& filepath, const int firstBytesRangeInt, QCryptographicHash::Algorithm alg) {
+QByteArray GetFileMD5(const QString& filepath, const BytesRangeTool::BytesRangeE firstBytesRangeInt, QCryptographicHash::Algorithm alg) {
   QFile file{filepath};
   if (!file.exists()) {
     LOG_W("file[%s] not found", qPrintable(filepath));
@@ -17,27 +17,53 @@ QString GetFileMD5(const QString& filepath, const int firstBytesRangeInt, QCrypt
     LOG_D("file[%s] open failed", qPrintable(filepath));
     return "";
   }
-  if (firstBytesRangeInt > 0) {
-    const QString ans = GetByteArrayMD5(file.read(firstBytesRangeInt), alg);
-    file.close();
-    return ans;
+  const qint64 sz = file.size();
+  const int bytesShouldRead = BytesRangeTool::toBytesValue(firstBytesRangeInt);
+  if (firstBytesRangeInt != BytesRangeTool::BytesRangeE::ENTIRE_FILE) {
+    switch (firstBytesRangeInt) {
+      case BytesRangeTool::BytesRangeE::FIRST_16_BYTES:
+        return GetByteArrayMD5(file.read(16), alg);
+      case BytesRangeTool::BytesRangeE::FIRST_1_KB:
+        return GetByteArrayMD5(file.read(1024), alg);
+      case BytesRangeTool::BytesRangeE::SAMPLED_128_KB:
+      case BytesRangeTool::BytesRangeE::SAMPLED_512_KB: {
+        if (sz < bytesShouldRead) {
+          break;
+        }
+        static constexpr int SAMPLE_TIME = 8;
+        const int blockSizeEachTimeRead = bytesShouldRead / SAMPLE_TIME;
+        const qint64 interval = sz / SAMPLE_TIME;
+        QCryptographicHash md5(alg);
+        int readTime = 0;
+        do {
+          md5.addData(file.read(blockSizeEachTimeRead));
+          ++readTime;
+        } while(readTime < SAMPLE_TIME && file.seek(readTime * interval));
+        return md5.result().toHex();
+      }
+      case BytesRangeTool::BytesRangeE::ENTIRE_FILE:
+      default:
+        break;
+    }
   }
   QCryptographicHash md5(alg);
   while (!file.atEnd()) {
-    md5.addData(file.read(BYTE_8));
+    md5.addData(file.read(8 * 1024));
   }
   file.close();
   return md5.result().toHex();
 }
 
-QString GetByteArrayMD5(const QByteArray& ba, QCryptographicHash::Algorithm alg) {
+QByteArray GetByteArrayMD5(const QByteArray& ba, QCryptographicHash::Algorithm alg) {
   QCryptographicHash md5(QCryptographicHash::Md5);
   md5.addData(ba);
   return md5.result().toHex();
 }
 
-QStringList GetBatchFileMD5(const QStringList& filepaths, const int firstBytesRangeInt, QCryptographicHash::Algorithm alg) {
-  QStringList md5Lst;
+QList<QByteArray> GetBatchFileMD5(const QStringList& filepaths,
+                                  const BytesRangeTool::BytesRangeE firstBytesRangeInt,
+                                  QCryptographicHash::Algorithm alg) {
+  QList<QByteArray> md5Lst;
   md5Lst.reserve(filepaths.size());
   for (const auto& path : filepaths) {
     QFileInfo fi(path);
@@ -53,45 +79,48 @@ QString DisplayFilesMD5(const QStringList& fileAbsPaths) {
   return MD5PrepathName2Table(GetBatchFileMD5(fileAbsPaths), fileAbsPaths);
 }
 
-QString MD5PrepathName2Table(const QStringList& md5s, const QStringList& fileAbsPaths) {
+QString MD5PrepathName2Table(const QList<QByteArray>& md5s, const QStringList& fileAbsPaths) {
   QStringList fileNames, fileDirs;
   for (const auto& pth : fileAbsPaths) {
     const QFileInfo fi{pth};
-    if (!fi.exists() or !fi.isFile()) {
+    if (!fi.exists() || !fi.isFile()) {
       continue;
     }
     fileNames << fi.fileName();
     fileDirs << fi.absolutePath();
   }
-  return QString("MD5 of %1 file(s)\n").arg(md5s.size()) + MD5DetailHtmlTable(md5s, fileNames, fileDirs);
+  QString nameHashListStr;
+  nameHashListStr += QString::asprintf("MD5 of %d file(s)\n", md5s.size());
+  nameHashListStr += MD5DetailHtmlTable(md5s, fileNames, fileDirs);
+  return nameHashListStr;
 }
 
-QString MD5DetailHtmlTable(const QStringList& md5s, const QStringList& fileNames, const QStringList& fileDirs) {
-  if (not(md5s.size() == fileNames.size() and fileNames.size() == fileDirs.size())) {
+QString MD5DetailHtmlTable(const QList<QByteArray>& md5s, const QStringList& fileNames, const QStringList& fileDirs) {
+  if (!(md5s.size() == fileNames.size() && fileNames.size() == fileDirs.size())) {
     LOG_W("list length unequal. md5s[%d], fileName[%d], fileDirs[%d]", md5s.size(), fileNames.size(), fileDirs.size());
     return "";
   }
   const QString& MD5_TABLE_TEMPLATE{
-                                    "<table>\n"
-                                    "<caption>File Identifiers Info</caption>\n"
-                                    "<tr>\n"
-                                    "<th style=\"border-right:2px solid red\">MD5</th>\n"
-                                    "<th style=\"border-right:2px solid red\">Name</th>\n"
-                                    "<th>Path</th>\n"
-                                    "</tr>\n"
-                                    "%1"
-                                    "\n"
-                                    "</table>"};
+      "<table>\n"
+      "<caption>File Identifiers Info</caption>\n"
+      "<tr>\n"
+      "<th style=\"border-right:2px solid red\">MD5</th>\n"
+      "<th style=\"border-right:2px solid red\">Name</th>\n"
+      "<th>Path</th>\n"
+      "</tr>\n"
+      "%1"
+      "\n"
+      "</table>"};
   const QString& MD5_TABLE_ROW_TEMPLATE{
-                                        "\n"
-                                        "<tr>\n"
-                                        "<td style=\"border-right:2px solid red\">%1</td>\n"
-                                        "<td style=\"border-right:2px solid red\">%2</td>\n"
-                                        "<td>%3</td>\n"
-                                        "</tr>\n"};
+      "\n"
+      "<tr>\n"
+      "<td style=\"border-right:2px solid red\">%1</td>\n"
+      "<td style=\"border-right:2px solid red\">%2</td>\n"
+      "<td>%3</td>\n"
+      "</tr>\n"};
   QString rows;
   for (int i = 0; i < md5s.size(); ++i) {
-    rows += MD5_TABLE_ROW_TEMPLATE.arg(md5s[i]).arg(fileNames[i]).arg(fileDirs[i]);
+    rows += MD5_TABLE_ROW_TEMPLATE.arg(QString::fromUtf8(md5s[i])).arg(fileNames[i]).arg(fileDirs[i]);
   }
   return MD5_TABLE_TEMPLATE.arg(rows);
 }
@@ -161,4 +190,4 @@ QString GetHashPlatformDependent(const QString& absFilePath) {
   return hashResult;
 }
 
-}
+}  // namespace MD5Calculator

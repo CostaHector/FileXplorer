@@ -62,14 +62,22 @@ bool VideoDurationGetter::StartToGet() {
   return true;
 }
 
-int VideoDurationGetter::GetLengthQuick(const QString& vidPath) {
+int VideoDurationGetter::GetLengthQuickStatic(const VideoDurationGetter& self, const QString& vidPath) {
+  return self.GetLengthQuick(vidPath);
+}
+
+QList<int> VideoDurationGetter::GetLengthsQuickStatic(const VideoDurationGetter& self, const QStringList& vidsPath) {
+  return self.GetLengthsQuick(vidsPath);
+}
+
+int VideoDurationGetter::GetLengthQuick(const QString& vidPath) const {
 #ifdef _WIN32
   return mi.VidDurationLengthQuick(vidPath);
 #endif
   return ReadAVideo(vidPath);
 }
 
-QList<int> VideoDurationGetter::GetLengthsQuick(const QStringList& vidsPath) {
+QList<int> VideoDurationGetter::GetLengthsQuick(const QStringList& vidsPath) const {
 #ifdef _WIN32
   return mi.batchVidsDurationLength(vidsPath);
 #endif

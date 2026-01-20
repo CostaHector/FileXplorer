@@ -117,13 +117,8 @@ int JsonTableView::onRenameJsonAndRelated() {
   const QString oldJsonBaseName = _JsonModel->fileBaseName(ind);
 
   bool isInputOk{false};
-  QString newJsonBaseName;
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(isInputOk, newJsonBaseName) = JsonTableViewMock::QryNewJsonBaseNameMock();
-#else
-  newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
+  QString newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
                                           {oldJsonBaseName}, 0, true, &isInputOk);
-#endif
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel rename json and related files", "return");
     return 0;
@@ -155,15 +150,9 @@ int JsonTableView::onSetStudio() {
   }
 
   bool isInputOk{false};
-  QString studio;
   QString inputStudioTitle{"Choose or select studio from drop down list"};
   QString inputStudioHintMsg{"Choose or select studio from drop down list"};
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(isInputOk, studio) = JsonTableViewMock::InputStudioNameMock();
-#else
-  studio = QInputDialog::getItem(this, inputStudioTitle, inputStudioHintMsg, m_studioCandidates, defIndex, true, &isInputOk);
-#endif
-
+  QString studio = QInputDialog::getItem(this, inputStudioTitle, inputStudioHintMsg, m_studioCandidates, defIndex, true, &isInputOk);
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel set studio", "return");
     return 0;
@@ -269,12 +258,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
     tagsOrCast = "";
     const QString clearQryCfm{"Confirm " + fieldOperation};
     const QString clearTagsCastsHintMsg{"Clear text?"};
-    QMessageBox::StandardButton cfmClearBtn = QMessageBox::StandardButton::No;
-#ifdef RUNNING_UNIT_TESTS
-    cfmClearBtn = JsonTableViewMock::clearTagsOrCastsMock() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
-#else
-    cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
-#endif
+    QMessageBox::StandardButton cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
     if (cfmClearBtn != QMessageBox::Yes) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
@@ -284,13 +268,9 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
 
     bool bIsAccept{false};
     QString inputTagsCastsHintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-#ifdef RUNNING_UNIT_TESTS
-    std::tie(bIsAccept, tagsOrCast) = JsonTableViewMock::InputTagsOrCastsMock();
-#else
     tagsOrCast = QInputDialog::getItem(this, fieldOperation, inputTagsCastsHintMsg,  //
                                        candidates, candidates.size() - 1,            //
                                        true, &bIsAccept);
-#endif
     if (!bIsAccept) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;

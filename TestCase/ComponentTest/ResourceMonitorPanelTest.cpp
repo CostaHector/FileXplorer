@@ -20,7 +20,13 @@ namespace {
 
 void get_timestamp(char* buf, size_t len);
 void invoke_get_timestamp(char* buf, size_t len) {
+#ifdef _MSC_VER
   memcpy_s(buf, len, gTimeArray.toStdString().c_str(), gTimeArray.size());
+#elif defined(__clang__) || defined(__GNUC__)
+  memcpy(buf, gTimeArray.toStdString().c_str(), len);
+#else
+  LOG_W("unknow compiles");
+#endif;
 }
 
 class ResourceMonitorPanelTest : public PlainTestSuite {
@@ -94,14 +100,13 @@ private slots:
     const QStringList& twoFloats = twoFloatsStr.split(',', Qt::SplitBehaviorFlags::SkipEmptyParts);
     QCOMPARE(twoFloats.size(), 2);
 
-    bool isFloat{false};
-    float memoryUsed = twoFloats[0].toFloat(&isFloat);
-    QVERIFY(isFloat);
+    bool isMemFloat{false};
+    float memoryUsed = twoFloats[0].toFloat(&isMemFloat);
+    bool isCpuFloat = false;
+    float cpuUsage = twoFloats[1].toFloat(&isCpuFloat);
+    QVERIFY(isMemFloat);
+    QVERIFY(isCpuFloat);
     QVERIFY(std::abs(memoryUsed) < 1E-6);
-
-    isFloat = false;
-    float cpuUsage = twoFloats[1].toFloat(&isFloat);
-    QVERIFY(isFloat);
     QVERIFY(std::abs(cpuUsage) < 1E-6);
   }
 

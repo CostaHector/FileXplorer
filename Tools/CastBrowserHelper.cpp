@@ -71,7 +71,7 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     if (!mi.StartToGet()) {
       return {};
     }
-    int dur = mi.GetLengthQuick(fileAbsPath);
+    int dur = VideoDurationGetter::GetLengthQuickStatic(mi, fileAbsPath);
     detail += QString(R"(<h3>Length: %1</h3>)").arg(DataFormatter::formatDurationISOMs(dur));
   }
 

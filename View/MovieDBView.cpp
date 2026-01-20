@@ -112,7 +112,7 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   return true;
 }
 
-bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) {
+bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const {
   const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
 
   const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
@@ -122,12 +122,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   }
   const QString caption{QString{"Choose a path %1(contains %2) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
 
-  QString selectPath;
-#ifdef RUNNING_UNIT_TESTS
-  selectPath = MovieDBViewMock::GetAPathFromFileDialogMock();
-#else
-  selectPath = QFileDialog::getExistingDirectory(this, caption, lastPath, QFileDialog::ShowDirsOnly);
-#endif
+  QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
     LOG_WARN_NP("User cancel insert, path is not directory", selectPath);
     return false;
@@ -162,13 +157,7 @@ bool MovieDBView::onInsertIntoTable() {
   }
 
   const QString confirmInsertIntoMsg{QString{"%1/* ----->---- Table: %2"}.arg(selectPath).arg(_movieDbSearchBar->GetCurrentTableName())};
-  QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::StandardButton::No;
-#ifdef RUNNING_UNIT_TESTS
-  cfmInsertIntoBtn = MovieDBViewMock::ConfirmInsertIntoMock() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
-#else
-  cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
-#endif
-
+  QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
   if (cfmInsertIntoBtn != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("User cancel insert", selectPath);
     return false;
@@ -234,12 +223,7 @@ bool MovieDBView::onCreateATable() {
                                           .arg(candidates.size())
                                           .arg(candidates.join('\n'))};
   bool isInputOk{false};
-  QString tableNameSpecified;
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(isInputOk, tableNameSpecified) = MovieDBViewMock::InputATableNameMock();
-#else
-  tableNameSpecified = QInputDialog::getItem(this, tableNameInputTitle, tableNameInputHintMsg, candidates, 0, true, &isInputOk);
-#endif
+  QString tableNameSpecified = QInputDialog::getItem(this, tableNameInputTitle, tableNameInputHintMsg, candidates, 0, true, &isInputOk);
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel create table", "return");
     return false;
@@ -307,12 +291,7 @@ int MovieDBView::onDeleteFromTable() {
   const QString deleteWhereQryMsg{QString{"DELETE FROM `%1` WHERE "}.arg(tbl)};
 
   bool okClicked = false;
-  QString whereClause;
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(okClicked, whereClause) = MovieDBViewMock::InputADeleteWhereClauseMock();
-#else
-  whereClause = QInputDialog::getItem(this, deleteWhereQryTitle, deleteWhereQryMsg, candidates, 0, true, &okClicked);
-#endif
+  QString whereClause = QInputDialog::getItem(this, deleteWhereQryTitle, deleteWhereQryMsg, candidates, 0, true, &okClicked);
   if (!okClicked) {
     LOG_OK_NP("[Skip] User cancel delete row", "return");
     return -1;
@@ -349,12 +328,7 @@ bool MovieDBView::onUnionTables() {
   }
   const QString confirmUnionTitle = "Confirm Union?";
   const QString confirmUnionHintMsg{QString{"All %1 tables into Table[%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
-  QMessageBox::StandardButton cfmUnionBtn = QMessageBox::StandardButton::No;
-#ifdef RUNNING_UNIT_TESTS
-  cfmUnionBtn = MovieDBViewMock::ConfirmUnionIntoMock() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
-#else
-  cfmUnionBtn = QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-#endif
+  QMessageBox::StandardButton cfmUnionBtn = QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (cfmUnionBtn != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("[Skip] User cancel union tables", "return");
     return false;
@@ -538,15 +512,9 @@ int MovieDBView::onSetStudio() {
   }
 
   bool isInputOk{false};
-  QString studio;
   QString inputStudioTitle{"Choose or select studio from drop down list"};
   QString inputStudioHintMsg{"Choose or select studio from drop down list"};
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(isInputOk, studio) = MovieDBViewMock::InputStudioNameMock();
-#else
-  studio = QInputDialog::getItem(this, inputStudioTitle, inputStudioHintMsg, m_studioCandidates, defIndex, true, &isInputOk);
-#endif
-
+  QString studio = QInputDialog::getItem(this, inputStudioTitle, inputStudioHintMsg, m_studioCandidates, defIndex, true, &isInputOk);
   if (!isInputOk) {
     LOG_OK_NP("[skip]User cancel set studio", "return");
     return 0;
@@ -575,12 +543,7 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
     tagsOrCast = "";
     const QString clearQryCfm{"Confirm " + fieldOperation};
     const QString clearTagsCastsHintMsg{"Clear text?"};
-    QMessageBox::StandardButton cfmClearBtn = QMessageBox::StandardButton::No;
-#ifdef RUNNING_UNIT_TESTS
-    cfmClearBtn = MovieDBViewMock::clearTagsOrCastsMock() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
-#else
-    cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
-#endif
+    QMessageBox::StandardButton cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
     if (cfmClearBtn != QMessageBox::Yes) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
@@ -590,14 +553,9 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
 
     bool bIsAccept{false};
     QString inputTagsCastsHintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-#ifdef RUNNING_UNIT_TESTS
-    std::tie(bIsAccept, tagsOrCast) = MovieDBViewMock::InputTagsOrCastsMock();
-#else
     tagsOrCast = QInputDialog::getItem(this, fieldOperation, inputTagsCastsHintMsg,  //
                                        candidates, candidates.size() - 1,            //
                                        true, &bIsAccept);
-#endif
-
     if (!bIsAccept) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;

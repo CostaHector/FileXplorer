@@ -14,11 +14,7 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 
 void FdBasedDbModel::setTable(const QString& tableName) {
   QSqlTableModel::setTable(tableName);
-#ifdef RUNNING_UNIT_TESTS
-  m_rootPath = MountPathTableNameMapper::toMountPathMock(tableName);
-#else
   m_rootPath = MountPathTableNameMapper::toMountPath(tableName);
-#endif
   LOG_D("tableName:%s, m_rootPath:%s", qPrintable(tableName), qPrintable(m_rootPath));
 }
 
@@ -67,14 +63,14 @@ QString FdBasedDbModel::fullInfo(const QModelIndex& curIndex) const {
 
 void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, studio);
+    setDataStatic(*this, ind, studio);
   }
 }
 
 void FdBasedDbModel::SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence) {
   QString strLst{NameTool::CastTagSentenceParse2Str(sentence, true)};
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, strLst);
+    setDataStatic(*this, ind, strLst);
   }
 }
 
@@ -89,7 +85,7 @@ void FdBasedDbModel::AddCastOrTags(const QModelIndexList& tagColIndexes, const Q
       beforeStr += NameTool::CSV_COMMA;
     }
     beforeStr += sentence;
-    setData(ind, NameTool::CastTagSentenceParse2Str(beforeStr, true));
+    setDataStatic(*this, ind, NameTool::CastTagSentenceParse2Str(beforeStr, true));
   }
 }
 
@@ -98,7 +94,7 @@ void FdBasedDbModel::RmvCastOrTags(const QModelIndexList& tagColIndexes, const Q
     return;
   }
   foreach (const QModelIndex& ind, tagColIndexes) {
-    setData(ind, NameTool::CastTagSentenceRmvEle2Str(                                 //
+    setDataStatic(*this, ind, NameTool::CastTagSentenceRmvEle2Str(                                 //
                      QSqlTableModel::data(ind, Qt::DisplayRole).toString(),  //
                      cast));
   }

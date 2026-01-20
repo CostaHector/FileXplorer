@@ -94,36 +94,6 @@ bool DbManager::DropAllTablesForTest(const QString& connName) {
   }
   return true;
 }
-
-// recommend in Singleton!
-bool DbManager::DropDatabaseForTest(const QString& dbFullName, const bool bRecycle) {
-  if (!dbFullName.endsWith(".db", Qt::CaseSensitivity::CaseInsensitive)) {
-    LOG_E("Skip file[%s] is not .db", qPrintable(dbFullName));
-    return false;
-  }
-  static const auto rmvIfFileExist = [](const QString& path) -> bool { return !QFile::exists(path) || QFile(path).remove(); };
-  static const auto recycleIfFileExist = [](const QString& path) -> bool { return !QFile::exists(path) || QFile::moveToTrash(path); };
-  static const std::function<bool(const QString&)> FileProc[2]{rmvIfFileExist, recycleIfFileExist};
-  FileProc[bRecycle](dbFullName + "-shm");
-  FileProc[bRecycle](dbFullName + "-wal");
-  if (!FileProc[bRecycle](dbFullName)) {
-    LOG_E("RecycleOrRemove .db file[%s] failed", qPrintable(dbFullName));
-    return false;
-  }
-  return true;
-}
-
-// recommend in auto object not static/global variant the lifetime through the program
-bool DbManager::DeleteDatabaseIselfForTest(bool bRecyle) {
-  if (!mIsValid) {
-    LOG_W("invalid cannot drop database");
-    return false;
-  }
-  ReleaseConnection();
-  DropDatabaseForTest(mDbName, bRecyle);
-  mIsValid = false;
-  return true;
-}
 #endif
 
 DbManager::DbManager(const QString& dbName, const QString& connName, QObject* parent)  //
@@ -248,6 +218,7 @@ int DbManager::UpdateForTest(const QString& qryCmd) const {
 }
 
 bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QString>& vals) const {
+  vals.clear();
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return false;
@@ -267,6 +238,7 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QStrin
 }
 
 bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<int>& vals) const {
+  vals.clear();
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return false;
@@ -285,7 +257,8 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<int>& 
   return true;
 }
 
-bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<qint64>& vals) const {
+bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<QByteArray>& vals) const {
+  vals.clear();
   auto db = GetDb();
   if (!CheckValidAndOpen(db)) {
     return false;
@@ -298,7 +271,7 @@ bool DbManager::QueryPK(const QString& tableName, const QString& pk, QSet<qint64
     return false;
   }
   while (qry.next()) {
-    vals << qry.value(pk).toLongLong();
+    vals << qry.value(pk).toByteArray();
   }
   LOG_D("%d records find by [%s]", vals.size(), qPrintable(qryCmd));
   return true;
@@ -353,13 +326,8 @@ int DbManager::DeleteByWhereClause(const QString& tableName, const QString& wher
   return affectedRows;
 }
 
-bool DbManager::IsTableVolumeOnline(const QString& tableName) const {
-  QString mountPath;
-#ifdef RUNNING_UNIT_TESTS
-  mountPath = MountPathTableNameMapper::toMountPathMock(tableName);
-#else
-  mountPath = MountPathTableNameMapper::toMountPath(tableName);
-#endif
+bool DbManager::IsTableVolumeOnline(const QString& tableName) {
+  QString mountPath = MountPathTableNameMapper::toMountPath(tableName);
   return QFileInfo(mountPath).isDir();
 }
 

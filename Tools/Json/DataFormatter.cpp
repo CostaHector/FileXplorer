@@ -1,6 +1,5 @@
 #include "DataFormatter.h"
 #include "SortedUniqStrLst.h"
-#include "MD5Calculator.h"
 #include "NameTool.h"
 #include <QJsonObject>
 #include <QJsonValue>
@@ -266,14 +265,5 @@ QString formatDurationISOMs(const qint64 ms) {
 }
 QString formatDurationISO(const qint64 ms) {
   return QTime::fromMSecsSinceStartOfDay(ms).toString(Qt::ISODate);
-}
-QString formatMd5ByPathFirst8Byte(const QString& fileAbspath) {
-  return MD5Calculator::GetFileMD5(fileAbspath, MD5Calculator::BYTE_8);
-}
-QString formatMd5ByPathFirst1MillionByte(const QString& fileAbspath) {
-  return MD5Calculator::GetFileMD5(fileAbspath, MD5Calculator::BYTE_1024);
-}
-QString formatMd5ByPath(const QString& fileAbspath) {
-  return MD5Calculator::GetFileMD5(fileAbspath, -1); // entire file
 }
 }  // namespace DataFormatter

@@ -14,6 +14,12 @@
 #include "TDir.h"
 #include "PathTool.h"
 #include "SqlTableTestPreconditionTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+
 using namespace SqlTableTestPreconditionTool;
 
 class FdBasedDbModelTest : public PlainTestSuite {

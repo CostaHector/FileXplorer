@@ -9,17 +9,32 @@
 #include "BeginToExposePrivateMember.h"
 #include "DatabaseSearchToolBar.h"
 #include "EndToExposePrivateMember.h"
+#include "MountHelper.h"
+#include "MountPathTableNameMapperMock.h"
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class DatabaseSearchToolBarTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
   void initTestCase() {
+    GlobalMockObject::reset();
+    using namespace MountPathTableNameMapper;
+    using namespace MountPathTableNameMapperMock;
+    MOCKER(toMountPath).stubs().will(invoke(invokeToMountPath));
+    MOCKER(toTableName).stubs().will(invoke(invokeToTableName));
+
     Configuration().clear();
     MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(false, "");
   }
 
   void cleanupTestCase() {
+    GlobalMockObject::verify();
+
     Configuration().clear();
     MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(false, "");
   }
@@ -30,7 +45,7 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     QWidget parent;
     MovieDBSearchToolBar mdbSearchBar{"MovieSearchToolBarTest", &parent};
     QVERIFY(mdbSearchBar.m_whereCB != nullptr);
-    QVERIFY(mdbSearchBar.m_whereCB->count() >= 2);  // at least 2 where clause
+    QVERIFY(mdbSearchBar.m_whereCB->count() >= 2); // at least 2 where clause
     auto* lineEdit = mdbSearchBar.m_whereCB->lineEdit();
     QVERIFY(lineEdit != nullptr);
     mdbSearchBar.InitCurrentIndex();
@@ -46,16 +61,16 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
 
     auto* tableCB = mdbSearchBar.m_tablesCB;
     QVERIFY(tableCB != nullptr);
-    QCOMPARE(tableCB->isEditable(), false);              // cannot edit by user directly
-    QCOMPARE(tableCB->count(), 0);                       // no candidates. because InitTables not called until castView get Initialized
-    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "");  // no drop table
+    QCOMPARE(tableCB->isEditable(), false);             // cannot edit by user directly
+    QCOMPARE(tableCB->count(), 0);                      // no candidates. because InitTables not called until castView get Initialized
+    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), ""); // no drop table
 
     QSignalSpy movieTableChangedSpy(&mdbSearchBar, &MovieDBSearchToolBar::movieTableChanged);
-    mdbSearchBar.AddATable("Disk_GUID");  // in linux rootpath=""
+    mdbSearchBar.AddATable("Disk_GUID"); // in linux rootpath=""
     tableCB->setCurrentIndex(0);
     QCOMPARE(mdbSearchBar.m_tablesCB->count(), 1);
 
-    const QString fullPath = tableCB->currentText();  // guid|rootpath
+    const QString fullPath = tableCB->currentText(); // guid|rootpath
     emit tableCB->currentTextChanged(fullPath);
     QList<QVariant> movieTableParams = movieTableChangedSpy.back();
     QCOMPARE(movieTableParams.size(), 1);
@@ -64,14 +79,14 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     QCOMPARE(tableCB->currentText(), fullPath);
 
     MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(false, "Disk_GUID");
-    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "");  // drop current text table by default
+    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), ""); // drop current text table by default
 
     MovieDBSearchToolBarMock::QryDropWhichTableMock() = std::pair<bool, QString>(true, "Disk_GUID");
-    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "Disk_GUID");  // drop current text table by default
+    QCOMPARE(mdbSearchBar.AskUserDropWhichTable(), "Disk_GUID"); // drop current text table by default
 
     QStringList validTableNames{"_mnt_DISKS_DD2", "C__home_DISKS_DD2"};
     mdbSearchBar.InitTables(validTableNames);
-    QCOMPARE(mdbSearchBar.m_tablesCB->count(), validTableNames.size());  // the former 1 table name in combobox will be cleared
+    QCOMPARE(mdbSearchBar.m_tablesCB->count(), validTableNames.size()); // the former 1 table name in combobox will be cleared
     mdbSearchBar.m_tablesCB->setCurrentText("_mnt_DISKS_DD2");
     QCOMPARE(mdbSearchBar.GetMovieTableMountPath(), "/mnt/DISKS/DD2");
     mdbSearchBar.m_tablesCB->setCurrentText("C__home_DISKS_DD2");
@@ -87,9 +102,9 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     CastDatabaseSearchToolBar mCastSearchBar{"MovieSearchToolBarTest", &parent};
 
     QVERIFY(mCastSearchBar.m_whereCB != nullptr);
-    QVERIFY(mCastSearchBar.m_whereCB->count() >= 2);  // at least 2 where clause
+    QVERIFY(mCastSearchBar.m_whereCB->count() >= 2); // at least 2 where clause
 
-    auto* lineEdit = mCastSearchBar.m_whereCB->lineEdit();
+    QLineEdit* lineEdit = mCastSearchBar.m_whereCB->lineEdit();
     QVERIFY(lineEdit != nullptr);
 
     QSignalSpy whereClauseChangedSpy(&mCastSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged);

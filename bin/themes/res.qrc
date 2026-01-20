@@ -240,9 +240,10 @@
 
     <!--Browser Icon here-->
     <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
-    <file alias="ONLY_FIRST_8_BYTES">Browser/ONLY_FIRST_8_BYTES.svg</file>
-    <file alias="ONLY_FIRST_16_BYTES">Browser/ONLY_FIRST_16_BYTES.svg</file>
-    <file alias="ONLY_EVERY_BYTES">Browser/ONLY_EVERY_BYTES.svg</file>
+    <file alias="FILE_FIRST_16_BYTES">Browser/FILE_FIRST_16_BYTES.svg</file>
+    <file alias="FILE_RATIO_128KB">Browser/FILE_RATIO_128KB.svg</file>
+    <file alias="FILE_RATIO_512KB">Browser/FILE_RATIO_512KB.svg</file>
+    <file alias="ENTIRE_FILE_BYTES">Browser/ENTIRE_FILE_BYTES.svg</file>
     <file alias="SEARCH_MULTI_KEYWORDS">Browser/SEARCH_MULTI_KEYWORDS.svg</file>
     <file alias="SEARCH_CHOICE">Browser/SEARCH_CHOICE.svg</file>
     <file alias="EDITOR_MODE">Browser/EDITOR_MODE.svg</file>

@@ -18,8 +18,8 @@ private slots:
 
   void test_operator_call_ok() {
     MD5Window mw;
-    QVERIFY(mw._ONLY_FIRST_8_BYTES != nullptr);
-    QCOMPARE(mw._ONLY_FIRST_8_BYTES->isChecked(), true);
+    QVERIFY(mw._SAMPLED_512_KB != nullptr);
+    QCOMPARE(mw._SAMPLED_512_KB->isChecked(), true);
     QVERIFY(mw._MD5 != nullptr);
     QCOMPARE(mw._MD5->isChecked(), true);
 

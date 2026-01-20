@@ -274,12 +274,12 @@ private slots:
       QCOMPARE(castModel.RefreshVidsForRecords(indexesVids, movieDb.GetDb()), 0); // no records not update
 
       {
-        QSet<qint64> needInsertFds = {1001, 1002, 1003}; // 三个唯一的文件描述符
-        QHash<qint64, QString> newFd2Pth = {
+        QSet<QByteArray> needInsertFds = {"1001", "1002", "1003"}; // 三个唯一的文件描述符
+        QHash<QByteArray, QString> newFd2Pth = {
             // 3 records, 2 of Chris Evans and 1 of Chris Hemsworth
-            {1001, "videos/superhero/Chris Evans 1.mp4"},
-            {1002, "videos/superhero/Chris Evans Captain America.mp4"},
-            {1003, "videos/superhero/Chris Hemsworth.mp4"},
+            {"1001", "videos/superhero/Chris Evans 1.mp4"},
+            {"1002", "videos/superhero/Chris Evans Captain America.mp4"},
+            {"1003", "videos/superhero/Chris Hemsworth.mp4"},
         };
         // 调用Insert函数插入记录
         int insertCnt = 0;

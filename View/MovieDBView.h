@@ -7,54 +7,6 @@
 #include "CustomTableView.h"
 #include "JsonKey.h"
 
-namespace MovieDBViewMock {
-
-inline std::pair<bool, QString>& InputATableNameMock() {
-  static std::pair<bool, QString> accept2TableNamePair;
-  return accept2TableNamePair;
-}
-inline std::pair<bool, QString>& InputADeleteWhereClauseMock() {
-  static std::pair<bool, QString> accept2deleteWhereClause;
-  return accept2deleteWhereClause;
-}
-inline std::pair<bool, QString>& InputStudioNameMock() {
-  static std::pair<bool, QString> accept2StudioName;
-  return accept2StudioName;
-}
-inline bool& clearTagsOrCastsMock() {
-  static bool bClearTagsOrCasts;
-  return bClearTagsOrCasts;
-}
-inline std::pair<bool, QString>& InputTagsOrCastsMock() {
-  static std::pair<bool, QString> accept2TagsOrCasts;
-  return accept2TagsOrCasts;
-}
-inline QString& GetAPathFromFileDialogMock() {
-  static QString pathFromFileDialog;
-  return pathFromFileDialog;
-}
-inline bool& ConfirmInsertIntoMock() {
-  static bool bConfirmInsertInto = false;
-  return bConfirmInsertInto;
-}
-inline bool& ConfirmUnionIntoMock() {
-  static bool bConfirmUnionInto = false;
-  return bConfirmUnionInto;
-}
-
-inline void clear() {
-  MovieDBViewMock::InputATableNameMock() = std::pair<bool, QString>(false, "");
-  MovieDBViewMock::InputADeleteWhereClauseMock() = std::pair<bool, QString>(false, "");
-  MovieDBViewMock::InputStudioNameMock() = std::pair<bool, QString>(false, "");
-  MovieDBViewMock::clearTagsOrCastsMock() = false;
-  MovieDBViewMock::InputTagsOrCastsMock() = std::pair<bool, QString>(false, "");
-  MovieDBViewMock::GetAPathFromFileDialogMock() = "";
-  MovieDBViewMock::ConfirmInsertIntoMock() = false;
-  MovieDBViewMock::ConfirmUnionIntoMock() = false;
-}
-
-}
-
 class MovieDBView : public CustomTableView {
 public:
   MovieDBView(FdBasedDbModel* model_,              //
@@ -88,7 +40,7 @@ public:
 
   // should not call ~destructure after getDb() and pass to QSqlTableModel
 private:
-  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected);
+  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const;
   bool IsHasSelection(const QString& msg = "") const;
 
   FdBasedDbModel* _dbModel{nullptr};

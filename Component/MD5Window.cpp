@@ -7,40 +7,74 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QMimeData>
+#include <QMetaEnum>
 
+QString algorithmToString(QCryptographicHash::Algorithm alg) {
+  QMetaEnum metaEnum = QMetaEnum::fromType<QCryptographicHash::Algorithm>();  // 获取元枚举
+  const char* name = metaEnum.valueToKey(static_cast<int>(alg));
+  if (name == nullptr) {
+    return QString::asprintf("Unknown[%d]", alg);
+  }
+  return QString::asprintf("%s[%d]", name, alg);
+}
+// each cell 16kB
+// dimension: 8*8
+// total = 16 * 64 = 1024kB
 MD5Window::MD5Window(QWidget* parent) : QDialog{parent} {
-  _ONLY_FIRST_8_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_FIRST_8_BYTES"}, "Only First 8 Bytes", this};
-  _ONLY_FIRST_8_BYTES->setCheckable(true);
-
-  _ONLY_FIRST_16_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_FIRST_16_BYTES"}, "Only First 16 Bytes", this};
+  // 优化后的 QAction 创建
+  _ONLY_FIRST_16_BYTES = new (std::nothrow) QAction{QIcon{":img/FILE_FIRST_16_BYTES"}, tr("First 16 Bytes"), this};
   _ONLY_FIRST_16_BYTES->setCheckable(true);
+  _ONLY_FIRST_16_BYTES->setToolTip(
+      "Use only the first 16 bytes of the file to calculate the hash.\n"
+      "Quick method that balances speed and uniqueness.");
+  _ONLY_FIRST_16_BYTES->setStatusTip("Calculate hash using first 16 bytes of the file");
 
-  _ONLY_ENTIRE_FILE_BYTES = new (std::nothrow) QAction{QIcon{":img/ONLY_EVERY_BYTES"}, "Every Bytes", this};
-  _ONLY_ENTIRE_FILE_BYTES->setCheckable(true);
+  _SAMPLED_128_KB = new (std::nothrow) QAction{QIcon(":img/FILE_RATIO_128KB"), tr("Sample 128 kBytes"), this};
+  _SAMPLED_128_KB->setCheckable(true);
+  _SAMPLED_128_KB->setToolTip(
+      "Sample 8 equally spaced 16kB chunks (total 128kB) to calculate hash.\n"
+      "Suitable for medium-sized files, balances speed and accuracy.");
+  _SAMPLED_128_KB->setStatusTip("Sample 16 chunks of 8192 bytes for hash calculation");
+
+  _SAMPLED_512_KB = new (std::nothrow) QAction{QIcon(":img/FILE_RATIO_512KB"), tr("Sample 512 kBytes (Balanced)"), this};
+  _SAMPLED_512_KB->setCheckable(true);
+  _SAMPLED_512_KB->setToolTip(
+      "Sample 16 equally spaced 32kB chunks (total 512kB) to calculate hash.\n"
+      "Recommended for most files, provides good accuracy with reasonable speed.");
+  _SAMPLED_512_KB->setStatusTip("Sample 32 chunks of 8192 bytes for balanced hash calculation");
+
+  _ENTIRE_FILE_BYTES = new (std::nothrow) QAction{QIcon{":img/ENTIRE_FILE_BYTES"}, tr("Entire File"), this};
+  _ENTIRE_FILE_BYTES->setCheckable(true);
+  _ENTIRE_FILE_BYTES->setToolTip(
+      "Use the entire file content to calculate the hash.\n"
+      "Slowest but most accurate method, ensures zero collision risk.");
+  _ENTIRE_FILE_BYTES->setStatusTip("Calculate hash using the entire file content");
+
   {
     using namespace BytesRangeTool;
-    mBytesRangeIntAct.init({{_ONLY_FIRST_8_BYTES,     BytesRangeE::FIRST_8},      //
-                            {_ONLY_FIRST_16_BYTES,    BytesRangeE::FIRST_16},     //
-                            {_ONLY_ENTIRE_FILE_BYTES, BytesRangeE::ENTIRE_FILE}}, //
+    mBytesRangeIntAct.init({{_ONLY_FIRST_16_BYTES, BytesRangeE::FIRST_16_BYTES},  //
+                            {_SAMPLED_128_KB, BytesRangeE::SAMPLED_128_KB},           //
+                            {_SAMPLED_512_KB, BytesRangeE::SAMPLED_512_KB},           //
+                            {_ENTIRE_FILE_BYTES, BytesRangeE::ENTIRE_FILE}},      //
                            BytesRangeTool::DEFAULT_BYTE_RANGE, QActionGroup::ExclusionPolicy::Exclusive);
     mBytesRangeIntAct.setCheckedIfActionExist(BytesRangeTool::DEFAULT_BYTE_RANGE);
   }
 
-  _MD5    = new (std::nothrow) QAction{"Md5", this};
+  _MD5 = new (std::nothrow) QAction{algorithmToString(QCryptographicHash::Algorithm::Md5), this};
   _MD5->setCheckable(true);
-  _SHA1   = new (std::nothrow) QAction{"Sha1", this};
+  _SHA1 = new (std::nothrow) QAction{algorithmToString(QCryptographicHash::Algorithm::Sha1), this};
   _SHA1->setCheckable(true);
-  _SHA256 = new (std::nothrow) QAction{"Sha256", this};
+  _SHA256 = new (std::nothrow) QAction{algorithmToString(QCryptographicHash::Algorithm::Sha256), this};
   _SHA256->setCheckable(true);
-  _SHA512 = new (std::nothrow) QAction{"Sha512", this};
+  _SHA512 = new (std::nothrow) QAction{algorithmToString(QCryptographicHash::Algorithm::Sha512), this};
   _SHA512->setCheckable(true);
   {
-    mHashAlgIntAct.init({{_MD5,    QCryptographicHash::Algorithm::Md5   },  //
-                         {_SHA1,   QCryptographicHash::Algorithm::Sha1  },  //
-                         {_SHA256, QCryptographicHash::Algorithm::Sha256},  //
-                         {_SHA512, QCryptographicHash::Algorithm::Sha512}}, //
+    mHashAlgIntAct.init({{_MD5, QCryptographicHash::Algorithm::Md5},         //
+                         {_SHA1, QCryptographicHash::Algorithm::Sha1},       //
+                         {_SHA256, QCryptographicHash::Algorithm::Sha256},   //
+                         {_SHA512, QCryptographicHash::Algorithm::Sha512}},  //
                         QCryptographicHash::Algorithm::Md5, QActionGroup::ExclusionPolicy::Exclusive);
-    mHashAlgIntAct.setCheckedIfActionExist(QCryptographicHash::Algorithm::Md5);    
+    mHashAlgIntAct.setCheckedIfActionExist(QCryptographicHash::Algorithm::Md5);
   }
   auto* pHashAlgorithmMenu = new (std::nothrow) QMenu{"Algorithm Menu", this};
   pHashAlgorithmMenu->addActions(mHashAlgIntAct.getActionEnumAscendingList());
@@ -80,7 +114,7 @@ int MD5Window::operator()(const QStringList& absPaths) {
   const int bytesRange = BytesRangeTool::toBytesValue(curBytesRangeE);
 
   const QCryptographicHash::Algorithm alg = mHashAlgIntAct.curVal();
-  const QString bytesRangeAndAlgorithmStr{QString::asprintf("[%03d|%03d]", bytesRange, (int)alg)};
+  const QString bytesRangeAndAlgorithmStr{QString::asprintf("[%s|%03d]", BytesRangeTool::c_str(curBytesRangeE), (int)alg)};
 
   int newCalculatedFileCnt{0}, validFilesCnt{0};
   for (const QString& absPath : absPaths) {
@@ -94,19 +128,19 @@ int MD5Window::operator()(const QStringList& absPaths) {
       mPathsList.push_back(absPath);
     }
 
-    QString md5;
+    QByteArray md5;
     AbsFilePathBytesRangeHashAlgorithmKey key{absPath, bytesRange, alg};
     auto it = mAlreadyCalculatedHashMap.find(key);
-    if (it != mAlreadyCalculatedHashMap.end()) { // no need calculate again
+    if (it != mAlreadyCalculatedHashMap.end()) {  // no need calculate again
       md5 = it.value();
     } else {
       ++newCalculatedFileCnt;
-      md5 = MD5Calculator::GetFileMD5(absPath, bytesRange, alg);
+      md5 = MD5Calculator::GetFileMD5(absPath, curBytesRangeE, alg);
       mAlreadyCalculatedHashMap[key] = md5;
     }
     m_md5TextEdit->appendPlainText(md5 + ':' + bytesRangeAndAlgorithmStr + ':' + absPath);
   }
-  m_md5TextEdit->appendPlainText(""); // add an empty line
+  m_md5TextEdit->appendPlainText("");  // add an empty line
 
   setWindowTitle(QString("MD5 | %1 file(s)").arg(validFilesCnt));
   LOG_OK_P("MD5 calculated ok", "+%d/%d file(s)", newCalculatedFileCnt, validFilesCnt);

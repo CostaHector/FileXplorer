@@ -63,6 +63,7 @@ file(GLOB SOURCES
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
+    MockTool/*.cpp
     ModelTest/*.cpp
     publicTest/*.cpp
     pubTestTool/*.cpp
@@ -103,6 +104,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/View/DupVideos
     ./
     pubTestTool
+    MockTool
 )
 
 file(GLOB HEADERS
@@ -128,6 +130,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/View/DupVideos/*.h
     pubTestTool/*.h
+    MockTool/*.h
 )
 
 SET(MOCKCPP_SRC_ROOT ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-src)
@@ -136,9 +139,11 @@ include(FetchContent)
 FetchContent_Declare(
   mockcpp
   GIT_REPOSITORY git@github.com:CostaHector/mockcpp.git
-  GIT_TAG v2.8
+  GIT_TAG v2.9
   GIT_SHALLOW TRUE
   GIT_PROGRESS TRUE
+  SOURCE_DIR ${MOCKCPP_SRC_ROOT}
+  BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-build
 )
 FetchContent_MakeAvailable(mockcpp)
 
@@ -195,17 +200,26 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mockcpp
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
-
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi)
+    # 1. mediaInfo
+    set(mediaInfoPath "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
+    if (NOT EXISTS ${mediaInfoPath})
+        message(FATAL_ERROR "mediainfo.dll not found at: ${mediaInfoPath}\n.")
+    endif()
+    target_link_directories(${PROJECT_NAME} PRIVATE ${mediaInfoPath})
+    target_link_libraries(${PROJECT_NAME} PRIVATE mediaInfo)
 
-    find_library(DWMWAPI_LIBRARY dwmapi)
-    find_library(SHLWAPI_LIBRARY shlwapi)
+    # 2. APIS need
+    # Desktop Window Manager API（桌面窗口管理器API）
+    # Shell Lightweight Utility API（Shell轻量实用工具API）
+    # Process Status API(Windows) cpu/memory usage
+    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
 
-    target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi shlwapi mediaInfo)
+    # 3. unpack "ffmpeg-7.1.1-full_build-shared.7z" to "C:/home/ffmpeg" needed
     set(ffmpegpath "C:/home/ffmpeg")
-
+    if(NOT EXISTS ${ffmpegpath})
+        message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack ffmpeg-7.1.1-full_build-shared.7z to [${ffmpegpath}].")
+    endif()
     target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 Qt5::Core
         "${ffmpegpath}/lib/avformat.lib"
@@ -213,39 +227,36 @@ if(WIN32)
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
 
-    # OpenSSL configuration for Windows
-    # Set OpenSSL paths
+    # 4. OpenSSL configuration for Windows
+    # Install "Win64OpenSSL-3_5_4.msi" to path "C:/Program Files/OpenSSL-Win64"
+    # Copy OpenSSL DLLs to: The OpenSSL binaries (/bin) directory
     set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-
-    # Include directories
+    if(NOT EXISTS ${OPENSSL_ROOT_DIR})
+        message(FATAL_ERROR "OpenSSL not found at: ${OPENSSL_ROOT_DIR}\n. Please install OpenSSL or set the correct path.")
+    endif()
     include_directories("${OPENSSL_ROOT_DIR}/include")
-
-    # Library paths
     link_directories("${OPENSSL_ROOT_DIR}/lib")
     link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
-
-    # Debug vs Release library selection
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_link_libraries(${PROJECT_NAME} PRIVATE
             "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
             "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
         )
-        message(STATUS "Linking with OpenSSL Debug libraries")
     else()
         target_link_libraries(${PROJECT_NAME} PRIVATE
             "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
             "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
         )
-        message(STATUS "Linking with OpenSSL Release libraries")
     endif()
 elseif(UNIX AND NOT APPLE)  # Linux
+    # 1. ffmpeg
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
-
+    # 2. openssl
     find_package(OpenSSL REQUIRED)
     target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
-
+    # 3. PkgConfig Credential
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
     include_directories(${LIBSECRET_INCLUDE_DIRS})

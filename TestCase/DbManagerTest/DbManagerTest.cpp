@@ -11,6 +11,14 @@
 #include <QSqlError>
 #include "DbManagerHelper.h"
 
+#include "MountHelper.h"
+#include "MountPathTableNameMapperMock.h"
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
 class DbManagerTest : public PlainTestSuite {
   Q_OBJECT
 public:
@@ -31,6 +39,12 @@ public:
 
 private slots:
   void initTestCase() {
+    GlobalMockObject::reset();
+    using namespace MountPathTableNameMapper;
+    using namespace MountPathTableNameMapperMock;
+    MOCKER(toMountPath).stubs().will(invoke(invokeToMountPath));
+    MOCKER(toTableName).stubs().will(invoke(invokeToTableName));
+
     QVERIFY(tDir.IsValid());
     QVERIFY(mDBMgr.IsValid());
 
@@ -39,6 +53,8 @@ private slots:
   }
 
   void cleanupTestCase() {
+    GlobalMockObject::verify();
+
     QCOMPARE(InsertTestData(), 4);
     QCOMPARE(mDBMgr.IsTableExist(DB_MANAGER_TEST_TBL_NAME), true);
     mDBMgr.ReleaseConnection();

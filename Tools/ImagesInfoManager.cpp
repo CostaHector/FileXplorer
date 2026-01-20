@@ -42,7 +42,7 @@ IMG_INFO_DATA_T ImagesInfoManager::ReadOutImgsInfo() const {
   while (it.hasNext()) {
     const QString fileAbsPath = it.next();
     const qint64 sz = QFile{fileAbsPath}.size();
-    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
+    const QByteArray& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
     sizeSet.insert(sz);
     hashSet.insert(md5);
     ++filesCnt;
@@ -93,7 +93,7 @@ RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, 
     if (!ImgDataStruct().contains(sz)) {
       continue;
     }
-    const QString& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
+    const QByteArray& md5 = MD5Calculator::GetFileMD5(fileAbsPath);
     if (!ImgDataStruct().contains(md5)) {
       continue;
     }
@@ -130,10 +130,10 @@ RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAls
     if (it.value().size() < 2) {
       continue;
     }
-    QMap<QString, QString> hash2FirstDuplicateFile;
-    QSet<QString> firstDuplicateFileMd5;
+    QMap<QByteArray, QString> hash2FirstDuplicateFile;
+    QSet<QByteArray> firstDuplicateFileMd5;
     for (const auto& absPath : it.value()) {
-      const QString& md5 = MD5Calculator::GetFileMD5(absPath);
+      const QByteArray& md5 = MD5Calculator::GetFileMD5(absPath);
       auto sameMd5It = hash2FirstDuplicateFile.find(md5);
       if (sameMd5It != hash2FirstDuplicateFile.cend()) {
         if (firstDuplicateFileMd5.find(md5) == firstDuplicateFileMd5.end()) {
