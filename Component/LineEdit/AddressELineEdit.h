@@ -20,8 +20,6 @@ class AddressELineEdit : public QStackedWidget {
   explicit AddressELineEdit(QWidget* parent = nullptr);
   ~AddressELineEdit();
 
-  static QString NormToolBarActionPath(QString actionPath);
-
   inline QString pathFromLineEdit() const {  //
     return PathTool::normPath(m_pathComboBox->currentText());
   }
@@ -47,7 +45,9 @@ class AddressELineEdit : public QStackedWidget {
   void onReturnPressed();
   bool ChangePath(const QString& path);
   void onFocusChange(bool hasFocus);
+  bool isClickMode() const;
   void clickMode();
+  bool isInputMode() const;
   void inputMode();
   void subscribe();
 

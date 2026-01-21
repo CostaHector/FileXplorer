@@ -107,18 +107,6 @@ AddressELineEdit::~AddressELineEdit() {
   }
 }
 
-QString AddressELineEdit::NormToolBarActionPath(QString actionPath) {
-#ifdef _WIN32
-  QString pth = actionPath.mid(1);
-  int n = pth.size();
-  if (n >= 2 && pth[n - 2] != ':' && pth[n - 1] == '/')
-    return pth.left(n - 1);
-  return pth;
-#else
-  return actionPath.size() > 1 && actionPath.back() == '/' ? actionPath.left(actionPath.size() - 1) : actionPath;
-#endif
-}
-
 auto AddressELineEdit::onPathActionTriggered(const QAction* cursorAt) -> void {
   const QString fullPth = pathFromCursorAction(cursorAt);
   LOG_D("Path triggered [%s]", qPrintable(fullPth));
@@ -158,23 +146,29 @@ auto AddressELineEdit::subscribe() -> void {
 }
 
 auto AddressELineEdit::onFocusChange(bool hasFocus) -> void {
-  if (hasFocus && currentWidget() != m_pathComboBox) {
+  if (hasFocus && !isInputMode()) {
     inputMode();
-  } else if (!hasFocus && currentWidget() != m_pathActionsTB) {
+  } else if (!hasFocus && !isClickMode()) {
     clickMode();
   }
+}
+bool AddressELineEdit::isClickMode() const {
+  return currentWidget() == m_pathActionsTB;
 }
 
 auto AddressELineEdit::clickMode() -> void {
   setCurrentWidget(m_pathActionsTB);
 }
 
+bool AddressELineEdit::isInputMode() const {
+  return currentWidget() == m_pathComboBox;
+}
 auto AddressELineEdit::inputMode() -> void {
   setCurrentWidget(m_pathComboBox);
 }
 
 void AddressELineEdit::mousePressEvent(QMouseEvent* event) {
-  if (currentWidget() == m_pathActionsTB) {
+  if (isClickMode()) {
     QAction* action = m_pathActionsTB->actionAt(event->pos());
     if (action == nullptr) {  // click at blank area. no action correspond
       emit m_pathComboBox->focusChanged(true);

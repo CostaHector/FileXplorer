@@ -620,7 +620,7 @@ int FdBasedDb::ExportDurationStudioCastTagsToJson(const QString& tableName) cons
   if (!db.tables().contains(tableName)) {
     return FD_OK;  // no need set duration
   }
-
+  // 只要Duration/Studio/Cast/Tags字段有至少一处非空, 那就会刷新该record的这些非空且有异于json的值到对应的json字段.
   QSqlQuery query{db};
   if (!query.prepare(SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
     LOG_W("prepare command[%s] failed: %s",  //
@@ -690,17 +690,16 @@ int FdBasedDb::UpdateStudioCastTagsByJson(const QString& tableName, const QStrin
   if (!db.tables().contains(tableName)) {
     return FD_OK;  // no need update studio/cast/tags
   }
-
+  // 由于json和video的basename完全一致, 所以从json的绝对路径可以获取到PathHash, 即video对应的record的PathHash列
+  // 开始更新该record
   QSqlQuery query{db};
   if (!query.prepare(UPDATE_STUDIO_CAST_TAGS_TEMPLATE.arg(tableName))) {
-    LOG_W("prepare command[%s] failed: %s",  //
-          qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
+    LOG_W("prepare command[%s] failed: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
     return FD_PREPARE_FAILED;
   }
   // 开始事务
   if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s",  //
-          1, qPrintable(db.lastError().text()));
+    LOG_W("start the %dth transaction failed: %s", 1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
