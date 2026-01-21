@@ -298,6 +298,12 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(QFile{dbName}.exists());  // should created
     QCOMPARE(dbManager.ReadADirectory(tableName, path1), 2);
 
+    // 表中studio/performers/tags的字段值将被json字段覆盖
+    const QString updateStudioCmd{QString{R"(UPDATE `%1` SET `%2` = "Hong Meng";)"}.arg(tableName).arg(ENUM_2_STR(Studio))};
+    QCOMPARE(dbManager.UpdateForTest(updateStudioCmd), 2);
+    const QString updateTagsCmd{QString{R"(UPDATE `%1` SET `%2` = "Adventure,Documentary";)"}.arg(tableName).arg(ENUM_2_STR(Tags))};
+    QCOMPARE(dbManager.UpdateForTest(updateTagsCmd), 2);
+
     // no json exists not exist, skip
     QFile::remove(tDir.itemPath("path1/20s.json"));
     QFile::remove(tDir.itemPath("path1/40s.json"));
@@ -305,36 +311,39 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(!tDir.exists("path1/40s.json"));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 0);
 
-    // json studio/performers/tags at least one field empty
+    // 前提: 只要json中的studio/performers/tags有一个字段值非空
+    // 预期: json字段原封不动覆盖写入表中字段(若json字段为空, 则表字段会设置为空)
     using namespace MOVIE_TABLE;
-    QVariantHash keyValueNotFull{{ENUM_2_STR(Studio), "Century"},                                       //
+    QVariantHash keyValueNotFull{{ENUM_2_STR(Studio), "Century"},    //
                                  {ENUM_2_STR(Cast), QStringList()},  //
-                                 {ENUM_2_STR(Tags), QStringList{"Action", "Science"}}};
-    QVERIFY(DumpJsonDict(keyValueNotFull, tDir.itemPath("path1/20s.json")));
-    QVERIFY(tDir.exists("path1/20s.json"));
-    QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 0);
-
-    // json studio/performers/tags all exists
+                                 {ENUM_2_STR(Tags), QStringList()}};
     QVariantHash keyFull{{ENUM_2_STR(Studio), "Fox"},
                          {ENUM_2_STR(Cast), QStringList{"Chris Evans", "Henry Cavill"}},  //
                          {ENUM_2_STR(Tags), QStringList{"Action", "Science"}}};
+    QVERIFY(DumpJsonDict(keyValueNotFull, tDir.itemPath("path1/20s.json")));
     QVERIFY(DumpJsonDict(keyFull, tDir.itemPath("path1/40s.json")));
+    QVERIFY(tDir.exists("path1/20s.json"));
     QVERIFY(tDir.exists("path1/40s.json"));
-    QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 1);
+    QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 2);
 
     const QString selectCentury{R"(SELECT * FROM `%1` WHERE `%2`="Century";)"};
+    const QString selectFox{R"(SELECT * FROM `%1` WHERE `%2`="Fox";)"};
+
     QList<QSqlRecord> centuryList;
     QVERIFY(dbManager.QueryForTest(selectCentury.arg(tableName).arg(ENUM_2_STR(Studio)), centuryList));
-    QVERIFY(centuryList.isEmpty());
+    QCOMPARE(centuryList.size(), 1);
+    const QSqlRecord& centuryRec = centuryList.front();
+    QCOMPARE(centuryRec.value(MOVIE_TABLE::Studio).toString(), "Century");
+    QCOMPARE(centuryRec.value(MOVIE_TABLE::Cast).toString(), "");
+    QCOMPARE(centuryRec.value(MOVIE_TABLE::Tags).toString(), "");
 
-    const QString selectFox{R"(SELECT * FROM `%1` WHERE `%2`="Fox";)"};
     QList<QSqlRecord> foxList;
     QVERIFY(dbManager.QueryForTest(selectFox.arg(tableName).arg(ENUM_2_STR(Studio)), foxList));
     QCOMPARE(foxList.size(), 1);
-    const QSqlRecord& firstRecord = foxList.front();
-    QCOMPARE(firstRecord.value(MOVIE_TABLE::Studio).toString(), "Fox");
-    QCOMPARE(firstRecord.value(MOVIE_TABLE::Cast).toString(), "Chris Evans,Henry Cavill");  // sperated by comma only
-    QCOMPARE(firstRecord.value(MOVIE_TABLE::Tags).toString(), "Action,Science");            // sperated by comma only
+    const QSqlRecord& foxRec = foxList.front();
+    QCOMPARE(foxRec.value(MOVIE_TABLE::Studio).toString(), "Fox");
+    QCOMPARE(foxRec.value(MOVIE_TABLE::Cast).toString(), "Chris Evans,Henry Cavill");  // sperated by comma only
+    QCOMPARE(foxRec.value(MOVIE_TABLE::Tags).toString(), "Action,Science");            // sperated by comma only
   }
 };
 

@@ -18,18 +18,15 @@ class JsonHelperTest : public PlainTestSuite {
  public:
   JsonHelperTest() : PlainTestSuite{} {}
   TDir mDir;
-  const QString mWorkPath{mDir.path()};
-  static const char mJsonContentStr[];
-  static const char mInvalidJsonContentStr[];
  private slots:
-  void initTestCase() {
-    QVERIFY(mDir.IsValid());
-    QVERIFY(mDir.touch("file_with_non_utf8_char.json", mJsonContentStr));
-    QVERIFY(mDir.touch("file_with_extra_trailing_comma_invalid.json", mInvalidJsonContentStr));
+  void initTestCase() { QVERIFY(mDir.IsValid()); }
+
+  void cleanup() {
+    mDir.ClearAll();
   }
 
   void test_GetDefaultJsonFile() {
-    const auto dict = GetJsonDictDefault();
+    const QVariantHash dict = GetJsonDictDefault();
     QCOMPARE(dict[ENUM_2_STR(Name)].toString(), JSON_DEF_VAL_Name);
     QCOMPARE(dict[ENUM_2_STR(Cast)].toStringList(), JSON_DEF_VAL_Cast);
     QCOMPARE(dict[ENUM_2_STR(Studio)].toString(), JSON_DEF_VAL_Studio);
@@ -57,7 +54,7 @@ class JsonHelperTest : public PlainTestSuite {
     QVERIFY(bParseBaOk);
     QCOMPARE(dictFromBa, expectDict);
 
-    { // bounder test
+    {  // bounder test
       // 1.0 empty dict
       const char emptyJsonStr[] = R"({})";
       bool bParseEmptyStr = false;
@@ -81,27 +78,36 @@ class JsonHelperTest : public PlainTestSuite {
   }
 
   void invalid_json_parse_failed() {
-    QString invalidJsonAbsFilePath = mDir.itemPath("file_with_extra_trailing_comma_invalid.json");
-    QVERIFY(QFile::exists(invalidJsonAbsFilePath));
-    QJsonObject jsonObj = GetJsonObject(invalidJsonAbsFilePath);
+    // json含有内容非法, 末尾多了个逗号, 预期解析失败
+    QString invalidJsonName = "file_with_extra_trailing_comma_invalid.json";
+    static constexpr char invalidContents[]{R"({"Name": "Henry Canvill", })"};
+    QVERIFY(mDir.touch(invalidJsonName, invalidContents));
+    const QString invalidJsonFileAbsPath = mDir.itemPath(invalidJsonName);
+    QJsonObject jsonObj = GetJsonObject(invalidJsonFileAbsPath);
     QVERIFY(jsonObj.isEmpty());
   }
 
   void test_GetJsonObject_ByteArrayWriter_contains_non_utf8_char_ok() {  // priority: top 1
-    // contents in json file is below, will recover automatically
-    // precondition
-    QDir dir{mWorkPath};
+    // 预期: 非utf8字符能正确写入/解析
     const QString nonUtf8JsonFileName = "file_with_non_utf8_char.json";
-    QVERIFY(dir.exists(nonUtf8JsonFileName));
-    QFile jsonFi{dir.absoluteFilePath(nonUtf8JsonFileName)};
-    QVERIFY(jsonFi.size() > 0);
-    ON_SCOPE_EXIT {
-      QVERIFY(jsonFi.open(QIODevice::OpenModeFlag::WriteOnly));
-      QVERIFY(jsonFi.write(mJsonContentStr) >= 0);
-      jsonFi.close();
-    };
-
-    const QString jsonAbsPath = dir.absoluteFilePath(nonUtf8JsonFileName);
+    static constexpr char jsonContentsStr[]{
+        R"({
+    "Name": "Frank - 1",
+    "Cast": [],
+    "Studio": "Marvel",
+    "Duration": 0,
+    "Uploaded": "17:22 25-Apr-1999",
+    "Tags": [
+        "comedy"
+    ],
+    "Rate": 0,
+    "Size": "1.00 MiB",
+    "Resolution": "1080p",
+    "Bitrate": "5000 kbps",
+    "Detail": "Frank boy’s adventure."
+})"};
+    QVERIFY(mDir.touch(nonUtf8JsonFileName, jsonContentsStr));
+    const QString jsonAbsPath = mDir.itemPath(nonUtf8JsonFileName);
 
     // load ok (using bytearray)
     JsonPr json1 = JsonPr::fromJsonFile(jsonAbsPath);
@@ -111,29 +117,21 @@ class JsonHelperTest : public PlainTestSuite {
     QVERIFY(json1.WriteIntoFiles());
 
     // reload ok (using bytearray)
-    JsonPr json2 = JsonPr::fromJsonFile(jsonFi.fileName());
+    JsonPr json2 = JsonPr::fromJsonFile(jsonAbsPath);
     QCOMPARE(json2.m_Detail, "Frank boy’s adventure.");
 
     QCOMPARE(json1, json2);
   }
 
   void test_InsertOrUpdateDurationStudioCastTags() {  //
-    QDir dir{mWorkPath};
-
     const QString jsonName{"InsertOrUpdateDurationStudioCastTags.json"};
-    const QString& jsonPth = dir.absoluteFilePath(jsonName);
+    const QString& jsonPth = mDir.itemPath(jsonName);
     // precondition, json not exist
-    QVERIFY(!dir.exists(jsonName));
+    QVERIFY(!QFile::exists(jsonPth));
 
     // json created
     auto ret = InsertOrUpdateDurationStudioCastTags(jsonPth, 0, {}, {}, {});
-    QVERIFY(dir.exists(jsonName));
     QCOMPARE(ret, CHANGED_OK);
-    ON_SCOPE_EXIT {
-      if (dir.exists(jsonName)) {
-        QVERIFY(dir.remove(jsonName));
-      }
-    };
 
     // json changed
     const QStringList expectCastLst{"Henry Cavill", "Paddy", "Chris", "Fassbender"};
@@ -153,39 +151,33 @@ class JsonHelperTest : public PlainTestSuite {
   }
 
   void test_ReadStudioCastTagsOut() {
-    QDir dir{mWorkPath};
     const QString jsonName{"ReadStudioCastTagsOut.json"};
-    const QString& jsonPth = dir.absoluteFilePath(jsonName);
-    // precondition, json not exist
-    QVERIFY(!dir.exists(jsonName));
-    ON_SCOPE_EXIT {
-      if (dir.exists(jsonName)) {
-        QVERIFY(dir.remove(jsonName));
-      }
-    };
-
+    const QString& jsonPth = mDir.itemPath(jsonName);
     // 1. empty value json
-    QVariantHash emptyValueDict{{ENUM_2_STR(Studio), ""}, {ENUM_2_STR(Cast), QStringList{}}, {ENUM_2_STR(Tags), QStringList{}}};
+    QVariantHash emptyValueDict{{ENUM_2_STR(Studio), ""},           //
+                                {ENUM_2_STR(Cast), QStringList{}},  //
+                                {ENUM_2_STR(Tags), QStringList{}}};
     QVERIFY(DumpJsonDict(emptyValueDict, jsonPth));
-    QVERIFY(dir.exists(jsonName));
-    QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(mWorkPath);
+    QVERIFY(QFile::exists(jsonPth));
+    QMap<uint, JsonDict2Table> fileNameHash2Json = ReadStudioCastTagsOut(mDir.path());
     QVERIFY(fileNameHash2Json.isEmpty());
 
-    // 2. only contains studio and tags, but not performers
+    // 2. only contains studio/tags
     QVariantHash notFullDict{{ENUM_2_STR(Studio), "Fox 2000"}, {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(notFullDict, jsonPth));
-    QVERIFY(dir.exists(jsonName));
-    fileNameHash2Json = ReadStudioCastTagsOut(mWorkPath);
-    QVERIFY(fileNameHash2Json.isEmpty());
+    QVERIFY(QFile::exists(jsonPth));
+    fileNameHash2Json = ReadStudioCastTagsOut(mDir.path());
+    QCOMPARE(fileNameHash2Json.size(), 1);
 
-    // 3. contains studio and tags and performers
+    // 3. contains studio/tags/performers
     QVariantHash fullDict{{ENUM_2_STR(Studio), "Fox 2000"},                    //
                           {ENUM_2_STR(Cast), QStringList{"Jocker", "Queen"}},  //
                           {ENUM_2_STR(Tags), QStringList{"Happiness", "Comedy"}}};
     QVERIFY(DumpJsonDict(fullDict, jsonPth));
-    QVERIFY(dir.exists(jsonName));
-    fileNameHash2Json = ReadStudioCastTagsOut(mWorkPath);
+    QVERIFY(QFile::exists(jsonPth));
+    fileNameHash2Json = ReadStudioCastTagsOut(mDir.path());
     QCOMPARE(fileNameHash2Json.size(), 1);
+
     const JsonDict2Table& info = fileNameHash2Json.cbegin().value();
     const QStringList expectCasts{"Jocker", "Queen"};
     const QStringList expectTags{"Happiness", "Comedy"};
@@ -194,25 +186,6 @@ class JsonHelperTest : public PlainTestSuite {
     QCOMPARE(info.Tags, expectTags);
   }
 };
-
-const char JsonHelperTest::mJsonContentStr[]{R"(
-{
-    "Name": "Frank - 1",
-    "Cast": [],
-    "Studio": "Marvel",
-    "Duration": 0,
-    "Uploaded": "17:22 25-Apr-1999",
-    "Tags": [
-        "comedy"
-    ],
-    "Rate": 0,
-    "Size": "1.00 MiB",
-    "Resolution": "1080p",
-    "Bitrate": "5000 kbps",
-    "Detail": "Frank boy’s adventure."
-}
-)"};
-const char JsonHelperTest::mInvalidJsonContentStr[]{R"({"Name": "Henry Canvill", })"};  // error: extra trailing comma here
 
 #include "JsonHelperTest.moc"
 REGISTER_TEST(JsonHelperTest, false)

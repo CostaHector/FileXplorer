@@ -7,6 +7,7 @@
 #include "NameTool.h"
 #include "CastManager.h"
 #include "StudiosManager.h"
+#include "TableFields.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -148,21 +149,16 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = MovieJsonLoader(jsonPath);
+    using namespace MOVIE_TABLE;
     const QString& studio = dict.value(ENUM_2_STR(Studio), "").toString();
-    if (studio.isEmpty()) {
-      continue;
-    }
     const QStringList& cast = dict.value(ENUM_2_STR(Cast), {}).toStringList();
-    if (cast.isEmpty()) {
-      continue;
-    }
     const QStringList& tags = dict.value(ENUM_2_STR(Tags), {}).toStringList();
-    if (tags.isEmpty()) {
+    if (studio.isEmpty() && cast.isEmpty() && tags.isEmpty()) {
       continue;
     }
     fileNameHash2Json[CalcFileHash(jsonPath)] = JsonDict2Table{studio, cast, tags};
   }
-  LOG_D("%d file contains Studio&Cast&Tags", fileNameHash2Json.size());
+  LOG_D("%d json file contains Studio|Cast|Tags Field", fileNameHash2Json.size());
   return fileNameHash2Json;
 }
 
