@@ -12,6 +12,13 @@
 #include "DuplicateVideosFinderActions.h"
 #include "ClipboardGuard.h"
 #include "TDir.h"
+#include <QDesktopServices>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 using namespace VideoTestPrecoditionTools;
 
@@ -27,6 +34,9 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
   DuplicateVideosFinder dvf;
  private slots:
   void initTestCase() {
+    GlobalMockObject::reset();
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
+
     // precondition: drop
     QVERIFY(tdir.IsValid());
     QVERIFY2(dbNameSetResult.first, qPrintable(dbNameSetResult.second));
@@ -43,6 +53,10 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 1);
     QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH));
     QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 2);
+  }
+
+  void cleanupTestCase() {  //
+    GlobalMockObject::verify();
   }
 
   void dup_vid_tables_drop_available() {

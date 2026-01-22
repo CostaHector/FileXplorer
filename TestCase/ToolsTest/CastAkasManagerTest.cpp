@@ -29,7 +29,7 @@ class CastAkasManagerTest : public PlainTestSuite {
     QCOMPARE(mDir.createEntries(gNodeEntries), 1);
     QVERIFY(mDir.exists("cast_aka_list.txt"));  // file not exist at now
 
-    castAkaInst.ResetStateForTestImpl(gCastAkaFilePath);
+    castAkaInst.InitializeImpl(gCastAkaFilePath);
     QVERIFY(castAkaInst.CastAkaMap().size() >= 2);  // 2 elements
     pCastAka = &castAkaInst;
   }

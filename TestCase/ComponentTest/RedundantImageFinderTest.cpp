@@ -71,7 +71,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
   void test_redundant_images_in_library_find_ok() {
     // procedure
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
-    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);
+    redunImgLib.InitializeImpl(mBenchmarkRedunFolder);
     QCOMPARE(redunImgLib.count(), 2 + 1);
     // hash {hash1, hash1, hash2}, // size {3,3,3} = 2+1 = 3
 
@@ -96,7 +96,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
   // the above testcase set library to mBenchmarkRedunFolder already
   void find_redun_decide_by_Lib() {
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
-    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);
+    redunImgLib.InitializeImpl(mBenchmarkRedunFolder);
 
     Configuration().clear();
     Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, true);
@@ -118,7 +118,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
   void find_redun_decide_by_md5_dup() {
     // clear libs
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
-    redunImgLib.ResetStateForTestImpl("");  // has nothing to do with a library
+    redunImgLib.InitializeImpl("");  // has nothing to do with a library
 
     Configuration().clear();  //
     QCOMPARE(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v.toBool(), true);
@@ -158,7 +158,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
 
   void last_test_current_file_recycle_all_ok() {
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
-    redunImgLib.ResetStateForTestImpl(mBenchmarkRedunFolder);  // has nothing to do with a library
+    redunImgLib.InitializeImpl(mBenchmarkRedunFolder);  // has nothing to do with a library
 
     auto& inst = g_redunImgFinderAg();
     inst.INCLUDING_EMPTY_IMAGES->setChecked(true);

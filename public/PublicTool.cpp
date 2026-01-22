@@ -158,9 +158,6 @@ bool OpenLocalFileUsingDesktopService(const QString& localFilePath) {
     LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
 }
 

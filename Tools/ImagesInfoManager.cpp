@@ -16,12 +16,11 @@ QString ImagesInfoManager::GetDynRedunPath() const {
 
 ImagesInfoManager::ImagesInfoManager() {
 #ifndef RUNNING_UNIT_TESTS
-  const QString benchMarkPath = GetDynRedunPath();
-  InitializeImpl(benchMarkPath);
+  InitializeImpl(GetDynRedunPath(), "");
 #endif
 }
 
-void ImagesInfoManager::InitializeImpl(const QString& path) {
+void ImagesInfoManager::InitializeImpl(const QString& path, const QString& blackPath) {
   // don't save path to member here. path existence is not guaranteed
   Configuration().setValue(RedunImgFinderKey::RUND_IMG_PATH.name, path);
   ImgDataStruct() = ReadOutImgsInfo();
@@ -101,13 +100,6 @@ RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, 
   }
   return redundantImgs;
 }
-
-#ifdef RUNNING_UNIT_TESTS
-int ImagesInfoManager::ResetStateForTestImpl(const QString& localFilePath) {
-  InitializeImpl(localFilePath);
-  return 0;
-}
-#endif
 
 RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty) {
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};

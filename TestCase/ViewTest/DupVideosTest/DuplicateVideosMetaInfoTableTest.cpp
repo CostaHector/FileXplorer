@@ -9,8 +9,16 @@
 #include "DuplicateVideosFinderActions.h"
 #include "VideoTestPrecoditionTools.h"
 #include "PublicVariable.h"
+#include "PublicTool.h"
+#include "FileToolMock.h"
 #include "PublicMacro.h"
 #include "TDir.h"
+#include <QDesktopServices>
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 using namespace VideoTestPrecoditionTools;
 
@@ -20,13 +28,19 @@ public:
   TDir tdir;
   QString aNewDupVidPrePath = tdir.path();
   SetDatabaseParmRetType dbNameSetResult = setDupVidDbAbsFilePath(aNewDupVidPrePath);
-  SetDatabaseParmRetType connNameSetResult = setDupVidDbConnectionName("DUP_VID_FINDER_CONN_TEST", __LINE__);
+  SetDatabaseParmRetType connNameSetResult = setDupVidDbConnectionName("DUP_VID_META_INFO_CONN", __LINE__);
 
 private slots:
   void initTestCase() { //
     QVERIFY(tdir.IsValid());
     QVERIFY2(dbNameSetResult.first, qPrintable(dbNameSetResult.second));
     QVERIFY2(connNameSetResult.first, qPrintable(connNameSetResult.second));
+
+    GlobalMockObject::reset();
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
+  }
+  void cleanupTestCase() {
+    GlobalMockObject::verify();
   }
 
   void dragMoveDropEvent_dropTable_ok() {

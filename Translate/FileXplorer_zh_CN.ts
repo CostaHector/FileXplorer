@@ -430,7 +430,7 @@
 <context>
     <name>FileRenameRulerActions</name>
     <message>
-        <location filename="../Actions/FileRenameRulerActions.cpp" line="+26"/>
+        <location filename="../Actions/FileRenameRulerActions.cpp" line="+15"/>
         <source>Name Ruler</source>
         <translation>名称标准化</translation>
     </message>
@@ -440,17 +440,32 @@
         <translation>编辑厂商列表文件</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Edit performers list file</source>
+        <location line="+2"/>
+        <source>Reload studios</source>
+        <translation>重加载厂商列表</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Edit actors list file</source>
         <translation>编辑演员列表文件</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Edit performers AKA list file</source>
+        <location line="+2"/>
+        <source>Reload actors</source>
+        <translation>重加载演员列表</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Edit actors alias list file</source>
         <translation>编辑演员别名列表文件</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+2"/>
+        <source>Reload actor alias</source>
+        <translation>重加载演员列表</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Rename rule statistics</source>
         <translation>名称标准化规则统计数据</translation>
     </message>

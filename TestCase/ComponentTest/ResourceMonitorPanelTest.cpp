@@ -26,7 +26,7 @@ void invoke_get_timestamp(char* buf, size_t len) {
   memcpy(buf, gTimeArray.toStdString().c_str(), len);
 #else
   LOG_W("unknow compiles");
-#endif;
+#endif
 }
 
 class ResourceMonitorPanelTest : public PlainTestSuite {

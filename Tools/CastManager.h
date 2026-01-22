@@ -29,14 +29,9 @@ class CastManager final : public SingletonManager<CastManager, CAST_MGR_DATA_T> 
  private:
   CastManager();
   CastManager(const CastManager& rhs) noexcept = delete;
-  void InitializeImpl(const QString& path);
-#ifdef RUNNING_UNIT_TESTS
-  int ResetStateForTestImpl(const QString& localFilePath);
-#endif
-  QString mLocalFilePath;
-
-  static const QRegularExpression EFFECTIVE_CAST_NAME;
-  static constexpr int EFFECTIVE_CAST_NAME_LEN = 12;
+  static bool IsActorNameValid(const QString& actorName);
+  void InitializeImpl(const QString& path, const QString& blackPath="");
+  QString mLocalFilePath, mLocalBlackFilePath;
 };
 
 #endif  // CastManager_H

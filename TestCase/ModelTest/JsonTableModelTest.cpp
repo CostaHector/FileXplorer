@@ -3,6 +3,7 @@
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"
 #include "JsonTableModel.h"
+#include "StudiosManager.h"
 #include "CastManager.h"
 #include "EndToExposePrivateMember.h"
 #include "TDir.h"
@@ -10,35 +11,70 @@
 #include "JsonTestPrecoditionTools.h"
 #include "PublicVariable.h"
 #include "PublicTool.h"
-#include "StudiosManager.h"
+#include "PathTool.h"
 #include "ModelTestHelper.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 using namespace JsonTestPrecoditionTools;
 
 class JsonTableModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TDir tDir;
-  const QString mWorkPath{tDir.path()};
+  TDir mTDir;
+  const QString mWorkPath{mTDir.path()};
   QDir mDir{mWorkPath, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  int mJsonsFileCountInitial = 0;
+  static constexpr int mJsonsFileCountInitial = 2;
+
+  const QString mStudiosFileName = "Studios.txt";
+  const QString mActorsFileName = "Actors.txt";
+  const QString mStudiosListFile = mTDir.itemPath(mStudiosFileName);
+  const QString mActorsListFile = mTDir.itemPath(mActorsFileName);
+
+  const QString mStudiosBlackFileName = "StudiosBlack.txt";
+  const QString mActorsBlackFileName = "ActorsBlack.txt";
+  const QString mStudiosBlackListFile = mTDir.itemPath(mStudiosBlackFileName);
+  const QString mActorsBlackListFile = mTDir.itemPath(mActorsBlackFileName);
+  const QList<FsNodeEntry> nodes{
+      //
+      {"a.json", false, JSON_CONTENTS_A_RANK_IN_MODEL},               //
+      {"b.json", false, JSON_CONTENTS_B_RANK_IN_MODEL},               //
+      {"jazz .txt", false, "don't care me here"},                     //
+      {"a.mp4", false, "only care me in rename json related files"},  //
+      FsNodeEntry{mStudiosFileName, false, ""},                       //
+      FsNodeEntry{mActorsFileName, false, ""},                        //
+      FsNodeEntry{mStudiosBlackFileName, false, ""},                  //
+      FsNodeEntry{mActorsBlackFileName, false, ""},
+  };
+
+  StudiosManager& studioMgr = StudiosManager::getInst();
+  CastManager& actorMgr = CastManager::getInst();
 
  private slots:
   void initTestCase() {
-    const QList<FsNodeEntry> nodes{
-        //
-        {"a.json", false, JSON_CONTENTS_A_RANK_IN_MODEL},               //
-        {"b.json", false, JSON_CONTENTS_B_RANK_IN_MODEL},               //
-        {"jazz .txt", false, "don't care me here"},                     //
-        {"a.mp4", false, "only care me in rename json related files"},  //
-    };
-    QCOMPARE(tDir.createEntries(nodes), nodes.size());
-    QVERIFY(tDir.IsValid());
+    QVERIFY(mTDir.IsValid());
+    QCOMPARE(mTDir.createEntries(nodes), nodes.size());
+
     bool readAok = false;
-    QCOMPARE(FileTool::TextReader(tDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
-    mDir.setNameFilters(TYPE_FILTER::JSON_TYPE_SET);
-    mJsonsFileCountInitial = mDir.entryList().size();
-    QVERIFY(mJsonsFileCountInitial >= 2);  // at least two json file exist here
+    QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+
+    GlobalMockObject::reset();
+    using namespace PathTool::FILE_REL_PATH;
+    MOCKER(GetStudiosListFilePath).stubs().will(returnValue(mStudiosListFile));
+    MOCKER(GetStudiosBlackListFilePath).stubs().will(returnValue(mStudiosBlackListFile));
+    MOCKER(GetActorsListFilePath).stubs().will(returnValue(mActorsListFile));
+    MOCKER(GetActorsBlackListFilePath).stubs().will(returnValue(mActorsBlackListFile));
+
+    studioMgr.InitializeImpl(GetStudiosListFilePath(), GetStudiosBlackListFilePath());
+    actorMgr.InitializeImpl(GetActorsListFilePath(), GetActorsBlackListFilePath());
+  }
+
+  void cleanupTestCase() {  //
+    GlobalMockObject::verify();
   }
 
   void CheckModelData(JsonTableModel& model) {
@@ -47,14 +83,14 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(model.data(model.index(0, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio A");
     QCOMPARE(model.data(model.index(0, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag A");
     QCOMPARE(model.data(model.index(0, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just a json example.");
-    QCOMPARE(model.data(model.index(0, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:36"); // 36000ms
+    QCOMPARE(model.data(model.index(0, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:36");  // 36000ms
 
     QCOMPARE(model.data(model.index(1, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - B rank - XX YY and ZZ DD EE");
     QCOMPARE(model.data(model.index(1, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast B 1,Empty Cast B 2");
     QCOMPARE(model.data(model.index(1, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio B");
     QCOMPARE(model.data(model.index(1, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag B");
     QCOMPARE(model.data(model.index(1, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just b json example.");
-    QCOMPARE(model.data(model.index(1, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:03"); // 3600ms
+    QCOMPARE(model.data(model.index(1, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:03");  // 3600ms
   }
 
   void initalize_ok() {
@@ -128,13 +164,13 @@ class JsonTableModelTest : public PlainTestSuite {
 
     {
       // 1.1 modify json file here
-      AutoRollbackFileContentModify autoRollbackContentMod(tDir.itemPath("a.json"),            //
+      AutoRollbackFileContentModify autoRollbackContentMod(mTDir.itemPath("a.json"),           //
                                                            "GameTurbo - A rank - GGG YYYYY",   //
                                                            "GAMETURBO - A RANK - GGG YYYYY");  //
       QCOMPARE(autoRollbackContentMod.Execute(), true);
       bool bReadOk = false;
-      QString afterReplace = FileTool::TextReader(tDir.itemPath("a.json"), &bReadOk);
-      QVERIFY(!afterReplace.contains("\r\n")); // "a.json" should never have \r\n at all
+      QString afterReplace = FileTool::TextReader(mTDir.itemPath("a.json"), &bReadOk);
+      QVERIFY(!afterReplace.contains("\r\n"));  // "a.json" should never have \r\n at all
 
       // 1.2 path unchange, skip directly, will not reload from file
       QCOMPARE(jtm.setRootPath(mWorkPath), 0);
@@ -151,10 +187,10 @@ class JsonTableModelTest : public PlainTestSuite {
       // 1.4 json contents rollback
     }
 
-    { // AutoRollbackFileContentModify rollback should be ok
+    {  // AutoRollbackFileContentModify rollback should be ok
       bool bReadOk = false;
-      QString afterReplace = FileTool::TextReader(tDir.itemPath("a.json"), &bReadOk);
-      QCOMPARE(afterReplace, JSON_CONTENTS_A_RANK_IN_MODEL); // "a.json" should never have \r\n at all
+      QString afterReplace = FileTool::TextReader(mTDir.itemPath("a.json"), &bReadOk);
+      QCOMPARE(afterReplace, JSON_CONTENTS_A_RANK_IN_MODEL);  // "a.json" should never have \r\n at all
     }
 
     {
@@ -163,7 +199,7 @@ class JsonTableModelTest : public PlainTestSuite {
           //
           {"c new added.json", false, JSON_CONTENTS_A_RANK_IN_MODEL},  //
       };
-      QCOMPARE(tDir.createEntries(extraNode), extraNode.size());
+      QCOMPARE(mTDir.createEntries(extraNode), extraNode.size());
       ON_SCOPE_EXIT {
         QVERIFY(mDir.remove("c new added.json"));
       };
@@ -186,21 +222,36 @@ class JsonTableModelTest : public PlainTestSuite {
 
     QFileInfo firstFi = jtm.fileInfo(firstLineIndex);
     QCOMPARE(firstFi.isFile(), true);
-    QCOMPARE(firstFi.absoluteFilePath(), tDir.itemPath("a.json"));
-    QCOMPARE(jtm.filePath(firstLineIndex), tDir.itemPath("a.json"));
+    QCOMPARE(firstFi.absoluteFilePath(), mTDir.itemPath("a.json"));
+    QCOMPARE(jtm.filePath(firstLineIndex), mTDir.itemPath("a.json"));
     QCOMPARE(jtm.fileName(firstLineIndex), "a.json");
     QCOMPARE(jtm.fileBaseName(firstLineIndex), "a");
-    QCOMPARE(jtm.absolutePath(firstLineIndex), tDir.path());
+    QCOMPARE(jtm.absolutePath(firstLineIndex), mTDir.path());
     const QString fullInfoStr = jtm.fullInfo(firstLineIndex);
     QCOMPARE(fullInfoStr.contains("GameTurbo - A rank - GGG YYYYY"), true);
     QCOMPARE(fullInfoStr.contains("This is just a json example."), true);
   }
 
   void dataField_modify_correct() {
+    mTDir.touch(mStudiosFileName,
+                "game turbo\tGameTurbo\n"
+                "gameturbo\tGameTurbo\n");
+    mTDir.touch(mStudiosBlackFileName, "");
+    studioMgr.ForceReloadImpl();
+    QCOMPARE(studioMgr.count(), 2);
+
+    mTDir.touch(mActorsFileName,
+                "ggg yyyyy\n"
+                "xx yy\n"
+                "zz dd ee\n");
+    mTDir.touch(mActorsBlackFileName, "");
+    actorMgr.ForceReloadImpl();
+    QCOMPARE(actorMgr.count(), 3);
+
     JsonTableModel jtm;
     QCOMPARE(jtm.setRootPath(mWorkPath), mJsonsFileCountInitial);
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
-    QVERIFY(mJsonsFileCountInitial >= 2);
+    QCOMPARE(mJsonsFileCountInitial, 2);
 
     decltype(jtm.mCachedJsons) mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
 
@@ -219,7 +270,7 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
       QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
 
-      QCOMPARE(jtm.InitCastAndStudio(valid2Indexes), 0);  // get skipped
+      QCOMPARE(jtm.InitCastAndStudio(valid2Indexes), 0);  // field Name/Cast/Studio already has value
       QCOMPARE(jtm.mCachedJsons, mCachedJsonsBackup);
       QCOMPARE(jtm.m_modifiedRows.any(), false);
 
@@ -228,9 +279,16 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 2);
       QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, ""), 2);
 
-      // here 2 row affected. but we don't assume what value it has been changed to. because it depends on CastManager, StudiosManager Behavior
+      // here 2 row affected.
+      // but we don't assume what value it has been changed to.
+      // because it depends on CastManager, StudiosManager Behavior
       QCOMPARE(jtm.InitCastAndStudio(valid2Indexes), 2);
       QVERIFY(jtm.mCachedJsons != mCachedJsonsBackup);
+      QCOMPARE(jtm.mCachedJsons.front().m_Studio, "GameTurbo");
+      QCOMPARE(jtm.mCachedJsons.front().m_Cast, (SortedUniqStrLst{QStringList{"GGG YYYYY"}}));
+
+      QCOMPARE(jtm.mCachedJsons.back().m_Studio, "GameTurbo");
+      QCOMPARE(jtm.mCachedJsons.back().m_Cast, (SortedUniqStrLst{QStringList{"XX YY", "ZZ DD EE"}}));
       QCOMPARE(jtm.m_modifiedRows.any(), true);
     }
 
@@ -315,11 +373,11 @@ class JsonTableModelTest : public PlainTestSuite {
     // above operation should not write into files
     {
       bool readAok = false;
-      QCOMPARE(FileTool::TextReader(tDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+      QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
       QVERIFY(readAok);
 
       bool readBok = false;
-      QCOMPARE(FileTool::TextReader(tDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
+      QCOMPARE(FileTool::TextReader(mTDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
       QVERIFY(readBok);
     }
 
@@ -470,11 +528,11 @@ class JsonTableModelTest : public PlainTestSuite {
       // above operation should write into files
 
       bool readAok = false;
-      QVERIFY(FileTool::TextReader(tDir.itemPath("a.json"), &readAok) != JSON_CONTENTS_A_RANK_IN_MODEL);
+      QVERIFY(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok) != JSON_CONTENTS_A_RANK_IN_MODEL);
       QVERIFY(readAok);
 
       bool readBok = false;
-      QVERIFY(FileTool::TextReader(tDir.itemPath("b.json"), &readBok) != JSON_CONTENTS_B_RANK_IN_MODEL);
+      QVERIFY(FileTool::TextReader(mTDir.itemPath("b.json"), &readBok) != JSON_CONTENTS_B_RANK_IN_MODEL);
       QVERIFY(readBok);
     }
 
@@ -510,45 +568,55 @@ class JsonTableModelTest : public PlainTestSuite {
     QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
     QCOMPARE(jtm.RenameJsonAndItsRelated(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), 2);  // two file renamed
 
-    const QStringList actualFileList = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-    const QStringList expectFileList = {"GameTurbo - A rank - GGG YYYYY.json", "GameTurbo - A rank - GGG YYYYY.mp4", "b.json", "jazz .txt"};
+    const QStringList actualFileList = mTDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
+    QStringList expectFileList = {
+        "GameTurbo - A rank - GGG YYYYY.json",  //
+        "GameTurbo - A rank - GGG YYYYY.mp4",   //
+        "b.json",     //
+        "jazz .txt",  //
+        mActorsFileName,
+        mActorsBlackFileName,
+        mStudiosFileName,
+        mStudiosBlackFileName,
+    };
+    std::sort(expectFileList.begin(), expectFileList.end());
     QCOMPARE(expectFileList, actualFileList);
   }
 
   void proxy_model_works() {
     QStandardItemModel sourceModel;
-    ModelTestHelper::InitStdItemModel(sourceModel, "row%1-col%2", 3, 2); // 3-by-2 matrix
+    ModelTestHelper::InitStdItemModel(sourceModel, "row%1-col%2", 3, 2);  // 3-by-2 matrix
     // rc00 rc01
     // rc10 rc11
     // rc20 rc21
 
     QSortFilterProxyModel proxyModel;
     proxyModel.setSourceModel(&sourceModel);
-    proxyModel.setFilterKeyColumn(-1); // all column
+    proxyModel.setFilterKeyColumn(-1);  // all column
 
-    proxyModel.setFilterFixedString(""); // empty filter. all pass
+    proxyModel.setFilterFixedString("");  // empty filter. all pass
     QCOMPARE(proxyModel.rowCount(), 3);
 
-    proxyModel.setFilterFixedString("row1"); // only one row contains row1
+    proxyModel.setFilterFixedString("row1");  // only one row contains row1
     QCOMPARE(proxyModel.rowCount(), 1);
     QModelIndex proxyIndex = proxyModel.index(0, 0);
     QString data = proxyModel.data(proxyIndex).toString();
     QVERIFY(data.startsWith("row1"));
 
-    proxyModel.setFilterFixedString("col1"); // all 3 row contains col1 in first column
+    proxyModel.setFilterFixedString("col1");  // all 3 row contains col1 in first column
     QCOMPARE(proxyModel.rowCount(), 3);
 
-    proxyModel.setFilterFixedString("ROW0"); // case sensitive
+    proxyModel.setFilterFixedString("ROW0");  // case sensitive
     QCOMPARE(proxyModel.rowCount(), 0);
 
-    proxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive); // case sensitive
+    proxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);  // case sensitive
     proxyModel.setFilterFixedString("ROW0");
     QCOMPARE(proxyModel.rowCount(), 1);
 
     proxyModel.setFilterCaseSensitivity(Qt::CaseSensitive);
-    proxyModel.setFilterKeyColumn(1); // only filter for second column
-    proxyModel.setFilterFixedString("col0"); // col0 not in second column at all
-    QCOMPARE(proxyModel.rowCount(), 0); // no row match
+    proxyModel.setFilterKeyColumn(1);         // only filter for second column
+    proxyModel.setFilterFixedString("col0");  // col0 not in second column at all
+    QCOMPARE(proxyModel.rowCount(), 0);       // no row match
   }
 };
 

@@ -29,17 +29,29 @@ bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hype
 StudiosManager::StudiosManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  const QString defaultPath = PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME);
-  InitializeImpl(defaultPath);
+  InitializeImpl(GetStudiosListFilePath(), GetActorsBlackListFilePath());
 #endif
 }
 
-void StudiosManager::InitializeImpl(const QString& path) {
+void StudiosManager::InitializeImpl(const QString& path, const QString& blackPath) {
   mLocalFilePath = path;
+  mLocalBlackFilePath = blackPath;
   ProStudioMap() = ReadOutStdStudioName();
 }
 
 STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
+  QSet<QString> blackList;
+  {
+    QFile blackFi{mLocalBlackFilePath};
+    if (blackFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QTextStream in(&blackFi);
+      in.setCodec("UTF-8");
+      while(!in.atEnd()) {
+        blackList.insert(in.readLine(128));
+      }
+    }
+  }
+
   QFile studioFi{mLocalFilePath};
   if (!studioFi.exists()) {
     LOG_D("Studio list file[%s] not exist", qPrintable(studioFi.fileName()));
@@ -69,7 +81,15 @@ STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
       LOG_W("The %dth line of file[%s] is invalid", lineIndex, qPrintable(studioFi.fileName()));
       continue;
     }
-    stdStudioNameDict[line.left(tabKeyInd)] = line.mid(tabKeyInd + 1);
+    QString befName = line.left(tabKeyInd);
+    if (blackList.contains(befName)) {
+      continue;
+    }
+    QString aftName = line.mid(tabKeyInd + 1);
+    if (blackList.contains(aftName)) {
+      continue;
+    }
+    stdStudioNameDict[befName] = aftName;
   }
   studioFi.close();
   LOG_D("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
@@ -221,12 +241,5 @@ auto StudiosManager::operator()(const QString& sentence) const -> QString {
   if (itBack != ProStudioMap().cend()) {
     return itBack.value();
   }
-  return studioNameFrontSection;
+  return ""; // not in table
 }
-
-#ifdef RUNNING_UNIT_TESTS
-int StudiosManager::ResetStateForTestImpl(const QString& localFilePath) {
-  InitializeImpl(localFilePath);
-  return 0;
-}
-#endif

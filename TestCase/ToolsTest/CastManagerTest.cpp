@@ -1,7 +1,5 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include "GlbDataProtect.h"
-#include "OnScopeExit.h"
 #include "TDir.h"
 #include "JsonKey.h"
 #include "JsonHelper.h"
@@ -14,159 +12,179 @@
 #include "EndToExposePrivateMember.h"
 #include "JsonTestPrecoditionTools.h"
 #include "PublicMacro.h"
+#include "PathTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class CastManagerTest : public PlainTestSuite {
   Q_OBJECT
  public:
   CastManagerTest() : PlainTestSuite{} {}
-  TDir mDir;
-  const QString rootpath{mDir.path()};
-  const QString gLocalFilePath{mDir.itemPath("cast_list.txt")};
-  const QString gStudioLocalFilePath{mDir.itemPath("studio_list.txt")};
-  QList<FsNodeEntry> gNodeEntries;
-  CastManager* cmInLLT{nullptr};
-  StudiosManager* smInLLT{nullptr};
+  TDir mTDir;
+  const QString rootpath{mTDir.path()};
+
+  const QString mStudiosFileName = "Studios.txt";
+  const QString mActorsFileName = "Actors.txt";
+  const QString mStudiosListFile = mTDir.itemPath(mStudiosFileName);
+  const QString mActorsListFile = mTDir.itemPath(mActorsFileName);
+
+  const QString mStudiosBlackFileName = "StudiosBlack.txt";
+  const QString mActorsBlackFileName = "ActorsBlack.txt";
+  const QString mStudiosBlackListFile = mTDir.itemPath(mStudiosBlackFileName);
+  const QString mActorsBlackListFile = mTDir.itemPath(mActorsBlackFileName);
+
+  const QString mJsonFileName = "My Good Boy.json";
+  const QString mJsonFile = mTDir.itemPath(mJsonFileName);
+
+  QList<FsNodeEntry> gNodeEntries{
+      FsNodeEntry{mStudiosFileName, false, ""},                                    //
+      FsNodeEntry{mActorsFileName, false, ""},                                     //
+      FsNodeEntry{mStudiosBlackFileName, false, ""},                               //
+      FsNodeEntry{mActorsBlackFileName, false, ""},                                //
+      FsNodeEntry{mJsonFileName, false, JsonTestPrecoditionTools::JSON_CONTENTS},  //
+      FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                     //
+      FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                   //
+      FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                       //
+      FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
+  };
+  CastManager& actorMgr = CastManager::getInst();
+  StudiosManager& studioMgr = StudiosManager::getInst();
+
  private slots:
   void initTestCase() {
-    QVERIFY(mDir.IsValid());
-    // 1. at first cast_list.txt and studio_list.txt file not exist
-    CastManager& instCast = CastManager::getInst();
-    {
-      instCast.InitializeImpl(gLocalFilePath);
-      QVERIFY(instCast.CastSet().isEmpty());
-    }
-    StudiosManager& instStudio = StudiosManager::getInst();
-    {
-      instStudio.InitializeImpl(gStudioLocalFilePath);
-      QVERIFY(instStudio.ProStudioMap().isEmpty());
-    }
+    GlobalMockObject::reset();
+    using namespace PathTool::FILE_REL_PATH;
+    MOCKER(GetStudiosListFilePath).stubs().will(returnValue(mStudiosListFile));
+    MOCKER(GetStudiosBlackListFilePath).stubs().will(returnValue(mStudiosBlackListFile));
+    MOCKER(GetActorsListFilePath).stubs().will(returnValue(mActorsListFile));
+    MOCKER(GetActorsBlackListFilePath).stubs().will(returnValue(mActorsBlackListFile));
 
-    gNodeEntries = QList<FsNodeEntry>  //
-        {
-            FsNodeEntry{"cast_list.txt", false, "any random cast1\nanother random cast2"},    //
-            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},  //
-            FsNodeEntry{"studio_list.txt", false, "any random studio\tAnyRandomStudio"},      //
-            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                          //
-            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                        //
-            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                            //
-            FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
-        };
-    QCOMPARE(mDir.createEntries(gNodeEntries), gNodeEntries.size());
+    QVERIFY(mTDir.IsValid());
+    QCOMPARE(mTDir.createEntries(gNodeEntries), gNodeEntries.size());
 
-    // 2. ResetStateForTestImpl ok
-    {
-      instCast.ResetStateForTestImpl(gLocalFilePath);
-      QCOMPARE(instCast.CastSet().size(), 2); // 2 elements
-      cmInLLT = &instCast;
-    }
-    {
-      instStudio.ResetStateForTestImpl(gStudioLocalFilePath);
-      QCOMPARE(instStudio.ProStudioMap().size(), 1); // 1 element
-      smInLLT = &instStudio;
-    }
+    actorMgr.InitializeImpl(GetActorsListFilePath(), GetActorsBlackListFilePath());
+    QVERIFY(actorMgr.CastSet().isEmpty());
+
+    studioMgr.InitializeImpl(GetStudiosListFilePath(), GetStudiosBlackListFilePath());
+    QVERIFY(studioMgr.ProStudioMap().isEmpty());
   }
 
-  void test_sentenceSplit() {
-    // precondition
-    const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    CAST_MGR_DATA_T tempPerfs;
-    for (const QString& star : expectCastList) {
-      tempPerfs.insert(star.toLower());
-    }
-    cmInLLT->CastSet().swap(tempPerfs);
-    ON_SCOPE_EXIT {
-      cmInLLT->CastSet().swap(tempPerfs);
-    };
-    QVERIFY(!cmInLLT->CastSet().isEmpty());
+  void cleanupTestCase() {
+    GlobalMockObject::verify();
+  }
 
+  void test_FilterPerformersOut_with_blacklist() {
     // procedure
-    const QStringList& actualCastList = (*cmInLLT)("Matt Dallas - Chris Pine and Jensen Ackles.");
+    QVERIFY(actorMgr.CastSet().isEmpty());
+    mTDir.touch(mActorsFileName,
+                "matt dallas\n"
+                "chris pine\n"
+                "jensen ackles\n"
+                "@captain\n"
+                "alex\n"   // in blacklist, ignored
+                "steve\n"  // in blacklist, ignored
+                "abc\n"    // length shorter then 12 and no special char contains, ignored
+    );
+    mTDir.touch(mActorsBlackFileName,
+                "adam\n"
+                "adonis\n"
+                "adrian\n"
+                "alan\n"
+                "alex\n"
+                "andy\n"
+                "antonio\n"
+                "beau\n"
+                "ben\n"
+                "blake\n"
+                "bradley\n"
+                "brody\n"
+                "cameron\n"
+                "justin\n"
+                "steve\n");
+    QCOMPARE(actorMgr.ForceReloadImpl(), 4 - 0);
+
+    const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles", "@Captain"};
+    const QStringList actualCastList =
+        actorMgr("The quick brown fox jumps over the lazy dog alex - Matt Dallas - Chris Pine and Jensen Ackles, @Captain.");
     QCOMPARE(actualCastList, expectCastList);
   }
 
   void test_filterOutNameFromWordsList() {
-    // precondition
-    const QStringList allCastList{"Jean le Rond d'Alembert", "Frenkie de Jong", "L Hospital", "James"};
-    // 4 word(not support now), 3 word, 2 word, 1 word
-    const QStringList expectCastList{"Frenkie de Jong", "L Hospital", "James"};
-    CAST_MGR_DATA_T tempPerfs;
-    for (const QString& star : allCastList) {
-      tempPerfs.insert(star.toLower());
-    }
-    cmInLLT->CastSet().swap(tempPerfs);
-    ON_SCOPE_EXIT {
-      cmInLLT->CastSet().swap(tempPerfs);
-    };
-    QVERIFY(!cmInLLT->CastSet().isEmpty());
+    // in FilterPerformersOut: not support now: 4 word, only: 3 word, 2 word, 1 word support
+    mTDir.touch(mActorsFileName,
+                "jean le rond d'alembert\n"
+                "frenkie de jong\n"
+                "l hospital\n"
+                "james\n"  // length shorter then 12 and no special char contains, ignored
+    );
+    mTDir.touch(mActorsBlackFileName, "");
+    actorMgr.ForceReloadImpl();
+    QCOMPARE(actorMgr.CastSet().size(), 3);
+
+    QCOMPARE(actorMgr.SplitSentence(""), (QStringList{}));        // empty string in empty list out
+    QCOMPARE(actorMgr.FilterPerformersOut({}), (QStringList{}));  // empty string in empty list out
 
     // single quote not used to split
     // and/And(insensitive) used to split
     // continous /\ used to split
     const QString sentence{"Jean le Rond d'Alembert AND Frenkie de Jong///L Hospital\\\\James"};
     const QStringList& expectWordSection{"Jean", "le", "Rond", "d'Alembert", "Frenkie", "de", "Jong", "L", "Hospital", "James"};
-
-    QCOMPARE(cmInLLT->SplitSentence(""), (QStringList{})); // empty string in empty list out
-
-    const auto& actualWordsList = cmInLLT->SplitSentence(sentence);
+    const auto& actualWordsList = actorMgr.SplitSentence(sentence);
     QCOMPARE(actualWordsList, expectWordSection);
 
-    QCOMPARE(cmInLLT->FilterPerformersOut({}), (QStringList{})); // empty string in empty list out
-    const auto& actualCast1 = cmInLLT->FilterPerformersOut(actualWordsList);
-    const auto& actualCast2 = (*cmInLLT)(sentence);
-    QCOMPARE(actualCast1, actualCast2);
+    const auto& actualCast1 = actorMgr.FilterPerformersOut(actualWordsList);
+    const auto& actualCast2 = actorMgr(sentence);
+    const QStringList expectCastList{"Frenkie de Jong", "L Hospital"};
 
     QCOMPARE(actualCast1, expectCastList);
+    QCOMPARE(actualCast2, expectCastList);
   }
 
-  void test_one_char_seperator() {
-    // precondition
-    const QStringList expectCastList{"U", "V", "W", "X", "Y", "Z"};
-    CAST_MGR_DATA_T tempPerfs;
-    for (const QString& star : expectCastList) {
-      tempPerfs.insert(star.toLower());
-    }
-    cmInLLT->CastSet().swap(tempPerfs);
-    ON_SCOPE_EXIT {
-      cmInLLT->CastSet().swap(tempPerfs);
-    };
-    QVERIFY(!cmInLLT->CastSet().isEmpty());
+  void test_with_actor_seperated_in_punctuation() {
+    mTDir.touch(mActorsFileName,
+                "matt dallas\n"
+                "chris pine\n"
+                "jensen ackles\n");
+    mTDir.touch(mActorsBlackFileName, "");
+    actorMgr.ForceReloadImpl();
+    QCOMPARE(actorMgr.CastSet().size(), 3);
 
-    const auto& perfsList = (*cmInLLT)("U! + V; / W. \\\\ X & Y and Z?");
-    QCOMPARE(perfsList, expectCastList);
-  }
-
-  void test_with_new_line_seperator() {
-    // precondition
     const QStringList expectCastList{"Matt Dallas", "Chris Pine", "Jensen Ackles"};
-    CAST_MGR_DATA_T tempPerfs;
-    for (const QString& star : expectCastList) {
-      tempPerfs.insert(star.toLower());
-    }
-    cmInLLT->CastSet().swap(tempPerfs);
-    ON_SCOPE_EXIT {
-      cmInLLT->CastSet().swap(tempPerfs);
-    };
-    QVERIFY(!cmInLLT->CastSet().isEmpty());
-
-    const auto& perfsList = (*cmInLLT)("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
-    QCOMPARE(perfsList, expectCastList);
+    const QStringList ansOfCommaSep = actorMgr("Matt Dallas, Chris Pine, Jensen Ackles");
+    const QStringList ansOfNewLineSep = actorMgr("Matt Dallas \n Chris Pine \r\n Jensen Ackles");
+    const QStringList ansOfColonSep = actorMgr("Matt Dallas; Chris Pine; Jensen Ackles");
+    const QStringList ansOfTabSep = actorMgr("Matt Dallas \t Chris Pine\tJensen Ackles");
+    const QStringList ansOfPeriodSep = actorMgr("Matt Dallas. Chris Pine. Jensen Ackles");
+    QCOMPARE(ansOfCommaSep, expectCastList);
+    QCOMPARE(ansOfNewLineSep, expectCastList);
+    QCOMPARE(ansOfColonSep, expectCastList);
+    QCOMPARE(ansOfTabSep, expectCastList);
+    QCOMPARE(ansOfPeriodSep, expectCastList);
   }
 
   void test_LearningFromAPath_write_local_file_succeed() {
-    // precondition
-    QDir dir{rootpath};
-    const QString jsonAbsFile{dir.absoluteFilePath("My Good Boy.json")};
-    QVERIFY(QFile::exists(jsonAbsFile));
+    mTDir.touch(mActorsFileName, "");
+    mTDir.touch(mActorsBlackFileName, "");
+    mTDir.touch(mStudiosListFile, "");
+    mTDir.touch(mStudiosBlackListFile, "");
+    actorMgr.ForceReloadImpl();
+    studioMgr.ForceReloadImpl();
+    QVERIFY(actorMgr.CastSet().isEmpty());
+    QVERIFY(studioMgr.ProStudioMap().isEmpty());
 
-    using namespace JsonKey;
-    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonAbsFile);
-
-    const auto studioIt = dict.constFind(ENUM_2_STR(Studio));
-    QVERIFY(studioIt != dict.cend());
-    const QString& studioName{"StudioNotExist"};
     // studio not exist, studionotexist => StudioNotExist
+    const QString& studioName{"StudioNotExist"};
     QHash<QString, QString> expectStudioSet{{"studionotexist", "StudioNotExist"},  //
                                             {"studio not exist", "StudioNotExist"}};
+
+    using namespace JsonKey;
+    const QVariantHash& dict = JsonHelper::MovieJsonLoader(mJsonFile);
+    const auto studioIt = dict.constFind(ENUM_2_STR(Studio));
+    QVERIFY(studioIt != dict.cend());
     QCOMPARE(studioIt.value().toString(), studioName);
 
     const auto castIt = dict.constFind(ENUM_2_STR(Cast));
@@ -175,43 +193,30 @@ class CastManagerTest : public PlainTestSuite {
     QSet<QString> expectCastSet{"cast1notexist", "cast2notexist"};
     QCOMPARE(castIt.value().toStringList(), castLst);
 
-    // procedure
-    QHash<QString, QString> emptyStudioSet;
-    smInLLT->ProStudioMap().swap(emptyStudioSet);
-    ON_SCOPE_EXIT {
-      smInLLT->ProStudioMap().swap(emptyStudioSet);
-    };
-
-    QSet<QString> emptyCastSet;
-    cmInLLT->CastSet().swap(emptyCastSet);
-    ON_SCOPE_EXIT {
-      cmInLLT->CastSet().swap(emptyCastSet);
-    };
-
     // cached should updated, local file should not write
     bool studioLocalFileWrite{false};
-    QCOMPARE(smInLLT->LearningFromAPath(rootpath, &studioLocalFileWrite), 2);
-    QCOMPARE(smInLLT->ProStudioMap(), expectStudioSet);
+    QCOMPARE(studioMgr.LearningFromAPath(rootpath, &studioLocalFileWrite), 2);
+    QCOMPARE(studioMgr.ProStudioMap(), expectStudioSet);
     QCOMPARE(studioLocalFileWrite, true);
-    const QFile fiStudio{gStudioLocalFilePath};
+    const QFile fiStudio{mStudiosListFile};
     QVERIFY(fiStudio.size() > 0);
 
     bool castLocalFileWrite{false};
-    QCOMPARE(cmInLLT->LearningFromAPath(rootpath, &castLocalFileWrite), 2);
-    QCOMPARE(cmInLLT->CastSet(), expectCastSet);
+    QCOMPARE(actorMgr.LearningFromAPath(rootpath, &castLocalFileWrite), 2);
+    QCOMPARE(actorMgr.CastSet(), expectCastSet);
     QCOMPARE(castLocalFileWrite, true);
-    const QFile fiCast{gLocalFilePath};
+    const QFile fiCast{mActorsListFile};
     QVERIFY(fiCast.size() > 0);
 
     // do it again, nothing new should append
     studioLocalFileWrite = true;
-    QCOMPARE(smInLLT->LearningFromAPath(rootpath, &studioLocalFileWrite), 0);
-    QCOMPARE(smInLLT->ProStudioMap(), expectStudioSet);
+    QCOMPARE(studioMgr.LearningFromAPath(rootpath, &studioLocalFileWrite), 0);
+    QCOMPARE(studioMgr.ProStudioMap(), expectStudioSet);
     QCOMPARE(studioLocalFileWrite, false);  // skipped, no write
 
     castLocalFileWrite = true;
-    QCOMPARE(cmInLLT->LearningFromAPath(rootpath, &castLocalFileWrite), 0);
-    QCOMPARE(cmInLLT->CastSet(), expectCastSet);
+    QCOMPARE(actorMgr.LearningFromAPath(rootpath, &castLocalFileWrite), 0);
+    QCOMPARE(actorMgr.CastSet(), expectCastSet);
     QCOMPARE(castLocalFileWrite, false);  // skipped, no write
   }
 };

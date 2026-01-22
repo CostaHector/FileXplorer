@@ -1,8 +1,16 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-
+#include "PublicTool.h"
+#include "FileToolMock.h"
 #include "PlayVideo.h"
 #include "TDir.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
 class PlayVideoTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -15,6 +23,14 @@ class PlayVideoTest : public PlainTestSuite {
         {"subdir", true, ""},                        //
     };
     QCOMPARE(tDir.createEntries(nodes), 2);  // 创建两个条目：一个文件，一个目录
+
+    GlobalMockObject::reset();
+    using namespace FileToolMock;
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+  }
+
+  void cleanupTestCase() {
+    GlobalMockObject::verify();
   }
 
   void test_PlayNonExistingPath() {
@@ -28,14 +44,14 @@ class PlayVideoTest : public PlainTestSuite {
     // 测试存在的文件
     QString filePath = tDir.itemPath("videos.mp4");
     QVERIFY(QFile::exists(filePath));
-    QVERIFY(on_ShiftEnterPlayVideo(filePath));  // 在测试宏下应返回true
+    QVERIFY(on_ShiftEnterPlayVideo(filePath));
   }
 
   void test_PlayDirectory() {
     // 测试目录
     QString dirPath = tDir.itemPath("subdir");
     QVERIFY(QFile::exists(dirPath));
-    QVERIFY(on_ShiftEnterPlayVideo(dirPath));  // 在测试宏下应返回true（因为PlayADir返回true）
+    QVERIFY(on_ShiftEnterPlayVideo(dirPath));
   }
 
   void test_PlayADir() {

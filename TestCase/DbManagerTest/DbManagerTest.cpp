@@ -10,7 +10,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include "DbManagerHelper.h"
-
+#include "PublicTool.h"
+#include "FileToolMock.h"
 #include "MountHelper.h"
 #include "MountPathTableNameMapperMock.h"
 #include <mockcpp/mokc.h>
@@ -40,6 +41,9 @@ public:
 private slots:
   void initTestCase() {
     GlobalMockObject::reset();
+        using namespace FileToolMock;
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+    
     using namespace MountPathTableNameMapper;
     using namespace MountPathTableNameMapperMock;
     MOCKER(toMountPath).stubs().will(invoke(invokeToMountPath));

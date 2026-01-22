@@ -5,7 +5,36 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QSet>
+
 namespace PathTool{
+
+namespace FILE_REL_PATH {
+const QString& GetStudiosListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/STANDARD_STUDIO_NAME.txt");
+  return path;
+}
+
+const QString& GetStudiosBlackListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/STUDIOS_BLACK_LIST.txt");
+  return path;
+}
+
+const QString& GetActorsListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/PERFORMERS_TABLE.txt");
+  return path;
+}
+
+const QString& GetActorsBlackListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/ACTORS_BLACK_LIST.txt");
+  return path;
+}
+
+const QString& GetActorsAliasListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/AKA_PERFORMERS.txt");
+  return path;
+}
+}
+
 
 QString GetPathByApplicationDirPath(const QString& relativePath) {
   static const QDir appDir{QCoreApplication::applicationDirPath()};

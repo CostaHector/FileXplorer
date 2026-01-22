@@ -41,14 +41,11 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
  private:
   StudiosManager();  // valid localFilePath only used in llt
   StudiosManager(const StudiosManager& rhs) noexcept = delete;
-  void InitializeImpl(const QString& path);
-#ifdef RUNNING_UNIT_TESTS
-  int ResetStateForTestImpl(const QString& localFilePath);
-#endif
+  void InitializeImpl(const QString& path, const QString& blackPath="");
 
   QString FileName2StudioNameSection(QString sentence) const;
   QString FileNameLastSection2StudioNameSection(QString sentence) const;
-  QString mLocalFilePath;
+  QString mLocalFilePath, mLocalBlackFilePath;
 };
 
 #endif  // STUDIOSMANAGER_H

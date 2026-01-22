@@ -4,11 +4,18 @@
 #include "TDir.h"
 #include "PublicVariable.h"
 #include "PlainTestSuite.h"
+#include "PublicTool.h"
+#include "FileToolMock.h"
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"
 #include "Logger.h" // ahead of any other file include this file
 #include "EndToExposePrivateMember.h"
 
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class LoggerTest : public PlainTestSuite {
   Q_OBJECT
@@ -18,7 +25,14 @@ public:
   const QString LOCAL_LOG{"log_handler_local.log"};
   const QString LOCAL_LOG_ABS_PATH{mDir.itemPath(LOCAL_LOG)};
 private slots:
+  void initupTestCase() {
+   GlobalMockObject::reset();
+   using namespace FileToolMock;
+   MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+  }
+
   void cleanupTestCase() {
+    GlobalMockObject::verify();
     if (Logger::mLogFILEStreamUniquePtr != nullptr) {
       // avoid the pointer open("log_handler_local.log")  block QTemporaryDir from delete temp directory
       Logger::mLogFILEStreamUniquePtr.reset(nullptr);
