@@ -45,11 +45,11 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
 
     CastManager& castInst = CastManager::getInst();
-    castInst.ResetStateForTestImpl(tDir.itemPath("casts_list_test.txt"));
+    castInst.InitializeImpl(tDir.itemPath("casts_list_test.txt"));
     castInst.CastSet().clear();
 
     StudiosManager& studioInst = StudiosManager::getInst();
-    studioInst.ResetStateForTestImpl(tDir.itemPath("studios_list_test.txt"));
+    studioInst.InitializeImpl(tDir.itemPath("studios_list_test.txt"));
     studioInst.ProStudioMap().clear();
   }
 

@@ -16,7 +16,7 @@ SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash) {
       varHash.value("Name", "").toString(),         //
       varHash.value("ImgName", "").toStringList(),  //
       varHash.value("VidName", "").toString(),      //
-      varHash.value("Size", 0).toULongLong(),       //
+      varHash.value("Size", 0).toLongLong(),       //
       varHash.value("Rate", 0).toInt(),             //
       varHash.value("Uploaded", "").toString(),     //
   };

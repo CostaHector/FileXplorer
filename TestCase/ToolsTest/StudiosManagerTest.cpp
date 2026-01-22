@@ -7,129 +7,140 @@
 #include "BeginToExposePrivateMember.h"
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
+#include "PathTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class StudiosManagerTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   StudiosManagerTest() : PlainTestSuite{} {}
-  TDir mDir;
-  const QString rootpath{mDir.path()};
-  const QString gLocalFilePath{rootpath + "/not_exist_studio_list.txt"};
-  StudiosManager* smInLLT{nullptr};
-  QList<FsNodeEntry> gNodeEntries;
-private slots:
+  TDir mTDir;
+  const QString rootpath{mTDir.path()};
+
+  const QString mStudiosFileName = "Studios.txt";
+  const QString mStudiosListFile = mTDir.itemPath(mStudiosFileName);
+  const QString mStudiosBlackFileName = "StudiosBlack.txt";
+  const QString mStudiosBlackListFile = mTDir.itemPath(mStudiosBlackFileName);
+
+  QList<FsNodeEntry> mNodes{
+      FsNodeEntry{mStudiosFileName, false, ""},       //
+      FsNodeEntry{mStudiosBlackFileName, false, ""},  //
+  };
+
+  StudiosManager& studioMgr = StudiosManager::getInst();
+ private slots:
   void initTestCase() {
-    static StudiosManager inst;
-    inst.ResetStateForTestImpl(gLocalFilePath);
-    smInLLT = &inst;
-  }
+    QVERIFY(mTDir.IsValid());
 
-  void test_studio_list_file_not_exist_read_out() {
-    QVERIFY2(!mDir.exists(gLocalFilePath), qPrintable(gLocalFilePath));  // file not exist
-    QVERIFY2(smInLLT->count() == 0, "Studio count in llt should be empty");
-  }
+    GlobalMockObject::reset();
+    using namespace PathTool::FILE_REL_PATH;
+    MOCKER(GetStudiosListFilePath).stubs().will(returnValue(mStudiosListFile));
+    MOCKER(GetStudiosBlackListFilePath).stubs().will(returnValue(mStudiosBlackListFile));
 
-  void test_studio_list_not_empty_in_service() {
-    const StudiosManager& psm{StudiosManager::getInst()};
-    QVERIFY2(psm.count() >= 0, "studio list should not be empty");
+    studioMgr.InitializeImpl("inexist studio list file.txt");
+    QVERIFY2(studioMgr.count() == 0, "read from inexist file should return 0 items");
+
+    studioMgr.InitializeImpl(GetStudiosListFilePath(), GetStudiosBlackListFilePath());
+    QVERIFY2(studioMgr.count() == 0, "read from empty file should return 0 items");
+  }
+  void cleanupTestCase() {  //
+    GlobalMockObject::verify();
   }
 
   void test_studio_name_in_last_section_ok() {
     // precondition
-    STUDIO_MGR_DATA_T tempStudioHash;
-    tempStudioHash["realmadridcf"] = "RealMadridCF";
-    tempStudioHash["real madrid cf"] = "RealMadridCF";
-    tempStudioHash["juventus"] = "Juventus";
+    QCOMPARE(studioMgr.count(), 0);
+    mTDir.touch(mStudiosFileName,
+                "realmadridcf\tRealMadridCF\n"
+                "real madrid cf\tRealMadridCF\n"
+                "juventus\tJuventus\n"
+                "random studio\tRandomStudio");  // in blacklist, ignored
+    mTDir.touch(mStudiosBlackFileName, "random studio\nrandomstudio\n");
 
-    smInLLT->ProStudioMap().swap(tempStudioHash);
-    ON_SCOPE_EXIT {
-      smInLLT->ProStudioMap().swap(tempStudioHash);
-    };
-    QVERIFY(!smInLLT->ProStudioMap().isEmpty());
+    QCOMPARE(studioMgr.ForceReloadImpl(), 3);
+    QCOMPARE(studioMgr.count(), 3);
 
-    QCOMPARE((*smInLLT)("Raphaël Varane, Kaka - RealMadridCF"), "RealMadridCF");
-    QCOMPARE((*smInLLT)("Raphaël Varane, Cristiano Ronaldo - Real Madrid CF"), "RealMadridCF");
-    QCOMPARE((*smInLLT)("Raphaël Varane, Álvaro Morata - Real Madrid CF"), "RealMadridCF");
+    QCOMPARE(studioMgr("Raphaël Varane, Kaka - RealMadridCF"), "RealMadridCF");
+    QCOMPARE(studioMgr("Raphaël Varane, Cristiano Ronaldo - Real Madrid CF"), "RealMadridCF");
+    QCOMPARE(studioMgr("Raphaël Varane, Álvaro Morata - Real Madrid CF"), "RealMadridCF");
 
-    QCOMPARE((*smInLLT)("Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "RealMadridCF");
-    QCOMPARE((*smInLLT)("Cristiano Ronaldo, Álvaro Morata - Real Madrid CF DVD"), "RealMadridCF");
+    QCOMPARE(studioMgr("Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "RealMadridCF");
+    QCOMPARE(studioMgr("Cristiano Ronaldo, Álvaro Morata - Real Madrid CF DVD"), "RealMadridCF");
 
-    QCOMPARE((*smInLLT)("juventus - Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "Juventus");
+    QCOMPARE(studioMgr("juventus - Cristiano Ronaldo, Kaka - RealMadridCF DVD"), "Juventus");
+
+    // 不在表中的厂商
+    QCOMPARE(studioMgr("Bayern Munich - Thomas Müller, Robert Lewandowski"), "");
+    // 在黑名单中的厂商
+    QCOMPARE(studioMgr("Random Studio - whatever contents here"), "");
   }
 
   void test_standardStudioNameFrom_ok() {
-    // precondition
-    STUDIO_MGR_DATA_T tempStudioHash;
+    mTDir.touch(mStudiosFileName,
+                "realmadridcf\tRealMadridCF\n"
+                "real madrid cf\tRealMadridCF\n"
+                "schalke04\tSchalke04\n"
+                "schalke 04\tSchalke04\n"
+                "men\tMEN\n"
+                "my 3 gifts\tMy3Gifts\n"
+                "my3gifts\tMy3Gifts\n");  // in blacklist, ignored
+    mTDir.touch(mStudiosBlackFileName, "randon studio\nrandonstudio");
+    studioMgr.ForceReloadImpl();
+    QCOMPARE(studioMgr.count(), 7);
+
     // FC Bayern Munich here not support
     // FC Barcelona here not support
-    tempStudioHash["realmadridcf"] = "RealMadridCF";
-    tempStudioHash["real madrid cf"] = "RealMadridCF";
-    tempStudioHash["schalke04"] = "Schalke04";
-    tempStudioHash["schalke 04"] = "Schalke04";
-    tempStudioHash["men"] = "MEN";
-    tempStudioHash["my 3 gifts"] = "My3Gifts";
-    tempStudioHash["my3gifts"] = "My3Gifts";
-
-    smInLLT->ProStudioMap().swap(tempStudioHash);
-    ON_SCOPE_EXIT {
-      smInLLT->ProStudioMap().swap(tempStudioHash);
-    };
-    QVERIFY(!smInLLT->ProStudioMap().isEmpty());
-
     QSet<QString> fromList;
     QSet<QString> expectStudiosName;
 
     // GetCoarseStudioNames name ok
     expectStudiosName = QSet<QString>{"realmadridcf", "real madrid cf"};
-    fromList = smInLLT->GetCoarseStudioNames("RealMadridCF");
+    fromList = studioMgr.GetCoarseStudioNames("RealMadridCF");
     QCOMPARE(expectStudiosName, fromList);
 
     expectStudiosName = QSet<QString>{"schalke04", "schalke 04"};
-    fromList = smInLLT->GetCoarseStudioNames("Schalke04");
+    fromList = studioMgr.GetCoarseStudioNames("Schalke04");
     QCOMPARE(expectStudiosName, fromList);
 
     expectStudiosName = QSet<QString>{"men"};
-    fromList = smInLLT->GetCoarseStudioNames("MEN");
+    fromList = studioMgr.GetCoarseStudioNames("MEN");
     QCOMPARE(expectStudiosName, fromList);
 
     expectStudiosName = QSet<QString>{"alreadylowercase"};
-    fromList = smInLLT->GetCoarseStudioNames("alreadylowercase");
+    fromList = studioMgr.GetCoarseStudioNames("alreadylowercase");
     QCOMPARE(expectStudiosName, fromList);
 
     // hint studio name ok
-    QCOMPARE((*smInLLT)("Schalke 04 - no matter whom"), "Schalke04");
-    QCOMPARE((*smInLLT)("schalke 04 - no matter whom"), "Schalke04");
-    QCOMPARE((*smInLLT)("schalke04 - no matter whom"), "Schalke04");
-    QCOMPARE((*smInLLT)("Schalke04 - no matter whom"), "Schalke04");
+    QCOMPARE(studioMgr("Schalke 04 - no matter whom"), "Schalke04");
+    QCOMPARE(studioMgr("schalke 04 - no matter whom"), "Schalke04");
+    QCOMPARE(studioMgr("schalke04 - no matter whom"), "Schalke04");
+    QCOMPARE(studioMgr("Schalke04 - no matter whom"), "Schalke04");
 
-    QCOMPARE((*smInLLT)("Real Madrid CF - Kaka & Cristinao Ronaldo"), "RealMadridCF");
-    QCOMPARE((*smInLLT)("real madrid cf - Kaka & Cristinao Ronaldo"), "RealMadridCF");
-    QCOMPARE((*smInLLT)("RealMadridCF - Kaka & Cristinao Ronaldo"), "RealMadridCF");
+    QCOMPARE(studioMgr("Real Madrid CF - Kaka & Cristinao Ronaldo"), "RealMadridCF");
+    QCOMPARE(studioMgr("real madrid cf - Kaka & Cristinao Ronaldo"), "RealMadridCF");
+    QCOMPARE(studioMgr("RealMadridCF - Kaka & Cristinao Ronaldo"), "RealMadridCF");
 
-    QCOMPARE((*smInLLT)("MEN - Henry Cavill"), "MEN");
-    QCOMPARE((*smInLLT)("men - Sean O'Pry"), "MEN");
+    QCOMPARE(studioMgr("MEN - Henry Cavill"), "MEN");
+    QCOMPARE(studioMgr("men - Sean O'Pry"), "MEN");
 
-    QCOMPARE((*smInLLT)("my 3 gifts - Henry Cavill"), "My3Gifts");
-    QCOMPARE((*smInLLT)("My3Gifts - Henry Cavill"), "My3Gifts");
-    QCOMPARE((*smInLLT)("my3gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("my 3 gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("My3Gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("my3gifts - Henry Cavill"), "My3Gifts");
 
     // with prefix still should ok
-    QCOMPARE((*smInLLT)("[FFL]my 3 gifts - Henry Cavill"), "My3Gifts");
-    QCOMPARE((*smInLLT)("[FL]My3Gifts - Henry Cavill"), "My3Gifts");
-    QCOMPARE((*smInLLT)("[GT]my3gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("[FFL]my 3 gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("[FL]My3Gifts - Henry Cavill"), "My3Gifts");
+    QCOMPARE(studioMgr("[GT]my3gifts - Henry Cavill"), "My3Gifts");
 
-    // studio not int dict, and hypen index exist and <=22, return itself
-    QVERIFY(!tempStudioHash.contains("studio not in dict"));
-    QVERIFY(!tempStudioHash.contains("studionotindict"));
-    QCOMPARE((*smInLLT)("StudioNotInDict - Henry Cavill"), "StudioNotInDict");
-
-    // studio not int dict, and hypen index exist and length>22, return empty
-    QVERIFY(!tempStudioHash.contains("01234567890123456789012"));
-    QCOMPARE((*smInLLT)("01234567890123456789012 - Henry Cavill"), "");
-
-    // studio not int dict, and hypen index not exist return empty
-    QVERIFY(!tempStudioHash.contains("01234567890123456789012"));
-    QCOMPARE((*smInLLT)("01234567890123456789012 Henry Cavill"), "");
+    // studio not int table, return ""
+    QCOMPARE(studioMgr("StudioNotInDict - Henry Cavill"), "");
+    QCOMPARE(studioMgr("01234567890123456789012 - Henry Cavill"), "");
+    QCOMPARE(studioMgr("01234567890123456789012 Henry Cavill"), "");
   }
 
   void test_isHypenIndexValid() {

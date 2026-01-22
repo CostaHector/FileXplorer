@@ -23,12 +23,19 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void test_cast_studio_file_path_exists() {
-    QString perfPath = GetPathByApplicationDirPath(FILE_REL_PATH::PERFORMERS_TABLE);
+    // 3 txt file should exists
+    // - Studios/Actors/ActorsAlias_Folder
+    //       Studios.txt
+    //       Actors.txt
+    //       ActorsAlias.txt
+    // - ThisProject
+    using namespace FILE_REL_PATH;
+    QString perfPath = GetActorsListFilePath();
     QVERIFY(QFile::exists(perfPath));
-    QString akaPath = GetPathByApplicationDirPath(FILE_REL_PATH::AKA_PERFORMERS);
-    QVERIFY(QFile::exists(akaPath));
-    QString stdStudioPath = GetPathByApplicationDirPath(FILE_REL_PATH::STANDARD_STUDIO_NAME);
+    QString stdStudioPath = GetStudiosListFilePath();
     QVERIFY(QFile::exists(stdStudioPath));
+    QString akaPath = GetActorsAliasListFilePath();
+    QVERIFY(QFile::exists(akaPath));
   }
 
   void test_GetWinStdPath() {

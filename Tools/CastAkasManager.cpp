@@ -16,12 +16,11 @@ template class SingletonManager<CastAkasManager, CAST_AKA_MGR_DATA_T>;
 CastAkasManager::CastAkasManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  const QString defaultPath = PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS);
-  InitializeImpl(defaultPath);
-
+  InitializeImpl(GetActorsAliasListFilePath(), "");
 #endif
 }
-void CastAkasManager::InitializeImpl(const QString& path) {
+
+void CastAkasManager::InitializeImpl(const QString& path, const QString& blackPath) {
   mLocalFilePath = path;
   CastAkaMap() = ReadOutCastAkas();
 }
@@ -57,10 +56,3 @@ int CastAkasManager::ForceReloadImpl() {
   LOG_D("%d aka names added/removed", afterAkaNameCnt - beforeAkaNameCnt);
   return afterAkaNameCnt - beforeAkaNameCnt;
 }
-
-#ifdef RUNNING_UNIT_TESTS
-int CastAkasManager::ResetStateForTestImpl(const QString& localFilePath) {
-  InitializeImpl(localFilePath);
-  return 0;
-}
-#endif
