@@ -42,10 +42,7 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
  private:
   ImagesInfoManager();
   ImagesInfoManager(const ImagesInfoManager& rhs) noexcept = delete;
-  void InitializeImpl(const QString& path);
-#ifdef RUNNING_UNIT_TESTS
-  int ResetStateForTestImpl(const QString& localFilePath);
-#endif
+  void InitializeImpl(const QString& path, const QString& blackPath="");
 };
 
 // only used in decide by MD5

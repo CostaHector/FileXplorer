@@ -34,8 +34,5 @@ bool on_ShiftEnterPlayVideo(const QString& path) {
     return PlayADir(path);
   }
   LOG_W("Play file[%s]...", qPrintable(path));
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return FileTool::OpenLocalFileUsingDesktopService(fi.absoluteFilePath());
 }

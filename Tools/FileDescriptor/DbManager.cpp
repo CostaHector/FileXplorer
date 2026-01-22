@@ -336,9 +336,6 @@ bool DbManager::onShowInFileSystemView() const {
     LOG_W("Database[%s] not exist, open failed", qPrintable(mDbName));
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return FileTool::OpenLocalFileUsingDesktopService(mDbName);
 }
 

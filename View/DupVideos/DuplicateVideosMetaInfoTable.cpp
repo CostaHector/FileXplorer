@@ -248,10 +248,6 @@ bool DuplicateVideosMetaInfoTable::onOpenTableAssociatedPath(const QModelIndex& 
     LOG_ERR_P("[Path not exist]", "[%s]\nderived from:[%s]", qPrintable(pth), qPrintable(tableName));
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
-
   const bool openRet = FileTool::OpenLocalFileUsingDesktopService(pth);
   LOG_OE_P(openRet, "Open Table Associated path", "%s", pth);
   return openRet;

@@ -108,9 +108,6 @@ bool Logger::OpenLogFile() {
     LOG_W("log file[%s] not exist", qPrintable(logAbsPath));
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return FileTool::OpenLocalFileUsingDesktopService(logAbsPath);
 }
 

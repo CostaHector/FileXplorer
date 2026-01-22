@@ -11,23 +11,44 @@
 
 template class SingletonManager<CastManager, CAST_MGR_DATA_T>;
 
-const QRegularExpression CastManager::EFFECTIVE_CAST_NAME{R"([@ _])"};
-constexpr int CastManager::EFFECTIVE_CAST_NAME_LEN;
-
 CastManager::CastManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  const QString defaultPath = PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE);
-  InitializeImpl(defaultPath);
+  InitializeImpl(GetActorsListFilePath(), GetActorsBlackListFilePath());
 #endif
 }
 
-void CastManager::InitializeImpl(const QString& path) {
+void CastManager::InitializeImpl(const QString& path, const QString& blackPath) {
   mLocalFilePath = path;
+  mLocalBlackFilePath = blackPath;
   CastSet() = ReadOutCasts();
 }
 
+bool CastManager::IsActorNameValid(const QString& actorName) {
+  static constexpr int EFFECTIVE_ACTOR_NAME_IF_LENGTH_GE = 12;
+  if (actorName.size() >= EFFECTIVE_ACTOR_NAME_IF_LENGTH_GE) {
+    return true;
+  }
+  static const QRegularExpression EFFECTIVE_CAST_NAME_CONTAIN_LETTERS{R"([@ _\.])"};
+  if (actorName.contains(EFFECTIVE_CAST_NAME_CONTAIN_LETTERS)) {
+    return true;
+  }
+  return false;
+}
+
 CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
+  CAST_MGR_DATA_T blackList;
+  {
+    QFile blackFi{mLocalBlackFilePath};
+    if (blackFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QTextStream in(&blackFi);
+      in.setCodec("UTF-8");
+      while(!in.atEnd()) {
+        blackList.insert(in.readLine(128));
+      }
+    }
+  }
+
   QFile castFi{mLocalFilePath};
   if (!castFi.exists()) {
     LOG_D("Cast list file[%s] not exist", qPrintable(castFi.fileName()));
@@ -45,18 +66,21 @@ CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
   QTextStream stream(&castFi);
   stream.setCodec("UTF-8");
 
-  CAST_MGR_DATA_T perfSet;
+  CAST_MGR_DATA_T actorsSet;
   QString name;
   while (!stream.atEnd()) {
     name = stream.readLine().toLower();
-    // at least 2 words, or 12 char
-    if (name.size() >= EFFECTIVE_CAST_NAME_LEN || name.contains(EFFECTIVE_CAST_NAME)) {
-      perfSet.insert(name);
+    if (!IsActorNameValid(name)) {
+      continue;
     }
+    if (blackList.contains(name)) {
+      continue;
+    }
+    actorsSet.insert(name);
   }
   castFi.close();
-  LOG_D("%d performers read out", perfSet.size());
-  return perfSet;
+  LOG_D("%d performers read out", actorsSet.size());
+  return actorsSet;
 }
 
 int CastManager::ForceReloadImpl() {
@@ -170,13 +194,14 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
   if (words.isEmpty()) {
     return {};
   }
+  const CAST_MGR_DATA_T& actorsSet = CastSet();
   QStringList performersList;
   int i = 0;
   const int N = words.size();
   while (i < N) {
     if (i < N - 2) {
       const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
-      if (CastSet().contains(w3.toLower())) {
+      if (actorsSet.contains(w3.toLower())) {
         if (!performersList.contains(w3))
           performersList.append(w3);
         i += 3;
@@ -185,7 +210,7 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     }
     if (i < N - 1) {
       const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
-      if (CastSet().contains(w2.toLower())) {
+      if (actorsSet.contains(w2.toLower())) {
         if (!performersList.contains(w2)) {
           performersList.append(w2);
         }
@@ -194,9 +219,10 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (!w1.isEmpty() && CastSet().contains(w1.toLower())) {
-      if (!performersList.contains(w1))
+    if (!w1.isEmpty() && actorsSet.contains(w1.toLower())) {
+      if (!performersList.contains(w1)) {
         performersList.append(w1);
+      }
       i += 1;
       continue;
     }
@@ -209,10 +235,3 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
 QStringList CastManager::operator()(const QString& sentence) const {
   return FilterPerformersOut(SplitSentence(sentence));
 }
-
-#ifdef RUNNING_UNIT_TESTS
-int CastManager::ResetStateForTestImpl(const QString& localFilePath) {
-  InitializeImpl(localFilePath);
-  return 0;
-}
-#endif

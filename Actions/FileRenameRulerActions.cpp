@@ -11,17 +11,6 @@
 #include <tuple>
 #include "PublicTool.h"
 
-void FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
-  const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(rel2File);
-  mLastTimeEditFileInfo.first = FileTool::OpenLocalFileUsingDesktopService(fileAbsPath);
-  mLastTimeEditFileInfo.second = fileAbsPath;
-  if (!mLastTimeEditFileInfo.first) {
-    LOG_WARN_NP("Cannot Edit", fileAbsPath);
-    return;
-  }
-  LOG_INFO_NP("Remember to reload", "don't forget it");
-}
-
 FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent} {
   _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), tr("Name Ruler"));
   _NAME_RULER->setToolTip(
@@ -33,20 +22,20 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
 
   _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), tr("Edit studios list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_STUDIOS;
-  _RELOAD_STUDIOS = new (std::nothrow) QAction("Reload studios", this);
+  _RELOAD_STUDIOS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload studios"), this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_STUDIOS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _EDIT_PERFS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Edit performers list file"), this);
-  NAME_RULES_ACTIONS_LIST += _EDIT_PERFS;
-  _RELOAD_PERFS = new (std::nothrow) QAction("Reload performers", this);
-  NAME_RULES_ACTIONS_LIST += _RELOAD_PERFS;
+  _EDIT_ACTORS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Edit actors list file"), this);
+  NAME_RULES_ACTIONS_LIST += _EDIT_ACTORS;
+  _RELOAD_ACTORS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload actors"), this);
+  NAME_RULES_ACTIONS_LIST += _RELOAD_ACTORS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
-  _EDIT_PERF_AKA = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), tr("Edit performers AKA list file"), this);
-  NAME_RULES_ACTIONS_LIST += _EDIT_PERF_AKA;
-  _RELOAD_PERF_AKA = new (std::nothrow) QAction("Reload performers AKA", this);
-  NAME_RULES_ACTIONS_LIST += _RELOAD_PERF_AKA;
+  _EDIT_ACTORS_ALIAS = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), tr("Edit actors alias list file"), this);
+  NAME_RULES_ACTIONS_LIST += _EDIT_ACTORS_ALIAS;
+  _RELOAD_ACTORS_ALIAS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload actor alias"), this);
+  NAME_RULES_ACTIONS_LIST += _RELOAD_ACTORS_ALIAS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
   _RENAME_RULE_STAT = new (std::nothrow) QAction(QIcon(":img/SHOW_CAST_STUDIO_STATISTIC"), tr("Rename rule statistics"), this);
@@ -55,40 +44,70 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
   subscribe();
 }
 
-void onShowRenameRuleStatistics() {
-  QString statictsContent;
-  statictsContent += "\nStudios number\t";
-  statictsContent += QString::number(StudiosManager::getInst().count());
-  statictsContent += '\n';
-  statictsContent += "Cast number\t";
-  statictsContent += QString::number(CastManager::getInst().count());
-  statictsContent += '\n';
-  statictsContent += "AKA number\t";
-  statictsContent += QString::number(CastAkasManager::getInst().count());
-  LOG_INFO_NP("Rename rule statistics", statictsContent);
+bool FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
+  const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(rel2File);
+  const bool openResult = FileTool::OpenLocalFileUsingDesktopService(fileAbsPath);
+  if (!openResult) {
+    LOG_WARN_NP("Cannot Edit", fileAbsPath);
+    return false;
+  }
+  LOG_INFO_NP("Remember to reload", "don't forget it");
+  return true;
+}
+
+bool FileRenameRulerActions::onEditStudiosListFile() {
+  using namespace PathTool::FILE_REL_PATH;
+  return onEditLocalFile(GetStudiosListFilePath());
+}
+bool FileRenameRulerActions::onEditActorsListFile() {
+  using namespace PathTool::FILE_REL_PATH;
+  return onEditLocalFile(GetActorsListFilePath());
+}
+bool FileRenameRulerActions::onEditActorsAliasListFile() {
+  using namespace PathTool::FILE_REL_PATH;
+  return onEditLocalFile(GetActorsAliasListFilePath());
+}
+int FileRenameRulerActions::onReloadStudiosListFile() {
+  StudiosManager& psm = StudiosManager::getInst();
+  int cntDelta = psm.ForceReloadImpl();
+  LOG_OK_P("Reload studios", "delta %d items", cntDelta);
+  return cntDelta;
+}
+
+int FileRenameRulerActions::onReloadActorsListFile() {
+  CastManager& pm = CastManager::getInst();
+  int cntDelta = pm.ForceReloadImpl();
+  LOG_OK_P("Reload performers", "delta %d item(s)", cntDelta);
+  return cntDelta;
+}
+int FileRenameRulerActions::onReloadActorsAliasListFile() {
+  static auto& dbTM = CastAkasManager::getInst();
+  int cntDelta = dbTM.ForceReloadImpl();
+  LOG_OK_P("Reload performers AKA", "delta %d item(s)", cntDelta);
+  return cntDelta;
+}
+
+void FileRenameRulerActions::onShowRenameRuleStatistics() {
+  QString statisticsContent;
+  statisticsContent += "Studios number\t";
+  statisticsContent += QString::number(StudiosManager::getInst().count());
+  statisticsContent += '\n';
+  statisticsContent += "Cast number\t";
+  statisticsContent += QString::number(CastManager::getInst().count());
+  statisticsContent += '\n';
+  statisticsContent += "AKA number\t";
+  statisticsContent += QString::number(CastAkasManager::getInst().count());
+  LOG_INFO_NP("Rename rule statistics", statisticsContent);
 }
 
 void FileRenameRulerActions::subscribe() {
-  using namespace PathTool::FILE_REL_PATH;
-  connect(_EDIT_STUDIOS, &QAction::triggered,  this, [this]() { onEditLocalFile(PathTool::GetPathByApplicationDirPath(STANDARD_STUDIO_NAME)); });
-  connect(_EDIT_PERFS, &QAction::triggered,    this, [this]() { onEditLocalFile(PathTool::GetPathByApplicationDirPath(PERFORMERS_TABLE)); });
-  connect(_EDIT_PERF_AKA, &QAction::triggered, this, [this]() { onEditLocalFile(PathTool::GetPathByApplicationDirPath(AKA_PERFORMERS)); });
+  connect(_EDIT_STUDIOS, &QAction::triggered, this, &FileRenameRulerActions::onEditStudiosListFile);
+  connect(_EDIT_ACTORS, &QAction::triggered, this, &FileRenameRulerActions::onEditActorsListFile);
+  connect(_EDIT_ACTORS_ALIAS, &QAction::triggered, this, &FileRenameRulerActions::onEditActorsAliasListFile);
 
-  connect(_RELOAD_STUDIOS, &QAction::triggered, this, [this]() {
-    StudiosManager& psm = StudiosManager::getInst();
-    mLastTimeCntDelta = psm.ForceReloadImpl();
-    LOG_OK_P("Reload studios", "delta %d items", mLastTimeCntDelta);
-  });
-  connect(_RELOAD_PERFS, &QAction::triggered, this, [this]() {
-    CastManager& pm = CastManager::getInst();
-    mLastTimeCntDelta = pm.ForceReloadImpl();
-    LOG_OK_P("Reload performers", "delta %d item(s)", mLastTimeCntDelta);
-  });
-  connect(_RELOAD_PERF_AKA, &QAction::triggered, this, [this]() {
-    static auto& dbTM = CastAkasManager::getInst();
-    mLastTimeCntDelta = dbTM.ForceReloadImpl();
-    LOG_OK_P("Reload performers AKA", "delta %d item(s)", mLastTimeCntDelta);
-  });
+  connect(_RELOAD_STUDIOS, &QAction::triggered, this, &FileRenameRulerActions::onReloadStudiosListFile);
+  connect(_RELOAD_ACTORS, &QAction::triggered, this, &FileRenameRulerActions::onReloadActorsListFile);
+  connect(_RELOAD_ACTORS_ALIAS, &QAction::triggered, this, &FileRenameRulerActions::onReloadActorsAliasListFile);
 
   connect(_RENAME_RULE_STAT, &QAction::triggered, this, &onShowRenameRuleStatistics);
 }

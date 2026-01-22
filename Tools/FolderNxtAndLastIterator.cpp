@@ -6,7 +6,7 @@
 #include <QDirIterator>
 
 FolderNxtAndLastIterator FolderNxtAndLastIterator::GetInstsNaviFolders() {
-  return {};
+  return FolderNxtAndLastIterator{};
 }
 
 FolderNxtAndLastIterator FolderNxtAndLastIterator::GetInstsNaviImages(bool bIncludingSubDir) {

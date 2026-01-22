@@ -48,9 +48,6 @@ bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) c
   if (!QFile::exists(filepath)) {
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return FileTool::OpenLocalFileUsingDesktopService(filepath);
 }
 

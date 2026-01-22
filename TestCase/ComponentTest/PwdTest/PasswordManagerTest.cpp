@@ -6,10 +6,18 @@
 #include "BeginToExposePrivateMember.h"
 #include "PasswordManager.h"
 #include "EndToExposePrivateMember.h"
+#include "PublicTool.h"
+#include "FileToolMock.h"
 
 #include "TDir.h"
 #include "SimpleAES.h"
 #include "PwdTableEditActions.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class PasswordManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -19,6 +27,10 @@ class PasswordManagerTest : public PlainTestSuite {
 
  private slots:
   void initTestCase() {
+    GlobalMockObject::reset();
+    using namespace FileToolMock;
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+
     QVERIFY(tDir.IsValid());  //
     QVERIFY(!tDir.exists("accounts_test.csv"));
     QVERIFY(!tDir.exists("exportedPlainAccounts_test.csv"));
@@ -38,6 +50,8 @@ class PasswordManagerTest : public PlainTestSuite {
   }
 
   void cleanupTestCase() {
+    GlobalMockObject::verify();
+
     // 清理 OpenSSL
     EVP_cleanup();
     ERR_free_strings();

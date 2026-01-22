@@ -17,14 +17,9 @@ class SingletonManager {
     return static_cast<INST_T*>(this)->ForceReloadImpl();
   }
 
-#ifdef RUNNING_UNIT_TESTS
-  int ResetStateForTest(const QString& path) {
-    return static_cast<INST_T*>(this)->ResetStateForTestImpl(path);
-  }
-#endif
  protected:
-  void Initialize(const QString& path) {
-    return static_cast<INST_T*>(this)->InitializeImpl(path);
+  void Initialize(const QString& path, const QString& blackPath="") {
+    return static_cast<INST_T*>(this)->InitializeImpl(path, blackPath);
   }
 
  private:

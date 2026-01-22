@@ -21,10 +21,7 @@ class CastAkasManager final : public SingletonManager<CastAkasManager, CAST_AKA_
  private:
   CastAkasManager();
   CastAkasManager(const CastAkasManager& rhs) noexcept = delete;
-  void InitializeImpl(const QString& path);
-#ifdef RUNNING_UNIT_TESTS
-  int ResetStateForTestImpl(const QString& localFilePath);
-#endif
+  void InitializeImpl(const QString& path, const QString& blackPath="");
   QString mLocalFilePath;
 };
 

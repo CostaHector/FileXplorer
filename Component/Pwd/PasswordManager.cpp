@@ -187,12 +187,7 @@ void PasswordManager::ShowPlainCSVContents() {
 bool PasswordManager::openEncFileLocatedIn() const {
   const QString locatedIn{QFileInfo(AccountStorage::GetFullEncCsvFilePath()).absolutePath()};
   const QUrl url = QUrl::fromLocalFile(locatedIn);
-  bool bRet = false;
-#ifdef RUNNING_UNIT_TESTS
-  bRet = QFile::exists(locatedIn);
-#else
-  bRet = FileTool::OpenLocalFileUsingDesktopService(url.toLocalFile());
-#endif
+  const bool bRet = FileTool::OpenLocalFileUsingDesktopService(url.toLocalFile());
   LOG_OE_P(bRet, "Open enc located in", "path:%s,ret:%d", qPrintable(locatedIn), bRet);
   return bRet;
 }
