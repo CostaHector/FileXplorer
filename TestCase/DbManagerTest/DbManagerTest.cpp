@@ -14,6 +14,7 @@
 #include "FileToolMock.h"
 #include "MountHelper.h"
 #include "MountPathTableNameMapperMock.h"
+#include <QDesktopServices>
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -41,8 +42,7 @@ public:
 private slots:
   void initTestCase() {
     GlobalMockObject::reset();
-        using namespace FileToolMock;
-    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
     
     using namespace MountPathTableNameMapper;
     using namespace MountPathTableNameMapperMock;

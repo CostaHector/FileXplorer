@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
       failedTestCaseNames.push_back("new testcase but return a nullptr:" + testHelper.locatedIn);
       continue;
     }
+    fprintf(stderr, "current test:%s", qPrintable(pTestObj->metaObject()->className()));
     if (QTest::qExec(pTestObj.get(), argc, argv) != 0) {
       failedTestCaseNames.push_back(pTestObj->metaObject()->className());
     }

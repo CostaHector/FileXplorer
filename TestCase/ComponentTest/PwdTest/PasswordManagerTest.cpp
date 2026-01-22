@@ -8,10 +8,10 @@
 #include "EndToExposePrivateMember.h"
 #include "PublicTool.h"
 #include "FileToolMock.h"
-
 #include "TDir.h"
 #include "SimpleAES.h"
 #include "PwdTableEditActions.h"
+#include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -28,8 +28,7 @@ class PasswordManagerTest : public PlainTestSuite {
  private slots:
   void initTestCase() {
     GlobalMockObject::reset();
-    using namespace FileToolMock;
-    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
 
     QVERIFY(tDir.IsValid());  //
     QVERIFY(!tDir.exists("accounts_test.csv"));
