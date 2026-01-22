@@ -109,6 +109,7 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
     LOG_W("Rename json failed[%s]->[%s]", qPrintable(jsonFileName), qPrintable(newJsonName));
     return E_JSON_FILE_RENAME_FAILED;
   }
+
   int renameCnt = 1;
   if (!alsoRenameRelatedFiles) {
     return renameCnt;
@@ -129,6 +130,8 @@ int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoR
     }
     ++renameCnt;
   }
+  jsonFileName = newJsonName;
+  m_Name = newJsonBaseName;
   return renameCnt;
 }
 

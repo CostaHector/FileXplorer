@@ -29,7 +29,7 @@ bool CastManager::IsActorNameValid(const QString& actorName) {
   if (actorName.size() >= EFFECTIVE_ACTOR_NAME_IF_LENGTH_GE) {
     return true;
   }
-  static const QRegularExpression EFFECTIVE_CAST_NAME_CONTAIN_LETTERS{R"([@ _\.])"};
+  static const QRegularExpression EFFECTIVE_CAST_NAME_CONTAIN_LETTERS{R"([@ _\.0-9])"};
   if (actorName.contains(EFFECTIVE_CAST_NAME_CONTAIN_LETTERS)) {
     return true;
   }

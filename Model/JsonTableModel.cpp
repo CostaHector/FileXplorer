@@ -594,7 +594,7 @@ int JsonTableModel::RenameJsonAndItsRelated(const QModelIndex& ind, const QStrin
     return 0;
   }
   auto cnt = mCachedJsons[row].RenameJsonAndRelated(newJsonBaseName, true);
-  // no need send data change signal, because rename json will not change Name Field automatically
+  emit dataChanged(ind, ind, {Qt::ItemDataRole::DisplayRole});
   return cnt;
 }
 
