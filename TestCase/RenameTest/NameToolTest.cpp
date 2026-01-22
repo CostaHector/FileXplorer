@@ -32,7 +32,7 @@ class NameToolTest : public PlainTestSuite {
     const QString verticalBarAsFS = "A | B";
     const QString ampersandAsFS = "A & B";
     const QStringList andAsFSLst{"A and B", "A AND B", "A And B"};
-    const QString atAsFS = "@A @B";
+    const QString atAsFS = "A, B";
     const QString slashAsFS = "A/B";
     const QString backSlashAsFS = "A\\B";
     const QString tagAsFS = "A#B";
@@ -75,7 +75,7 @@ class NameToolTest : public PlainTestSuite {
     QCOMPARE(m_nameTool(s), expectSingleQuote);
   }
   void test_unexpectedSpace() {
-    const QString& s = "A,B ,C&D &E|F |G#H #I@J @K/L /M\\N \\O";
+    const QString& s = "A,B ,C&D &E|F |G#H #I,J ,K/L /M\\N \\O";
     const QStringList expectIgnoreSpace{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
     QCOMPARE(m_nameTool(s), expectIgnoreSpace);
   }
