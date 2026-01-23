@@ -1,6 +1,24 @@
 #include "CredentialUtil.h"
 #include "Logger.h"
 
+#ifdef _WIN32
+// clang-format off
+#include <windows.h>
+#include <wincred.h>
+// clang-format on
+
+#elif defined(__linux__)
+/*
+ sudo apt install libsecret-1-dev
+ ls /usr/include/libsecret-1/libsecret/
+ */
+#define QT_NO_KEYWORDS  // 1. 禁用 Qt 关键字宏
+#undef signals
+#undef slots
+#undef emit
+#include <libsecret/secret.h>
+#endif
+
 const CredentialUtil& CredentialUtil::GetInst() {
 #ifdef _WIN32
   static WinCredUtil winCredUtil;
@@ -85,7 +103,7 @@ bool WinCredUtil::deletePassword(const QString& key) const {
 #endif
 
 #ifdef __linux__
-const SecretSchema* LinuxCredUtil::getCredentialSchema() const {
+const SecretSchema* getCredentialSchema() {
   static const SecretSchema schema = {
       "com.example.PasswordManager.Credential",
       SECRET_SCHEMA_DONT_MATCH_NAME,

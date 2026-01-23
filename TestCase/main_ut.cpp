@@ -2,9 +2,6 @@
 #include "Logger.h"
 #include <QtTest/QtTest>
 
-#define RUN_UT_MAIN_FILE 1
-#ifdef RUN_UT_MAIN_FILE
-
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
 
@@ -23,7 +20,6 @@ int main(int argc, char* argv[]) {
       failedTestCaseNames.push_back("new testcase but return a nullptr:" + testHelper.locatedIn);
       continue;
     }
-    fprintf(stderr, "current test:%s", qPrintable(pTestObj->metaObject()->className()));
     if (QTest::qExec(pTestObj.get(), argc, argv) != 0) {
       failedTestCaseNames.push_back(pTestObj->metaObject()->className());
     }
@@ -51,5 +47,3 @@ int main(int argc, char* argv[]) {
   exclusiveSuite.clear();
   return failedTestCaseNames.size();
 }
-
-#endif

@@ -3,21 +3,6 @@
 
 #include <QString>
 
-#ifdef _WIN32
-// clang-format off
-#include <windows.h>
-#include <wincred.h>
-// clang-format on
-#elif defined(__linux__)
-/*
- sudo apt install libsecret-1-dev
- ls /usr/include/libsecret-1/libsecret/
- */
-#define signals signalsVariable
-#include <libsecret/secret.h>
-#undef signals
-#endif
-
 class CredentialUtil {
  public:
   static const CredentialUtil& GetInst();
@@ -49,8 +34,6 @@ class LinuxCredUtil : public CredentialUtil {
 
  protected:
   bool credentialExists(const QString& key) const override;
- private:
-  const SecretSchema* getCredentialSchema() const;
 };
 #endif
 
