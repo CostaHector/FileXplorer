@@ -2,9 +2,6 @@
 #include "Logger.h"
 #include <QtTest/QtTest>
 
-#define RUN_UT_MAIN_FILE 1
-#ifdef RUN_UT_MAIN_FILE
-
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
 
@@ -50,5 +47,3 @@ int main(int argc, char* argv[]) {
   exclusiveSuite.clear();
   return failedTestCaseNames.size();
 }
-
-#endif

@@ -51,7 +51,7 @@ bool JsonPr::operator<(const JsonPr& rhs) const {
 }
 
 bool JsonPr::Reload() {
-  const QString absPth = GetAbsPath();
+  const QString absPth = GetJsonFileAbsPath();
   if (!QFileInfo(absPth).isFile()) {
     LOG_W("file[%s] not exist", qPrintable(absPth));
     return false;
@@ -65,7 +65,7 @@ bool JsonPr::Reload() {
 }
 
 bool JsonPr::WriteIntoFiles() const {
-  const QString& jsonPath = GetAbsPath();
+  const QString& jsonPath = GetJsonFileAbsPath();
   if (!QFile::exists(jsonPath)) {
     return false;
   }
@@ -86,50 +86,34 @@ QByteArray JsonPr::GetJsonBA() const {
   return QJsonDocument(json).toJson(QJsonDocument::Indented);
 }
 
-int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
-  QString newJsonName{newJsonNameUserInput};
-  QString newJsonBaseName{newJsonName};
-  if (!newJsonName.endsWith(JsonHelper::JSON_EXT, Qt::CaseInsensitive)) {
-    newJsonName += JsonHelper::JSON_EXT;
+QStringList JsonPr::GetImagesAbsPath() const {
+  QStringList imgs;
+  imgs.reserve(m_ImgName.size());
+  for (const QString& imgName: m_ImgName) {
+    imgs.push_back(GetItemsAbsPath(imgName));
+  }
+  return imgs;
+}
+
+QStringList JsonPr::GetVideosAbsPath() const {
+  QStringList vids;
+  vids.reserve(1);
+  if (!m_VidName.isEmpty()) {
+    vids.push_back(GetItemsAbsPath(m_VidName));
+  }
+  return vids;
+}
+
+void JsonPr::UpdateJsonNameFieldAndJsonAbsPath(const QString& newJsonName) {
+  if (newJsonName.endsWith(JsonHelper::JSON_EXT, Qt::CaseInsensitive)) {
+    // with extension
+    jsonFileName = newJsonName;
+    m_Name = newJsonName.left(newJsonName.size() - JsonHelper::JSON_EXT_LENGTH);
   } else {
-    newJsonBaseName.chop(JsonHelper::JSON_EXT_LENGTH);
+    // without extension
+    jsonFileName = newJsonName + JsonHelper::JSON_EXT;
+    m_Name = newJsonName;
   }
-  if (newJsonName == jsonFileName) {
-    return E_OK;  // skip
-  }
-
-  QDir dir{m_Prepath, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  if (!dir.exists(jsonFileName)) {
-    return E_JSON_NOT_EXIST;
-  }
-  if (dir.exists(newJsonName)) {
-    return E_JSON_NEW_NAME_OCCUPID;
-  }
-  if (!dir.rename(jsonFileName, newJsonName)) {
-    LOG_W("Rename json failed[%s]->[%s]", qPrintable(jsonFileName), qPrintable(newJsonName));
-    return E_JSON_FILE_RENAME_FAILED;
-  }
-  int renameCnt = 1;
-  if (!alsoRenameRelatedFiles) {
-    return renameCnt;
-  }
-
-  QString fileName, fileExt;
-  QString newFileName;
-  const QString& oldJsonBaseName{PathTool::GetBaseName(jsonFileName)};
-  for (const QString& oldName : dir.entryList({oldJsonBaseName + "*"})) {
-    std::tie(fileName, fileExt) = PathTool::GetBaseNameExt(oldName);
-    if (fileName.leftRef(oldJsonBaseName.size()) != oldJsonBaseName) {
-      continue;
-    }
-    newFileName = newJsonBaseName + oldName.mid(oldJsonBaseName.size());
-    if (!dir.rename(oldName, newFileName)) {
-      LOG_W("Rename related failed[%s]->[%s]", qPrintable(oldName), qPrintable(newFileName));
-      return E_RELATED_FILE_RENAME_FAILED;
-    }
-    ++renameCnt;
-  }
-  return renameCnt;
 }
 
 bool JsonPr::SyncNameValueFromFileBaseName() {

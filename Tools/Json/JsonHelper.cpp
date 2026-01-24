@@ -96,6 +96,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   }
 
   QHash<QString, QVariant>::iterator it;
+  using namespace JsonKey;
   if (duration != 0) {
     it = dict.find(ENUM_2_STR(Duration));  // here size is the duration
     if (it != dict.cend() && it->toInt() != duration) {

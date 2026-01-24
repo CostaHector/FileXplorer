@@ -219,8 +219,7 @@ QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
   if (!isIndexValid(index, linearInd)) {
     return {};
   }
-  const QString vidAbsPath = mCurBegin[linearInd].GetVideoAbsPath(mRootPath);
-  return {vidAbsPath}; // may return an inexist video
+  return mCurBegin[linearInd].GetVideosAbsPath(mRootPath);
 }
 
 QString ScenesListModel::GetJson(const QModelIndex& index) const {

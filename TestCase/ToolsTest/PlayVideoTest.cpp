@@ -4,6 +4,7 @@
 #include "FileToolMock.h"
 #include "PlayVideo.h"
 #include "TDir.h"
+#include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -25,8 +26,7 @@ class PlayVideoTest : public PlainTestSuite {
     QCOMPARE(tDir.createEntries(nodes), 2);  // 创建两个条目：一个文件，一个目录
 
     GlobalMockObject::reset();
-    using namespace FileToolMock;
-    MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
   }
 
   void cleanupTestCase() {

@@ -7,6 +7,7 @@
 #include <QSortFilterProxyModel>
 
 class JsonTableView : public CustomTableView {
+  Q_OBJECT
  public:
   explicit JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent = nullptr);
   QModelIndex CurrentIndexSource() const;
@@ -37,7 +38,11 @@ class JsonTableView : public CustomTableView {
   };
 
   bool GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_TYPE& edtWidType) const;
+ signals:
+  void currentJsonSelectedChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
+
  private:
+  void onSelectNewJsonLine(const QModelIndex &current);
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};

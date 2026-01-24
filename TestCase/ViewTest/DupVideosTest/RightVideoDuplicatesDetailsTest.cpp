@@ -11,20 +11,33 @@
 #include "TDir.h"
 #include "ClipboardGuard.h"
 #include "DuplicateVideosFinderActions.h"
+#include <QDesktopServices>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   QDir mDir{tDir.path()};
- private slots:
+private slots:
   void initTestCase() {
+    QVERIFY(tDir.IsValid());
     const QList<FsNodeEntry> nodes{
         //
-        {"video 1.mp4", false, "0123456789"},    //
-        {"video 1 ai.mp4", false, "012345678"},  //
+        {"video 1.mp4", false, "0123456789"},   //
+        {"video 1 ai.mp4", false, "012345678"}, //
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
+    GlobalMockObject::reset();
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
+  }
+  void cleanupTestCase() { //
+    GlobalMockObject::verify();
   }
 
   void initalized_and_no_exception_ok() {
@@ -35,8 +48,8 @@ class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
     QCOMPARE(rvdd.selectionBehavior(), QAbstractItemView::SelectionBehavior::SelectRows);
 
     // should not crash down below
-    QCOMPARE(rvdd.setSharedMember(nullptr, nullptr), false);                 // pass nullptr
-    rvdd.onLeftVideoGroupsTableSelectionChanged(INVALID_LEFT_SELECTED_ROW);  // pass invalid row number
+    QCOMPARE(rvdd.setSharedMember(nullptr, nullptr), false);                // pass nullptr
+    rvdd.onLeftVideoGroupsTableSelectionChanged(INVALID_LEFT_SELECTED_ROW); // pass invalid row number
 
     QModelIndex invalidIndex;
     QCOMPARE(rvdd.on_cellDoubleClicked(invalidIndex), false);
@@ -50,12 +63,12 @@ class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
     GroupedDupVidList szGrp{
         DupVidMetaInfoList{
             // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
-            {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"),    "h1"},      //
-            {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"),          "h2"},            //
-            {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"},  // a remain
+            {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
+            {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
+            {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
         },
     };
-    GroupedDupVidList durGrp = szGrp;  // for simplicity. two of them are equal
+    GroupedDupVidList durGrp = szGrp; // for simplicity. two of them are equal
     GroupedDupVidListArr groupedVidsLists{szGrp, durGrp};
 
     DuplicateVideoDetectionCriteria::DVCriteriaE differBy = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
@@ -79,11 +92,12 @@ class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
       QCOMPARE(rvdd.on_effectiveNameCopiedForEverything(proxyIndex0), true);
       auto* cb = QApplication::clipboard();
       QVERIFY(cb != nullptr);
-      QCOMPARE(cb->text(), "video 1 ai mp4");  // only contains [0-9a-zA-Z_ ] char
+      QCOMPARE(cb->text(), "video 1 ai mp4"); // only contains [0-9a-zA-Z_ ] char
 
       QCOMPARE(rvdd.on_effectiveNameCopiedForEverything(fileNotExistProxyIndex2), true);
 #ifndef _WIN32
-      QCOMPARE(cb->text(), "inexist video 1 mp4");  // clipboard is extremely unreliable in windows. only contains [0-9a-zA-Z_ ] char. clipboard is unreliable
+      QCOMPARE(cb->text(),
+               "inexist video 1 mp4"); // clipboard is extremely unreliable in windows. only contains [0-9a-zA-Z_ ] char. clipboard is unreliable
 #endif
     }
 
@@ -96,7 +110,7 @@ class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
     // 2.0 recycle ok;
     {
       const QStringList beforeNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-      QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"}));  // ascii(' ') less than ascii('.')
+      QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"})); // ascii(' ') less than ascii('.')
       emit g_dupVidFinderAg().RECYCLE_SELECTIONS->triggered();
       const QStringList nothingSelectedRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QCOMPARE(nothingSelectedRecyleNames, beforeNames);

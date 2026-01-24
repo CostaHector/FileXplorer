@@ -78,7 +78,7 @@ escape folder
   const QString mPerfAkaMultiLineText {
       "Kaka|Ricardo Izecson dos Santos Leite\n"
       "Chris Evans,Cevans and Christopher Robert Evans\n"
-      "Huge Jackman @ Wolverine\n"
+      "Huge Jackman, Wolverine\n"
       "Ricky Martin, Enrique Martin Morales"
   };
   // itself

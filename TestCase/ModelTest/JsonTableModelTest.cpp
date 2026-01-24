@@ -144,7 +144,7 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.HintCastAndStudio(invalidIndexes, "learn from this sentence"), 0);
       QCOMPARE(jtm.FormatCast(invalidIndexes), 0);
       QCOMPARE(jtm.SyncFieldNameByJsonBaseName(invalidIndexes), 0);
-      QCOMPARE(jtm.RenameJsonAndItsRelated(invalidIndex, "correct name.json"), 0);
+      QCOMPARE(jtm.AfterJsonFileNameRenamed(invalidIndex, "correct name.json"), false);
       QCOMPARE(jtm.SaveCurrentChanges(invalidIndexes), 0);
       QCOMPARE(jtm.ExportCastStudioToLocalDictionaryFile(invalidIndexes), (std::pair<int, int>{-1, -1}));
       QCOMPARE(jtm.ExportCastStudioToLocalDictionaryFile({}), (std::pair<int, int>{0, 0}));
@@ -566,21 +566,12 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.m_modifiedRows.any(), false);
 
     QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QCOMPARE(jtm.RenameJsonAndItsRelated(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), 2);  // two file renamed
-
-    const QStringList actualFileList = mTDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-    QStringList expectFileList = {
-        "GameTurbo - A rank - GGG YYYYY.json",  //
-        "GameTurbo - A rank - GGG YYYYY.mp4",   //
-        "b.json",     //
-        "jazz .txt",  //
-        mActorsFileName,
-        mActorsBlackFileName,
-        mStudiosFileName,
-        mStudiosBlackFileName,
-    };
-    std::sort(expectFileList.begin(), expectFileList.end());
-    QCOMPARE(expectFileList, actualFileList);
+    QSignalSpy dataChangedSig{&jtm, &JsonTableModel::dataChanged};
+    QSignalSpy headerDataChangedSig{&jtm, &JsonTableModel::headerDataChanged};
+    QCOMPARE(jtm.AfterJsonFileNameRenamed(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), true);
+    QCOMPARE(jtm.m_modifiedRows.test(firstLineIndex.row()), true);
+    QCOMPARE(dataChangedSig.count(), 1);
+    QCOMPARE(headerDataChangedSig.count(), 1);
   }
 
   void proxy_model_works() {

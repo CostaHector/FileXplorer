@@ -3,12 +3,16 @@
 #include "NotificatorMacro.h"
 #include "StudiosManager.h"
 #include "NameTool.h"
+#include "PathTool.h"
+#include "RenameWidget_Replace.h"
+#include <QDir>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTextCursor>
 #include <QPlainTextEdit>
 #include <QStyleOptionViewItem>
+#include <QRegularExpression>
 
 JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent)  //
     : CustomTableView{"JSON_TABLE_VIEW", parent}                                                                 //
@@ -27,7 +31,6 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   m_DetailEdit = new (std::nothrow) MultiLineEditDelegate;
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
-
 
   m_jsonMenu = new (std::nothrow) QMenu{this};
   CHECK_NULLPTR_RETURN_VOID(m_jsonMenu);
@@ -114,23 +117,44 @@ int JsonTableView::onRenameJsonAndRelated() {
     return 0;
   }
   const QModelIndex& ind = CurrentIndexSource();
-  const QString oldJsonBaseName = _JsonModel->fileBaseName(ind);
+  const JsonPr& jsonPr = _JsonModel->GetJsonPr(ind);
+  const QString jsonFileName = jsonPr.GetJsonFileName();
+  QString jsonBaseName, jsonExt;
+  std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
+  const QString jsonLocatedInPath = jsonPr.GetJsonPrepath();
+  QStringList jsonRelatedFilePrePaths;
 
-  bool isInputOk{false};
-  QString newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
-                                          {oldJsonBaseName}, 0, true, &isInputOk);
-  if (!isInputOk) {
-    LOG_OK_NP("[skip] User cancel rename json and related files", "return");
+  QDir sameLevelDir{jsonLocatedInPath, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  QString fileBaseName, fileExt;
+  static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d{1,3})$"};
+  for (const QString& fileName : sameLevelDir.entryList()) {
+    std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
+    // fileBaseName == (jsonBaseName + extraContent) + fileExt
+    if (!fileBaseName.startsWith(jsonBaseName)) {
+      continue;
+    }
+    // extraContent can be
+    // 1. "": (fileBaseName == jsonBaseName)
+    // 2. " - number": len(fileBaseName) > len(jsonBaseName)
+    // 3. " number": len(fileBaseName) > len(jsonBaseName)
+    QString extraContent = fileBaseName.mid(jsonBaseName.size());
+    if (!extraContent.isEmpty() && !JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
+      continue;
+    }
+    jsonRelatedFilePrePaths.push_back(fileName);
+  }
+
+  bool bRenamed {false};
+  QString newJsonName;
+  std::tie(bRenamed, newJsonName) = RenameWidget_Replace::QueryAndConfirm(jsonLocatedInPath, jsonRelatedFilePrePaths, jsonBaseName, jsonBaseName, true);
+  if (!bRenamed) {
+    LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", jsonRelatedFilePrePaths.size());
     return 0;
   }
-  if (newJsonBaseName.isEmpty()) {
-    LOG_ERR_NP("[skip] New json base name can not be empty", "return");
-    return -1;
-  }
-  int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
-  LOG_OE_P(cnt >= 0, "Rename Json", "[%s]\n[%s]\n and it's related file(s). retCode: %d",  //
-           qPrintable(oldJsonBaseName), qPrintable(newJsonBaseName), cnt);
-  return cnt;
+  _JsonModel->AfterJsonFileNameRenamed(ind, newJsonName);
+  LOG_OK_P("Rename Json", "[%s]\n[%s]\n and it's related %d file(s)",  //
+           qPrintable(jsonFileName), qPrintable(newJsonName), jsonRelatedFilePrePaths.size());
+  return jsonRelatedFilePrePaths.size();
 }
 
 int JsonTableView::onSetStudio() {
@@ -268,8 +292,10 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
 
     bool bIsAccept{false};
     QString inputTagsCastsHintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-    tagsOrCast = QInputDialog::getItem(this, fieldOperation, inputTagsCastsHintMsg,  //
-                                       candidates, candidates.size() - 1,            //
+    tagsOrCast = QInputDialog::getItem(this, fieldOperation,
+                                       inputTagsCastsHintMsg,  //
+                                       candidates,
+                                       candidates.size() - 1,  //
                                        true, &bIsAccept);
     if (!bIsAccept) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
@@ -481,4 +507,11 @@ void JsonTableView::subscribe() {
 
   connect(inst._ADD_SELECTED_CAST_SENTENCE, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._EXTRACT_UPPERCASE_CAST, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
+}
+
+void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
+  const JsonPr& json = _JsonModel->GetJsonPr(current);
+  const QString jsonAbsPath = json.GetJsonFileAbsPath();
+  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), json.GetVideosAbsPath());
 }

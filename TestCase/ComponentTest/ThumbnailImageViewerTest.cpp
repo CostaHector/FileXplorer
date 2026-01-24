@@ -12,6 +12,13 @@
 #include "ImageTestPrecoditionTools.h"
 #include "ClipboardGuard.h"
 #include "TDir.h"
+#include <QDesktopServices>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 using namespace MouseKeyboardEventHelper;
 using namespace ImageTestPrecoditionTools;
@@ -22,6 +29,15 @@ public:
   const QString THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME = "ThumbnailImageViewer";
   const ClipboardGuard clipGuard;
 private slots:
+  void initupTestCase() {
+    GlobalMockObject::reset();
+    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
+  }
+
+  void cleanupTestCase() { //
+    GlobalMockObject::verify();
+  }
+
   void default_constructor_ok() { //
     // should not crash down
     Configuration().setValue(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME + "_ICON_SIZE_INDEX", 1);

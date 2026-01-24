@@ -10,6 +10,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "Logger.h" // ahead of any other file include this file
 #include "EndToExposePrivateMember.h"
+#include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -27,8 +28,7 @@ public:
 private slots:
   void initupTestCase() {
    GlobalMockObject::reset();
-   using namespace FileToolMock;
-   MOCKER(FileTool::OpenLocalFileUsingDesktopService).stubs().will(invoke(invokeOpenLocalFileUsingDesktopService));
+   MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
   }
 
   void cleanupTestCase() {

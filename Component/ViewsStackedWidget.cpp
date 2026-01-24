@@ -16,8 +16,9 @@
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
-    : QStackedWidget{parent},        //
-      _previewFolder{previewFolder}  //
+  : QStackedWidget{parent}
+  ,                             //
+  _previewFolder{previewFolder} //
 {
   m_fsModel = new (std::nothrow) FileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -42,7 +43,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   // can only be triggered by lineedit return pressed
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo otherwise not
-  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {  // may be an shared folder cross platform
+  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) { // may be an shared folder cross platform
     LOG_W("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
@@ -130,7 +131,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     default: {
-      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int) vt, c_str(vt));
       return false;
     }
   }
@@ -146,7 +147,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
     case ViewType::JSON: {
       break;
     }
-    case ViewType::SCENE: {  // avoid lag when text changed frequently
+    case ViewType::SCENE: { // avoid lag when text changed frequently
       CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
       const QRegularExpression* pRegex = GetRegularExpression(targetStr);
       CHECK_NULLPTR_RETURN_FALSE(pRegex);
@@ -154,7 +155,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
       break;
     }
     default: {
-      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int) vt, c_str(vt));
       return false;
     }
   }
@@ -168,11 +169,12 @@ void ViewsStackedWidget::subscribe() {
 void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
   CHECK_NULLPTR_RETURN_VOID(addressBar)
   _addressBar = addressBar;
-  connect(_addressBar->m_addressLine, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,  //
-          this,                                                                                        //
-          [this](const QString& newPath) {                                                             //
-            onAddressToolbarPathChanged(newPath, true);                                                //
-          }                                                                                            //
+  connect(_addressBar->m_addressLine,
+          &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed, //
+          this,                                                           //
+          [this](const QString& newPath) {                                //
+            onAddressToolbarPathChanged(newPath, true);                   //
+          } //
   );
 }
 
@@ -210,7 +212,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     return false;
   }
   QFileInfo fi = getFileInfo(clickedIndex);
-  const QString absItemPath {fi.absoluteFilePath()};
+  const QString absItemPath{fi.absoluteFilePath()};
   LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
     LOG_ERR_NP("path not exist", absItemPath);
@@ -219,7 +221,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   if (fi.isSymLink()) {
 #ifdef _WIN32
     const QString tarPath{fi.symLinkTarget()};
-#else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
+#else // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
     const QString tarPath{absItemPath};
 #endif
     fi.setFile(tarPath);
@@ -257,9 +259,9 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     if (ViewTypeTool::isFSView(vt)) {
       return onActionAndViewNavigate(absItemPath, true, true);
     }
-    if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
+    if (ViewTypeTool::IsMatch(vt, (int) ViewTypeTool::ViewTypeMask::CAST)) {
       g_viewActions()._TABLE_VIEW->setChecked(true);
-      emit g_viewActions()._TABLE_VIEW->triggered(true);  // both 2 signals: 1) undo stack+1 and 2) view Switched happen
+      emit g_viewActions()._TABLE_VIEW->triggered(true); // both 2 signals: 1) undo stack+1 and 2) view Switched happen
       return onActionAndViewNavigate(absItemPath, true, true);
     }
   }
@@ -277,7 +279,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   }
 
   auto vt = GetVt();
-  if (ViewTypeTool::isFSView(vt)) {  // anchorTags only work for file-system
+  if (ViewTypeTool::isFSView(vt)) { // anchorTags only work for file-system
     QString parentPth = fi.absolutePath();
 #ifdef _WIN32
     if (!parentPth.isEmpty() && parentPth.back() == ':') {
@@ -302,32 +304,48 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged();
 
   auto* curView = GetCurView();
-  mSelectionChangedConn =
-      ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
-  mDoubleClickedConnectConn =
-      ViewsStackedWidget::connect(curView, &QAbstractItemView::doubleClicked, this, &ViewsStackedWidget::on_cellDoubleClicked);
+  mSelectionChangedConn = ViewsStackedWidget::connect(curView->selectionModel(),
+                                                      &QItemSelectionModel::selectionChanged,
+                                                      this,
+                                                      &ViewsStackedWidget::on_selectionChanged);
+  mDoubleClickedConnectConn = ViewsStackedWidget::connect(curView,
+                                                          &QAbstractItemView::doubleClicked,
+                                                          this,
+                                                          &ViewsStackedWidget::on_cellDoubleClicked);
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::SEARCH: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(),
+                                                        &QItemSelectionModel::currentRowChanged,
+                                                        this,
                                                         &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
     case ViewType::SCENE: {
       mCurrentChangedConn = ViewsStackedWidget::connect(
-          m_sceneTableView, &SceneListView::currentSceneChanged,
-          _previewFolder,  //
+          m_sceneTableView,
+          &SceneListView::currentSceneChanged,
+          _previewFolder, //
           static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
               &CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::CAST: {
-      mCurrentChangedConn =
-          ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
-                                      _previewFolder,  //
-                                      static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView,
+                                                        &CastDBView::currentRecordChanged,
+                                                        _previewFolder, //
+                                                        static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(
+                                                            &CurrentRowPreviewer::operator()));
+      break;
+    }
+    case ViewType::JSON: {
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_jsonTableView,
+                                                        &JsonTableView::currentJsonSelectedChanged,
+                                                        _previewFolder, //
+                                                        static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
+                                                            &CurrentRowPreviewer::operator()));
       break;
     }
     default: {
@@ -625,7 +643,7 @@ QStringList ViewsStackedWidget::getFullRecords() const {
       break;
     }
     default: {
-      LOG_W("No getFullRecords ViewType:%d", (int)vt);
+      LOG_W("No getFullRecords ViewType:%d", (int) vt);
       break;
     }
   }
@@ -682,7 +700,7 @@ QStringList ViewsStackedWidget::getFilePaths() const {
       break;
     }
     default: {
-      LOG_D("No getFilePaths ViewType:%d", (int)vt);
+      LOG_D("No getFilePaths ViewType:%d", (int) vt);
       break;
     }
   }
@@ -748,7 +766,7 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
       break;
     }
     default: {
-      LOG_D("No getFilePrepaths ViewType:%d", (int)vt);
+      LOG_D("No getFilePrepaths ViewType:%d", (int) vt);
       break;
     }
   }
@@ -840,8 +858,9 @@ MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt:
       return ret;
     }
     case ViewType::SEARCH: {
-      MimeDataMember ret =
-          GetMimeDataMemberFromSearchModel(*m_searchSrcModel, *m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows());
+      MimeDataMember ret = GetMimeDataMemberFromSearchModel(*m_searchSrcModel,
+                                                            *m_searchProxyModel,
+                                                            m_advanceSearchView->selectionModel()->selectedRows());
       FillCutCopySomething<AdvanceSearchModel>(*m_searchSrcModel, ret.srcIndexes, dropAct);
       return ret;
     }
@@ -980,7 +999,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
       LOG_W("No getCurFilePath");
     }
   }
-  LOG_W("nothing selected in viewType[%d]", (int)vt);
+  LOG_W("nothing selected in viewType[%d]", (int) vt);
   return "";
 }
 

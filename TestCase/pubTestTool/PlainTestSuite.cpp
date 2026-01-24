@@ -1,5 +1,4 @@
 #include "PlainTestSuite.h"
-#include "Logger.h"
 int PlainTestSuite::mTotalTestCaseCount{0};
 
 PlainTestSuite::PlainTestSuite(QObject *parent): QObject{parent} {}

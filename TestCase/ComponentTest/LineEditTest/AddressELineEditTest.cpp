@@ -20,8 +20,11 @@ USING_MOCKCPP_NS
 
 class AddressELineEditTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
+  void initTestCase() { GlobalMockObject::reset(); }
+  void cleanupTestCase() { GlobalMockObject::verify(); }
+
   void parentPath_ok() {
     const QString folderPath{"/path/to/destination/folder"};
     AddressELineEdit addLe;
@@ -62,16 +65,16 @@ class AddressELineEditTest : public PlainTestSuite {
     QCOMPARE(parms0.front().toString(), folderPath);
 
     QVERIFY(addLe.m_pathActionsTB != nullptr);
-    QList<QAction*> acts = addLe.m_pathActionsTB->actions();
-    QCOMPARE(acts.size(), 1 + 5);  // computer, "", path, to, destination, folder
+    QList<QAction *> acts = addLe.m_pathActionsTB->actions();
+    QCOMPARE(acts.size(), 1 + 5); // computer, "", path, to, destination, folder
 
     addLe.onPathActionTriggered(acts.front());
     QCOMPARE(addressToolBarSignal.size(), 1);
     QVariantList parms1 = addressToolBarSignal.takeFirst();
     QCOMPARE(parms1.size(), 1);
     QCOMPARE(parms1.front().toString(), "");
-    QList<QAction*> onlyComputerAct = addLe.m_pathActionsTB->actions();
-    QCOMPARE(onlyComputerAct.size(), 1 + 1);  // "Computer", ""
+    QList<QAction *> onlyComputerAct = addLe.m_pathActionsTB->actions();
+    QCOMPARE(onlyComputerAct.size(), 1 + 1); // "Computer", ""
   }
 
   void returnPressed_file_ok() {
@@ -85,7 +88,7 @@ class AddressELineEditTest : public PlainTestSuite {
     addLe.m_pathComboBox->lineEdit()->setText(filePath);
 
     QVERIFY(addLe.m_pathActionsTB != nullptr);
-    QList<QAction*> beforeActs = addLe.m_pathActionsTB->actions();
+    QList<QAction *> beforeActs = addLe.m_pathActionsTB->actions();
 
     QSignalSpy addressToolBarSignal{&addLe, &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed};
     addLe.onReturnPressed();
@@ -94,7 +97,7 @@ class AddressELineEditTest : public PlainTestSuite {
 
     QCOMPARE(addressToolBarSignal.size(), 0);
 
-    QList<QAction*> afterActs = addLe.m_pathActionsTB->actions();
+    QList<QAction *> afterActs = addLe.m_pathActionsTB->actions();
     QCOMPARE(afterActs, beforeActs);
   }
 
@@ -121,7 +124,7 @@ class AddressELineEditTest : public PlainTestSuite {
     QVERIFY(addLe.isClickMode());
 
     // 点击ToolBar的空白区域, 返回QAction=nullptr, 切换到InputMode
-    QPoint outOfWidgetPoint{(int)1E6, (int)1E6};
+    QPoint outOfWidgetPoint{(int) 1E6, (int) 1E6};
     QMouseEvent blankZoneClicked{QEvent::MouseButtonPress, outOfWidgetPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier};
     addLe.mousePressEvent(&blankZoneClicked);
     QVERIFY(addLe.isInputMode());
@@ -142,8 +145,8 @@ class AddressELineEditTest : public PlainTestSuite {
     QVERIFY(addLe.isClickMode());
 
     MOCKER(View::onDropMimeData)
-        .expects(exactly(1))                                  //
-        .with(any(), Qt::DropAction::CopyAction, folderPath)  //
+        .expects(exactly(1))                                 //
+        .with(any(), Qt::DropAction::CopyAction, folderPath) //
         .will(returnValue(true));
 
     QMimeData urlsMimeData;
@@ -151,9 +154,12 @@ class AddressELineEditTest : public PlainTestSuite {
     QList<QUrl> urlsList{QUrl::fromLocalFile(__FILE__), QUrl::fromLocalFile(__FILE__)};
     urlsMimeData.setUrls(urlsList);
 
-    QPoint outOfWidgetPoint{(int)1E6, (int)1E6};                                                                                  // 全路径
-    QDropEvent dropEvent{outOfWidgetPoint, Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction,  //
-                         &urlsMimeData, Qt::LeftButton, Qt::ControlModifier};
+    QPoint outOfWidgetPoint{(int) 1E6, (int) 1E6}; // 全路径
+    QDropEvent dropEvent{outOfWidgetPoint,
+                         Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction, //
+                         &urlsMimeData,
+                         Qt::LeftButton,
+                         Qt::ControlModifier};
     addLe.dropEvent(&dropEvent);
   }
 
@@ -171,11 +177,11 @@ class AddressELineEditTest : public PlainTestSuite {
     urlsMimeData.setText("2 urls");
     QList<QUrl> urlsList{QUrl::fromLocalFile(__FILE__), QUrl::fromLocalFile(__FILE__)};
     urlsMimeData.setUrls(urlsList);
-    QPoint outOfWidgetPoint{(int)1E6, (int)1E6};                                                                          // 全路径
-    QDragEnterEvent dragEnterEvent(outOfWidgetPoint,                                                                      //
-                                   Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction,  //
-                                   &urlsMimeData,                                                                             //
-                                   Qt::MouseButton::LeftButton,                                                           //
+    QPoint outOfWidgetPoint{(int) 1E6, (int) 1E6};                                                                       // 全路径
+    QDragEnterEvent dragEnterEvent(outOfWidgetPoint,                                                                     //
+                                   Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction, //
+                                   &urlsMimeData,                                                                        //
+                                   Qt::MouseButton::LeftButton,                                                          //
                                    Qt::KeyboardModifier::AltModifier);
     addLe.dragEnterEvent(&dragEnterEvent);
     QVERIFY(dragEnterEvent.isAccepted());
@@ -194,9 +200,12 @@ class AddressELineEditTest : public PlainTestSuite {
 
     // 1. 没有url, 忽略
     QMimeData urlsMimeData;
-    QPoint outOfWidgetPoint{(int)1E6, (int)1E6};                                                                                      // 全路径
-    QDragMoveEvent dragEvent{outOfWidgetPoint, Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction,  //
-                             &urlsMimeData, Qt::LeftButton, Qt::KeyboardModifier::NoModifier};
+    QPoint outOfWidgetPoint{(int) 1E6, (int) 1E6}; // 全路径
+    QDragMoveEvent dragEvent{outOfWidgetPoint,
+                             Qt::DropAction::MoveAction | Qt::DropAction::CopyAction | Qt::DropAction::LinkAction, //
+                             &urlsMimeData,
+                             Qt::LeftButton,
+                             Qt::KeyboardModifier::NoModifier};
     addLe.dragMoveEvent(&dragEvent);
     QVERIFY(!dragEvent.isAccepted());
     QVERIFY(dragEvent.dropAction() != Qt::DropAction::MoveAction);

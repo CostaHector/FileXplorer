@@ -11,8 +11,8 @@ class SyncModifiyFileSystemTest : public PlainTestSuite {
   SyncModifiyFileSystemTest() : PlainTestSuite{} {}
   SyncModifiyFileSystem syncMod;
   TDir mDir;
-  const QString mBasicPath{mDir.path() + "/home"};
-  const QString mSyncToPath{mDir.path() + "/bin"};
+  const QString mBasicPath{mDir.itemPath("/home")};
+  const QString mSyncToPath{mDir.itemPath("/bin")};
  private slots:
   void initTestCase() {
     QVERIFY(mDir.IsValid());

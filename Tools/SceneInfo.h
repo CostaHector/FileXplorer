@@ -22,6 +22,7 @@ struct SceneInfo {
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoAbsPath(const QString& rootPath) const;
+  QStringList GetVideosAbsPath(const QString& rootPath) const;
   QString GetJsonAbsPath(const QString& rootPath) const;
 
   using CompareFunc = bool (SceneInfo::*)(const SceneInfo&) const;
