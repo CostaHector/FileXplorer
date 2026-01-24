@@ -14,6 +14,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
+  const QString& rootPath() const {return mRootPath;}
   int setRootPath(const QString& path, bool isForce = false);
   int forceReloadPath();
 
@@ -35,7 +36,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
 
-  int RenameJsonAndItsRelated(const QModelIndex& ind, const QString& newJsonBaseName);
+  bool AfterJsonFileNameRenamed(const QModelIndex& ind, const QString& newJsonBaseName);
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);
   std::pair<int, int> ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const;
 

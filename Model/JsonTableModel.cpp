@@ -138,7 +138,7 @@ QFileInfo JsonTableModel::fileInfo(const QModelIndex& index) const {
     LOG_W("row: %d out of range", row);
     return {};
   }
-  return QFileInfo{mCachedJsons[row].GetAbsPath()};
+  return QFileInfo{mCachedJsons[row].GetJsonFileAbsPath()};
 }
 
 QString JsonTableModel::filePath(const QModelIndex& index) const {
@@ -147,7 +147,7 @@ QString JsonTableModel::filePath(const QModelIndex& index) const {
     LOG_W("row: %d out of range", row);
     return {};
   }
-  return mCachedJsons[row].GetAbsPath();
+  return mCachedJsons[row].GetJsonFileAbsPath();
 }
 
 QString JsonTableModel::fileName(const QModelIndex& index) const {
@@ -526,7 +526,7 @@ int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    const QString& jsonFullPath = mCachedJsons[row].GetAbsPath();
+    const QString& jsonFullPath = mCachedJsons[row].GetJsonFileAbsPath();
     const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
     const QString& vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
     affectedRows += (int)mCachedJsons[row].UpdateDurationField(vidFullPath);
@@ -583,7 +583,7 @@ int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexe
   return cnt;
 }
 
-int JsonTableModel::RenameJsonAndItsRelated(const QModelIndex& ind, const QString& newJsonBaseName) {
+bool JsonTableModel::AfterJsonFileNameRenamed(const QModelIndex& ind, const QString& newJsonBaseName) {
   if (newJsonBaseName.isEmpty()) {
     LOG_W("new json basename cannot be empty");
     return false;
@@ -593,9 +593,11 @@ int JsonTableModel::RenameJsonAndItsRelated(const QModelIndex& ind, const QStrin
     LOG_W("row: %d out of range [0,%d)", row, rowCount());
     return 0;
   }
-  auto cnt = mCachedJsons[row].RenameJsonAndRelated(newJsonBaseName, true);
+  mCachedJsons[row].UpdateJsonNameFieldAndJsonAbsPath(newJsonBaseName);
+  setModifiedNoEmit(row);
   emit dataChanged(ind, ind, {Qt::ItemDataRole::DisplayRole});
-  return cnt;
+  emit headerDataChanged(Qt::Vertical, row, row);
+  return true;
 }
 
 int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
@@ -612,7 +614,7 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
       continue;
     }
     if (!mCachedJsons[row].WriteIntoFiles()) {
-      LOG_W("Write into local file[%s] failed", qPrintable(mCachedJsons[row].GetAbsPath()));
+      LOG_W("Write into local file[%s] failed", qPrintable(mCachedJsons[row].GetJsonFileAbsPath()));
       return -1;
     }
     setModifiedNoEmit(row, false);

@@ -5,7 +5,7 @@
 
 RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
     : AdvanceRenamer{parent}                                 //
-{ }
+{}
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar{"replace tb", this};
@@ -74,6 +74,31 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   return RenameHelper::ReplaceRename(replaceeList, oldString, newString, regexEnable);
 }
 
+void RenameWidget_Replace::setOldNameAndNewName(const QString& oldName, const QString& newName) {
+  m_oldStrCB->setCurrentText(oldName);
+  m_newStrCB->setCurrentText(newName);
+}
+
+std::pair<bool, QString> RenameWidget_Replace::QueryAndConfirm(const QString& workPath,
+                                                               const QStringList& selectedNames,  //
+                                                               const QString& defOldName,
+                                                               const QString& defNewName,  //
+                                                               bool disableOldNameEdit) {
+  RenameWidget_Replace pReplacer{nullptr};
+  pReplacer.init();
+  pReplacer.setModal(true);
+  pReplacer.InitTextEditContent(workPath, selectedNames);
+  pReplacer.setOldNameAndNewName(defOldName, defNewName);
+  if (disableOldNameEdit) {
+    pReplacer.m_oldStrCB->setDisabled(true);
+  }
+  if (pReplacer.exec() != QDialog::Accepted) {
+    LOG_D("User cancel rename %d item(s)", selectedNames.size());
+    return {false, ""};
+  }
+  return {true, pReplacer.GetNewName()};
+}
+
 void RenameWidget_Replace::InitExtraCommonVariable() {
   windowTitleFormat = QString("Replace name string | %1 item(s) under [%2]");
   setWindowTitle(windowTitleFormat);
@@ -81,8 +106,7 @@ void RenameWidget_Replace::InitExtraCommonVariable() {
 }
 
 RenameWidget_Delete::RenameWidget_Delete(QWidget* parent)  //
-    : RenameWidget_Replace(parent) {
-}
+    : RenameWidget_Replace(parent) {}
 
 void RenameWidget_Delete::initExclusiveSetting() {
   m_newStrCB->setCurrentText("");

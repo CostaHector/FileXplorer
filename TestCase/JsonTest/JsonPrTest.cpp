@@ -155,7 +155,7 @@ class JsonPrTest : public PlainTestSuite {
     dict[ENUM_2_STR(Detail)] = "Description of SuperMan - Henry Cavill";
     dict[ENUM_2_STR(ImgName)] = QStringList{"A 2.jpg", "A 1.jpg"};
     dict[ENUM_2_STR(VidName)] = "A.mp4";
-    QVERIFY(JsonHelper::DumpJsonDict(dict, jPr.GetAbsPath()));
+    QVERIFY(JsonHelper::DumpJsonDict(dict, jPr.GetJsonFileAbsPath()));
 
     // Reload deprecated should be replaced by m_Studio, m_Cast in cache
     QVERIFY(jPr.Reload());
@@ -175,7 +175,7 @@ class JsonPrTest : public PlainTestSuite {
     QVERIFY(jPr.hintCast.isEmpty());
     QVERIFY(jPr.hintStudio.isEmpty());
 
-    const auto& writedJson = JsonHelper::MovieJsonLoader(jPr.GetAbsPath());
+    const auto& writedJson = JsonHelper::MovieJsonLoader(jPr.GetJsonFileAbsPath());
     QVERIFY(!writedJson.contains("ProductionStudio"));
     QVERIFY(!writedJson.contains(ENUM_2_STR(Performers)));
     QCOMPARE(writedJson[ENUM_2_STR(Name)], dict[ENUM_2_STR(Name)]);
@@ -237,45 +237,14 @@ class JsonPrTest : public PlainTestSuite {
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 2. rename succeed
-    // name equal skip rename
     {
-      QVERIFY(dir.exists(fixedJsonName));
-      QCOMPARE(jPr.RenameJsonAndRelated(fixedJsonName), JsonPr::E_OK);
-    }
+      jPr.UpdateJsonNameFieldAndJsonAbsPath(fixedJsonName);
+      QCOMPARE(jPr.m_Name, fixedJsonBaseName);
+      QCOMPARE(jPr.GetJsonFileName(), fixedJsonName);
 
-    // json been moved
-    {
-      const QString movedFixedJsonName = "[moved]" + fixedJsonName;
-      QVERIFY(dir.exists(fixedJsonName));
-      QVERIFY(dir.rename(fixedJsonName, movedFixedJsonName));
-      QVERIFY(!dir.exists(fixedJsonName));
-
-      QCOMPARE(jPr.RenameJsonAndRelated(newJsonName), JsonPr::E_JSON_NOT_EXIST);
-      ON_SCOPE_EXIT {
-        QVERIFY(dir.rename(movedFixedJsonName, fixedJsonName));
-      };
-    }
-
-    // new json name occupied
-    {
-      QVERIFY(dir.exists(occupiedJsonName));
-      QCOMPARE(jPr.RenameJsonAndRelated(occupiedJsonName), JsonPr::E_JSON_NEW_NAME_OCCUPID);
-    }
-
-    // cnt = itself + else file
-    {
-      QCOMPARE(jPr.RenameJsonAndRelated(newJsonName), relatedNames.size());
-      for (const QString& name : relatedNames) {
-        QVERIFY(!dir.exists(name));
-      }
-      for (const QString& name : newRelatedNames) {
-        QVERIFY(dir.exists(name));
-      }
-      ON_SCOPE_EXIT {
-        for (int i = 0; i < newRelatedNames.size(); ++i) {
-          QVERIFY(dir.rename(newRelatedNames[i], relatedNames[i]));
-        }
-      };
+      jPr.UpdateJsonNameFieldAndJsonAbsPath(fixedJsonBaseName);
+      QCOMPARE(jPr.m_Name, fixedJsonBaseName);
+      QCOMPARE(jPr.GetJsonFileName(), fixedJsonName);
     }
   }
 

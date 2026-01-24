@@ -18,8 +18,10 @@ struct JsonPr {
   bool Reload();
   bool WriteIntoFiles() const;
   QByteArray GetJsonBA() const;
-  inline QString GetItemsAbsPath(const QString& itemName) const {return m_Prepath + '/' + itemName;}
-  inline QString GetAbsPath() const { return GetItemsAbsPath(jsonFileName); }
+  QString GetJsonPrepath() const {return m_Prepath;}
+  QString GetJsonFileName() const {return jsonFileName;}
+  inline QString GetItemsAbsPath(const QString& itemName) const {return GetJsonPrepath() + '/' + itemName;}
+  inline QString GetJsonFileAbsPath() const { return GetItemsAbsPath(jsonFileName); }
   QStringList GetImagesAbsPath() const;
   QStringList GetVideosAbsPath() const;
 
@@ -39,7 +41,7 @@ struct JsonPr {
     E_RELATED_FILE_RENAME_FAILED,  //
     E_OK = 0,                      //
   };
-  int RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles = true);
+  void UpdateJsonNameFieldAndJsonAbsPath(const QString& newJsonName);
   bool SyncNameValueFromFileBaseName();
   bool UpdateDurationField(QString videoAbsPath="");
   bool ConstructCastStudioValue();  // contruct cast/studio
