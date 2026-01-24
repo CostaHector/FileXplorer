@@ -486,11 +486,11 @@ void JsonTableView::subscribe() {
 
   connect(inst._RENAME_JSON_AND_RELATED_FILES, &QAction::triggered, this, &JsonTableView::onRenameJsonAndRelated);
 
-  connect(inst._AI_HINT_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
-  connect(inst._FORMATTER, &QAction::triggered, this, &JsonTableView::onFormatCast);
+  connect(inst._INFER_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
+  connect(inst._FORMAT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onFormatCast);
   connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
 
-  connect(inst._INIT_STUDIO_CAST, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
+  connect(inst._INIT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);
 
   connect(inst._CLEAR_STUDIO, &QAction::triggered, this, &JsonTableView::onClearStudio);
@@ -505,8 +505,8 @@ void JsonTableView::subscribe() {
   connect(inst._TAGS_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
   connect(inst._TAGS_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
 
-  connect(inst._ADD_SELECTED_CAST_SENTENCE, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
-  connect(inst._EXTRACT_UPPERCASE_CAST, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
+  connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
+  connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
 }
 

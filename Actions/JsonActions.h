@@ -27,29 +27,31 @@ public:
   QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
 
   // **Studio/Cast/Tags Field Operation**
-  QAction* _AI_HINT_CAST_STUDIO{nullptr};
-  QAction* _FORMATTER{nullptr};
+  QAction* _INIT_STUDIO_CAST_FIELD{nullptr};
+  QAction* _INFER_CAST_STUDIO{nullptr};
+  QAction* _FORMAT_STUDIO_CAST_FIELD{nullptr};
   QAction* _UPDATE_DURATION_FIELD{nullptr};
   QAction* _UPDATE_SIZE_FIELD{nullptr};
   QAction* _UPDATE_HASH_FIELD{nullptr};
 
-  QAction* _INIT_STUDIO_CAST{nullptr};
   QAction* _STUDIO_FIELD_SET{nullptr};
+  QAction* _CLEAR_STUDIO{nullptr};
+  QList<QAction*> m_studioOperationList;
 
   QAction* _CAST_FIELD_SET{nullptr};
   QAction* _CAST_FIELD_APPEND{nullptr};
   QAction* _CAST_FIELD_RMV{nullptr};
+  QAction* _CLEAR_CAST{nullptr};
+  QList<QAction*> m_castOperationList;
 
   QAction* _TAGS_FIELD_SET{nullptr};
   QAction* _TAGS_FIELD_APPEND{nullptr};
   QAction* _TAGS_FIELD_RMV{nullptr};
-
-  QAction* _CLEAR_CAST{nullptr};
-  QAction* _CLEAR_STUDIO{nullptr};
   QAction* _CLEAR_TAGS{nullptr};
+  QList<QAction*> m_tagsOperationList;
 
-  QAction* _ADD_SELECTED_CAST_SENTENCE{nullptr};
-  QAction* _EXTRACT_UPPERCASE_CAST{nullptr};
+  QAction* _INFER_CAST_FROM_SELECTION{nullptr};
+  QAction* _INFER_CAST_FROM_UPPERCASE_SELECTION{nullptr};
 };
 
 JsonActions& g_JsonActions();

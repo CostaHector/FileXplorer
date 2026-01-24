@@ -122,4 +122,10 @@ struct RedunImgFinderKey {
   static const KV RUND_IMG_PATH;
 };
 
+namespace JsonOpMemoryKey {
+  const KV& STUDIO_OPERATION();
+  const KV& CAST_OPERATION();
+  const KV& TAGS_OPERATION();
+}
+
 #endif  // MEMORYKEY_H
