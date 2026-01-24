@@ -667,6 +667,15 @@ std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const 
   return {castIncrements.size(), studioIncrements.size()};
 }
 
+JsonPr JsonTableModel::GetJsonPr(const QModelIndex& ind) const {
+  const int row = ind.row();
+  if (row < 0 || row >= rowCount()) {
+    LOG_W("row: %d out of range [0,%d)", row, rowCount());
+    return {};
+  }
+  return mCachedJsons[row];
+}
+
 int JsonTableModel::AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence) {
   int row = ind.row();
   if (row < 0 || row >= rowCount()) {

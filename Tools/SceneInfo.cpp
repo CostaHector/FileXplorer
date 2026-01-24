@@ -1,5 +1,6 @@
 #include "SceneInfo.h"
 #include "PathTool.h"
+#include "PublicVariable.h"
 #include <QFileInfo>
 #include <QFile>
 #include <QDirIterator>
@@ -40,7 +41,37 @@ QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
 }
 
 QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
-  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (vidName.isEmpty() ? name : vidName));
+  if (vidName.isEmpty()) {
+    return "";
+  }
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
+}
+
+QStringList SceneInfo::GetVideosAbsPath(const QString& rootPath) const {
+  if (vidName.isEmpty()) {
+    static auto GetVideosListUnderPath = [] (const QString& path) -> QStringList {
+      QDir subDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
+      subDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+      QStringList vids;
+      for (const QFileInfo& vidInfo: subDir.entryInfoList()) {
+        if (vidInfo.size() < 10 * 1024 * 1024) { // 10MiB
+          continue;
+        }
+        vids.push_back(vidInfo.filePath());
+      }
+      return vids;
+    };
+
+    const QString dvdPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "VIDEO_TS");
+    if (QFileInfo(dvdPath).isDir()) {
+      return GetVideosListUnderPath(dvdPath);
+    }
+    const QString videosPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "Videos");
+    if (QFileInfo(videosPath).isDir()) {
+      return GetVideosListUnderPath(videosPath);
+    }
+  }
+  return {PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName)};
 }
 
 QString SceneInfo::GetJsonAbsPath(const QString& rootPath) const {

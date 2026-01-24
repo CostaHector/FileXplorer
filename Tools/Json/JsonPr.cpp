@@ -86,6 +86,24 @@ QByteArray JsonPr::GetJsonBA() const {
   return QJsonDocument(json).toJson(QJsonDocument::Indented);
 }
 
+QStringList JsonPr::GetImagesAbsPath() const {
+  QStringList imgs;
+  imgs.reserve(m_ImgName.size());
+  for (const QString& imgName: m_ImgName) {
+    imgs.push_back(GetItemsAbsPath(imgName));
+  }
+  return imgs;
+}
+
+QStringList JsonPr::GetVideosAbsPath() const {
+  QStringList vids;
+  vids.reserve(1);
+  if (!m_VidName.isEmpty()) {
+    vids.push_back(GetItemsAbsPath(m_VidName));
+  }
+  return vids;
+}
+
 int JsonPr::RenameJsonAndRelated(const QString& newJsonNameUserInput, bool alsoRenameRelatedFiles) {
   QString newJsonName{newJsonNameUserInput};
   QString newJsonBaseName{newJsonName};

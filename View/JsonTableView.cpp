@@ -10,8 +10,8 @@
 #include <QPlainTextEdit>
 #include <QStyleOptionViewItem>
 
-JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent)  //
-    : CustomTableView{"JSON_TABLE_VIEW", parent}                                                                 //
+JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent) //
+  : CustomTableView{"JSON_TABLE_VIEW", parent}                                                                  //
 {
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   _JsonModel = jsonModel;
@@ -19,7 +19,7 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   _JsonProxyModel = jsonProxyModel;
 
   _JsonProxyModel->setSourceModel(_JsonModel);
-  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name);  // only filter the specified name row; set -1 to filter all column if needed
+  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name); // only filter the specified name row; set -1 to filter all column if needed
 
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
@@ -27,7 +27,6 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   m_DetailEdit = new (std::nothrow) MultiLineEditDelegate;
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
-
 
   m_jsonMenu = new (std::nothrow) QMenu{this};
   CHECK_NULLPTR_RETURN_VOID(m_jsonMenu);
@@ -117,8 +116,13 @@ int JsonTableView::onRenameJsonAndRelated() {
   const QString oldJsonBaseName = _JsonModel->fileBaseName(ind);
 
   bool isInputOk{false};
-  QString newJsonBaseName = QInputDialog::getItem(this, "Input an new json base name", oldJsonBaseName,  //
-                                          {oldJsonBaseName}, 0, true, &isInputOk);
+  QString newJsonBaseName = QInputDialog::getItem(this,
+                                                  "Input an new json base name",
+                                                  oldJsonBaseName, //
+                                                  {oldJsonBaseName},
+                                                  0,
+                                                  true,
+                                                  &isInputOk);
   if (!isInputOk) {
     LOG_OK_NP("[skip] User cancel rename json and related files", "return");
     return 0;
@@ -128,8 +132,12 @@ int JsonTableView::onRenameJsonAndRelated() {
     return -1;
   }
   int cnt = _JsonModel->RenameJsonAndItsRelated(ind, newJsonBaseName);
-  LOG_OE_P(cnt >= 0, "Rename Json", "[%s]\n[%s]\n and it's related file(s). retCode: %d",  //
-           qPrintable(oldJsonBaseName), qPrintable(newJsonBaseName), cnt);
+  LOG_OE_P(cnt >= 0,
+           "Rename Json",
+           "[%s]\n[%s]\n and it's related file(s). retCode: %d", //
+           qPrintable(oldJsonBaseName),
+           qPrintable(newJsonBaseName),
+           cnt);
   return cnt;
 }
 
@@ -247,7 +255,7 @@ int JsonTableView::onClearStudio() {
 }
 
 int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
-  const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
+  const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int) type] + ' ' + FIELD_OP_MODE_ARR[(int) mode]};
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("nothing selected. skip", fieldOperation);
     return 0;
@@ -258,19 +266,26 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
     tagsOrCast = "";
     const QString clearQryCfm{"Confirm " + fieldOperation};
     const QString clearTagsCastsHintMsg{"Clear text?"};
-    QMessageBox::StandardButton cfmClearBtn = QMessageBox::question(this, clearQryCfm, clearTagsCastsHintMsg, QMessageBox::Yes | QMessageBox::No);
+    QMessageBox::StandardButton cfmClearBtn = QMessageBox::question(this,
+                                                                    clearQryCfm,
+                                                                    clearTagsCastsHintMsg,
+                                                                    QMessageBox::Yes | QMessageBox::No);
     if (cfmClearBtn != QMessageBox::Yes) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
     }
   } else {
-    QStringList& candidates = m_candidatesLst[(int)type];
+    QStringList& candidates = m_candidatesLst[(int) type];
 
     bool bIsAccept{false};
     QString inputTagsCastsHintMsg{QString{"Choose or select from drop down list[%1]"}.arg(fieldOperation)};
-    tagsOrCast = QInputDialog::getItem(this, fieldOperation, inputTagsCastsHintMsg,  //
-                                       candidates, candidates.size() - 1,            //
-                                       true, &bIsAccept);
+    tagsOrCast = QInputDialog::getItem(this,
+                                       fieldOperation,
+                                       inputTagsCastsHintMsg, //
+                                       candidates,
+                                       candidates.size() - 1, //
+                                       true,
+                                       &bIsAccept);
     if (!bIsAccept) {
       LOG_OK_NP("[Skip] User cancel", fieldOperation);
       return 0;
@@ -291,7 +306,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       fieldColumn = JSON_KEY_E::Tags;
       break;
     default:
-      LOG_ERR_P("Field Type invalid", "field: %d", (int)type);
+      LOG_ERR_P("Field Type invalid", "field: %d", (int) type);
       return -1;
   }
 
@@ -309,7 +324,7 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
       cnt = _JsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     default:
-      LOG_ERR_P("Field Operation invalid", "mode: %d", (int)mode);
+      LOG_ERR_P("Field Operation invalid", "mode: %d", (int) mode);
       return -2;
   }
   LOG_OK_P("SetCastOrTags", "%d/%d row(s) affected by [%s]", cnt, indexes.size(), qPrintable(fieldOperation));
@@ -333,7 +348,7 @@ bool JsonTableView::GetSelectedTextInCell(QString& selectedText, EDITOR_WIDGET_T
 #else
   editor = indexWidget(curInd);
 #endif
-  if (editor == nullptr) {  // not in edit mode
+  if (editor == nullptr) { // not in edit mode
     LOG_D("Cell not in edit, cannot get selection text in cell");
     return true;
   }
@@ -481,4 +496,11 @@ void JsonTableView::subscribe() {
 
   connect(inst._ADD_SELECTED_CAST_SENTENCE, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._EXTRACT_UPPERCASE_CAST, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
+}
+
+void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
+  const JsonPr& json = _JsonModel->GetJsonPr(current);
+  const QString jsonAbsPath = json.GetAbsPath();
+  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), json.GetVideosAbsPath());
 }
