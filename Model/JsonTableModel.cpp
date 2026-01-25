@@ -20,10 +20,10 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
-  case enu:                                                                          \
-    return format(item.m_##enu);  //
-      JSON_MODEL_FIELD_MAPPING    //
-#undef JSON_KEY_ITEM              //
+  case enu: \
+    return format(item.m_##enu); //
+      JSON_MODEL_FIELD_MAPPING   //
+#undef JSON_KEY_ITEM             //
           default : return {};
     }
   } else if (role == Qt::ForegroundRole) {
@@ -38,7 +38,10 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
         if (!item.hintStudio.isEmpty()) {
           return QColor{Qt::GlobalColor::red};
         }
-        break;
+        static const auto& studiosTable = StudiosManager::getInst().StdStudiosSet();
+        if (!item.m_Studio.isEmpty() && !studiosTable.contains(item.m_Studio)) {
+          return QColor{Qt::GlobalColor::darkRed};
+        }
       }
       default:
         break;
@@ -72,21 +75,21 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (index.column() == JsonKey::Prepath) {  // ignore it
+  if (index.column() == JsonKey::Prepath) { // ignore it
     return false;
   }
   if (role == Qt::EditRole) {
     auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
-  case enu: {                                                                        \
-    if (!writer(item.m_##enu, value)) {                                              \
-      return false;                                                                  \
-    }                                                                                \
-    break;                                                                           \
+  case enu: { \
+    if (!writer(item.m_##enu, value)) { \
+      return false; \
+    } \
+    break; \
   }
-      JSON_MODEL_FIELD_MAPPING  //
-#undef JSON_KEY_ITEM            //
+      JSON_MODEL_FIELD_MAPPING //
+#undef JSON_KEY_ITEM           //
           default : return false;
     }
     setModified(index.row(), true);
@@ -234,7 +237,7 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
 
 int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E keyEnum, const QString& sentence) {
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int)keyEnum);
+    LOG_W("Field[%d] not support", (int) keyEnum);
     return -1;
   }
 
@@ -270,7 +273,13 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) set [%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow, qPrintable(sentence));
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) set [%s]",
+        keyEnum,
+        affectedRows,
+        rowIndexes.size(),
+        minRow,
+        maxRow,
+        qPrintable(sentence));
   return affectedRows;
 }
 
@@ -280,7 +289,7 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
     return 0;
   }
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int)keyEnum);
+    LOG_W("Field[%d] not support", (int) keyEnum);
     return -1;
   }
 
@@ -317,7 +326,13 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) Add [%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow, qPrintable(sentence));
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) Add [%s]",
+        keyEnum,
+        affectedRows,
+        rowIndexes.size(),
+        minRow,
+        maxRow,
+        qPrintable(sentence));
   return affectedRows;
 }
 
@@ -328,7 +343,7 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   }
 
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int)keyEnum);
+    LOG_W("Field[%d] not support", (int) keyEnum);
     return -1;
   }
 
@@ -362,7 +377,12 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) remove element[%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow,
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) remove element[%s]",
+        keyEnum,
+        affectedRows,
+        rowIndexes.size(),
+        minRow,
+        maxRow,
         qPrintable(oneElement));
   return affectedRows;
 }
@@ -529,7 +549,7 @@ int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
     const QString& jsonFullPath = mCachedJsons[row].GetJsonFileAbsPath();
     const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
     const QString& vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
-    affectedRows += (int)mCachedJsons[row].UpdateDurationField(vidFullPath);
+    affectedRows += (int) mCachedJsons[row].UpdateDurationField(vidFullPath);
     setModifiedNoEmit(row);
     if (row > maxRow) {
       maxRow = row;

@@ -2,6 +2,7 @@
 #define STUDIOSMANAGER_H
 
 #include <QHash>
+#include <QSet>
 #include <QString>
 #include "SingletonManager.h"
 
@@ -9,6 +10,7 @@
 // warner bros. => WarnerBros.
 // warnerbros. => WarnerBros.
 using STUDIO_MGR_DATA_T = QHash<QString, QString>;
+using STD_STUDIOS_SET_T = QSet<QString>;
 class StudiosManager;
 extern template class SingletonManager<StudiosManager, STUDIO_MGR_DATA_T>;
 
@@ -18,6 +20,8 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
 
   STUDIO_MGR_DATA_T& ProStudioMap() { return data(); }
   const STUDIO_MGR_DATA_T& ProStudioMap() const { return data(); }
+
+  const STD_STUDIOS_SET_T& StdStudiosSet() const {return mStdStudioNamesSet;}
 
   STUDIO_MGR_DATA_T ReadOutStdStudioName() const;
 
@@ -42,6 +46,8 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
   StudiosManager();  // valid localFilePath only used in llt
   StudiosManager(const StudiosManager& rhs) noexcept = delete;
   void InitializeImpl(const QString& path, const QString& blackPath="");
+  void UpdateStdStudioNamesStd();
+  STD_STUDIOS_SET_T mStdStudioNamesSet;
 
   QString FileName2StudioNameSection(QString sentence) const;
   QString FileNameLastSection2StudioNameSection(QString sentence) const;

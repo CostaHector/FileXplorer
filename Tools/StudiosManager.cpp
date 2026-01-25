@@ -37,6 +37,13 @@ void StudiosManager::InitializeImpl(const QString& path, const QString& blackPat
   mLocalFilePath = path;
   mLocalBlackFilePath = blackPath;
   ProStudioMap() = ReadOutStdStudioName();
+  UpdateStdStudioNamesStd();
+}
+
+void StudiosManager::UpdateStdStudioNamesStd() {
+  const QStringList& lst = ProStudioMap().values();
+  STD_STUDIOS_SET_T tempSet{lst.cbegin(), lst.cend()};
+  mStdStudioNamesSet.swap(tempSet);
 }
 
 STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
@@ -101,6 +108,7 @@ int StudiosManager::ForceReloadImpl() {
 
   STUDIO_MGR_DATA_T newStudioNames = StudiosManager::ReadOutStdStudioName();
   ProStudioMap().swap(newStudioNames);
+  UpdateStdStudioNamesStd();
 
   int aftCnt = ProStudioMap().size();
   LOG_D("standard studio names rule from %d to %d", befCnt, aftCnt);
@@ -135,6 +143,7 @@ int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
   if (studiosIncrementMap.isEmpty()) {
     return 0;
   }
+  UpdateStdStudioNamesStd();
   int cnt = WriteIntoLocalDictionaryFiles(studiosIncrementMap);
   if (cnt < 0) {
     return -1;
