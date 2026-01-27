@@ -29,7 +29,7 @@ bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hype
 StudiosManager::StudiosManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetVendorsTableFilePath(), GetMononymActorsListFilePath());
+  InitializeImpl(GetVendorsTableFilePath(), GetMononymVendorsListFilePath());
 #endif
 }
 
