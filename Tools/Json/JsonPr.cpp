@@ -18,7 +18,7 @@
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
   QString jsonFileName = PathTool::GetPrepathAndFileName(jsonAbsFile, prepath);
-  const auto& json = JsonHelper::GetJsonObject(jsonAbsFile);
+  const QJsonObject& json = JsonHelper::GetJsonObject(jsonAbsFile);
   return JsonPr{prepath, jsonFileName, json};
 }
 
