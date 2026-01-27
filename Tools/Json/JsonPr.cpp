@@ -150,19 +150,23 @@ bool JsonPr::ConstructCastStudioValue() {
     return false;
   }
   bool changed = false;
-  if (m_Cast.isEmpty()) {
-    static const auto& pm = CastManager::getInst();
-    QStringList newCastLst = pm(m_Name);
-    if (!newCastLst.isEmpty()) {
-      m_Cast.setBatch(newCastLst);
-      changed = true;
-    }
-  }
+
+  bool bIsActorFromSingleWordStudio = false;
   if (m_Studio.isEmpty()) {
-    static const auto& psm = StudiosManager::getInst();
-    QString newStudio = psm(m_Name);
+    static const StudiosManager& studioMgr = StudiosManager::getInst();
+    QString newStudio = studioMgr(m_Name);
     if (!newStudio.isEmpty()) {
       m_Studio.swap(newStudio);
+      changed = true;
+    }
+    bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(hintStudio);
+  }
+
+  if (m_Cast.isEmpty()) {
+    static const CastManager& actorMgr = CastManager::getInst();
+    QStringList newCastLst = actorMgr(m_Name, bIsActorFromSingleWordStudio);
+    if (!newCastLst.isEmpty()) {
+      m_Cast.setBatch(newCastLst);
       changed = true;
     }
   }
@@ -229,20 +233,27 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
 }
 
 void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
-  static StudiosManager& psm = StudiosManager::getInst();
-  hintStudio = psm(m_Name);
-  if (m_Studio != hintStudio) { // not equal update
-    studioChanged = true;
+  static StudiosManager& studioMgr = StudiosManager::getInst();
+  hintStudio = studioMgr(m_Name);
+  if (!hintStudio.isEmpty()) {
+    if (m_Studio != hintStudio) { // not equal update
+      studioChanged = true;
+    } else {
+      studioChanged = false;
+      hintStudio.clear();
+    }
   } else {
     studioChanged = false;
-    hintStudio.clear();
   }
+  const bool bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(hintStudio);
 
-  static CastManager& pm = CastManager::getInst();
-  const QStringList& hintPerfsList = pm(m_Name + " " + selectedText);
+  static CastManager& actorMgr = CastManager::getInst();
+  const QStringList& hintPerfsList = actorMgr(m_Name + " " + selectedText, bIsActorFromSingleWordStudio);
   QSet<QString> elseCastSet{hintPerfsList.cbegin(), hintPerfsList.cend()};
   elseCastSet.subtract(m_Cast.m_set); // has increasing update
-  hintCast = elseCastSet.values().join(NameTool::CSV_COMMA);
+  QStringList elseCastList{elseCastSet.values()};
+  std::sort(elseCastList.begin(), elseCastList.end());
+  hintCast = elseCastList.join(NameTool::CSV_COMMA);
   if (!elseCastSet.isEmpty()) {
     castChanged = true;
   } else {

@@ -18,8 +18,9 @@
 
 class JsonPrTest : public PlainTestSuite {
   Q_OBJECT
- public:
-  JsonPrTest() : PlainTestSuite{} {}
+public:
+  JsonPrTest()
+    : PlainTestSuite{} {}
   TDir mDir;
   QString rootpath{mDir.path()};
   QList<FsNodeEntry> gNodeEntries;
@@ -28,17 +29,17 @@ class JsonPrTest : public PlainTestSuite {
   const QString newJsonName = "SuperMan - Chris Evans.json";
   const QString occupiedJsonName = "My Good Boy.json";
   const QString fixedAbsPath{rootpath + '/' + fixedJsonName};
- private slots:
+private slots:
   void initTestCase() {
     QVERIFY(mDir.IsValid());
-    gNodeEntries = QList<FsNodeEntry>  //
+    gNodeEntries = QList<FsNodeEntry> //
         {
-            FsNodeEntry{"cast_list.txt", false, {}},                    //
-            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},      //
-            FsNodeEntry{"studio_list.txt", false, {}},                  //
-            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},    //
-            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},  //
-            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},      //
+            FsNodeEntry{"cast_list.txt", false, {}},                                         //
+            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS}, //
+            FsNodeEntry{"studio_list.txt", false, {}},                                       //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                         //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                       //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                           //
             FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
         };
     mDir.createEntries(gNodeEntries);
@@ -51,7 +52,7 @@ class JsonPrTest : public PlainTestSuite {
     }
   }
 
-  void test_HintForCastStudio() {  //
+  void test_HintForCastStudio() { //
     JsonPr jpr;
     bool studioChange{true}, castChanged{true};
     jpr.HintForCastStudio("", studioChange, castChanged);
@@ -75,41 +76,56 @@ class JsonPrTest : public PlainTestSuite {
       pm.CastSet().swap(tempCast);
     };
 
-    QString sentence{"A1 C1, G1, A1 B1, B1 D1.mp4"};
-    jpr.m_Name = "Marvel Films- Read Madrid - A1 C1, G1, A1 B1";
+    // Studio(NotInTableStudio) and actor not in table
+    {
+      QString sentence_bothStudioCastNotInTable{"NotInTableStudio - X1 Y1, X4 Y4"};
+      jpr.m_Name = sentence_bothStudioCastNotInTable;
+      jpr.m_Studio = "NotInTableStudio"; // not in ProStudioMap
+      jpr.m_Cast = SortedUniqStrLst{QStringList{"X1 Y1", "X4 Y4"}}; // not in CastSet
+      studioChange = true;
+      castChanged = true;
+      jpr.HintForCastStudio(sentence_bothStudioCastNotInTable, studioChange, castChanged);
+      QVERIFY(!studioChange);
+      QVERIFY(!castChanged);
+    }
 
-    studioChange = false;
-    castChanged = false;
-    jpr.HintForCastStudio(sentence, studioChange, castChanged);
-    QCOMPARE(studioChange, true);
-    QCOMPARE(castChanged, true);
+    // Studio(Marvel Films) and 3 actors(A1 C1, A1 B1, B1 D1) in table
+    {
+      QString sentence{"A1 C1, G1, A1 B1, B1 D1.mp4"};
+      jpr.m_Name = "Marvel Films- Read Madrid - A1 C1, G1, A1 B1";
+      jpr.m_Studio = "OtherStudio";
+      jpr.m_Cast = SortedUniqStrLst{QStringList{"B1 D1"}}; // casts delta: only a1b1 and a1c1
 
-    QSet<QString> expectHintCast{"A1 C1", "A1 B1", "B1 D1"};
-    QStringList actualHintCastLst{jpr.hintCast.split(NameTool::CSV_COMMA)};
-    QSet<QString> actualHintCast{actualHintCastLst.begin(), actualHintCastLst.end()};
-    QCOMPARE(expectHintCast, actualHintCast);  // hint cast no need sorted
-    jpr.RejectCastHint();
-    QCOMPARE(jpr.hintCast, "");
+      studioChange = false;
+      castChanged = false;
+      jpr.HintForCastStudio(sentence, studioChange, castChanged);
+      QCOMPARE(studioChange, true);
+      QCOMPARE(castChanged, true);
 
-    QCOMPARE(jpr.hintStudio, "MarvelFilms");
-    jpr.RejectStudioHint();
-    QCOMPARE(jpr.hintStudio, "");
+      QCOMPARE(jpr.hintCast, "A1 B1,A1 C1"); // hint cast no need sorted
+      jpr.RejectCastHint();
+      QCOMPARE(jpr.hintCast, "");
 
-    QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1");  // name not change
-    QVERIFY(jpr.m_Studio.isEmpty());                                       // studio not fill automatically
-    QVERIFY(jpr.m_Cast.isEmpty());                                         // cast not fill automatically
+      QCOMPARE(jpr.hintStudio, "MarvelFilms");
+      jpr.RejectStudioHint();
+      QCOMPARE(jpr.hintStudio, "");
+
+      QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1"); // name not change
+      QCOMPARE(jpr.m_Studio, "OtherStudio");                                // studio not fill automatically
+      QCOMPARE(jpr.m_Cast, SortedUniqStrLst{QStringList{"B1 D1"}});         // cast not fill automatically
+    }
   }
 
   void test_fromJsonFile() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
-    QCOMPARE(fixedFi.size(), 0);  // empty at first
+    QCOMPARE(fixedFi.size(), 0); // empty at first
     const auto& jPr = JsonPr::fromJsonFile(fixedFi.fileName());
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 2. "Name" find, other key need insert by StandardlizeKeyValue ok
-    QVERIFY(jPr.m_Name != PathTool::GetBaseName(fixedJsonName));  // should not be replaced automatically
+    QVERIFY(jPr.m_Name != PathTool::GetBaseName(fixedJsonName)); // should not be replaced automatically
     QCOMPARE(jPr.m_Name, "");
     QVERIFY(jPr.m_Cast.isEmpty());
     QVERIFY(jPr.m_Studio.isEmpty());
@@ -180,8 +196,8 @@ class JsonPrTest : public PlainTestSuite {
     QVERIFY(!writedJson.contains(ENUM_2_STR(Performers)));
     QCOMPARE(writedJson[ENUM_2_STR(Name)], dict[ENUM_2_STR(Name)]);
     QCOMPARE(writedJson[ENUM_2_STR(Studio)], dict["ProductionStudio"]);
-    QCOMPARE(writedJson[ENUM_2_STR(Cast)], (QStringList{"Chris Evans", "Henry Cavill"}));  // Cast should sorted
-    QCOMPARE(writedJson[ENUM_2_STR(Tags)], (QStringList{"friction", "science"}));          // Tags should also sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Cast)], (QStringList{"Chris Evans", "Henry Cavill"})); // Cast should sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Tags)], (QStringList{"friction", "science"}));         // Tags should also sorted
     QCOMPARE(writedJson[ENUM_2_STR(Detail)], dict[ENUM_2_STR(Detail)]);
     QCOMPARE(writedJson[ENUM_2_STR(ImgName)], dict[ENUM_2_STR(ImgName)]);
     QCOMPARE(writedJson[ENUM_2_STR(VidName)], dict[ENUM_2_STR(VidName)]);
@@ -208,17 +224,17 @@ class JsonPrTest : public PlainTestSuite {
   void test_Rename_ok() {
     const QStringList relatedNames{
         // environment exist MUST
-        "SuperMan - Henry Cavill.json",    // fixedJsonName
-        "SuperMan - Henry Cavill.jpg",     //
-        "SuperMan - Henry Cavill 1.jpg",   //
-        "SuperMan - Henry Cavill 999.mp4"  //
+        "SuperMan - Henry Cavill.json",   // fixedJsonName
+        "SuperMan - Henry Cavill.jpg",    //
+        "SuperMan - Henry Cavill 1.jpg",  //
+        "SuperMan - Henry Cavill 999.mp4" //
     };
     const QStringList newRelatedNames{
         // environment not exist MUST
-        "SuperMan - Chris Evans.json",    // newJsonName
-        "SuperMan - Chris Evans.jpg",     //
-        "SuperMan - Chris Evans 1.jpg",   //
-        "SuperMan - Chris Evans 999.mp4"  //
+        "SuperMan - Chris Evans.json",   // newJsonName
+        "SuperMan - Chris Evans.jpg",    //
+        "SuperMan - Chris Evans 1.jpg",  //
+        "SuperMan - Chris Evans 999.mp4" //
     };
     QCOMPARE(relatedNames.size(), newRelatedNames.size());
 

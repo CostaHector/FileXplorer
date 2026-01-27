@@ -80,7 +80,7 @@ class CastDBViewTest : public PlainTestSuite {
       QModelIndexList indexesNames{GetIndexessAtOneRow(castModel, 0, 2, PERFORMER_DB_HEADER_KEY::Name)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesNames,  //
                                                  QStringList{"Guardiola", "Huge Jackman"}));
-      QModelIndexList indexesAkas{GetIndexessAtOneRow(castModel, 0, 2, PERFORMER_DB_HEADER_KEY::AKA)};
+      QModelIndexList indexesAkas{GetIndexessAtOneRow(castModel, 0, 2, PERFORMER_DB_HEADER_KEY::ALIAS)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesAkas,  //
                                                  QStringList{"Pep", "Wolverine"}));
 

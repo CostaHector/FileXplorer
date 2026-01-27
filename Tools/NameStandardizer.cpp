@@ -35,11 +35,3 @@ QString NameStandardizer::operator()(QString aFileName) {
   const QString& studioName = fileName.left(barIndex - 1);
   return psm[studioName] + fileName.mid(barIndex - 1);
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-int main(int argc, char* argv[]) {
-  const auto& mp = NameStandardizer::jsonLoader();
-  LOG_D("STANDARD_STUDIO_NAME size=%d", mp.size());
-}
-#endif

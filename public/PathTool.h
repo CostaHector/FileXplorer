@@ -68,10 +68,10 @@ struct RMFComponent {
 
 namespace FILE_REL_PATH{
 constexpr char MEDIA_INFO_DLL[] {"../../lib/MediaInfo.dll"};
-const QString& GetStudiosListFilePath();
-const QString& GetStudiosBlackListFilePath();
+const QString& GetVendorsTableFilePath();
+const QString& GetMononymVendorsListFilePath();
 const QString& GetActorsListFilePath();
-const QString& GetActorsBlackListFilePath();
+const QString& GetMononymActorsListFilePath();
 const QString& GetActorsAliasListFilePath();
 #ifdef _WIN32
 constexpr char TORRENT_EDITOR_PROG_PATH[]{"../../../torrent-file-editor/build/Debug/torrent-file-editor.exe"};

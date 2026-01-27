@@ -139,7 +139,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())    //
                  .arg(orientation)                                                    //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString()) //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::AKA).value().toString())  //
+                 .arg(record.field(PERFORMER_DB_HEADER_KEY::ALIAS).value().toString())  //
                  .arg(record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString());
 
   // Videos here

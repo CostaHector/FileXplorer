@@ -9,7 +9,7 @@
 #define PSON_MODEL_FIELD_MAPPING \
   PSON_KEY_ITEM(Name, 0, QString{}, toString, QString{R"(`%1` TEXT NOT NULL %2,)"}) \
   PSON_KEY_ITEM(Rate, 1, (int) 0, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \
-  PSON_KEY_ITEM(AKA, 2, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
+  PSON_KEY_ITEM(ALIAS, 2, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Tags, 3, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Ori, 4, QString{"Football"}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Height, 5, (int) -1, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \

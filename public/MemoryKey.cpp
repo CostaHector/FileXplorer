@@ -115,3 +115,19 @@ const KV BrowserKey::FLOATING_MEDIA_TYPE_SEQ{"FLOATING_MEDIA_TYPE_SEQ", "012", V
 
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH}, true);
+
+
+namespace JsonOpMemoryKey {
+const KV& STUDIO_OPERATION() {
+  static const KV studioOperation("STUDIO_OPERATION", 0, ValueChecker{0, 100 + 1});
+  return studioOperation;
+}
+const KV& CAST_OPERATION() {
+  static const KV castOperation("CAST_OPERATION", 0, ValueChecker{0, 100 + 1});
+  return castOperation;
+}
+const KV& TAGS_OPERATION() {
+  static const KV tagsOperation("TAGS_OPERATION", 0, ValueChecker{0, 100 + 1});
+  return tagsOperation;
+}
+}

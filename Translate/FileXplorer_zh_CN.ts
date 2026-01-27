@@ -485,7 +485,7 @@
         <translation>更新Name字段</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Reload from disk</source>
         <translation>从磁盘重新加载</translation>
     </message>
@@ -495,7 +495,7 @@
         <translation>导出到字典</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Title</source>
         <translation>首字母大写</translation>
     </message>
@@ -511,34 +511,44 @@
         <translation>打开此json文件</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>Reveal in explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>Rename json
 (also related files)</source>
         <translation>重命名文件
 (同步更新Name字段)</translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+54"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+25"/>
+        <source>Infer cast from selection</source>
+        <translation>推测演员根据选中</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Infer cast from upper selection</source>
+        <translation>推测演员根据大写选中</translation>
+    </message>
+    <message>
+        <location line="-47"/>
         <source>Clear Studio</source>
         <translation>清除厂商</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+32"/>
         <source>Clear Tags</source>
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-60"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -563,17 +573,17 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-23"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+28"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+9"/>
         <source>Set Cast</source>
         <translation>设置演员</translation>
     </message>
@@ -588,29 +598,19 @@
         <translation>移除演员</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+11"/>
         <source>Set Tags</source>
         <translation>设置标签</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Add Tags</source>
-        <translation>添加演员</translation>
+        <translation>添加标签</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Rmv Tag</source>
         <translation>移除标签</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Cast from sentence</source>
-        <translation>从段落中推测演员</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>From uppercase sentence</source>
-        <translation>从纯大写段落中推测可能演员</translation>
     </message>
 </context>
 <context>
@@ -1054,6 +1054,24 @@
         <location line="+1"/>
         <source>Toggle Case</source>
         <translation>大小写互换</translation>
+    </message>
+</context>
+<context>
+    <name>RibbonJson</name>
+    <message>
+        <location filename="../Component/RibbonJson.cpp" line="+61"/>
+        <source>Studio</source>
+        <translation>厂商</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Cast</source>
+        <translation>演员</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Tags</source>
+        <translation>标签</translation>
     </message>
 </context>
 <context>

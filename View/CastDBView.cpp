@@ -27,7 +27,7 @@ void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
-  : CustomTableView{"PERFORMERS_TABLE", parent}
+  : CustomTableView{"ACTORS_TABLE", parent}
   , //
   _castDbSearchBar{castDbSearchBar_}
   , _castModel{castDbModel_}
