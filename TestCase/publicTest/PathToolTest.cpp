@@ -32,7 +32,7 @@ class PathToolTest : public PlainTestSuite {
     using namespace FILE_REL_PATH;
     QString perfPath = GetActorsListFilePath();
     QVERIFY(QFile::exists(perfPath));
-    QString stdStudioPath = GetStudiosListFilePath();
+    QString stdStudioPath = GetVendorsTableFilePath();
     QVERIFY(QFile::exists(stdStudioPath));
     QString akaPath = GetActorsAliasListFilePath();
     QVERIFY(QFile::exists(akaPath));

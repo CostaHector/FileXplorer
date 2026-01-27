@@ -20,10 +20,10 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
-  case enu: \
-    return format(item.m_##enu); //
-      JSON_MODEL_FIELD_MAPPING   //
-#undef JSON_KEY_ITEM             //
+  case enu:                                                                          \
+    return format(item.m_##enu);  //
+      JSON_MODEL_FIELD_MAPPING    //
+#undef JSON_KEY_ITEM              //
           default : return {};
     }
   } else if (role == Qt::ForegroundRole) {
@@ -75,21 +75,21 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (index.column() == JsonKey::Prepath) { // ignore it
+  if (index.column() == JsonKey::Prepath) {  // ignore it
     return false;
   }
   if (role == Qt::EditRole) {
     auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
-  case enu: { \
-    if (!writer(item.m_##enu, value)) { \
-      return false; \
-    } \
-    break; \
+  case enu: {                                                                        \
+    if (!writer(item.m_##enu, value)) {                                              \
+      return false;                                                                  \
+    }                                                                                \
+    break;                                                                           \
   }
-      JSON_MODEL_FIELD_MAPPING //
-#undef JSON_KEY_ITEM           //
+      JSON_MODEL_FIELD_MAPPING  //
+#undef JSON_KEY_ITEM            //
           default : return false;
     }
     setModified(index.row(), true);
@@ -237,7 +237,7 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
 
 int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E keyEnum, const QString& sentence) {
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int) keyEnum);
+    LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
 
@@ -273,12 +273,7 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) set [%s]",
-        keyEnum,
-        affectedRows,
-        rowIndexes.size(),
-        minRow,
-        maxRow,
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) set [%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow,
         qPrintable(sentence));
   return affectedRows;
 }
@@ -289,7 +284,7 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
     return 0;
   }
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int) keyEnum);
+    LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
 
@@ -326,12 +321,7 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) Add [%s]",
-        keyEnum,
-        affectedRows,
-        rowIndexes.size(),
-        minRow,
-        maxRow,
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) Add [%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow,
         qPrintable(sentence));
   return affectedRows;
 }
@@ -343,7 +333,7 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   }
 
   if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
-    LOG_W("Field[%d] not support", (int) keyEnum);
+    LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
 
@@ -377,12 +367,7 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   const QModelIndex& backInd = sibling(maxRow, keyEnum, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) remove element[%s]",
-        keyEnum,
-        affectedRows,
-        rowIndexes.size(),
-        minRow,
-        maxRow,
+  LOG_D("Cast or Tags Field[%d] of %d/%d row(s) range [%d, %d) remove element[%s]", keyEnum, affectedRows, rowIndexes.size(), minRow, maxRow,
         qPrintable(oneElement));
   return affectedRows;
 }
@@ -549,7 +534,7 @@ int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
     const QString& jsonFullPath = mCachedJsons[row].GetJsonFileAbsPath();
     const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
     const QString& vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
-    affectedRows += (int) mCachedJsons[row].UpdateDurationField(vidFullPath);
+    affectedRows += (int)mCachedJsons[row].UpdateDurationField(vidFullPath);
     setModifiedNoEmit(row);
     if (row > maxRow) {
       maxRow = row;
@@ -659,34 +644,42 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
 }
 
 std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const {
-  int row{-1};
-  int cnt{0};
-  CastManager& pm = CastManager::getInst();
-  CAST_MGR_DATA_T castIncrements;
+  CastManager& castMgr = CastManager::getInst();
+  CAST_MGR_DATA_T actorsFromSelection, singleWordActorsFromSelection;
 
-  StudiosManager& psm = StudiosManager::getInst();
+  StudiosManager& stdMgr = StudiosManager::getInst();
   STUDIO_MGR_DATA_T studioIncrements;
 
+  int rowCnt{0};
+  int row{-1};
   for (const QModelIndex& ind : rowIndexes) {
     row = ind.row();
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return {-1, -1};
     }
-    pm.CastIncrement(castIncrements, mCachedJsons[row].m_Cast.toLowerSets());
-    psm.StudioIncrement(studioIncrements, mCachedJsons[row].m_Studio);
-    ++cnt;
+
+    const QString& stdStudioName = mCachedJsons[row].m_Studio;
+    stdMgr.StudioIncrement(studioIncrements, stdStudioName);
+
+    const CAST_MGR_DATA_T& actors = mCachedJsons[row].m_Cast.toLowerSets();
+    if (stdMgr.isStudioWithSingleWord(stdStudioName)) {
+      singleWordActorsFromSelection += actors;
+    }
+    actorsFromSelection += actors;
+    ++rowCnt;
   }
-  LOG_D("Increment of Cast:%d, Studio:%d from %d row(s)", castIncrements.size(), studioIncrements.size(), cnt);
-  if (pm.WriteIntoLocalDictionaryFiles(castIncrements) < 0) {
-    LOG_W("Write %d Cast into local file failed", castIncrements.size());
-    return {-1, studioIncrements.size()};
-  }
-  if (psm.WriteIntoLocalDictionaryFiles(studioIncrements) < 0) {
-    LOG_W("Write %d Studio into local file failed", studioIncrements.size());
-    return {castIncrements.size(), -1};
-  }
-  return {castIncrements.size(), studioIncrements.size()};
+  const int studioRet = stdMgr.WriteIntoLocalDictionaryFiles(studioIncrements);
+  CAST_MGR_DATA_T actorIncrements = castMgr.ActorIncrement(actorsFromSelection);
+  CAST_MGR_DATA_T singleWordActorIncrements = castMgr.SingleWordActorIncrement(singleWordActorsFromSelection);
+  const int actorRet = castMgr.WriteIntoLocalDictionaryFiles(actorIncrements, false);
+  const int singleWordActorRet = castMgr.WriteIntoLocalDictionaryFiles(singleWordActorIncrements, true);
+  LOG_D("Increment of Actors:%d(writeRet:%d), SingleWordActors:%d(writeRet:%d), Studios:%d(writeRet:%d) from %d row(s)",  //
+        actorIncrements.size(), actorRet,                                                                                 //
+        singleWordActorIncrements.size(), singleWordActorRet,                                                             //
+        studioIncrements.size(), studioRet,                                                                               //
+        rowCnt);
+  return {actorRet, studioRet};
 }
 
 JsonPr JsonTableModel::GetJsonPr(const QModelIndex& ind) const {

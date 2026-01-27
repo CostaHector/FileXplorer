@@ -29,14 +29,14 @@ bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hype
 StudiosManager::StudiosManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetStudiosListFilePath(), GetActorsBlackListFilePath());
+  InitializeImpl(GetVendorsTableFilePath(), GetMononymActorsListFilePath());
 #endif
 }
 
 void StudiosManager::InitializeImpl(const QString& path, const QString& blackPath) {
   mLocalFilePath = path;
   mLocalBlackFilePath = blackPath;
-  ProStudioMap() = ReadOutStdStudioName();
+  std::tie(ProStudioMap(), mStudioWithSingleWordActor) = ReadOutStdStudioName();
   UpdateStdStudioNamesStd();
 }
 
@@ -46,15 +46,15 @@ void StudiosManager::UpdateStdStudioNamesStd() {
   mStdStudioNamesSet.swap(tempSet);
 }
 
-STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
-  QSet<QString> blackList;
+std::pair<STUDIO_MGR_DATA_T, STUDIOS_SET_T> StudiosManager::ReadOutStdStudioName() const {
+  STUDIOS_SET_T studiosWithSingleWordActor;
   {
-    QFile blackFi{mLocalBlackFilePath};
-    if (blackFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      QTextStream in(&blackFi);
+    QFile studioWithSingleWordActorFi{mLocalBlackFilePath};
+    if (studioWithSingleWordActorFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QTextStream in(&studioWithSingleWordActorFi);
       in.setCodec("UTF-8");
       while(!in.atEnd()) {
-        blackList.insert(in.readLine(128));
+        studiosWithSingleWordActor.insert(in.readLine(128));
       }
     }
   }
@@ -88,26 +88,18 @@ STUDIO_MGR_DATA_T StudiosManager::ReadOutStdStudioName() const {
       LOG_W("The %dth line of file[%s] is invalid", lineIndex, qPrintable(studioFi.fileName()));
       continue;
     }
-    QString befName = line.left(tabKeyInd);
-    if (blackList.contains(befName)) {
-      continue;
-    }
-    QString aftName = line.mid(tabKeyInd + 1);
-    if (blackList.contains(aftName)) {
-      continue;
-    }
+    const QString& befName = line.left(tabKeyInd);
+    const QString& aftName = line.mid(tabKeyInd + 1);
     stdStudioNameDict[befName] = aftName;
   }
   studioFi.close();
   LOG_D("%d studio item(s) read out from %d lines", stdStudioNameDict.size(), lineIndex);
-  return stdStudioNameDict;
+  return {stdStudioNameDict, studiosWithSingleWordActor};
 }
 
 int StudiosManager::ForceReloadImpl() {
   int befCnt = ProStudioMap().size();
-
-  STUDIO_MGR_DATA_T newStudioNames = StudiosManager::ReadOutStdStudioName();
-  ProStudioMap().swap(newStudioNames);
+  std::tie(ProStudioMap(), mStudioWithSingleWordActor) = StudiosManager::ReadOutStdStudioName();
   UpdateStdStudioNamesStd();
 
   int aftCnt = ProStudioMap().size();
@@ -115,54 +107,19 @@ int StudiosManager::ForceReloadImpl() {
   return aftCnt - befCnt;
 }
 
-int StudiosManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
-  if (bHasWrite != nullptr) {
-    *bHasWrite = false;
-  }
-  using namespace JsonKey;
-  if (!QDir{path}.exists()) {
-    LOG_D("path[%s] not exist", qPrintable(path));
-    return 0;
-  }
-
-  STUDIO_MGR_DATA_T studiosIncrementMap;
-  QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  int jsonFilesCnt{0};
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonPath);
-    auto studioIt = dict.constFind(ENUM_2_STR(Studio));
-    if (studioIt == dict.cend()) {
-      continue;
-    }
-    ++jsonFilesCnt;
-    StudioIncrement(studiosIncrementMap, studioIt->toString());
-  }
-  LOG_D("Learn extra %d studios from %d json files", studiosIncrementMap.size(), jsonFilesCnt);
-  if (studiosIncrementMap.isEmpty()) {
-    return 0;
-  }
-  UpdateStdStudioNamesStd();
-  int cnt = WriteIntoLocalDictionaryFiles(studiosIncrementMap);
-  if (cnt < 0) {
-    return -1;
-  }
-  if (bHasWrite != nullptr) {
-    *bHasWrite = true;
-  }
-  return cnt;
-}
-
-int StudiosManager::StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& newStudio) {
+int StudiosManager::StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& stdStudioName) {
   int cnt{0};
-  for (const QString& coarseStudioName : GetCoarseStudioNames(newStudio)) {
-    auto it = ProStudioMap().find(coarseStudioName);
-    if (coarseStudioName.isEmpty() || it != ProStudioMap().cend()) {
+  STUDIO_MGR_DATA_T& studioMap = ProStudioMap();
+  for (const QString& coarseStudioName : GetCoarseStudioNames(stdStudioName)) {
+    if (coarseStudioName.isEmpty()) {
       continue;
     }
-    increments[coarseStudioName] = newStudio;
-    ProStudioMap()[coarseStudioName] = newStudio;
+    auto it = studioMap.find(coarseStudioName);
+    if (it != studioMap.cend()) {
+      continue;
+    }
+    increments[coarseStudioName] = stdStudioName;
+    studioMap[coarseStudioName] = stdStudioName;
     ++cnt;
   }
   return cnt;
@@ -251,4 +208,8 @@ auto StudiosManager::operator()(const QString& sentence) const -> QString {
     return itBack.value();
   }
   return ""; // not in table
+}
+
+bool StudiosManager::isStudioWithSingleWord(const QString& studioName) const {
+  return mStudioWithSingleWordActor.contains(studioName);
 }

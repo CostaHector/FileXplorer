@@ -45,7 +45,7 @@ class FileRenameRulerActionsTest : public PlainTestSuite {
         .stubs()                                        //
         .with(spy(mFileNameEdit))                       //
         .will(invoke(invokeOpenLocalFileUsingDesktopService));
-    MOCKER(PathTool::FILE_REL_PATH::GetStudiosListFilePath).stubs().will(returnValue(mStudiosListFile));
+    MOCKER(PathTool::FILE_REL_PATH::GetVendorsTableFilePath).stubs().will(returnValue(mStudiosListFile));
     MOCKER(PathTool::FILE_REL_PATH::GetActorsListFilePath).stubs().will(returnValue(mActorsListFile));
     MOCKER(PathTool::FILE_REL_PATH::GetActorsAliasListFilePath).stubs().will(returnValue(mActorsAliasListFile));
 

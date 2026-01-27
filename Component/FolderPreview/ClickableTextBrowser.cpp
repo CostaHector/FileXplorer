@@ -209,7 +209,7 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
   std::tie(bAccept, perfsText) = UserSpecifiedBrowerInteractMock::mockMultiLinePerfsText();
 #else
   perfsText =                                       //
-      QInputDialog::getMultiLineText(this, "Edit 'Casts(, aka)'",  //
+      QInputDialog::getMultiLineText(this, "Edit 'Casts(, alias)'",  //
                                      "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine", rawStringFromSelection, &bAccept);
 #endif
   if (!bAccept) {

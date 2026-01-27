@@ -260,7 +260,7 @@ int CastDbModel::RefreshVidsForRecords(const QModelIndexList& selectedRowsIndexe
 
     // 获取演员信息
     QString performer = rec.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-    QString akas = rec.value(PERFORMER_DB_HEADER_KEY::AKA).toString();
+    QString akas = rec.value(PERFORMER_DB_HEADER_KEY::ALIAS).toString();
 
     // 构建并执行查询
     QString queryStr = QuickWhereClauseHelper::GetSelectMovieByCastStatement(performer, akas, DB_TABLE::MOVIES);

@@ -152,7 +152,7 @@ private slots:
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
     for (const auto& record : records) {
       const QString castName{record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
-      const QString akaNames{record.value(PERFORMER_DB_HEADER_KEY::AKA).toString()};
+      const QString akaNames{record.value(PERFORMER_DB_HEADER_KEY::ALIAS).toString()};
       if (newMap.contains(castName)) {
         QCOMPARE(newMap[castName], akaNames);
       } else if (oldMap.contains(castName)) {  // only newMap not exists this one, we consider oldMap

@@ -57,7 +57,7 @@ bool FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
 
 bool FileRenameRulerActions::onEditStudiosListFile() {
   using namespace PathTool::FILE_REL_PATH;
-  return onEditLocalFile(GetStudiosListFilePath());
+  return onEditLocalFile(GetVendorsTableFilePath());
 }
 bool FileRenameRulerActions::onEditActorsListFile() {
   using namespace PathTool::FILE_REL_PATH;
@@ -77,13 +77,13 @@ int FileRenameRulerActions::onReloadStudiosListFile() {
 int FileRenameRulerActions::onReloadActorsListFile() {
   CastManager& pm = CastManager::getInst();
   int cntDelta = pm.ForceReloadImpl();
-  LOG_OK_P("Reload performers", "delta %d item(s)", cntDelta);
+  LOG_OK_P("Reload actors", "delta %d item(s)", cntDelta);
   return cntDelta;
 }
 int FileRenameRulerActions::onReloadActorsAliasListFile() {
   static auto& dbTM = CastAkasManager::getInst();
   int cntDelta = dbTM.ForceReloadImpl();
-  LOG_OK_P("Reload performers AKA", "delta %d item(s)", cntDelta);
+  LOG_OK_P("Reload actors alias", "delta %d item(s)", cntDelta);
   return cntDelta;
 }
 
@@ -92,10 +92,10 @@ void FileRenameRulerActions::onShowRenameRuleStatistics() {
   statisticsContent += "Studios number\t";
   statisticsContent += QString::number(StudiosManager::getInst().count());
   statisticsContent += '\n';
-  statisticsContent += "Cast number\t";
+  statisticsContent += "Actors number\t";
   statisticsContent += QString::number(CastManager::getInst().count());
   statisticsContent += '\n';
-  statisticsContent += "AKA number\t";
+  statisticsContent += "Actors Alias number\t";
   statisticsContent += QString::number(CastAkasManager::getInst().count());
   LOG_INFO_NP("Rename rule statistics", statisticsContent);
 }

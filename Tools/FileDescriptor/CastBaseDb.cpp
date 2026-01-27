@@ -31,7 +31,7 @@ const QString INSERT_FULL_FIELDS_TEMPLATE  //
 VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11);)")
            .arg(ENUM_2_STR(Name))
            .arg(ENUM_2_STR(Rate))
-           .arg(ENUM_2_STR(AKA))
+           .arg(ENUM_2_STR(ALIAS))
            .arg(ENUM_2_STR(Tags))
            .arg(ENUM_2_STR(Ori))
            .arg(ENUM_2_STR(Height))
@@ -45,7 +45,7 @@ VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11);)")
 enum INSERT_FULL_FIELDS_TEMPLATE_FIELD {
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name = 0,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Rate,
-  INSERT_FULL_FIELDS_TEMPLATE_FIELD_AKA,
+  INSERT_FULL_FIELDS_TEMPLATE_FIELD_ALIAS,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Tags,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Ori,
   INSERT_FULL_FIELDS_TEMPLATE_FIELD_Height,
@@ -75,19 +75,19 @@ enum INSERT_NAME_ORI_IMGS_TEMPLATE_FIELD {  //  DO UPDATE SET `%2`=:%3, `%3`=:%4
 
 // 数值参数占位符即便要填入的值一样也不可重用, 例如:1, :2, :2, 有两个:2会出错, 需要改占位符:1, :2, :3
 /* INSERT INTO `%1` (`%1`,`%2`) VALUES (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3; */
-// 命名占位符:Name, :AKA则可重复
-/* INSERT INTO `TABLE` (`%1`,`%2`) VALUES (:%1, :%2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:%2;).arg("Name", "AKA") */
-const QString INSERT_PERF_AND_AKA_TEMPLATE  //
+// 命名占位符:Name, :ALIAS 则可重复
+/* INSERT INTO `TABLE` (`%1`,`%2`) VALUES (:%1, :%2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:%2;).arg("Name", "ALIAS") */
+const QString INSERT_PERF_AND_ALIAS_TEMPLATE  //
     {"INSERT INTO `%1` "                    //
      + QString{R"(
 (`%1`,`%2`) VALUES
 (:1, :2) ON CONFLICT(`%1`) DO UPDATE SET `%2`=:3;)"}
-           .arg(ENUM_2_STR(Name), ENUM_2_STR(AKA))};
+           .arg(ENUM_2_STR(Name), ENUM_2_STR(ALIAS))};
 
-enum INSERT_PERF_AND_AKA_TEMPLATE_FIELD {
-  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_Name = 0,
-  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA,
-  INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE,
+enum INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD {
+  INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_Name = 0,
+  INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_ALIAS,
+  INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_ALIAS_VALUE,
 };
 
 int CastBaseDb::ReadFromImageHost(const QString& imgsHostOriPath) {
@@ -233,7 +233,7 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   }
 
   QSqlQuery qry{db};
-  if (!qry.prepare(INSERT_PERF_AND_AKA_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
+  if (!qry.prepare(INSERT_PERF_AND_ALIAS_TEMPLATE.arg(DB_TABLE::PERFORMERS))) {
     LOG_W("prepare command[%s] failed: %s",  //
           qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));
     return FD_PREPARE_FAILED;
@@ -241,9 +241,9 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   int succeedCnt = 0;
   // update aka by new value if name conflict
   for (auto it = perfs.cbegin(); it != perfs.cend(); ++it) {
-    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_Name, it.key());
-    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA, it.value());
-    qry.bindValue(INSERT_PERF_AND_AKA_TEMPLATE_FIELD_AKA_VALUE, it.value());
+    qry.bindValue(INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_Name, it.key());
+    qry.bindValue(INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_ALIAS, it.value());
+    qry.bindValue(INSERT_PERF_AND_ALIAS_TEMPLATE_FIELD_ALIAS_VALUE, it.value());
     if (!qry.exec()) {
       LOG_W("Insert[%s] failed: %s",  //
             qPrintable(qry.executedQuery()), qPrintable(qry.lastError().text()));

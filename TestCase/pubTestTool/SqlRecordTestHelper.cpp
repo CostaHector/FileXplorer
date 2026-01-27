@@ -14,7 +14,7 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   QSqlRecord rec;
   rec.append(QSqlField(ENUM_2_STR(Name), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Rate), QVariant::Int));
-  rec.append(QSqlField(ENUM_2_STR(AKA), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(ALIAS), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Tags), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Ori), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Height), QVariant::Int));
@@ -26,7 +26,7 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
 
   rec.setValue(Name, castName);
   rec.setValue(Rate, 9);
-  rec.setValue(AKA, "Thor");
+  rec.setValue(ALIAS, "Thor");
   rec.setValue(Tags, "Man");
   rec.setValue(Ori, ori);
   rec.setValue(Height, -1);

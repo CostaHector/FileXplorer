@@ -10,7 +10,8 @@
 // warner bros. => WarnerBros.
 // warnerbros. => WarnerBros.
 using STUDIO_MGR_DATA_T = QHash<QString, QString>;
-using STD_STUDIOS_SET_T = QSet<QString>;
+using STUDIOS_SET_T = QSet<QString>;
+using STD_STUDIOS_SET_T = STUDIOS_SET_T;
 class StudiosManager;
 extern template class SingletonManager<StudiosManager, STUDIO_MGR_DATA_T>;
 
@@ -23,12 +24,11 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
 
   const STD_STUDIOS_SET_T& StdStudiosSet() const {return mStdStudioNamesSet;}
 
-  STUDIO_MGR_DATA_T ReadOutStdStudioName() const;
+  std::pair<STUDIO_MGR_DATA_T, STUDIOS_SET_T> ReadOutStdStudioName() const;
 
   int ForceReloadImpl();
 
-  int LearningFromAPath(const QString& path, bool* bHasWrite = nullptr);
-  int StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& newStudio);
+  int StudioIncrement(STUDIO_MGR_DATA_T& increments, const QString& stdStudioName);
   int WriteIntoLocalDictionaryFiles(const STUDIO_MGR_DATA_T& increments) const;
 
   QString ProductionStudioFilterOut(const QString& words) const;
@@ -38,6 +38,7 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
   QString operator[](const QString& nm) const {       // name standardlize not change sequence
     return ProStudioMap().value(nm.toLower(), nm);
   }
+  bool isStudioWithSingleWord(const QString& studioName) const;
 
   static bool isHypenIndexValid(const QString& sentence, int& hypenIndex);
   static bool isHypenIndexValidReverse(const QString& sentence, int& hypenIndex);
@@ -48,6 +49,7 @@ class StudiosManager final : public SingletonManager<StudiosManager, STUDIO_MGR_
   void InitializeImpl(const QString& path, const QString& blackPath="");
   void UpdateStdStudioNamesStd();
   STD_STUDIOS_SET_T mStdStudioNamesSet;
+  STUDIOS_SET_T mStudioWithSingleWordActor;
 
   QString FileName2StudioNameSection(QString sentence) const;
   QString FileNameLastSection2StudioNameSection(QString sentence) const;

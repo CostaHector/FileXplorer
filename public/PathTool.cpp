@@ -9,28 +9,28 @@
 namespace PathTool{
 
 namespace FILE_REL_PATH {
-const QString& GetStudiosListFilePath() {
-  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/STANDARD_STUDIO_NAME.txt");
+const QString& GetVendorsTableFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/VENDORS.txt");
   return path;
 }
 
-const QString& GetStudiosBlackListFilePath() {
-  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/STUDIOS_BLACK_LIST.txt");
+const QString& GetMononymVendorsListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/MONONYM_VENDORS.txt");
   return path;
 }
 
 const QString& GetActorsListFilePath() {
-  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/PERFORMERS_TABLE.txt");
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/ACTORS_LIST.txt");
   return path;
 }
 
-const QString& GetActorsBlackListFilePath() {
-  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/ACTORS_BLACK_LIST.txt");
+const QString& GetMononymActorsListFilePath() {
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/MONONYM_ACTORS_LIST.txt");
   return path;
 }
 
 const QString& GetActorsAliasListFilePath() {
-  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/AKA_PERFORMERS.txt");
+  static const QString path = PathTool::GetPathByApplicationDirPath("../../../CastStudioList/ACTORS_ALIAS_LIST.txt");
   return path;
 }
 }

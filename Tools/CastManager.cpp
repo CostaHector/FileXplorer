@@ -3,6 +3,7 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
+#include "JsonKey.h"
 #include "JsonHelper.h"
 #include "TableFields.h"
 #include <QDir>
@@ -14,14 +15,14 @@ template class SingletonManager<CastManager, CAST_MGR_DATA_T>;
 CastManager::CastManager() {
 #ifndef RUNNING_UNIT_TESTS
   using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetActorsListFilePath(), GetActorsBlackListFilePath());
+  InitializeImpl(GetActorsListFilePath(), GetMononymActorsListFilePath());
 #endif
 }
 
 void CastManager::InitializeImpl(const QString& path, const QString& blackPath) {
   mLocalFilePath = path;
-  mLocalBlackFilePath = blackPath;
-  CastSet() = ReadOutCasts();
+  mLocalSingleWordFilePath = blackPath;
+  std::tie(CastSet(), mSingleWordActors) = ReadOutActors();
 }
 
 bool CastManager::IsActorNameValid(const QString& actorName) {
@@ -36,15 +37,15 @@ bool CastManager::IsActorNameValid(const QString& actorName) {
   return false;
 }
 
-CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
-  CAST_MGR_DATA_T blackList;
+std::pair<CAST_MGR_DATA_T, CAST_MGR_DATA_T> CastManager::ReadOutActors() const {
+  CAST_MGR_DATA_T singleWordActors;
   {
-    QFile blackFi{mLocalBlackFilePath};
-    if (blackFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      QTextStream in(&blackFi);
+    QFile singleWordFi{mLocalSingleWordFilePath};
+    if (singleWordFi.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QTextStream in(&singleWordFi);
       in.setCodec("UTF-8");
-      while(!in.atEnd()) {
-        blackList.insert(in.readLine(128));
+      while (!in.atEnd()) {
+        singleWordActors.insert(in.readLine(128));
       }
     }
   }
@@ -73,80 +74,44 @@ CAST_MGR_DATA_T CastManager::ReadOutCasts() const {
     if (!IsActorNameValid(name)) {
       continue;
     }
-    if (blackList.contains(name)) {
+    if (singleWordActors.contains(name)) {
       continue;
     }
     actorsSet.insert(name);
   }
   castFi.close();
   LOG_D("%d performers read out", actorsSet.size());
-  return actorsSet;
+  return {actorsSet, singleWordActors};
 }
 
 int CastManager::ForceReloadImpl() {
   int beforeStudioNameCnt = CastSet().size();
-  CastSet() = ReadOutCasts();
+  std::tie(CastSet(), mSingleWordActors) = ReadOutActors();
   int afterStudioNameCnt = CastSet().size();
   LOG_D("%d performers added/removed", afterStudioNameCnt - beforeStudioNameCnt);
   return afterStudioNameCnt - beforeStudioNameCnt;
 }
 
-int CastManager::LearningFromAPath(const QString& path, bool* bHasWrite) {
-  if (bHasWrite != nullptr) {
-    *bHasWrite = false;
-  }
-
-  if (!QDir{path}.exists()) {
-    LOG_W("path[%s] not exist", qPrintable(path));
-    return 0;
-  }
-  CAST_MGR_DATA_T castsIncrement;
-  QDirIterator it{path, {"*.json"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  int jsonFilesCnt{0};
-  while (it.hasNext()) {
-    it.next();
-    const QString& jsonPath = it.filePath();
-    const QVariantHash& dict = JsonHelper::MovieJsonLoader(jsonPath);
-    auto perfIt = dict.constFind(ENUM_2_STR(Cast));
-    if (perfIt == dict.cend()) {
-      continue;
-    }
-    ++jsonFilesCnt;
-    CAST_MGR_DATA_T lowerSet;
-    for (const auto& str : perfIt->toStringList()) {
-      lowerSet.insert(str.toLower());
-    }
-    CastIncrement(castsIncrement, lowerSet);
-  }
-  LOG_D("Learn extra %d cast from %d valid json files", castsIncrement.size(), jsonFilesCnt);
-  if (castsIncrement.isEmpty()) {
-    return 0;
-  }
-  CastSet().unite(castsIncrement);
-
-  int cnt = WriteIntoLocalDictionaryFiles(castsIncrement);
-  if (cnt < 0) {
-    return cnt;
-  }
-  if (bHasWrite != nullptr) {
-    *bHasWrite = true;
-  }
-  return cnt;
+CAST_MGR_DATA_T CastManager::ActorIncrement(const CAST_MGR_DATA_T& actors) {
+  CAST_MGR_DATA_T increments = actors;
+  increments -= CastSet();
+  CastSet() += increments;
+  return increments;
 }
 
-int CastManager::CastIncrement(CAST_MGR_DATA_T& increments, CAST_MGR_DATA_T delta) {
-  delta -= CastSet();
-  increments += delta;
-  CastSet() += delta;
-  return delta.size();
+CAST_MGR_DATA_T CastManager::SingleWordActorIncrement(const CAST_MGR_DATA_T& singleWordActors) {
+  CAST_MGR_DATA_T increments = singleWordActors;
+  increments -= mSingleWordActors;
+  mSingleWordActors += increments;
+  return increments;
 }
 
-int CastManager::WriteIntoLocalDictionaryFiles(const CAST_MGR_DATA_T& increments) const {
+int CastManager::WriteIntoLocalDictionaryFiles(const CAST_MGR_DATA_T& increments, bool bWriteIntoSingleWordFilePath) const {
   if (increments.isEmpty()) {
     LOG_D("Empty increments, skip writing.");
     return 0;
   }
-  QFile file{mLocalFilePath};
+  QFile file{bWriteIntoSingleWordFilePath ? mLocalSingleWordFilePath : mLocalFilePath};
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
     LOG_W("Open file[%s] to write failed. Cannot write studio increasement.", qPrintable(file.fileName()));
     return -1;
@@ -190,20 +155,19 @@ QString CastManager::RmvBelongLetter(const QString& word) {
   return s;
 }
 
-QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
+QStringList CastManager::FilterPerformersOut(const QStringList& words, const bool bIsActorFromSingleWordStudio) const {
   if (words.isEmpty()) {
     return {};
   }
   const CAST_MGR_DATA_T& actorsSet = CastSet();
-  QStringList performersList;
+  QStringList actorsList;
   int i = 0;
   const int N = words.size();
   while (i < N) {
     if (i < N - 2) {
       const QString& w3 = words[i] + " " + words[i + 1] + " " + RmvBelongLetter(words[i + 2]);
       if (actorsSet.contains(w3.toLower())) {
-        if (!performersList.contains(w3))
-          performersList.append(w3);
+        actorsList.append(w3);
         i += 3;
         continue;
       }
@@ -211,27 +175,27 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words) const {
     if (i < N - 1) {
       const QString& w2 = words[i] + " " + RmvBelongLetter(words[i + 1]);
       if (actorsSet.contains(w2.toLower())) {
-        if (!performersList.contains(w2)) {
-          performersList.append(w2);
-        }
+        actorsList.append(w2);
         i += 2;
         continue;
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (!w1.isEmpty() && actorsSet.contains(w1.toLower())) {
-      if (!performersList.contains(w1)) {
-        performersList.append(w1);
-      }
+    if (!w1.isEmpty() && (actorsSet.contains(w1.toLower())                                               //
+                          || (bIsActorFromSingleWordStudio && mSingleWordActors.contains(w1.toLower()))  //
+                          )                                                                              //
+    ) {
+      actorsList.append(w1);
       i += 1;
       continue;
     }
     ++i;
   }
-  performersList.removeDuplicates();
-  return performersList;
+  std::sort(actorsList.begin(), actorsList.end());
+  actorsList.erase(std::unique(actorsList.begin(), actorsList.end()), actorsList.end());
+  return actorsList;
 }
 
-QStringList CastManager::operator()(const QString& sentence) const {
-  return FilterPerformersOut(SplitSentence(sentence));
+QStringList CastManager::operator()(const QString& sentence, const bool bIsActorFromSingleWordStudio) const {
+  return FilterPerformersOut(SplitSentence(sentence), bIsActorFromSingleWordStudio);
 }
