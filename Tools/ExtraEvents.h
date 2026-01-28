@@ -11,6 +11,8 @@ public:
   explicit ExtraEvents(QWidget* parent);
   void subscribe();
 private:
+  LoginQryWidget* LoginQryWidgetCreater(QWidget* parent);
+
   PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
   PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
   PopupWidgetManager<LoginQryWidget>* m_pwdEntrance{nullptr};

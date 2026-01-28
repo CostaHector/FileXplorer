@@ -708,4 +708,4 @@ private slots:
 };
 
 #include "JsonTableModelTest.moc"
-REGISTER_TEST(JsonTableModelTest, true)
+REGISTER_TEST(JsonTableModelTest, false)

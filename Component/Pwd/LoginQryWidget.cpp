@@ -8,7 +8,6 @@
 #include "FileLeafAction.h"
 #include <QLabel>
 #include <QPushButton>
-#include <QTimer>
 
 QString GetCredTargetName() {
 #ifdef RUNNING_UNIT_TESTS
@@ -133,13 +132,11 @@ void LoginWid::InitState() {
     static constexpr int TIMER_LENGTH_MS = 2000;                                    // time count down
     mMessage->setText(QString("Will auto Login in %1(ms)").arg(TIMER_LENGTH_MS));
 
-    autoLoginTimer = new (std::nothrow) QTimer(this);
-    CHECK_NULLPTR_RETURN_VOID(autoLoginTimer);
-    autoLoginTimer->setInterval(TIMER_LENGTH_MS);
-    autoLoginTimer->setSingleShot(true);
+    autoLoginTimer.setInterval(TIMER_LENGTH_MS);
+    autoLoginTimer.setSingleShot(true);
+    connect(&autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
 #ifndef RUNNING_UNIT_TESTS
-    connect(autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
-    autoLoginTimer->start();
+    autoLoginTimer.start();
 #endif
   }
 }
@@ -155,6 +152,12 @@ void LoginWid::AutoLoginTimeoutCallback() {
 #endif
   if (isAutoLoginStillChecked) {
     emit timeoutAccepted();
+  }
+}
+
+void LoginWid::stopTimer() {
+  if (autoLoginTimer.isActive()) {
+    autoLoginTimer.stop();
   }
 }
 
@@ -244,6 +247,7 @@ QString LoginQryWidget::getAESKey() const {
 }
 
 void LoginQryWidget::onOkButtonClicked() {
+  mLoginWid->stopTimer();
   const int curWidType = mLoginRegisterStk->currentIndex();
   switch (curWidType) {
     case LOGIN: {
@@ -264,6 +268,11 @@ void LoginQryWidget::onOkButtonClicked() {
   }
 }
 
+void LoginQryWidget::onCancelButtonClicked() {
+  mLoginWid->stopTimer();
+  close();
+}
+
 void LoginQryWidget::Subscribe() {
   connect(mLoginRegisterTab, &QTabBar::currentChanged, mLoginRegisterStk, &QStackedWidget::setCurrentIndex);
 
@@ -272,5 +281,5 @@ void LoginQryWidget::Subscribe() {
   connect(mRegisterWid, &RegisterWid::registerAccepted, this, &QDialog::accept);
 
   connect(mDlgBtnBox, &QDialogButtonBox::accepted, this, &LoginQryWidget::onOkButtonClicked);
-  connect(mDlgBtnBox, &QDialogButtonBox::rejected, this, &QDialog::close);
+  connect(mDlgBtnBox, &QDialogButtonBox::rejected, this, &LoginQryWidget::onCancelButtonClicked);
 }
