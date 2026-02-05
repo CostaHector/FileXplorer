@@ -8,10 +8,11 @@
 
 #include <QDateTime>
 #include <QFileInfo>
-#include <QPlainTextEdit>
 
-PasswordBook::PasswordBook(QWidget* parent) : QMainWindow{parent} {
+PasswordBook::PasswordBook()
+  : QMainWindow{nullptr} {
   setObjectName("PasswordBook");
+  setAttribute(Qt::WA_DeleteOnClose);
 
   mAccountListView = new (std::nothrow) AccountTableView{this};
   CHECK_NULLPTR_RETURN_VOID(mAccountListView);
@@ -42,14 +43,6 @@ PasswordBook::PasswordBook(QWidget* parent) : QMainWindow{parent} {
   insertRowsTB->addAction(tblEditInst.INSERT_ROWS);
   SetLayoutAlightment(insertRowsTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  QToolBar* exportTB = new (std::nothrow) QToolBar{"Export Contents", this};
-  CHECK_NULLPTR_RETURN_VOID(exportTB);
-  exportTB->setOrientation(Qt::Orientation::Vertical);
-  exportTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  exportTB->addAction(tblEditInst.SHOW_PLAIN_CSV_CONTENT);
-  exportTB->addAction(tblEditInst.EXPORT_TO_PLAIN_CSV);
-  SetLayoutAlightment(exportTB->layout(), Qt::AlignmentFlag::AlignLeft);
-
   mToolBar = new (std::nothrow) QToolBar{"EditToolbar", this};
   CHECK_NULLPTR_RETURN_VOID(mToolBar);
   mToolBar->setObjectName(mToolBar->windowTitle());
@@ -61,7 +54,8 @@ PasswordBook::PasswordBook(QWidget* parent) : QMainWindow{parent} {
   mToolBar->addWidget(mSearchText);
   mToolBar->addSeparator();
   mToolBar->addAction(tblEditInst.LOAD_FROM_INPUT);
-  mToolBar->addWidget(exportTB);
+  mToolBar->addAction(tblEditInst.SHOW_PLAIN_CSV_CONTENT);
+  mToolBar->addAction(tblEditInst.EXPORT_TO_PLAIN_CSV);
   mToolBar->addAction(tblEditInst.OPEN_DIRECTORY);
   mToolBar->addAction(tblEditInst.SAVE_CHANGES);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, mToolBar);
@@ -106,6 +100,7 @@ void PasswordBook::Subscribe() {
   connect(ins.LOAD_FROM_INPUT, &QAction::triggered, this, &PasswordBook::onGetRecordsFromInput);
   connect(ins.OPEN_DIRECTORY, &QAction::triggered, this, &PasswordBook::openEncFileLocatedIn);
   connect(ins.SAVE_CHANGES, &QAction::triggered, this, &PasswordBook::onSave);
+  connect(ins.SEARCH_BY, &QAction::triggered, mSearchText, &QLineEdit::returnPressed);
 }
 
 void PasswordBook::SetPWBookName() {
@@ -129,7 +124,7 @@ void PasswordBook::onSave() {
 
   QString message;
   message.reserve(30);
-  message += SAVE_RESULT_STR[(int)saveResult];
+  message += SAVE_RESULT_STR[(int) saveResult];
   message += ' ';
   message += "Try save record(s) at ";
   message += QDateTime::currentDateTime().toString();

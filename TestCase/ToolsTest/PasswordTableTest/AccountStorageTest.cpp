@@ -136,7 +136,7 @@ class AccountStorageTest : public PlainTestSuite {
     const AccountInfo& invalid2 = storage[100];
     QVERIFY(invalid2.typeStr.isEmpty());
 
-    // 10. 测试GetExportCSVRecords
+    // 10. GetExportCSVRecords
     QString exportContent = storage.GetExportCSVRecords();
     QVERIFY(exportContent.contains("Email,Personal,user@example.com,pass123,Additional info"));
     QVERIFY(exportContent.contains("Bank,Savings,bank_user,bank_pass,"));

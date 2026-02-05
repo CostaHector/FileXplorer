@@ -12,7 +12,7 @@
 
 class PasswordBook : public QMainWindow {
  public:
-  explicit PasswordBook(QWidget *parent = nullptr);
+  explicit PasswordBook();
   void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
   void Subscribe();

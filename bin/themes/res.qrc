@@ -386,6 +386,7 @@
         <file alias="SEARCH_BY">pwd/SEARCH_BY.svg</file>
         <file alias="SHOW_CSV_CONTENTS">pwd/SHOW_CSV_CONTENTS.svg</file>
         <file alias="EXPORT">pwd/EXPORT.svg</file>
+        <file alias="PARSE_ENCRYPT_CSV_FILE">pwd/PARSE_ENCRYPT_CSV_FILE.svg</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="SAVED">pwd/SUCCESS.svg</file>

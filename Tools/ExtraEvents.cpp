@@ -29,7 +29,7 @@ LoginQryWidget* ExtraEvents::LoginQryWidgetCreater(QWidget* parent) {
     QString key = pLoginQryWidget->getAESKey();
     LOG_INFO_P("key length", "%d char(s)", key.size());
     SimpleAES::InitInst(key);
-    PasswordBook* pm = new (std::nothrow) PasswordBook{parent};
+    PasswordBook* pm = new (std::nothrow) PasswordBook;
     CHECK_NULLPTR_RETURN_VOID(pm);
     pm->show();
   });

@@ -31,17 +31,18 @@ const bool AccountStorage::IsAccountCSVFileInexistOrEmpty() {
   return !csvFile.exists() || csvFile.size() == 0;
 }
 
-QString AccountStorage::GetExportCSVRecords() const {
+QString AccountStorage::GetExportCSVRecordsStatic(const QVector<AccountInfo>& lst) {
   QString fullPlainCSVContents;
   fullPlainCSVContents.reserve(2048);
-  for (const AccountInfo& acc : mAccounts) {
+  for (const AccountInfo& acc : lst) {
     fullPlainCSVContents += acc.toCsvLine();
     fullPlainCSVContents += '\n';
   }
-  if (!fullPlainCSVContents.isEmpty()) {
-    fullPlainCSVContents.chop(1); // remove extra `\n` at the back
-  }
   return fullPlainCSVContents;
+}
+
+QString AccountStorage::GetExportCSVRecords() const {
+  return GetExportCSVRecordsStatic(mAccounts);
 }
 
 // one can save to file to plain text or encrypted by their willing
@@ -73,26 +74,33 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
   return true;
 }
 
+bool AccountStorage::ParseEncryptCsvFile(const QString& encryptCsvFilePath, QString& plainCsvFileContent){
+  bool bReadOk{false};
+  QString encryptedContents = FileTool::TextReader(encryptCsvFilePath, &bReadOk);
+  if (!bReadOk) {
+    LOG_W("Open file to read failed", qPrintable(encryptCsvFilePath));
+    return false;
+  }
+  bool decryptResult = SimpleAES::GetInst().decrypt_GCM(encryptedContents, plainCsvFileContent);
+  if (!decryptResult) {
+    LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encryptCsvFilePath));
+    return false;
+  }
+  return true;
+}
+
 // when start on, data is from plain or encrypted is determined
 bool AccountStorage::LoadAccounts() {
   if (IsAccountCSVFileInexistOrEmpty()) {
     return true; // first time used
   }
   const QString encCsvFilePath = GetFullEncCsvFilePath();
-  bool bReadOk{false};
-  QString encryptedContents = FileTool::TextReader(encCsvFilePath, &bReadOk);
-  if (!bReadOk) {
-    LOG_W("Open file to read failed", qPrintable(encCsvFilePath));
-    return false;
-  }
-  QString plainContents;
-  bool decryptResult = SimpleAES::GetInst().decrypt_GCM(encryptedContents, plainContents);
-  if (!decryptResult) {
-    LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encCsvFilePath));
+  QString plainCsvFileContent;
+  if (!ParseEncryptCsvFile(encCsvFilePath, plainCsvFileContent)) {
     return false;
   }
   int nonEmptyLine{0};
-  decltype(mAccounts) tempAccounts = GetAccountsFromPlainString(plainContents, &nonEmptyLine);
+  decltype(mAccounts) tempAccounts = GetAccountsFromPlainString(plainCsvFileContent, &nonEmptyLine);
   mAccounts.swap(tempAccounts);
   // SetListModified(); here mAccounts is same as file contents, we consider it has no modification
   LOG_D("%d account record(s) was loaded from %d non empty lines", mAccounts.size(), nonEmptyLine);
