@@ -3,8 +3,11 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QSet>
 namespace UserInteractiveMock {
 using QUESTION_TYPE = QMessageBox::StandardButton (*)(QWidget *, const QString &, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton);
+using FILE_EXIST_TYPE = bool (*)(const QString&);
+using FILE_COPY_TYPE = bool (*)(const QString &fileName, const QString &newName);
 
 namespace InputDialog {
 
@@ -23,6 +26,12 @@ QString invoke_getItem(QWidget *parent,
                        Qt::WindowFlags flags = Qt::WindowFlags(),
                        Qt::InputMethodHints inputMethodHints = Qt::ImhNone);
 }
+
+inline QSet<QString>& existsSet() {
+  static QSet<QString> existsFiles;
+  return existsFiles;
+}
+bool invoke_exists(const QString& filePath);
 
 } // namespace UserInteractiveMock
 

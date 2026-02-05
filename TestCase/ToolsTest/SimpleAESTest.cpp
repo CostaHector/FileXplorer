@@ -7,18 +7,21 @@
 
 #include "OnScopeExit.h"
 
+#include <openssl/err.h>
+#include <openssl/evp.h>
+// #include <openssl/provider.h>
+#include <openssl/rand.h>
+
 class SimpleAESTest : public PlainTestSuite {
   Q_OBJECT
  public:
   const QString CORRECT_AES_KEY{"MySecretKey12345"};
+  SimpleAES mAes{CORRECT_AES_KEY};
  private slots:
   void initTestCase() {
     // 注册 OpenSSL 错误处理
     ERR_load_crypto_strings();
     OpenSSL_add_all_algorithms();
-
-    // 初始化密钥
-    SimpleAES::setKey(CORRECT_AES_KEY);  // 16字符密钥
   }
 
   void cleanupTestCase() {
@@ -32,10 +35,10 @@ class SimpleAESTest : public PlainTestSuite {
     QString encryptedText;
     QString decryptedText;
 
-    QVERIFY(SimpleAES::encrypt_GCM(originalText, encryptedText));
+    QVERIFY(mAes.encrypt_GCM(originalText, encryptedText));
     QVERIFY(!encryptedText.isEmpty());
 
-    QVERIFY(SimpleAES::decrypt_GCM(encryptedText, decryptedText));
+    QVERIFY(mAes.decrypt_GCM(encryptedText, decryptedText));
 
     QCOMPARE(decryptedText, originalText);
   }
@@ -46,16 +49,16 @@ class SimpleAESTest : public PlainTestSuite {
     QString decryptedText;
 
     // 使用正确密钥加密
-    QVERIFY(SimpleAES::encrypt_GCM(originalText, encryptedText));
+    QVERIFY(mAes.encrypt_GCM(originalText, encryptedText));
 
     // 修改密钥为错误值
-    SimpleAES::setKey("WrongSecretKey123");
+    mAes.setKey("WrongSecretKey123");
     ON_SCOPE_EXIT {
-      SimpleAES::setKey(CORRECT_AES_KEY);
+      mAes.setKey(CORRECT_AES_KEY);
     };
 
     // 尝试解密（应失败）
-    bool decryptResult = SimpleAES::decrypt_GCM(encryptedText, decryptedText);
+    bool decryptResult = mAes.decrypt_GCM(encryptedText, decryptedText);
 
     // 验证解密失败
     QVERIFY(!decryptResult);
@@ -67,10 +70,10 @@ class SimpleAESTest : public PlainTestSuite {
     QString encryptedText;
     QString decryptedText;
 
-    QVERIFY(SimpleAES::encrypt_GCM(emptyText, encryptedText));
+    QVERIFY(mAes.encrypt_GCM(emptyText, encryptedText));
     QVERIFY(encryptedText.isEmpty());
 
-    QVERIFY(SimpleAES::decrypt_GCM(encryptedText, decryptedText));
+    QVERIFY(mAes.decrypt_GCM(encryptedText, decryptedText));
     QVERIFY(decryptedText.isEmpty());
   }
 
@@ -83,10 +86,10 @@ class SimpleAESTest : public PlainTestSuite {
     QString encryptedText;
     QString decryptedText;
 
-    QVERIFY(SimpleAES::encrypt_GCM(longText, encryptedText));
+    QVERIFY(mAes.encrypt_GCM(longText, encryptedText));
     QVERIFY(!encryptedText.isEmpty());
 
-    QVERIFY(SimpleAES::decrypt_GCM(encryptedText, decryptedText));
+    QVERIFY(mAes.decrypt_GCM(encryptedText, decryptedText));
 
     QCOMPARE(decryptedText, longText);
   }
@@ -96,8 +99,8 @@ class SimpleAESTest : public PlainTestSuite {
     QString encryptedText;
     QString decryptedText;
 
-    QVERIFY(SimpleAES::encrypt_GCM(specialText, encryptedText));
-    QVERIFY(SimpleAES::decrypt_GCM(encryptedText, decryptedText));
+    QVERIFY(mAes.encrypt_GCM(specialText, encryptedText));
+    QVERIFY(mAes.decrypt_GCM(encryptedText, decryptedText));
     QCOMPARE(decryptedText, specialText);
   }
 };

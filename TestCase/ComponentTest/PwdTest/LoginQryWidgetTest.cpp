@@ -6,16 +6,27 @@
 #include "LoginQryWidget.h"
 #include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
+#include <openssl/err.h>
+#include <openssl/evp.h>
 
 #include "TDir.h"
 #include "AccountStorage.h"
 #include "CredentialUtil.h"
-#include <QPushButton>
 #include <QSignalSpy>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QFileDialog>
+
+#include "UserInteractiveMock.h"
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class LoginQryWidgetTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   QString mEncCsvFilePath{tDir.itemPath("accounts_test.csv")};
   QString backUpCredKey;
@@ -63,7 +74,6 @@ class LoginQryWidgetTest : public PlainTestSuite {
     QVERIFY(loginPage != nullptr);
 
     loginPage->inputKeyLe->setText(key);
-    QVERIFY(loginPage->autoLoginTimer != nullptr);
 
     QSignalSpy timeoutSpy(loginPage, &LoginWid::timeoutAccepted);
     QSignalSpy acceptSpy(&widget, &LoginQryWidget::accepted);
@@ -89,31 +99,34 @@ class LoginQryWidgetTest : public PlainTestSuite {
 #endif
 
     // timeout trigger accept, 超时自动登录, 不会触发自动保存密钥
-    LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock() = true;  // user accept before timeout
+    LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock() = true; // user accept before timeout
     loginPage->AutoLoginTimeoutCallback();
     QCOMPARE(widget.result(), QDialog::Accepted);
     QCOMPARE(timeoutSpy.count(), 1);
     QCOMPARE(acceptSpy.count(), 2);
   }
 
- private slots:
+private slots:
   void initTestCase() {
-    QVERIFY(tDir.IsValid());  //
+    QVERIFY(tDir.IsValid()); //
     QVERIFY(!tDir.exists("accounts_test.csv"));
     AccountStorageMock::GetFullEncCsvFilePathMock() = mEncCsvFilePath;
     LoginQryWidgetMock::clear();
-    Configuration().clear();  //
+    Configuration().clear(); //
 
     backUpCredKey = credUtil.readPassword(GetCredTargetName());
   }
 
   void cleanupTestCase() {
     LoginQryWidgetMock::clear();
-    Configuration().clear();  //
+    Configuration().clear(); //
 
     credUtil.savePassword(GetCredTargetName(), backUpCredKey);
   }
 
+  void init() { GlobalMockObject::reset(); }
+
+  void cleanup() { GlobalMockObject::verify(); }
   void firstTime_registerNeeded() {
     QVERIFY(!tDir.exists("accounts_test.csv"));
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
@@ -123,8 +136,8 @@ class LoginQryWidgetTest : public PlainTestSuite {
     // 3. 验证初始页面状态
     QVERIFY(widget.mLoginWid != nullptr);
     QVERIFY(widget.mRegisterWid != nullptr);
-    QVERIFY(!widget.mLoginWid->isEnabled());    // disable login
-    QVERIFY(widget.mRegisterWid->isEnabled());  // enable register
+    QVERIFY(!widget.mLoginWid->isEnabled());   // disable login
+    QVERIFY(widget.mRegisterWid->isEnabled()); // enable register
 
     // 4. 模拟注册过程
     const QString testKey = "MySecureKey123";
@@ -138,12 +151,12 @@ class LoginQryWidgetTest : public PlainTestSuite {
   void secondTime_autoLogin() {
     // 1. 后面必须用此密钥才能登陆
     const QString testKey = "AutoLoginKey456";
-    SimpleAES::setKey(testKey);
+    SimpleAES::InitInst(testKey);
     AccountStorage storage;
     storage.mAccounts = {
-        {"Email", "Personal", "user@example.com", "pass123", "Additional info"},         //
-        {"Social", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"},  //
-        {"Bank", "Savings", "bank_user", "bank_pass", ""}                                //
+        {"Email", "Personal", "user@example.com", "pass123", "Additional info"},        //
+        {"Social", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"}, //
+        {"Bank", "Savings", "bank_user", "bank_pass", ""}                               //
     };
     QVERIFY(storage.SaveAccounts(true));
     QVERIFY(tDir.exists("accounts_test.csv"));
@@ -161,12 +174,11 @@ class LoginQryWidgetTest : public PlainTestSuite {
     LoginQryWidget widget;
 
     // 5. 验证初始页面状态
-    QVERIFY(widget.mLoginWid->isEnabled());      // login enabled
-    QVERIFY(!widget.mRegisterWid->isEnabled());  // register disabled
+    QVERIFY(widget.mLoginWid->isEnabled());     // login enabled
+    QVERIFY(!widget.mRegisterWid->isEnabled()); // register disabled
     // 6. 验证自动填充密钥
     QLineEdit* keyInput = widget.mLoginWid->inputKeyLe;
     QCOMPARE(keyInput->text(), testKey);
-    QVERIFY(widget.mLoginWid->autoLoginTimer != nullptr);
 
     // 7. 模拟自动登录
     simulateAutoLogin(widget, testKey);
@@ -187,9 +199,8 @@ class LoginQryWidgetTest : public PlainTestSuite {
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::Unchecked);
 
     LoginQryWidget widget;
-    QVERIFY(widget.mLoginWid->isEnabled());               // login enabled
-    QVERIFY(!widget.mRegisterWid->isEnabled());           // register disabled
-    QCOMPARE(widget.mLoginWid->autoLoginTimer, nullptr);  // timer must be a nullptr
+    QVERIFY(widget.mLoginWid->isEnabled());     // login enabled
+    QVERIFY(!widget.mRegisterWid->isEnabled()); // register disabled
 
     QLineEdit* keyInput = widget.mLoginWid->inputKeyLe;
     keyInput->setText(newTestKey);
@@ -197,22 +208,22 @@ class LoginQryWidgetTest : public PlainTestSuite {
 
     QCheckBox* remeberKey = widget.mLoginWid->remeberKey;
     QCheckBox* autoLogin = widget.mLoginWid->autoLogin;
-    {  // inital state is from Configuration
+    { // inital state is from Configuration
       QVERIFY(remeberKey != nullptr);
       QVERIFY(autoLogin != nullptr);
       QCOMPARE(remeberKey->isChecked(), false);
       QCOMPARE(autoLogin->isChecked(), false);
     }
-    {  // when check state changed. it will be write into system credUtil, can QSettings
+    { // when check state changed. it will be write into system credUtil, can QSettings
       QCOMPARE(credUtil.readPassword(GetCredTargetName()), "AutoLoginKey456");
       remeberKey->setChecked(true);
       emit remeberKey->stateChanged(Qt::CheckState::Checked);
-      QCOMPARE(credUtil.readPassword(GetCredTargetName()), newTestKey);  // get updated
+      QCOMPARE(credUtil.readPassword(GetCredTargetName()), newTestKey); // get updated
       QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Checked);
 
       remeberKey->setChecked(false);
       emit remeberKey->stateChanged(Qt::CheckState::Unchecked);
-      QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");  // get removed
+      QCOMPARE(credUtil.readPassword(GetCredTargetName()), ""); // get removed
       QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Unchecked);
 
       autoLogin->setChecked(true);
@@ -224,17 +235,24 @@ class LoginQryWidgetTest : public PlainTestSuite {
       QCOMPARE(Configuration().value("LOG_IN_AUTOMATICALLY").toInt(), Qt::Unchecked);
     }
 
-    // 7. user input key and click ok directly
+    // 7. click cancel. Timer should stopped
     QDialogButtonBox* buttonBox = widget.mDlgBtnBox;
-
     QVERIFY(buttonBox != nullptr);
+    if (!widget.mLoginWid->autoLoginTimer.isActive()) {
+      widget.mLoginWid->autoLoginTimer.start();
+    }
+    QVERIFY(widget.mLoginWid->autoLoginTimer.isActive());
     emit buttonBox->button(QDialogButtonBox::Cancel)->clicked();
     QVERIFY(widget.result() != QDialog::Accepted);
+    QVERIFY(!widget.mLoginWid->autoLoginTimer.isActive());
 
+    // 8. click Ok. Timer should stopped, aes key should correct
+    if (!widget.mLoginWid->autoLoginTimer.isActive()) {
+      widget.mLoginWid->autoLoginTimer.start();
+    }
+    QVERIFY(widget.mLoginWid->autoLoginTimer.isActive());
     emit buttonBox->button(QDialogButtonBox::Ok)->clicked();
-    QCOMPARE(widget.result(), QDialog::Accepted);
-
-    // 8. 验证结果
+    QVERIFY(!widget.mLoginWid->autoLoginTimer.isActive());
     QCOMPARE(widget.result(), QDialog::Accepted);
     QCOMPARE(widget.getAESKey(), newTestKey);
   }
@@ -250,13 +268,47 @@ class LoginQryWidgetTest : public PlainTestSuite {
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::Checked);
 
     LoginQryWidget widget;
-    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");                 // AES key cleared
-    QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Unchecked);          // unchecked
-    QCOMPARE(Configuration().value("LOG_IN_AUTOMATICALLY").toInt(), Qt::Unchecked);  // unchecked
+    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");                       // AES key cleared
+    QCOMPARE(Configuration().value("REMEMBER_KEY").toInt(), Qt::Unchecked);         // unchecked
+    QCOMPARE(Configuration().value("LOG_IN_AUTOMATICALLY").toInt(), Qt::Unchecked); // unchecked
     QCheckBox* remeberKey = widget.mLoginWid->remeberKey;
     QCheckBox* autoLogin = widget.mLoginWid->autoLogin;
     QVERIFY(!remeberKey->isChecked());
     QVERIFY(!autoLogin->isChecked());
+  }
+
+  void QueryWhenPasswordBookFileNotExist_ok() {
+    using namespace UserInteractiveMock;
+    const QString inExistedFile{"Inexist_File.csv"};
+    const QString selectExistedFile{"exist.csv"};
+    const QString destFile = AccountStorage::GetFullEncCsvFilePath();
+
+    MOCKER((FILE_EXIST_TYPE) QFile::exists).stubs().will(invoke(invoke_exists));
+    MOCKER((QUESTION_TYPE) QMessageBox::question)
+        .stubs()                                            //
+        .will(returnValue(QMessageBox::StandardButton::No)) //
+        .then(returnValue(QMessageBox::StandardButton::Yes));
+    // User Click No
+    QVERIFY(QueryWhenPasswordBookFileNotExist(nullptr));
+
+    MOCKER(QFileDialog::getOpenFileName)
+        .stubs()                          //
+        .will(returnValue(inExistedFile)) //
+        .then(returnValue(selectExistedFile));
+    existsSet() = QSet<QString>{selectExistedFile, destFile};
+    // Yes, "Inexist_File.csv"(false: not exist)
+    QVERIFY(!QueryWhenPasswordBookFileNotExist(nullptr));
+
+    // Yes, "exist.csv"(exist), destinationFile(exists) already occupied
+    QVERIFY(!QueryWhenPasswordBookFileNotExist(nullptr));
+
+    existsSet() = QSet<QString>{selectExistedFile};
+    // Yes, "exist.csv"(exist), destinationFile(not exist)
+    MOCKER((FILE_COPY_TYPE) QFile::copy)           //
+        .expects(once())                                   //
+        .with(eq(selectExistedFile), eq(destFile)) //
+        .will(returnValue(true));
+    QVERIFY(QueryWhenPasswordBookFileNotExist(nullptr));
   }
 };
 

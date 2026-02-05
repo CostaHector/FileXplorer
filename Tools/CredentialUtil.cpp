@@ -1,5 +1,10 @@
 #include "CredentialUtil.h"
+#include "SimpleAES.h"
 #include "Logger.h"
+#include <QFileInfo>
+#include <QDir>
+#include <QStandardPaths>
+#include <QTextStream>
 
 #ifdef _WIN32
 // clang-format off
@@ -19,6 +24,7 @@
 #include <libsecret/secret.h>
 #endif
 
+
 const CredentialUtil& CredentialUtil::GetInst() {
 #ifdef _WIN32
   static WinCredUtil winCredUtil;
@@ -27,27 +33,87 @@ const CredentialUtil& CredentialUtil::GetInst() {
   static LinuxCredUtil linuxCredUtil;
   return linuxCredUtil;
 #else
-  LOG_F("Current platform not support Credential");
+  LOG_F("Use unsafe credUtil");
   static CredentialUtil defCredUtil;
   return defCredUtil;
 #endif
 }
 
+const QString g_SimpleKey = "SimpleKey";
+QString GetPwdAbsFilePath() {
+  static const QString privateRootPath = QStandardPaths::writableLocation(
+      QStandardPaths::AppDataLocation);
+  if (privateRootPath.isEmpty()) {
+    return "";
+  }
+  static const QString pwdAbsFileName = QDir(privateRootPath).absoluteFilePath("pwdEncFile.txt");
+  return pwdAbsFileName;
+}
+
 bool CredentialUtil::savePassword(const QString& key, const QString& password) const {
-  LOG_C("Should never call me");
-  return false;
+  const SimpleAES aes{g_SimpleKey};
+  QString pwdEncText;
+  if (!aes.encrypt_GCM(password, pwdEncText)) {
+    LOG_E("encrypt failed");
+    return "";
+  }
+
+  QFileInfo fi{GetPwdAbsFilePath()};
+  const QString parentFolder = fi.absolutePath();
+  if (!QFile::exists(parentFolder)) {
+    if(!QDir{}.mkpath(parentFolder)) {
+      LOG_E("cannot mkpath for its folder[%s]", qPrintable(parentFolder));
+      return false;
+    }
+  }
+  QFile file(fi.absoluteFilePath());
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    LOG_E("cannot write file:[%s]:%s", qPrintable(file.fileName()), qPrintable(file.errorString()));
+    return false;
+  }
+
+  QTextStream out(&file);
+  out << pwdEncText;
+  file.flush();
+  file.close();
+  return true;
 }
+
 QString CredentialUtil::readPassword(const QString& key) const {
-  LOG_C("Should never call me");
-  return "";
+  if (!credentialExists(key)) {
+    LOG_E("cannot read, key[%s] not exist", qPrintable(key));
+    return "";
+  }
+
+  QFile file(GetPwdAbsFilePath());
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    LOG_E("cannot read file[%s]:%s", qPrintable(file.fileName()), qPrintable(file.errorString()));
+    return "";
+  }
+  QTextStream in(&file);
+  QString content = in.readAll();
+  file.close();
+  const SimpleAES aes{g_SimpleKey};
+  QString pwdPlainText;
+  if (!aes.decrypt_GCM(content, pwdPlainText)) {
+    LOG_E("decrypt failed");
+    return "";
+  }
+  return pwdPlainText;
 }
+
 bool CredentialUtil::deletePassword(const QString& key) const {
-  LOG_C("Should never call me");
-  return false;
+  if (!credentialExists(key)) {
+    LOG_E("skip, key[%s] already not exist", qPrintable(key));
+    return true;
+  }
+  const QString pwdFilePath = GetPwdAbsFilePath();
+  return QFile::remove(pwdFilePath);
 }
+
 bool CredentialUtil::credentialExists(const QString& key) const {
-  LOG_C("Should never call me");
-  return false;
+  const QString pwdFilePath = GetPwdAbsFilePath();
+  return !pwdFilePath.isEmpty() && QFile::exists(pwdFilePath);
 }
 
 #ifdef _WIN32
@@ -105,7 +171,7 @@ bool WinCredUtil::deletePassword(const QString& key) const {
 #ifdef __linux__
 const SecretSchema* getCredentialSchema() {
   static const SecretSchema schema = {
-      "com.example.PasswordManager.Credential",
+      "com.example.PasswordBook.Credential",
       SECRET_SCHEMA_DONT_MATCH_NAME,
       {
        {"key", SECRET_SCHEMA_ATTRIBUTE_STRING},

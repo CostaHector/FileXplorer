@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QTimer>
 
 #ifdef RUNNING_UNIT_TESTS
 namespace LoginQryWidgetMock {
@@ -23,6 +24,7 @@ inline void clear() {
 #endif
 
 QString GetCredTargetName();
+bool QueryWhenPasswordBookFileNotExist(QWidget* parent);
 
 class LoginWid : public QWidget {
   Q_OBJECT
@@ -46,7 +48,7 @@ class LoginWid : public QWidget {
   bool isRememberEnabled() const {
     return remeberKey->isChecked();
   }
-
+  void stopTimer();
  signals:
   void timeoutAccepted();
 
@@ -56,7 +58,7 @@ class LoginWid : public QWidget {
   QCheckBox* autoLogin{nullptr};
   QLabel* mMessage{nullptr};
   QFormLayout* loginLo{nullptr};
-  QTimer* autoLoginTimer{nullptr};
+  QTimer autoLoginTimer;
 };
 
 class RegisterWid : public QWidget {
@@ -94,6 +96,7 @@ public:
 
  public slots:
   void onOkButtonClicked();
+  void onCancelButtonClicked();
 
 private:
   QTabBar *mLoginRegisterTab{nullptr};

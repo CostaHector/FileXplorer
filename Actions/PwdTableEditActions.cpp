@@ -2,13 +2,13 @@
 
 PwdTableEditActions::PwdTableEditActions(QObject* parent)
   : QObject{parent} {
-  INSERT_A_ROW = new QAction{QIcon{":/edit/INSERT_ROW_BEFORE"}, tr("Insert a row"), this};
+  INSERT_A_ROW = new QAction{QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert a row"), this};
   INSERT_A_ROW->setToolTip("Insert a row before current line");
-  INSERT_ROWS = new QAction{QIcon{":/edit/INSERT_ROWS"}, tr("Insert rows"), this};
+  INSERT_ROWS = new QAction{tr("Insert rows"), this};
   INSERT_ROWS->setToolTip("Insert row(s) before current line");
   APPEND_ROWS = new QAction{QIcon{":/edit/APPEND_ROWS"}, tr("Append rows"), this};
   APPEND_ROWS->setToolTip("Append row(s) behind last row");
-  DELETE_ROWS = new QAction{QIcon{":/edit/DELETE_ROWS"}, tr("Delete rows"), this};
+  DELETE_ROWS = new QAction{QIcon{":img/DELETE_FROM_TABLE"}, tr("Delete rows"), this};
   DELETE_ROWS->setToolTip("Delete row(s) selected currently");
 
   LOAD_FROM_INPUT = new QAction{QIcon{":/edit/LOAD_FROM_INPUT"}, tr("Load from input"), this};

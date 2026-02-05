@@ -45,7 +45,11 @@ std::pair<CAST_MGR_DATA_T, CAST_MGR_DATA_T> CastManager::ReadOutActors() const {
       QTextStream in(&singleWordFi);
       in.setCodec("UTF-8");
       while (!in.atEnd()) {
-        singleWordActors.insert(in.readLine(128));
+        const QString ln = in.readLine(128);
+        if (ln.contains(' ')) {
+          continue;
+        }
+        singleWordActors.insert(ln);
       }
     }
   }
@@ -181,9 +185,10 @@ QStringList CastManager::FilterPerformersOut(const QStringList& words, const boo
       }
     }
     const QString& w1 = RmvBelongLetter(words[i]);
-    if (!w1.isEmpty() && (actorsSet.contains(w1.toLower())                                               //
-                          || (bIsActorFromSingleWordStudio && mSingleWordActors.contains(w1.toLower()))  //
-                          )                                                                              //
+    if (!w1.isEmpty()
+        && (actorsSet.contains(w1.toLower())                                              //
+            || (bIsActorFromSingleWordStudio && mSingleWordActors.contains(w1.toLower())) //
+            )                                                                             //
     ) {
       actorsList.append(w1);
       i += 1;

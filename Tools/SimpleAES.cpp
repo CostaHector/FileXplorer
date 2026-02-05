@@ -1,28 +1,60 @@
 #include "SimpleAES.h"
 #include "Logger.h"
+#include <QCryptographicHash>
+#include <QMessageAuthenticationCode>
+
+#include <openssl/err.h>
+#include <openssl/evp.h>
+// #include <openssl/provider.h>
+#include <openssl/rand.h>
+/*
+sudo apt install libssl-dev needed
+openssl version
+ls /usr/include/openssl/
+ */
 
 constexpr int SimpleAES::MAX_KEY_BYTES_LENGTH;
-unsigned char SimpleAES::KEY_BYTES_UNSIGNED_ARRAY[]{0};
-bool SimpleAES::B_USE_RANDOM_IV = true;  // all 0 is only for debug
+
+SimpleAES &SimpleAES::GetInst() {
+  static SimpleAES inst;
+  return inst;
+}
+
+void SimpleAES::InitInst(const QString& key) {
+  GetInst().setKey(key);
+}
+
+SimpleAES::SimpleAES(const QString& key) {
+  setKey(key);
+}
 
 void SimpleAES::setKey(const QString& userInputKey) {
+  if (isInited()) {
+    LOG_W("password already set. now key changed");
+  }
   QString keyString;
   if (userInputKey.length() > 16) {
     keyString = userInputKey.left(16);
   } else if (userInputKey.length() < 16) {
     int zerosToAdd = 16 - userInputKey.length();
-    keyString = userInputKey + QString(zerosToAdd, '0');  // 补全16-length个'0'
+    keyString = userInputKey + QString(zerosToAdd, '0');  // append 16-length numbers of char '0'
   } else {
     keyString = userInputKey;
   }
 
   QByteArray keyBytes = keyString.toUtf8();
-  const int validLen = static_cast<size_t>(std::min(keyBytes.size(), MAX_KEY_BYTES_LENGTH));
-  memcpy(KEY_BYTES_UNSIGNED_ARRAY, keyBytes.constData(), validLen);
-  KEY_BYTES_UNSIGNED_ARRAY[validLen] = '\0';
+  const int validLen = static_cast<size_t>(std::min<long long>(keyBytes.size(), MAX_KEY_BYTES_LENGTH));
+  memcpy(mKeyBytesArray, keyBytes.constData(), validLen);
+  mKeyBytesArray[validLen] = '\0';
+
+  setInited();
 }
 
-bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encryptedResult) {
+bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encryptedResult) const {
+  if (!isInited()) {
+    LOG_E("encrypted key not Inited");
+    return false;
+  }
   encryptedResult.clear();
   if (input.isEmpty()) {
     return true;  // 空串无需解密
@@ -30,7 +62,7 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
 
   // 1. 获取随机 IV
   unsigned char iv[12]{0};
-  if (B_USE_RANDOM_IV) {
+  if (m_bUseRandomIV) {
     if (RAND_bytes(iv, sizeof(iv)) != 1) {
       LOG_W("Failed to generate IV");
       return false;
@@ -39,7 +71,7 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
 
   // 2. 初始化加密器
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-  EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, KEY_BYTES_UNSIGNED_ARRAY, iv);
+  EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, mKeyBytesArray, iv);
 
   // 3. 加密数据
   int ciphertext_len = input.size() + EVP_CIPHER_block_size(EVP_aes_128_gcm());
@@ -67,7 +99,11 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
   return true;
 }
 
-bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
+bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) const {
+  if (!isInited()) {
+    LOG_E("encrypted key not Inited");
+    return false;
+  }
   QByteArray inputByteArray = input.toUtf8();
   QByteArray outputByteArray;
   if (!encrypt_GCM_ByteArray(inputByteArray, outputByteArray)) {
@@ -79,7 +115,12 @@ bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) {
   return true;
 }
 
-bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decryptedResult) {
+bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decryptedResult) const {
+  if (!isInited()) {
+    LOG_E("encrypted key not Inited");
+    return false;
+  }
+
   decryptedResult.clear();
   if (input.isEmpty()) {
     return true;  // 无需解密
@@ -108,7 +149,7 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
     return false;
   }
 
-  if (EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, KEY_BYTES_UNSIGNED_ARRAY, iv) != 1) {
+  if (EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, mKeyBytesArray, iv) != 1) {
     LOG_W("Failed to initialize decryption");
     EVP_CIPHER_CTX_free(ctx);
     return false;
@@ -157,7 +198,11 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
   return true;
 }
 
-bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) {
+bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) const {
+  if (!isInited()) {
+    LOG_E("encrypted key not Inited");
+    return false;
+  }
   QByteArray inputBa = input.toUtf8();
   QByteArray outputBa;
   decryptedResult.clear();

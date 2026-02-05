@@ -1,14 +1,15 @@
 #include "LoginQryWidget.h"
 #include "AccountStorage.h"
 #include "CredentialUtil.h"
+#include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
-#include "MemoryKey.h"
 #include "FileLeafAction.h"
+#include <QFileDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
-#include <QTimer>
 
 QString GetCredTargetName() {
 #ifdef RUNNING_UNIT_TESTS
@@ -25,14 +26,16 @@ QLineEdit* CreateKeyLineEdit(QWidget* parent) {
   keyLe->setEchoMode(QLineEdit::Password);
   keyLe->setClearButtonEnabled(false);
   keyLe->setToolTip("Maximum 16 printable ASCII characters(AES-256 key 16 bytes)");
-  QRegularExpressionValidator* validator = new (std::nothrow) QRegularExpressionValidator{QRegularExpression("[\\x20-\\x7E]{0,16}"), parent};
+  QRegularExpressionValidator* validator = new (std::nothrow)
+      QRegularExpressionValidator{QRegularExpression("[\\x20-\\x7E]{0,16}"), parent};
   CHECK_NULLPTR_RETURN_NULLPTR(validator);
   keyLe->setValidator(validator);
   // printable ASCII char, count <=16
   return keyLe;
 }
 
-LoginWid::LoginWid(QWidget* parent) : QWidget{parent} {
+LoginWid::LoginWid(QWidget* parent)
+  : QWidget{parent} {
   inputKeyLe = CreateKeyLineEdit(this);
   CHECK_NULLPTR_RETURN_VOID(inputKeyLe);
   inputKeyLe->setPlaceholderText("Enter AES decryption key");
@@ -71,7 +74,7 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
 
   const QString& keyNow = GetKey();
   switch (rememberState) {
-    case Qt::CheckState::Checked: {  // update into credential
+    case Qt::CheckState::Checked: { // update into credential
       bool saveResult = credUtil.savePassword(GetCredTargetName(), keyNow);
       if (!saveResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
@@ -80,7 +83,7 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
       mMessage->setText("Password <b>saved</b> to system credential succeed");
       break;
     }
-    default: {  // delete from credential
+    default: { // delete from credential
       bool deleteResult = credUtil.deletePassword(GetCredTargetName());
       if (!deleteResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
@@ -129,17 +132,15 @@ void LoginWid::InitState() {
     }
   }
 
-  if (autoLogin->checkState() == Qt::CheckState::Checked && !GetKey().isEmpty()) {  // empty key. skip right now
-    static constexpr int TIMER_LENGTH_MS = 2000;                                    // time count down
+  if (autoLogin->checkState() == Qt::CheckState::Checked && !GetKey().isEmpty()) { // empty key. skip right now
+    static constexpr int TIMER_LENGTH_MS = 2000;                                   // time count down
     mMessage->setText(QString("Will auto Login in %1(ms)").arg(TIMER_LENGTH_MS));
 
-    autoLoginTimer = new (std::nothrow) QTimer(this);
-    CHECK_NULLPTR_RETURN_VOID(autoLoginTimer);
-    autoLoginTimer->setInterval(TIMER_LENGTH_MS);
-    autoLoginTimer->setSingleShot(true);
+    autoLoginTimer.setInterval(TIMER_LENGTH_MS);
+    autoLoginTimer.setSingleShot(true);
+    connect(&autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
 #ifndef RUNNING_UNIT_TESTS
-    connect(autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
-    autoLoginTimer->start();
+    autoLoginTimer.start();
 #endif
   }
 }
@@ -158,7 +159,14 @@ void LoginWid::AutoLoginTimeoutCallback() {
   }
 }
 
-RegisterWid::RegisterWid(QWidget* parent) : QWidget{parent} {
+void LoginWid::stopTimer() {
+  if (autoLoginTimer.isActive()) {
+    autoLoginTimer.stop();
+  }
+}
+
+RegisterWid::RegisterWid(QWidget* parent)
+  : QWidget{parent} {
   CHECK_NULLPTR_RETURN_VOID(parent)
 
   inputKeyLe = CreateKeyLineEdit(this);
@@ -186,14 +194,41 @@ void RegisterWid::InitState() {
 
 void RegisterWid::onTryRegisterButtonClicked() {
   if (inputKeyLe->text() != inputKeyAgainLe->text()) {
-    LOG_WARN_P("Key mismatch", "first length: %d, second length: %d",  //
-               inputKeyLe->text().size(), inputKeyAgainLe->text().size());
+    LOG_WARN_P("Key mismatch",
+               "first length: %lld, second length: %lld", //
+               inputKeyLe->text().size(),
+               inputKeyAgainLe->text().size());
     return;
   }
   emit registerAccepted();
 }
 
-LoginQryWidget::LoginQryWidget(QWidget* parent) : QDialog{parent} {
+bool QueryWhenPasswordBookFileNotExist(QWidget* parent) {
+  if (QMessageBox::question(parent, "Password Book not exist", "Select manually right now?") != QMessageBox::StandardButton::Yes) {
+    return true;
+  }
+  const QString fileName = QFileDialog::getOpenFileName(parent, "Select password book", QDir::homePath(), "CSV Files (*)");
+  if (!QFile::exists(fileName)) {
+    LOG_ERR_P("Select abort", "file[%s] not exist", qPrintable(fileName));
+    return false;
+  }
+  const QString dstFileName = AccountStorage::GetFullEncCsvFilePath();
+  if (QFile::exists(dstFileName)) {
+    LOG_WARN_P("Copy abort", "file[%s] already exist", qPrintable(dstFileName));
+    return false;
+  }
+  bool cpyRet = QFile::copy(fileName, dstFileName);
+  LOG_OE_P(cpyRet, "Select file", "from:[%s]\nto:[%s]", qPrintable(fileName), qPrintable(dstFileName));
+  return cpyRet;
+}
+
+LoginQryWidget::LoginQryWidget(QWidget* parent)
+  : QDialog{parent} {
+  if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
+#ifndef RUNNING_UNIT_TESTS
+    QueryWhenPasswordBookFileNotExist(this);
+#endif
+  }
   mLoginRegisterTab = new (std::nothrow) QTabBar{this};
   CHECK_NULLPTR_RETURN_VOID(mLoginRegisterTab);
   mLoginRegisterTab->addTab(QIcon(":/LOGIN"), ENUM_2_STR(LOGIN));
@@ -209,6 +244,14 @@ LoginQryWidget::LoginQryWidget(QWidget* parent) : QDialog{parent} {
   CHECK_NULLPTR_RETURN_VOID(mLoginRegisterStk);
   mLoginRegisterStk->insertWidget(LOGIN, mLoginWid);
   mLoginRegisterStk->insertWidget(REGISTER, mRegisterWid);
+
+  if (mLoginWid->isEnabled()) {
+    mLoginRegisterTab->setCurrentIndex(LOGIN);
+    mLoginRegisterStk->setCurrentIndex(LOGIN);
+  } else if (mRegisterWid->isEnabled()) {
+    mLoginRegisterTab->setCurrentIndex(REGISTER);
+    mLoginRegisterStk->setCurrentIndex(REGISTER);
+  }
 
   mDlgBtnBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   CHECK_NULLPTR_RETURN_VOID(mDlgBtnBox);
@@ -244,6 +287,7 @@ QString LoginQryWidget::getAESKey() const {
 }
 
 void LoginQryWidget::onOkButtonClicked() {
+  mLoginWid->stopTimer();
   const int curWidType = mLoginRegisterStk->currentIndex();
   switch (curWidType) {
     case LOGIN: {
@@ -264,6 +308,11 @@ void LoginQryWidget::onOkButtonClicked() {
   }
 }
 
+void LoginQryWidget::onCancelButtonClicked() {
+  mLoginWid->stopTimer();
+  close();
+}
+
 void LoginQryWidget::Subscribe() {
   connect(mLoginRegisterTab, &QTabBar::currentChanged, mLoginRegisterStk, &QStackedWidget::setCurrentIndex);
 
@@ -272,5 +321,5 @@ void LoginQryWidget::Subscribe() {
   connect(mRegisterWid, &RegisterWid::registerAccepted, this, &QDialog::accept);
 
   connect(mDlgBtnBox, &QDialogButtonBox::accepted, this, &LoginQryWidget::onOkButtonClicked);
-  connect(mDlgBtnBox, &QDialogButtonBox::rejected, this, &QDialog::close);
+  connect(mDlgBtnBox, &QDialogButtonBox::rejected, this, &LoginQryWidget::onCancelButtonClicked);
 }

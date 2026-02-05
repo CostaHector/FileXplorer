@@ -1063,16 +1063,6 @@
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
-    <message>
-        <location line="+7"/>
-        <source>Cast</source>
-        <translation>演员</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Tags</source>
-        <translation>标签</translation>
-    </message>
 </context>
 <context>
     <name>RibbonMenu</name>

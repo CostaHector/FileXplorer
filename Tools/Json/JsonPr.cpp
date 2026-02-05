@@ -18,7 +18,7 @@
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
   QString jsonFileName = PathTool::GetPrepathAndFileName(jsonAbsFile, prepath);
-  const auto& json = JsonHelper::GetJsonObject(jsonAbsFile);
+  const QJsonObject& json = JsonHelper::GetJsonObject(jsonAbsFile);
   return JsonPr{prepath, jsonFileName, json};
 }
 
@@ -151,15 +151,17 @@ bool JsonPr::ConstructCastStudioValue() {
   }
   bool changed = false;
 
+  static const StudiosManager& studioMgr = StudiosManager::getInst();
   bool bIsActorFromSingleWordStudio = false;
   if (m_Studio.isEmpty()) {
-    static const StudiosManager& studioMgr = StudiosManager::getInst();
     QString newStudio = studioMgr(m_Name);
     if (!newStudio.isEmpty()) {
       m_Studio.swap(newStudio);
       changed = true;
     }
     bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(hintStudio);
+  } else {
+    bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(m_Studio);
   }
 
   if (m_Cast.isEmpty()) {
@@ -235,7 +237,9 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
 void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
   static StudiosManager& studioMgr = StudiosManager::getInst();
   hintStudio = studioMgr(m_Name);
+  bool bIsActorFromSingleWordStudio = false;
   if (!hintStudio.isEmpty()) {
+    bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(hintStudio);
     if (m_Studio != hintStudio) { // not equal update
       studioChanged = true;
     } else {
@@ -244,8 +248,8 @@ void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged,
     }
   } else {
     studioChanged = false;
+    bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(m_Studio);
   }
-  const bool bIsActorFromSingleWordStudio = studioMgr.isStudioWithSingleWord(hintStudio);
 
   static CastManager& actorMgr = CastManager::getInst();
   const QStringList& hintPerfsList = actorMgr(m_Name + " " + selectedText, bIsActorFromSingleWordStudio);

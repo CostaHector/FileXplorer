@@ -22,4 +22,8 @@ QString invoke_getItem(QWidget *parent,
 
 }
 
+bool invoke_exists(const QString& filePath) {
+  return existsSet().contains(filePath);
+}
+
 }

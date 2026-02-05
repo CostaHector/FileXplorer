@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
-#include <set>
 #include "PwdPublicVariable.h"
 #include "PwdTableEditActions.h"
 #include "NotificatorMacro.h"

@@ -7,6 +7,10 @@
 
 #include "TDir.h"
 #include "SimpleAES.h"
+#include <openssl/err.h>
+#include <openssl/evp.h>
+// #include <openssl/provider.h>
+#include <openssl/rand.h>
 
 class AccountStorageTest : public PlainTestSuite {
   Q_OBJECT
@@ -30,7 +34,7 @@ class AccountStorageTest : public PlainTestSuite {
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
-    SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
+    SimpleAES::InitInst("TestKey1234567890");  // 16字符密钥
   }
 
   void cleanupTestCase() {
@@ -132,7 +136,7 @@ class AccountStorageTest : public PlainTestSuite {
     const AccountInfo& invalid2 = storage[100];
     QVERIFY(invalid2.typeStr.isEmpty());
 
-    // 10. 测试GetExportCSVRecords
+    // 10. GetExportCSVRecords
     QString exportContent = storage.GetExportCSVRecords();
     QVERIFY(exportContent.contains("Email,Personal,user@example.com,pass123,Additional info"));
     QVERIFY(exportContent.contains("Bank,Savings,bank_user,bank_pass,"));

@@ -29,10 +29,13 @@ struct AccountStorage {
 
   // plain Utf8 -> list<Account>
   static QVector<AccountInfo> GetAccountsFromPlainString(const QString& contents, int* pNonEmptyLine = nullptr);
-  // encrypted base64 -> encrypted binary -> plain binary -> plain Utf8 -> list<Account>
+  // encrypted base64 (.csv) -> encrypted binary -> plain binary -> plain Utf8 (.csv)
+  static bool ParseEncryptCsvFile(const QString& encryptCsvFilePath, QString& plainCsvFileContent);
+  // plain Utf8 (.csv)-> list<Account>
   bool LoadAccounts();
 
   // list<Account> -> plain Utf8
+  static QString GetExportCSVRecordsStatic(const QVector<AccountInfo>& lst);
   QString GetExportCSVRecords() const;
   // list<Account> -> plain Utf8 -> plain binary -> encrypted binary -> plain base64
   bool SaveAccounts(bool bEncrypt = true) const;
