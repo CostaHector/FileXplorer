@@ -6,12 +6,23 @@
 #include "LoginQryWidget.h"
 #include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
+#include <openssl/err.h>
+#include <openssl/evp.h>
 
 #include "TDir.h"
 #include "AccountStorage.h"
 #include "CredentialUtil.h"
-#include <QPushButton>
 #include <QSignalSpy>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QFileDialog>
+
+#include "UserInteractiveMock.h"
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class LoginQryWidgetTest : public PlainTestSuite {
   Q_OBJECT
@@ -113,6 +124,9 @@ private slots:
     credUtil.savePassword(GetCredTargetName(), backUpCredKey);
   }
 
+  void init() { GlobalMockObject::reset(); }
+
+  void cleanup() { GlobalMockObject::verify(); }
   void firstTime_registerNeeded() {
     QVERIFY(!tDir.exists("accounts_test.csv"));
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
@@ -137,7 +151,7 @@ private slots:
   void secondTime_autoLogin() {
     // 1. 后面必须用此密钥才能登陆
     const QString testKey = "AutoLoginKey456";
-    SimpleAES::setKey(testKey);
+    SimpleAES::InitInst(testKey);
     AccountStorage storage;
     storage.mAccounts = {
         {"Email", "Personal", "user@example.com", "pass123", "Additional info"},        //
@@ -261,6 +275,40 @@ private slots:
     QCheckBox* autoLogin = widget.mLoginWid->autoLogin;
     QVERIFY(!remeberKey->isChecked());
     QVERIFY(!autoLogin->isChecked());
+  }
+
+  void QueryWhenPasswordBookFileNotExist_ok() {
+    using namespace UserInteractiveMock;
+    const QString inExistedFile{"Inexist_File.csv"};
+    const QString selectExistedFile{"exist.csv"};
+    const QString destFile = AccountStorage::GetFullEncCsvFilePath();
+
+    MOCKER((FILE_EXIST_TYPE) QFile::exists).stubs().will(invoke(invoke_exists));
+    MOCKER((QUESTION_TYPE) QMessageBox::question)
+        .stubs()                                            //
+        .will(returnValue(QMessageBox::StandardButton::No)) //
+        .then(returnValue(QMessageBox::StandardButton::Yes));
+    // User Click No
+    QVERIFY(QueryWhenPasswordBookFileNotExist(nullptr));
+
+    MOCKER(QFileDialog::getOpenFileName)
+        .stubs()                          //
+        .will(returnValue(inExistedFile)) //
+        .then(returnValue(selectExistedFile));
+    existsSet() = QSet<QString>{selectExistedFile, destFile};
+    // Yes, "Inexist_File.csv"(false: not exist)
+    QVERIFY(!QueryWhenPasswordBookFileNotExist(nullptr));
+
+    // Yes, "exist.csv"(exist), destinationFile(exists) already occupied
+    QVERIFY(!QueryWhenPasswordBookFileNotExist(nullptr));
+
+    existsSet() = QSet<QString>{selectExistedFile};
+    // Yes, "exist.csv"(exist), destinationFile(not exist)
+    MOCKER((FILE_COPY_TYPE) QFile::copy)           //
+        .expects(once())                                   //
+        .with(eq(selectExistedFile), eq(destFile)) //
+        .will(returnValue(true));
+    QVERIFY(QueryWhenPasswordBookFileNotExist(nullptr));
   }
 };
 

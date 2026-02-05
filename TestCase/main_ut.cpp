@@ -1,5 +1,4 @@
 #include "PlainTestSuite.h"
-#include "Logger.h"
 #include <QtTest/QtTest>
 
 int main(int argc, char* argv[]) {

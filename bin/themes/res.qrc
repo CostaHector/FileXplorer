@@ -372,11 +372,15 @@
         <file alias="UNION_CARD_TEMPLATE">pwd/UNION_CARD_TEMPLATE.svg</file>
         <file alias="VISA_CARD_TEMPLATE">pwd/VISA_CARD_TEMPLATE.svg</file>
     </qresource>
+    <qresource prefix="/type">
+        <file alias="BANK">pwd/credit_card_cvc_hint.png</file>
+        <file alias="GAME">pwd/games.svg</file>
+        <file alias="EMAIL">pwd/email.svg</file>
+        <file alias="SOCIETY">pwd/society.png</file>
+        <file alias="TOOL">pwd/tool.png</file>
+    </qresource>
     <qresource prefix="/edit">
-        <file alias="DELETE_ROWS">pwd/DELETE_ROWS.svg</file>
-        <file alias="INSERT_ROW_BEFORE">pwd/INSERT_ROW_BEFORE.svg</file>
         <file alias="APPEND_ROWS">pwd/APPEND_ROWS.svg</file>
-        <file alias="INSERT_ROWS">pwd/INSERT_ROWS.svg</file>
         <file alias="LOAD_FROM_INPUT">pwd/LOAD_FROM_INPUT.svg</file>
         <file alias="SAVE_CHANGES">pwd/SAVE_CHANGES.svg</file>
         <file alias="SEARCH_BY">pwd/SEARCH_BY.svg</file>

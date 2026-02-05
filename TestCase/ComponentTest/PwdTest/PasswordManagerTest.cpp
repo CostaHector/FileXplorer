@@ -4,12 +4,15 @@
 #include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
-#include "PasswordManager.h"
+#include "PasswordBook.h"
+#include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
+
 #include "PublicTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"
-#include "SimpleAES.h"
+#include <openssl/err.h>
+#include <openssl/evp.h>
 #include "PwdTableEditActions.h"
 #include <QDesktopServices>
 
@@ -43,7 +46,7 @@ class PasswordManagerTest : public PlainTestSuite {
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
-    SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
+    SimpleAES::InitInst("TestKey1234567890");
     AccountTableViewMock::clear();
     Configuration().clear();
   }
@@ -64,7 +67,7 @@ class PasswordManagerTest : public PlainTestSuite {
     QVERIFY(!tDir.exists("accounts_test.csv"));
     auto& ins = GetTableEditActionsInst();
 
-    PasswordManager pwdMgr;
+    PasswordBook pwdMgr;
     {
       QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // no file no row
       // title correct
@@ -187,7 +190,7 @@ class PasswordManagerTest : public PlainTestSuite {
   void secondTime_FromExistsEncrypedFile_directly() {
     QVERIFY(tDir.exists("accounts_test.csv"));
 
-    PasswordManager pwdMgr;
+    PasswordBook pwdMgr;
     QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 rows once opened
     pwdMgr.onSave();                                              // no need save at all
     QVERIFY(pwdMgr.mStatusBar->currentMessage().contains("SKIP", Qt::CaseInsensitive));

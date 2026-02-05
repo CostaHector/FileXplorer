@@ -52,7 +52,7 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
 
   if (bEncrypt) {
     writeIntoPath = GetFullEncCsvFilePath();
-    bool encryptedResult = SimpleAES::encrypt_GCM(fullPlainCSVContents, contentNeedDumped);
+    bool encryptedResult = SimpleAES::GetInst().encrypt_GCM(fullPlainCSVContents, contentNeedDumped);
     if (!encryptedResult) {
       qCritical("Encrypt file[%s] failed! Skip write into file!", qPrintable(writeIntoPath));
       return false;
@@ -86,7 +86,7 @@ bool AccountStorage::LoadAccounts() {
     return false;
   }
   QString plainContents;
-  bool decryptResult = SimpleAES::decrypt_GCM(encryptedContents, plainContents);
+  bool decryptResult = SimpleAES::GetInst().decrypt_GCM(encryptedContents, plainContents);
   if (!decryptResult) {
     LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encCsvFilePath));
     return false;

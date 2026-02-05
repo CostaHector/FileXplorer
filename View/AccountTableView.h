@@ -29,7 +29,7 @@ inline void clear() {
 
 class AccountTableView : public CustomTableView {
 public:
-  friend class PasswordManager;
+  friend class PasswordBook;
   explicit AccountTableView(QWidget* parent = nullptr);
   void Subscribe();
   int GetRowsCountFromUserInput(const QString& method);

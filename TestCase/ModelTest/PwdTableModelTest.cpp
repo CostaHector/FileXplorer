@@ -6,6 +6,8 @@
 #include "EndToExposePrivateMember.h"
 #include "SimpleAES.h"
 #include "TDir.h"
+#include <openssl/err.h>
+#include <openssl/evp.h>
 
 class PwdTableModelTest : public PlainTestSuite {
   Q_OBJECT
@@ -29,7 +31,7 @@ class PwdTableModelTest : public PlainTestSuite {
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
 
     // 初始化 AES 密钥
-    SimpleAES::setKey("TestKey1234567890");  // 16字符密钥
+    SimpleAES::InitInst("TestKey1234567890");  // 16字符密钥
   }
 
   void cleanupTestCase() {

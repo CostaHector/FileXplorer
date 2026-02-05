@@ -8,14 +8,12 @@
 
 #include "PopupWidgetManager.h"
 #include "SimpleAES.h"
-#include "PasswordManager.h"
+#include "PasswordBook.h"
 #include "LoginQryWidget.h"
-#include "ResourceMonitor.h"
 
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
-#include "PublicVariable.h"
 #include <QMessageBox>
 
 ExtraEvents::ExtraEvents(QWidget* parent)
@@ -30,8 +28,8 @@ LoginQryWidget* ExtraEvents::LoginQryWidgetCreater(QWidget* parent) {
   connect(pLoginQryWidget, &LoginQryWidget::accepted, pLoginQryWidget, [pLoginQryWidget, parent]() {
     QString key = pLoginQryWidget->getAESKey();
     LOG_INFO_P("key length", "%d char(s)", key.size());
-    SimpleAES::setKey(key);
-    PasswordManager* pm = new (std::nothrow) PasswordManager{parent};
+    SimpleAES::InitInst(key);
+    PasswordBook* pm = new (std::nothrow) PasswordBook{parent};
     CHECK_NULLPTR_RETURN_VOID(pm);
     pm->show();
   });

@@ -18,6 +18,11 @@ const QMap<QString, QIcon>& LoadTypeIcons() {
       {"unionpay", QIcon(":/bankcard/UNIONPAY")},
       {"mastercard", QIcon(":/bankcard/MASTERCARD")},
       {"visa", QIcon(":/bankcard/VISA")},
+      {"bank", QIcon(":/type/BANK")},
+      {"society", QIcon(":/type/SOCIETY")},
+      {"email", QIcon(":/type/EMAIL")},
+      {"game", QIcon(":/type/GAME")},
+      {"tool", QIcon(":/type/TOOL")},
   };
   return type2Icons;
 }

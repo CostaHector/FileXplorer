@@ -24,6 +24,7 @@ inline void clear() {
 #endif
 
 QString GetCredTargetName();
+bool QueryWhenPasswordBookFileNotExist(QWidget* parent);
 
 class LoginWid : public QWidget {
   Q_OBJECT

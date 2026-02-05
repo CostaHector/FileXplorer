@@ -112,9 +112,10 @@ a log line example:
 
 ## get video duration using FFmpeg/libav
 ### in windows:
+
 step1: Download dynamic library `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
 
-step2: Here we assume path added to system variable is "C:/home/ffmpeg/bin", i.e. SET(path "C:/home/ffmpeg")
+step2: Add path that contains file `[ffmpeg.exe]` says "C:/home/ffmpeg/bin" to system variable, i.e. SET(path "C:/home/ffmpeg")
 
 step3: add following snippet in .pro file
 ```pro
@@ -169,6 +170,8 @@ linux {
 
 ### For windows user
 
+Precondition: add path that contains `[Qt5Core.dll]` says "C:\Qt\5.15.2\mingw81_64\bin" to system variable path.
+
 Way1: (Recommend)
 
 ![Add a shortcut action to system right click context menu](bin/AddThisProgramToSystemContextMenu.png)
@@ -179,6 +182,7 @@ In "File" Tab Widget;
 Click "System Menu/Add";
 
 In the popup UAC Window click allow this app to make changes;
+
 ```
 
 Way2: 
@@ -195,8 +199,6 @@ Modify command (Default) value data to following string;
 
 `"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\FileXplorer.exe" "%V"`
 ```
-
-And don't forget to add "C:\Qt\5.15.2\mingw81_64\bin" to system environment path
 
 ### for Ubuntu user
 using fma-config-tool
@@ -245,9 +247,9 @@ find ./ -name "RemovedFileName*" -delete
 ```bash
 cd path_to_project
 # windows
-lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
-linguist ./Translate/FileXplorer_zh_CN.ts
-lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
+C:\Qt\5.15.2\mingw81_64\bin\lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
+C:\Qt\5.15.2\mingw81_64\bin\linguist ./Translate/FileXplorer_zh_CN.ts
+C:\Qt\5.15.2\mingw81_64\bin\lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
 # linux
 /home/ariel/Qt/5.15.2/gcc_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
 /home/ariel/Qt/5.15.2/gcc_64/bin/linguist ./Translate/FileXplorer_zh_CN.ts

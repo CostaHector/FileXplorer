@@ -22,19 +22,19 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
 
   _EDIT_STUDIOS = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), tr("Edit studios list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_STUDIOS;
-  _RELOAD_STUDIOS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload studios"), this);
+  _RELOAD_STUDIOS = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload studios"), this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_STUDIOS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
   _EDIT_ACTORS = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Edit actors list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_ACTORS;
-  _RELOAD_ACTORS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload actors"), this);
+  _RELOAD_ACTORS = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload actors"), this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_ACTORS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
   _EDIT_ACTORS_ALIAS = new (std::nothrow) QAction(QIcon(":img/CAST_AKA_LIST_FILE"), tr("Edit actors alias list file"), this);
   NAME_RULES_ACTIONS_LIST += _EDIT_ACTORS_ALIAS;
-  _RELOAD_ACTORS_ALIAS = new (std::nothrow) QAction(QIcon(":/img/RELOAD_FROM_DISK"), tr("Reload actor alias"), this);
+  _RELOAD_ACTORS_ALIAS = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), tr("Reload actor alias"), this);
   NAME_RULES_ACTIONS_LIST += _RELOAD_ACTORS_ALIAS;
   NAME_RULES_ACTIONS_LIST += nullptr;
 
