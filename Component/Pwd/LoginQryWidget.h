@@ -48,6 +48,7 @@ class LoginWid : public QWidget {
   bool isRememberEnabled() const {
     return remeberKey->isChecked();
   }
+  void startTimer();
   void stopTimer();
  signals:
   void timeoutAccepted();
@@ -88,13 +89,13 @@ public:
   void hideEvent(QHideEvent* event) override;
   QString getAESKey() const;
   void Subscribe();
-
   enum TAB_TYPE {
     LOGIN = 0,
     REGISTER = 1,
   };
 
  public slots:
+  void onStartTimer();
   void onOkButtonClicked();
   void onCancelButtonClicked();
 

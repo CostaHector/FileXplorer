@@ -3,19 +3,15 @@
 #include <QObject>
 #include <QWidget>
 #include "PopupWidgetManager.h"
-
-class TorrentsManagerWidget;
-class ConfigsTable;
+class PasswordBook;
 class ExtraEvents : public QObject {
 public:
   explicit ExtraEvents(QWidget* parent);
   void subscribe();
 private:
-  LoginQryWidget* LoginQryWidgetCreater(QWidget* parent);
-
   PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
   PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
-  PopupWidgetManager<LoginQryWidget>* m_pwdEntrance{nullptr};
+  PopupWidgetManager<PasswordBook>* mPwdBook{nullptr};
   PopupWidgetManager<ResourceMonitorPanel>* m_resMonitor{nullptr};
 };
 

@@ -22,7 +22,7 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-class PasswordManagerTest : public PlainTestSuite {
+class PasswordBookTest : public PlainTestSuite {
   Q_OBJECT
  public:
   TDir tDir;
@@ -84,10 +84,10 @@ class PasswordManagerTest : public PlainTestSuite {
     const QString partial2LineValidCSV{
         "Email,Personal,user@example.com,pass123,Chris Evans info\n"
         "Invalid Line\n"
-        "Bank,Savings,bank_user,bank_pass,Henry Cavill info"};
+        "Bank,Savings,bank_user,bank_pass,Henry Cavill info\n"};
     const QString expectPlainCsvContentShow{
         "Email,Personal,user@example.com,pass123,Chris Evans info\n"
-        "Bank,Savings,bank_user,bank_pass,Henry Cavill info"};
+        "Bank,Savings,bank_user,bank_pass,Henry Cavill info\n"};
 
     {
       QVERIFY(pwdMgr.mCsvInputDialog == nullptr);
@@ -198,5 +198,5 @@ class PasswordManagerTest : public PlainTestSuite {
   }
 };
 
-#include "PasswordManagerTest.moc"
-REGISTER_TEST(PasswordManagerTest, false)
+#include "PasswordBookTest.moc"
+REGISTER_TEST(PasswordBookTest, false)

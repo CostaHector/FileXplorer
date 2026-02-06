@@ -1,6 +1,7 @@
 #include "LoginQryWidget.h"
 #include "AccountStorage.h"
 #include "CredentialUtil.h"
+#include "SimpleAES.h"
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -105,6 +106,11 @@ void LoginWid::onAutoLoginSwitchChanged(int autoLoginState) {
 }
 
 void LoginWid::InitState() {
+  static constexpr int TIMER_LENGTH_MS = 2000;
+  autoLoginTimer.setInterval(TIMER_LENGTH_MS);
+  autoLoginTimer.setSingleShot(true);
+  connect(&autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
+
   const CredentialUtil& credUtil = CredentialUtil::GetInst();
   if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
     // 1.0 disabled login widget itself
@@ -131,18 +137,6 @@ void LoginWid::InitState() {
       inputKeyLe->setText(aesKey);
     }
   }
-
-  if (autoLogin->checkState() == Qt::CheckState::Checked && !GetKey().isEmpty()) { // empty key. skip right now
-    static constexpr int TIMER_LENGTH_MS = 2000;                                   // time count down
-    mMessage->setText(QString("Will auto Login in %1(ms)").arg(TIMER_LENGTH_MS));
-
-    autoLoginTimer.setInterval(TIMER_LENGTH_MS);
-    autoLoginTimer.setSingleShot(true);
-    connect(&autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
-#ifndef RUNNING_UNIT_TESTS
-    autoLoginTimer.start();
-#endif
-  }
 }
 
 void LoginWid::AutoLoginTimeoutCallback() {
@@ -157,6 +151,19 @@ void LoginWid::AutoLoginTimeoutCallback() {
   if (isAutoLoginStillChecked) {
     emit timeoutAccepted();
   }
+}
+
+void LoginWid::startTimer() {
+  if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
+    return;
+  }
+  if (autoLogin->checkState() != Qt::CheckState::Checked || GetKey().isEmpty()) {
+    return; // no need start
+  }
+  if (!autoLoginTimer.isActive()) {
+    autoLoginTimer.start();
+  }
+  mMessage->setText(QString("Will auto Login in %1(ms)").arg(autoLoginTimer.remainingTime()));
 }
 
 void LoginWid::stopTimer() {
@@ -224,6 +231,7 @@ bool QueryWhenPasswordBookFileNotExist(QWidget* parent) {
 
 LoginQryWidget::LoginQryWidget(QWidget* parent)
   : QDialog{parent} {
+  setAttribute(Qt::WA_DeleteOnClose);
   if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
 #ifndef RUNNING_UNIT_TESTS
     QueryWhenPasswordBookFileNotExist(this);
@@ -291,11 +299,11 @@ void LoginQryWidget::onOkButtonClicked() {
   const int curWidType = mLoginRegisterStk->currentIndex();
   switch (curWidType) {
     case LOGIN: {
-      this->accept();
       if (mLoginWid->isRememberEnabled()) {
         const CredentialUtil& credUtil = CredentialUtil::GetInst();
         credUtil.savePassword(GetCredTargetName(), getAESKey());
       }
+      accept();
       return;
     }
     case REGISTER: {
@@ -308,6 +316,10 @@ void LoginQryWidget::onOkButtonClicked() {
   }
 }
 
+void LoginQryWidget::onStartTimer() {
+  mLoginWid->startTimer();
+}
+
 void LoginQryWidget::onCancelButtonClicked() {
   mLoginWid->stopTimer();
   close();
@@ -315,11 +327,13 @@ void LoginQryWidget::onCancelButtonClicked() {
 
 void LoginQryWidget::Subscribe() {
   connect(mLoginRegisterTab, &QTabBar::currentChanged, mLoginRegisterStk, &QStackedWidget::setCurrentIndex);
-
   connect(mLoginWid, &LoginWid::timeoutAccepted, this, &QDialog::accept);
-
   connect(mRegisterWid, &RegisterWid::registerAccepted, this, &QDialog::accept);
-
   connect(mDlgBtnBox, &QDialogButtonBox::accepted, this, &LoginQryWidget::onOkButtonClicked);
   connect(mDlgBtnBox, &QDialogButtonBox::rejected, this, &LoginQryWidget::onCancelButtonClicked);
+  connect(this, &QDialog::accepted, this, [this]() {
+    const QString key = getAESKey();
+    LOG_INFO_P("key length", "%d char(s)", key.size());
+    SimpleAES::InitInst(key);
+  });
 }

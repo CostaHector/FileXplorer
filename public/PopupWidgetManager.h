@@ -12,6 +12,7 @@ public:
 
   void setWidgetCreator(std::function<WidgetType*(QWidget*)> creator) { m_widgetCreator = creator; }
 
+  void setOnShowCallback(std::function<void()> callback) { m_onShowCallback = callback; }
   void setOnCloseCallback(std::function<void()> callback) { m_onCloseCallback = callback; }
   bool isVisible() const { return widget() != nullptr && widget()->isVisible(); }
   const WidgetType* widget() const { return m_widget; }
@@ -32,6 +33,7 @@ private:
 
   std::function<WidgetType*(QWidget*)> m_widgetCreator{nullptr};
   std::function<void()> m_onCloseCallback{nullptr};
+  std::function<void()> m_onShowCallback{nullptr};
 };
 
 class QWidget;
@@ -41,7 +43,7 @@ class RedundantImageFinder;
 class TorrentsManagerWidget;
 class ConfigsTable;
 class Archiver;
-class LoginQryWidget;
+class PasswordBook;
 class ResourceMonitorPanel;
 
 extern template class PopupWidgetManager<QWidget>;
@@ -51,6 +53,6 @@ extern template class PopupWidgetManager<RedundantImageFinder>;
 extern template class PopupWidgetManager<TorrentsManagerWidget>;
 extern template class PopupWidgetManager<ConfigsTable>;
 extern template class PopupWidgetManager<Archiver>;
-extern template class PopupWidgetManager<LoginQryWidget>;
+extern template class PopupWidgetManager<PasswordBook>;
 extern template class PopupWidgetManager<ResourceMonitorPanel>;
 #endif // POPUPWIDGETMANAGER_H

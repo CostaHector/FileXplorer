@@ -5,27 +5,39 @@
 #include "NotificatorMacro.h"
 #include "StyleSheet.h"
 #include "MemoryKey.h"
-
+#include "LoginQryWidget.h"
 #include <QDateTime>
 #include <QFileInfo>
 
-PasswordBook::PasswordBook()
-  : QMainWindow{nullptr} {
-  setObjectName("PasswordBook");
-  setAttribute(Qt::WA_DeleteOnClose);
+PasswordBook* PasswordBook::Creater(QWidget* parent) {
+  LoginQryWidget* loginQryWidget = new (std::nothrow) LoginQryWidget;
+  loginQryWidget->onStartTimer();
+  if (loginQryWidget->exec() != QDialog::DialogCode::Accepted) {
+    LOG_INFO_NP("Cancel", "user skip");
+    return nullptr;
+  }
+  return new (std::nothrow) PasswordBook{parent};
+}
 
+PasswordBook::PasswordBook(QWidget* parent)
+  : QMainWindow{parent} {
+  setObjectName("PasswordBook");
   mAccountListView = new (std::nothrow) AccountTableView{this};
   CHECK_NULLPTR_RETURN_VOID(mAccountListView);
   if (!mAccountListView->IsLoadSucceed()) {
     LOG_CRIT_NP("Load failed", "Key error");
     this->setEnabled(false);
   }
-  setCentralWidget(mAccountListView);
 
   mAccountDetailView = new (std::nothrow) AccountDetailView{"AccountDetailView", this};
   CHECK_NULLPTR_RETURN_VOID(mAccountDetailView);
   mAccountDetailView->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, mAccountDetailView);
+
+  mMainWidget = new QStackedWidget{this};
+  mMainWidget->addWidget(mAccountListView);
+  mMainWidget->setCurrentIndex(ViewType::LIST_VIEW);
+  setCentralWidget(mMainWidget);
 
   const auto& tblEditInst = GetTableEditActionsInst();
   mSearchText = new (std::nothrow) QLineEdit{""};
@@ -74,19 +86,17 @@ PasswordBook::PasswordBook()
 
 void PasswordBook::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event)
-  Configuration().setValue("PASSWORD_TABLEVIEW_GEOMETRY", saveGeometry());
   Configuration().setValue("PASSWORD_TABLEVIEW_STATE", saveState());
   Configuration().setValue("ACCOUNT_DETAIL_VIEW_GEOMETRY", mAccountDetailView->saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
 void PasswordBook::ReadSettings() {
-  if (Configuration().contains("PASSWORD_TABLEVIEW_GEOMETRY")) {
-    restoreGeometry(Configuration().value("PASSWORD_TABLEVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("PASSWORD_TABLEVIEW_STATE")) {
     restoreState(Configuration().value("PASSWORD_TABLEVIEW_STATE").toByteArray());
+  }
+  if (Configuration().contains("ACCOUNT_DETAIL_VIEW_GEOMETRY")) {
     mAccountDetailView->restoreGeometry(Configuration().value("ACCOUNT_DETAIL_VIEW_GEOMETRY").toByteArray());
-  } else {
-    setGeometry(QRect(0, 0, 1024, 768));
   }
 }
 
@@ -113,6 +123,7 @@ void PasswordBook::SetPWBookName() {
 }
 
 void PasswordBook::onUpdateDetailView(const QModelIndex& proxyIndex) {
+  mMainWidget->setCurrentIndex(ViewType::DETAIL_VIEW);
   auto* pData = mAccountListView->GetAccountInfoByCurrentIndex(proxyIndex);
   mAccountDetailView->UpdateDisplay(pData);
 }

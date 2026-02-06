@@ -9,7 +9,6 @@
 #include "PopupWidgetManager.h"
 #include "SimpleAES.h"
 #include "PasswordBook.h"
-#include "LoginQryWidget.h"
 
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
@@ -19,21 +18,6 @@
 ExtraEvents::ExtraEvents(QWidget* parent)
   : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(parent);
-}
-
-LoginQryWidget* ExtraEvents::LoginQryWidgetCreater(QWidget* parent) {
-  auto* pLoginQryWidget = new (std::nothrow) LoginQryWidget{parent};
-  CHECK_NULLPTR_RETURN_NULLPTR(pLoginQryWidget);
-  m_pwdEntrance->setOnCloseCallback([pLoginQryWidget]() { pLoginQryWidget->onCancelButtonClicked(); });
-  connect(pLoginQryWidget, &LoginQryWidget::accepted, pLoginQryWidget, [pLoginQryWidget, parent]() {
-    QString key = pLoginQryWidget->getAESKey();
-    LOG_INFO_P("key length", "%d char(s)", key.size());
-    SimpleAES::InitInst(key);
-    PasswordBook* pm = new (std::nothrow) PasswordBook;
-    CHECK_NULLPTR_RETURN_VOID(pm);
-    pm->show();
-  });
-  return pLoginQryWidget;
 }
 
 void ExtraEvents::subscribe() {
@@ -53,9 +37,9 @@ void ExtraEvents::subscribe() {
   m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsTable>{leafInst._SETTINGS, pParentWidget, "ConfigsTableGeometry"};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
 
-  m_pwdEntrance = new (std::nothrow) PopupWidgetManager<LoginQryWidget>{leafInst._PWD_BOOK, pParentWidget, "PwdEntranceGeometry"};
-  CHECK_NULLPTR_RETURN_VOID(m_pwdEntrance);
-  m_pwdEntrance->setWidgetCreator([this](QWidget* parent) -> LoginQryWidget* { return LoginQryWidgetCreater(parent); });
+  mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "PasswordBookGeometry"};
+  CHECK_NULLPTR_RETURN_VOID(mPwdBook);
+  mPwdBook->setWidgetCreator(PasswordBook::Creater);
 
   connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::toggled, this, [pParentWidget]() {
     QMessageBox::about(pParentWidget,
