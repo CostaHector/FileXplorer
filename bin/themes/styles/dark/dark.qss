@@ -137,13 +137,11 @@ QTabBar::tab:selected:hover {
 QHeaderView::section {
     background-color: #252525;
     color: #d4d4d4;
-    border: 1px solid #3c3c3c;
 }
 
 /* 左上角全选按钮基础样式 */
 QTableView QTableCornerButton::section {
     background-color: #252525;
-    border: 1px solid #3c3c3c;
     border-right: none;
     border-bottom: none;
 }

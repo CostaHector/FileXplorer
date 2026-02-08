@@ -1,7 +1,7 @@
 ﻿#include "CommandsPreview.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
-#include "NotificatorMacro.h"
+#include "PublicMacro.h"
 #include "PublicTool.h"
 
 #include <QResizeEvent>

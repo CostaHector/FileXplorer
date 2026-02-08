@@ -4,6 +4,7 @@
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
+#include "PublicMacro.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>

@@ -4,6 +4,7 @@
 #include "StyleSheet.h"
 #include "FileLeafAction.h"
 #include "PublicTool.h"
+#include "PublicMacro.h"
 
 #include <QDialogButtonBox>
 #include <QIcon>
