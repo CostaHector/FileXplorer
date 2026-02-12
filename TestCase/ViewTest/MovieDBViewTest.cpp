@@ -1,6 +1,5 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 #include <QTestEventList>
 #include <QSignalSpy>
 #include <QInputDialog>
@@ -18,10 +17,8 @@
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QSqlQuery>
-#include "VideoTestPrecoditionTools.h"
 #include "MovieDBActions.h"
 #include "VideoDurationGetter.h"
-#include "AutoRollbackRename.h"
 
 #include "UserInteractiveMock.h"
 #include "MountPathTableNameMapperMock.h"

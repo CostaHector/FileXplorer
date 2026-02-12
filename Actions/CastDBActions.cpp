@@ -18,7 +18,6 @@ CastDBActions::CastDBActions(QObject* parent)  //
 
   _MODEL_REPOPULATE = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), tr("Repopulate"), this};
   CHECK_NULLPTR_RETURN_VOID(_MODEL_REPOPULATE);
-  _MODEL_REPOPULATE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R));
   _MODEL_REPOPULATE->setShortcutVisibleInContextMenu(true);
   _MODEL_REPOPULATE->setToolTip(QString{"<b>%1 (%2)</b><br/>Repopulates the model with data from the table via setTable"}.arg(
       _MODEL_REPOPULATE->text(), _MODEL_REPOPULATE->shortcut().toString()));

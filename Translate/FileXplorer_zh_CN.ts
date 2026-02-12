@@ -116,7 +116,7 @@
         <translation>重新填充</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Append Casts</source>
         <translation>读取自输入列表</translation>
     </message>
@@ -189,6 +189,14 @@
         <location line="+6"/>
         <source>Dump all records</source>
         <translation>写入变更到pson(所有行)</translation>
+    </message>
+</context>
+<context>
+    <name>DragDropTextEdit</name>
+    <message>
+        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
+        <source>select encrypt CSV file</source>
+        <translation>选择已加密CSV文件</translation>
     </message>
 </context>
 <context>
@@ -664,7 +672,7 @@
 <context>
     <name>LoginWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+39"/>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+43"/>
         <source>Remember key</source>
         <translation>记住密码</translation>
     </message>
@@ -711,6 +719,11 @@
     </message>
     <message>
         <location line="+5"/>
+        <source>Repopulate</source>
+        <translation>重新填充</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Revert</source>
         <translation>重置</translation>
     </message>
@@ -750,7 +763,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+18"/>
         <source>Read Duration</source>
         <translation>更新时长</translation>
     </message>
@@ -836,7 +849,7 @@
         <translation>深色主题</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+65"/>
         <source>App UI Style</source>
         <translation>应用风格</translation>
     </message>
@@ -968,7 +981,7 @@
 <context>
     <name>RegisterWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+119"/>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+130"/>
         <source>Encryption Key</source>
         <translation>设置密钥</translation>
     </message>
@@ -1200,7 +1213,7 @@
 <context>
     <name>ThumbnailProcessActions</name>
     <message>
-        <location filename="../Actions/ThumbnailProcessActions.cpp" line="+6"/>
+        <location filename="../Actions/ThumbnailProcessActions.cpp" line="+7"/>
         <source>Create 1x1 thumbnail</source>
         <translation>创建1x1缩略图</translation>
     </message>
