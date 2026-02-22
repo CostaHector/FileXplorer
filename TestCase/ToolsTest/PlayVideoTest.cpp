@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "PlayVideo.h"
 #include "TDir.h"

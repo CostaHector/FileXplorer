@@ -3,7 +3,6 @@
 #include "PlainTestSuite.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
-#include "AdvanceRenamer.h"
 #include "RenameWidget_LongPath.h"
 #include "RenameWidget_ArrangeSection.h"
 #include "RenameWidget_ConsecutiveFileNo.h"
@@ -15,6 +14,7 @@
 #include "RenameWidget_ReverseNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
 #include "EndToExposePrivateMember.h"
+#include <QPushButton>
 #include "RenameActions.h"
 
 class AdvanceRenamerTest : public PlainTestSuite {
@@ -516,6 +516,7 @@ private slots:
     RenameWidget_ArrangeSection pArrange;
     pArrange.init();
     pArrange.setModal(true);
+    QCOMPARE(pArrange.m_nameExtIndependent->checkState(), Qt::CheckState::Checked);
 
     pArrange.m_nameExtIndependent->setChecked(true);
     pArrange.m_recursiveCB->setChecked(true);
@@ -628,7 +629,7 @@ private slots:
     pConse.init();
     pConse.setModal(true);
 
-            // m_nameExtIndependent set indepentent in InitExtraMemberWidget
+    // m_nameExtIndependent set indepentent in InitExtraMemberWidget
     pConse.m_fileNoStartIndex->setText("1");
     QCOMPARE(pConse.m_nameExtIndependent->checkState(), Qt::CheckState::Unchecked);
 

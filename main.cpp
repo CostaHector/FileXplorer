@@ -1,7 +1,7 @@
 ﻿#include "FileExplorerEvent.h"
 #include "FileXplorer.h"
 #include "ExtraEvents.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "MemoryKey.h"
 #include "Logger.h"
 #include <QApplication>

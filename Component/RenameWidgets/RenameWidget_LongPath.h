@@ -3,6 +3,7 @@
 
 #include "AdvanceRenamer.h"
 #include "LongPathFinder.h"
+#include <QLineEdit>
 
 class RenameWidget_LongPath : public AdvanceRenamer {
  public:

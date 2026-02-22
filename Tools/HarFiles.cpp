@@ -1,6 +1,6 @@
 #include "HarFiles.h"
 #include "PublicVariable.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "Logger.h"
 #include <QFile>
 #include <QDir>

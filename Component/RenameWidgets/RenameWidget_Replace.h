@@ -1,6 +1,7 @@
 #ifndef RENAMEWIDGET_REPLACE_H
 #define RENAMEWIDGET_REPLACE_H
 #include "AdvanceRenamer.h"
+#include <QComboBox>
 
 class RenameWidget_Replace : public AdvanceRenamer {
  public:

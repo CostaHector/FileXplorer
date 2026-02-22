@@ -1,5 +1,5 @@
 #include "SystemContextMenuControl.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PathTool.h"
 #include "NotificatorMacro.h"
 #include <QCoreApplication>

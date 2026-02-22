@@ -8,7 +8,10 @@
 #include "NotificatorMacro.h"
 #include "RenameNamesUnique.h"
 #include "CommandsPreview.h"
+
 #include <QDataStream>
+#include <QScrollBar>
+#include <QPushButton>
 
 constexpr char AdvanceRenamer::NAME_SEP;
 

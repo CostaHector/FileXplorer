@@ -1,15 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-#include <QTestEventList>
+#include "FileToolMock.h"
+#include "TDir.h"
 
-#include "Logger.h"
-#include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "RightVideoDuplicatesDetails.h"
 #include "EndToExposePrivateMember.h"
-#include "TDir.h"
-#include "ClipboardGuard.h"
+#include "FileTool.h"
 #include "DuplicateVideosFinderActions.h"
 #include <QDesktopServices>
 
@@ -26,6 +23,9 @@ public:
   QDir mDir{tDir.path()};
 private slots:
   void initTestCase() {
+    GlobalMockObject::reset();
+    MOCKER(QDesktopServices::openUrl).stubs().will(invoke(FileToolMock::invokeOpenUrl));
+
     QVERIFY(tDir.IsValid());
     const QList<FsNodeEntry> nodes{
         //
@@ -33,14 +33,12 @@ private slots:
         {"video 1 ai.mp4", false, "012345678"}, //
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
-    GlobalMockObject::reset();
-    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
   }
   void cleanupTestCase() { //
     GlobalMockObject::verify();
   }
 
-  void initalized_and_no_exception_ok() {
+  void default_construct_ok() {
     RightVideoDuplicatesDetails rvdd;
     QVERIFY(rvdd.m_detailsModel != nullptr);
     QVERIFY(rvdd.m_rightSortProxy != nullptr);
@@ -62,10 +60,10 @@ private slots:
   void copy_to_clipboard_and_recycle_selection_ok() {
     GroupedDupVidList szGrp{
         DupVidMetaInfoList{
-            // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
-            {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
-            {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
-            {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
+        // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
+        {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
+        {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
+        {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
         },
     };
     GroupedDupVidList durGrp = szGrp; // for simplicity. two of them are equal
@@ -78,6 +76,8 @@ private slots:
 
     QCOMPARE(rvdd.m_detailsModel->rowCount(), 0);
     QCOMPARE(rvdd.onLeftVideoGroupsTableSelectionChanged(0), 3 - 0);
+    QCOMPARE(szGrp.size(), 1);    // groups count=1
+    QCOMPARE(szGrp[0].size(), 3); // item(s) int group[0]=3
     QCOMPARE(rvdd.m_detailsModel->rowCount(), 3);
 
     QModelIndex sourceIndex0 = rvdd.m_detailsModel->index(0, 0);
@@ -86,35 +86,41 @@ private slots:
     QModelIndex fileNotExistSourceIndex2 = rvdd.m_detailsModel->index(2, 0);
     QModelIndex fileNotExistProxyIndex2 = rvdd.m_rightSortProxy->mapFromSource(fileNotExistSourceIndex2);
 
-    // 1.0 copy to clipbord ok
     {
-      ClipboardGuard systemClipboardGuard;
+      // 1.0 copy to clipbord ok
+      // only contains [0-9a-zA-Z_ ] char
+      MOCKER(FileTool::CopyTextToSystemClipboard) //
+          .expects(exactly(1))                    //
+          .with(eq(QString{"video 1 ai mp4"}))    //
+          .will(returnValue(true))
+          .id("index0_Copy");
+      MOCKER(FileTool::CopyTextToSystemClipboard) //
+          .expects(exactly(1))                    //
+          .with(eq(QString{"inexist video 1 mp4"}))    //
+          .after("index0_Copy")
+          .will(returnValue(true));
+      // "video 1 ai mp4"
       QCOMPARE(rvdd.on_effectiveNameCopiedForEverything(proxyIndex0), true);
-      auto* cb = QApplication::clipboard();
-      QVERIFY(cb != nullptr);
-      QCOMPARE(cb->text(), "video 1 ai mp4"); // only contains [0-9a-zA-Z_ ] char
-
+      // "inexist video 1 mp4"
       QCOMPARE(rvdd.on_effectiveNameCopiedForEverything(fileNotExistProxyIndex2), true);
-#ifndef _WIN32
-      QCOMPARE(cb->text(),
-               "inexist video 1 mp4"); // clipboard is extremely unreliable in windows. only contains [0-9a-zA-Z_ ] char. clipboard is unreliable
-#endif
     }
 
-    // 2.0 double clicked ok
     {
+      // 2.0 double clicked ok
       QCOMPARE(rvdd.on_cellDoubleClicked(proxyIndex0), true);
       QCOMPARE(rvdd.on_cellDoubleClicked(fileNotExistProxyIndex2), false);
     }
 
-    // 2.0 recycle ok;
     {
+      // 3.0 recycle when nothing selected
+      QVERIFY(!rvdd.selectionModel()->hasSelection());
       const QStringList beforeNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"})); // ascii(' ') less than ascii('.')
       emit g_dupVidFinderAg().RECYCLE_SELECTIONS->triggered();
       const QStringList nothingSelectedRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QCOMPARE(nothingSelectedRecyleNames, beforeNames);
 
+      // 3.1 recycle when all rows selected
       rvdd.selectAll();
       emit g_dupVidFinderAg().RECYCLE_SELECTIONS->triggered();
       const QStringList afterSelectedAllRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);

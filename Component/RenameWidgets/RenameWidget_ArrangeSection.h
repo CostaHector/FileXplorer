@@ -2,6 +2,7 @@
 #define RENAMEWIDGET_ARRANGESECTION_H
 
 #include "AdvanceRenamer.h"
+#include <QComboBox>
 #include <QAction>
 #include <QActionGroup>
 

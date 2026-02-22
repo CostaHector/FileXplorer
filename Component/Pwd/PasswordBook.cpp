@@ -1,5 +1,5 @@
 ﻿#include "PasswordBook.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PwdPublicVariable.h"
 #include "PwdTableEditActions.h"
 #include "NotificatorMacro.h"

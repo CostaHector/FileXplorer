@@ -2,6 +2,8 @@
 #define RENAMEWIDGET_NUMERIZE_H
 
 #include "AdvanceRenamer.h"
+#include <QLineEdit>
+#include <QComboBox>
 
 class RenameWidget_Numerize : public AdvanceRenamer {
  public:

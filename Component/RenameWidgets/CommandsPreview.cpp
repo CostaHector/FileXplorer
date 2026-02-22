@@ -2,12 +2,12 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 
 #include <QResizeEvent>
 
 CommandsPreview::CommandsPreview(const QString& name, QWidget* parent) //
-  : QPlainTextEdit{parent}
+  : QTextBrowser{parent}
   , mName{name} //
 {
   COPY_TEXT = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy", this};
@@ -32,13 +32,13 @@ CommandsPreview::CommandsPreview(const QString& name, QWidget* parent) //
 }
 
 void CommandsPreview::showEvent(QShowEvent* event) {
-  QPlainTextEdit::showEvent(event);
+  QTextBrowser::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 
 void CommandsPreview::closeEvent(QCloseEvent* event) {
   Configuration().setValue(mName + "_GEOMETRY", saveGeometry());
-  QPlainTextEdit::closeEvent(event);
+  QTextBrowser::closeEvent(event);
 }
 
 void CommandsPreview::ReadSettings() {
@@ -52,7 +52,7 @@ void CommandsPreview::ReadSettings() {
 }
 
 void CommandsPreview::resizeEvent(QResizeEvent* event) {
-  QPlainTextEdit::resizeEvent(event);
+  QTextBrowser::resizeEvent(event);
   adjustButtonPosition();
 }
 

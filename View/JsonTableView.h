@@ -16,6 +16,7 @@ class JsonTableView : public CustomTableView {
   int ReadADirectory(const QString& path);
   void subscribe();
 
+  int onFixSelectionRecordContents();
   int onSaveCurrentChanges();
   int onSyncNameField();
   int onExportCastStudioToDictonary();

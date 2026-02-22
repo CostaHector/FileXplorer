@@ -336,8 +336,12 @@ private slots:
     QVERIFY(writeBool(prev, "invalid"));  // invalid to false by default
     QVERIFY(!prev);
 
+    prev = false;
+    QVERIFY(writeBool(prev, "1"));
+    QVERIFY(prev);
+
     prev = true;
-    QVERIFY(writeBool(prev, "1"));  // invalid to false by default
+    QVERIFY(writeBool(prev, "0"));
     QVERIFY(!prev);
   }
 

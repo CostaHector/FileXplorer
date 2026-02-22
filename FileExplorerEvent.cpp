@@ -40,7 +40,7 @@
 #include "ThumbnailProcesser.h"
 
 #include "PopupWidgetManager.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"

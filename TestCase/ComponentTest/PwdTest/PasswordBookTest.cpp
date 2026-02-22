@@ -8,7 +8,7 @@
 #include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"
 #include <openssl/err.h>

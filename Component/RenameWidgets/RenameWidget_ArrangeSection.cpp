@@ -10,7 +10,7 @@ RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
 
 void RenameWidget_ArrangeSection::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
-  m_nameExtIndependent->setChecked(false);
+  m_nameExtIndependent->setChecked(true);
   regexValidLabel->setVisible(true);
 }
 

@@ -531,7 +531,12 @@
 (同步更新Name字段)</translation>
     </message>
     <message>
-        <location line="+54"/>
+        <location line="+25"/>
+        <source>Mark Contents Fixed</source>
+        <translation>固定内容</translation>
+    </message>
+    <message>
+        <location line="+37"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -556,17 +561,17 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-60"/>
+        <location line="-68"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Format Cast/Studio</source>
         <translation>格式化演员/制片厂</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+14"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
@@ -581,12 +586,12 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="-23"/>
+        <location line="-31"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+36"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -758,7 +763,7 @@
         <translation>合并</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+9"/>
         <source>Audit This Table</source>
         <translation>审计</translation>
     </message>
@@ -1072,7 +1077,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../Component/RibbonJson.cpp" line="+61"/>
+        <location filename="../Component/RibbonJson.cpp" line="+62"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>

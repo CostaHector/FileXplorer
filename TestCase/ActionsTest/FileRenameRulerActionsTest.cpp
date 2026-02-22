@@ -9,7 +9,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include "PathTool.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"
 

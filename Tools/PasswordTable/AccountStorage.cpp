@@ -1,7 +1,7 @@
 #include "AccountStorage.h"
 #include "SimpleAES.h"
 #include "PublicVariable.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "Logger.h"
 #include <QFile>
 #include <QRegularExpression>

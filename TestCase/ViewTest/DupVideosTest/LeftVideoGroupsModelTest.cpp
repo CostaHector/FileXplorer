@@ -1,7 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "LeftVideoGroupsModel.h"
@@ -11,7 +10,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initalized_ok() {
+  void default_construct_ok() {
     // with configs
     Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1 * 1000);  // 1 s
     Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 1 * 1024);  // 1 kB
@@ -45,15 +44,17 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
         {"v2.mp4", 2048, 20000, 0, "/v2.mp4", "hash2"},  //
     };                                                         //
     model.onDuplicateVideosListChanged(testData);
+
+    QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "SIZE");
 
     model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
     QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
-
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "DURATION");
 
     model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
     QCOMPARE(model.m_currentDiffer, DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), "SIZE");
   }
 
   void DeviationSizeChangeOnly_ok() {

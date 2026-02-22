@@ -9,7 +9,7 @@
 #include <QUrl>
 #include <QFile>
 #include <tuple>
-#include "PublicTool.h"
+#include "FileTool.h"
 
 FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent} {
   _NAME_RULER = new (std::nothrow) QAction(QIcon(":img/NAME_RULER"), tr("Name Ruler"));

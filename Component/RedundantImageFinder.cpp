@@ -7,7 +7,7 @@
 #include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "SpacerWidget.h"
 #include "PathTool.h"
 

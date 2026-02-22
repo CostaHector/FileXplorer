@@ -10,7 +10,7 @@
 #include "AutoRollbackFileContentModify.h"
 #include "JsonTestPrecoditionTools.h"
 #include "PublicVariable.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PathTool.h"
 #include "ModelTestHelper.h"
 #include "StudioActorManagerTestHelper.h"

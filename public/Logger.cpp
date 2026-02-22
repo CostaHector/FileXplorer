@@ -2,7 +2,7 @@
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PublicVariable.h"
 
 #include <QFileInfo>

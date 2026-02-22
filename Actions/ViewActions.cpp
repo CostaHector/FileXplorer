@@ -1,7 +1,7 @@
 ﻿#include "ViewActions.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PublicVariable.h"
 #include "StyleSheet.h"
 #include "ViewTypeTool.h"
