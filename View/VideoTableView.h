@@ -3,9 +3,8 @@
 
 #include "CustomTableView.h"
 #include "VideoTableModel.h"
-#include "QMediaPlaylist.h"
+#include <QMediaPlaylist>
 #include <QSortFilterProxyModel>
-#include <QUrl>
 
 class VideoTableView : public CustomTableView {
   Q_OBJECT
@@ -18,13 +17,13 @@ public:
   void PlayNextVideo();
 
 signals:
-  void reqPlayMedia(QUrl mediaUrl);
+  void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);
 
 private:
   QModelIndex previousIndex() const;
   QModelIndex nextIndex() const;
   QModelIndex iteratorCore(int step) const;
-  void ReqPlay(const QModelIndex& proIndex);
+  void ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly);
 
   VideoTableModel* mVideoModel{nullptr};
   QSortFilterProxyModel* mProxyModel{nullptr};

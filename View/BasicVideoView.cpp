@@ -11,18 +11,41 @@
 #include <QResizeEvent>
 #include <QFileDialog>
 
-BasicVideoView::BasicVideoView(bool bBasicMode, QWidget *parent)
-  : QWidget{parent} {
-  mFunctionCtrlBar = new ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
-  mFunctionCtrlBar->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+constexpr int MyVideoWidget::TIMER_INTERVAL;
+
+MyVideoWidget::MyVideoWidget(QWidget* parent) : QVideoWidget{parent} {
+  mLongTimeNoClickTimer.setSingleShot(true);
+  mLongTimeNoClickTimer.setInterval(TIMER_INTERVAL);
+
+  connect(&mLongTimeNoClickTimer, &QTimer::timeout, this, &MyVideoWidget::onTimerTimeout);
+  mLongTimeNoClickTimer.start();
+}
+
+void MyVideoWidget::onTimerTimeout() {
+  emit reqToolBarVisibilityChange(false);
+}
+
+void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
+  if (event->button() == Qt::LeftButton) {
+    emit reqPausePlayStatusToggle();
+    emit reqToolBarVisibilityChange(true);
+    if (!mLongTimeNoClickTimer.isActive()) {
+      mLongTimeNoClickTimer.start();
+    }
+    event->setAccepted(true);
+    return;
+  }
+  QVideoWidget::mousePressEvent(event);
+}
+
+BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{parent} {
+  mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   mSelectVideoFileBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/OPEN_A_VIDEO"}, tr("open file"));
 
-  const bool bPlayInstant
-      = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.v).toBool();
-  mPlayInstantlyBtn = mFunctionCtrlBar->createToolButton(QIcon{""},
-                                                         tr("instant"),
-                                                         "Automatically play selected file instantly in current view when enabled.",
-                                                         true);
+  const bool bPlayInstant =
+      Configuration().value(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.v).toBool();
+  mPlayInstantlyBtn =
+      mFunctionCtrlBar->createToolButton(QIcon{""}, tr("instant"), "Automatically play selected file instantly in current view when enabled.", true);
   mPlayInstantlyBtn->setChecked(bPlayInstant);
 
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, !bPlayInstant);
@@ -31,19 +54,17 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget *parent)
   mStopBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/STOP_VIDEO"}, tr("stop"), "Stop playing and move position to time 0.");
   mSeekBackwardBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/SEEK_BACKWARD"}, tr("seek backward 10s"));
   mSeekForwardBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/SEEK_FORWARD"}, tr("seek forward 10s"));
-  mProgressSlider = new ClickableSlider{Qt::Orientation::Horizontal, this};
+  mProgressSlider = new (std::nothrow) ClickableSlider{Qt::Orientation::Horizontal, this};
   mProgressSlider->setRange(0, 0);
   mProgressSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  mCurrentTimeLabel = new QLabel{"00:00:00", this};
-  mDurationLabel = new QLabel{"00:00:00", this};
 
   mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
   mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   mBasicModeBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"}, tr("basic mode"), "", true);
   mBasicModeBtn->setChecked(bBasicMode);
-  auto* pFullScreenTemp = DualIconCheckableAction::CreateFullSceenAction(this, false);
-  mFullScreenBtn = mFunctionCtrlBar->createToolButton(pFullScreenTemp);
+  mFullScreenAct = DualIconCheckableAction::CreateFullSceenAction(this, false);
+  mFullScreenBtn = mFunctionCtrlBar->createToolButton(mFullScreenAct);
 
   mFunctionCtrlBar->addWidget(mPlayInstantlyBtn);
   mFunctionCtrlBar->addSeparator();
@@ -55,55 +76,60 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget *parent)
   mFunctionCtrlBar->addWidget(mSeekForwardBtn);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addWidget(mProgressSlider, 10);
-  mFunctionCtrlBar->addWidget(mCurrentTimeLabel);
+  mCurrentTimeLabel = mFunctionCtrlBar->addString("00:00:00");
   mFunctionCtrlBar->addString("/");
-  mFunctionCtrlBar->addWidget(mDurationLabel);
+  mDurationLabel = mFunctionCtrlBar->addString("00:00:00");
   mFunctionCtrlBar->addWidget(mVolumeWid, 2);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addWidget(mBasicModeBtn);
   mFunctionCtrlBar->addWidget(mFullScreenBtn);
 
-  mVideoWidget = new QVideoWidget{this};
-  mPauseShieldButton = new QToolButton{this};
-  mPauseShieldButton->setDefaultAction(mPauseAct);
-  mPauseShieldButton->setMinimumSize(64, 64);
-  mPauseShieldButton->setAutoRaise(true);
-  mPauseShieldButton->raise();
-
-  mLeftLayout = new QVBoxLayout{this};
-  mLeftLayout->addWidget(mVideoWidget);
-  // mLeftLayout->addWidget(mFunctionCtrlBar);
-  mLeftLayout->setContentsMargins(0, 0, 0, 0);
-
-  mPlayer = new QMediaPlayer;
+  mPlayer = new (std::nothrow) QMediaPlayer{this};        // never swap these 2 lines, must desctruct first
+  mVideoWidget = new (std::nothrow) MyVideoWidget{this};  // never swap these 2 lines, must desctruct behind player
   mPlayer->setVolume(mVolumeWid->volumeVal());
   mPlayer->setMuted(mVolumeWid->isMuted());
   mPlayer->setVideoOutput(mVideoWidget);
 
+  mPauseShieldButton = new (std::nothrow) QToolButton{this};
+  mPauseShieldButton->setObjectName("VideoPlayerPauseShieldButton");
+  mPauseShieldButton->setDefaultAction(mPauseAct);
+  mPauseShieldButton->setMinimumSize(64, 64);
+  mPauseShieldButton->setAutoRaise(true);
+
+  mLeftLayout = new (std::nothrow) QVBoxLayout{this};
+  mLeftLayout->addWidget(mVideoWidget);
+  mLeftLayout->addWidget(mFunctionCtrlBar);
+  mLeftLayout->setContentsMargins(0, 0, 0, 0);
+
   subscribe();
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"});
   setWindowTitle("Basic Video Player");
-  mFunctionCtrlBar->move(0, 0);
-  mFunctionCtrlBar->raise();
+  QTimer::singleShot(0, this, [this]() { movePauseBtnToCenter(); });
 }
 
 BasicVideoView::~BasicVideoView() {
+  Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, mPlayInstantlyBtn->isChecked());
   StopPlay();
-  if (mPlayer != nullptr) {
-    Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, mPlayInstantlyBtn->isChecked());
 
-    mPlayer->disconnect();
-    mPlayer->setVideoOutput((QVideoWidget *) nullptr);
-  }
+  // if (mPlayer) {
+  //   StopPlay();
+  //   mPlayer->disconnect();
+  //   delete mPlayer;
+  //   mPlayer = nullptr;
+  // }
+  // if (mVideoWidget) {
+  //   delete mVideoWidget;
+  //   mVideoWidget = nullptr;
+  // }
 }
 
 void BasicVideoView::subscribe() {
   connect(mPauseAct, &QAction::toggled, this, &BasicVideoView::onPauseActionToggled);
   connect(mStopBtn, &QToolButton::triggered, this, &BasicVideoView::onStopPlaying);
-  connect(mSeekBackwardBtn, &QToolButton::triggered, this, [this]() { // -10 second
-    mPlayer->setPosition(std::max((qint64) 0, mPlayer->position() - 10 * 1000));
+  connect(mSeekBackwardBtn, &QToolButton::triggered, this, [this]() {  // -10 second
+    mPlayer->setPosition(std::max((qint64)0, mPlayer->position() - 10 * 1000));
   });
-  connect(mSeekForwardBtn, &QToolButton::triggered, this, [this]() { // +10 second
+  connect(mSeekForwardBtn, &QToolButton::triggered, this, [this]() {  // +10 second
     mPlayer->setPosition(std::min(mPlayer->duration(), mPlayer->position() + 10 * 1000));
   });
 
@@ -118,28 +144,36 @@ void BasicVideoView::subscribe() {
   connect(mVolumeWid, &VolumeWidget::onMutedChanged, mPlayer, &QMediaPlayer::setMuted);
   connect(mVolumeWid, &VolumeWidget::onVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
 
-  connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, [](QMediaPlayer::Error error) {
-    LOG_E("Player error:%d", error);
-  });
+  connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
+          [](QMediaPlayer::Error error) { LOG_E("Player error:%d", error); });
 
-  connect(mPlayer, &QMediaPlayer::audioAvailableChanged, this, [this](bool available) {
-    LOG_D("Audio available: %d, volume:%d", available, mPlayer->volume());
-  });
+  connect(mPlayer, &QMediaPlayer::audioAvailableChanged, this,
+          [this](bool available) { LOG_D("Audio available: %d, volume:%d", available, mPlayer->volume()); });
 
   connect(mPlayer, &QMediaPlayer::stateChanged, this, &BasicVideoView::onMediaPlayStateChanged);
   connect(mSelectVideoFileBtn, &QToolButton::triggered, this, &BasicVideoView::onSelectAFile);
-  connect(mFullScreenBtn, &QToolButton::toggled, this, &BasicVideoView::reqFullscreenModeChange);
+  connect(mFullScreenAct, &QAction::toggled, this, &BasicVideoView::reqFullscreenModeChange);
   connect(mBasicModeBtn, &QToolButton::toggled, this, &BasicVideoView::reqFunctionModeChange);
 
-  mVideoWidget->installEventFilter(this);
+  connect(mVideoWidget, &MyVideoWidget::reqPausePlayStatusToggle, this, [this]() {
+    const bool bNewPause = !mPauseAct->isChecked();
+    mPauseAct->setChecked(bNewPause);
+  });
+  connect(GetVideoWidget(), &MyVideoWidget::reqToolBarVisibilityChange, mFunctionCtrlBar, &ToolBarWidget::setVisible);
 }
 
-bool BasicVideoView::PlayAVideo(const QString &filePath, bool forcePlayInstantly) {
+bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly) {
+  if (!bPauseButtonCenterInit) {
+    bPauseButtonCenterInit = true;
+    movePauseBtnToCenter();
+  }
   if (!QFile::exists(filePath)) {
     return false;
   }
   mPlayer->setMedia(QUrl::fromLocalFile(filePath));
+  mCurrentPlayingMediaPath = filePath;
   if (isAutoPlay() || forcePlayInstantly) {
+    mPauseAct->setChecked(false);
     mPlayer->play();
   } else {
     mPauseAct->setChecked(true);
@@ -149,7 +183,9 @@ bool BasicVideoView::PlayAVideo(const QString &filePath, bool forcePlayInstantly
 
 void BasicVideoView::StopPlay() {
   if (mPlayer != nullptr) {
-    mPlayer->stop();
+    if (mPlayer->state() != QMediaPlayer::StoppedState) {
+      mPlayer->stop();
+    }
   }
 }
 
@@ -180,24 +216,24 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
 
 void BasicVideoView::onMediaPlayStateChanged(QMediaPlayer::State state) {
   if (state == QMediaPlayer::PausedState) {
-    movePauseBtnToCenter();
-    mPauseShieldButton->show();
+    mPauseShieldButton->raise();
+    mPauseShieldButton->setVisible(true);
   } else {
-    mPauseShieldButton->hide();
+    mPauseShieldButton->lower();
+    mPauseShieldButton->setVisible(false);
   }
 }
 
 bool BasicVideoView::onSelectAFile() {
-  QString defaultOpenPathLocatedIn
-      = Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+  QString defaultOpenPathLocatedIn =
+      Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
     defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
   }
   static const QString filterStr = "Video Files (" + TYPE_FILTER::VIDEO_TYPE_SET.join(" ") + ")";
   QString fileSelected = QFileDialog::getOpenFileName(this,
-                                                      "Select a video file", //
-                                                      defaultOpenPathLocatedIn,
-                                                      filterStr);
+                                                      "Select a video file",  //
+                                                      defaultOpenPathLocatedIn, filterStr);
   if (fileSelected.isEmpty()) {
     return false;
   }
@@ -205,28 +241,16 @@ bool BasicVideoView::onSelectAFile() {
   return PlayAVideo(fileSelected, true);
 }
 
-bool BasicVideoView::eventFilter(QObject *watched, QEvent *event) {
-  if (watched == mVideoWidget && event->type() == QEvent::MouseButtonPress) {
-    const auto *mouseEvent = static_cast<QMouseEvent *>(event);
-    if (mouseEvent->button() == Qt::LeftButton) {
-      const bool bNewPause = !mPauseAct->isChecked();
-      mPauseAct->setChecked(bNewPause);
-      emit mPauseAct->toggled(bNewPause);
-      return true;
-    }
-  }
-  return QObject::eventFilter(watched, event);
-}
-
-void BasicVideoView::keyPressEvent(QKeyEvent *event) {
+void BasicVideoView::keyPressEvent(QKeyEvent* event) {
   if (event->key() == Qt::Key::Key_Space) {
     const bool bNewPause = !mPauseAct->isChecked();
     mPauseAct->setChecked(bNewPause);
     event->setAccepted(true);
     return;
   } else if (event->key() == Qt::Key::Key_Escape) {
-    if (mFullScreenBtn->isChecked()) {
-      mFullScreenBtn->setChecked(false);
+    if (mFullScreenAct->isChecked()) {
+      mFullScreenAct->setChecked(false);
+      emit mFullScreenAct->toggled(false);
       event->setAccepted(true);
       return;
     }
@@ -234,16 +258,42 @@ void BasicVideoView::keyPressEvent(QKeyEvent *event) {
   QWidget::keyPressEvent(event);
 }
 
-void BasicVideoView::resizeEvent(QResizeEvent *e) {
-  if (mPauseShieldButton == nullptr) {
-    return;
-  }
+void BasicVideoView::resizeEvent(QResizeEvent* e) {
   if (mPauseShieldButton->isVisible()) {
     movePauseBtnToCenter();
   }
 }
 
 void BasicVideoView::movePauseBtnToCenter() {
-  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2, //
-                     mVideoWidget->height() / 2 - mPauseShieldButton->height() / 2);
+  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2,  //
+                           mVideoWidget->height() / 2 - mPauseShieldButton->height() / 2);
 }
+
+/*
+ * in ubuntu system when you try to play a .vob file, it may say
+Warning: "No decoder available for type 'video/mpeg, systemstream=(boolean)true, mpegversion=(int)2'."
+Error: "Your GStreamer installation is missing a plug-in."
+
+检查版本
+$ gst-launch-1.0 --version
+gst-launch-1.0 version 1.16.3
+GStreamer 1.16.3
+https://launchpad.net/distros/ubuntu/+source/gstreamer1.0
+
+检查如下的插件: 没有时会报错 No such element or plugin 'mpeg2dec'
+$ gst-inspect-1.0 mpeg2dec
+$ gst-inspect-1.0 mpegpsdemux
+
+# 启用仓库
+sudo add-apt-repository multiverse
+# 需要安装如下内容
+sudo apt install gstreamer1.0-plugins-ugly
+sudo apt install gstreamer1.0-plugins-bad
+sudo apt install gstreamer1.0-libav
+
+sudo apt install libdvd-pkg
+sudo dpkg-reconfigure libdvd-pkg
+sudo apt install vlc-plugin-notify
+
+sudo apt install ubuntu-restricted-extras
+ */

@@ -3,13 +3,14 @@
 #include "PathTool.h"
 #include "MemoryKey.h"
 #include "Logger.h"
+#include "NotificatorMacro.h"
 
-DetailPreview::DetailPreview(QWidget* parent)
-  : QSplitter{parent} {
+DetailPreview::DetailPreview(QWidget* parent) : QSplitter{parent} {
   setOrientation(Qt::Orientation::Vertical);
 
   mDetailTextBrowser = new (std::nothrow) ClickableTextBrowser{this};
   mBasicVideoView = new (std::nothrow) BasicVideoView{true, this};
+
   mBasicVideoView->setVisible(false);
   addWidget(mDetailTextBrowser);
   addWidget(mBasicVideoView);
@@ -20,9 +21,10 @@ DetailPreview::DetailPreview(QWidget* parent)
 }
 
 DetailPreview::~DetailPreview() {
-  if (mBasicVideoView->parent() != nullptr) { // only save when mBasicVideoView is this instead of out
+  if (mBasicVideoView->parent() != nullptr) {  // only save when mBasicVideoView is this instead of out
     Configuration().setValue("DETAIL_PREVIEW_SPLITTER_STATE", saveState());
   }
+  CleanTempFullScreenWindow();
 }
 
 QSize DetailPreview::iconSize() const {
@@ -75,24 +77,33 @@ void DetailPreview::onReqFullscreenModeChange(bool bFullScreen) {
   if (mBasicVideoView == nullptr) {
     return;
   }
-  LOG_E("req, %d", bFullScreen);
-  // 最大化
   if (bFullScreen) {
-    if (mBasicVideoView->parent() == nullptr) {
-      return;
-    }
+    mBeforeFullScreenState = saveState();
+    mVideoViewOriginalIndex = indexOf(mBasicVideoView);
+
+    mFullScreenWindow = new (std::nothrow) QWidget;
+    QVBoxLayout* layout = new (std::nothrow) QVBoxLayout{mFullScreenWindow};
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(mBasicVideoView);
+    mFullScreenWindow->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    mFullScreenWindow->setWindowTitle(QString{"[%s] Playing ..."}.arg(mBasicVideoView->GetCurrentPlayingMediaPath()));
+    mFullScreenWindow->showFullScreen();
+    return;
+  }
+
+  if (mFullScreenWindow != nullptr) {
     mBasicVideoView->setParent(nullptr);
-    mBasicVideoView->setAttribute(Qt::WA_DeleteOnClose);
-    mBasicVideoView->setWindowFlags(Qt::Window);
-    mBasicVideoView->showFullScreen();
-    return;
+    insertWidget(mVideoViewOriginalIndex, mBasicVideoView);
+    restoreState(mBeforeFullScreenState);
+
+    CleanTempFullScreenWindow();
   }
-  // 正常大小
-  if (mBasicVideoView->parent() != nullptr) {
-    return;
+}
+
+void DetailPreview::CleanTempFullScreenWindow() {
+  if (mFullScreenWindow != nullptr) {
+    mFullScreenWindow->close();
+    delete mFullScreenWindow;
+    mFullScreenWindow = nullptr;
   }
-  mBasicVideoView->setParent(this);
-  mBasicVideoView->setAttribute(Qt::WA_DeleteOnClose, false);
-  mBasicVideoView->setWindowFlags(Qt::Widget);
-  mBasicVideoView->showNormal();
 }

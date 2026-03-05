@@ -15,6 +15,7 @@ public:
   void operator()(const QString& pth); // file system view
   void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 
+  void StopPlay();
   void UpdateImgs(const QString& name, const QStringList& imgPthLst);
   void UpdateVids(const QStringList& vidsLst);
   void UpdateOthers(const QStringList& dataLst);
@@ -32,6 +33,9 @@ public:
     mTypeToDisplayTB->move(width() - mTypeToDisplayTB->width() - marginX, height() - mTypeToDisplayTB->height() - marginY);
     mTypeToDisplayTB->raise();
   }
+
+  void onReqFullscreenModeChange(bool bFullScreen);
+
 protected:
   void resizeEvent(QResizeEvent *event) override {
     QWidget::resizeEvent(event);
@@ -69,6 +73,11 @@ private:
       (int)PREVIEW_ITEM_TYPE::VID,  //
       (int)PREVIEW_ITEM_TYPE::OTH   //
   };
+
+  void CleanTempFullScreenWindow();
+  QWidget* mFullScreenWindow{nullptr};
+  QByteArray mBeforeFullScreenState;
+  int mVideoViewOriginalIndex{0};
 };
 
 #endif

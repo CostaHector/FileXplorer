@@ -8,25 +8,59 @@
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Relative path", "Size", "Duration", "Rate"};
 
-int VideoTableModel::setPlayPath(const QString& folderPath) {
+int VideoTableModel::setPlayPath(const QString& folderPath, VideoFindMode findMode) {
   if (mPlayPath == folderPath) {
     LOG_D("skip, path[%s] unchange", qPrintable(mPlayPath));
     return 0;
   }
   mPlayPath = folderPath;
-  const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = mPlayPath.size();
+  using namespace PathTool;
+
+  QList<QFileInfo> mediaFileInfoLst;
+  mediaFileInfoLst.reserve(8);
+  if (findMode == VideoFindMode::INCLUDING_SUBDIRECTORY) {
+    QDirIterator it{folderPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+    while (it.hasNext()) {
+      it.next();
+      mediaFileInfoLst.push_back(it.fileInfo());
+    }
+  } else {
+    static const auto GetDirectMediaFileInfo = [](const QString& path, bool bSkipIfSpecial) -> QList<QFileInfo> {
+      QList<QFileInfo> fiInfoLst;
+      QDir dir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
+      dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+      for (const QFileInfo& fi: dir.entryInfoList()) {
+        if (bSkipIfSpecial && fi.size() < 10 * 1024 * 1024) {
+          continue;
+        }
+        fiInfoLst.push_back(fi);
+      }
+      return fiInfoLst;
+    };
+
+    static const QStringList specialFolders{"VIDEO_TS", "videos", "vids"}; // < 10MiB
+    for (const QString& specialFolderName: specialFolders) {
+      const QString& specialPath = PathTool::join(folderPath, specialFolderName);
+      if (!QFile::exists(specialPath)) {
+        continue;
+      }
+      mediaFileInfoLst += GetDirectMediaFileInfo(specialPath, true);
+    }
+    mediaFileInfoLst += GetDirectMediaFileInfo(folderPath, false);
+  }
 
   QList<VideoBasicInfo> videosList;
+  videosList.reserve(mediaFileInfoLst.size());
   QString rel2searchItem;
   QString fileName;
-  using namespace PathTool;
-  QDirIterator it{folderPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  while (it.hasNext()) {
-    const QFileInfo fi{it.next()};
+
+  const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = mPlayPath.size();
+  for (const QFileInfo& fi: mediaFileInfoLst) {
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
   }
+
   // C:/A/B/C
   // C:/A   file
   std::sort(videosList.begin(), videosList.end());

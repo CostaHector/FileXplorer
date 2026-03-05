@@ -20,7 +20,7 @@ bool isDotExtVideo(const QString& dotExt) {
     }
     return initHashSet;
   }()};
-  return vidDotExtHashSet.contains(dotExt);
+  return vidDotExtHashSet.contains(dotExt.toLower());
 }
 bool isDotExtImage(const QString& dotExt) {
   static const DOT_EXT_HASH_SET imgDotExtHashSet{[]() -> DOT_EXT_HASH_SET {
@@ -30,7 +30,7 @@ bool isDotExtImage(const QString& dotExt) {
     }
     return initHashSet;
   }()};
-  return imgDotExtHashSet.contains(dotExt);
+  return imgDotExtHashSet.contains(dotExt.toLower());
 }
 
 bool isDotExtCompressed(const QString& dotExt) {
@@ -41,7 +41,7 @@ bool isDotExtCompressed(const QString& dotExt) {
     }
     return initHashSet;
   }()};
-  return compressedDotExtHashSet.contains(dotExt);
+  return compressedDotExtHashSet.contains(dotExt.toLower());
 }
 
 } // namespace TYPE_FILTER

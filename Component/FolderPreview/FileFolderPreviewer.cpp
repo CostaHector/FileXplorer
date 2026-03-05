@@ -40,10 +40,19 @@ void FileFolderPreviewer::SaveSettings() {
   Configuration().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
 }
 
+void FileFolderPreviewer::StopVideoPlay() {
+  if (mDetailsPane) {
+    mDetailsPane->StopPlay();
+  }
+  if (mImgVidOtherPane) {
+    mImgVidOtherPane->StopPlay();
+  }
+}
+
 void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost) {
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
   mDetailsPane->setHtml("");
-  mDetailsPane->StopPlay();
+  StopVideoPlay();
   if (record.isEmpty()) {
     return;
   }
@@ -60,7 +69,7 @@ void FileFolderPreviewer::operator()(const QString& pth) { // file system view
   if (!NeedUpdate(pth)) {
     return;
   }
-  mDetailsPane->StopPlay();
+  StopVideoPlay();
   mLastName = pth;
   setWindowTitle(mLastName);
   if (QFileInfo{pth}.isFile()) { // a file
@@ -79,7 +88,7 @@ void FileFolderPreviewer::operator()(const QString& name,
   if (!NeedUpdate(name)) {
     return;
   }
-  mDetailsPane->StopPlay();
+  StopVideoPlay();
   mLastName = name;
   setWindowTitle(mLastName);
   BeforeDisplayAFolder();

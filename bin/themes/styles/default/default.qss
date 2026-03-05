@@ -174,12 +174,10 @@ QScrollBar::add-page, QScrollBar::sub-page {
 QToolBar {
     border: 1px solid #FFFFFF;
 }
-
 QToolBar QToolBar {
     margin: 0px;
     border: 0px;
 }
-
 QToolBar QComboBox {
     margin: 0px;
     border: 0px;
@@ -299,6 +297,11 @@ QToolButton::menu-indicator {
 }
 QToolButton::menu-arrow {
 
+}
+
+#VideoPlayerPauseShieldButton {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
 }
 
 QComboBox {

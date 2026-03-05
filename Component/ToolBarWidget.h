@@ -5,6 +5,7 @@
 #include <QToolButton>
 #include <QBoxLayout>
 #include <QAction>
+#include <QLabel>
 #include <unordered_set>
 
 class ToolBarWidget : public QWidget {
@@ -13,10 +14,11 @@ public:
   void setDirection(QBoxLayout::Direction direction);
   int setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool bRecursive = false);
   void addWidget(QWidget *parent, int stretch = 0);
+  bool addAction(QAction* act);
   void addSpacing(int size = 1);
   void addStretch(int stretch = 0);
-  void addString(const QString &sep = "|");
-  void addSeparator();
+  QLabel* addString(const QString &sep = "|");
+  QFrame* addSeparator();
 
   QToolButton *createToolButton(const QIcon &icon,
                                 const QString &text,

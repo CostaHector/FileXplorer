@@ -14,15 +14,18 @@ VideoTableView::VideoTableView(QWidget* parent)
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
   InitTableView();
+  verticalHeader()->setVisible(false);
 
-  connect(this, &QTableView::doubleClicked, this, &VideoTableView::ReqPlay);
+  connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex &proIndex) {
+    ReqPlay(proIndex, true);
+  });
 }
 
 int VideoTableView::setPlayPath(const QString& path) {
   const int mediasCnt = mVideoModel->setPlayPath(path);
   if (mediasCnt > 0) {
     selectRow(0);
-    ReqPlay(currentIndex());
+    ReqPlay(currentIndex(), false);
   }
   return mediasCnt;
 }
@@ -31,7 +34,7 @@ int VideoTableView::setMediaFiles(const QString& folderPath, const QStringList& 
   const int mediasCnt = mVideoModel->setPlayMedias(folderPath, mediaFiles);
   if (mediasCnt > 0) {
     selectRow(0);
-    ReqPlay(currentIndex());
+    ReqPlay(currentIndex(), false);
   }
   return mediasCnt;
 }
@@ -96,7 +99,7 @@ void VideoTableView::PlayPreviousVideo() {
   }
   LOG_OK_P("select", "previous: %d", proIndex.row());
   selectRow(proIndex.row());
-  ReqPlay(proIndex);
+  ReqPlay(proIndex, true);
 }
 
 void VideoTableView::PlayNextVideo() {
@@ -107,12 +110,11 @@ void VideoTableView::PlayNextVideo() {
   }
   LOG_OK_P("select", "next: %d", proIndex.row());
   selectRow(proIndex.row());
-  ReqPlay(proIndex);
+  ReqPlay(proIndex, true);
 }
 
-void VideoTableView::ReqPlay(const QModelIndex& proIndex) {
+void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   const QModelIndex srcIndex = mProxyModel->mapToSource(proIndex);
   const QString mediaPath = mVideoModel->mediaPath(srcIndex);
-  LOG_OK_NP("Req Play", mediaPath);
-  emit reqPlayMedia(QUrl::fromLocalFile(mediaPath));
+  emit reqPlayMedia(mediaPath, bPlayInstantly);
 }

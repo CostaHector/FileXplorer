@@ -9,15 +9,17 @@ struct VideoBasicInfo {
   qint64 fileSize;
   int duration;
   short rate;
-  bool operator<(const VideoBasicInfo& rhs) const {
-    return relPath < rhs.relPath || (relPath == rhs.relPath && fileName < rhs.fileName);
-  }
+  bool operator<(const VideoBasicInfo& rhs) const { return relPath < rhs.relPath || (relPath == rhs.relPath && fileName < rhs.fileName); }
 };
 
 class VideoTableModel : public QAbstractTableModelPub {
-public:
+ public:
+  enum class VideoFindMode {
+    NORMAL = 0,                  // direct files and special folder, too small files in special folder will be ignored
+    INCLUDING_SUBDIRECTORY = 1,  // all files
+  };
   using QAbstractTableModelPub::QAbstractTableModelPub;
-  int setPlayPath(const QString& folderPath);
+  int setPlayPath(const QString& folderPath, VideoFindMode findMode = VideoFindMode::NORMAL);
   int setPlayMedias(const QString& folderPath, const QStringList& mediaFiles);
   QString mediaPath(const QModelIndex& ind) const;
 
@@ -43,10 +45,10 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& /*index*/) const override { return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable; }
 
-private:
+ private:
   QList<VideoBasicInfo> mVideosInfo;
   QString mPlayPath;
   static const QStringList VIDEO_VERTICAL_HEAD;
 };
 
-#endif // VIDEOTABLEMODEL_H
+#endif  // VIDEOTABLEMODEL_H

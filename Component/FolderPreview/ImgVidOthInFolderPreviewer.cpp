@@ -3,6 +3,7 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include <QDir>
+#include <QTimer>
 
 constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
@@ -67,11 +68,12 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   mLo->setContentsMargins(0, 0, 0, 0);
 
   subscribe();
-  AdjustButtonPosition();
+  QTimer::singleShot(0, this, [this]() { AdjustButtonPosition(); });
 }
 
 ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {
   SaveState();
+  CleanTempFullScreenWindow();
 }
 
 void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system view
@@ -108,6 +110,12 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& name,
   }
 }
 
+void ImgVidOthInFolderPreviewer::StopPlay() {
+  if (mVidTv) {
+    mVidTv->StopPlay();
+  }
+}
+
 void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
   if (!NeedUpdateImgs()) {
     return;
@@ -121,6 +129,7 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   if (!NeedUpdateVids()) {
     return;
   }
+  mVidTv->StopPlay();
   CHECK_NULLPTR_RETURN_VOID(mVidTv)
   mVidTv->PlayVideos("", vidsLst);
 }
@@ -146,13 +155,16 @@ bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
 }
 
 void ImgVidOthInFolderPreviewer::SaveState() {
-  Configuration().setValue("FLOATING_PREVIEW_STATE", mImgVidOtherSplitter->saveState());
+  if (mVidTv->parent() != nullptr) {
+    Configuration().setValue("FLOATING_PREVIEW_STATE", mImgVidOtherSplitter->saveState());
+  }
 }
 
 void ImgVidOthInFolderPreviewer::subscribe() {
   connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &ImgVidOthInFolderPreviewer::onReorder);
   connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &ImgVidOthInFolderPreviewer::onImgVidOthActTriggered);
   connect(mImgVidOtherSplitter, &QSplitter::splitterMoved, this, &ImgVidOthInFolderPreviewer::SaveState);
+  connect(mVidTv->GetBasicVideoView(), &BasicVideoView::reqFullscreenModeChange, this, &ImgVidOthInFolderPreviewer::onReqFullscreenModeChange);
 }
 
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
@@ -213,5 +225,40 @@ void ImgVidOthInFolderPreviewer::onImgVidOthActTriggered(const QAction* pAct) {
     onOthBtnClicked(checked);
   } else {
     LOG_W("Action[%s] not supported", qPrintable(pAct->text()));
+  }
+}
+
+void ImgVidOthInFolderPreviewer::onReqFullscreenModeChange(bool bFullScreen) {
+  if (mVidTv == nullptr) {
+    return;
+  }
+  if (bFullScreen) {
+    mBeforeFullScreenState = mImgVidOtherSplitter->saveState();
+    mVideoViewOriginalIndex = mImgVidOtherSplitter->indexOf(mVidTv);
+
+    mFullScreenWindow = new (std::nothrow) QWidget;
+    QVBoxLayout* layout = new (std::nothrow) QVBoxLayout{mFullScreenWindow};
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(mVidTv);
+    mFullScreenWindow->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    mFullScreenWindow->setWindowTitle(QString{"[%s] Playing ..."}.arg(mVidTv->GetCurrentPlayingMediaPath()));
+    mFullScreenWindow->showFullScreen();
+    return;
+  }
+
+  if (mFullScreenWindow != nullptr) {
+    mVidTv->setParent(nullptr);
+    mImgVidOtherSplitter->insertWidget(mVideoViewOriginalIndex, mVidTv);
+    mImgVidOtherSplitter->restoreState(mBeforeFullScreenState);
+
+    CleanTempFullScreenWindow();
+  }
+}
+
+void ImgVidOthInFolderPreviewer::CleanTempFullScreenWindow() {
+  if (mFullScreenWindow != nullptr) {
+    mFullScreenWindow->close();
+    delete mFullScreenWindow;
+    mFullScreenWindow = nullptr;
   }
 }

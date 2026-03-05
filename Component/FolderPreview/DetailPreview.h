@@ -6,7 +6,7 @@
 #include <QSplitter>
 
 class DetailPreview : public QSplitter {
-public:
+ public:
   explicit DetailPreview(QWidget* parent = nullptr);
   virtual ~DetailPreview();
   QSize iconSize() const;
@@ -18,9 +18,17 @@ public:
   void UpdateWhenSelectAFile(const QString& pth);
 
   void onReqFullscreenModeChange(bool bFullScreen);
-private:
+
+ private:
   ClickableTextBrowser* mDetailTextBrowser{nullptr};
   BasicVideoView* mBasicVideoView{nullptr};
+  QWidget* rmReplacer{nullptr};
+  Qt::WindowFlags beforeFlags;
+
+  void CleanTempFullScreenWindow();
+  QWidget* mFullScreenWindow{nullptr};
+  QByteArray mBeforeFullScreenState;
+  int mVideoViewOriginalIndex{0};
 };
 
-#endif // DETAILPREVIEW_H
+#endif  // DETAILPREVIEW_H

@@ -15,6 +15,7 @@ public:
   void ReadSettings();
   void SaveSettings();
 
+  void StopVideoPlay();
   void operator()(const QSqlRecord& record, const QString& imgHost);  // cast view
   void operator()(const QString& pth);                                // file system view
   void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
