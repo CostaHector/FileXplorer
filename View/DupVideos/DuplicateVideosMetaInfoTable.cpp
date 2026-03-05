@@ -4,7 +4,7 @@
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 
 #include <QItemSelectionModel>
 #include <QFileDialog>

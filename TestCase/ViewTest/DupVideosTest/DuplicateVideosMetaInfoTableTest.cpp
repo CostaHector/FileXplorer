@@ -9,7 +9,7 @@
 #include "DuplicateVideosFinderActions.h"
 #include "VideoTestPrecoditionTools.h"
 #include "PublicVariable.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "PublicMacro.h"
 #include "TDir.h"

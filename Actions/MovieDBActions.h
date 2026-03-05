@@ -11,6 +11,7 @@ class MovieDBActions : public QObject {
   explicit MovieDBActions(QObject* parent = nullptr);
 
   QAction* SUBMIT{nullptr};
+  QAction* _MODEL_REPOPULATE{nullptr};
   QAction* REVERT{nullptr};
   QAction* INIT_A_DATABASE{nullptr};
   QAction* INIT_A_TABLE{nullptr};

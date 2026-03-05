@@ -1,35 +1,36 @@
 #include <QCoreApplication>
 #include <QtTest>
-#include "OnScopeExit.h"
+
 #include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "CommandsPreview.h"
 #include "EndToExposePrivateMember.h"
-#include <QClipboard>
+#include "FileTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class CommandsPreviewTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
   void copyTextAction_ok() {
-    QClipboard* clipboard = QApplication::clipboard();
-    QVERIFY(clipboard != nullptr);
-    const QString beforeContentsInClipboard = clipboard->text();
-    ON_SCOPE_EXIT{
-      clipboard->setText(beforeContentsInClipboard);
-    };
+    const QString contentsInBrowser{"This is a test text"};
+    MOCKER(FileTool::CopyTextToSystemClipboard) //
+        .expects(exactly(1))
+        .with(eq(contentsInBrowser)) //
+        .will(returnValue(true));    //
 
     CommandsPreview preview("TestPreview CopyText");
-    const QString contentsInBrowser {"This is a test text"};
     preview.setPlainText(contentsInBrowser);
-
     QVERIFY(preview.COPY_TEXT != nullptr);
     emit preview.COPY_TEXT->triggered();
-
-    const QString afterCopyActionTextInClipboard = clipboard->text();
-#ifndef _WIN32
-    QCOMPARE(afterCopyActionTextInClipboard, contentsInBrowser);  // clipboard is extremely unreliable in windows
-#endif
   }
 
   void testStayOnTopAction() {

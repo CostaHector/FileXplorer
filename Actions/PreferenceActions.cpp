@@ -97,6 +97,7 @@ bool PreferenceActions::onSetStylesheet(const QAction* pStyleSheetAct) {
     qssFile.close();
   }
   qApp->setStyleSheet(theme2QssContent[(int)stylesheetEnum]);
+  StyleSheet::setGlobalDarkMode(stylesheetEnum == StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
   LOG_D("Style Changed to %s", qPrintable(pStyleSheetAct->text()));
   return true;
 }

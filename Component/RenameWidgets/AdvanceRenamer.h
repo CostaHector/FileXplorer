@@ -2,19 +2,13 @@
 #define ADVANCERENAMER_H
 
 #include <QCheckBox>
-#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QScrollBar>
-#include <QSet>
-#include <QToolBar>
 #include <QVBoxLayout>
-#include <QWidget>
+#include <QPlainTextEdit>
+#include <QTextBrowser>
+#include <QToolBar>
 #include "StateLabel.h"
 #include "MultiCursorEditor.h"
 
@@ -76,7 +70,7 @@ protected:
   QPlainTextEdit* m_nExtTE{nullptr};
 
 private:
-  QPlainTextEdit* m_commandsPreview{nullptr};
+  QTextBrowser* m_commandsPreview{nullptr};
   QDialogButtonBox* m_buttonBox{nullptr};
 
   QToolBar* m_controlBar{nullptr};

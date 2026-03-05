@@ -21,7 +21,7 @@ class CSVInputDialogTest : public PlainTestSuite {
     QVERIFY(dialog.mainLayout != nullptr);
 
     // 验证文本编辑框
-    QCOMPARE(dialog.textEdit->placeholderText(), "Enter your text here...");
+    QCOMPARE(dialog.textEdit->placeholderText(), "Enter your text here or drag encrypt csv file here...");
 
     // 验证按钮
     QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Ok) != nullptr);

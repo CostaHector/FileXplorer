@@ -51,6 +51,7 @@ void MovieDBView::subscribe() {
   auto& inst = g_dbAct();
   // control actions
   connect(inst.SUBMIT, &QAction::triggered, this, &MovieDBView::onSubmit);
+  connect(inst._MODEL_REPOPULATE, &QAction::triggered, _dbModel, &FdBasedDbModel::repopulate);
   connect(inst.REVERT, &QAction::triggered, this, &MovieDBView::onRevert);
   connect(inst.INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
   connect(inst.INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
@@ -155,8 +156,8 @@ bool MovieDBView::onInsertIntoTable() {
   if (!GetAPathFromUserSelect("and load videos into", selectPath)) {
     return false;
   }
-
-  const QString confirmInsertIntoMsg{QString{"%1/* ----->---- Table: %2"}.arg(selectPath).arg(_movieDbSearchBar->GetCurrentTableName())};
+  const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
+  const QString confirmInsertIntoMsg{hintTemplate.arg(selectPath, _movieDbSearchBar->GetCurrentTableName())};
   QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
   if (cfmInsertIntoBtn != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("User cancel insert", selectPath);
@@ -276,8 +277,9 @@ int MovieDBView::onDeleteFromTable() {
   using namespace MOVIE_TABLE;
   const QString& tbl = _movieDbSearchBar->GetCurrentTableName();
   static const QString RELATION_TEMPLATE{R"("%1" = )"};
-  static const QStringList candidates{
-      "",
+  static const QStringList candidates {
+      "1=1",//
+      "",//
       RELATION_TEMPLATE.arg(ENUM_2_STR(PrePathLeft)),   //
       RELATION_TEMPLATE.arg(ENUM_2_STR(PrePathRight)),  //
       RELATION_TEMPLATE.arg(ENUM_2_STR(Name)),          //

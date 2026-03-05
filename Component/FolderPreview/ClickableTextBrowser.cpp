@@ -8,7 +8,7 @@
 #include "JsonRenameRegex.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "TableFields.h"
 #include "StringTool.h"
 #include "StyleSheet.h"
@@ -68,7 +68,7 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   connect(inst.ADD_SELECTIONS_2_CAST_TABLE, &QAction::triggered, this, &ClickableTextBrowser::onAppendMultiSelectionToCastDbReq);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
-  AdjustButtonPosition();
+  QTimer::singleShot(0, this, [this]() { AdjustButtonPosition(); });
 }
 
 ClickableTextBrowser::~ClickableTextBrowser() {

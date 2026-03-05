@@ -2,7 +2,7 @@
 #define FILEFOLDERPREVIEWER_H
 
 #include "ImgVidOthInFolderPreviewer.h"
-#include "ClickableTextBrowser.h"
+#include "DetailPreview.h"
 #include <QStackedWidget>
 #include <QSqlRecord>
 
@@ -15,6 +15,7 @@ public:
   void ReadSettings();
   void SaveSettings();
 
+  void StopVideoPlay();
   void operator()(const QSqlRecord& record, const QString& imgHost);  // cast view
   void operator()(const QString& pth);                                // file system view
   void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
@@ -56,7 +57,7 @@ private:
   QString mLastName;
   PANE_TYPE m_curIndex{PANE_TYPE::DETAIL};
 
-  ClickableTextBrowser* mDetailsPane{nullptr};
+  DetailPreview* mDetailsPane{nullptr};
   ImgVidOthInFolderPreviewer* mImgVidOtherPane{nullptr};
 };
 

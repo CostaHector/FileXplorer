@@ -35,6 +35,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   int UpdateDuration(const QModelIndexList& rowIndexes);
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
+  int SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed=true);
 
   bool AfterJsonFileNameRenamed(const QModelIndex& ind, const QString& newJsonBaseName);
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);

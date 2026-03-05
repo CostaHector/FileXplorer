@@ -1,6 +1,6 @@
 ﻿#include "TDir.h"
 #include "PathTool.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "Logger.h"
 #include <QTextStream>
 #include <QDirIterator>

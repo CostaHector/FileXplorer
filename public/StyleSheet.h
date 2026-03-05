@@ -1,6 +1,5 @@
 ﻿#ifndef STYLESHEET_H
 #define STYLESHEET_H
-#include "PublicMacro.h"
 #include <QString>
 #include <QRect>
 #include <QSize>

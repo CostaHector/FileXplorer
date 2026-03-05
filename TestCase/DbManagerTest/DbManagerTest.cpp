@@ -10,7 +10,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include "DbManagerHelper.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "MountHelper.h"
 #include "MountPathTableNameMapperMock.h"

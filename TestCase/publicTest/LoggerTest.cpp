@@ -4,7 +4,7 @@
 #include "TDir.h"
 #include "PublicVariable.h"
 #include "PlainTestSuite.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "FileToolMock.h"
 #include "OnScopeExit.h"
 #include "BeginToExposePrivateMember.h"

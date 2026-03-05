@@ -77,6 +77,7 @@ JsonActions::JsonActions(QObject* parent) //
   _INFER_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint") //
                                        .arg(_INFER_CAST_STUDIO->text())
                                        .arg(_INFER_CAST_STUDIO->shortcut().toString()));
+
   _FORMAT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":img/FORMAT_PAINTER"), tr("Format Cast/Studio"), this);
   _FORMAT_STUDIO_CAST_FIELD->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMAT_STUDIO_CAST_FIELD->setShortcutVisibleInContextMenu(true);
@@ -84,6 +85,12 @@ JsonActions::JsonActions(QObject* parent) //
                                  "e.g., A,B -> A, B.")
                              .arg(_FORMAT_STUDIO_CAST_FIELD->text())
                              .arg(_FORMAT_STUDIO_CAST_FIELD->shortcut().toString()));
+
+  _SET_CONTENTS_FIXED = new (std::nothrow) QAction(QIcon(":img/SAVED"), tr("Mark Contents Fixed"), this);
+  _SET_CONTENTS_FIXED->setToolTip(QString("<b>%1 (%2)</b><br/> Mark selection record(s) fixed and will no longer changed when request hint on studio/cast field") //
+                                      .arg(_SET_CONTENTS_FIXED->text())
+                                      .arg(_SET_CONTENTS_FIXED->shortcut().toString()));
+
   _UPDATE_DURATION_FIELD = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, tr("Update duration"), this};
   _UPDATE_DURATION_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the duration information from video file and write into json file")
                                          .arg(_UPDATE_DURATION_FIELD->text())

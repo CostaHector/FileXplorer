@@ -69,6 +69,15 @@ int JsonTableView::ReadADirectory(const QString& path) {
   return _JsonModel->setRootPath(path);
 }
 
+int JsonTableView::onFixSelectionRecordContents() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("[skip] nothing selected", "skip fix json record");
+    return 0;
+  }
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::ContentFixed);
+  return _JsonModel->SetRecordContentsFixed(indexes, true);
+}
+
 int JsonTableView::onSaveCurrentChanges() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
@@ -507,6 +516,9 @@ void JsonTableView::subscribe() {
 
   connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
+
+  connect(inst._SET_CONTENTS_FIXED, &QAction::triggered, this, &JsonTableView::onFixSelectionRecordContents);
+
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
 }
 

@@ -1,6 +1,6 @@
 ﻿#include "RibbonJson.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "StyleSheet.h"
 #include "PublicVariable.h"
 #include "JsonActions.h"
@@ -36,9 +36,10 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   CHECK_NULLPTR_RETURN_VOID(mInitFormatStudioCastField);
   mInitFormatStudioCastField->addAction(inst._INIT_STUDIO_CAST_FIELD);
   mInitFormatStudioCastField->addAction(inst._FORMAT_STUDIO_CAST_FIELD);
+  mInitFormatStudioCastField->addAction(inst._SET_CONTENTS_FIXED);
   mInitFormatStudioCastField->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mInitFormatStudioCastField->setOrientation(Qt::Orientation::Vertical);
-  mInitFormatStudioCastField->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  mInitFormatStudioCastField->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   mInitFormatStudioCastField->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mInitFormatStudioCastField->layout(), Qt::AlignmentFlag::AlignLeft);
 

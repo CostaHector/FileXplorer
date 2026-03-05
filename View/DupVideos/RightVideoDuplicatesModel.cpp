@@ -73,7 +73,7 @@ auto RightVideoDuplicatesModel::headerData(int section, Qt::Orientation orientat
   return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-bool RightVideoDuplicatesModel::SyncFrom(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
+bool RightVideoDuplicatesModel::SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
   CHECK_NULLPTR_RETURN_FALSE(_groupedVidsListArr);
   CHECK_NULLPTR_RETURN_FALSE(_currentDiffer);
   _pGroupedVidsList = _groupedVidsListArr;

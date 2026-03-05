@@ -7,7 +7,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "AddressELineEdit.h"
 #include "EndToExposePrivateMember.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "ViewHelper.h"
 #include <QMimeData>
 #include <QUrl>

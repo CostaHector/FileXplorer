@@ -8,7 +8,7 @@
 #include "TorrentsManagerWidget.h"
 #include "ConfigsTable.h"
 #include "Archiver.h"
-#include "LoginQryWidget.h"
+#include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
 #include "MemoryKey.h"
 #include "Logger.h"
@@ -22,7 +22,7 @@ template class PopupWidgetManager<RedundantImageFinder>;
 template class PopupWidgetManager<TorrentsManagerWidget>;
 template class PopupWidgetManager<ConfigsTable>;
 template class PopupWidgetManager<Archiver>;
-template class PopupWidgetManager<LoginQryWidget>;
+template class PopupWidgetManager<PasswordBook>;
 template class PopupWidgetManager<ResourceMonitorPanel>;
 
 template<typename WidgetType>
@@ -57,7 +57,7 @@ PopupWidgetManager<WidgetType>::~PopupWidgetManager() {
 template<typename WidgetType>
 void PopupWidgetManager<WidgetType>::onActionToggled(bool checked) {
   if (!checked) {
-    if (m_widget != nullptr && m_widget->isVisible()) {
+    if (m_widget != nullptr && !m_widget->isHidden()) {
       m_widget->hide();
     }
     return;
@@ -82,6 +82,16 @@ bool PopupWidgetManager<WidgetType>::eventFilter(QObject* watched, QEvent* event
     }
     if (m_onCloseCallback != nullptr) {
       m_onCloseCallback();
+    }
+    event->accept();
+    return true;
+  }
+  if (watched == m_widget && event->type() == QEvent::Show) {
+    if (m_action->isCheckable()) {
+      m_action->setChecked(true);
+    }
+    if (m_onShowCallback != nullptr) {
+      m_onShowCallback();
     }
     event->accept();
     return true;

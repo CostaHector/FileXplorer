@@ -1,5 +1,5 @@
 #include "AutoRollbackFileContentModify.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "Logger.h"
 
 AutoRollbackFileContentModify::AutoRollbackFileContentModify(const QString& absFilePath, const QString& replaceeStr, const QString& replacerStr)

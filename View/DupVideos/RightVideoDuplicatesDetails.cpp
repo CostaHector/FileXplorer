@@ -2,7 +2,7 @@
 #include "FileOperatorPub.h"
 #include "DuplicateVideosFinderActions.h"
 #include "PublicMacro.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
 #include <QFile>
@@ -55,7 +55,7 @@ bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGrouped
                                                   DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType) {
   CHECK_NULLPTR_RETURN_FALSE(pGroupedVidsList);
   CHECK_NULLPTR_RETURN_FALSE(pCurDifferType);
-  return m_detailsModel->SyncFrom(pGroupedVidsList, pCurDifferType);
+  return m_detailsModel->SetSharedMemberSrc(pGroupedVidsList, pCurDifferType);
 }
 
 bool RightVideoDuplicatesDetails::onRecycleSelection() {

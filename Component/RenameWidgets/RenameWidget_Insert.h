@@ -1,6 +1,7 @@
 #ifndef RENAMEWIDGET_INSERT_H
 #define RENAMEWIDGET_INSERT_H
 #include "AdvanceRenamer.h"
+#include <QComboBox>
 
 class RenameWidget_Insert : public AdvanceRenamer {
  public:

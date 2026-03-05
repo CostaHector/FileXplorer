@@ -14,6 +14,12 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
   SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));
 
+  _MODEL_REPOPULATE = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), tr("Repopulate"), this};
+  CHECK_NULLPTR_RETURN_VOID(_MODEL_REPOPULATE);
+  _MODEL_REPOPULATE->setShortcutVisibleInContextMenu(true);
+  _MODEL_REPOPULATE->setToolTip(QString{"<b>%1 (%2)</b><br/>Repopulates the model with data from the table via setTable"}.arg(
+      _MODEL_REPOPULATE->text(), _MODEL_REPOPULATE->shortcut().toString()));
+
   REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), tr("Revert"), this);
   CHECK_NULLPTR_RETURN_VOID(REVERT);
 
@@ -39,7 +45,12 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
 
   UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), tr("Union Into"), this);
   CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
-  UNION_TABLE->setToolTip("REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;");
+  UNION_TABLE->setToolTip(
+      "Merge data from T1 and T2 into MOVIES table: "
+      "Conflicting rows (by PRIMARY/UNIQUE key) will be replaced, "
+      "non-conflicting existing rows in MOVIES are preserved. "
+      "\nSQL: REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;"
+      );
 
   AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), tr("Audit This Table"), this);
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
@@ -48,6 +59,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
   DB_CONTROL_ACTIONS->addAction(SUBMIT);
+  DB_CONTROL_ACTIONS->addAction(_MODEL_REPOPULATE);
   DB_CONTROL_ACTIONS->addAction(REVERT);
   DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(INSERT_A_PATH);

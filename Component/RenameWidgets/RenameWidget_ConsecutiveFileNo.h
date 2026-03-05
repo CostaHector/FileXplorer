@@ -2,6 +2,7 @@
 #define RENAMEWIDGET_CONSECUTIVEFILENO_H
 
 #include "AdvanceRenamer.h"
+#include <QLineEdit>
 
 class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
  public:

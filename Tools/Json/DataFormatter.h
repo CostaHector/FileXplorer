@@ -21,12 +21,15 @@ bool writeQString(QString& dst, const QVariant& src);
 bool writeInt(int& dst, const QVariant& src);
 bool writeFloat(float& dst, const QVariant& src);
 bool writeDouble(double& dst, const QVariant& src);
+
 QString initQString(const QJsonObject& json, const QString& key, const QString& defaultValue);
 QString initStudioQString(const QJsonObject& json, const QString& key, const QString& defaultValue);
 int initInt(const QJsonObject& json, const QString& key, const int& defaultValue);
+bool initBool(const QJsonObject& json, const QString& key, const bool& defaultValue);
 QStringList initQStringLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
 SortedUniqStrLst initSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
 SortedUniqStrLst initCastSortedLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue);
+
 void writeJsonObjectInt(QJsonObject& json, const QString& key, const int& val);
 void writeJsonObjectFloat(QJsonObject& json, const QString& key, const float& val);
 void writeJsonObjectDouble(QJsonObject& json, const QString& key, const double& val);

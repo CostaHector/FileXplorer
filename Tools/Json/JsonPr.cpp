@@ -5,7 +5,7 @@
 #include "StudiosManager.h"
 #include "NameTool.h"
 #include "JsonHelper.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PublicVariable.h"
 #include <QFile>
 #include <QDir>

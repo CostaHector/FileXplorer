@@ -9,7 +9,7 @@
 #include "ViewTypeTool.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 
 #include <QRegularExpression>
 #include <QCache>

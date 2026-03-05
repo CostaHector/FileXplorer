@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg 
+   viewBox="0 0 600 600"
+   version="1.1"
+   id="svg9724"
+   sodipodi:docname="stop.svg"
+   inkscape:version="1.2.2 (1:1.2.2+202212051550+b0a8486541)"
+   width="600"
+   height="600"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9728" />
+  <sodipodi:namedview
+     id="namedview9726"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="0.84118632"
+     inkscape:cx="17.23756"
+     inkscape:cy="385.76471"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="0"
+     inkscape:window-y="1080"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g10449"
+     showguides="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid9972"
+       originx="0"
+       originy="0" />
+    <sodipodi:guide
+       position="-260,300"
+       orientation="0,-1"
+       id="guide383"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="200,470"
+       orientation="1,0"
+       id="guide385"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="240,520"
+       orientation="0,-1"
+       id="guide939"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="220,80"
+       orientation="0,-1"
+       id="guide941"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  
+  <g
+     id="g10449"
+     transform="matrix(0.95173205,0,0,0.95115787,13.901174,12.168794)"
+     style="stroke-width:1.05103">
+    <g
+       id="path10026"
+       inkscape:transform-center-x="-0.59233046"
+       inkscape:transform-center-y="-20.347403"
+       transform="matrix(1.3807551,0,0,1.2700888,273.60014,263.99768)" />
+    <g
+       id="g11314"
+       transform="matrix(1.5092301,0,0,1.3955555,36.774048,-9.4503933)"
+       style="stroke-width:50.6951" />
+    <path
+       style="color:#000000;fill:#000000;stroke-linecap:round;stroke-linejoin:round;-inkscape-stroke:none;paint-order:stroke fill markers"
+       d="m 132.50586,-12.792969 c -80.786912,0 -147.111329,66.38096 -147.111329,147.175779 v 336.45703 c 0,80.79483 66.324417,147.17578 147.111329,147.17578 h 336.20508 c 80.78691,0 147.11328,-66.38095 147.11328,-147.17578 V 134.38281 c 0,-80.794819 -66.32637,-147.175779 -147.11328,-147.175779 z"
+       id="rect1334"
+       sodipodi:nodetypes="sssssssss" />
+  </g>
+</svg>

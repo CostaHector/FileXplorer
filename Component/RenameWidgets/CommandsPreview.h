@@ -1,11 +1,11 @@
 ﻿#ifndef COMMANDSPREVIEW_H
 #define COMMANDSPREVIEW_H
 
-#include <QPlainTextEdit>
+#include <QTextBrowser>
 #include <QToolBar>
 #include <QAction>
 
-class CommandsPreview : public QPlainTextEdit {
+class CommandsPreview : public QTextBrowser {
 public:
   explicit CommandsPreview(const QString& name, QWidget *parent = nullptr);
   void subscribe();

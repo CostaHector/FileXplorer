@@ -4,6 +4,7 @@
 #include "StyleSheet.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
+#include "PublicMacro.h"
 #include <QToolBar>
 
 Archiver::Archiver(QWidget* parent) : QMainWindow{parent} {

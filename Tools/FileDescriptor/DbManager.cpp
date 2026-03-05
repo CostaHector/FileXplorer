@@ -1,6 +1,6 @@
 #include "DbManager.h"
 #include "MountHelper.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "Logger.h"
 
 #include <QSet>

@@ -24,7 +24,8 @@ namespace JsonKey {
   JSON_KEY_ITEM(Duration, 11, (int)0, (int)0, /*               */ DataFormatter::formatDurationISO, DataFormatter::writeInt, DataFormatter::initInt, DataFormatter::writeJsonObjectInt) \
   JSON_KEY_ITEM(ImgName, 12, QStringList{}, QStringList{}, /*  */ DataFormatter::formatQStringLst, DataFormatter::writeQStringLst, DataFormatter::initQStringLst, DataFormatter::writeJsonObjectQStringLst)   \
   JSON_KEY_ITEM(VidName, 13, QString{}, QString{}, /*          */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
-  JSON_KEY_ITEM(Detail, 14, QString{}, QString{}, /*           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
+  JSON_KEY_ITEM(ContentFixed, 14, false, false, /*             */ DataFormatter::formatBool, DataFormatter::writeBool, DataFormatter::initBool, DataFormatter::writeJsonObjectBool) \
+  JSON_KEY_ITEM(Detail, 15, QString{}, QString{}, /*           */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
 
 // Key, enum like Name=0, Cast=1, ...,
 enum JSON_KEY_E {

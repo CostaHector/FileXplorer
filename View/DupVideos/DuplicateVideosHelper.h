@@ -7,7 +7,7 @@
 #define DUP_VIDEO_META_INFO_KEY_MAPPING \
   DUP_VIDEO_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \
   DUP_VIDEO_META_INFO_KEY_ITEM(Size, 1, qint64, DataFormatter::formatFileSizeGMKB) \
-  DUP_VIDEO_META_INFO_KEY_ITEM(Duration, 2, int, DataFormatter::formatDateIsoMs) \
+  DUP_VIDEO_META_INFO_KEY_ITEM(Duration, 2, int, DataFormatter::formatDurationISOMs) \
   DUP_VIDEO_META_INFO_KEY_ITEM(ModifiedDate, 3, qint64, DataFormatter::formatDateIso) \
   DUP_VIDEO_META_INFO_KEY_ITEM(AbsPath, 4, QString, DataFormatter::formatDefault) \
   DUP_VIDEO_META_INFO_KEY_ITEM(Hash, 5, QString, DataFormatter::formatDefault) \

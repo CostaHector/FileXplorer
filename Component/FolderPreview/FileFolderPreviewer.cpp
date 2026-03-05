@@ -7,9 +7,8 @@
 #include <QFileInfo>
 
 FileFolderPreviewer::FileFolderPreviewer(const QString& memoryName, QWidget* parent)
-  : QStackedWidget{parent}
-{
-  mDetailsPane = new (std::nothrow) ClickableTextBrowser{this};
+  : QStackedWidget{parent} {
+  mDetailsPane = new (std::nothrow) DetailPreview{this};
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
 
   mImgVidOtherPane = new (std::nothrow) ImgVidOthInFolderPreviewer{memoryName, this};
@@ -17,8 +16,8 @@ FileFolderPreviewer::FileFolderPreviewer(const QString& memoryName, QWidget* par
 
   addWidget(mDetailsPane);
   addWidget(mImgVidOtherPane);
-  if (currentIndex() != (int)m_curIndex) {
-    setCurrentIndex((int)m_curIndex);
+  if (currentIndex() != (int) m_curIndex) {
+    setCurrentIndex((int) m_curIndex);
   }
 
   ReadSettings();
@@ -41,9 +40,19 @@ void FileFolderPreviewer::SaveSettings() {
   Configuration().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
 }
 
+void FileFolderPreviewer::StopVideoPlay() {
+  if (mDetailsPane) {
+    mDetailsPane->StopPlay();
+  }
+  if (mImgVidOtherPane) {
+    mImgVidOtherPane->StopPlay();
+  }
+}
+
 void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& imgHost) {
   CHECK_NULLPTR_RETURN_VOID(mDetailsPane)
   mDetailsPane->setHtml("");
+  StopVideoPlay();
   if (record.isEmpty()) {
     return;
   }
@@ -56,32 +65,32 @@ void FileFolderPreviewer::operator()(const QSqlRecord& record, const QString& im
   mDetailsPane->UpdateHtmlContents();
 }
 
-void FileFolderPreviewer::operator()(const QString& pth) {  // file system view
+void FileFolderPreviewer::operator()(const QString& pth) { // file system view
   if (!NeedUpdate(pth)) {
     return;
   }
-
+  StopVideoPlay();
   mLastName = pth;
   setWindowTitle(mLastName);
-  if (QFileInfo{pth}.isFile()) {  // a file
+  if (QFileInfo{pth}.isFile()) { // a file
     BeforeDisplayAFileDetail();
-    QSize ICON_SIZE = mDetailsPane->iconSize();
-    const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth, ICON_SIZE);
-    mDetailsPane->setHtml("");
-    mDetailsPane->setHtml(detailHtmls);
+    mDetailsPane->UpdateWhenSelectAFile(pth);
     return;
   }
   BeforeDisplayAFolder();
   mImgVidOtherPane->operator()(pth);
 }
 
-void FileFolderPreviewer::operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst) {  // scene view
+void FileFolderPreviewer::operator()(const QString& name,
+                                     const QString& jsonAbsFilePath,
+                                     const QStringList& imgPthLst,
+                                     const QStringList& vidsLst) { // scene view
   if (!NeedUpdate(name)) {
     return;
   }
+  StopVideoPlay();
   mLastName = name;
   setWindowTitle(mLastName);
   BeforeDisplayAFolder();
   mImgVidOtherPane->operator()(name, jsonAbsFilePath, imgPthLst, vidsLst);
 }
-

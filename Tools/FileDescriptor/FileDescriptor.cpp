@@ -1,5 +1,4 @@
 #include "FileDescriptor.h"
-#include "Logger.h"
 #include "MD5Calculator.h"
 #include "BytesRangeTool.h"
 

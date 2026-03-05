@@ -5,7 +5,6 @@
 #include "DataFormatter.h"
 #include "CastManager.h"
 #include "PathTool.h"
-#include "VideoDurationGetter.h"
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
@@ -25,6 +24,15 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
       JSON_MODEL_FIELD_MAPPING    //
 #undef JSON_KEY_ITEM              //
           default : return {};
+    }
+  } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
+    if (item.m_ContentFixed) {
+      static const QPixmap CONTENTS_FIXED_IMG{[](){
+        QPixmap pixmap{":/img/SAVED"};
+        QPixmap pixmap32 = pixmap.scaledToHeight(32);
+        return pixmap32;
+      }()};
+      return CONTENTS_FIXED_IMG;
     }
   } else if (role == Qt::ForegroundRole) {
     switch (col) {
@@ -210,6 +218,9 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
+    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+      continue;
+    }
     if (mCachedJsons[row].m_Studio == studio) {
       continue;
     }
@@ -250,6 +261,9 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
+    }
+    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+      continue;
     }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == newLst) {
@@ -299,6 +313,9 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
+    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+      continue;
+    }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == appendContainer) {
       continue;
@@ -346,6 +363,9 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
+    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+      continue;
+    }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (!targetField.remove(oneElement)) {
       continue;
@@ -382,6 +402,9 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affecteRows;
+    }
+    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+      continue;
     }
     if (!mCachedJsons[row].ConstructCastStudioValue()) {
       continue;
@@ -427,6 +450,9 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const Q
       return studioCnt;
     }
     auto& item = mCachedJsons[row];
+    if (item.m_ContentFixed) { // will not be influenced
+      continue;
+    }
     item.HintForCastStudio(sentence, studioChanged, castChanged);
     if (!studioChanged && !castChanged) {
       continue;
@@ -715,4 +741,39 @@ int JsonTableModel::AppendCastFromSentence(const QModelIndex& ind, const QString
   emit headerDataChanged(Qt::Vertical, row, row);
   LOG_D("%d cast increased by selected sentence[%s]", afterCastCnt - beforeCastCnt, qPrintable(sentence));
   return afterCastCnt - beforeCastCnt;
+}
+
+int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed) {
+  int affectedRows{0};
+  int row{-1};
+  int minRow{INT_MAX}, maxRow{-1};
+  for (const QModelIndex& ind : rowIndexes) {
+    row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range [0,%d)", row, rowCount());
+      return affectedRows;
+    }
+    if (mCachedJsons[row].m_ContentFixed == bFixed) {
+      continue;
+    }
+    ++affectedRows;
+    mCachedJsons[row].m_ContentFixed = bFixed;
+    setModifiedNoEmit(row);
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    LOG_W("ContentFixed Field of %d row(s) NO change at all", rowIndexes.size());
+    return 0;
+  }
+  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::ContentFixed, {});
+  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::ContentFixed, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole, Qt::DecorationRole});
+  emit headerDataChanged(Qt::Vertical, minRow, maxRow);
+  LOG_D("ContentFixed Field of %d/%d row(s) range [%d, %d) changed to bool[%d]", affectedRows, rowIndexes.size(), minRow, maxRow, bFixed);
+  return affectedRows;
 }

@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "PlainTestSuite.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "TDir.h"
 #include "PublicVariable.h"
 #include "OnScopeExit.h"

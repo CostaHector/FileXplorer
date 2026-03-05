@@ -7,7 +7,7 @@
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 

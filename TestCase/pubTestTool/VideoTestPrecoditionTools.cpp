@@ -1,6 +1,6 @@
 #include "VideoTestPrecoditionTools.h"
 #include "VidDupTabFields.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include <QProcess>
 #include <QBuffer>
 #include <QDebug>

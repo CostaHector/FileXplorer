@@ -18,7 +18,7 @@ class RightVideoDuplicatesModel : public QAbstractTableModelPub {
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
 
-  bool SyncFrom(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer);
+  bool SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer);
 
   int onChangeDetailIndex(int newLeftSelectedRow);
   void onInvalidateLeftSelection();

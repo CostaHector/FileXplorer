@@ -1,5 +1,5 @@
-﻿#ifndef PUBLICTOOL_H
-#define PUBLICTOOL_H
+#ifndef FILETOOL_H
+#define FILETOOL_H
 
 #include <QActionGroup>
 #include <QLayout>
@@ -29,4 +29,4 @@ QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGrou
 
 bool LoadCNLanguagePack(QTranslator& translator, QString qmName="");
 bool CreateUserPath();
-#endif  // PUBLICTOOL_H
+#endif  // FILETOOL_H

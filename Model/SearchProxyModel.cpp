@@ -1,7 +1,7 @@
 ﻿#include "SearchProxyModel.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
-#include "PublicTool.h"
+#include "FileTool.h"
 #include "PathTool.h"
 
 void SearchProxyModel::setSearchMode(SearchTools::SearchModeE newSearchMode) {

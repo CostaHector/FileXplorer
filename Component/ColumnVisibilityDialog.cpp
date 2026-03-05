@@ -36,13 +36,9 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers, const
   mSelectToolButton->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
   mSelectToolButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 
-  buttons = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-  CHECK_NULLPTR_RETURN_VOID(buttons)
-
   m_layout = new (std::nothrow) QFormLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_layout)
-  m_layout->addWidget(mSelectToolButton);
-
+  m_layout->addRow(mSelectToolButton);
   m_layout->addRow("ID", new QLabel{"Column Name", this});
   m_checkboxes.reserve(headers.size());
   for (int i = 0; i < headers.size(); ++i) {
@@ -52,6 +48,9 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers, const
     m_checkboxes.append(checkbox);
     m_layout->addRow(QString::number(i), checkbox);
   }
+
+  buttons = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+  CHECK_NULLPTR_RETURN_VOID(buttons)
   m_layout->addWidget(buttons);
 
   connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -61,7 +60,6 @@ ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers, const
   connect(mInvertSelect, &QAction::triggered, this, &ColumnVisibilityDialog::toggleAllCheckboxes);
   connect(mRevertChange, &QAction::triggered, this, [this, initSwitches]() { revertCheckboxes(initSwitches); });
 
-  setMinimumWidth(400);
   setWindowIcon(QIcon(":img/COLUMN_VISIBILITY"));
   setWindowTitle(QString{"Column Visibility[%1]"}.arg(name));
 }

@@ -59,6 +59,10 @@ int initInt(const QJsonObject& json, const QString& key, const int& defaultValue
   return json.value(key).toInt(defaultValue);
 }
 
+bool initBool(const QJsonObject& json, const QString& key, const bool& defaultValue) {
+  return json.value(key).toBool(defaultValue);
+}
+
 QStringList initQStringLst(const QJsonObject& json, const QString& key, const QStringList& defaultValue) {
   auto it = json.constFind(key);
   return it == json.constEnd() ? defaultValue : it->toVariant().toStringList();
@@ -207,9 +211,9 @@ QString formatBool(bool value) {  //
 bool writeBool(bool& dst, const QVariant& src) {  //
   QString srcStr{src.toString().toLower()};
   bool srcValue{false};
-  if (srcStr == "true") {
+  if (srcStr == "true" || srcStr == "1") {
     srcValue = true;
-  } else if (srcStr == "false") {
+  } else if (srcStr == "false" || srcStr == "0") {
     srcValue = false;
   }
   if (dst == srcValue) {

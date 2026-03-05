@@ -1,9 +1,9 @@
 ﻿#include "StyleSheet.h"
-#include "MemoryKey.h"
 #include "PreferenceActions.h"
+#include "PublicMacro.h"
 #include <QApplication>
 #include <QWidget>
-#include <QVBoxLayout>
+#include <QLayout>
 
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {
@@ -25,6 +25,7 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
   // 19: DWMWA_USE_IMMERSIVE_DARK_MODE_OLD <- Windows 10 Build 18368.418（19H1）
   // 20: DWMWA_USE_IMMERSIVE_DARK_MODE
   DwmSetWindowAttribute(hwnd, 19 /*DWMWA_USE_IMMERSIVE_DARK_MODE*/, &darkMode, sizeof(darkMode));
+  SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
 void setGlobalDarkMode(bool enable) {
