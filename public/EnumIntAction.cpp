@@ -10,6 +10,7 @@
 #include "ScenePageNaviHelper.h"
 #include <QHeaderView>
 #include <QCryptographicHash>
+#include <QMediaPlaylist>
 
 template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 template struct EnumIntAction<ViewTypeTool::ViewType>;
@@ -25,3 +26,4 @@ template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 template struct EnumIntAction<Qt::TextElideMode>;
 template struct EnumIntAction<QHeaderView::ResizeMode>;
 template struct EnumIntAction<Qt::ScrollBarPolicy>;
+template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;

@@ -5,6 +5,7 @@
 #include "FloatingModels.h"
 #include "ReorderableToolBar.h"
 #include "WidgetReorderHelper.h"
+#include "VideoView.h"
 #include <QVBoxLayout>
 
 class ImgVidOthInFolderPreviewer: public QWidget {
@@ -52,9 +53,9 @@ private:
   bool onReorder(int fromIndex, int destIndex);
 
   ImgsModel* mImgModel{nullptr};
-  VidsModel* mVidsModel{nullptr};
   OthersModel* mOthModel{nullptr};
-  ItemView *mImgTv{nullptr}, *mVidTv{nullptr}, *mOthTv{nullptr};
+  ItemView *mImgTv{nullptr}, *mOthTv{nullptr};
+  VideoView *mVidTv{nullptr};
   QAction *_IMG_ACT{nullptr}, *_VID_ACT{nullptr}, *_OTH_ACT{nullptr};
   bool m_bImgVisible{true}, m_bVidVisible{true}, m_bOthVisible{true};
   ReorderableToolBar* mTypeToDisplayTB{nullptr};

@@ -19,12 +19,12 @@ class HarModel : public QAbstractTableModelPub {
 
   int setRootPath(const QString& harFileAbsPath);
 
-  auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return mHarParser.size(); }
-  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return HAR_VERTICAL_HEAD.size(); }
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mHarParser.size(); }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return HAR_VERTICAL_HEAD.size(); }
 
-  auto data(const QModelIndex& index, int role = Qt::DisplayRole) const -> QVariant override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-  auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override {
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override {
     if (role == Qt::TextAlignmentRole) {
       if (orientation == Qt::Vertical) {
         return Qt::AlignRight;

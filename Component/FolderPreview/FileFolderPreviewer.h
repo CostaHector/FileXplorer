@@ -2,7 +2,7 @@
 #define FILEFOLDERPREVIEWER_H
 
 #include "ImgVidOthInFolderPreviewer.h"
-#include "ClickableTextBrowser.h"
+#include "DetailPreview.h"
 #include <QStackedWidget>
 #include <QSqlRecord>
 
@@ -56,7 +56,7 @@ private:
   QString mLastName;
   PANE_TYPE m_curIndex{PANE_TYPE::DETAIL};
 
-  ClickableTextBrowser* mDetailsPane{nullptr};
+  DetailPreview* mDetailsPane{nullptr};
   ImgVidOthInFolderPreviewer* mImgVidOtherPane{nullptr};
 };
 

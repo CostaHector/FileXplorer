@@ -80,7 +80,7 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system
     _IMG_ACT->setText(QString::number(imgCnt));
   }
   if (NeedUpdateVids()) {
-    const int vidCnt = mVidsModel->setDirPath(pth, TYPE_FILTER::VIDEO_TYPE_SET, true);
+    const int vidCnt = mVidTv->PlayAPath(pth);
     _VID_ACT->setText(QString::number(vidCnt));
   }
   if (NeedUpdateOthers()) {
@@ -121,8 +121,8 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
   if (!NeedUpdateVids()) {
     return;
   }
-  CHECK_NULLPTR_RETURN_VOID(mVidsModel)
-  mVidsModel->UpdateData(vidsLst);
+  CHECK_NULLPTR_RETURN_VOID(mVidTv)
+  mVidTv->PlayVideos("", vidsLst);
 }
 
 void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
@@ -178,11 +178,8 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
 void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
   m_bVidVisible = checked;
   if (mVidTv == nullptr) {
-    mVidsModel = new (std::nothrow) VidsModel;
-    CHECK_NULLPTR_RETURN_VOID(mVidsModel)
-    mVidTv = new (std::nothrow) ItemView{mMemoryName + "_VIDEO", this};
+    mVidTv = new (std::nothrow) VideoView{false, this};
     CHECK_NULLPTR_RETURN_VOID(mVidTv)
-    mVidTv->SetCurrentModel(mVidsModel);
     mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     mImgVidOtherSplitter->addWidget(mVidTv);
   }
