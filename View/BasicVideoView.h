@@ -15,10 +15,13 @@
 #include "ToolBarWidget.h"
 #include <QTimer>
 
-class MyVideoWidget : public QVideoWidget {
+class PausableVideoWidget : public QVideoWidget {
   Q_OBJECT
  public:
-  explicit MyVideoWidget(QWidget* parent = nullptr);
+  explicit PausableVideoWidget(QWidget* parent = nullptr);
+  void onIntoFullScreenMode();
+  void onQuitFullScreenMode();
+
  signals:
   void reqPausePlayStatusToggle();
   void reqToolBarVisibilityChange(bool bVisible);
@@ -29,7 +32,7 @@ class MyVideoWidget : public QVideoWidget {
  private:
   void onTimerTimeout();
   QTimer mLongTimeNoClickTimer;
-  static constexpr int TIMER_INTERVAL = 20 * 1000;
+  static constexpr int TIMER_INTERVAL = 10 * 1000;
 };
 
 class BasicVideoView : public QWidget {
@@ -42,9 +45,11 @@ class BasicVideoView : public QWidget {
 
   bool PlayAVideo(const QString& filePath, bool forcePlayInstantly = false);
   bool isAutoPlay() const { return mPlayInstantlyBtn != nullptr && mPlayInstantlyBtn->isChecked(); }
+  bool isFullScreen() const {return mFullScreenAct!= nullptr && mFullScreenAct->isChecked(); }
   void StopPlay();
   QString GetCurrentPlayingMediaPath() const { return mCurrentPlayingMediaPath; }
-  const MyVideoWidget* GetVideoWidget() const { return mVideoWidget; }
+  const PausableVideoWidget* GetVideoWidget() const { return mVideoWidget; }
+  void onChangeToolBarVisibility(bool visibility);
 
  signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -56,8 +61,9 @@ class BasicVideoView : public QWidget {
   QMediaPlayer* GetPlayer() { return mPlayer; }
   const QMediaPlayer* GetPlayer() const { return mPlayer; }
 
- private:
+ private:  
   void subscribe();
+  void emitFullScreenModeReq(bool bFullScreen);
   void durationChanged(qint64 duration);
   void onPlaying(qint64 position);
   void onStopPlaying();
@@ -67,7 +73,7 @@ class BasicVideoView : public QWidget {
   void movePauseBtnToCenter();
 
   QMediaPlayer* mPlayer{nullptr};
-  MyVideoWidget* mVideoWidget{nullptr};  // 播放显示框
+  PausableVideoWidget* mVideoWidget{nullptr};  // 播放显示框
 
   ToolBarWidget* mFunctionCtrlBar{nullptr};                           // 功能控制条
   QToolButton* mPlayInstantlyBtn{nullptr};                            // 是否自动播放

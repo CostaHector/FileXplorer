@@ -17,7 +17,8 @@
 constexpr QMediaPlaylist::PlaybackMode VideoView::DEFAULT_PLAYBACK_MODE;
 constexpr int VideoView::SOURCE_INDEX_COLUMN;
 
-VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientation::Horizontal, parent} {
+VideoView::VideoView(bool bBasicMode, QWidget* parent)
+  : QSplitter{Qt::Orientation::Horizontal, parent} {
   mBasicVideoView = new (std::nothrow) BasicVideoView{false, this};
 
   mSelectVideoFolder = new (std::nothrow) QAction{QIcon{":/VideoPlayer/OPEN_A_FOLDER"}, tr("select a folder"), this};
@@ -36,10 +37,11 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
   mShowVideoList->setCheckable(true);
   mShowVideoList->setChecked(true);
 
-  mPlaybackMode_CurrentItemOnce = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_ONCE"}, tr("current item once"), this};
+  mPlaybackMode_CurrentItemOnce = new (std::nothrow)
+      QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_ONCE"}, tr("current item once"), this};
   mPlaybackMode_CurrentItemOnce->setCheckable(true);
-  mPlaybackMode_CurrentItemInLoop =
-      new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP"}, tr("current item in loop"), this};
+  mPlaybackMode_CurrentItemInLoop = new (std::nothrow)
+      QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP"}, tr("current item in loop"), this};
   mPlaybackMode_CurrentItemInLoop->setCheckable(true);
   mPlaybackMode_Sequential = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_SEQUENTIAL"}, tr("sequential"), this};
   mPlaybackMode_Sequential->setCheckable(true);
@@ -48,17 +50,20 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
   mPlaybackMode_Random = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_RANDOM"}, tr("random"), this};
   mPlaybackMode_Random->setCheckable(true);
 
-  mPlaybackIntAction.init({{mPlaybackMode_CurrentItemOnce, QMediaPlaylist::PlaybackMode::CurrentItemOnce},      //
-                           {mPlaybackMode_CurrentItemInLoop, QMediaPlaylist::PlaybackMode::CurrentItemInLoop},  //
+  mPlaybackIntAction.init({{mPlaybackMode_CurrentItemOnce, QMediaPlaylist::PlaybackMode::CurrentItemOnce},     //
+                           {mPlaybackMode_CurrentItemInLoop, QMediaPlaylist::PlaybackMode::CurrentItemInLoop}, //
                            {mPlaybackMode_Sequential, QMediaPlaylist::PlaybackMode::Sequential},
                            {mPlaybackMode_Loop, QMediaPlaylist::PlaybackMode::Loop},
                            {mPlaybackMode_Random, QMediaPlaylist::PlaybackMode::Random}},
-                          DEFAULT_PLAYBACK_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  const int playbackModeInt = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name, MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.v).toInt();
+                          DEFAULT_PLAYBACK_MODE,
+                          QActionGroup::ExclusionPolicy::Exclusive);
+  const int playbackModeInt
+      = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name, MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.v).toInt();
   QMediaPlaylist::PlaybackMode initPlaybackMode = mPlaybackIntAction.intVal2Enum(playbackModeInt);
   mPlaybackIntAction.setCheckedIfActionExist(initPlaybackMode);
 
-  mPlaybackMode = new (std::nothrow) MenuToolButton{mPlaybackIntAction.getActionEnumAscendingList(), QToolButton::ToolButtonPopupMode::InstantPopup,
+  mPlaybackMode = new (std::nothrow) MenuToolButton{mPlaybackIntAction.getActionEnumAscendingList(),
+                                                    QToolButton::ToolButtonPopupMode::InstantPopup,
                                                     Qt::ToolButtonStyle::ToolButtonTextBesideIcon};
   mPlaybackMode->SetCaption(QIcon{""}, tr("Playback Mode"), "Change Playback Mode");
 
@@ -89,6 +94,8 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
 
   addWidget(mExtendLeftWidget);
   addWidget(mVideoList);
+  setContentsMargins(0, 0, 0, 0);
+
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_PLAYER"});
   setWindowTitle("Video Player");
 
@@ -110,13 +117,10 @@ void VideoView::subscribe() {
   connect(mPlayPrevAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
   connect(mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
   connect(mPlaybackIntAction.getActionGroup(), &QActionGroup::triggered, this, &VideoView::onPlaybackModeChanged);
-  connect(mShowVideoList, &QAction::toggled, mVideoList, &QWidget::setVisible);
+  connect(mShowVideoList, &QAction::toggled, mVideoList, &VideoTableView::setVisible);
   connect(mVideoList, &VideoTableView::reqPlayMedia, mBasicVideoView, &BasicVideoView::PlayAVideo);
 
-  connect(mBasicVideoView->GetVideoWidget(), &MyVideoWidget::reqToolBarVisibilityChange, this, [this](bool visibility) {
-    mExtendedFunctionCtrlBar->setVisible(visibility);
-    mVideoList->setVisible(visibility);
-  });
+  connect(mBasicVideoView->GetVideoWidget(), &PausableVideoWidget::reqToolBarVisibilityChange, this, &VideoView::onChangeToolBarVisibility);
 }
 
 void VideoView::onPlaybackModeChanged(const QAction* newPlaybackModeAct) {
@@ -133,13 +137,13 @@ int VideoView::PlayVideos(const QString& rootPath, const QStringList& mediafileN
 }
 
 int VideoView::onSelectAFolder() {
-  QString defaultOpenPathLocatedIn =
-      Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+  QString defaultOpenPathLocatedIn
+      = Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
     defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
   }
   const QString dirSelected = QFileDialog::getExistingDirectory(this,
-                                                                "Select a media folder",  //
+                                                                "Select a media folder", //
                                                                 defaultOpenPathLocatedIn);
   if (dirSelected.isEmpty()) {
     return -1;
@@ -153,4 +157,12 @@ void VideoView::StopPlay() {
   if (mBasicVideoView) {
     mBasicVideoView->StopPlay();
   }
+}
+
+void VideoView::onChangeToolBarVisibility(bool visibility) {
+  mExtendedFunctionCtrlBar->setVisible(visibility);
+  if (mShowVideoList->isChecked() != visibility) {
+    mShowVideoList->setChecked(visibility);
+  }
+  mBasicVideoView->movePauseBtnToCenter();
 }

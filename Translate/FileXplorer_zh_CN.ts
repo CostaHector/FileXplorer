@@ -104,6 +104,39 @@
     </message>
 </context>
 <context>
+    <name>BasicVideoView</name>
+    <message>
+        <location filename="../View/BasicVideoView.cpp" line="+49"/>
+        <source>select video</source>
+        <translation>选择视频文件</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>instant</source>
+        <translation>选中即刻播放</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>stop</source>
+        <translation>停止</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>seek backward 10s</source>
+        <translation>后退10s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>seek forward 10s</source>
+        <translation>前进10s</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>basic mode</source>
+        <translation>基础模式</translation>
+    </message>
+</context>
+<context>
     <name>CastDBActions</name>
     <message>
         <location filename="../Actions/CastDBActions.cpp" line="+12"/>
@@ -197,6 +230,27 @@
         <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
+    </message>
+</context>
+<context>
+    <name>DualIconCheckableAction</name>
+    <message>
+        <location filename="../Actions/DualIconCheckableAction.cpp" line="+33"/>
+        <location line="+1"/>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+1"/>
+        <source>Pause</source>
+        <translation>暂停</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location line="+1"/>
+        <source>Full screen</source>
+        <translation>全屏</translation>
     </message>
 </context>
 <context>
@@ -536,7 +590,7 @@
         <translation>固定内容</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -561,7 +615,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -571,7 +625,7 @@
         <translation>格式化演员/制片厂</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+13"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
@@ -586,12 +640,12 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-30"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1312,6 +1366,74 @@
         <location filename="../Component/TypeFilterButton.cpp" line="+12"/>
         <source>Filter</source>
         <translation>过滤</translation>
+    </message>
+</context>
+<context>
+    <name>VideoView</name>
+    <message>
+        <location filename="../View/VideoView.cpp" line="+23"/>
+        <source>select a folder</source>
+        <translation>选择文件夹</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>previous hot point</source>
+        <translation>上一热点</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>next hot point</source>
+        <translation>下一热点</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>play previous video</source>
+        <translation>上一视频</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>play next video</source>
+        <translation>下一视频</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>show frames</source>
+        <translation>帧图组</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>show video list</source>
+        <translation>显示播放列表</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>current item once</source>
+        <translation>单播</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>current item in loop</source>
+        <translation>单曲循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>sequential</source>
+        <translation>顺序播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>loop</source>
+        <translation>列表循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>random</source>
+        <translation>随机播放</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Playback Mode</source>
+        <translation>播放模式</translation>
     </message>
 </context>
 <context>

@@ -86,7 +86,7 @@ void DetailPreview::onReqFullscreenModeChange(bool bFullScreen) {
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(mBasicVideoView);
     mFullScreenWindow->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    mFullScreenWindow->setWindowTitle(QString{"[%s] Playing ..."}.arg(mBasicVideoView->GetCurrentPlayingMediaPath()));
+    mFullScreenWindow->setWindowTitle(QString{"[%1] Playing ..."}.arg(mBasicVideoView->GetCurrentPlayingMediaPath()));
     mFullScreenWindow->showFullScreen();
     return;
   }

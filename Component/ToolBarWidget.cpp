@@ -88,7 +88,7 @@ QToolButton* ToolBarWidget::createToolButton(const QIcon& icon,
   QAction* tmpAct = new (std::nothrow) QAction{icon, text, this};
   tmpAct->setObjectName(text);
   CHECK_NULLPTR_RETURN_NULLPTR(tmpAct);
-  tmpAct->setToolTip(toolTip);
+  tmpAct->setToolTip(QString{"<b>%1 (%2)</b><br/>"}.arg(text, "") + toolTip);
   tmpAct->setCheckable(checkable);
 
   btn->setObjectName(text);

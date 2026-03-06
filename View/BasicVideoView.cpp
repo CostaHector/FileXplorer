@@ -11,42 +11,54 @@
 #include <QResizeEvent>
 #include <QFileDialog>
 
-constexpr int MyVideoWidget::TIMER_INTERVAL;
+constexpr int PausableVideoWidget::TIMER_INTERVAL;
 
-MyVideoWidget::MyVideoWidget(QWidget* parent) : QVideoWidget{parent} {
+PausableVideoWidget::PausableVideoWidget(QWidget* parent)
+  : QVideoWidget{parent} {
   mLongTimeNoClickTimer.setSingleShot(true);
   mLongTimeNoClickTimer.setInterval(TIMER_INTERVAL);
 
-  connect(&mLongTimeNoClickTimer, &QTimer::timeout, this, &MyVideoWidget::onTimerTimeout);
+  connect(&mLongTimeNoClickTimer, &QTimer::timeout, this, &PausableVideoWidget::onTimerTimeout);
+}
+
+void PausableVideoWidget::onIntoFullScreenMode() {
   mLongTimeNoClickTimer.start();
 }
 
-void MyVideoWidget::onTimerTimeout() {
+void PausableVideoWidget::onQuitFullScreenMode() {
+  mLongTimeNoClickTimer.stop();
+}
+
+void PausableVideoWidget::onTimerTimeout() {
   emit reqToolBarVisibilityChange(false);
 }
 
-void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
-  if (event->button() == Qt::LeftButton) {
+void PausableVideoWidget::mousePressEvent(QMouseEvent* event) {
+  if (event->button() == Qt::MouseButton::LeftButton) {
     emit reqPausePlayStatusToggle();
+    event->setAccepted(true);
+    return;
+  } else {
     emit reqToolBarVisibilityChange(true);
-    if (!mLongTimeNoClickTimer.isActive()) {
-      mLongTimeNoClickTimer.start();
-    }
+    mLongTimeNoClickTimer.start(); // 已经在运行中则会保持间隔重启
     event->setAccepted(true);
     return;
   }
   QVideoWidget::mousePressEvent(event);
 }
 
-BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{parent} {
+BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
+  : QWidget{parent} {
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
-  mSelectVideoFileBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/OPEN_A_VIDEO"}, tr("open file"));
+  mSelectVideoFileBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/OPEN_A_VIDEO"}, tr("select video"));
 
-  const bool bPlayInstant =
-      Configuration().value(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.v).toBool();
-  mPlayInstantlyBtn =
-      mFunctionCtrlBar->createToolButton(QIcon{""}, tr("instant"), "Automatically play selected file instantly in current view when enabled.", true);
-  mPlayInstantlyBtn->setChecked(bPlayInstant);
+  const bool bPlayInstant
+      = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.v).toBool();
+  mPlayInstantlyBtn = mFunctionCtrlBar->createToolButton(QIcon{""},
+                                                         tr("instant"),
+                                                         "Automatically play selected file instantly in current view when enabled.",
+                                                         true);
+  mPlayInstantlyBtn->defaultAction()->setChecked(bPlayInstant);
 
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, !bPlayInstant);
   mPauseBtn = mFunctionCtrlBar->createToolButton(mPauseAct);
@@ -62,7 +74,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   mBasicModeBtn = mFunctionCtrlBar->createToolButton(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"}, tr("basic mode"), "", true);
-  mBasicModeBtn->setChecked(bBasicMode);
+  mBasicModeBtn->defaultAction()->setChecked(bBasicMode);
   mFullScreenAct = DualIconCheckableAction::CreateFullSceenAction(this, false);
   mFullScreenBtn = mFunctionCtrlBar->createToolButton(mFullScreenAct);
 
@@ -84,8 +96,8 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mFunctionCtrlBar->addWidget(mBasicModeBtn);
   mFunctionCtrlBar->addWidget(mFullScreenBtn);
 
-  mPlayer = new (std::nothrow) QMediaPlayer{this};        // never swap these 2 lines, must desctruct first
-  mVideoWidget = new (std::nothrow) MyVideoWidget{this};  // never swap these 2 lines, must desctruct behind player
+  mPlayer = new (std::nothrow) QMediaPlayer{this};             // never swap these 2 lines, must desctruct first
+  mVideoWidget = new (std::nothrow) PausableVideoWidget{this}; // never swap these 2 lines, must desctruct behind player
   mPlayer->setVolume(mVolumeWid->volumeVal());
   mPlayer->setMuted(mVolumeWid->isMuted());
   mPlayer->setVideoOutput(mVideoWidget);
@@ -126,10 +138,10 @@ BasicVideoView::~BasicVideoView() {
 void BasicVideoView::subscribe() {
   connect(mPauseAct, &QAction::toggled, this, &BasicVideoView::onPauseActionToggled);
   connect(mStopBtn, &QToolButton::triggered, this, &BasicVideoView::onStopPlaying);
-  connect(mSeekBackwardBtn, &QToolButton::triggered, this, [this]() {  // -10 second
-    mPlayer->setPosition(std::max((qint64)0, mPlayer->position() - 10 * 1000));
+  connect(mSeekBackwardBtn, &QToolButton::triggered, this, [this]() { // -10 second
+    mPlayer->setPosition(std::max((qint64) 0, mPlayer->position() - 10 * 1000));
   });
-  connect(mSeekForwardBtn, &QToolButton::triggered, this, [this]() {  // +10 second
+  connect(mSeekForwardBtn, &QToolButton::triggered, this, [this]() { // +10 second
     mPlayer->setPosition(std::min(mPlayer->duration(), mPlayer->position() + 10 * 1000));
   });
 
@@ -144,22 +156,33 @@ void BasicVideoView::subscribe() {
   connect(mVolumeWid, &VolumeWidget::onMutedChanged, mPlayer, &QMediaPlayer::setMuted);
   connect(mVolumeWid, &VolumeWidget::onVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
 
-  connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
-          [](QMediaPlayer::Error error) { LOG_E("Player error:%d", error); });
+  connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, [](QMediaPlayer::Error error) {
+    LOG_E("Player error:%d", error);
+  });
 
-  connect(mPlayer, &QMediaPlayer::audioAvailableChanged, this,
-          [this](bool available) { LOG_D("Audio available: %d, volume:%d", available, mPlayer->volume()); });
+  connect(mPlayer, &QMediaPlayer::audioAvailableChanged, this, [this](bool available) {
+    LOG_D("Audio available: %d, volume:%d", available, mPlayer->volume());
+  });
 
   connect(mPlayer, &QMediaPlayer::stateChanged, this, &BasicVideoView::onMediaPlayStateChanged);
   connect(mSelectVideoFileBtn, &QToolButton::triggered, this, &BasicVideoView::onSelectAFile);
-  connect(mFullScreenAct, &QAction::toggled, this, &BasicVideoView::reqFullscreenModeChange);
+  connect(mFullScreenAct, &QAction::toggled, this, &BasicVideoView::emitFullScreenModeReq);
   connect(mBasicModeBtn, &QToolButton::toggled, this, &BasicVideoView::reqFunctionModeChange);
 
-  connect(mVideoWidget, &MyVideoWidget::reqPausePlayStatusToggle, this, [this]() {
+  connect(mVideoWidget, &PausableVideoWidget::reqPausePlayStatusToggle, this, [this]() {
     const bool bNewPause = !mPauseAct->isChecked();
     mPauseAct->setChecked(bNewPause);
   });
-  connect(GetVideoWidget(), &MyVideoWidget::reqToolBarVisibilityChange, mFunctionCtrlBar, &ToolBarWidget::setVisible);
+  connect(GetVideoWidget(), &PausableVideoWidget::reqToolBarVisibilityChange, this, &BasicVideoView::onChangeToolBarVisibility);
+}
+
+void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
+  emit reqFullscreenModeChange(bFullScreen);
+  if (bFullScreen) {
+    mVideoWidget->onIntoFullScreenMode();
+  } else {
+    mVideoWidget->onQuitFullScreenMode();
+  }
 }
 
 bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly) {
@@ -187,6 +210,12 @@ void BasicVideoView::StopPlay() {
       mPlayer->stop();
     }
   }
+}
+
+void BasicVideoView::onChangeToolBarVisibility(bool visibility) {
+  // mFunctionCtrlBar->setVisible(visibility);
+  mFunctionCtrlBar->setHidden(!visibility);
+  movePauseBtnToCenter();
 }
 
 void BasicVideoView::durationChanged(qint64 duration) {
@@ -225,15 +254,16 @@ void BasicVideoView::onMediaPlayStateChanged(QMediaPlayer::State state) {
 }
 
 bool BasicVideoView::onSelectAFile() {
-  QString defaultOpenPathLocatedIn =
-      Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
+  QString defaultOpenPathLocatedIn
+      = Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
     defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
   }
   static const QString filterStr = "Video Files (" + TYPE_FILTER::VIDEO_TYPE_SET.join(" ") + ")";
   QString fileSelected = QFileDialog::getOpenFileName(this,
-                                                      "Select a video file",  //
-                                                      defaultOpenPathLocatedIn, filterStr);
+                                                      "Select a video file", //
+                                                      defaultOpenPathLocatedIn,
+                                                      filterStr);
   if (fileSelected.isEmpty()) {
     return false;
   }
@@ -248,9 +278,8 @@ void BasicVideoView::keyPressEvent(QKeyEvent* event) {
     event->setAccepted(true);
     return;
   } else if (event->key() == Qt::Key::Key_Escape) {
-    if (mFullScreenAct->isChecked()) {
+    if (isFullScreen()) {
       mFullScreenAct->setChecked(false);
-      emit mFullScreenAct->toggled(false);
       event->setAccepted(true);
       return;
     }
@@ -265,7 +294,7 @@ void BasicVideoView::resizeEvent(QResizeEvent* e) {
 }
 
 void BasicVideoView::movePauseBtnToCenter() {
-  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2,  //
+  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2, //
                            mVideoWidget->height() / 2 - mPauseShieldButton->height() / 2);
 }
 

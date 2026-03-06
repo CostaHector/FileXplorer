@@ -6,9 +6,8 @@
 #include "ReorderableToolBar.h"
 #include "WidgetReorderHelper.h"
 #include "VideoView.h"
-#include <QVBoxLayout>
 
-class ImgVidOthInFolderPreviewer: public QWidget {
+class ImgVidOthInFolderPreviewer: public QSplitter {
 public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
   ~ImgVidOthInFolderPreviewer();
@@ -27,20 +26,7 @@ public:
   void SaveState();
   void subscribe();
 
-  void AdjustButtonPosition() {
-    if (mTypeToDisplayTB == nullptr) {return;}
-    static constexpr int marginX = 16, marginY = 32;
-    mTypeToDisplayTB->move(width() - mTypeToDisplayTB->width() - marginX, height() - mTypeToDisplayTB->height() - marginY);
-    mTypeToDisplayTB->raise();
-  }
-
   void onReqFullscreenModeChange(bool bFullScreen);
-
-protected:
-  void resizeEvent(QResizeEvent *event) override {
-    QWidget::resizeEvent(event);
-    AdjustButtonPosition();
-  }
 
 private:
   void onImgBtnClicked(bool checked);
@@ -63,9 +49,6 @@ private:
   QAction *_IMG_ACT{nullptr}, *_VID_ACT{nullptr}, *_OTH_ACT{nullptr};
   bool m_bImgVisible{true}, m_bVidVisible{true}, m_bOthVisible{true};
   ReorderableToolBar* mTypeToDisplayTB{nullptr};
-
-  QSplitter* mImgVidOtherSplitter{nullptr};
-  QVBoxLayout* mLo{nullptr};
 
   const QString mMemoryName;
   QVector<int> mMediaSequence{
