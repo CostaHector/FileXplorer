@@ -359,6 +359,8 @@
         <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
         <file alias="FULL_SCREEN_ON">VideoPlayer/FULL_SCREEN_ON.svg</file>
         <file alias="FULL_SCREEN_OFF">VideoPlayer/FULL_SCREEN_OFF.svg</file>
+        <file alias="TOOLBAR_SHOW">VideoPlayer/TOOLBAR_SHOW.svg</file>
+        <file alias="TOOLBAR_HIDE">VideoPlayer/TOOLBAR_HIDE.svg</file>
         <file alias="VIDEO_LIST">VideoPlayer/VIDEO_LIST.svg</file>
         <file alias="PLAYBACK_MODE_CURRENT_ITEM_ONCE">VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_ONCE.svg</file>
         <file alias="PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP">VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP.svg</file>

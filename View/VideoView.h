@@ -15,8 +15,6 @@
 #include "VideoTableView.h"
 #include "ToolBarWidget.h"
 
-extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
-
 class VideoView : public QSplitter {
   Q_OBJECT
 
@@ -31,36 +29,20 @@ public:
   QString GetCurrentPlayingMediaPath() const { return mBasicVideoView == nullptr ? "" : mBasicVideoView->GetCurrentPlayingMediaPath(); }
   const BasicVideoView* GetBasicVideoView() const { return mBasicVideoView; }
   void StopPlay();
-  void onChangeToolBarVisibility(bool visibility);
+  void onChangeToolBarVisibility(bool bHide);
+  void onChangeListVisibility(bool visibility);
 
 protected:
   QSize sizeHint() const override { return {480, 360}; }
 
 private:
   void subscribe();
-  void onPlaybackModeChanged(const QAction* newPlaybackModeAct);
 
   BasicVideoView* mBasicVideoView{nullptr};
-  QAction* mSelectVideoFolder{nullptr};                                // 选择视频文件夹并播放
-  QAction *mSeekBackwardHotAct{nullptr}, *mSeekForwardHotAct{nullptr}; // 上一个热点, 下一个热点
-  QAction *mPlayPrevAct{nullptr}, *mPlayNextAct{nullptr};              // 上一首, 下一首
-  QAction* mShowFrames{nullptr};                                       // 展示帧截图
-  QAction                                                              //
-      *mPlaybackMode_CurrentItemOnce{nullptr},                         // 播放模式-单曲
-      *mPlaybackMode_CurrentItemInLoop{nullptr},                       // 播放模式-单曲循环
-      *mPlaybackMode_Sequential{nullptr},                              // 播放模式-列表顺序
-      *mPlaybackMode_Loop{nullptr},                                    // 播放模式-循环
-      *mPlaybackMode_Random{nullptr};                                  // 播放模式-随机
-  MenuToolButton* mPlaybackMode{nullptr};                              // 列表播放模式控制
-  QAction* mShowVideoList{nullptr};                                    // 隐藏视频文件列表
   ToolBarWidget* mExtendedFunctionCtrlBar{nullptr};                    // 扩展功能控制条
   QVBoxLayout* mExtendLeftLayout{nullptr};                             // 扩展左侧布局
   QWidget* mExtendLeftWidget{nullptr};                                 // 扩展左侧Widget
 
   VideoTableView* mVideoList{nullptr}; // 视频文件列表
-
-  EnumIntAction<QMediaPlaylist::PlaybackMode> mPlaybackIntAction;                                                     //
-  static constexpr QMediaPlaylist::PlaybackMode DEFAULT_PLAYBACK_MODE{QMediaPlaylist::PlaybackMode::CurrentItemOnce}; // 缺省时列表播放模式
-  static constexpr int SOURCE_INDEX_COLUMN = 2;
 };
 #endif // VIDEOVIEW_H

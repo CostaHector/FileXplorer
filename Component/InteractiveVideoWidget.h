@@ -1,0 +1,76 @@
+#ifndef INTERACTIVEVIDEOWIDGET_H
+#define INTERACTIVEVIDEOWIDGET_H
+
+#include <QVideoWidget>
+#include <QMediaPlaylist>
+#include <QMenu>
+#include <QTimer>
+#include "EnumIntAction.h"
+#include "MenuToolButton.h"
+
+extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
+
+class InteractiveVideoWidget : public QVideoWidget {
+  Q_OBJECT
+public:
+  friend class BasicVideoView;
+
+  explicit InteractiveVideoWidget(QWidget* parent = nullptr);
+  ~InteractiveVideoWidget();
+  MenuToolButton* GetPlaybackModelMenuToolButton(QWidget* notNullParent) const;
+
+  void onIntoFullScreenMode();
+  void onQuitFullScreenMode();
+
+  bool isAutoPlay() const { return mPlayInstantlyAct != nullptr && mPlayInstantlyAct->isChecked(); }
+  bool isVideoFullScreen() const { return mFullScreenAct != nullptr && mFullScreenAct->isChecked(); }
+  QMediaPlaylist::PlaybackMode GetPlaybackMode() const;
+
+  QAction* mPlayInstantlyAct{nullptr};                                 // 是否自动播放
+  QAction* mPauseAct{nullptr};                                         // 通用暂停/继续动作
+  QAction* mStopAct{nullptr};                                          // 停止播放
+  QAction *mSeekBackwardAct{nullptr}, *mSeekForwardAct{nullptr};       // 快退10s, 快进10s
+  QAction *mSeekBackwardHotAct{nullptr}, *mSeekForwardHotAct{nullptr}; // 上一个热点, 下一个热点
+  QAction *mPlayPrevAct{nullptr}, *mPlayNextAct{nullptr};              // 上一首, 下一首
+  QAction* mShowFrames{nullptr};                                       // 展示帧截图
+  QAction* mShowVideoList{nullptr};                                    // 显示视频文件列表
+
+  QAction                                        // 播放模式
+      *mPlaybackMode_CurrentItemOnce{nullptr},   // 播放模式-单曲
+      *mPlaybackMode_CurrentItemInLoop{nullptr}, // 播放模式-单曲循环
+      *mPlaybackMode_Sequential{nullptr},        // 播放模式-列表顺序
+      *mPlaybackMode_Loop{nullptr},              // 播放模式-循环
+      *mPlaybackMode_Random{nullptr};            // 播放模式-随机
+
+  QAction* mBasicModeAct{nullptr};   //基础功能模式
+  QAction* mHideToolBarAct{nullptr}; // 隐藏工具栏
+  QAction* mFullScreenAct{nullptr};  // 全屏播放
+
+  QAction* mSelectVideoFileAct{nullptr}; // 选择视频文件
+  QAction* mSelectVideoFolder{nullptr};  // 选择视频文件夹并播放
+
+signals:
+  void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);
+  void layoutVisibilityChanged();
+
+protected:
+  void mousePressEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
+  void contextMenuEvent(QContextMenuEvent* event) override;
+
+private:
+  void onPlaybackModeTriggered(const QAction* newPlaybackModeAct);
+  EnumIntAction<QMediaPlaylist::PlaybackMode> mPlaybackIntAction;                                                     //
+  static constexpr QMediaPlaylist::PlaybackMode DEFAULT_PLAYBACK_MODE{QMediaPlaylist::PlaybackMode::CurrentItemOnce}; // 缺省时列表播放模式
+
+  QMenu* mPlaybackModeMenu{nullptr};
+  QMenu* mContextMenu{nullptr};
+
+  void onMouseEventHappend();
+  void changeAllToolbarVisibility(bool visible);
+  void onLongTimeNoEventHappen();
+  QTimer mLongTimeNoClickTimer;
+  static constexpr int TIMER_INTERVAL = 10 * 1000;
+};
+
+#endif // INTERACTIVEVIDEOWIDGET_H

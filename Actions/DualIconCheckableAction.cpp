@@ -30,7 +30,7 @@ void DualIconCheckableAction::updateActionProperty(bool checked) {
 DualIconCheckableAction* DualIconCheckableAction::CreateMuteAction(QObject* parent, const bool bMute) {
   DualIconCheckableAction* muteAction = new DualIconCheckableAction{QIcon{":/VideoPlayer/VOLUME_UNMUTE"},
                                                                     QIcon{":/VideoPlayer/VOLUME_MUTE"},
-                                                                    tr("Mute"),
+                                                                    tr("Unmute"),
                                                                     tr("Mute"),
                                                                     bMute,
                                                                     parent};
@@ -42,7 +42,7 @@ DualIconCheckableAction* DualIconCheckableAction::CreatePauseAction(QObject* par
   DualIconCheckableAction* pauseAction = new DualIconCheckableAction{QIcon{":/VideoPlayer/PLAY_VIDEO"},
                                                                      QIcon{":/VideoPlayer/PAUSE_VIDEO"},
                                                                      tr("Pause"),
-                                                                     tr("Pause"),
+                                                                     tr("Playing"),
                                                                      bPause,
                                                                      parent};
   pauseAction->setToolTip(QString{"<b>%1 (%2)</b><br/>Pause current player when enabled."} //
@@ -50,15 +50,27 @@ DualIconCheckableAction* DualIconCheckableAction::CreatePauseAction(QObject* par
   return pauseAction;
 }
 
-DualIconCheckableAction* DualIconCheckableAction::CreateFullSceenAction(QObject* parent, const bool bFullScreen) {
+DualIconCheckableAction* DualIconCheckableAction::CreateFullScreenAction(QObject* parent, const bool bFullScreen) {
   DualIconCheckableAction* fullScreenAction = new DualIconCheckableAction{QIcon{":/VideoPlayer/FULL_SCREEN_OFF"},
                                                                           QIcon{":/VideoPlayer/FULL_SCREEN_ON"},
-                                                                          tr("Full screen"),
-                                                                          tr("Full screen"),
+                                                                          tr("Full screen off"),
+                                                                          tr("Full screen on"),
                                                                           bFullScreen,
                                                                           parent};
   fullScreenAction->setShortcut(QKeySequence(Qt::Key::Key_F12));
   fullScreenAction->setToolTip(QString{"<b>%1 (%2)</b><br/>Show view widget in fullscreen when enabled."} //
                                    .arg(fullScreenAction->text(), fullScreenAction->shortcut().toString()));
   return fullScreenAction;
+}
+
+DualIconCheckableAction* DualIconCheckableAction::CreateHideToolBarAction(QObject* parent, const bool bHide) {
+  DualIconCheckableAction* hideToolBarAct = new DualIconCheckableAction{QIcon{":/VideoPlayer/TOOLBAR_SHOW"},
+                                                                          QIcon{":/VideoPlayer/TOOLBAR_HIDE"},
+                                                                          tr("Show Toolbar"),
+                                                                          tr("Hide Toolbar"),
+                                                                          bHide,
+                                                                          parent};
+  hideToolBarAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Hide toolbars when enabled."} //
+                                   .arg(hideToolBarAct->text(), hideToolBarAct->shortcut().toString()));
+  return hideToolBarAct;
 }
