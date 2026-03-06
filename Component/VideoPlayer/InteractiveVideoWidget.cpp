@@ -12,15 +12,14 @@ constexpr int InteractiveVideoWidget::TIMER_INTERVAL;
 
 InteractiveVideoWidget::InteractiveVideoWidget(QWidget* parent)
   : QVideoWidget{parent} {
-  const bool bPlayInstant
-      = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.v).toBool();
+  mPlaybackTrigger_MANUAL = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_MANUAL"}, tr("Manual play"), this};
+  mPlaybackTrigger_MANUAL->setCheckable(true);
+  mPlaybackTrigger_AUTO = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_AUTO"}, tr("Auto play"), this};
+  mPlaybackTrigger_AUTO->setCheckable(true);
+  mPlaybackTrigger_DISABLED = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_DISABLED"}, tr("Disabled play"), this};
+  mPlaybackTrigger_DISABLED->setCheckable(true);
 
-  mPlayInstantlyAct = new QAction{QIcon{""}, tr("instant"), this};
-  mPlayInstantlyAct->setCheckable(true);
-  mPlayInstantlyAct->setChecked(bPlayInstant);
-  mPlayInstantlyAct->setToolTip("Automatically play selected file instantly in current view when enabled.");
-
-  mPauseAct = DualIconCheckableAction::CreatePauseAction(this, !bPlayInstant);
+  mPauseAct = DualIconCheckableAction::CreatePauseAction(this, true);
 
   mStopAct = new QAction{QIcon{":/VideoPlayer/STOP_VIDEO"}, tr("stop"), this};
   mStopAct->setToolTip("Stop playing and move position to time 0.");
@@ -52,17 +51,30 @@ InteractiveVideoWidget::InteractiveVideoWidget(QWidget* parent)
   mPlaybackMode_Random = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_RANDOM"}, tr("random"), this};
   mPlaybackMode_Random->setCheckable(true);
 
-  mPlaybackIntAction.init({{mPlaybackMode_CurrentItemOnce, QMediaPlaylist::PlaybackMode::CurrentItemOnce},     //
-                           {mPlaybackMode_CurrentItemInLoop, QMediaPlaylist::PlaybackMode::CurrentItemInLoop}, //
-                           {mPlaybackMode_Sequential, QMediaPlaylist::PlaybackMode::Sequential},
-                           {mPlaybackMode_Loop, QMediaPlaylist::PlaybackMode::Loop},
-                           {mPlaybackMode_Random, QMediaPlaylist::PlaybackMode::Random}},
-                          DEFAULT_PLAYBACK_MODE,
-                          QActionGroup::ExclusionPolicy::Exclusive);
+  mPlaybackModeIntAction.init({{mPlaybackMode_CurrentItemOnce, QMediaPlaylist::PlaybackMode::CurrentItemOnce},     //
+                               {mPlaybackMode_CurrentItemInLoop, QMediaPlaylist::PlaybackMode::CurrentItemInLoop}, //
+                               {mPlaybackMode_Sequential, QMediaPlaylist::PlaybackMode::Sequential},
+                               {mPlaybackMode_Loop, QMediaPlaylist::PlaybackMode::Loop},
+                               {mPlaybackMode_Random, QMediaPlaylist::PlaybackMode::Random}},
+                              DEFAULT_PLAYBACK_MODE,
+                              QActionGroup::ExclusionPolicy::Exclusive);
   const int playbackModeInt
       = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name, MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.v).toInt();
-  QMediaPlaylist::PlaybackMode initPlaybackMode = mPlaybackIntAction.intVal2Enum(playbackModeInt);
-  mPlaybackIntAction.setCheckedIfActionExist(initPlaybackMode);
+  const QMediaPlaylist::PlaybackMode initPlaybackMode = mPlaybackModeIntAction.intVal2Enum(playbackModeInt);
+  mPlaybackModeIntAction.setCheckedIfActionExist(initPlaybackMode);
+
+  {
+    using namespace VideoPlayTool;
+    mPlaybackTriggerIntAction.init({{mPlaybackTrigger_MANUAL, PlaybackTriggerMode::MANUAL}, //
+                                    {mPlaybackTrigger_AUTO, PlaybackTriggerMode::AUTO},     //
+                                    {mPlaybackTrigger_DISABLED, PlaybackTriggerMode::DISABLED}},
+                                   DEFAULT_PLAYBACK_TRIGGER_MODE,
+                                   QActionGroup::ExclusionPolicy::Exclusive);
+    const int playbackTriggerModeInt
+        = Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.v).toInt();
+    const PlaybackTriggerMode initPlaybackTriggerMode = mPlaybackTriggerIntAction.intVal2Enum(playbackTriggerModeInt);
+    mPlaybackTriggerIntAction.setCheckedIfActionExist(initPlaybackTriggerMode);
+  }
 
   mBasicModeAct = new QAction(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"}, tr("basic mode"), this);
   mBasicModeAct->setCheckable(true);
@@ -75,7 +87,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(QWidget* parent)
 
   mPlaybackModeMenu = new QMenu{tr("Playerback mode"), this};
   mPlaybackModeMenu->setToolTipsVisible(true);
-  mPlaybackModeMenu->addActions(mPlaybackIntAction.getActionEnumAscendingList());
+  mPlaybackModeMenu->addActions(mPlaybackModeIntAction.getActionEnumAscendingList());
 
   mContextMenu = new QMenu{tr("Player Menu"), this};
   mContextMenu->setToolTipsVisible(true);
@@ -85,7 +97,6 @@ InteractiveVideoWidget::InteractiveVideoWidget(QWidget* parent)
   mContextMenu->addSeparator();
   mContextMenu->addAction(mPauseAct);
   mContextMenu->addAction(mStopAct);
-  mContextMenu->addAction(mPlayInstantlyAct);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mSeekBackwardAct);
   mContextMenu->addAction(mSeekForwardAct);
@@ -107,25 +118,43 @@ InteractiveVideoWidget::InteractiveVideoWidget(QWidget* parent)
   mLongTimeNoClickTimer.setInterval(TIMER_INTERVAL);
 
   connect(&mLongTimeNoClickTimer, &QTimer::timeout, this, &InteractiveVideoWidget::onLongTimeNoEventHappen);
-  connect(mPlaybackIntAction.getActionGroup(), &QActionGroup::triggered, this, &InteractiveVideoWidget::onPlaybackModeTriggered);
+  connect(mPlaybackModeIntAction.getActionGroup(),
+          &QActionGroup::triggered, //
+          this,
+          &InteractiveVideoWidget::onPlaybackModeTriggered);
+  connect(mPlaybackTriggerIntAction.getActionGroup(),
+          &QActionGroup::triggered, //
+          this,
+          &InteractiveVideoWidget::onPlaybackTriggerModeTriggered);
 
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 }
 
 InteractiveVideoWidget::~InteractiveVideoWidget() {
-  Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAY_SELECT_INSTANTLY.name, isAutoPlay());
-  Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name, mPlaybackIntAction.curVal());
 }
 
 MenuToolButton* InteractiveVideoWidget::GetPlaybackModelMenuToolButton(QWidget* notNullParent) const {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
-  MenuToolButton* playbackModeToolButton = new (std::nothrow) MenuToolButton{mPlaybackIntAction.getActionEnumAscendingList(),
+  MenuToolButton* playbackModeToolButton = new (std::nothrow) MenuToolButton{mPlaybackModeIntAction.getActionEnumAscendingList(),
                                                                              QToolButton::ToolButtonPopupMode::InstantPopup,
                                                                              Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
                                                                              IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                                                                              notNullParent};
   playbackModeToolButton->SetCaption(QIcon{""}, tr("Playback Mode"), "Change Playback Mode");
+  playbackModeToolButton->InitDefaultActionFromQSetting(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE, true);
   return playbackModeToolButton;
+}
+
+MenuToolButton* InteractiveVideoWidget::GetPlaybackTriggerModelMenuToolButton(QWidget* notNullParent) const {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  MenuToolButton* playbackTriggerModeToolButton = new (std::nothrow) MenuToolButton{mPlaybackTriggerIntAction.getActionEnumAscendingList(),
+                                                                                    QToolButton::ToolButtonPopupMode::InstantPopup,
+                                                                                    Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
+                                                                                    IMAGE_SIZE::TABS_ICON_IN_MENU_16,
+                                                                                    notNullParent};
+  playbackTriggerModeToolButton->SetCaption(QIcon{":/VideoPlayer/PLAY_TRIGGER_MODE"}, tr("Play Trigger Mode"), "Change Playback Trigger Mode");
+  playbackTriggerModeToolButton->InitDefaultActionFromQSetting(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE, true);
+  return playbackTriggerModeToolButton;
 }
 
 void InteractiveVideoWidget::onIntoFullScreenMode() {
@@ -138,8 +167,18 @@ void InteractiveVideoWidget::onQuitFullScreenMode() {
   changeAllToolbarVisibility(true);
 }
 
+void InteractiveVideoWidget::updatePauseActionState(bool bPauseChecked) {
+  if (mPauseAct->isChecked() != bPauseChecked) {
+    mPauseAct->setChecked(bPauseChecked);
+  }
+}
+
 QMediaPlaylist::PlaybackMode InteractiveVideoWidget::GetPlaybackMode() const {
-  return mPlaybackIntAction.curVal();
+  return mPlaybackModeIntAction.curVal();
+}
+
+VideoPlayTool::PlaybackTriggerMode InteractiveVideoWidget::GetPlaybackTriggerMode() const {
+  return mPlaybackTriggerIntAction.curVal();
 }
 
 void InteractiveVideoWidget::mousePressEvent(QMouseEvent* event) {
@@ -208,8 +247,13 @@ void InteractiveVideoWidget::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void InteractiveVideoWidget::onPlaybackModeTriggered(const QAction* newPlaybackModeAct) {
-  const QMediaPlaylist::PlaybackMode newPlaybackMode = mPlaybackIntAction.act2Enum(newPlaybackModeAct);
+  const QMediaPlaylist::PlaybackMode newPlaybackMode = mPlaybackModeIntAction.act2Enum(newPlaybackModeAct);
   emit playbackModeChanged(newPlaybackMode);
+}
+
+void InteractiveVideoWidget::onPlaybackTriggerModeTriggered(const QAction* newPlaybackTriggerModeAct) {
+  const VideoPlayTool::PlaybackTriggerMode newPlaybackTriggerMode = mPlaybackTriggerIntAction.act2Enum(newPlaybackTriggerModeAct);
+  emit playbackTriggerModeChanged(newPlaybackTriggerMode);
 }
 
 void InteractiveVideoWidget::onMouseEventHappend() {

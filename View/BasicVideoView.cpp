@@ -25,8 +25,12 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mPlayer->setMuted(mVolumeWid->isMuted());
   mPlayer->setVideoOutput(mVideoWidget);
 
+  MenuToolButton* playbackTriggerModeBtn = mVideoWidget->GetPlaybackTriggerModelMenuToolButton(this);
+  playbackTriggerModeBtn->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
+  setPlaybackTriggerMode(mVideoWidget->GetPlaybackTriggerMode());
+
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
-  mFunctionCtrlBar->addAction(mVideoWidget->mPlayInstantlyAct);
+  mFunctionCtrlBar->addWidget(playbackTriggerModeBtn);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mSelectVideoFileAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mPauseAct);
@@ -113,6 +117,8 @@ void BasicVideoView::subscribe() {
 
   connect(mVideoWidget->mHideToolBarAct, &QAction::toggled, this, &BasicVideoView::onChangeToolBarVisibility);
 
+  connect(mVideoWidget, &InteractiveVideoWidget::playbackTriggerModeChanged, this, &BasicVideoView::setPlaybackTriggerMode);
+
   connect(mVideoWidget, &InteractiveVideoWidget::layoutVisibilityChanged, this, &BasicVideoView::movePauseBtnToCenter);
 }
 
@@ -135,13 +141,30 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
   if (!QFile::exists(filePath)) {
     return false;
   }
-  mPlayer->setMedia(QUrl::fromLocalFile(filePath));
   mCurrentPlayingMediaPath = filePath;
-  if (mVideoWidget->isAutoPlay() || forcePlayInstantly) {
-    mVideoWidget->mPauseAct->setChecked(false);
-    mPlayer->play();
-  } else {
-    mVideoWidget->mPauseAct->setChecked(true);
+
+  using namespace VideoPlayTool;
+  const PlaybackTriggerMode playTriggerMode{forcePlayInstantly ? PlaybackTriggerMode::AUTO : GetPlayTriggerMode()};
+  switch (playTriggerMode) {
+    case VideoPlayTool::PlaybackTriggerMode::MANUAL: { // 仅仅设置
+      mPlayer->setMedia(QUrl::fromLocalFile(filePath));
+      mVideoWidget->updatePauseActionState(true);
+      break;
+    }
+    case VideoPlayTool::PlaybackTriggerMode::AUTO: { // 设置+播放
+      mPlayer->setMedia(QUrl::fromLocalFile(filePath));
+      mPlayer->play();
+      mVideoWidget->updatePauseActionState(false);
+      break;
+    }
+    case VideoPlayTool::PlaybackTriggerMode::DISABLED: {
+      mVideoWidget->updatePauseActionState(true);
+      break;
+    }
+    default: {
+      LOG_W("playTriggerMode[%d] invalid, forcePlayInstantly[%d], should never ran into here", (int)playTriggerMode, forcePlayInstantly);
+      break;
+    }
   }
   return true;
 }

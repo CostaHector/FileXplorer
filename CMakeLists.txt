@@ -35,6 +35,7 @@ file(GLOB SOURCES
     Component/Pwd/*.cpp
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
+    Component/VideoPlayer/*.cpp
     FileOperation/*.cpp
     Model/*.cpp
     public/*.cpp
@@ -65,6 +66,7 @@ set(SRV_HEADER_PATH
     Component/Pwd
     Component/HeaderView
     Component/LineEdit
+    Component/VideoPlayer
     FileOperation
     lib
     Model
@@ -89,6 +91,7 @@ file(GLOB HEADERS
     Component/RenameWidgets/*.h
     Component/HeaderView/*.h
     Component/LineEdit/*.h
+    Component/VideoPlayer/*.h
     FileOperation/*.h
     lib/*.h
     Model/*.h
@@ -132,12 +135,14 @@ qt_add_translation(QM_FILES ${TS_FILES})
 if(WIN32)
     # Windows-specific platform: Use the WIN32 option to hide the console
     find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt5 REQUIRED COMPONENTS Core)
 
     add_executable(${PROJECT_NAME} WIN32
         ${SOURCES}
         ${RESOURCES}
     )
 
+target_link_libraries(FileXplorer PRIVATE Qt5::Core)
 target_link_libraries(FileXplorer PRIVATE Qt5::Core)
 else()
     # Linux Platform: Directly generate a GUI application (no terminal displayed by default). No extra flags needed for GUI apps

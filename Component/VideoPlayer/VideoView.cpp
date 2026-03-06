@@ -69,7 +69,7 @@ void VideoView::subscribe() {
   connect(inst->mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
   connect(inst->mShowVideoList, &QAction::toggled, this, &VideoView::onChangeListVisibility);
 
-  connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);
+  connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);  
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
 }
 

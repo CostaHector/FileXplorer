@@ -52,14 +52,18 @@ private:
   QMediaPlayer* mPlayer{nullptr};
   InteractiveVideoWidget* mVideoWidget{nullptr}; // 播放显示框
 
-  ToolBarWidget* mFunctionCtrlBar{nullptr};                          // 功能控制条
-  QToolButton* mPauseShieldButton{nullptr};                          // 暂停遮罩画面
-  ClickableSlider* mProgressSlider{nullptr};                         // 进度控制块
-  QLabel* mCurrentTimeLabel{nullptr};                                // 当前播放的时间点
-  QLabel* mDurationLabel{nullptr};                                   // 视频文件时长
-  VolumeWidget* mVolumeWid{nullptr};                                 // 音量控制组件
+  ToolBarWidget* mFunctionCtrlBar{nullptr};  // 功能控制条
+  QToolButton* mPauseShieldButton{nullptr};  // 暂停遮罩画面
+  ClickableSlider* mProgressSlider{nullptr}; // 进度控制块
+  QLabel* mCurrentTimeLabel{nullptr};        // 当前播放的时间点
+  QLabel* mDurationLabel{nullptr};           // 视频文件时长
+  VolumeWidget* mVolumeWid{nullptr};         // 音量控制组件
 
   QVBoxLayout* mLeftLayout{nullptr}; // 左侧布局
+
+  void setPlaybackTriggerMode(VideoPlayTool::PlaybackTriggerMode newTriggerMode) { mPlaybackTriggerMode = newTriggerMode; }
+  VideoPlayTool::PlaybackTriggerMode GetPlayTriggerMode() const { return mPlaybackTriggerMode; }
+  VideoPlayTool::PlaybackTriggerMode mPlaybackTriggerMode{VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE};
 
   QString mCurrentPlayingMediaPath;
   bool bPauseButtonCenterInit = false;

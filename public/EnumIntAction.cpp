@@ -8,6 +8,7 @@
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
 #include "ScenePageNaviHelper.h"
+#include "VideoPlayTool.h"
 #include <QHeaderView>
 #include <QCryptographicHash>
 #include <QMediaPlaylist>
@@ -27,3 +28,4 @@ template struct EnumIntAction<Qt::TextElideMode>;
 template struct EnumIntAction<QHeaderView::ResizeMode>;
 template struct EnumIntAction<Qt::ScrollBarPolicy>;
 template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
+template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;

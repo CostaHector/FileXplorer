@@ -524,12 +524,22 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/InteractiveVideoWidget.cpp" line="+18"/>
-        <source>instant</source>
-        <translation>选中即刻播放</translation>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+15"/>
+        <source>Manual play</source>
+        <translation>手动播放</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+2"/>
+        <source>Auto play</source>
+        <translation>自动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Disabled play</source>
+        <translation>禁止播放</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -599,7 +609,7 @@
         <translation>随机播放</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+28"/>
         <source>basic mode</source>
         <translation>基础模式</translation>
     </message>
@@ -624,9 +634,14 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+53"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Play Trigger Mode</source>
+        <translation>触发方式</translation>
     </message>
 </context>
 <context>

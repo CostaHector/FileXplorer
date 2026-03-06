@@ -7,8 +7,10 @@
 #include <QTimer>
 #include "EnumIntAction.h"
 #include "MenuToolButton.h"
+#include "VideoPlayTool.h"
 
 extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
+extern template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;
 
 class InteractiveVideoWidget : public QVideoWidget {
   Q_OBJECT
@@ -18,15 +20,21 @@ public:
   explicit InteractiveVideoWidget(QWidget* parent = nullptr);
   ~InteractiveVideoWidget();
   MenuToolButton* GetPlaybackModelMenuToolButton(QWidget* notNullParent) const;
+  MenuToolButton* GetPlaybackTriggerModelMenuToolButton(QWidget* notNullParent) const;
 
   void onIntoFullScreenMode();
   void onQuitFullScreenMode();
+  void updatePauseActionState(bool bPauseChecked);
 
-  bool isAutoPlay() const { return mPlayInstantlyAct != nullptr && mPlayInstantlyAct->isChecked(); }
   bool isVideoFullScreen() const { return mFullScreenAct != nullptr && mFullScreenAct->isChecked(); }
   QMediaPlaylist::PlaybackMode GetPlaybackMode() const;
+  VideoPlayTool::PlaybackTriggerMode GetPlaybackTriggerMode() const;
 
-  QAction* mPlayInstantlyAct{nullptr};                                 // 是否自动播放
+  QAction                              // 播放触发模式
+      *mPlaybackTrigger_MANUAL,        // 播放触发模式-手动播放
+      *mPlaybackTrigger_AUTO,          // 播放触发模式-自动播放
+      *mPlaybackTrigger_DISABLED;      // 播放触发模式-禁用播放
+
   QAction* mPauseAct{nullptr};                                         // 通用暂停/继续动作
   QAction* mStopAct{nullptr};                                          // 停止播放
   QAction *mSeekBackwardAct{nullptr}, *mSeekForwardAct{nullptr};       // 快退10s, 快进10s
@@ -51,6 +59,7 @@ public:
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);
+  void playbackTriggerModeChanged(VideoPlayTool::PlaybackTriggerMode newPlaybackTriggerMode);
   void layoutVisibilityChanged();
 
 protected:
@@ -60,8 +69,11 @@ protected:
 
 private:
   void onPlaybackModeTriggered(const QAction* newPlaybackModeAct);
-  EnumIntAction<QMediaPlaylist::PlaybackMode> mPlaybackIntAction;                                                     //
+  EnumIntAction<QMediaPlaylist::PlaybackMode> mPlaybackModeIntAction;                                                 //
   static constexpr QMediaPlaylist::PlaybackMode DEFAULT_PLAYBACK_MODE{QMediaPlaylist::PlaybackMode::CurrentItemOnce}; // 缺省时列表播放模式
+
+  void onPlaybackTriggerModeTriggered(const QAction* newPlaybackTriggerModeAct);
+  EnumIntAction<VideoPlayTool::PlaybackTriggerMode> mPlaybackTriggerIntAction; //
 
   QMenu* mPlaybackModeMenu{nullptr};
   QMenu* mContextMenu{nullptr};

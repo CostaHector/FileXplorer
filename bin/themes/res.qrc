@@ -367,6 +367,10 @@
         <file alias="PLAYBACK_MODE_LOOP">VideoPlayer/PLAYBACK_MODE_LOOP.svg</file>
         <file alias="PLAYBACK_MODE_RANDOM">VideoPlayer/PLAYBACK_MODE_RANDOM.svg</file>
         <file alias="PLAYBACK_MODE_SEQUENTIAL">VideoPlayer/PLAYBACK_MODE_SEQUENTIAL.svg</file>
+        <file alias="PLAY_TRIGGER_MODE">VideoPlayer/PLAY_TRIGGER_MODE.svg</file>
+        <file alias="PLAY_TRIGGER_MANUAL">VideoPlayer/PLAY_TRIGGER_MANUAL.svg</file>
+        <file alias="PLAY_TRIGGER_AUTO">VideoPlayer/PLAY_TRIGGER_AUTO.svg</file>
+        <file alias="PLAY_TRIGGER_DISABLED">VideoPlayer/PLAY_TRIGGER_DISABLED.svg</file>
     </qresource>
 
     <qresource prefix="/">
