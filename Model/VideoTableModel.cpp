@@ -8,18 +8,18 @@
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Relative path", "Size", "Duration", "Rate"};
 
-int VideoTableModel::setPlayPath(const QString& folderPath, VideoFindMode findMode) {
-  if (mPlayPath == folderPath) {
+int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode) {
+  if (mPlayPath == rootPath) {
     LOG_D("skip, path[%s] unchange", qPrintable(mPlayPath));
     return 0;
   }
-  mPlayPath = folderPath;
+  mPlayPath = rootPath;
   using namespace PathTool;
 
   QList<QFileInfo> mediaFileInfoLst;
   mediaFileInfoLst.reserve(8);
   if (findMode == VideoFindMode::INCLUDING_SUBDIRECTORY) {
-    QDirIterator it{folderPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+    QDirIterator it{mPlayPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
     while (it.hasNext()) {
       it.next();
       mediaFileInfoLst.push_back(it.fileInfo());
@@ -40,13 +40,13 @@ int VideoTableModel::setPlayPath(const QString& folderPath, VideoFindMode findMo
 
     static const QStringList specialFolders{"VIDEO_TS", "videos", "vids"}; // < 10MiB
     for (const QString& specialFolderName: specialFolders) {
-      const QString& specialPath = PathTool::join(folderPath, specialFolderName);
+      const QString& specialPath = PathTool::join(mPlayPath, specialFolderName);
       if (!QFile::exists(specialPath)) {
         continue;
       }
       mediaFileInfoLst += GetDirectMediaFileInfo(specialPath, true);
     }
-    mediaFileInfoLst += GetDirectMediaFileInfo(folderPath, false);
+    mediaFileInfoLst += GetDirectMediaFileInfo(mPlayPath, false);
   }
 
   QList<VideoBasicInfo> videosList;
@@ -72,18 +72,19 @@ int VideoTableModel::setPlayPath(const QString& folderPath, VideoFindMode findMo
   return mVideosInfo.size();
 }
 
-int VideoTableModel::setPlayMedias(const QString& folderPath, const QStringList& mediaFiles) {
-  mPlayPath = folderPath;
+int VideoTableModel::setPlayMedias(const QString& rootPath, const QStringList& mediaFiles) {
+  mPlayPath = rootPath;
   const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = mPlayPath.size();
 
   QList<VideoBasicInfo> videosList;
   QString rel2searchItem;
+  QString fileName;
 
   using namespace PathTool;
-  const QDir dir{mPlayPath, "", QDir::SortFlag::Name, QDir::Filter::Files};
-  for (const QString& fileName : mediaFiles) {
-    const QFileInfo fi{dir.absoluteFilePath(fileName)};
-    rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
+  for (const QString& fileAbsPath : mediaFiles) {
+    const QFileInfo fi{fileAbsPath};
+    fileName = fi.fileName();
+    rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fileAbsPath, fileName.size());
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
   }
 

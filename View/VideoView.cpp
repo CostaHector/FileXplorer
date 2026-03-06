@@ -45,10 +45,15 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent)
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_PLAYER"});
   setWindowTitle("Video Player");
 
+  restoreState(Configuration().value("VIDEO_VIEW_STATE").toByteArray());
   subscribe();
 }
 
-VideoView::~VideoView() {}
+VideoView::~VideoView() {
+  if (this->parent() != nullptr) {
+    Configuration().setValue("VIDEO_VIEW_STATE", saveState());
+  }
+}
 
 void VideoView::onReqModeChange(bool bBasicMode) {
   mExtendedFunctionCtrlBar->setVisible(!bBasicMode);

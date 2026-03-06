@@ -19,8 +19,8 @@ class VideoTableModel : public QAbstractTableModelPub {
     INCLUDING_SUBDIRECTORY = 1,  // all files
   };
   using QAbstractTableModelPub::QAbstractTableModelPub;
-  int setPlayPath(const QString& folderPath, VideoFindMode findMode = VideoFindMode::NORMAL);
-  int setPlayMedias(const QString& folderPath, const QStringList& mediaFiles);
+  int setPlayPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL);
+  int setPlayMedias(const QString& rootPath, const QStringList& mediaFiles);
   QString mediaPath(const QModelIndex& ind) const;
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mVideosInfo.size(); }

@@ -1,6 +1,7 @@
 #include "ImgVidOthInFolderPreviewer.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
+#include "PathTool.h"
 #include "MemoryKey.h"
 #include <QDir>
 
@@ -85,12 +86,13 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system
 void ImgVidOthInFolderPreviewer::operator()(const QString& name,
                                             const QString& jsonAbsFilePath,
                                             const QStringList& imgPthLst,
-                                            const QStringList& vidsLst) { // scene view
+                                            const QStringList& vidsLst) { // scene view, json view
   if (NeedUpdateImgs()) {
     UpdateImgs(name, imgPthLst);
   }
+  const QString& rootPath = PathTool::absolutePath(jsonAbsFilePath);
   if (NeedUpdateVids()) {
-    UpdateVids(vidsLst);
+    UpdateVids(rootPath, vidsLst);
   }
   if (NeedUpdateOthers()) {
     QStringList othersList;
@@ -116,13 +118,13 @@ void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringLi
   mImgModel->UpdateData(imgPthLst);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateVids(const QStringList& vidsLst) {
+void ImgVidOthInFolderPreviewer::UpdateVids(const QString& rootPath, const QStringList& vidsLst) {
   if (!NeedUpdateVids()) {
     return;
   }
   mVidTv->StopPlay();
   CHECK_NULLPTR_RETURN_VOID(mVidTv)
-  mVidTv->PlayVideos("", vidsLst);
+  mVidTv->PlayVideos(rootPath, vidsLst);
 }
 
 void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now

@@ -16,7 +16,7 @@ public:
 
   void StopPlay();
   void UpdateImgs(const QString& name, const QStringList& imgPthLst);
-  void UpdateVids(const QStringList& vidsLst);
+  void UpdateVids(const QString& rootPath, const QStringList& vidsLst);
   void UpdateOthers(const QStringList& dataLst);
 
   inline bool NeedUpdateImgs() const { return m_bImgVisible; }
