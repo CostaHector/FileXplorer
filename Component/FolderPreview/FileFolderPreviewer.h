@@ -46,8 +46,8 @@ public:
     setWindowTitle(mLastName);
     mImgVidOtherPane->UpdateImgs(name, imgPthLst);
   }
-  void UpdateVids(const QStringList& dataLst) {
-    mImgVidOtherPane->UpdateVids(dataLst);
+  void UpdateVids(const QString& rootPath, const QStringList& dataLst) {
+    mImgVidOtherPane->UpdateVids(rootPath, dataLst);
   }
   void UpdateOthers(const QStringList& dataLst) {
     mImgVidOtherPane->UpdateOthers(dataLst);

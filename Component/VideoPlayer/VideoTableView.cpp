@@ -2,8 +2,7 @@
 #include "NotificatorMacro.h"
 #include <random>
 
-VideoTableView::VideoTableView(QWidget* parent)
-  : CustomTableView{"VIEDO_TABLE_VIEW", parent} {
+VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_VIEW", parent} {
   mVideoModel = new VideoTableModel{this};
   mProxyModel = new QSortFilterProxyModel{this};
 
@@ -16,25 +15,23 @@ VideoTableView::VideoTableView(QWidget* parent)
   InitTableView();
   verticalHeader()->setVisible(false);
 
-  connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex &proIndex) {
-    ReqPlay(proIndex, true);
-  });
+  connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
 }
 
-int VideoTableView::setPlayPath(const QString& path) {
+int VideoTableView::setPlayPath(const QString& path, bool bPlayInstantly) {
   const int mediasCnt = mVideoModel->setPlayPath(path);
   if (mediasCnt > 0) {
     selectRow(0);
-    ReqPlay(currentIndex(), false);
+    ReqPlay(currentIndex(), bPlayInstantly);
   }
   return mediasCnt;
 }
 
-int VideoTableView::setMediaFiles(const QString& folderPath, const QStringList& mediaFiles) {
+int VideoTableView::setMediaFiles(const QString& folderPath, const QStringList& mediaFiles, bool bPlayInstantly) {
   const int mediasCnt = mVideoModel->setPlayMedias(folderPath, mediaFiles);
   if (mediasCnt > 0) {
     selectRow(0);
-    ReqPlay(currentIndex(), false);
+    ReqPlay(currentIndex(), bPlayInstantly);
   }
   return mediasCnt;
 }
@@ -81,7 +78,7 @@ QModelIndex VideoTableView::iteratorCore(int step) const {
     case QMediaPlaylist::PlaybackMode::Random: {
       static std::random_device rd;
       static std::mt19937 gen(rd());
-      std::uniform_int_distribution<> dis(0, n);
+      std::uniform_int_distribution<> dis(0, n - 1);
       int randomRow = dis(gen);
       return proxyCur.siblingAtRow(randomRow);
     }
@@ -115,6 +112,7 @@ void VideoTableView::PlayNextVideo() {
 
 void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   const QModelIndex srcIndex = mProxyModel->mapToSource(proIndex);
-  const QString mediaPath = mVideoModel->mediaPath(srcIndex);
-  emit reqPlayMedia(mediaPath, bPlayInstantly);
+  mVideoModel->updateDurationFields({srcIndex});
+  const QString& mediaFullPath = mVideoModel->GetMediaFullPath(srcIndex);
+  emit reqPlayMedia(mediaFullPath, bPlayInstantly);
 }

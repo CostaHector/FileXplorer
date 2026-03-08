@@ -196,14 +196,16 @@ bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 
 void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  const QPoint pos = event->pos();
-  const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
-  if (mLastClickedIndex != proIndex) {
-    onClickEvent(proIndex);
+  if (event->button() == Qt::MouseButton::LeftButton) {
+    const QPoint pos = event->pos();
+    const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
+    if (mLastClickedIndex != proIndex) {
+      onClickEvent(proIndex);
+    }
+    mLastClickedIndex = proIndex;
+    const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(proIndex, visualRect(proIndex))};
+    emit sceneGridClicked(proIndex, imageRect, pos);
   }
-  mLastClickedIndex = proIndex;
-  const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(proIndex, visualRect(proIndex))};
-  emit sceneGridClicked(proIndex, imageRect, pos);
   QListView::mousePressEvent(event);
 }
 

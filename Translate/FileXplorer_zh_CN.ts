@@ -200,6 +200,49 @@
     </message>
 </context>
 <context>
+    <name>DualIconCheckableAction</name>
+    <message>
+        <location filename="../Actions/DualIconCheckableAction.cpp" line="+33"/>
+        <source>Unmute</source>
+        <translation>已静音</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Pause</source>
+        <translation>已暂停</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Playing</source>
+        <translation>播放中</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Full screen off</source>
+        <translation>已关闭全屏模式</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Full screen on</source>
+        <translation>已开启全屏模式</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Show Toolbar</source>
+        <translation>已显示工具栏</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hide Toolbar</source>
+        <translation>已隐藏工具栏</translation>
+    </message>
+</context>
+<context>
     <name>FileLeafActions</name>
     <message>
         <location filename="../Actions/FileLeafAction.cpp" line="+9"/>
@@ -479,6 +522,129 @@
     </message>
 </context>
 <context>
+    <name>InteractiveVideoWidget</name>
+    <message>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+15"/>
+        <source>Manual play</source>
+        <translation>手动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Auto play</source>
+        <translation>自动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Disabled play</source>
+        <translation>禁止播放</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>stop</source>
+        <translation>停止</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>seek backward 10s</source>
+        <translation>后退10s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>seek forward 10s</source>
+        <translation>前进10s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>previous hot point</source>
+        <translation>上一热点</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>next hot point</source>
+        <translation>下一热点</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>play previous video</source>
+        <translation>上一视频</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>play next video</source>
+        <translation>下一视频</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>show frames</source>
+        <translation>帧图组</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>show list</source>
+        <translation>显示列表</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>current item once</source>
+        <translation>单播</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>current item in loop</source>
+        <translation>单曲循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>sequential</source>
+        <translation>顺序播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>loop</source>
+        <translation>列表循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>random</source>
+        <translation>随机播放</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>basic mode</source>
+        <translation>基础模式</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>select video</source>
+        <translation>选择视频文件</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>select a folder</source>
+        <translation>选择文件夹</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Playerback mode</source>
+        <translation>播放模式</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Player Menu</source>
+        <translation>播放器菜单</translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Playback Mode</source>
+        <translation>播放模式</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Play Trigger Mode</source>
+        <translation>触发方式</translation>
+    </message>
+</context>
+<context>
     <name>JsonActions</name>
     <message>
         <location filename="../Actions/JsonActions.cpp" line="+9"/>
@@ -536,7 +702,7 @@
         <translation>固定内容</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -561,7 +727,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-68"/>
+        <location line="-67"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -571,7 +737,7 @@
         <translation>格式化演员/制片厂</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+13"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
@@ -586,12 +752,12 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-30"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>

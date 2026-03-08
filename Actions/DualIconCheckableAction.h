@@ -14,7 +14,8 @@ public:
 
   static DualIconCheckableAction* CreateMuteAction(QObject* parent, const bool bMute);
   static DualIconCheckableAction* CreatePauseAction(QObject* parent, const bool bPause);
-  static DualIconCheckableAction* CreateFullSceenAction(QObject* parent, const bool bFullScreen);
+  static DualIconCheckableAction* CreateFullScreenAction(QObject* parent, const bool bFullScreen);
+  static DualIconCheckableAction* CreateHideToolBarAction(QObject* parent, const bool bHide);
 private slots:
   void onToggled(bool checked);
 

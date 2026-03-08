@@ -353,18 +353,26 @@
         <file alias="VIDEO_NEXT">VideoPlayer/VIDEO_NEXT.svg</file>
         <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
         <file alias="JUMP_NEXT_HOT_SCENE">VideoPlayer/JUMP_NEXT_HOT_SCENE.svg</file>
+        <file alias="VOLUME_PLUS">VideoPlayer/VOLUME_PLUS.svg</file>
+        <file alias="VOLUME_MINUS">VideoPlayer/VOLUME_MINUS.svg</file>
         <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
         <file alias="MARK_HOT_SCENE_POSITION">VideoPlayer/MARK_HOT_SCENE_POSITION.svg</file>
         <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>
         <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
         <file alias="FULL_SCREEN_ON">VideoPlayer/FULL_SCREEN_ON.svg</file>
         <file alias="FULL_SCREEN_OFF">VideoPlayer/FULL_SCREEN_OFF.svg</file>
+        <file alias="TOOLBAR_SHOW">VideoPlayer/TOOLBAR_SHOW.svg</file>
+        <file alias="TOOLBAR_HIDE">VideoPlayer/TOOLBAR_HIDE.svg</file>
         <file alias="VIDEO_LIST">VideoPlayer/VIDEO_LIST.svg</file>
         <file alias="PLAYBACK_MODE_CURRENT_ITEM_ONCE">VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_ONCE.svg</file>
         <file alias="PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP">VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_IN_LOOP.svg</file>
         <file alias="PLAYBACK_MODE_LOOP">VideoPlayer/PLAYBACK_MODE_LOOP.svg</file>
         <file alias="PLAYBACK_MODE_RANDOM">VideoPlayer/PLAYBACK_MODE_RANDOM.svg</file>
         <file alias="PLAYBACK_MODE_SEQUENTIAL">VideoPlayer/PLAYBACK_MODE_SEQUENTIAL.svg</file>
+        <file alias="PLAY_TRIGGER_MODE">VideoPlayer/PLAY_TRIGGER_MODE.svg</file>
+        <file alias="PLAY_TRIGGER_MANUAL">VideoPlayer/PLAY_TRIGGER_MANUAL.svg</file>
+        <file alias="PLAY_TRIGGER_AUTO">VideoPlayer/PLAY_TRIGGER_AUTO.svg</file>
+        <file alias="PLAY_TRIGGER_DISABLED">VideoPlayer/PLAY_TRIGGER_DISABLED.svg</file>
     </qresource>
 
     <qresource prefix="/">

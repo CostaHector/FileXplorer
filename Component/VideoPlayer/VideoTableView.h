@@ -11,8 +11,8 @@ class VideoTableView : public CustomTableView {
 public:
   explicit VideoTableView(QWidget* parent = nullptr);
   void setPlaybackMode(QMediaPlaylist::PlaybackMode mode) { mPlaybackMode = mode; }
-  int setPlayPath(const QString& path);
-  int setMediaFiles(const QString& folderPath, const QStringList& mediaFiles);
+  int setPlayPath(const QString& path, bool bPlayInstantly);
+  int setMediaFiles(const QString& folderPath, const QStringList& mediaFiles, bool bPlayInstantly);
   void PlayPreviousVideo();
   void PlayNextVideo();
 

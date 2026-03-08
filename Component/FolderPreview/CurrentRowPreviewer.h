@@ -112,7 +112,7 @@ private:
 
   enum class SRC_FROM {
     FILE_SYSTEM_VIEW,
-    SCENE,
+    SCENE, // scene or json
     CAST,
   };
   SRC_FROM mCurrentSrcFrom{SRC_FROM::FILE_SYSTEM_VIEW};
