@@ -1,10 +1,13 @@
 #include "VideoTableModel.h"
+#include "VideoDurationGetter.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "DataFormatter.h"
 #include "RateHelper.h"
 #include "Logger.h"
 #include <QDirIterator>
+
+constexpr int VideoBasicInfo::DURATION_FIELD, VideoBasicInfo::SCORE_FIELD;
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Relative path", "Size", "Duration", "Rate"};
 
@@ -29,7 +32,7 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
       QList<QFileInfo> fiInfoLst;
       QDir dir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
       dir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-      for (const QFileInfo& fi: dir.entryInfoList()) {
+      for (const QFileInfo& fi : dir.entryInfoList()) {
         if (bSkipIfSpecial && fi.size() < 10 * 1024 * 1024) {
           continue;
         }
@@ -38,8 +41,8 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
       return fiInfoLst;
     };
 
-    static const QStringList specialFolders{"VIDEO_TS", "videos", "vids"}; // < 10MiB
-    for (const QString& specialFolderName: specialFolders) {
+    static const QStringList specialFolders{"VIDEO_TS", "videos", "vids"};  // < 10MiB
+    for (const QString& specialFolderName : specialFolders) {
       const QString& specialPath = PathTool::join(mPlayPath, specialFolderName);
       if (!QFile::exists(specialPath)) {
         continue;
@@ -55,7 +58,7 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
   QString fileName;
 
   const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = mPlayPath.size();
-  for (const QFileInfo& fi: mediaFileInfoLst) {
+  for (const QFileInfo& fi : mediaFileInfoLst) {
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
@@ -87,6 +90,7 @@ int VideoTableModel::setPlayMedias(const QString& rootPath, const QStringList& m
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fileAbsPath, fileName.size());
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
   }
+  std::sort(videosList.begin(), videosList.end());
 
   beginResetModel();
   mVideosInfo.swap(videosList);
@@ -94,10 +98,52 @@ int VideoTableModel::setPlayMedias(const QString& rootPath, const QStringList& m
   return mVideosInfo.size();
 }
 
-QString VideoTableModel::mediaPath(const QModelIndex& ind) const {
-  int row = ind.row();
+QString VideoTableModel::GetMediaFullPath(const QModelIndex& ind) const {
+  const int row = ind.row();
+  if (row < 0 || row >= rowCount()) {
+    LOG_W("row[%d] out of range", row);
+    return "";
+  }
   const VideoBasicInfo& item = mVideosInfo[row];
   return PathTool::GetAbsFilePathFromRootRelName(mPlayPath, item.relPath, item.fileName);
+}
+
+int VideoTableModel::updateDurationFields(const QModelIndexList& indexes) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  int minRow{INT_MAX}, maxRow{-1};
+  int affectedRows{0};
+
+  VideoDurationGetter mi;
+  if (!mi.StartToGet()) {
+    return -1;
+  }
+  for (const QModelIndex& ind : indexes) {
+    const int row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row[%d] out of range", row);
+      continue;
+    }
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+    auto& item = mVideosInfo[ind.row()];
+    const QString& mediaFullPath = GetMediaFullPath(ind);
+    item.duration = mi.GetLengthQuick(mediaFullPath);
+    ++affectedRows;
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    return 0;
+  }
+  const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::DURATION_FIELD, {});
+  const QModelIndex& backInd = sibling(maxRow, VideoBasicInfo::DURATION_FIELD, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
+  LOG_D("Duration field in row[%d, %d] get updated, count[%d]", minRow, maxRow, affectedRows);
+  return affectedRows;
 }
 
 QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
@@ -114,14 +160,14 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
         return item.relPath;
       case 2:
         return DataFormatter::formatFileSizeGMKB(item.fileSize);
-      case 3:
+      case VideoBasicInfo::DURATION_FIELD:
         return DataFormatter::formatDurationISO(item.duration);
-      case 4:
+      case VideoBasicInfo::SCORE_FIELD:
         return item.rate;
       default:
         return {};
     }
-  } else if (role == Qt::DecorationRole && col == 4) {
+  } else if (role == Qt::DecorationRole && col == VideoBasicInfo::SCORE_FIELD) {
     return RateHelper::GetRatePixmap(item.rate);
   }
 

@@ -353,6 +353,8 @@
         <file alias="VIDEO_NEXT">VideoPlayer/VIDEO_NEXT.svg</file>
         <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
         <file alias="JUMP_NEXT_HOT_SCENE">VideoPlayer/JUMP_NEXT_HOT_SCENE.svg</file>
+        <file alias="VOLUME_PLUS">VideoPlayer/VOLUME_PLUS.svg</file>
+        <file alias="VOLUME_MINUS">VideoPlayer/VOLUME_MINUS.svg</file>
         <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
         <file alias="MARK_HOT_SCENE_POSITION">VideoPlayer/MARK_HOT_SCENE_POSITION.svg</file>
         <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>

@@ -3,30 +3,13 @@
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
-#include "PublicVariable.h"
-#include <QFileDialog>
 
-VideoView::VideoView(bool bBasicMode, QWidget* parent)
-  : QSplitter{Qt::Orientation::Horizontal, parent} {
-  mBasicVideoView = new (std::nothrow) BasicVideoView{false, this};
+VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientation::Horizontal, parent} {
+  mBasicVideoView = new (std::nothrow) BasicVideoView{bBasicMode, this};
 
   const InteractiveVideoWidget& inst = *mBasicVideoView->GetVideoWidget();
-  MenuToolButton* playbackModeBtn = inst.GetPlaybackModelMenuToolButton(this);
-
-  mExtendedFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
-  mExtendedFunctionCtrlBar->setVisible(!bBasicMode);
-  mExtendedFunctionCtrlBar->addAction(inst.mSelectVideoFolder);
-  mExtendedFunctionCtrlBar->addSeparator();
-  mExtendedFunctionCtrlBar->addAction(inst.mSeekBackwardHotAct);
-  mExtendedFunctionCtrlBar->addAction(inst.mSeekForwardHotAct);
-  mExtendedFunctionCtrlBar->addSeparator();
-  mExtendedFunctionCtrlBar->addAction(inst.mPlayPrevAct);
-  mExtendedFunctionCtrlBar->addAction(inst.mPlayNextAct);
-  mExtendedFunctionCtrlBar->addSeparator();
-  mExtendedFunctionCtrlBar->addWidget(playbackModeBtn);
-  mExtendedFunctionCtrlBar->addAction(inst.mShowFrames);
-  mExtendedFunctionCtrlBar->addStretch();
-  mExtendedFunctionCtrlBar->addAction(inst.mShowVideoList);
+  const QMediaPlaylist::PlaybackMode initPlaybackMode{inst.GetPlaybackMode()};
+  mExtendedFunctionCtrlBar = inst.GetExtendedFunctionCtrlBar(this);
 
   mExtendLeftWidget = new (std::nothrow) QWidget{this};
   mExtendLeftWidget->setVisible(!bBasicMode);
@@ -36,7 +19,7 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent)
   mExtendLeftLayout->setContentsMargins(0, 0, 0, 0);
 
   mVideoList = new (std::nothrow) VideoTableView{this};
-  mVideoList->setPlaybackMode(inst.GetPlaybackMode());
+  mVideoList->setPlaybackMode(initPlaybackMode);
 
   addWidget(mExtendLeftWidget);
   addWidget(mVideoList);
@@ -62,58 +45,42 @@ void VideoView::onReqModeChange(bool bBasicMode) {
 
 void VideoView::subscribe() {
   connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);
-  connect(mVideoList, &VideoTableView::reqPlayMedia, mBasicVideoView, &BasicVideoView::PlayAVideo);
 
   const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget();
   connect(inst->mPlayPrevAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
   connect(inst->mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
   connect(inst->mShowVideoList, &QAction::toggled, this, &VideoView::onChangeListVisibility);
+  // InteractiveVideoWidget select folder, tableview&model filter medias, BasicVideoView play it
+  connect(inst, &InteractiveVideoWidget::newFolderSelectedChangedByUser, this, &VideoView::PlayAPath);
+  connect(mVideoList, &VideoTableView::reqPlayMedia, mBasicVideoView, &BasicVideoView::PlayAVideo);
 
-  connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);  
+  connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
 }
 
-int VideoView::PlayAPath(const QString& folderPath) {
-  return mVideoList->setPlayPath(folderPath);
+int VideoView::PlayAPath(const QString& folderPath, bool bPlayInstantly) {
+  return mVideoList->setPlayPath(folderPath, bPlayInstantly);
 }
 
-int VideoView::PlayVideos(const QString& rootPath, const QStringList& mediafileNames) {
-  return mVideoList->setMediaFiles(rootPath, mediafileNames);
-}
-
-int VideoView::onSelectAFolder() {
-  QString defaultOpenPathLocatedIn
-      = Configuration().value(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.v).toString();
-  if (!QFile::exists(defaultOpenPathLocatedIn)) {
-    defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
-  }
-  const QString dirSelected = QFileDialog::getExistingDirectory(this,
-                                                                "Select a media folder", //
-                                                                defaultOpenPathLocatedIn);
-  if (dirSelected.isEmpty()) {
-    return -1;
-  }
-  Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, dirSelected);
-  const int mediaFilesCnt = mVideoList->setPlayPath(dirSelected);
-  return mediaFilesCnt;
+int VideoView::PlayVideos(const QString& rootPath, const QStringList& mediafileNames, bool bPlayInstantly) {
+  return mVideoList->setMediaFiles(rootPath, mediafileNames, bPlayInstantly);
 }
 
 void VideoView::StopPlay() {
-  if (mBasicVideoView) {
+  if (mBasicVideoView != nullptr) {
     mBasicVideoView->StopPlay();
   }
 }
 
 void VideoView::onChangeToolBarVisibility(bool bHide) {
-  const bool newVisibility = !bHide;
-  if (mExtendedFunctionCtrlBar->isVisible() != newVisibility) {
-    mExtendedFunctionCtrlBar->setVisible(newVisibility);
+  if (mExtendedFunctionCtrlBar->isHidden() != bHide) {
+    mExtendedFunctionCtrlBar->setVisible(!bHide);
     mBasicVideoView->movePauseBtnToCenter();
   }
 }
 
 void VideoView::onChangeListVisibility(bool visibility) {
-  if (mVideoList->isVisible() != visibility) {
+  if (mVideoList->isHidden() == visibility) {
     mVideoList->setVisible(visibility);
     mBasicVideoView->movePauseBtnToCenter();
   }

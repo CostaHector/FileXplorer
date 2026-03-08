@@ -8,7 +8,9 @@ struct VideoBasicInfo {
   QString relPath;
   qint64 fileSize;
   int duration;
+  static constexpr int DURATION_FIELD = 3;
   short rate;
+  static constexpr int SCORE_FIELD = 4;
   bool operator<(const VideoBasicInfo& rhs) const { return relPath < rhs.relPath || (relPath == rhs.relPath && fileName < rhs.fileName); }
 };
 
@@ -20,8 +22,10 @@ class VideoTableModel : public QAbstractTableModelPub {
   };
   using QAbstractTableModelPub::QAbstractTableModelPub;
   int setPlayPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL);
+  QString GetPlayPath() const { return mPlayPath; }
   int setPlayMedias(const QString& rootPath, const QStringList& mediaFiles);
-  QString mediaPath(const QModelIndex& ind) const;
+  QString GetMediaFullPath(const QModelIndex& ind) const;
+  int updateDurationFields(const QModelIndexList& indexes);
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mVideosInfo.size(); }
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return VIDEO_VERTICAL_HEAD.size(); }

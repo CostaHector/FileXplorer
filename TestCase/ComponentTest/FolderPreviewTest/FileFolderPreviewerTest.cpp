@@ -77,7 +77,7 @@ private slots:
     QVERIFY(previewer.mImgVidOtherPane != nullptr);
     const QStringList othersLst;
     previewer.UpdateImgs("random images", othersLst); // should not crash down
-    previewer.UpdateVids(othersLst); // should not crash down
+    previewer.UpdateVids("", othersLst); // should not crash down
     previewer.UpdateOthers(othersLst); // should not crash down
   }
 };

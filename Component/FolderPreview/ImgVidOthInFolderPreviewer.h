@@ -41,6 +41,7 @@ private:
   };
   void onImgVidOthActTriggered(const QAction* pAct);
   bool onReorder(int fromIndex, int destIndex);
+  QString GetActionText(PREVIEW_ITEM_TYPE itemType, int cnt) const;
 
   ImgsModel* mImgModel{nullptr};
   OthersModel* mOthModel{nullptr};

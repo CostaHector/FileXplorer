@@ -27,8 +27,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Search for Qt libraries in the order of Qt6, Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools Multimedia MultimediaWidgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets Charts LinguistTools Multimedia MultimediaWidgets)
 
 file(GLOB SOURCES
     # service module sources
@@ -41,6 +41,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/Pwd/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
+    ${PARENT_DIR}/Component/VideoPlayer/*.cpp
     ${PARENT_DIR}/FileOperation/*.cpp
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/public/*.cpp
@@ -60,6 +61,7 @@ file(GLOB SOURCES
     ComponentTest/PwdTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
+    ComponentTest/VideoPlayerTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
@@ -90,6 +92,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/Pwd
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
+    ${PARENT_DIR}/Component/VideoPlayer
     ${PARENT_DIR}/FileOperation
     ${PARENT_DIR}/lib
     ${PARENT_DIR}/Model
@@ -117,6 +120,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/Pwd/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
+    ${PARENT_DIR}/Component/VideoPlayer/*.h
     ${PARENT_DIR}/FileOperation/*.h
     ${PARENT_DIR}/lib/*.h
     ${PARENT_DIR}/Model/*.h
@@ -197,6 +201,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Charts
+    Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::MultimediaWidgets
     mockcpp
 )
 

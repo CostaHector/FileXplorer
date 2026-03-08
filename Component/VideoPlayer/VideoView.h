@@ -13,7 +13,6 @@
 #include "MenuToolButton.h"
 #include "BasicVideoView.h"
 #include "VideoTableView.h"
-#include "ToolBarWidget.h"
 
 class VideoView : public QSplitter {
   Q_OBJECT
@@ -22,9 +21,8 @@ public:
   explicit VideoView(bool bBasicMode = false, QWidget* parent = nullptr);
   virtual ~VideoView();
   void onReqModeChange(bool bBasicMode);
-  int PlayAPath(const QString& folderPath);
-  int PlayVideos(const QString& rootPath, const QStringList& mediafileNames);
-  int onSelectAFolder();
+  int PlayAPath(const QString& folderPath, bool bPlayInstantly);
+  int PlayVideos(const QString& rootPath, const QStringList& mediafileNames, bool bPlayInstantly);
   bool onSelectMediaFiles();
   QString GetCurrentPlayingMediaPath() const { return mBasicVideoView == nullptr ? "" : mBasicVideoView->GetCurrentPlayingMediaPath(); }
   const BasicVideoView* GetBasicVideoView() const { return mBasicVideoView; }
@@ -39,7 +37,7 @@ private:
   void subscribe();
 
   BasicVideoView* mBasicVideoView{nullptr};
-  ToolBarWidget* mExtendedFunctionCtrlBar{nullptr};                    // 扩展功能控制条
+  QWidget* mExtendedFunctionCtrlBar{nullptr};                          // 扩展功能控制条
   QVBoxLayout* mExtendLeftLayout{nullptr};                             // 扩展左侧布局
   QWidget* mExtendLeftWidget{nullptr};                                 // 扩展左侧Widget
 

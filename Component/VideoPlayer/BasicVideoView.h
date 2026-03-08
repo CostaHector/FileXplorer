@@ -8,6 +8,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QToolButton>
+#include <QTimer>
 #include "ClickableSlider.h"
 #include "MenuToolButton.h"
 #include "VolumeWidget.h"
@@ -23,7 +24,7 @@ public:
   virtual ~BasicVideoView();
 
   bool PlayAVideo(const QString& filePath, bool forcePlayInstantly = false);
-  void StopPlay();
+  bool StopPlay();
   QString GetCurrentPlayingMediaPath() const { return mCurrentPlayingMediaPath; }
   const InteractiveVideoWidget* GetVideoWidget() const { return mVideoWidget; }
   void onChangeToolBarVisibility(bool bHide);
@@ -41,13 +42,21 @@ protected:
 private:
   void subscribe();
   void emitFullScreenModeReq(bool bFullScreen);
-  void durationChanged(qint64 duration);
-  void onPlaying(qint64 position);
+  void onDurationChanged(qint64 duration);
+  bool onUpdateProgressSliderPosition();
   void onStopPlaying();
   void onPauseActionToggled(bool pauseChecked);
   void onMediaPlayStateChanged(QMediaPlayer::State state);
-  bool onSelectAFile();
   void movePauseBtnToCenter();
+  static bool SetMediaCore(QMediaPlayer* mediaPlayer, const QUrl& mediaUrl);
+  static bool PlayCore(QMediaPlayer* mediaPlayer);
+  static bool DeviatePositionCore(QMediaPlayer* mPlayer, int deviationInSeconds);
+  bool deviatePositionPrevious();
+  bool deviatePositionNext();
+  static bool SetPositionCore(QMediaPlayer* mPlayer, int newPosition);
+  static qint64 GetPositionCore(QMediaPlayer* mPlayer);
+  QMediaPlayer::Error onError(QMediaPlayer::Error error) const;
+  int onAudioAvailableChanged(bool available) const;
 
   QMediaPlayer* mPlayer{nullptr};
   InteractiveVideoWidget* mVideoWidget{nullptr}; // 播放显示框
@@ -65,7 +74,10 @@ private:
   VideoPlayTool::PlaybackTriggerMode GetPlayTriggerMode() const { return mPlaybackTriggerMode; }
   VideoPlayTool::PlaybackTriggerMode mPlaybackTriggerMode{VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE};
 
+  QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
   bool bPauseButtonCenterInit = false;
+
+  mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };
 #endif // BASICVIDEOVIEW_H

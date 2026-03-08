@@ -4,17 +4,19 @@
 #include <QSlider>
 
 class ClickableSlider : public QSlider {
-public:
+ public:
   using T_REG = std::function<void(int)>;
 
   using QSlider::QSlider;
-  void reg(T_REG regFunc) { m_reg = regFunc; }
+  bool regMouseEventProcessor(T_REG regFunc);
+  bool isRegistered() const { return (bool)m_reg; }
 
-protected:
+ protected:
   void mousePressEvent(QMouseEvent* ev) override;
 
-private:
+ private:
+  void mousePressEventCore(int curClickedPositionValue);
   T_REG m_reg;
 };
 
-#endif // CLICKABLESLIDER_H
+#endif  // CLICKABLESLIDER_H

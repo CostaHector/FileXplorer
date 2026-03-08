@@ -26,19 +26,19 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   }
 
   // init for actions
-  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Images: 0", this};
+  _IMG_ACT = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, GetActionText(PREVIEW_ITEM_TYPE::IMG, 0), this};
   CHECK_NULLPTR_RETURN_VOID(_IMG_ACT)
   _IMG_ACT->setToolTip("Image(s) file count");
   _IMG_ACT->setCheckable(true);
   _IMG_ACT->setChecked(m_bImgVisible);
 
-  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, "Videos: 0", this};
+  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, GetActionText(PREVIEW_ITEM_TYPE::VID, 0), this};
   CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
   _VID_ACT->setToolTip("Video(s) file count");
   _VID_ACT->setCheckable(true);
   _VID_ACT->setChecked(m_bVidVisible);
 
-  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, "Others: 0", this};
+  _OTH_ACT = new (std::nothrow) QAction{QIcon{":img/FILE"}, GetActionText(PREVIEW_ITEM_TYPE::OTH, 0), this};
   CHECK_NULLPTR_RETURN_VOID(_OTH_ACT)
   _OTH_ACT->setToolTip("Other(s) file count");
   _OTH_ACT->setCheckable(true);
@@ -71,15 +71,15 @@ ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {
 void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
-    _IMG_ACT->setText("Images: " + QString::number(imgCnt));
+    _IMG_ACT->setText(GetActionText(PREVIEW_ITEM_TYPE::IMG, imgCnt));
   }
   if (NeedUpdateVids()) {
-    const int vidCnt = mVidTv->PlayAPath(pth);
-    _VID_ACT->setText("Videos: " + QString::number(vidCnt));
+    const int vidCnt = mVidTv->PlayAPath(pth, false);
+    _VID_ACT->setText(GetActionText(PREVIEW_ITEM_TYPE::VID, vidCnt));
   }
   if (NeedUpdateOthers()) {
     const int othCnt = mOthModel->setDirPath(pth, TYPE_FILTER::TEXT_TYPE_SET, true);
-    _OTH_ACT->setText("Others: " + QString::number(othCnt));
+    _OTH_ACT->setText(GetActionText(PREVIEW_ITEM_TYPE::OTH, othCnt));
   }
 }
 
@@ -124,7 +124,7 @@ void ImgVidOthInFolderPreviewer::UpdateVids(const QString& rootPath, const QStri
   }
   mVidTv->StopPlay();
   CHECK_NULLPTR_RETURN_VOID(mVidTv)
-  mVidTv->PlayVideos(rootPath, vidsLst);
+  mVidTv->PlayVideos(rootPath, vidsLst, false);
 }
 
 void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
@@ -144,6 +144,20 @@ bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
   Configuration().setValue(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, newMediaTypeSeq);
   LOG_D("New media type seq[%s]", qPrintable(newMediaTypeSeq));
   return MoveWidgetAtFromIndexInFrontOfDestIndex(fromIndex, destIndex, *this);
+}
+
+QString ImgVidOthInFolderPreviewer::GetActionText(PREVIEW_ITEM_TYPE itemType, int cnt) const {
+  switch (itemType) {
+    case PREVIEW_ITEM_TYPE::IMG:
+      return QString::asprintf("Images: %d", cnt);
+    case PREVIEW_ITEM_TYPE::VID:
+      return QString::asprintf("Videos: %d", cnt);
+    case PREVIEW_ITEM_TYPE::OTH:
+      return QString::asprintf("Others: %d", cnt);
+    case PREVIEW_ITEM_TYPE::BUTT:
+    default:
+      return QString::asprintf("Unknown[%d]: %d", (int)itemType, cnt);
+  }
 }
 
 void ImgVidOthInFolderPreviewer::SaveState() {

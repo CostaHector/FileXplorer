@@ -333,12 +333,11 @@ private slots:
     previewer(itemsFolderPath);
 
     QVERIFY(previewer.mTypeToDisplayTB != nullptr);
-    QVERIFY(previewer.mImgVidOtherSplitter != nullptr);
-    QCOMPARE(previewer.mImgVidOtherSplitter->count(), 3);
+    QCOMPARE(previewer.count(), 4);
 
-    const QString imgCntStr{QString::number(SVG_IMG_COUNT)};
-    const QString vidCntStr{QString::number(MP4_VID_COUNT)};
-    const QString othCntStr{QString::number(OTH_JSON_COUNT)};
+    const QString imgCntStr{"Images: " + QString::number(SVG_IMG_COUNT)};
+    const QString vidCntStr{"Videos: " + QString::number(MP4_VID_COUNT)};
+    const QString othCntStr{"Others: " + QString::number(OTH_JSON_COUNT)};
 
     QCOMPARE(previewer._IMG_ACT->text(), imgCntStr);
     QCOMPARE(previewer._VID_ACT->text(), vidCntStr);
@@ -359,27 +358,27 @@ private slots:
 
     // before 012
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "012");
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(0), previewer.mImgTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(1), previewer.mVidTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(2), previewer.mOthTv);
+    QCOMPARE(previewer.widget(0), previewer.mImgTv);
+    QCOMPARE(previewer.widget(1), previewer.mVidTv);
+    QCOMPARE(previewer.widget(2), previewer.mOthTv);
     QCOMPARE(defActionsTextList(previewer.mTypeToDisplayTB), (QStringList{imgCntStr, vidCntStr, othCntStr}));
 
     // reorder, after 120
     QVERIFY(MoveWidgetAtFromIndexInFrontOfDestIndex(0, 3, *previewer.mTypeToDisplayTB));
     emit previewer.mTypeToDisplayTB->widgetMoved(0, 3);
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "120");
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(0), previewer.mVidTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(1), previewer.mOthTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(2), previewer.mImgTv);
+    QCOMPARE(previewer.widget(0), previewer.mVidTv);
+    QCOMPARE(previewer.widget(1), previewer.mOthTv);
+    QCOMPARE(previewer.widget(2), previewer.mImgTv);
     QCOMPARE(defActionsTextList(previewer.mTypeToDisplayTB), (QStringList{vidCntStr, othCntStr, imgCntStr}));
 
     // reorder, after 012
     QVERIFY(MoveWidgetAtFromIndexInFrontOfDestIndex(2, 0, *previewer.mTypeToDisplayTB));
     emit previewer.mTypeToDisplayTB->widgetMoved(2, 0);
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "012");
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(0), previewer.mImgTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(1), previewer.mVidTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(2), previewer.mOthTv);
+    QCOMPARE(previewer.widget(0), previewer.mImgTv);
+    QCOMPARE(previewer.widget(1), previewer.mVidTv);
+    QCOMPARE(previewer.widget(2), previewer.mOthTv);
     QCOMPARE(defActionsTextList(previewer.mTypeToDisplayTB), (QStringList{imgCntStr, vidCntStr, othCntStr}));
   }
 
@@ -399,12 +398,11 @@ private slots:
     QVERIFY(QTest::qWaitForWindowExposed(&previewer));
 
     QVERIFY(previewer.mTypeToDisplayTB != nullptr);
-    QVERIFY(previewer.mImgVidOtherSplitter != nullptr);
-    QCOMPARE(previewer.mImgVidOtherSplitter->count(), 3);
+    QCOMPARE(previewer.count(), 4);
 
-    const QString imgCntStr{QString::number(SVG_IMG_COUNT)};
-    const QString vidCntStr{QString::number(MP4_VID_COUNT)};
-    const QString othCntStr{"0"}; // invisible. the text will not update at all
+    const QString imgCntStr{"Images: " + QString::number(SVG_IMG_COUNT)};
+    const QString vidCntStr{"Videos: " + QString::number(MP4_VID_COUNT)};
+    const QString othCntStr{"Others: 0"}; // invisible. the text will not update at all
 
     QCOMPARE(previewer._IMG_ACT->text(), imgCntStr);
     QCOMPARE(previewer._VID_ACT->text(), vidCntStr);
@@ -420,9 +418,9 @@ private slots:
 
     // before 210
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "210");
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(0), previewer.mOthTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(1), previewer.mVidTv);
-    QCOMPARE(previewer.mImgVidOtherSplitter->widget(2), previewer.mImgTv);
+    QCOMPARE(previewer.widget(0), previewer.mOthTv);
+    QCOMPARE(previewer.widget(1), previewer.mVidTv);
+    QCOMPARE(previewer.widget(2), previewer.mImgTv);
     QCOMPARE(defActionsTextList(previewer.mTypeToDisplayTB), (QStringList{othCntStr, vidCntStr, imgCntStr}));
   }
 };
