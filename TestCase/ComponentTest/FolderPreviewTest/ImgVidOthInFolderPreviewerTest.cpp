@@ -18,6 +18,7 @@ class ImgVidOthInFolderPreviewerTest : public PlainTestSuite {
 
   void init_state_ok() {
     ImgVidOthInFolderPreviewer ivoWid{"ImgVidOthInFolderPreviewer"};
+    QCOMPARE(ivoWid.GetFullScreenableWidget(), ivoWid.mVidTv);
     QCOMPARE(ivoWid.needSaveStateWhenClose(), true);
 
     QCOMPARE(ivoWid._IMG_ACT->isChecked(), true);

@@ -11,6 +11,7 @@ class DetailPreviewTest : public PlainTestSuite {
  private slots:
   void UpdateWhenSelectAFile_ok() {  //
     DetailPreview dp;
+    QCOMPARE(dp.GetFullScreenableWidget(), dp.mBasicVideoView);
     QCOMPARE(dp.needSaveStateWhenClose(), true);
 
     dp.UpdateWhenSelectAFile("path/to/not an video.txt");

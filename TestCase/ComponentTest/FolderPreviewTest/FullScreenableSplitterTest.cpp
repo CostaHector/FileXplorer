@@ -51,6 +51,7 @@ class FullScreenableSplitterTest : public PlainTestSuite {
     {
       // 非全屏, 可以保存状态->保存状态, 全屏, 不可以保存状态->非全屏, 恢复状态, 可以保存状态
       FullScreenableSplitterDerived wid{mMemoryName};
+      QCOMPARE(wid.GetFullScreenableWidget(), wid.btn1);
       QVERIFY(wid.mFullScreenWindow == nullptr);
       QCOMPARE(wid.btn1->isChecked(), false);
       QVERIFY(wid.btn1->parent() == &wid);

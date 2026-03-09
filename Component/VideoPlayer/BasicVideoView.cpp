@@ -127,10 +127,12 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
     movePauseBtnToCenter();
   }
   mCurrentPlayingMediaPath = "";
+  setWindowTitle(mCurrentPlayingMediaPath);
   if (!QFile::exists(filePath)) {
     return false;
   }
   mCurrentPlayingMediaPath = filePath;
+  setWindowTitle(mCurrentPlayingMediaPath);
 
   using namespace VideoPlayTool;
   const PlaybackTriggerMode playTriggerMode{forcePlayInstantly ? PlaybackTriggerMode::AUTO : GetPlayTriggerMode()};
