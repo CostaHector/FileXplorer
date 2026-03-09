@@ -524,7 +524,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+15"/>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+18"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -574,6 +574,16 @@
         <translation>下一视频</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>+Volume</source>
+        <translation>增大音量</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-Volume</source>
+        <translation>减少音量</translation>
+    </message>
+    <message>
         <location line="+2"/>
         <source>show frames</source>
         <translation>帧图组</translation>
@@ -584,7 +594,7 @@
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>current item once</source>
         <translation>单播</translation>
     </message>
@@ -609,12 +619,12 @@
         <translation>随机播放</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+25"/>
         <source>basic mode</source>
         <translation>基础模式</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>select video</source>
         <translation>选择视频文件</translation>
     </message>
@@ -639,7 +649,7 @@
         <translation>播放模式</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+10"/>
         <source>Play Trigger Mode</source>
         <translation>触发方式</translation>
     </message>
