@@ -42,7 +42,7 @@ private:
   bool onReorder(int fromIndex, int destIndex);
   QString GetActionText(PREVIEW_ITEM_TYPE itemType, int cnt) const;
   QWidget* GetFullScreenableWidget() const override {
-    return mImgTv;
+    return mVidTv;
   }
 
 

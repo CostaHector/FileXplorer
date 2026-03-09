@@ -38,7 +38,6 @@ bool FullScreenableSplitter::onReqFullscreenModeChange(bool bFullScreen) {
     subWidget->setParent(nullptr);
     insertWidget(mVideoViewOriginalIndex, subWidget);
     restoreState(mBeforeFullScreenState);
-
     CleanTempFullScreenWindow();
   }
   return true;
