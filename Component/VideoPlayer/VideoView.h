@@ -29,6 +29,7 @@ public:
   void StopPlay();
   void onChangeToolBarVisibility(bool bHide);
   void onChangeListVisibility(bool visibility);
+  bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
 
 protected:
   QSize sizeHint() const override { return {480, 360}; }
@@ -42,5 +43,7 @@ private:
   QWidget* mExtendLeftWidget{nullptr};                                 // 扩展左侧Widget
 
   VideoTableView* mVideoList{nullptr}; // 视频文件列表
+
+  TFuncFullScreenToggleCallback mFullScreenCallback;
 };
 #endif // VIDEOVIEW_H

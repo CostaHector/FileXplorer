@@ -4,8 +4,9 @@
 #include "MemoryKey.h"
 #include "Logger.h"
 #include "NotificatorMacro.h"
+#include "PublicMacro.h"
 
-DetailPreview::DetailPreview(QWidget* parent) : QSplitter{parent} {
+DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_PREVIEW_SPLITTER", parent} {
   setOrientation(Qt::Orientation::Vertical);
 
   mDetailTextBrowser = new (std::nothrow) ClickableTextBrowser{this};
@@ -15,42 +16,30 @@ DetailPreview::DetailPreview(QWidget* parent) : QSplitter{parent} {
   addWidget(mDetailTextBrowser);
   addWidget(mBasicVideoView);
 
-  connect(mBasicVideoView, &BasicVideoView::reqFullscreenModeChange, this, &DetailPreview::onReqFullscreenModeChange);
-
-  restoreState(Configuration().value("DETAIL_PREVIEW_SPLITTER_STATE").toByteArray());
+  mBasicVideoView->registerFullScreenToggleCallback(std::bind(&DetailPreview::onReqFullscreenModeChange, this, std::placeholders::_1));
+  restoreState(Configuration().value(GetMemoryName()).toByteArray());
 }
 
-DetailPreview::~DetailPreview() {
-  if (mBasicVideoView->parent() != nullptr) {  // only save when mBasicVideoView is this instead of out
-    Configuration().setValue("DETAIL_PREVIEW_SPLITTER_STATE", saveState());
-  }
-  CleanTempFullScreenWindow();
+DetailPreview::~DetailPreview() {  //
+  saveStateInDerivedDestructor();
 }
 
 QSize DetailPreview::iconSize() const {
-  if (mDetailTextBrowser == nullptr) {
-    return {};
-  }
+  CHECK_NULLPTR_RETURN_INT(mDetailTextBrowser, {});
   return mDetailTextBrowser->iconSize();
 }
 
 void DetailPreview::setHtml(const QString& text) {
-  if (mDetailTextBrowser == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(mDetailTextBrowser);
   mDetailTextBrowser->setHtml(text);
 }
 
 void DetailPreview::SetCastHtmlParts(const CastHtmlParts& castHtmls) {
-  if (mDetailTextBrowser == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(mDetailTextBrowser);
   mDetailTextBrowser->SetCastHtmlParts(castHtmls);
 }
 void DetailPreview::UpdateHtmlContents() {
-  if (mDetailTextBrowser == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(mDetailTextBrowser);
   mDetailTextBrowser->UpdateHtmlContents();
 }
 
@@ -61,7 +50,7 @@ void DetailPreview::StopPlay() {
 void DetailPreview::UpdateWhenSelectAFile(const QString& pth) {
   const bool bIsAVideo{TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(pth))};
   // 更新可见性, 开始/停止播放, 更新基础描述html文本
-  if (mBasicVideoView->isVisible() != bIsAVideo) {
+  if (mBasicVideoView->isHidden() == bIsAVideo) {
     mBasicVideoView->setVisible(bIsAVideo);
   }
   if (bIsAVideo) {
@@ -71,39 +60,4 @@ void DetailPreview::UpdateWhenSelectAFile(const QString& pth) {
   const QString detailHtmls = CastBrowserHelper::GetDetailDescription(pth, ICON_SIZE);
   setHtml("");
   setHtml(detailHtmls);
-}
-
-void DetailPreview::onReqFullscreenModeChange(bool bFullScreen) {
-  if (mBasicVideoView == nullptr) {
-    return;
-  }
-  if (bFullScreen) {
-    mBeforeFullScreenState = saveState();
-    mVideoViewOriginalIndex = indexOf(mBasicVideoView);
-
-    mFullScreenWindow = new (std::nothrow) QWidget;
-    QVBoxLayout* layout = new (std::nothrow) QVBoxLayout{mFullScreenWindow};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mBasicVideoView);
-    mFullScreenWindow->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    mFullScreenWindow->setWindowTitle(QString{"[%1] Playing ..."}.arg(mBasicVideoView->GetCurrentPlayingMediaPath()));
-    mFullScreenWindow->showFullScreen();
-    return;
-  }
-
-  if (mFullScreenWindow != nullptr) {
-    mBasicVideoView->setParent(nullptr);
-    insertWidget(mVideoViewOriginalIndex, mBasicVideoView);
-    restoreState(mBeforeFullScreenState);
-
-    CleanTempFullScreenWindow();
-  }
-}
-
-void DetailPreview::CleanTempFullScreenWindow() {
-  if (mFullScreenWindow != nullptr) {
-    mFullScreenWindow->close();
-    delete mFullScreenWindow;
-    mFullScreenWindow = nullptr;
-  }
 }

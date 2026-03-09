@@ -3,14 +3,11 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
-#include <QDir>
 
 constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
 ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)
-  : //
-  QSplitter{Qt::Orientation::Vertical, parent}
-  , mMemoryName{memoryName} {
+    : FullScreenableSplitter{memoryName, Qt::Orientation::Vertical, parent} {
   m_bImgVisible = Configuration().value(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, BrowserKey::FLOATING_IMAGE_VIEW_SHOW.v).toBool();
   m_bVidVisible = Configuration().value(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, BrowserKey::FLOATING_VIDEO_VIEW_SHOW.v).toBool();
   m_bOthVisible = Configuration().value(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, BrowserKey::FLOATING_OTHER_VIEW_SHOW.v).toBool();
@@ -20,8 +17,8 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);
   }
-  const bool visibility[(int) PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
-  for (int mediaTypeInd : mMediaSequence) { // hide or show each widget in splitter
+  const bool visibility[(int)PREVIEW_ITEM_TYPE::BUTT] = {m_bImgVisible, m_bVidVisible, m_bOthVisible};
+  for (int mediaTypeInd : mMediaSequence) {  // hide or show each widget in splitter
     (this->*MEDIA_HANDLERS_MAP[mediaTypeInd])(visibility[mediaTypeInd]);
   }
 
@@ -49,7 +46,7 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   CHECK_NULLPTR_RETURN_VOID(mTypeToDisplayTB)
   mTypeToDisplayTB->setOrientation(Qt::Orientation::Horizontal);
   mTypeToDisplayTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  QAction* MEDIA_TYPE_2_ACTS[(int) PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
+  QAction* MEDIA_TYPE_2_ACTS[(int)PREVIEW_ITEM_TYPE::BUTT] = {_IMG_ACT, _VID_ACT, _OTH_ACT};
   for (int mediaTypeInd : mMediaSequence) {
     mTypeToDisplayTB->addAction(MEDIA_TYPE_2_ACTS[mediaTypeInd]);
   }
@@ -59,16 +56,15 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   addWidget(mTypeToDisplayTB);
 
   setContentsMargins(0, 0, 0, 0);
-  restoreState(Configuration().value("FLOATING_PREVIEW_STATE").toByteArray());
+  restoreState(Configuration().value(GetMemoryName() + "_STATE").toByteArray());
   subscribe();
 }
 
-ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {
-  SaveState();
-  CleanTempFullScreenWindow();
+ImgVidOthInFolderPreviewer::~ImgVidOthInFolderPreviewer() {  //
+  saveStateInDerivedDestructor();
 }
 
-void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system view
+void ImgVidOthInFolderPreviewer::operator()(const QString& pth) {  // file system view
   if (NeedUpdateImgs()) {
     const int imgCnt = mImgModel->setDirPath(pth, TYPE_FILTER::IMAGE_TYPE_SET, false);
     _IMG_ACT->setText(GetActionText(PREVIEW_ITEM_TYPE::IMG, imgCnt));
@@ -86,7 +82,7 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& pth) { // file system
 void ImgVidOthInFolderPreviewer::operator()(const QString& name,
                                             const QString& jsonAbsFilePath,
                                             const QStringList& imgPthLst,
-                                            const QStringList& vidsLst) { // scene view, json view
+                                            const QStringList& vidsLst) {  // scene view, json view
   if (NeedUpdateImgs()) {
     UpdateImgs(name, imgPthLst);
   }
@@ -104,35 +100,37 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& name,
 }
 
 void ImgVidOthInFolderPreviewer::StopPlay() {
-  if (mVidTv) {
-    mVidTv->StopPlay();
-  }
-}
-
-void ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
-  if (!NeedUpdateImgs()) {
-    return;
-  }
-
-  CHECK_NULLPTR_RETURN_VOID(mImgModel)
-  mImgModel->UpdateData(imgPthLst);
-}
-
-void ImgVidOthInFolderPreviewer::UpdateVids(const QString& rootPath, const QStringList& vidsLst) {
-  if (!NeedUpdateVids()) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(mVidTv);
   mVidTv->StopPlay();
-  CHECK_NULLPTR_RETURN_VOID(mVidTv)
-  mVidTv->PlayVideos(rootPath, vidsLst, false);
 }
 
-void ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) { // no usage now
-  if (!NeedUpdateOthers()) {
-    return;
+bool ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
+  if (!NeedUpdateImgs()) {
+    return false;
   }
-  CHECK_NULLPTR_RETURN_VOID(mOthModel)
+
+  CHECK_NULLPTR_RETURN_FALSE(mImgModel)
+  mImgModel->UpdateData(imgPthLst);
+  return true;
+}
+
+bool ImgVidOthInFolderPreviewer::UpdateVids(const QString& rootPath, const QStringList& vidsLst) {
+  if (!NeedUpdateVids()) {
+    return false;
+  }
+  CHECK_NULLPTR_RETURN_FALSE(mVidTv)
+  mVidTv->StopPlay();
+  mVidTv->PlayVideos(rootPath, vidsLst, false);
+  return true;
+}
+
+bool ImgVidOthInFolderPreviewer::UpdateOthers(const QStringList& dataLst) {  // no usage now
+  if (!NeedUpdateOthers()) {
+    return false;
+  }
+  CHECK_NULLPTR_RETURN_FALSE(mOthModel)
   mOthModel->UpdateData(dataLst);
+  return true;
 }
 
 bool ImgVidOthInFolderPreviewer::onReorder(int fromIndex, int destIndex) {
@@ -160,20 +158,10 @@ QString ImgVidOthInFolderPreviewer::GetActionText(PREVIEW_ITEM_TYPE itemType, in
   }
 }
 
-void ImgVidOthInFolderPreviewer::SaveState() {
-  if (mVidTv->parent() != nullptr) {
-    Configuration().setValue("FLOATING_PREVIEW_STATE", saveState());
-  }
-}
-
 void ImgVidOthInFolderPreviewer::subscribe() {
   connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &ImgVidOthInFolderPreviewer::onReorder);
   connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &ImgVidOthInFolderPreviewer::onImgVidOthActTriggered);
-  connect(this, &QSplitter::splitterMoved, this, &ImgVidOthInFolderPreviewer::SaveState);
-  connect(mVidTv->GetBasicVideoView(),
-          &BasicVideoView::reqFullscreenModeChange,
-          this,
-          &ImgVidOthInFolderPreviewer::onReqFullscreenModeChange);
+  mVidTv->registerFullScreenToggleCallback(std::bind(&ImgVidOthInFolderPreviewer::onReqFullscreenModeChange, this, std::placeholders::_1));
 }
 
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
@@ -181,7 +169,7 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   if (mImgTv == nullptr) {
     mImgModel = new (std::nothrow) ImgsModel;
     CHECK_NULLPTR_RETURN_VOID(mImgModel)
-    mImgTv = new (std::nothrow) ItemView{mMemoryName + "_IMAGE", this};
+    mImgTv = new (std::nothrow) ItemView{GetMemoryName() + "_IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgTv)
     mImgTv->setViewMode(QListView::ViewMode::IconMode);
     mImgModel->onIconSizeChange(mImgTv->iconSize());
@@ -192,12 +180,8 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   }
   Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, checked);
 
-  if (checked) {
-    if (!mImgTv->isVisible()) {
-      mImgTv->setVisible(true);
-    }
-  } else {
-    mImgTv->setVisible(false);
+  if (mImgTv->isHidden() == checked) {
+    mImgTv->setVisible(checked);
   }
 }
 
@@ -210,12 +194,8 @@ void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
     addWidget(mVidTv);
   }
   Configuration().setValue(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, checked);
-  if (checked) {
-    if (!mVidTv->isVisible()) {
-      mVidTv->setVisible(true);
-    }
-  } else {
-    mVidTv->setVisible(false);
+  if (mVidTv->isHidden() == checked) {
+    mVidTv->setVisible(checked);
   }
 }
 
@@ -224,19 +204,15 @@ void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
   if (mOthTv == nullptr) {
     mOthModel = new (std::nothrow) OthersModel;
     CHECK_NULLPTR_RETURN_VOID(mOthModel)
-    mOthTv = new (std::nothrow) ItemView{mMemoryName + "_OTHER", this};
+    mOthTv = new (std::nothrow) ItemView{GetMemoryName() + "_OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthTv)
     mOthTv->SetCurrentModel(mOthModel);
     mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     addWidget(mOthTv);
   }
   Configuration().setValue(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, checked);
-  if (checked) {
-    if (!mOthTv->isVisible()) {
-      mOthTv->setVisible(true);
-    }
-  } else {
-    mOthTv->setVisible(false);
+  if (mOthTv->isHidden() == checked) {
+    mOthTv->setVisible(checked);
   }
 }
 
@@ -251,38 +227,5 @@ void ImgVidOthInFolderPreviewer::onImgVidOthActTriggered(const QAction* pAct) {
     onOthBtnClicked(checked);
   } else {
     LOG_W("Action[%s] not supported", qPrintable(pAct->text()));
-  }
-}
-
-void ImgVidOthInFolderPreviewer::onReqFullscreenModeChange(bool bFullScreen) {
-  CHECK_NULLPTR_RETURN_VOID(mVidTv);
-  LOG_D("Switch to bFullScreen[%d]", bFullScreen);
-  if (bFullScreen) {
-    mBeforeFullScreenState = saveState();
-    mVideoViewOriginalIndex = indexOf(mVidTv);
-
-    mFullScreenWindow = new (std::nothrow) QWidget;
-    QVBoxLayout* layout = new (std::nothrow) QVBoxLayout{mFullScreenWindow};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mVidTv);
-    mFullScreenWindow->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    mFullScreenWindow->setWindowTitle(QString{"[%1] Playing ..."}.arg(mVidTv->GetCurrentPlayingMediaPath()));
-    mFullScreenWindow->showFullScreen();
-    return;
-  }
-
-  if (mFullScreenWindow != nullptr) {
-    mVidTv->setParent(nullptr);
-    insertWidget(mVideoViewOriginalIndex, mVidTv);
-    restoreState(mBeforeFullScreenState);
-    CleanTempFullScreenWindow();
-  }
-}
-
-void ImgVidOthInFolderPreviewer::CleanTempFullScreenWindow() {
-  if (mFullScreenWindow != nullptr) {
-    mFullScreenWindow->close();
-    delete mFullScreenWindow;
-    mFullScreenWindow = nullptr;
   }
 }

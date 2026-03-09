@@ -90,9 +90,6 @@ bool PopupWidgetManager<WidgetType>::eventFilter(QObject* watched, QEvent* event
     if (m_action->isCheckable()) {
       m_action->setChecked(true);
     }
-    if (m_onShowCallback != nullptr) {
-      m_onShowCallback();
-    }
     event->accept();
     return true;
   }

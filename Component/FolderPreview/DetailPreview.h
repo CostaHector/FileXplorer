@@ -3,9 +3,9 @@
 
 #include "BasicVideoView.h"
 #include "ClickableTextBrowser.h"
-#include <QSplitter>
+#include "FullScreenableSplitter.h"
 
-class DetailPreview : public QSplitter {
+class DetailPreview : public FullScreenableSplitter {
  public:
   explicit DetailPreview(QWidget* parent = nullptr);
   virtual ~DetailPreview();
@@ -17,18 +17,14 @@ class DetailPreview : public QSplitter {
   void StopPlay();
   void UpdateWhenSelectAFile(const QString& pth);
 
-  void onReqFullscreenModeChange(bool bFullScreen);
+ protected:
+  QWidget* GetFullScreenableWidget() const override {
+    return mBasicVideoView;
+  }
 
  private:
   ClickableTextBrowser* mDetailTextBrowser{nullptr};
   BasicVideoView* mBasicVideoView{nullptr};
-  QWidget* rmReplacer{nullptr};
-  Qt::WindowFlags beforeFlags;
-
-  void CleanTempFullScreenWindow();
-  QWidget* mFullScreenWindow{nullptr};
-  QByteArray mBeforeFullScreenState;
-  int mVideoViewOriginalIndex{0};
 };
 
 #endif  // DETAILPREVIEW_H

@@ -14,6 +14,7 @@
 #include "ConfigsTable.h"
 #include "Archiver.h"
 #include "PasswordBook.h"
+#include "ResourceMonitorPanel.h"
 
 class PopupWidgetManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -91,6 +92,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
     PopupWidgetManagerTestTemplate<ConfigsTable>("ConfigsTable", true);
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
     PopupWidgetManagerTestTemplate<PasswordBook>("PasswordBook", true);
+    PopupWidgetManagerTestTemplate<ResourceMonitorPanel>("ResourceMonitorPanel", true);
   }
 
   void not_checkable_popup_widget_geometry_state_ok() {  //
