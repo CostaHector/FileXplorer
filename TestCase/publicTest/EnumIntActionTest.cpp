@@ -21,6 +21,8 @@
 #include "FileStructurePolicy.h"
 #include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
+#include <QMediaPlaylist>
+#include "VideoPlayTool.h"
 
 extern template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
@@ -36,6 +38,8 @@ extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 extern template struct EnumIntAction<Qt::TextElideMode>;
 extern template struct EnumIntAction<QHeaderView::ResizeMode>;
 extern template struct EnumIntAction<Qt::ScrollBarPolicy>;
+extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
+extern template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;
 
 class EnumIntActionTest : public PlainTestSuite {
   Q_OBJECT
@@ -113,7 +117,7 @@ class EnumIntActionTest : public PlainTestSuite {
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<BytesRangeTool::BytesRangeE>(  //
-        BytesRangeTool::BytesRangeE::FIRST_16_BYTES,          //
+        BytesRangeTool::BytesRangeE::FIRST_16_BYTES,    //
         BytesRangeTool::BytesRangeE::ENTIRE_FILE,       //
         BytesRangeTool::DEFAULT_BYTE_RANGE,             //
         QActionGroup::ExclusionPolicy::Exclusive);
@@ -158,6 +162,18 @@ class EnumIntActionTest : public PlainTestSuite {
         Qt::ScrollBarPolicy::ScrollBarAsNeeded,   //
         Qt::ScrollBarPolicy::ScrollBarAlwaysOff,  //
         Qt::ScrollBarPolicy::ScrollBarAsNeeded,   //
+        QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<QMediaPlaylist::PlaybackMode>(   //
+        QMediaPlaylist::PlaybackMode::CurrentItemOnce,    //
+        QMediaPlaylist::PlaybackMode::CurrentItemInLoop,  //
+        QMediaPlaylist::PlaybackMode::CurrentItemInLoop,  //
+        QActionGroup::ExclusionPolicy::Exclusive);
+
+    EnumIntActionChecker<VideoPlayTool::PlaybackTriggerMode>(  //
+        VideoPlayTool::PlaybackTriggerMode::MANUAL,            //
+        VideoPlayTool::PlaybackTriggerMode::AUTO,              //
+        VideoPlayTool::PlaybackTriggerMode::MANUAL,            //
         QActionGroup::ExclusionPolicy::Exclusive);
   }
 

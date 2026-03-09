@@ -11,6 +11,7 @@
 
 extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
 extern template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;
+typedef std::function<bool(bool)> TFuncFullScreenToggleCallback;
 
 class InteractiveVideoWidget : public QVideoWidget {
   Q_OBJECT

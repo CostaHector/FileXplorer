@@ -6,27 +6,26 @@
 #include "ReorderableToolBar.h"
 #include "WidgetReorderHelper.h"
 #include "VideoView.h"
+#include "FullScreenableSplitter.h"
 
-class ImgVidOthInFolderPreviewer: public QSplitter {
+class ImgVidOthInFolderPreviewer: public FullScreenableSplitter {
 public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
-  ~ImgVidOthInFolderPreviewer();
+  virtual ~ImgVidOthInFolderPreviewer();
+
   void operator()(const QString& pth); // file system view
   void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 
   void StopPlay();
-  void UpdateImgs(const QString& name, const QStringList& imgPthLst);
-  void UpdateVids(const QString& rootPath, const QStringList& vidsLst);
-  void UpdateOthers(const QStringList& dataLst);
+  bool UpdateImgs(const QString& name, const QStringList& imgPthLst);
+  bool UpdateVids(const QString& rootPath, const QStringList& vidsLst);
+  bool UpdateOthers(const QStringList& dataLst);
 
   inline bool NeedUpdateImgs() const { return m_bImgVisible; }
   inline bool NeedUpdateVids() const { return m_bVidVisible; }
   inline bool NeedUpdateOthers() const { return m_bOthVisible; }
 
-  void SaveState();
   void subscribe();
-
-  void onReqFullscreenModeChange(bool bFullScreen);
 
 private:
   void onImgBtnClicked(bool checked);
@@ -42,6 +41,10 @@ private:
   void onImgVidOthActTriggered(const QAction* pAct);
   bool onReorder(int fromIndex, int destIndex);
   QString GetActionText(PREVIEW_ITEM_TYPE itemType, int cnt) const;
+  QWidget* GetFullScreenableWidget() const override {
+    return mImgTv;
+  }
+
 
   ImgsModel* mImgModel{nullptr};
   OthersModel* mOthModel{nullptr};
@@ -51,17 +54,11 @@ private:
   bool m_bImgVisible{true}, m_bVidVisible{true}, m_bOthVisible{true};
   ReorderableToolBar* mTypeToDisplayTB{nullptr};
 
-  const QString mMemoryName;
   QVector<int> mMediaSequence{
       (int)PREVIEW_ITEM_TYPE::IMG,  //
       (int)PREVIEW_ITEM_TYPE::VID,  //
       (int)PREVIEW_ITEM_TYPE::OTH   //
   };
-
-  void CleanTempFullScreenWindow();
-  QWidget* mFullScreenWindow{nullptr};
-  QByteArray mBeforeFullScreenState;
-  int mVideoViewOriginalIndex{0};
 };
 
 #endif

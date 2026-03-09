@@ -29,6 +29,7 @@ public:
   const InteractiveVideoWidget* GetVideoWidget() const { return mVideoWidget; }
   void onChangeToolBarVisibility(bool bHide);
   bool isVideoFullScreen() const;
+  bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -73,6 +74,8 @@ private:
   void setPlaybackTriggerMode(VideoPlayTool::PlaybackTriggerMode newTriggerMode) { mPlaybackTriggerMode = newTriggerMode; }
   VideoPlayTool::PlaybackTriggerMode GetPlayTriggerMode() const { return mPlaybackTriggerMode; }
   VideoPlayTool::PlaybackTriggerMode mPlaybackTriggerMode{VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE};
+
+  TFuncFullScreenToggleCallback mFullScreenCallback;
 
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;

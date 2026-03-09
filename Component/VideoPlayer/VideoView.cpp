@@ -85,3 +85,14 @@ void VideoView::onChangeListVisibility(bool visibility) {
     mBasicVideoView->movePauseBtnToCenter();
   }
 }
+
+bool VideoView::registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback) {
+  CHECK_NULLPTR_RETURN_FALSE(funcCallback);
+  if (mFullScreenCallback != nullptr) {
+    LOG_W("Full screen callback already set, cannot reset");
+    return false;
+  }
+  mFullScreenCallback = funcCallback;
+  connect(GetBasicVideoView(), &BasicVideoView::reqFullscreenModeChange, mFullScreenCallback);
+  return true;
+}
