@@ -72,10 +72,14 @@ private slots:
     QVERIFY(tDir.touch(filePath, content));
 
     // 计算MD5
-    QByteArray md5 = MD5Calculator::GetFileMD5(tDir.itemPath(filePath));
+    QByteArray md5_full = MD5Calculator::GetFileMD5(tDir.itemPath(filePath));
 
     // 验证结果
-    QCOMPARE(md5, MD5Calculator::GetByteArrayMD5(content));
+    QCOMPARE(md5_full, MD5Calculator::GetByteArrayMD5(content));
+
+
+    QByteArray md5_512kB = MD5Calculator::GetFileMD5(tDir.itemPath(filePath), BytesRangeTool::BytesRangeE::SAMPLED_512_KB, QCryptographicHash::Algorithm::Md5);
+    QCOMPARE(md5_512kB, md5_full);
   }
 
   // 测试批量文件MD5计算

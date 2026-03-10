@@ -170,38 +170,6 @@
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5_FILE_IDENTIFIER_PATH.svg</file>
         <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>
 
-        <!--JsonEditor Icon here        -->
-        <file alias="OPEN_JSON_FILE">JsonEditor/OPEN_JSON_FILE.svg</file>
-        <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
-        <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
-        <file alias="CAST">JsonEditor/CAST.svg</file>
-        <file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
-        <file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
-        <file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
-        <file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
-        <file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
-        <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
-        <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
-        <file alias="SAVED">JsonEditor/SAVED.svg</file>
-        <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
-        <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
-        <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
-        <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
-        <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
-        <file alias="JSON_FILE_NEXT">JsonEditor/JSON_FILE_NEXT.png</file>
-        <file alias="JSON_FILE_PRECIOUS">JsonEditor/JSON_FILE_PRECIOUS.png</file>
-        <file alias="JSON_FILE_NEXT_PREVIOUS">JsonEditor/JSON_FILE_NEXT_PREVIOUS.png</file>
-        <file alias="JSON_FILE_NEXT_UNFINISHED">JsonEditor/JSON_FILE_NEXT_UNFINISHED.png</file>
-        <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
-        <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
-        <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>
-        <file alias="TAGS_REMOVE">JsonEditor/TAGS_REMOVE.svg</file>
-        <file alias="TAGS_SET">JsonEditor/TAGS_SET.svg</file>
-        <file alias="TAGS_CLEAR">JsonEditor/TAGS_CLEAR.svg</file>
-        <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
-        <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
-        <file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
-
         <!--NameStr Icon here-->
         <file alias="RENAME">Rename/RENAME.svg</file>
         <file alias="NAME_STR_CASE">Rename/NAME_STR_CASE.svg</file>
@@ -336,6 +304,41 @@
         <!--Notification icon here-->
         <file alias="LOADING">Notification/LOADING.gif</file>
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
+    </qresource>
+
+    <qresource prefix="/JsonEditor">
+        <!--JsonEditor Icon here        -->
+        <file alias="OPEN_JSON_FILE">JsonEditor/OPEN_JSON_FILE.svg</file>
+        <file alias="SELECT_A_FOLDER_AND_LOAD_JSON">JsonEditor/SELECT_A_FOLDER_AND_LOAD_JSON.svg</file>
+        <file alias="EMPTY_LISTWIDGET">JsonEditor/EMPTY_LISTWIDGET.svg</file>
+        <file alias="CAST">JsonEditor/CAST.svg</file>
+        <file alias="CAST_APPEND_INPUT">JsonEditor/CAST_APPEND_INPUT.svg</file>
+        <file alias="CAST_REMOVE">JsonEditor/CAST_REMOVE.svg</file>
+        <file alias="CAST_CLEAR">JsonEditor/CAST_CLEAR.svg</file>
+        <file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
+        <file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
+        <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
+        <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
+        <file alias="ANCHOR_DROP">JsonEditor/ANCHOR_DROP.svg</file>
+        <file alias="ANCHOR_WEIGH">JsonEditor/ANCHOR_WEIGH.svg</file>
+        <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
+        <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
+        <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
+        <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
+        <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
+        <file alias="JSON_FILE_NEXT">JsonEditor/JSON_FILE_NEXT.png</file>
+        <file alias="JSON_FILE_PRECIOUS">JsonEditor/JSON_FILE_PRECIOUS.png</file>
+        <file alias="JSON_FILE_NEXT_PREVIOUS">JsonEditor/JSON_FILE_NEXT_PREVIOUS.png</file>
+        <file alias="JSON_FILE_NEXT_UNFINISHED">JsonEditor/JSON_FILE_NEXT_UNFINISHED.png</file>
+        <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
+        <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
+        <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>
+        <file alias="TAGS_REMOVE">JsonEditor/TAGS_REMOVE.svg</file>
+        <file alias="TAGS_SET">JsonEditor/TAGS_SET.svg</file>
+        <file alias="TAGS_CLEAR">JsonEditor/TAGS_CLEAR.svg</file>
+        <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
+        <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
+        <file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
     </qresource>
 
     <qresource prefix="/VideoPlayer">

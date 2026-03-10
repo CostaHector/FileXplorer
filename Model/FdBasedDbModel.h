@@ -52,6 +52,8 @@ public:
   void AddCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);
   void RmvCastOrTags(const QModelIndexList& tagColIndexes, const QString& cast);
 
+  QList<qint64> GetSelectionFileSizes(const QModelIndexList& indexes) const;
+  QList<int> GetSelectionDurations(const QModelIndexList& indexes) const;
 private:
   QString m_rootPath;
 };

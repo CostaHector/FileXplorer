@@ -69,13 +69,21 @@ int JsonTableView::ReadADirectory(const QString& path) {
   return _JsonModel->setRootPath(path);
 }
 
-int JsonTableView::onFixSelectionRecordContents() {
+int JsonTableView::onReqFixSelectionRecordContents() {
+  return onFixSelectionRecordContents(true);
+}
+
+int JsonTableView::onReqUnfixSelectionRecordContents() {
+  return onFixSelectionRecordContents(false);
+}
+
+int JsonTableView::onFixSelectionRecordContents(bool bFixed) {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("[skip] nothing selected", "skip fix json record");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::ContentFixed);
-  return _JsonModel->SetRecordContentsFixed(indexes, true);
+  return _JsonModel->SetRecordContentsFixed(indexes, bFixed);
 }
 
 int JsonTableView::onSaveCurrentChanges() {
@@ -265,7 +273,7 @@ int JsonTableView::onUpdateDuration() {
   const int cnt = _JsonModel->UpdateDuration(indexes);
 
   LOG_OK_P("Duration field has been update", "%d/%d row(s)", cnt, indexes.size());
-  return indexes.size();
+  return cnt;
 }
 
 int JsonTableView::onClearStudio() {
@@ -517,7 +525,8 @@ void JsonTableView::subscribe() {
   connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
 
-  connect(inst._SET_CONTENTS_FIXED, &QAction::triggered, this, &JsonTableView::onFixSelectionRecordContents);
+  connect(inst._SET_CONTENTS_FIXED, &QAction::triggered, this, &JsonTableView::onReqFixSelectionRecordContents);
+  connect(inst._SET_CONTENTS_UNFIXED, &QAction::triggered, this, &JsonTableView::onReqUnfixSelectionRecordContents);
 
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
 }

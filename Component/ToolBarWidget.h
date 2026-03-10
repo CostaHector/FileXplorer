@@ -11,7 +11,7 @@
 class ToolBarWidget : public QWidget {
 public:
   explicit ToolBarWidget(QBoxLayout::Direction direction = QBoxLayout::Direction::LeftToRight, QWidget *parent = nullptr);
-  void setDirection(QBoxLayout::Direction direction);
+  bool setDirection(QBoxLayout::Direction direction);
   int setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool bRecursive = false);
   void addWidget(QWidget *parent, int stretch = 0);
   bool addAction(QAction* act);
@@ -19,13 +19,6 @@ public:
   void addStretch(int stretch = 0);
   QLabel* addString(const QString &sep = "|");
   QFrame* addSeparator();
-
-  QToolButton *createToolButton(const QIcon &icon,
-                                const QString &text,
-                                const QString &toolTip = "",
-                                bool checkable = false,
-                                Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonIconOnly,
-                                bool bToolButtonStyleFixed = false);
 
   QToolButton *createToolButton(QAction *act,
                                 Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonIconOnly,

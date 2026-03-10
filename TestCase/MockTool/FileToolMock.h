@@ -4,6 +4,7 @@
 #include <QUrl>
 
 namespace FileToolMock {
+bool invokeOpenLocalFile(const QString& localFilePath);
 bool invokeOpenLocalFileUsingDesktopService(const QString& localFilePath);
 bool invokeOpenUrl(const QUrl &url);
 }

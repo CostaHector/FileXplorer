@@ -15,6 +15,11 @@
 
 constexpr char AdvanceRenamer::NAME_SEP;
 
+int AdvanceRenamer::execCore(AdvanceRenamer* self) {
+  CHECK_NULLPTR_RETURN_INT(self, -1);
+  return self->exec();
+}
+
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   : QDialog{parent}
 {
@@ -124,6 +129,7 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
   pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
   pHelpBtn->setText("See commands...");
   pHelpBtn->setCheckable(true);
+  pHelpBtn->setChecked(false);
   return buttonBox;
 }
 
@@ -164,7 +170,7 @@ void AdvanceRenamer::Subscribe() {
     m_nExtTE->verticalScrollBar()->setValue(position);
   });
 
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Ok), &QPushButton::clicked, this, [this]() {
+  connect(m_buttonBox, &QDialogButtonBox::accepted, this, [this]() {
     onApply(false);
     QDialog::accept();
   });
@@ -179,7 +185,7 @@ void AdvanceRenamer::Subscribe() {
       onApply(true);
     }
   });
-  connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Cancel), &QPushButton::clicked, this, &QDialog::close);
+  connect(m_buttonBox, &QDialogButtonBox::rejected, this, &QDialog::close);
 }
 
 bool AdvanceRenamer::onApply(const bool isOnlyHelp) {

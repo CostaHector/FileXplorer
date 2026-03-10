@@ -94,21 +94,19 @@ class PasswordBookTest : public PlainTestSuite {
       pwdMgr.onGetRecordsFromInput();
       QVERIFY(pwdMgr.mCsvInputDialog != nullptr);
       QVERIFY(pwdMgr.mCsvInputDialog->pOkBtn != nullptr);
-      QVERIFY(pwdMgr.mCsvInputDialog->pHelpBtn != nullptr);
-      QVERIFY(pwdMgr.mCsvInputDialog->pCancelBtn != nullptr);
       QVERIFY(pwdMgr.mCsvInputDialog->textEdit != nullptr);
 
       //  no contents at all. accept still no row
       pwdMgr.mCsvInputDialog->textEdit->setPlainText("");
-      emit pwdMgr.mCsvInputDialog->pHelpBtn->clicked();
+      emit pwdMgr.mCsvInputDialog->buttonBox->helpRequested();
       emit pwdMgr.mCsvInputDialog->pOkBtn->clicked();
       QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // still no row
 
       // 2 valid row contents, cancel still no row
       pwdMgr.mCsvInputDialog->textEdit->setPlainText(partial2LineValidCSV);
-      emit pwdMgr.mCsvInputDialog->pHelpBtn->clicked();
+      emit pwdMgr.mCsvInputDialog->buttonBox->helpRequested();
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
-      emit pwdMgr.mCsvInputDialog->pCancelBtn->clicked();
+      emit pwdMgr.mCsvInputDialog->buttonBox->rejected();
       QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // still no row
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
 

@@ -29,12 +29,12 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this}; //  docker
   m_previewFolder = new (std::nothrow) CurrentRowPreviewer{previewHtmlDock}; // previewer in docker
   m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this}; // previewer switcher
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar; // searchToolBar
-  m_navigationToolBar = new (std::nothrow) NavigationToolBar; // left navigation bar
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this}; // searchToolBar
+  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this}; // left navigation bar
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this}; // ribbon menu
   m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
   m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget()}; // view/searchToolBar switcher
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget(), this}; // view/searchToolBar switcher
 
   m_fsPanel->BindLogger(m_statusBar);
   m_viewSwitchHelper->onSwitchByViewType(ViewTypeTool::DEFAULT_VIEW_TYPE);

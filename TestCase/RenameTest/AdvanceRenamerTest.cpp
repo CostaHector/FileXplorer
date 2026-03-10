@@ -14,52 +14,101 @@
 #include "RenameWidget_ReverseNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
 #include "EndToExposePrivateMember.h"
-#include <QPushButton>
 #include "RenameActions.h"
+#include <QPushButton>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
+namespace AdvanceRenamerTestTool {
+QList<int> g_execReturnValue;
+
+void set(const QList<int> newReturnValues) {
+  g_execReturnValue = newReturnValues;
+}
+
+void clear() {
+  (decltype(g_execReturnValue){}).swap(g_execReturnValue);
+}
+
+int execCoreMock(AdvanceRenamer* self) {
+  if (self == nullptr) {
+    return -1;
+  }
+  QDialogButtonBox* dlgBtnBox = self->m_buttonBox;
+  if (dlgBtnBox == nullptr) {
+    return -2;
+  }
+  if (g_execReturnValue.isEmpty()) {
+    return -3;
+  }
+  int ansCode = g_execReturnValue.takeFirst();
+  switch (ansCode) {
+    case QDialog::DialogCode::Rejected: {
+      emit dlgBtnBox->rejected();
+      return QDialog::DialogCode::Rejected;
+    }
+    case QDialog::DialogCode::Accepted: {
+      emit dlgBtnBox->accepted();
+      return QDialog::DialogCode::Accepted;
+    }
+    default:
+      return -4;
+  }
+}
+}  // namespace AdvanceRenamerTestTool
 
 class AdvanceRenamerTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   AdvanceRenamerTest() : PlainTestSuite{} {}
   TDir mTDir;
   QString mPath{mTDir.path()};
   QDir mDir{mPath};
-private slots:
+ private slots:
   void initTestCase() {
-    const QList<FsNodeEntry> nodesEntries //
-        {{"numerizer/super/Chris Evans.jpg", false, ""},
-         {"numerizer/super/Chris Evans.pson", false, ""},
-         {"numerizer/Henry Cavill.jpg", false, ""},
+    const QList<FsNodeEntry> nodesEntries  //
+        {
+            {"numerizer/super/Chris Evans.jpg", false, ""},
+            {"numerizer/super/Chris Evans.pson", false, ""},
+            {"numerizer/Henry Cavill.jpg", false, ""},
 
-         {"reverser/Henry Cavill 0.jpg", false, ""},
-         {"reverser/Henry Cavill 1.jpg", false, ""},
+            {"reverser/Henry Cavill 0.jpg", false, ""},
+            {"reverser/Henry Cavill 1.jpg", false, ""},
 
-         {"arrange/Part A - Part B/Img A - Img B - Img C - Img D.jpg", false, ""},
-         {"arrange/Part A - Part B/json A - json B - json C - json D.json", false, ""},
+            {"arrange/Part A - Part B/Img A - Img B - Img C - Img D.jpg", false, ""},
+            {"arrange/Part A - Part B/json A - json B - json C - json D.json", false, ""},
 
-         {"consecutive/Chris Pine 0.jpg", false, ""},
-         {"consecutive/Chris Pine 5.jpg", false, ""},
-         {"consecutive/Chris Pine 11.jpg", false, ""},
-         {"consecutive/Chris Hemsworth 13.jpg", false, ""},
+            {"consecutive/Chris Pine 0.jpg", false, ""},
+            {"consecutive/Chris Pine 5.jpg", false, ""},
+            {"consecutive/Chris Pine 11.jpg", false, ""},
+            {"consecutive/Chris Hemsworth 13.jpg", false, ""},
 
-         {"nameContainUnicode/𝗔𝗕𝗖.txt", false, ""},
-         {"nameContainUnicode/𝘅𝘆𝘇.txt", false, ""},
-         {"nameContainUnicode/def.txt", false, ""},
-         };
+            {"nameContainUnicode/𝗔𝗕𝗖.txt", false, ""},
+            {"nameContainUnicode/𝘅𝘆𝘇.txt", false, ""},
+            {"nameContainUnicode/def.txt", false, ""},
+        };
     QCOMPARE(mTDir.createEntries(nodesEntries), nodesEntries.size());
   }
 
+  void init() { GlobalMockObject::reset(); }
+
+  void cleanup() { GlobalMockObject::verify(); }
+
   void test_Numerize() {
     const QString numerizerPath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super", // selection sequence decide rowSelections()
+    const QStringList selectFileNames{"super",  // selection sequence decide rowSelections()
                                       "Henry Cavill.jpg"};
 
     RenameWidget_Numerize pNumerize;
     pNumerize.init();
     pNumerize.setModal(true);
 
-    pNumerize.m_nameExtIndependent->setChecked(true); // file | .txt
-    pNumerize.m_recursiveCB->setChecked(true); // including sub
+    pNumerize.m_nameExtIndependent->setChecked(true);  // file | .txt
+    pNumerize.m_recursiveCB->setChecked(true);         // including sub
 
     pNumerize.m_completeBaseName->setText("super");
     pNumerize.m_startNo->setText("1");
@@ -67,24 +116,10 @@ private slots:
     pNumerize.m_numberPattern->setCurrentText(" (%1)");
 
     pNumerize.InitTextEditContent(numerizerPath, selectFileNames);
-    QCOMPARE(pNumerize.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pNumerize.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pNumerize.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pNumerize.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pNumerize.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pNumerize.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pNumerize.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pNumerize.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pNumerize.m_relNameTE->toPlainText();
     const QString& sOldName = pNumerize.m_oBaseTE->toPlainText();
@@ -100,7 +135,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when base name changed
+    {  // when base name changed
       pNumerize.m_completeBaseName->setText("Captain CE");
       const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
       const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
@@ -108,7 +143,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when number pattern changed
+    {  // when number pattern changed
       pNumerize.m_numberPattern->setCurrentText(" [%1]");
       const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
       const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
@@ -116,7 +151,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when number start index changed
+    {  // when number start index changed
       pNumerize.m_startNo->setText("99");
       const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
       const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
@@ -124,50 +159,66 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when unique counter per ext changed
+    {  // when unique counter per ext changed
       pNumerize.m_isUniqueCounterPerExtension->setChecked(true);
       const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
       const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
-      QCOMPARE(sNewName, "Captain CE\nCaptain CE [099]\nCaptain CE\nCaptain CE [100]"); // the folder and the pson has only itself, no need add number
+      QCOMPARE(sNewName,
+               "Captain CE\nCaptain CE [099]\nCaptain CE\nCaptain CE [100]");  // the folder and the pson has only itself, no need add number
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
   }
 
+  void test_Replace_QueryAndConfirm() {
+    using namespace AdvanceRenamerTestTool;
+    set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted, QDialog::DialogCode::Accepted});
+    MOCKER(AdvanceRenamer::execCore).expects(exactly(3)).will(invoke(execCoreMock));
+
+    QString workPath = mTDir.itemPath("numerizer/super");
+    const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
+    QStringList beforeSelectedNames{"Chris Evans.jpg", "Chris Evans.pson"};
+    QString defOldName{"Chris Evans"};
+    QString defNewName{"Chris Evans aka Captain America"};
+    bool disableOldNameEdit{true};
+
+    std::pair<bool, QString> expectAnsReject{false, ""};
+    QCOMPARE(RenameWidget_Replace::QueryAndConfirm(workPath, beforeSelectedNames, defOldName, defNewName, disableOldNameEdit), expectAnsReject);
+    const QSet<QString> snapshot2 = mTDir.SnapshotAtPath(workPath);
+    QCOMPARE(snapshot2, snapshot1);  // unchange
+
+    std::pair<bool, QString> expectAnsAccepted1{true, defNewName};
+    QCOMPARE(RenameWidget_Replace::QueryAndConfirm(workPath, beforeSelectedNames, defOldName, defNewName, disableOldNameEdit), expectAnsAccepted1);
+    const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
+    QVERIFY(snapshot3 != snapshot1);
+
+    QStringList afterSelectedNames{"Chris Evans aka Captain America.jpg", "Chris Evans aka Captain America.pson"};
+    std::pair<bool, QString> expectAnsAccepted2{true, defOldName};
+    QCOMPARE(RenameWidget_Replace::QueryAndConfirm(workPath, afterSelectedNames, defNewName, defOldName, disableOldNameEdit), expectAnsAccepted2);
+    const QSet<QString> snapshot4 = mTDir.SnapshotAtPath(workPath);
+    QCOMPARE(snapshot4, snapshot1);
+  }
+
   void test_Replace() {
     const QString replacePath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super", // selection sequence decide rowSelections()
+    const QStringList selectFileNames{"super",  // selection sequence decide rowSelections()
                                       "Henry Cavill.jpg"};
 
     RenameWidget_Replace pReplace;
     pReplace.init();
     pReplace.setModal(true);
 
-    pReplace.m_nameExtIndependent->setChecked(true); // file | .txt
-    pReplace.m_recursiveCB->setChecked(true); // including sub
+    pReplace.m_nameExtIndependent->setChecked(true);  // file | .txt
+    pReplace.m_recursiveCB->setChecked(true);         // including sub
 
     pReplace.m_oldStrCB->setCurrentText("Chris Evans");
     pReplace.m_newStrCB->setCurrentText("Chris Evans");
     pReplace.m_regexCB->setChecked(false);
 
     pReplace.InitTextEditContent(replacePath, selectFileNames);
-    QCOMPARE(pReplace.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pReplace.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pReplace.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pReplace.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pReplace.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pReplace.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pReplace.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pReplace.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pReplace.m_relNameTE->toPlainText();
     const QString& sOldName = pReplace.m_oBaseTE->toPlainText();
@@ -183,7 +234,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when new name changed, Chris Evans->Captain Steve
+    {  // when new name changed, Chris Evans->Captain Steve
       pReplace.m_newStrCB->setCurrentText("Captain Steve");
       const QString& sNewName = pReplace.m_nBaseTE->toPlainText();
       const QString& sNewExt = pReplace.m_nExtTE->toPlainText();
@@ -191,7 +242,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when old name changed, Henry Cavill->Captain Steve
+    {  // when old name changed, Henry Cavill->Captain Steve
       pReplace.m_oldStrCB->setCurrentText("Henry Cavill");
       const QString& sNewName = pReplace.m_nBaseTE->toPlainText();
       const QString& sNewExt = pReplace.m_nExtTE->toPlainText();
@@ -199,7 +250,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // regex enabled, (Henry Cavill)|(Chris Evans)->Captain Steve
+    {  // regex enabled, (Henry Cavill)|(Chris Evans)->Captain Steve
       pReplace.m_regexCB->setChecked(true);
       pReplace.m_oldStrCB->setCurrentText("(Henry Cavill)|(Chris Evans)");
       const QString& sNewName = pReplace.m_nBaseTE->toPlainText();
@@ -209,8 +260,8 @@ private slots:
       QCOMPARE(pReplace.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED);
     }
 
-    { // regex enabled but regex pattern invalid
-      pReplace.m_oldStrCB->setCurrentText("(["); // invalid regex
+    {                                             // regex enabled but regex pattern invalid
+      pReplace.m_oldStrCB->setCurrentText("([");  // invalid regex
       const QString& sNewName = pReplace.m_nBaseTE->toPlainText();
       const QString& sNewExt = pReplace.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
@@ -221,39 +272,25 @@ private slots:
 
   void test_Delete() {
     const QString deletePath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super", // selection sequence decide rowSelections()
+    const QStringList selectFileNames{"super",  // selection sequence decide rowSelections()
                                       "Henry Cavill.jpg"};
 
     RenameWidget_Delete pDelete;
     pDelete.init();
     pDelete.setModal(true);
 
-    pDelete.m_nameExtIndependent->setChecked(true); // file | .txt
-    pDelete.m_recursiveCB->setChecked(true); // including sub
+    pDelete.m_nameExtIndependent->setChecked(true);  // file | .txt
+    pDelete.m_recursiveCB->setChecked(true);         // including sub
 
     pDelete.m_oldStrCB->setCurrentText("Chris Evans");
     // m_newStrCB->setCurrentText("") already set in initExclusiveSetting
     pDelete.m_regexCB->setChecked(false);
 
     pDelete.InitTextEditContent(deletePath, selectFileNames);
-    QCOMPARE(pDelete.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pDelete.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pDelete.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pDelete.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pDelete.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pDelete.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pDelete.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pDelete.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     const QString& sPathLeftNoRoot = pDelete.m_relNameTE->toPlainText();
     const QString& sOldName = pDelete.m_oBaseTE->toPlainText();
     const QString& sOldExt = pDelete.m_oExtTE->toPlainText();
@@ -261,14 +298,14 @@ private slots:
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 
-    { // new name is empty by default, Chris Evans->""
+    {  // new name is empty by default, Chris Evans->""
       const QString& sNewName = pDelete.m_nBaseTE->toPlainText();
       const QString& sNewExt = pDelete.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "super\n\n\nHenry Cavill");
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // "[A-Za-z ]{10,20}" -> ""
+    {  // "[A-Za-z ]{10,20}" -> ""
       pDelete.m_regexCB->setChecked(true);
       pDelete.m_oldStrCB->setCurrentText("[A-Za-z ]{10,20}");
       const QString& sNewName = pDelete.m_nBaseTE->toPlainText();
@@ -281,38 +318,24 @@ private slots:
 
   void test_Insert() {
     const QString insertPath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super", // selection sequence decide rowSelections()
+    const QStringList selectFileNames{"super",  // selection sequence decide rowSelections()
                                       "Henry Cavill.jpg"};
 
     RenameWidget_Insert pInsert;
     pInsert.init();
     pInsert.setModal(true);
 
-    pInsert.m_nameExtIndependent->setChecked(true); // file | .txt
-    pInsert.m_recursiveCB->setChecked(true); // including sub
+    pInsert.m_nameExtIndependent->setChecked(true);  // file | .txt
+    pInsert.m_recursiveCB->setChecked(true);         // including sub
 
-    pInsert.insertStrCB->setCurrentText(""); // insert nothing
+    pInsert.insertStrCB->setCurrentText("");  // insert nothing
     pInsert.insertAtCB->setCurrentText("256");
 
     pInsert.InitTextEditContent(insertPath, selectFileNames);
-    QCOMPARE(pInsert.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pInsert.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pInsert.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pInsert.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pInsert.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pInsert.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pInsert.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pInsert.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     const QString& sPathLeftNoRoot = pInsert.m_relNameTE->toPlainText();
     const QString& sOldName = pInsert.m_oBaseTE->toPlainText();
     const QString& sOldExt = pInsert.m_oExtTE->toPlainText();
@@ -327,7 +350,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when insert str changed to " - Captain Steve" insert at 256
+    {  // when insert str changed to " - Captain Steve" insert at 256
       pInsert.insertStrCB->setCurrentText(" - Captain Steve");
       const QString& sNewName = pInsert.m_nBaseTE->toPlainText();
       const QString& sNewExt = pInsert.m_nExtTE->toPlainText();
@@ -335,7 +358,7 @@ private slots:
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // when insert at index changed to 0. " - Captain Steve" insert at 0
+    {  // when insert at index changed to 0. " - Captain Steve" insert at 0
       pInsert.insertAtCB->setCurrentText("0");
       const QString& sNewName = pInsert.m_nBaseTE->toPlainText();
       const QString& sNewExt = pInsert.m_nExtTE->toPlainText();
@@ -373,8 +396,7 @@ private slots:
 
   void test_ReverseNames() {
     const QString reversePath{mDir.absoluteFilePath("reverser")};
-    const QStringList selectFileNames {"Henry Cavill 0.jpg",
-                                      "Henry Cavill 1.jpg"};
+    const QStringList selectFileNames{"Henry Cavill 0.jpg", "Henry Cavill 1.jpg"};
 
     RenameWidget_ReverseNames pReverse;
     pReverse.init();
@@ -382,18 +404,10 @@ private slots:
     pReverse.m_nameExtIndependent->setChecked(true);
 
     pReverse.InitTextEditContent(reversePath, selectFileNames);
-    QCOMPARE(pReverse.mSelectedNames,
-             (QStringList{"Henry Cavill 0.jpg",
-                          "Henry Cavill 1.jpg"}));
-    QCOMPARE(pReverse.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          ""}));
-    QCOMPARE(pReverse.mNames,
-             (QStringList{"Henry Cavill 0",
-                          "Henry Cavill 1"}));
-    QCOMPARE(pReverse.mExts,
-             (QStringList{".jpg",
-                          ".jpg"}));
+    QCOMPARE(pReverse.mSelectedNames, (QStringList{"Henry Cavill 0.jpg", "Henry Cavill 1.jpg"}));
+    QCOMPARE(pReverse.mRelToNameWithNoRoot, (QStringList{"", ""}));
+    QCOMPARE(pReverse.mNames, (QStringList{"Henry Cavill 0", "Henry Cavill 1"}));
+    QCOMPARE(pReverse.mExts, (QStringList{".jpg", ".jpg"}));
     const QString& sPathLeftNoRoot = pReverse.m_relNameTE->toPlainText();
     const QString& sOldName = pReverse.m_oBaseTE->toPlainText();
     const QString& sOldExt = pReverse.m_oExtTE->toPlainText();
@@ -411,8 +425,7 @@ private slots:
 
   void test_PrependParentFolderName() {
     const QString prependPath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super",
-                                      "Henry Cavill.jpg"};
+    const QStringList selectFileNames{"super", "Henry Cavill.jpg"};
 
     RenameWidget_PrependParentFolderName pPrepend;
     pPrepend.init();
@@ -420,24 +433,10 @@ private slots:
     pPrepend.m_nameExtIndependent->setChecked(true);
     // m_recursiveCB->checked(true) already set in initExclusiveSetting
     pPrepend.InitTextEditContent(prependPath, selectFileNames);
-    QCOMPARE(pPrepend.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pPrepend.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pPrepend.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pPrepend.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pPrepend.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pPrepend.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pPrepend.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pPrepend.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     {
       const QString& sPathLeftNoRoot = pPrepend.m_relNameTE->toPlainText();
       const QString& sOldName = pPrepend.m_oBaseTE->toPlainText();
@@ -454,8 +453,7 @@ private slots:
   }
   void test_Case() {
     const QString casePath{mDir.absoluteFilePath("numerizer")};
-    const QStringList selectFileNames {"super",
-                                      "Henry Cavill.jpg"};
+    const QStringList selectFileNames{"super", "Henry Cavill.jpg"};
 
     RenameWidget_Case pCase;
     pCase.init();
@@ -465,24 +463,10 @@ private slots:
     g_renameAg()._UPPER_CASE->setChecked(true);
 
     pCase.InitTextEditContent(casePath, selectFileNames);
-    QCOMPARE(pCase.mSelectedNames,
-             (QStringList{"super",
-                          "Henry Cavill.jpg"}));
-    QCOMPARE(pCase.mRelToNameWithNoRoot,
-             (QStringList{"",
-                          "super",
-                          "super",
-                          ""}));
-    QCOMPARE(pCase.mNames,
-             (QStringList{"super",
-                          "Chris Evans",
-                          "Chris Evans",
-                          "Henry Cavill"}));
-    QCOMPARE(pCase.mExts,
-             (QStringList{"",
-                          ".jpg",
-                          ".pson",
-                          ".jpg"}));
+    QCOMPARE(pCase.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
+    QCOMPARE(pCase.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pCase.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
+    QCOMPARE(pCase.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pCase.m_relNameTE->toPlainText();
     const QString& sOldName = pCase.m_oBaseTE->toPlainText();
@@ -491,14 +475,14 @@ private slots:
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 
-    { // upper case
+    {  // upper case
       const QString& sNewName = pCase.m_nBaseTE->toPlainText();
       const QString& sNewExt = pCase.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "SUPER\nCHRIS EVANS\nCHRIS EVANS\nHENRY CAVILL");
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
     }
 
-    { // lower case
+    {  // lower case
       g_renameAg()._LOWER_CASE->setChecked(true);
       emit g_renameAg().NAME_CASE->triggered(g_renameAg()._LOWER_CASE);
 
@@ -511,7 +495,7 @@ private slots:
 
   void test_ArrangeSection() {
     const QString arrangePath{mDir.absoluteFilePath("arrange")};
-    const QStringList selectFileNames {"Part A - Part B"};
+    const QStringList selectFileNames{"Part A - Part B"};
 
     RenameWidget_ArrangeSection pArrange;
     pArrange.init();
@@ -532,59 +516,59 @@ private slots:
     QCOMPARE(pArrange.mExts, (QStringList{"", ".jpg", ".json"}));
 
     const QString& sPathLeftNoRoot = pArrange.m_relNameTE->toPlainText();
-    const QString& sOldName        = pArrange.m_oBaseTE->toPlainText();
-    const QString& sOldExt         = pArrange.m_oExtTE->toPlainText();
+    const QString& sOldName = pArrange.m_oBaseTE->toPlainText();
+    const QString& sOldExt = pArrange.m_oExtTE->toPlainText();
     QCOMPARE(sPathLeftNoRoot, "\nPart A - Part B\nPart A - Part B");
-    QCOMPARE(sOldName,        "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
-    QCOMPARE(sOldExt,         "\n.jpg\n.json");
+    QCOMPARE(sOldName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
+    QCOMPARE(sOldExt, "\n.jpg\n.json");
 
-    { // swap index at 0 and 1
+    {  // swap index at 0 and 1
       const QString& sNewName = pArrange.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pArrange.m_nExtTE->toPlainText();
+      const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "Part B - Part A\nImg B - Img A - Img C - Img D\njson B - json A - json C - json D");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
       QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED);
     }
 
-    { // swap index char invalid
+    {  // swap index char invalid
       pArrange.m_swap2Index->setCurrentText("a0,1a");
       const QString& sNewName = pArrange.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pArrange.m_nExtTE->toPlainText();
+      const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
       QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::NOT_SAVED);
     }
 
-    { // swap index count invalid
+    {  // swap index count invalid
       pArrange.m_swap2Index->setCurrentText("0,1,2");
       const QString& sNewName = pArrange.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pArrange.m_nExtTE->toPlainText();
+      const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
       QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::NOT_SAVED);
     }
 
-    { // rearrange index "2 - 1 - 0" and drop others
+    {  // rearrange index "2 - 1 - 0" and drop others
       pArrange._SECTIONS_USED_TO_JOIN->setChecked(true);
       pArrange.m_sectionsUsedToJoin->setCurrentText("2,1,0");
       pArrange.m_recordWasted->setChecked(true);
       const QString& sNewName = pArrange.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pArrange.m_nExtTE->toPlainText();
+      const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "Part B - Part A\nImg C - Img B - Img A\njson C - json B - json A");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
       QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED);
     }
   }
 
   void test_LongPath() {
     const QString longPath{mDir.absoluteFilePath("arrange")};
-    const QStringList selectFileNames {"Part A - Part B"};
+    const QStringList selectFileNames{"Part A - Part B"};
 
     RenameWidget_LongPath pLongPath;
     pLongPath.init();
     pLongPath.setModal(true);
 
-    pLongPath.m_dropSectionLE->setText("1"); // drop the 1st section
+    pLongPath.m_dropSectionLE->setText("1");  // drop the 1st section
     emit pLongPath.m_dropSectionLE->textEdited("1");
     pLongPath.m_maxPathLengthLE->setText("10");
 
@@ -598,33 +582,33 @@ private slots:
     QCOMPARE(pLongPath.mExts, (QStringList{"", ".jpg", ".json"}));
 
     const QString& sPathLeftNoRoot = pLongPath.m_relNameTE->toPlainText();
-    const QString& sOldName        = pLongPath.m_oBaseTE->toPlainText();
-    const QString& sOldExt         = pLongPath.m_oExtTE->toPlainText();
+    const QString& sOldName = pLongPath.m_oBaseTE->toPlainText();
+    const QString& sOldExt = pLongPath.m_oExtTE->toPlainText();
     QCOMPARE(sPathLeftNoRoot, "\nPart A - Part B\nPart A - Part B");
-    QCOMPARE(sOldName,        "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
-    QCOMPARE(sOldExt,         "\n.jpg\n.json");
+    QCOMPARE(sOldName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
+    QCOMPARE(sOldExt, "\n.jpg\n.json");
 
-    { // remove name first section
+    {  // remove name first section
       const QString& sNewName = pLongPath.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pLongPath.m_nExtTE->toPlainText();
+      const QString& sNewExt = pLongPath.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "Part B\nImg B - Img C - Img D\njson B - json C - json D");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
     }
 
-    { // long enough path. remove nothing
+    {  // long enough path. remove nothing
       pLongPath.m_maxPathLengthLE->setText("260");
       pLongPath.DropSectionChanged("260");
 
       const QString& sNewName = pLongPath.m_nBaseTE->toPlainText();
-      const QString& sNewExt  = pLongPath.m_nExtTE->toPlainText();
+      const QString& sNewExt = pLongPath.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
-      QCOMPARE(sNewExt,  "\n.jpg\n.json");
+      QCOMPARE(sNewExt, "\n.jpg\n.json");
     }
   }
 
-  void test_ConsecutiveFileNo () {
+  void test_ConsecutiveFileNo() {
     const QString consecutivePath{mDir.absoluteFilePath("consecutive")};
-    const QStringList selectFileNames {"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"};
+    const QStringList selectFileNames{"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"};
     RenameWidget_ConsecutiveFileNo pConse;
     pConse.init();
     pConse.setModal(true);
@@ -647,7 +631,7 @@ private slots:
 
   void test_ConvertBoldUnicodeCharset2Ascii() {
     const QString unicodePath{mDir.absoluteFilePath("nameContainUnicode")};
-    const QStringList selectFileNames {"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"};
+    const QStringList selectFileNames{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"};
     RenameWidget_ConvertBoldUnicodeCharset2Ascii pCovert;
     pCovert.init();
     pCovert.setModal(true);

@@ -106,7 +106,7 @@ class VideoViewTest : public PlainTestSuite {
     // 1 file exist
     QCOMPARE(videoView.PlayVideos("", {__FILE__}, true), 1);
     QCOMPARE(reqPlayMediaSpy.count(), 1);
-    QCOMPARE(reqPlayMediaSpy.takeLast(), (QList<QVariant>{__FILE__, true}));
+    QCOMPARE(reqPlayMediaSpy.takeLast(), (QVariantList{__FILE__, true}));
     QCOMPARE(videoView.GetCurrentPlayingMediaPath(), __FILE__);
 
     // 2 file but not exist
@@ -115,7 +115,7 @@ class VideoViewTest : public PlainTestSuite {
 
     QCOMPARE(fileFindCnt2, 2);
     QCOMPARE(reqPlayMediaSpy.count(), 1);
-    QCOMPARE(reqPlayMediaSpy.takeLast(), (QList<QVariant>{"Path/to/InexistFolder/file1.mp4", true}));
+    QCOMPARE(reqPlayMediaSpy.takeLast(), (QVariantList{"Path/to/InexistFolder/file1.mp4", true}));
     QCOMPARE(videoView.GetCurrentPlayingMediaPath(), "");
 
     videoView.StopPlay();

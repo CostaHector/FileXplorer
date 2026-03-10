@@ -26,7 +26,7 @@ public:
   const QString LOCAL_LOG{"log_handler_local.log"};
   const QString LOCAL_LOG_ABS_PATH{mDir.itemPath(LOCAL_LOG)};
 private slots:
-  void initupTestCase() {
+  void initTestCase() {
    GlobalMockObject::reset();
    MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
   }

@@ -17,6 +17,7 @@
 #include <QTextEdit>
 #include <QMessageBox>
 
+#include "VideoDurationGetter.h"
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -109,8 +110,9 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonView.onAppendFromSelection(true), -1);
     QCOMPARE(jsonView.onAppendFromSelection(false), -1);
 
+    // has no current index;
     QString selectedText;
-    JsonTableView::EDITOR_WIDGET_TYPE widgetType{JsonTableView::EDITOR_WIDGET_TYPE::LINE_EDIT};
+    JsonTableView::EDITOR_WIDGET_TYPE widgetType{JsonTableView::EDITOR_WIDGET_TYPE::BUTT};
     QVERIFY(!jsonView.GetSelectedTextInCell(selectedText, widgetType));
   }
 
@@ -251,11 +253,6 @@ class JsonTableViewTest : public PlainTestSuite {
     JsonTableModel jsonModel;
     JsonTableView jsonView{&jsonModel, &jsonProxyModel};
 
-    QLineEdit lineEditCell{&jsonView};
-    QPlainTextEdit plainTextEditCell{&jsonView};
-    QTextEdit textEditCell{&jsonView};
-    QWidget invalidEditCell{&jsonView};
-
     // set a directory
     QCOMPARE(jsonView.ReadADirectory(workPath), 2);
     QCOMPARE(jsonModel.rowCount(), 2);
@@ -267,6 +264,7 @@ class JsonTableViewTest : public PlainTestSuite {
     jsonView.setCurrentIndex(jsonProxyModel.index(0, JsonKey::Detail));
     QVERIFY(jsonView.currentIndex().isValid());
 
+    QLineEdit lineEditCell{&jsonView};
     lineEditCell.setText("chris evans");
     lineEditCell.selectAll();
     jsonView.pWidgetInCellMock = &lineEditCell;
@@ -277,6 +275,7 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(lineEditCell.text(), "chris evans");
     QCOMPARE(lineEditCell.selectedText(), "chris evans");
 
+    QPlainTextEdit plainTextEditCell{&jsonView};
     plainTextEditCell.setPlainText("chris evans");
     plainTextEditCell.selectAll();
     jsonView.pWidgetInCellMock = &plainTextEditCell;
@@ -287,19 +286,38 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(plainTextEditCell.toPlainText(), "chris evans");
     QCOMPARE(plainTextEditCell.textCursor().selectedText(), "chris evans");
 
+    QTextEdit textEditCell{&jsonView};
     textEditCell.setPlainText("chris evans");
     textEditCell.selectAll();
     jsonView.pWidgetInCellMock = &textEditCell;
     jsonView.onSelectionCaseOperation(true);
     QCOMPARE(textEditCell.toPlainText(), "Chris Evans");
-    QCOMPARE(textEditCell.textCursor().selectedText(), "Chris Evans");  // 此处如何检查QPlainTextEdit选中
+    QCOMPARE(textEditCell.textCursor().selectedText(), "Chris Evans");
     jsonView.onSelectionCaseOperation(false);
     QCOMPARE(textEditCell.toPlainText(), "chris evans");
     QCOMPARE(textEditCell.textCursor().selectedText(), "chris evans");
+    textEditCell.setText(" \t ");  // white char 纯空白字符, 视为没有选中, 将不会控制更新大小写转变
+    textEditCell.selectAll();
+    QCOMPARE(jsonView.onSelectionCaseOperation(true), -1);
+    QCOMPARE(textEditCell.toPlainText(), " \t ");
+    QCOMPARE(textEditCell.textCursor().selectedText(), " \t ");
+    QString selectedText;
+    JsonTableView::EDITOR_WIDGET_TYPE thisTimeWidgeType{JsonTableView::EDITOR_WIDGET_TYPE::BUTT};
+    QVERIFY(jsonView.GetSelectedTextInCell(selectedText, thisTimeWidgeType));
+    QCOMPARE(selectedText, " \t ");
+    QCOMPARE(thisTimeWidgeType, JsonTableView::EDITOR_WIDGET_TYPE::TEXT_EDIT);
 
+    QWidget invalidEditCell{&jsonView};
     jsonView.pWidgetInCellMock = &invalidEditCell;  // cannot convert
     QCOMPARE(jsonView.onSelectionCaseOperation(true), -1);
+
+    // nullptr widget, not in edit mode
     jsonView.pWidgetInCellMock = nullptr;
+    selectedText = "";
+    thisTimeWidgeType = JsonTableView::EDITOR_WIDGET_TYPE::BUTT;
+    QVERIFY(jsonView.GetSelectedTextInCell(selectedText, thisTimeWidgeType));
+    QCOMPARE(selectedText, "");
+    QCOMPARE(thisTimeWidgeType, JsonTableView::EDITOR_WIDGET_TYPE::BUTT);
   }
 
   void onFormatCast_ok() {
@@ -530,6 +548,60 @@ class JsonTableViewTest : public PlainTestSuite {
     jsonView.selectRow(0);
     QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
     QCOMPARE(jsonView.onRenameJsonAndRelated(), 2);  // two file get renamed
+  }
+
+  void onFixSelectionRecordContents_ok() {
+    QSortFilterProxyModel jsonProxyModel;
+    JsonTableModel jsonModel;
+    JsonTableView jsonView{&jsonModel, &jsonProxyModel};
+    QCOMPARE(jsonView.ReadADirectory(workPath), 2);
+    QCOMPARE(jsonModel.rowCount(), 2);
+
+    jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Studio), "Marvel", Qt::EditRole);
+    jsonModel.setData(jsonModel.index(1, JSON_KEY_E::Studio), "", Qt::EditRole);
+
+    jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Cast), "Henry Cavill, Chris Evans, Henry Cavill", Qt::EditRole);
+    jsonModel.setData(jsonModel.index(1, JSON_KEY_E::Cast), "Michael Fassbender", Qt::EditRole);
+
+    jsonView.clearSelection();
+    QCOMPARE(jsonView.onReqFixSelectionRecordContents(), 0);
+    QCOMPARE(jsonView.onReqUnfixSelectionRecordContents(), 0);
+
+    jsonView.selectionModel()->select({jsonProxyModel.index(0, JSON_KEY_E::Prepath), jsonProxyModel.index(0, JSON_KEY_E::Detail)},
+                                      QItemSelectionModel::SelectionFlag::Select);
+    jsonView.selectionModel()->select({jsonProxyModel.index(1, JSON_KEY_E::Prepath), jsonProxyModel.index(1, JSON_KEY_E::Detail)},
+                                      QItemSelectionModel::SelectionFlag::Select);
+    QCOMPARE(jsonView.onReqFixSelectionRecordContents(), 2);
+
+    jsonView.selectionModel()->select({jsonProxyModel.index(1, JSON_KEY_E::Prepath), jsonProxyModel.index(1, JSON_KEY_E::Detail)},
+                                      QItemSelectionModel::SelectionFlag::Deselect);
+    QCOMPARE(jsonView.onReqUnfixSelectionRecordContents(), 1);
+  }
+
+  void onUpdateDuration_ok() {
+    QSortFilterProxyModel jsonProxyModel;
+    JsonTableModel jsonModel;
+    JsonTableView jsonView{&jsonModel, &jsonProxyModel};
+    jsonProxyModel.sort(JSON_KEY_E::Name, Qt::AscendingOrder);
+    QCOMPARE(jsonView.ReadADirectory(workPath), 2);
+    QCOMPARE(jsonModel.rowCount(), 2);
+
+    jsonView.selectAll();
+    QCOMPARE(jsonView.onSyncNameField(), 2);
+    QCOMPARE(jsonProxyModel.index(0, JSON_KEY_E::Name).data(Qt::DisplayRole).toString(), "a");
+    QCOMPARE(jsonProxyModel.index(1, JSON_KEY_E::Name).data(Qt::DisplayRole).toString(), "b");
+
+    jsonView.clearSelection();
+    QCOMPARE(jsonView.onUpdateDuration(), 0);
+
+    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).with(tDir.itemPath("a.mp4")).will(returnValue(10 * 60 * 1000));  // 10min
+    jsonView.selectAll();
+    QCOMPARE(jsonView.onUpdateDuration(), 1);  // only a.json contains a.mp4
+
+    // only select "b.json", but "b.json" have no mp4
+    jsonView.clearSelection();
+    jsonView.selectRow(1);
+    QCOMPARE(jsonView.onUpdateDuration(), 0);
   }
 };
 

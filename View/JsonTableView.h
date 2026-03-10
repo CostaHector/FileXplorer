@@ -16,7 +16,8 @@ class JsonTableView : public CustomTableView {
   int ReadADirectory(const QString& path);
   void subscribe();
 
-  int onFixSelectionRecordContents();
+  int onReqFixSelectionRecordContents();
+  int onReqUnfixSelectionRecordContents();
   int onSaveCurrentChanges();
   int onSyncNameField();
   int onExportCastStudioToDictonary();
@@ -44,6 +45,7 @@ class JsonTableView : public CustomTableView {
 
  private:
   void onSelectNewJsonLine(const QModelIndex &current);
+  int onFixSelectionRecordContents(bool bFixed);
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};

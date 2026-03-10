@@ -1,15 +1,12 @@
 #include "SceneStyleDelegate.h"
+#include "PublicMacro.h"
 #include "ScenesListModel.h"
-#include <QAbstractItemView>
-#include <QEvent>
-#include <QMouseEvent>
 #include <QPainter>
-#include <QToolTip>
 #include <QGraphicsEffect>
-
 constexpr QColor SceneStyleDelegate::GRAY_AND_HALF_TRANS;
 
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
+  CHECK_NULLPTR_RETURN_VOID(option);
   option->decorationPosition = QStyleOptionViewItem::Position::Top;
   option->decorationAlignment = Qt::AlignmentFlag::AlignHCenter;
   option->textElideMode = Qt::TextElideMode::ElideLeft;
@@ -29,6 +26,7 @@ QString SceneStyleDelegate::displayText(const QVariant& value, const QLocale& lo
 }
 
 void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
+  CHECK_NULLPTR_RETURN_VOID(painter);
   // 1. plot basic image and text
   QStyledItemDelegate::paint(painter, option, index);
   // 2. only when index = curIndex and display = true. plot rating bar is needed
@@ -48,6 +46,7 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 }
 
 void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) const {
+  CHECK_NULLPTR_RETURN_VOID(painter);
   // 绘制半透明背景层
   painter->fillRect(rect, GRAY_AND_HALF_TRANS); // gray and half transparent
 

@@ -38,6 +38,10 @@ public:
   int onSetStudio();
   int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
 
+  QList<qint64> GetSelectionFileSizes() const;
+  QList<int> GetSelectionDurations() const;
+
+
   // should not call ~destructure after getDb() and pass to QSqlTableModel
 private:
   bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const;

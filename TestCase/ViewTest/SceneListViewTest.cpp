@@ -24,8 +24,8 @@ class SceneListViewTest : public PlainTestSuite {
 public:
   TDir tDir;
   const QString scnAbsPath = SceneInfoManager::ScnMgr::GetScnAbsFilePath(tDir.path());
-  QList<QVariant> expectCurrentSceneChangedArgs_ChrisEvans;
-  QList<QVariant> expectCurrentSceneChangedArgs_HenryCavill;
+  QVariantList expectCurrentSceneChangedArgs_ChrisEvans;
+  QVariantList expectCurrentSceneChangedArgs_HenryCavill;
   const QSize listViewImageSize{RateHelper::RATING_BAR_HEIGHT * RateHelper::RATING_BAR_HEIGHT, RateHelper::RATING_BAR_HEIGHT * 2};
   static constexpr int rateChrisEvans = 3;
   static constexpr int rateHenryCavill = 8;
@@ -62,13 +62,13 @@ private slots:
     };
     QCOMPARE(tDir.createEntries(nodes), 6);
 
-    expectCurrentSceneChangedArgs_ChrisEvans = QList<QVariant>{
+    expectCurrentSceneChangedArgs_ChrisEvans = QVariantList{
         "Chris Evans",                                 //
         tDir.itemPath("Chris Evans.json"),             //
         QStringList{tDir.itemPath("Chris Evans.jpg")}, //
         QStringList{tDir.itemPath("Chris Evans.mp4")},
     };
-    expectCurrentSceneChangedArgs_HenryCavill = QList<QVariant>{
+    expectCurrentSceneChangedArgs_HenryCavill = QVariantList{
         "Henry Cavill",                                 //
         tDir.itemPath("Henry Cavill.json"),             //
         QStringList{tDir.itemPath("Henry Cavill.png")}, //

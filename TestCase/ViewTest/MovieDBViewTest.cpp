@@ -124,6 +124,9 @@ class MovieDBViewTest : public PlainTestSuite {
     QVERIFY(!movieView.onAuditATable());       // no tables at all
 
     QVERIFY(movieView.onInitDataBase());  // usually we don't need call it
+
+    QCOMPARE(movieView.GetSelectionFileSizes(), (QList<qint64>{}));
+    QCOMPARE(movieView.GetSelectionDurations(), (QList<int>{}));
   }
 
   void create_tableName1_ok() {

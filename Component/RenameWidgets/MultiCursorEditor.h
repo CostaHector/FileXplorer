@@ -15,10 +15,7 @@ public:
     MULTI_LINE_SELECTING,
   };
 
-  MultiCursorEditor(QWidget *parent = nullptr)
-    : QPlainTextEdit(parent) {
-    connect(&blinkTimer, &QTimer::timeout, this, &MultiCursorEditor::toggleCursors);
-  }
+  explicit MultiCursorEditor(QWidget *parent = nullptr);
 
 protected:
   void mousePressEvent(QMouseEvent *e) override;
@@ -32,10 +29,7 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-  void toggleCursors() {
-    cursorVisible = !cursorVisible;
-    viewport()->update();
-  }
+  void toggleCursors();
 
 private:
   void deleteAtBothCursors(bool backward = true);
@@ -45,36 +39,20 @@ private:
 
   QRect GetRect() const;
 
-  void IntoInitStatus(QPoint startPos) {
-    disableMultiline();
-    mStatus = INIT;
-    m_startPos = startPos;
-    m_endPos = QPoint(); // invalid
-  }
+  void IntoInitStatus(QPoint startPos);
 
   void IntoMultiSelectStatus();
 
-  void PreparingStatusUpdateEndPostion(QPoint endPos) {
-    m_endPos = endPos;
-  }
+  void PreparingStatusUpdateEndPostion(QPoint endPos);
 
   void IntoMultiLineSelecting(QPoint endPos);
 
-  void enableMultiline() {
-    blinkTimer.start(800);
-    cursorVisible = true;
-    viewport()->update();
-  }
+  void enableMultiline();
 
-  void disableMultiline() {
-    mCursors.clear();
-    blinkTimer.stop();
-    cursorVisible = false;
-    viewport()->update();
-  }
+  void disableMultiline();
 
   bool cursorVisible{false};
-  QTimer blinkTimer;
+  QTimer mBlinkTimer;
   QList<QTextCursor> mCursors;
   SelectStatus mStatus = INIT;
   QPoint m_startPos, m_endPos;

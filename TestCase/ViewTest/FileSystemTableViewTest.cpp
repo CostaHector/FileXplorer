@@ -144,7 +144,7 @@ private slots:
     QCOMPARE(directoyLoadedSigSpy.wait(1000), true);
     QCOMPARE(directoyLoadedSigSpy.count(), 1);
 
-    QList<QVariant> params = directoyLoadedSigSpy.back();
+    QVariantList params = directoyLoadedSigSpy.back();
     QCOMPARE(params.size(), 1);
     QCOMPARE(params[0].toString(), currentPath);
   }

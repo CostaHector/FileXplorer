@@ -15,7 +15,8 @@
 class PropertiesWindowTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TDir testDir;
+  TDir mTDir;
+  const PropertiesWindowActions& actInst = g_propertiesWindowAct();
 
  private slots:
   void initTestCase() {
@@ -26,196 +27,188 @@ class PropertiesWindowTest : public PlainTestSuite {
                                   {"video2.mp4", false, ""},
                                   {"folder1/subfile.txt", false, "Sub content"},
                                   {"folder2", true, ""}};
-    QVERIFY(testDir.IsValid());
-    QCOMPARE(testDir.createEntries(entries), entries.size());
+    QVERIFY(mTDir.IsValid());
+    QCOMPARE(mTDir.createEntries(entries), entries.size());
+
+    QCOMPARE(actInst.SHOW_FILES_MD5->isChecked(), false);
+    QCOMPARE(actInst.SHOW_VIDS_DURATION->isChecked(), false);
   }
 
   void cleanupTestCase() {
     Configuration().clear();  //
   }
 
-  void testEmptyItems() {
+  void no_row_selected_ok() {
     PropertiesWindow propWindow;
-    // 测试空项目列表
-    propWindow(QStringList());
-    // 验证窗口标题
+    propWindow.showEvent(nullptr);  // will not crash
+
+    QVERIFY(propWindow(QStringList{}));
     QCOMPARE(propWindow.windowTitle(), "Property | [0] item(s)");
-    // 验证显示内容
     QCOMPARE(propWindow.m_propertiesInfoTextEdit->toPlainText(), "Nothing selected");
 
-    //
-    propWindow(nullptr, nullptr);
+    QVERIFY(propWindow(QList<qint64>{}, QList<int>{}));
+    QCOMPARE(propWindow.windowTitle(), "Property | [0] item(s)");
+    QCOMPARE(propWindow.m_propertiesInfoTextEdit->toPlainText(), "Nothing selected");
   }
 
-  void testSingleFile() {
+  void singleFile_ok() {
     PropertiesWindow propWindow;
 
-    // 测试单个文件
-    QString filePath = testDir.itemPath("file1.txt");
-    propWindow({filePath});
-
-    // 验证窗口标题
+    propWindow({mTDir.itemPath("file1.txt")});
     QCOMPARE(propWindow.windowTitle(), QString("Property | [1] item(s)"));
 
-    // 验证通用信息初始化
-    QVERIFY(!propWindow.m_commonInfomation.isEmpty());
+    QCOMPARE(propWindow.m_commonInfomation.isEmpty(), false);
     QVERIFY(propWindow.m_commonInfomation.contains("Contents: 1 file(s), 0 folder(s)"));
     QVERIFY(propWindow.m_commonInfomation.contains("Size:"));
 
-    // 验证MD5信息未初始化（默认不显示）
     QVERIFY(propWindow.m_fileIdentifier.isEmpty());
-
-    // 验证时长信息未初始化（默认不显示）
     QVERIFY(propWindow.m_durations.isEmpty());
   }
 
-  void testMultipleFiles() {
+  void multipleFiles_ok() {
     PropertiesWindow propWindow;
-
-    // 测试多个文件
     QStringList items = {
-        testDir.itemPath("file1.txt"),   //
-        testDir.itemPath("folder1"),     // 1 file under it
-        testDir.itemPath("video1.mp4"),  //
+        mTDir.itemPath("file1.txt"),   //
+        mTDir.itemPath("folder1"),     // 1 file under it
+        mTDir.itemPath("video1.mp4"),  //
     };
-    propWindow(items);
-
-    // 验证窗口标题
+    QCOMPARE(propWindow(items), true);
     QCOMPARE(propWindow.windowTitle(), QString("Property | [3] item(s)"));
 
-    // 验证通用信息初始化
     QVERIFY(!propWindow.m_commonInfomation.isEmpty());
     const QString commonInfo = propWindow.m_commonInfomation;
     QVERIFY(commonInfo.contains("Contents: 3 file(s)"));
     QVERIFY(commonInfo.contains("Size:"));
 
-    // 验证MD5信息未初始化（默认不显示）
     QVERIFY(propWindow.m_fileIdentifier.isEmpty());
 
-    // 验证时长信息未初始化（默认不显示）
     QVERIFY(propWindow.m_durations.isEmpty());
   }
 
-  void testFileSizeDisplay() {
+  void fileSizeDisplay_ok() {
+    actInst.SHOW_FILES_SIZE->setChecked(true);
+    ON_SCOPE_EXIT {
+      actInst.SHOW_FILES_SIZE->setChecked(false);
+    };
+
     PropertiesWindow propWindow;
-
-    // 启用文件大小显示
-    g_propertiesWindowAct().SHOW_FILES_SIZE->setChecked(true);
-
-    // 测试文件
     QStringList items = {
-        testDir.itemPath("file1.txt"),  //
-        testDir.itemPath("folder1"),    // 1 file under it
+        mTDir.itemPath("file1.txt"),  //
+        mTDir.itemPath("folder1"),    // 1 file under it
     };
     propWindow(items);
-
-    // 验证显示内容
     QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains(PropertiesWindow::STRING_SPLITTER));
     QVERIFY(html.contains("Contents: 2 file(s), 1 folder(s)"));
     QVERIFY(html.contains("Size:"));
-
-    // 重置状态
-    g_propertiesWindowAct().SHOW_FILES_SIZE->setChecked(false);
   }
 
-  void testDurationDisplay() {
-    PropertiesWindow propWindow;
-
-    // 启用时长显示
-    g_propertiesWindowAct().SHOW_VIDS_DURATION->setChecked(true);
-
-    // 测试视频文件
-    QStringList videoFiles = {
-        testDir.itemPath("video1.mp4"),  //
-        testDir.itemPath("video2.mp4"),  //
+  void duration_display_stringList_ok() {
+    actInst.SHOW_VIDS_DURATION->setChecked(true);
+    ON_SCOPE_EXIT {
+      actInst.SHOW_VIDS_DURATION->setChecked(false);
     };
+    QStringList videoFiles{
+        mTDir.itemPath("video1.mp4"),  //
+        mTDir.itemPath("video2.mp4"),  //
+    };
+    PropertiesWindow propWindow;
     propWindow(videoFiles);
-
-    // 验证显示内容
     QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains(PropertiesWindow::STRING_SPLITTER));
-
-    // 重置状态
-    g_propertiesWindowAct().SHOW_VIDS_DURATION->setChecked(false);
   }
 
-  void testMd5Display() {
+  void duration_display_intList_ok() {
+    actInst.SHOW_VIDS_DURATION->setChecked(true);
+    actInst.SHOW_FILES_SIZE->setChecked(true);
+    ON_SCOPE_EXIT {
+      actInst.SHOW_VIDS_DURATION->setChecked(false);
+      actInst.SHOW_FILES_SIZE->setChecked(false);
+    };
+    QList<qint64> fileSizes{
+        1 * 1024,         //
+        1 * 1024 * 1024,  //
+        1,                //
+    };
+    QList<int> videoDurations{
+        60 * 1000,  //
+        30 * 1000,  //
+        10 * 1000,  //
+    };
     PropertiesWindow propWindow;
+    QVERIFY(propWindow(fileSizes, videoDurations));
+    QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
+    QVERIFY(html.contains("3 file(s) durations: 00:01:40"));
+    QVERIFY(html.contains("3 file(s) sizes: 0'1'1'1"));
+  }
 
-    // 启用MD5显示
-    g_propertiesWindowAct().SHOW_FILES_MD5->setChecked(true);
+  void md5_display_ok() {
+    actInst.SHOW_FILES_MD5->setChecked(true);
+    ON_SCOPE_EXIT {
+      actInst.SHOW_FILES_MD5->setChecked(false);
+    };
 
-    // 测试文件
-    QString filePath = testDir.itemPath("file1.txt");
+    PropertiesWindow propWindow;
+    QString filePath = mTDir.itemPath("file1.txt");
     propWindow({filePath});
 
-    // 验证显示内容
     QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains(PropertiesWindow::STRING_SPLITTER));
     QVERIFY(html.contains("MD5"));
 
-    // 验证MD5值计算正确
     QString expectedMd5 = QCryptographicHash::hash("Content of file1", QCryptographicHash::Md5).toHex();
     QVERIFY(html.contains(expectedMd5));
-
-    // 重置状态
-    g_propertiesWindowAct().SHOW_FILES_MD5->setChecked(false);
   }
 
-  void testSettingsPersistence() {
+  void settings_persistence_ok() {
     PropertiesWindow propWindow;
-
-    // 保存初始几何信息
     QByteArray originalGeometry = propWindow.saveGeometry();
-
-    // 模拟关闭事件
     QCloseEvent closeEvent;
     propWindow.closeEvent(&closeEvent);
 
-    // 验证设置已保存
     QByteArray savedGeometry = Configuration().value("PropertiesWindowGeometry").toByteArray();
     QCOMPARE(savedGeometry, originalGeometry);
-
-    // 修改几何信息
     propWindow.setGeometry(100, 100, 800, 600);
-
-    // 读取设置
-    propWindow.ReadSetting();
   }
 
-  void testToggleDisplayOptions() {
+  void toggle_display_options_ok() {
+    ON_SCOPE_EXIT {
+      actInst.SHOW_FILES_SIZE->setChecked(false);
+      actInst.SHOW_VIDS_DURATION->setChecked(false);
+      actInst.SHOW_FILES_MD5->setChecked(false);
+    };
+
     PropertiesWindow propWindow;
 
     // 设置测试数据
-    QStringList items = {testDir.itemPath("file1.txt"), testDir.itemPath("video1.mp4"), testDir.itemPath("folder1")};
+    QStringList items = {mTDir.itemPath("file1.txt"), mTDir.itemPath("video1.mp4"), mTDir.itemPath("folder1")};
     propWindow(items);
 
     // 启用文件大小显示
-    g_propertiesWindowAct().SHOW_FILES_SIZE->setChecked(true);
+    actInst.SHOW_FILES_SIZE->setChecked(true);
     propWindow.UpdateMessage();
     QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains("Contents:"));
     QVERIFY(!html.contains("MD5"));
 
     // 启用时长显示
-    g_propertiesWindowAct().SHOW_VIDS_DURATION->setChecked(true);
+    actInst.SHOW_VIDS_DURATION->setChecked(true);
     propWindow.UpdateMessage();
     html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains("Contents:"));
     QVERIFY(!html.contains("MD5"));
 
     // 启用MD5显示
-    g_propertiesWindowAct().SHOW_FILES_MD5->setChecked(true);
+    actInst.SHOW_FILES_MD5->setChecked(true);
     propWindow.UpdateMessage();
     html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains("Contents:"));
     QVERIFY(html.contains("MD5"));
 
     // 禁用所有显示选项
-    g_propertiesWindowAct().SHOW_FILES_SIZE->setChecked(false);
-    g_propertiesWindowAct().SHOW_VIDS_DURATION->setChecked(false);
-    g_propertiesWindowAct().SHOW_FILES_MD5->setChecked(false);
+    actInst.SHOW_FILES_SIZE->setChecked(false);
+    actInst.SHOW_VIDS_DURATION->setChecked(false);
+    actInst.SHOW_FILES_MD5->setChecked(false);
     propWindow.UpdateMessage();
     html = propWindow.m_propertiesInfoTextEdit->toPlainText();
     QVERIFY(html.isEmpty());

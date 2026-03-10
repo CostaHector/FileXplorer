@@ -40,7 +40,7 @@ private slots:
     btn.SEARCH_NAME_CASE_SENSITIVE->setChecked(true);
     btn.SEARCH_NAME_CASE_SENSITIVE->triggered(true);
     QTRY_COMPARE(spy.count(), 1);
-    QList<QVariant> nameCaseSentiveSignalParam = spy.last();
+    QVariantList nameCaseSentiveSignalParam = spy.last();
     QCOMPARE(nameCaseSentiveSignalParam.size(), 1); // only one parameter
     QCOMPARE(nameCaseSentiveSignalParam[0].value<Qt::CaseSensitivity>(), Qt::CaseSensitive);
     QCOMPARE(btn.curNameCaseSensitive(), Qt::CaseSensitive);
@@ -52,7 +52,7 @@ private slots:
     btn.SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(false);
     btn.SEARCH_CONTENTS_CASE_SENSITIVE->triggered(false);
     QTRY_COMPARE(spy.count(), 1);
-    QList<QVariant> contentCaseSentiveSignalParam = spy.last();
+    QVariantList contentCaseSentiveSignalParam = spy.last();
     QCOMPARE(contentCaseSentiveSignalParam.size(), 1); // only one parameter
     QCOMPARE(contentCaseSentiveSignalParam[0].value<Qt::CaseSensitivity>(), Qt::CaseInsensitive);
     QCOMPARE(btn.curContentCaseSensitive(), Qt::CaseInsensitive);

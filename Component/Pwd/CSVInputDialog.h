@@ -39,7 +39,7 @@ private:
   void onCheckPassed();
   QTextEdit *textEdit{nullptr};
   QDialogButtonBox *buttonBox{nullptr};
-  QPushButton *pOkBtn{nullptr}, *pCancelBtn{nullptr}, *pHelpBtn{nullptr};
+  QPushButton *pOkBtn{nullptr};
   QVBoxLayout *mainLayout{nullptr};
 };
 

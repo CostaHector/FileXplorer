@@ -1,21 +1,22 @@
 #include "MultiCursorEditor.h"
 #include "Logger.h"
+#include "PublicMacro.h"
 #include <QPainter>
 #include <QTextBlock>
 
+MultiCursorEditor::MultiCursorEditor(QWidget *parent)
+    : QPlainTextEdit(parent) {
+  connect(&mBlinkTimer, &QTimer::timeout, this, &MultiCursorEditor::toggleCursors);
+}
+
 void MultiCursorEditor::mousePressEvent(QMouseEvent *e) {
-  if (e == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(e);
   IntoInitStatus(e->pos());
   QPlainTextEdit::mousePressEvent(e);
 }
 
 void MultiCursorEditor::mouseMoveEvent(QMouseEvent *e) {
-  if (e == nullptr) {
-    return;
-  }
-
+  CHECK_NULLPTR_RETURN_VOID(e);
   if (mStatus == PREPARING) {
     PreparingStatusUpdateEndPostion(e->pos());
     e->accept();
@@ -25,9 +26,7 @@ void MultiCursorEditor::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void MultiCursorEditor::mouseReleaseEvent(QMouseEvent *e) {
-  if (e == nullptr) {
-    return;
-  }
+  CHECK_NULLPTR_RETURN_VOID(e);
   if (mStatus == PREPARING) {
     IntoMultiLineSelecting(e->pos());
     e->accept();
@@ -37,6 +36,7 @@ void MultiCursorEditor::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 void MultiCursorEditor::paintEvent(QPaintEvent *event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QPlainTextEdit::paintEvent(event);
 
   if (cursorVisible) {
@@ -86,6 +86,11 @@ void MultiCursorEditor::keyPressEvent(QKeyEvent *event) {
       QPlainTextEdit::keyPressEvent(event);
       break;
   }
+}
+
+void MultiCursorEditor::toggleCursors() {
+  cursorVisible = !cursorVisible;
+  viewport()->update();
 }
 
 void MultiCursorEditor::deleteAtBothCursors(bool backward) {
@@ -173,6 +178,13 @@ QRect MultiCursorEditor::GetRect() const {
   return {QPoint(x1, y1), QPoint(x2, y2)};
 }
 
+void MultiCursorEditor::IntoInitStatus(QPoint startPos) {
+  disableMultiline();
+  mStatus = INIT;
+  m_startPos = startPos;
+  m_endPos = QPoint(); // invalid
+}
+
 void MultiCursorEditor::IntoMultiSelectStatus() {
   if (m_startPos.isNull()) {
     LOG_D("[invalid] m_startPos is null");
@@ -180,6 +192,10 @@ void MultiCursorEditor::IntoMultiSelectStatus() {
   }
   mStatus = PREPARING;
   LOG_D("[preparing] now, alt pressed");
+}
+
+void MultiCursorEditor::PreparingStatusUpdateEndPostion(QPoint endPos) {
+  m_endPos = endPos;
 }
 
 void MultiCursorEditor::IntoMultiLineSelecting(QPoint endPos) {
@@ -194,4 +210,17 @@ void MultiCursorEditor::IntoMultiLineSelecting(QPoint endPos) {
   m_endPos = endPos;
   mStatus = MULTI_LINE_SELECTING;
   onSelectMultiLine();
+}
+
+void MultiCursorEditor::enableMultiline() {
+  mBlinkTimer.start(800);
+  cursorVisible = true;
+  viewport()->update();
+}
+
+void MultiCursorEditor::disableMultiline() {
+  mCursors.clear();
+  mBlinkTimer.stop();
+  cursorVisible = false;
+  viewport()->update();
 }

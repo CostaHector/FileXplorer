@@ -99,3 +99,23 @@ void FdBasedDbModel::RmvCastOrTags(const QModelIndexList& tagColIndexes, const Q
                      cast));
   }
 }
+
+QList<qint64> FdBasedDbModel::GetSelectionFileSizes(const QModelIndexList& indexes) const {
+  QList<qint64> fileSizes;
+  QModelIndex szInd;
+  for (const QModelIndex& idx : indexes) {
+    szInd = idx.siblingAtColumn(MOVIE_TABLE::Size);
+    fileSizes.push_back(QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong());
+  }
+  return fileSizes;
+}
+
+QList<int> FdBasedDbModel::GetSelectionDurations(const QModelIndexList& indexes) const {
+  QList<int> durations;
+  QModelIndex durInd;
+  for (const QModelIndex& idx : indexes) {
+    durInd = idx.siblingAtColumn(MOVIE_TABLE::Duration);
+    durations.push_back(QSqlTableModel::data(durInd, Qt::ItemDataRole::DisplayRole).toInt());
+  }
+  return durations;
+}

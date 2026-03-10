@@ -55,7 +55,7 @@ private slots:
     lineEdit->setText("New where Clause return pressed");
     emit lineEdit->returnPressed();
     QCOMPARE(whereClauseChangedSpy.count(), 1);
-    QList<QVariant> whereClauseParams = whereClauseChangedSpy.back();
+    QVariantList whereClauseParams = whereClauseChangedSpy.back();
     QCOMPARE(whereClauseParams.size(), 1);
     QCOMPARE(whereClauseParams[0].toString(), "New where Clause return pressed");
 
@@ -72,7 +72,7 @@ private slots:
 
     const QString fullPath = tableCB->currentText(); // guid|rootpath
     emit tableCB->currentTextChanged(fullPath);
-    QList<QVariant> movieTableParams = movieTableChangedSpy.back();
+    QVariantList movieTableParams = movieTableChangedSpy.back();
     QCOMPARE(movieTableParams.size(), 1);
     QCOMPARE(movieTableParams[0].toString(), fullPath);
 
@@ -112,7 +112,7 @@ private slots:
     QCOMPARE(lineEdit->text(), "New where Cast Clause return pressed");
     emit lineEdit->returnPressed();
     QCOMPARE(whereClauseChangedSpy.count(), 1);
-    QList<QVariant> whereClauseParams1 = whereClauseChangedSpy.back();
+    QVariantList whereClauseParams1 = whereClauseChangedSpy.back();
     QCOMPARE(whereClauseParams1.size(), 1);
     QCOMPARE(whereClauseParams1[0].toString(), "New where Cast Clause return pressed");
 
@@ -124,7 +124,7 @@ private slots:
     mCastSearchBar.onQuickWhereClause();
     QCOMPARE(whereClauseChangedSpy.count(), 3);
     QCOMPARE(lineEdit->text(), "Chris Evans");
-    QList<QVariant> whereClauseParams3 = whereClauseChangedSpy.back();
+    QVariantList whereClauseParams3 = whereClauseChangedSpy.back();
     QCOMPARE(whereClauseParams3.size(), 1);
     QCOMPARE(whereClauseParams3[0].toString(), "Chris Evans");
   }

@@ -468,8 +468,8 @@ private slots:
       QSignalSpy searchStatementChangedSpy{&horHeader, &DoubleRowHeader::searchStatementChanged};
       emit horHeader.m_filterEditors[0]->returnPressed();
       QCOMPARE(searchStatementChangedSpy.count(), 1);
-      QList<QVariant> actualParams = searchStatementChangedSpy.takeLast();
-      QList<QVariant> expectParams{R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"};
+      QVariantList actualParams = searchStatementChangedSpy.takeLast();
+      QVariantList expectParams{R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"};
       QCOMPARE(actualParams, expectParams);
     }
   }

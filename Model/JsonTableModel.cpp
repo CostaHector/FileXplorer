@@ -28,9 +28,8 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
     if (item.m_ContentFixed) {
       static const QPixmap CONTENTS_FIXED_IMG{[](){
-        QPixmap pixmap{":/img/SAVED"};
-        QPixmap pixmap32 = pixmap.scaledToHeight(32);
-        return pixmap32;
+        QPixmap pixmap{":/JsonEditor/ANCHOR_DROP"};
+        return pixmap.scaledToHeight(32);
       }()};
       return CONTENTS_FIXED_IMG;
     }
@@ -218,9 +217,6 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
-      continue;
-    }
     if (mCachedJsons[row].m_Studio == studio) {
       continue;
     }
@@ -261,9 +257,6 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
-    }
-    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
-      continue;
     }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == newLst) {
@@ -313,9 +306,6 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
-      continue;
-    }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == appendContainer) {
       continue;
@@ -362,9 +352,6 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
-    }
-    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
-      continue;
     }
     auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (!targetField.remove(oneElement)) {
@@ -537,9 +524,9 @@ int JsonTableModel::FormatCast(const QModelIndexList& rowIndexes) {
   return affectedRows;
 }
 
-int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
+int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
   QHash<QString, QString> vidBaseName2FullPath;
-  if (rowIndexes.size() >= 50) {
+  if (rowIndexes.size() >= ITERATE_FOLDER_FIRST_LIMIT) {
     QDirIterator it{mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
     while (it.hasNext()) {
       QString vidFullPath = it.next();
@@ -577,7 +564,7 @@ int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes) {
   const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Duration, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
-  return 0;
+  return affectedRows;
 }
 
 int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes) {

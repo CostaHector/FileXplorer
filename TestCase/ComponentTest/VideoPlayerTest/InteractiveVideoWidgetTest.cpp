@@ -172,14 +172,14 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     videoWid.mousePressEvent(&leftClickPause2PlayToggleEvent);
     QCOMPARE(leftClickPause2PlayToggleEvent.isAccepted(), true);
     QCOMPARE(pauseToggledSpy.count(), 1);
-    QCOMPARE(pauseToggledSpy.takeLast(), (QList<QVariant>{false}));
+    QCOMPARE(pauseToggledSpy.takeLast(), (QVariantList{false}));
 
     QMouseEvent leftClickPlay2PauseToggleEvent{QEvent::MouseButtonPress, videoWid.geometry().center(), Qt::LeftButton, Qt::LeftButton,
                                                Qt::NoModifier};
     videoWid.mousePressEvent(&leftClickPlay2PauseToggleEvent);
     QCOMPARE(leftClickPlay2PauseToggleEvent.isAccepted(), true);
     QCOMPARE(pauseToggledSpy.count(), 1);
-    QCOMPARE(pauseToggledSpy.takeLast(), (QList<QVariant>{true}));
+    QCOMPARE(pauseToggledSpy.takeLast(), (QVariantList{true}));
 
     QCOMPARE(videoWid.updatePauseActionState(false), true);
     QCOMPARE(videoWid.updatePauseActionState(false), false);  // no need update, already unchecked
@@ -282,7 +282,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
     QCOMPARE(videoWid.onSelectAFile(), true);
     QCOMPARE(selectAFileSpy.count(), 1);
-    QCOMPARE(selectAFileSpy.takeLast(), (QList<QVariant>{"path/to/MediaFile.mp4", true}));
+    QCOMPARE(selectAFileSpy.takeLast(), (QVariantList{"path/to/MediaFile.mp4", true}));
 
     Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "path/to");
   }
@@ -309,7 +309,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
     QCOMPARE(videoWid.onSelectAFolder(), true);
     QCOMPARE(selectAFolderSpy.count(), 1);
-    QCOMPARE(selectAFolderSpy.takeLast(), (QList<QVariant>{"path/to/MediaFolder", true}));
+    QCOMPARE(selectAFolderSpy.takeLast(), (QVariantList{"path/to/MediaFolder", true}));
 
     Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "path/to");
   }

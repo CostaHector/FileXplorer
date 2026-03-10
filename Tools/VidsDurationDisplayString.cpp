@@ -6,17 +6,7 @@
 #include <stdlib.h>
 #include <QFileInfo>
 
-QString VidsDurationDisplayString::DisplayVideosDuration(const QStringList& fileAbsPaths) {
-  QList<int> durationLst;
-#ifdef RUNNING_UNIT_TESTS
-  durationLst = MockFilesDurationLstReturn();
-#else
-  VideoDurationGetter mi;
-  if (!mi.StartToGet()) {
-    return {};
-  }
-  durationLst = mi.GetLengthsQuick(fileAbsPaths);
-#endif
+QString VidsDurationDisplayString::DisplayVideosDuration(const QList<int>& durationLst, const QStringList& fileAbsPaths) {
   return DurationPrepathName2Table(durationLst, fileAbsPaths);
 }
 
@@ -35,7 +25,7 @@ QString VidsDurationDisplayString::DurationPrepathName2Table(const QList<int>& d
 QString VidsDurationDisplayString::VideosDurationDetailHtmlTable(const QList<int>& durationLst,
                                                                  const QStringList& fileNames,
                                                                  const QStringList& fileDirs) {
-  if (not(durationLst.size() == fileNames.size() and fileNames.size() == fileDirs.size())) {
+  if (not(durationLst.size() == fileNames.size() && fileNames.size() == fileDirs.size())) {
     LOG_W("list length unequal. duration[%d], fileName[%d], fileDirs[%d]", durationLst.size(), fileNames.size(), fileDirs.size());
     return "";
   }

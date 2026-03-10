@@ -316,7 +316,9 @@ bool FileExplorerEvent::on_properties() const {
   } else if (ViewTypeTool::IsMatch(vt, (int) ViewTypeMask::MOVIE)) {
     pW = new PropertiesWindow(this->_contentPane);
     pW->show();
-    pW->operator()(_contentPane->m_movieDbModel, _contentPane->m_movieView);
+    const QList<qint64>& fileSizes{_contentPane->m_movieView->GetSelectionFileSizes()};
+    const QList<int>& videoDurations{_contentPane->m_movieView->GetSelectionDurations()};
+    pW->operator()(fileSizes, videoDurations);
     return true;
   }
   LOG_INFO_NP("Current View type not support Properties", ViewTypeTool::c_str(vt));

@@ -108,7 +108,7 @@ class CustomListViewTest : public PlainTestSuite {
       QVERIFY(SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
       QCOMPARE(viewer.GetCurImageSizeScale(), 6);
       QVERIFY(!spy.isEmpty());
-      QList<QVariant> params = spy.back();
+      QVariantList params = spy.back();
       QCOMPARE(params.size(), 1);
       QSize newSz = params[0].value<QSize>();
       QCOMPARE(IMAGE_SIZE::ICON_SIZE_CANDIDATES[6], newSz);  // iconSizeChanged
@@ -119,7 +119,7 @@ class CustomListViewTest : public PlainTestSuite {
       QVERIFY(SendWheelEvent(viewer, upAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
       QCOMPARE(viewer.GetCurImageSizeScale(), 5);
       QVERIFY(!spy.isEmpty());
-      QList<QVariant> params = spy.back();
+      QVariantList params = spy.back();
       QCOMPARE(params.size(), 1);
       QSize newSz = params[0].value<QSize>();
       QCOMPARE(IMAGE_SIZE::ICON_SIZE_CANDIDATES[5], newSz);

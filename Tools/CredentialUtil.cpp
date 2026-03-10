@@ -50,6 +50,7 @@ QString GetPwdAbsFilePath() {
   return pwdAbsFileName;
 }
 
+// can only save 1 password. otherwise the former one will get override
 bool CredentialUtil::savePassword(const QString& key, const QString& password) const {
   const SimpleAES aes{g_SimpleKey};
   QString pwdEncText;

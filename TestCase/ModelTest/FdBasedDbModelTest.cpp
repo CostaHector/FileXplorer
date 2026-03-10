@@ -11,6 +11,9 @@
 #include "PathTool.h"
 #include "SqlTableTestPreconditionTool.h"
 
+#include "VideoDurationGetter.h"
+#include "VideoDurationGetterMock.h"
+
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -21,7 +24,17 @@ using namespace SqlTableTestPreconditionTool;
 class FdBasedDbModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
+  TDir mTDir;
  private slots:
+
+  void initTestCase() {  //
+    QVERIFY(mTDir.IsValid());
+  }
+
+  void init() {  //
+    mTDir.ClearAll();
+  }
+
   void default_constructor_ok() {
     FdBasedDbModel fdModel;
     // call member should not leading crash down
@@ -53,12 +66,13 @@ class FdBasedDbModelTest : public PlainTestSuite {
     // 测试无效索引调用siblingAtColumn
     QModelIndex sibling = invalidIndex.siblingAtColumn(0);
     QVERIFY(!sibling.isValid());
+
+    QCOMPARE(fdModel.GetSelectionFileSizes({}), (QList<qint64>{}));
+    QCOMPARE(fdModel.GetSelectionDurations({}), (QList<int>{}));
   }
 
   void data_retrieve_ok() {
-    TDir tDir;
-    QVERIFY(tDir.IsValid());
-    const QString dbName{tDir.itemPath("FdBasedMovieTest.db")};
+    const QString dbName{mTDir.itemPath("FdBasedMovieTest.db")};
     const QString connName{"FdBasedMovieTestConn"};
     const QString tableName{"ABCDEF12_3456_7890_ABCDEF1234567890"};  // can be converted to guid
 
@@ -69,7 +83,7 @@ class FdBasedDbModelTest : public PlainTestSuite {
         {"Michael Fassbender.mp4", false, "Michael Fassbender"},
         {"Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
     };
-    QCOMPARE(tDir.createEntries(nodes), 5);
+    QCOMPARE(mTDir.createEntries(nodes), 5);
     QSet<QString> movieNames;
     QSet<QString> movieSizes;
     QSet<QString> absolutePathSet;
@@ -79,7 +93,7 @@ class FdBasedDbModelTest : public PlainTestSuite {
       }
       movieNames.insert(node.relativePathToNode);
       movieSizes.insert(QString::asprintf("0'0'0'%d", node.contents.size()));
-      absolutePathSet.insert(tDir.path());
+      absolutePathSet.insert(mTDir.path());
     }
 
     FdBasedDb movieDb{dbName, connName};
@@ -95,7 +109,7 @@ class FdBasedDbModelTest : public PlainTestSuite {
     QCOMPARE(movieModel.rowCount(), 0);
     {
       // .jpg is not videos. ignored
-      QCOMPARE(movieDb.ReadADirectory(tableName, tDir.path()), 5 - 1);
+      QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 5 - 1);
       movieModel.select();
       QCOMPARE(movieModel.rowCount(), 5 - 1);
       // todo: check data here
@@ -122,10 +136,10 @@ class FdBasedDbModelTest : public PlainTestSuite {
         {"Raphael Varane.mp4", false, "Raphael Varane"},
         {"Alvaro Morata.mp4", false, "Alvaro Morata"},
     };
-    QCOMPARE(tDir.createEntries(nodesExtra), 2);
+    QCOMPARE(mTDir.createEntries(nodesExtra), 2);
     {
       // .jpg is not videos. ignored
-      QCOMPARE(movieDb.ReadADirectory(tableName, tDir.path()), 2);
+      QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 2);
       movieModel.select();
       QCOMPARE(movieModel.rowCount(), 5 - 1 + 2);
       QSet<QString> expectSize{"0'0'0'14", "0'0'0'13"};
@@ -135,9 +149,9 @@ class FdBasedDbModelTest : public PlainTestSuite {
 
       QSet<QString> expectFullInfo{
           QString() + "Raphael Varane.mp4" + '\t' + "0'0'0'14" + '\t' +
-              PathTool::RMFComponent::FromPath(tDir.itemPath("Raphael Varane.mp4")).middlePart,
+              PathTool::RMFComponent::FromPath(mTDir.itemPath("Raphael Varane.mp4")).middlePart,
           QString() + "Alvaro Morata.mp4" + '\t' + "0'0'0'13" + '\t' +
-              PathTool::RMFComponent::FromPath(tDir.itemPath("Alvaro Morata.mp4")).middlePart,
+              PathTool::RMFComponent::FromPath(mTDir.itemPath("Alvaro Morata.mp4")).middlePart,
       };
       QSet<QString> actualFullInfo{
           movieModel.fullInfo(movieModel.index(4, MOVIE_TABLE::Size)),
@@ -151,7 +165,7 @@ class FdBasedDbModelTest : public PlainTestSuite {
       QModelIndex index4Studio{movieModel.index(4, MOVIE_TABLE::Studio)};
       QModelIndex index5Studio{movieModel.index(5, MOVIE_TABLE::Studio)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
-                                                 QStringList{"", ""})); // todo: use GetIndexessAtOneRow
+                                                 QStringList{"", ""}));                     // todo: use GetIndexessAtOneRow
       movieModel.SetStudio({index4Studio, index5Studio}, "Marvel");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
                                                  QStringList{"Marvel", "Marvel"}));
@@ -232,6 +246,57 @@ class FdBasedDbModelTest : public PlainTestSuite {
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
                                                  QStringList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
     }
+  }
+
+  void get_durations_file_size_ok() {
+    const QString dbName{mTDir.itemPath("DurationFileSizeTest.db")};
+    const QString connName{"DurationFileSizeTestConn"};
+    const QString tableName{"DURATION_3456_7890_ABCDEF1234567890"};  // can be converted to guid
+    const QList<FsNodeEntry> nodes{
+        {"Chris Evans.mp4", false, "Chris Evans"},          // 5+1+5=11Bytes
+        {"Chris Hemsworth.mp4", false, "Chris Hemsworth"},  // 5+1+9=15Bytes
+    };
+    QCOMPARE(mTDir.createEntries(nodes), 2);
+
+    FdBasedDb movieDb{dbName, connName};
+    QVERIFY(movieDb.IsValid());
+    QVERIFY(movieDb.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
+    QVERIFY(movieDb.IsTableExist(tableName));
+    QVERIFY(movieDb.IsTableEmpty(tableName));
+
+    FdBasedDbModel movieModel{nullptr, movieDb.GetDb()};
+    movieModel.setTable(tableName);
+    movieModel.select();
+    QCOMPARE(movieModel.GUID(), "DURATION-3456-7890-ABCDEF1234567890");
+    QCOMPARE(movieModel.rowCount(), 0);
+
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic)  //
+        .stubs()                                       //
+        .will(invoke(VideoDurationGetterMock::invokeGetLengthQuickStatic));
+    QHash<QString, int> vidPath2Duration{
+        {mTDir.itemPath("Chris Evans.mp4"), 10 * 1000},      // 10s
+        {mTDir.itemPath("Chris Hemsworth.mp4"), 70 * 1000},  // 70s
+    };
+    VideoDurationGetterMock::PresetVidsDuration(vidPath2Duration);
+
+    QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 2);
+    QCOMPARE(movieDb.SetDuration(tableName), 2);
+
+    movieModel.sort(MOVIE_TABLE::Name, Qt::AscendingOrder);
+    movieModel.select();
+    QCOMPARE(movieModel.rowCount(), 2);
+
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Name), Qt::DisplayRole).toString(), "Chris Evans.mp4");
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Name), Qt::DisplayRole).toString(), "Chris Hemsworth.mp4");
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Size), Qt::DisplayRole).toLongLong(), 11);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Size), Qt::DisplayRole).toLongLong(), 15);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Duration), Qt::DisplayRole).toInt(), 10000);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Duration), Qt::DisplayRole).toInt(), 70000);
+
+    const QModelIndexList indexes{movieModel.index(0, MOVIE_TABLE::Name), movieModel.index(1, MOVIE_TABLE::Name)};
+
+    QCOMPARE(movieModel.GetSelectionFileSizes(indexes), (QList<qint64>{11, 15}));
+    QCOMPARE(movieModel.GetSelectionDurations(indexes), (QList<int>{10000, 70000}));
   }
 };
 

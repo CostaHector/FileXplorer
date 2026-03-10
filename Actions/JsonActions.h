@@ -31,6 +31,7 @@ public:
   QAction* _INFER_CAST_STUDIO{nullptr};
   QAction* _FORMAT_STUDIO_CAST_FIELD{nullptr};
   QAction* _SET_CONTENTS_FIXED{nullptr};
+  QAction* _SET_CONTENTS_UNFIXED{nullptr};
 
   QAction* _UPDATE_DURATION_FIELD{nullptr};
   QAction* _UPDATE_SIZE_FIELD{nullptr};
