@@ -186,5 +186,5 @@ void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folde
 bool NavigationExToolBar::onPathActionTriggeredNavi(const QAction* pAct) {
   CHECK_NULLPTR_RETURN_FALSE(m_IntoNewPathNavi);
   CHECK_NULLPTR_RETURN_FALSE(pAct);
-  return m_IntoNewPathNavi(pAct->toolTip(), true, true);
+  return m_IntoNewPathNavi(pAct->toolTip(), true);
 }

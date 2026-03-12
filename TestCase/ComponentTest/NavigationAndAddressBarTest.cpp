@@ -69,11 +69,11 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
     PathSearchMockerClear();
     {
       // ChangePath will not influence IntoNewPathParms
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false}));
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder2")));
       QCOMPARE(naviAddr.m_addressLine->pathFromLineEdit(), tDir.itemPath("folder2"));
       QCOMPARE(naviAddr.m_addressLine->pathFromFullActions(), tDir.itemPath("folder2"));
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false}));
     }
 
     PathSearchMockerClear();
@@ -95,7 +95,7 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       const QString expectParPath = naviAddr.m_addressLine->parentPath(&isParentPathSameAsCurrent);
       QVERIFY(!isParentPathSameAsCurrent);
       QVERIFY(naviAddr.onUpTo());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{expectParPath, true, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{expectParPath, true}));
       IntoNewPathParms::GetInst().clear();
 
       naviAddr.m_addressLine->ChangePath("");
@@ -103,7 +103,7 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       QCOMPARE(expectSameParPath, "");
       QVERIFY(isParentPathSameAsCurrent);
       QVERIFY(!naviAddr.onUpTo());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false}));
     }
 
     PathSearchMockerClear();
@@ -111,10 +111,10 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder2")));
       QVERIFY(!naviAddr.m_pathRD.undoPathAvailable());
       QVERIFY(!naviAddr.onBackward());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false}));
       QVERIFY(!naviAddr.m_pathRD.undoPathAvailable());
       QVERIFY(!naviAddr.onForward());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{"", false}));
 
       naviAddr.m_pathRD(tDir.itemPath("folder2"));  // undostack:[folder2], redoStack:[]
       QVERIFY(!naviAddr.m_pathRD.undoPathAvailable());
@@ -122,12 +122,12 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       QVERIFY(naviAddr.m_pathRD.undoPathAvailable());
       QVERIFY(!naviAddr.m_pathRD.redoPathAvailable());
       QVERIFY(naviAddr.onBackward());  // undostack:[folder2], redoStack:[folder3], enter folder2
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder2"), false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder2"), false}));
       IntoNewPathParms::GetInst().clear();
 
       QVERIFY(naviAddr.m_pathRD.redoPathAvailable());
       QVERIFY(naviAddr.onForward());  // undostack:[folder2, folder3], redoStack:[], enter folder3
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), false, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), false}));
     }
 
     PathSearchMockerClear();
@@ -135,19 +135,19 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       // 2->3->1
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder2")));
       QVERIFY(naviAddr.onIteratorToNextFolder());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), true, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), true}));
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder3")));
       QVERIFY(naviAddr.onIteratorToNextFolder());  // already the back element, wrap to the first one
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder1"), true, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder1"), true}));
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder1")));
 
       // 1->3->2
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder1")));
       QVERIFY(naviAddr.onIteratorToLastFolder());
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), true, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder3"), true}));
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder3")));
       QVERIFY(naviAddr.onIteratorToLastFolder());  // already the back element, wrap to the first one
-      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder2"), true, false}));
+      QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{tDir.itemPath("folder2"), true}));
       QVERIFY(naviAddr.m_addressLine->ChangePath(tDir.itemPath("folder2")));
     }
     PathSearchMockerClear();

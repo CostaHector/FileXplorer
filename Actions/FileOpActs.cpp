@@ -23,7 +23,6 @@ FileOpActs::FileOpActs(QObject* parent)
   COPY_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), tr("Copy path"), this);
   COPY_NAME = new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), tr("Copy name"), this);
 
-  COPY_THE_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_THE_PATH"), tr("Copy the path"), this);
   COPY_RECORDS = new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), tr("Copy records"), this);
   COPY_PATH_AG = GetCOPY_PATHActions();
   NEW_FOLDER = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), tr("New folder"), this);
@@ -230,11 +229,6 @@ QActionGroup* FileOpActs::GetCOPY_PATHActions() {
                             .arg(COPY_NAME->text(), COPY_NAME->shortcut().toString()));
   COPY_NAME->setShortcutVisibleInContextMenu(true);
 
-  COPY_THE_PATH->setToolTip(QString("<b>%1 (%2)</b><br/> <b>pth/itemName.jpg</b> <br/>Given current selected item named 'itemName' and its path "
-                                    "'pth', <br/>'pth/itemName.jpg' is copied to the clipboard.")
-                                .arg(COPY_THE_PATH->text(), COPY_THE_PATH->shortcut().toString()));
-  COPY_THE_PATH->setShortcutVisibleInContextMenu(true);
-
   COPY_RECORDS->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_C));
   COPY_RECORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Copy the selected records, especially name, size, and prepath")
                                .arg(COPY_RECORDS->text(), COPY_RECORDS->shortcut().toString()));
@@ -244,7 +238,6 @@ QActionGroup* FileOpActs::GetCOPY_PATHActions() {
   actionGroup->addAction(COPY_FULL_PATH);
   actionGroup->addAction(COPY_PATH);
   actionGroup->addAction(COPY_NAME);
-  actionGroup->addAction(COPY_THE_PATH);
   actionGroup->addAction(COPY_RECORDS);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 

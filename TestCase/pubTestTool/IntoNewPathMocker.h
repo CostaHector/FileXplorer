@@ -8,28 +8,26 @@ struct IntoNewPathParms {
     return inst;
   }
 
-  explicit IntoNewPathParms(const QString& newPath="", bool isNewPath=false, bool isF5Force=false)//
-      : m_newPath{newPath}, m_isNewPath{isNewPath}, m_isF5Force{isF5Force} {}
+  explicit IntoNewPathParms(const QString& newPath="", bool isNewPath=false)//
+      : m_newPath{newPath}, m_isNewPath{isNewPath} {}
 
   bool operator==(const IntoNewPathParms& rhs) const {
-    return m_newPath == rhs.m_newPath && m_isNewPath == rhs.m_isNewPath && m_isF5Force == rhs.m_isF5Force;
+    return m_newPath == rhs.m_newPath && m_isNewPath == rhs.m_isNewPath;
   }
 
   void clear() {
     m_newPath.clear();
-    m_isNewPath = m_isF5Force = false;
+    m_isNewPath = false;
   }
 
   QString m_newPath;
   bool m_isNewPath;
-  bool m_isF5Force;
 };
 
 struct IntoNewPathMocker {
-  bool operator()(QString newPath, bool isNewPath, bool isF5Force) const {
+  bool operator()(QString newPath, bool isNewPath) const {
     IntoNewPathParms::GetInst().m_newPath = newPath;
     IntoNewPathParms::GetInst().m_isNewPath = isNewPath;
-    IntoNewPathParms::GetInst().m_isF5Force = isF5Force;
     return true;
   }
 };

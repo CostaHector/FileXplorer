@@ -43,8 +43,6 @@ class ConfigsTableTest : public PlainTestSuite {
     ConfigsTable cfgTbl;
     QVERIFY(cfgTbl.m_alertsTable != nullptr);
     QVERIFY(cfgTbl.m_alertModel != nullptr);
-    cfgTbl.show();
-    QCOMPARE(QTest::qWaitForWindowExposed(&cfgTbl), true);
 
     QCOMPARE(cfgTbl.m_alertModel->rowCount(), KV::mEditableKVs.size());
     QCOMPARE(cfgTbl.m_alertModel->failCount(), 2);

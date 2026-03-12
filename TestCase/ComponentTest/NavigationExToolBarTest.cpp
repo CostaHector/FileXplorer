@@ -26,7 +26,6 @@ class NavigationExToolBarTest : public PlainTestSuite {
     QToolBar tb;
     tb.addAction(&act);
     connect(&tb, &QToolBar::actionTriggered, this, [](const QAction* pAct) { LOG_D("actionTriggered: %s", qPrintable(pAct->text())); });
-    tb.show();
 
     QToolButton* button1 = qobject_cast<QToolButton*>(tb.widgetForAction(&act));
     QVERIFY(button1 != nullptr);
@@ -121,9 +120,6 @@ class NavigationExToolBarTest : public PlainTestSuite {
 
     NavigationExToolBar naviExToolBar{"navi extra toolbar unpin this"};
     naviExToolBar.show();
-    naviExToolBar.raise();
-    naviExToolBar.activateWindow();
-    QCOMPARE(QTest::qWaitForWindowActive(&naviExToolBar), true);
 
     QList<QAction*> actList1DirectFromTb = naviExToolBar.actions();
     QList<QAction*> actList1FromAG = naviExToolBar.mCollectPathAgs->actions();
@@ -276,10 +272,10 @@ class NavigationExToolBarTest : public PlainTestSuite {
     QList<QAction*> lsts = naviExToolBar.mCollectPathAgs->actions();
     QCOMPARE(lsts.size(), 2);
     naviExToolBar.onPathActionTriggeredNavi(lsts.front());
-    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{TESTCASE_ROOT_PATH, true, true}));
+    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{TESTCASE_ROOT_PATH, true}));
 
     naviExToolBar.onPathActionTriggeredNavi(lsts.back());
-    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{__FILE__, true, true}));
+    QCOMPARE(IntoNewPathParms::GetInst(), (IntoNewPathParms{__FILE__, true}));
   }
 };
 

@@ -11,7 +11,10 @@ private slots:
   void test_custom_statusbar_label_contents_ok() {
     CustomStatusBar statusBar;
     QCOMPARE(statusBar.mLabelsLst.size(), 3);
-    QVERIFY(statusBar.m_viewsSwitcher != nullptr);
+
+    QToolBar toolBar;
+    QCOMPARE(statusBar.addViewSwitcherToRightCorner(nullptr), false);
+    QCOMPARE(statusBar.addViewSwitcherToRightCorner(&toolBar), true);
 
     // onPathInfoChanged - ITEMS
     statusBar.onPathInfoChanged(10, CustomStatusBar::ITEMS);

@@ -165,7 +165,6 @@
         <file alias="COPY_FULL_PATH">RightClickIcon/COPY_FULL_PATH.png</file>
         <file alias="COPY_PATH">RightClickIcon/COPY_PATH.svg</file>
         <file alias="COPY_NAME">RightClickIcon/COPY_NAME.svg</file>
-        <file alias="COPY_THE_PATH">RightClickIcon/COPY_THE_PATH.svg</file>
         <file alias="COPY_RECORD">RightClickIcon/COPY_RECORD.svg</file>
         <file alias="MD5_FILE_IDENTIFIER_PATH">RightClickIcon/MD5_FILE_IDENTIFIER_PATH.svg</file>
         <file alias="PROPERTIES">RightClickIcon/PROPERTIES.ico</file>

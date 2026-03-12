@@ -9,13 +9,15 @@
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
 
 class ViewSwitchToolBar : public QToolBar {
+  Q_OBJECT
 public:
-  using QToolBar::QToolBar;
+  explicit ViewSwitchToolBar(const QString &title, QWidget *parent = nullptr);
   EnumIntAction<ViewTypeTool::ViewType> mViewTypeIntAction;
   void subscribe();
-
+signals:
+  void viewTypeChanged(const ViewTypeTool::ViewType viewType);
 private:
-  void onPushNewViewIntoUndoStack(QAction* viewAct);
+  void onViewTypeActionTriggered(QAction* viewAct);
 
   bool onViewNavigateBackward();
   bool onViewNavigateForward();

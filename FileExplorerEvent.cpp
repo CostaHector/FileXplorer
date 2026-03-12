@@ -420,10 +420,6 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() {
       CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name");
     });
-    connect(fileOpInst.COPY_THE_PATH, &QAction::triggered, _contentPane, [this]() {
-      CopyStringListToClipboard::PathStringListCopy(_contentPane->getTheJpgFolderPaths(),
-                                                    "absolute-file-path+folderName+.jpg(in local seperator)");
-    });
     connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() {
       CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record");
     });

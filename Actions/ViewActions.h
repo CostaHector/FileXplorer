@@ -5,11 +5,11 @@
 #include <QActionGroup>
 #include <QToolBar>
 #include <QList>
+
 class ViewActions : public QObject {
   Q_OBJECT
 public:
   friend ViewActions& g_viewActions();
-  QToolBar* GetViewTB(QWidget* parent = nullptr);
 
   QAction* _LIST_VIEW{nullptr};
   QAction* _TABLE_VIEW{nullptr};

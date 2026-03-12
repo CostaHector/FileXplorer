@@ -636,7 +636,6 @@ class AdvanceRenamerTest : public PlainTestSuite {
     pCovert.init();
     pCovert.setModal(true);
     pCovert.m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
-    pCovert.show();
 
     pCovert.InitTextEditContent(unicodePath, selectFileNames);
     QCOMPARE(pCovert.mSelectedNames, (QStringList{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"}));
@@ -656,7 +655,7 @@ class AdvanceRenamerTest : public PlainTestSuite {
     pHelpBtn->setChecked(true);
     emit pHelpBtn->toggled(true);
     QVERIFY(pCovert.m_commandsPreview != nullptr);
-    QVERIFY(pCovert.m_commandsPreview->isVisible());
+    QVERIFY(!pCovert.m_commandsPreview->isHidden());
 
     // 2. hide command preview ok
     pHelpBtn->setChecked(false);

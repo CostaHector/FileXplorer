@@ -29,7 +29,7 @@ class ViewsStackedWidget : public QStackedWidget {
   explicit ViewsStackedWidget(CurrentRowPreviewer* previewFolder = nullptr, QWidget* parent = nullptr);
 
  public slots:
-  bool onActionAndViewNavigate(QString newPath, bool isNewPath = true, bool isF5Force = false);
+  bool onActionAndViewNavigate(QString newPath, bool isNewPath = true);
   bool onAddressToolbarPathChanged(QString newPath, bool isNewPath = true);
 
  public:
@@ -84,11 +84,9 @@ class ViewsStackedWidget : public QStackedWidget {
   QStringList getFileNames() const;
   QStringList getFilePaths() const;
   QStringList getFilePrepaths() const;
-  QStringList getTheJpgFolderPaths() const;
-  QStringList getFullRecords() const;
-
-  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
+  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
+  QStringList getFullRecords() const;
 
   int getSelectedRowsCount() const;
   QString getCurFilePath() const;

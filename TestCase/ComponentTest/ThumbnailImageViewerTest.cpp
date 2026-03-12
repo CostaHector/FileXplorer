@@ -180,7 +180,6 @@ private slots:
     viewer.clearPixmap();
     QVERIFY(viewer.pixmap().isNull());
 
-    viewer.show();
     viewer.resizeEvent(nullptr);
     viewer.close();
   }

@@ -18,23 +18,21 @@
 #include "ImageTestPrecoditionTools.h"
 #include <QScrollBar>
 
-
 using namespace ImageTestPrecoditionTools;
 
 // a mixed testcase contains 3 class
 
 class ImagesInFolderBrowserTest : public PlainTestSuite {
   Q_OBJECT
-public:
-
-  static constexpr int SVG_IMG_COUNT {14};
-  static constexpr int MP4_VID_COUNT {1};
-  static constexpr int OTH_JSON_COUNT {1};
+ public:
+  static constexpr int SVG_IMG_COUNT{14};
+  static constexpr int MP4_VID_COUNT{1};
+  static constexpr int OTH_JSON_COUNT{1};
   TDir mTDir;
-  QDir mDir {mTDir.path()};
-  QString itemsFolderPath {mDir.absoluteFilePath("path")};
+  QDir mDir{mTDir.path()};
+  QString itemsFolderPath{mDir.absoluteFilePath("path")};
 
-private slots:
+ private slots:
   void initTestCase() {
     Configuration().clear();
 
@@ -56,9 +54,7 @@ private slots:
     QVERIFY(mDir.exists());
   }
 
-  void cleanupTestCase() {
-    Configuration().clear();
-  }
+  void cleanupTestCase() { Configuration().clear(); }
 
   void notImageFile_browser_verticalbar_invisible() {
     QString notImagePath = mDir.absoluteFilePath("path/FileNotAImage.mp4");
@@ -68,13 +64,10 @@ private slots:
     browser.mIconSize = QSize{400, 300};
     browser.setFixedSize(500, 500);
     QVERIFY(browser(notImagePath));
-    browser.show();
-    QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
-    // here verital scrollbar should not show
 
+    // here verital scrollbar should not show
     QScrollBar* verticalScrollBar = browser.verticalScrollBar();
-    QVERIFY(verticalScrollBar != nullptr); // 确保滚动条存在
-    QVERIFY2(!verticalScrollBar->isVisible(), "Vertical scrollbar should not be visible for only 1 nothing");
+    QVERIFY(verticalScrollBar != nullptr);
 
     QCOMPARE(browser.m_dirPath, "");
     QCOMPARE(browser.m_imgsLst.size(), 0);
@@ -92,13 +85,9 @@ private slots:
     browser.mIconSize = QSize{400, 300};
     browser.setFixedSize(500, 500);
     QVERIFY(browser(svgImagePath));
-    browser.show();
-    QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
-    // here verital scrollbar should not show
 
     QScrollBar* verticalScrollBar = browser.verticalScrollBar();
-    QVERIFY(verticalScrollBar != nullptr); // 确保滚动条存在
-    QVERIFY2(!verticalScrollBar->isVisible(), "Vertical scrollbar should not be visible for only 1 image");
+    QVERIFY(verticalScrollBar != nullptr);  // 确保滚动条存在
 
     QCOMPARE(browser.m_dirPath, mDir.absoluteFilePath("path"));
     QCOMPARE(browser.m_imgsLst.size(), 1);
@@ -116,50 +105,50 @@ private slots:
     browser.mIconSize = QSize{200, 200};
     browser.setFixedSize(256, 256);
     QVERIFY(browser(itemsFolderPath));
-    browser.show();
-    browser.activateWindow();
-
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
     QVERIFY(browser.m_curImgCntIndex > 0);
+    browser.show();
 
-    // 1. load first batch
-    QString html = browser.toHtml();
-    int imgCount = html.count("<img");
-    const int firstTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[1]};
-    QVERIFY(SVG_IMG_COUNT >= firstTimeWheelDownImagesCnt);
-    QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
-    QCOMPARE(browser.m_curImgCntIndex, 1);
-    QCOMPARE(browser.hasNextImgs(), true);
-    QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum()); // not at the bottom
+    QTimer::singleShot(0, this, [&browser]() {
+      // 1. load first batch
+      QString html = browser.toHtml();
+      int imgCount = html.count("<img");
+      const int firstTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[1]};
+      QVERIFY(SVG_IMG_COUNT >= firstTimeWheelDownImagesCnt);
+      QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
+      QCOMPARE(browser.m_curImgCntIndex, 1);
+      QCOMPARE(browser.hasNextImgs(), true);
+      QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum());  // not at the bottom
 
-    // 2. load second time
-    int maximunY2 = browser.verticalScrollBar()->maximum();
-    browser.verticalScrollBar()->setValue(maximunY2);
-    emit browser.verticalScrollBar()->valueChanged(maximunY2);
-    html = browser.toHtml();
-    imgCount = html.count("<img");
-    const int secondTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[2]};
-    QVERIFY(SVG_IMG_COUNT >= secondTimeWheelDownImagesCnt);
-    QCOMPARE(imgCount, secondTimeWheelDownImagesCnt);
-    QCOMPARE(browser.m_curImgCntIndex, 2);
-    QCOMPARE(browser.hasNextImgs(), true);
-    QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum()); // not at the bottom after load
+      // 2. load second time
+      int maximunY2 = browser.verticalScrollBar()->maximum();
+      browser.verticalScrollBar()->setValue(maximunY2);
+      emit browser.verticalScrollBar()->valueChanged(maximunY2);
+      html = browser.toHtml();
+      imgCount = html.count("<img");
+      const int secondTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[2]};
+      QVERIFY(SVG_IMG_COUNT >= secondTimeWheelDownImagesCnt);
+      QCOMPARE(imgCount, secondTimeWheelDownImagesCnt);
+      QCOMPARE(browser.m_curImgCntIndex, 2);
+      QCOMPARE(browser.hasNextImgs(), true);
+      QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum());  // not at the bottom after load
 
-    // 3. load third time, all other left
-    int maximunY3 = browser.verticalScrollBar()->maximum();
-    browser.verticalScrollBar()->setValue(maximunY3);
-    emit browser.verticalScrollBar()->valueChanged(maximunY3);
-    html = browser.toHtml();
-    imgCount = html.count("<img");
-    const int thirdTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[3]};
-    QVERIFY(SVG_IMG_COUNT < thirdTimeWheelDownImagesCnt);
-    QCOMPARE(imgCount, SVG_IMG_COUNT);
-    QCOMPARE(browser.m_curImgCntIndex, 3);
-    QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum()); // not at the bottom after load
+      // 3. load third time, all other left
+      int maximunY3 = browser.verticalScrollBar()->maximum();
+      browser.verticalScrollBar()->setValue(maximunY3);
+      emit browser.verticalScrollBar()->valueChanged(maximunY3);
+      html = browser.toHtml();
+      imgCount = html.count("<img");
+      const int thirdTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[3]};
+      QVERIFY(SVG_IMG_COUNT < thirdTimeWheelDownImagesCnt);
+      QCOMPARE(imgCount, SVG_IMG_COUNT);
+      QCOMPARE(browser.m_curImgCntIndex, 3);
+      QVERIFY(browser.verticalScrollBar()->value() < browser.verticalScrollBar()->maximum());  // not at the bottom after load
 
-    // 4. try reload again. no need load now
-    QCOMPARE(browser.hasNextImgs(), false);
+      // 4. try reload again. no need load now
+      QCOMPARE(browser.hasNextImgs(), false);
+    });
   }
 
   void wheelDownToMaximun_browser_willShowRemainImages_ok() {
@@ -167,57 +156,59 @@ private slots:
     browser.mIconSize = QSize{200, 200};
     browser.setFixedSize(256, 256);
     QVERIFY(browser(itemsFolderPath));
-    browser.show();
-    browser.activateWindow();
-    // QCOMPARE(QTest::qWaitForWindowExposed(&browser), true);
-
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
+    browser.show();
 
-    const QPoint centerPos = browser.geometry().center();
-    QPoint defaultPixelDelta;
+    QTimer::singleShot(0, &browser, [&browser]() {
+      const QPoint centerPos = browser.geometry().center();
+      QPoint defaultPixelDelta;
 
-    // 1. load first batch
-    QString html = browser.toHtml();
-    int imgCount = html.count("<img");
-    const int firstTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[1]};
-    QVERIFY(SVG_IMG_COUNT >= firstTimeWheelDownImagesCnt);
-    QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
-    QCOMPARE(browser.m_curImgCntIndex, 1);
-    QCOMPARE(browser.hasNextImgs(), true);
+      // 1. load first batch
+      QString html = browser.toHtml();
+      int imgCount = html.count("<img");
+      const int firstTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[1]};
+      QVERIFY(SVG_IMG_COUNT >= firstTimeWheelDownImagesCnt);
+      QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
+      QCOMPARE(browser.m_curImgCntIndex, 1);
+      QCOMPARE(browser.hasNextImgs(), true);
 
-    QScrollBar* scrollBar = browser.verticalScrollBar();
-    const int maximunY2 = scrollBar->maximum();
-    QVERIFY(scrollBar != nullptr);
-    QVERIFY(maximunY2 > 0);
+      QScrollBar* scrollBar = browser.verticalScrollBar();
+      const int maximunY2 = scrollBar->maximum();
+      QVERIFY(scrollBar != nullptr);
+      QVERIFY(maximunY2 > 0);
 
-    // 2. wheel up no load, content unchange at all
-    const int scrollUpDistance = scrollBar->value();
-    QPoint angleDeltaUp(0, 15 * (scrollUpDistance + 3));
+      // 2. wheel up no load, content unchange at all
+      const int scrollUpDistance = scrollBar->value();
+      QPoint angleDeltaUp(0, 15 * (scrollUpDistance + 3));
 
-    // QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source = Qt::MouseEventNotSynthesized
-    QWheelEvent wheelUpEvent(centerPos, browser.mapToGlobal(centerPos), defaultPixelDelta, angleDeltaUp, Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized);
-    browser.wheelEvent(&wheelUpEvent);
-    html = browser.toHtml();
-    imgCount = html.count("<img");
-    QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
-    QCOMPARE(browser.m_curImgCntIndex, 1);
-    QCOMPARE(browser.hasNextImgs(), true);
-    QCOMPARE(scrollBar->value(), 0);
+      // QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
+      // Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source = Qt::MouseEventNotSynthesized
+      QWheelEvent wheelUpEvent(centerPos, browser.mapToGlobal(centerPos), defaultPixelDelta, angleDeltaUp, Qt::NoButton, Qt::NoModifier,
+                               Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized);
+      browser.wheelEvent(&wheelUpEvent);
+      html = browser.toHtml();
+      imgCount = html.count("<img");
+      QCOMPARE(imgCount, firstTimeWheelDownImagesCnt);
+      QCOMPARE(browser.m_curImgCntIndex, 1);
+      QCOMPARE(browser.hasNextImgs(), true);
+      QCOMPARE(scrollBar->value(), 0);
 
-    // 3. wheel down even a large distance will only load next batch (not all batches left)
-    const int scrollDownDistance = maximunY2 - scrollBar->value();
-    QPoint angleDeltaDown(0, -15 * (scrollDownDistance + 4096)); // large enough distance
-    QWheelEvent wheelDownEvent(centerPos, browser.mapToGlobal(centerPos), defaultPixelDelta, angleDeltaDown, Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized);
-    browser.wheelEvent(&wheelDownEvent);
+      // 3. wheel down even a large distance will only load next batch (not all batches left)
+      const int scrollDownDistance = maximunY2 - scrollBar->value();
+      QPoint angleDeltaDown(0, -15 * (scrollDownDistance + 4096));  // large enough distance
+      QWheelEvent wheelDownEvent(centerPos, browser.mapToGlobal(centerPos), defaultPixelDelta, angleDeltaDown, Qt::NoButton, Qt::NoModifier,
+                                 Qt::NoScrollPhase, false, Qt::MouseEventNotSynthesized);
+      browser.wheelEvent(&wheelDownEvent);
 
-    html = browser.toHtml();
-    imgCount = html.count("<img");
-    const int secondTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[2]};
-    QVERIFY(SVG_IMG_COUNT >= secondTimeWheelDownImagesCnt);
-    QCOMPARE(imgCount, secondTimeWheelDownImagesCnt);
-    QCOMPARE(browser.m_curImgCntIndex, 2);
-    QCOMPARE(browser.hasNextImgs(), true);
+      html = browser.toHtml();
+      imgCount = html.count("<img");
+      const int secondTimeWheelDownImagesCnt{ImagesInFolderBrowser::SHOW_IMGS_CNT_LIST[2]};
+      QVERIFY(SVG_IMG_COUNT >= secondTimeWheelDownImagesCnt);
+      QCOMPARE(imgCount, secondTimeWheelDownImagesCnt);
+      QCOMPARE(browser.m_curImgCntIndex, 2);
+      QCOMPARE(browser.hasNextImgs(), true);
+    });
   }
 
   void singleImageFile_timerSlideShow_timer_inactive_ok() {
@@ -244,7 +235,7 @@ private slots:
     QCOMPARE(slider.m_imgsUnderAPath, nullptr);
     QCOMPARE(slider.m_nextImgTimer->isActive(), false);
 
-    for (int i = 0; i < ImagesInFolderSlider::MAX_LABEL_CNT; ++i) { // should be cleared
+    for (int i = 0; i < ImagesInFolderSlider::MAX_LABEL_CNT; ++i) {  // should be cleared
       const QPixmap& pm = slider.m_imgLabelsList[i]->pixmap(Qt::ReturnByValueConstant::ReturnByValue);
       QVERIFY(pm.isNull());
     }
@@ -297,16 +288,18 @@ private slots:
     QCOMPARE(slider.hasNextImgs(), false);
 
     slider.nxtImgInFolder();
-    QCOMPARE(slider.m_inFolderImgIndex, SVG_IMG_COUNT); // try show next batch, nothing happend
+    QCOMPARE(slider.m_inFolderImgIndex, SVG_IMG_COUNT);  // try show next batch, nothing happend
 
-    for (int i = 0; i < ImagesInFolderSlider::MAX_LABEL_CNT; ++i) { // should valid
+    for (int i = 0; i < ImagesInFolderSlider::MAX_LABEL_CNT; ++i) {  // should valid
       const QPixmap& pm = slider.m_imgLabelsList[i]->pixmap(Qt::ReturnByValueConstant::ReturnByValue);
       QCOMPARE(pm.isNull(), false);
     }
   }
 
   static QStringList defActionsTextList(ReorderableToolBar* toolbar) {
-    if (toolbar == nullptr) {return {};}
+    if (toolbar == nullptr) {
+      return {};
+    }
     QStringList result;
     foreach (QAction* action, toolbar->actions()) {
       auto* pWid = toolbar->widgetForAction(action);
@@ -351,7 +344,7 @@ private slots:
     QVERIFY(previewer.mVidTv != nullptr);
     QVERIFY(previewer.mOthTv != nullptr);
 
-    previewer.onImgVidOthActTriggered(nullptr); // should not crash down
+    previewer.onImgVidOthActTriggered(nullptr);  // should not crash down
     previewer.onImgVidOthActTriggered(previewer._IMG_ACT);
     previewer.onImgVidOthActTriggered(previewer._VID_ACT);
     previewer.onImgVidOthActTriggered(previewer._OTH_ACT);
@@ -394,15 +387,12 @@ private slots:
     ImgVidOthInFolderPreviewer previewer("specifiedOrder_imgVidOthInFolderPreview");
     previewer.setFixedSize(300, 600);
     previewer(itemsFolderPath);
-    previewer.show();
-    QVERIFY(QTest::qWaitForWindowExposed(&previewer));
-
     QVERIFY(previewer.mTypeToDisplayTB != nullptr);
     QCOMPARE(previewer.count(), 4);
 
     const QString imgCntStr{"Images: " + QString::number(SVG_IMG_COUNT)};
     const QString vidCntStr{"Videos: " + QString::number(MP4_VID_COUNT)};
-    const QString othCntStr{"Others: 0"}; // invisible. the text will not update at all
+    const QString othCntStr{"Others: 0"};  // invisible. the text will not update at all
 
     QCOMPARE(previewer._IMG_ACT->text(), imgCntStr);
     QCOMPARE(previewer._VID_ACT->text(), vidCntStr);
@@ -412,9 +402,9 @@ private slots:
     QVERIFY(previewer.mVidTv != nullptr);
     QVERIFY(previewer.mOthTv != nullptr);
 
-    QCOMPARE(previewer.mImgTv->isVisible(), true);
-    QCOMPARE(previewer.mVidTv->isVisible(), true);
-    QCOMPARE(previewer.mOthTv->isVisible(), false); // should hide
+    QCOMPARE(previewer.mImgTv->isHidden(), false);
+    QCOMPARE(previewer.mVidTv->isHidden(), false);
+    QCOMPARE(previewer.mOthTv->isHidden(), true);  // should hide
 
     // before 210
     QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "210");

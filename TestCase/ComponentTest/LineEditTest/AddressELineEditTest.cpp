@@ -59,20 +59,16 @@ private slots:
     QCOMPARE(addLe.pathFromFullActions(), folderPath);
     QCOMPARE(addLe.m_pathComboBox->currentText(), folderPath);
 
-    QCOMPARE(addressToolBarSignal.size(), 1);
-    QVariantList parms0 = addressToolBarSignal.takeFirst();
-    QCOMPARE(parms0.size(), 1);
-    QCOMPARE(parms0.front().toString(), folderPath);
+    QCOMPARE(addressToolBarSignal.count(), 1);
+    QCOMPARE(addressToolBarSignal.takeLast(), (QVariantList{folderPath, true}));
 
     QVERIFY(addLe.m_pathActionsTB != nullptr);
     QList<QAction *> acts = addLe.m_pathActionsTB->actions();
     QCOMPARE(acts.size(), 1 + 5); // computer, "", path, to, destination, folder
 
     addLe.onPathActionTriggered(acts.front());
-    QCOMPARE(addressToolBarSignal.size(), 1);
-    QVariantList parms1 = addressToolBarSignal.takeFirst();
-    QCOMPARE(parms1.size(), 1);
-    QCOMPARE(parms1.front().toString(), "");
+    QCOMPARE(addressToolBarSignal.count(), 1);
+    QCOMPARE(addressToolBarSignal.takeLast(), (QVariantList{"", true}));
     QList<QAction *> onlyComputerAct = addLe.m_pathActionsTB->actions();
     QCOMPARE(onlyComputerAct.size(), 1 + 1); // "Computer", ""
   }
@@ -94,8 +90,7 @@ private slots:
     addLe.onReturnPressed();
     QVERIFY(addLe.isInputMode());
     QCOMPARE(addLe.m_pathComboBox->currentText(), filePath);
-
-    QCOMPARE(addressToolBarSignal.size(), 0);
+    QCOMPARE(addressToolBarSignal.count(), 0);
 
     QList<QAction *> afterActs = addLe.m_pathActionsTB->actions();
     QCOMPARE(afterActs, beforeActs);

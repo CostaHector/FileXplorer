@@ -12,12 +12,12 @@ ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {
   COMPRESSED_IMAGES = new (std::nothrow) QAction{tr("Compress Images"), this};
 
   ARCHIVE_PREVIEW = new (std::nothrow) QAction{QIcon(":img/COMPRESS_ITEM"), tr("Archive"), this};
+  ARCHIVE_PREVIEW->setToolTip("Open the selected .qz file");
+  ARCHIVE_PREVIEW->setCheckable(true);
 
   COMPRESSED_HERE->setToolTip("Compresse selected files to current path.\n(folders not supported now)");
   DECOMPRESSED_HERE->setToolTip("Decompressed one selected .qz files to current path.");
   COMPRESSED_IMAGES->setToolTip("Compress images in current folder and its directly sub folder.");
-  ARCHIVE_PREVIEW->setToolTip("Open the selected .qz file");
-  ARCHIVE_PREVIEW->setCheckable(true);
 }
 
 QToolBar* GetArchiveTooBar() {

@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <functional>
 
-typedef std::function<bool(QString, bool, bool)> T_IntoNewPath;
+typedef std::function<bool(QString, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 
@@ -27,6 +27,10 @@ inline const QString& VIDS_DATABASE() {
   return path;
 }
 
+inline QString MovieDBConnection() {
+  return "DBMOVIE_CONNECT";
+}
+
 inline const QString& AI_MEDIA_DUP_DATABASE() {
   static const QString path = WORK_PATH() + "/DUPLICATES_DB.db";
   return path;
@@ -40,6 +44,10 @@ inline const QString& RECYCLE_BIN_DATABASE() {
 inline const QString& PEFORMERS_DATABASE() {
   static const QString path = WORK_PATH() + "/PERFORMERS_DATABASE.db";
   return path;
+}
+
+inline QString CastDBConnection() {
+  return "CAST_CONNECTION";
 }
 
 inline const QString& TORRENTS_DATABASE() {

@@ -105,6 +105,6 @@ QVariant FileSystemModel::headerData(int section, Qt::Orientation orientation, i
 
 void FileSystemModel::whenDirectoryLoaded(const QString& path) {
   if (_mPLogger != nullptr) {
-    _mPLogger->onPathInfoChanged(rowCount(mRootIndex), 0);
+    _mPLogger->onPathInfoChanged(rowCount(GetRootIndex()), 0);
   }
 }

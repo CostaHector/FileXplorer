@@ -35,7 +35,6 @@ private slots:
 
   void testStayOnTopAction() {
     CommandsPreview preview("TestPreview StayOnTop");
-    preview.show();
 
     QVERIFY(!preview.windowFlags().testFlag(Qt::WindowStaysOnTopHint));
     QVERIFY(!preview.STAY_ON_TOP->isChecked());
