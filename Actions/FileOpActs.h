@@ -31,7 +31,7 @@ Q_OBJECT
   QActionGroup* OPEN_AG{nullptr};
 
   QActionGroup* GetCOPY_PATHActions();
-  QAction *COPY_FULL_PATH{nullptr}, *COPY_PATH{nullptr}, *COPY_NAME{nullptr}, *COPY_THE_PATH{nullptr}, *COPY_RECORDS{nullptr};
+  QAction *COPY_FULL_PATH{nullptr}, *COPY_PATH{nullptr}, *COPY_NAME{nullptr}, *COPY_RECORDS{nullptr};
   QActionGroup* COPY_PATH_AG{nullptr};
 
   QActionGroup* GetNEWActions();

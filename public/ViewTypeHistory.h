@@ -8,6 +8,12 @@ class ViewTypeHistory {
  public:
   ViewTypeHistory() { operator()(ViewTypeTool::DEFAULT_VIEW_TYPE); }
 
+  void reset() {
+    undoStack.clear();
+    redoStack.clear();
+    operator()(ViewTypeTool::DEFAULT_VIEW_TYPE);
+  }
+
   bool operator()(const ViewTypeTool::ViewType& vt) {
     if (!undoStack.isEmpty() && undoStack.top() == vt) {  // same viewType
       LOG_D("[Skip] Duplicate ViewType[%s]", ViewTypeTool::c_str(vt));

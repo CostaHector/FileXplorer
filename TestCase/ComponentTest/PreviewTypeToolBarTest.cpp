@@ -24,7 +24,7 @@ class PreviewTypeToolBarTest : public PlainTestSuite {
     QCOMPARE(toolbar.mCurrentPreviewType, PreviewTypeTool::DEFULT_PREVIEW_TYPE_E);
     toolbar.CATEGORY_PRE->trigger();
     QCOMPARE(spy.count(), 1);
-    QList<QVariant> parms = spy.back();
+    QVariantList parms = spy.back();
     QCOMPARE(parms.size(), 1);
     QCOMPARE(parms.back().value<PreviewTypeTool::PREVIEW_TYPE_E>(), PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);
     QCOMPARE(toolbar.mCurrentPreviewType, PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);

@@ -60,7 +60,7 @@ class AddressELineEdit : public QStackedWidget {
   void dragMoveEvent(QDragMoveEvent* event) override;
 
  signals:
-  void pathActionsTriggeredOrLineEditReturnPressed(const QString&);
+  void pathActionsTriggeredOrLineEditReturnPressed(const QString& newPath, bool bIsNewPath);
 
  public slots:
   void updateAddressToolBarPathActions(const QString& newPath);

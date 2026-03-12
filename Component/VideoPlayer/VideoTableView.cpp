@@ -45,14 +45,14 @@ QModelIndex VideoTableView::nextIndex() const {
 }
 
 QModelIndex VideoTableView::iteratorCore(int step) const {
-  const QModelIndex proxyCur = currentIndex();
-  if (!proxyCur.isValid()) {
-    LOG_D("No current index");
-    return {};
-  }
   const int n = mVideoModel->rowCount();
   if (n == 0) {
     LOG_D("Empty media list");
+    return {};
+  }
+  const QModelIndex proxyCur = currentIndex();
+  if (!proxyCur.isValid()) {
+    LOG_D("No current index");
     return {};
   }
   switch (mPlaybackMode) {

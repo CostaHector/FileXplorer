@@ -5,14 +5,13 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QToolBar>
-#include <QSqlTableModel>
-#include <QTableView>
+#include "FileSystemItemFilter.h"
 
 class PropertiesWindow : public QDialog {
  public:
   explicit PropertiesWindow(QWidget* parent = nullptr);
   bool operator()(const QStringList& items);
-  bool operator()(const QSqlTableModel* model, const QTableView* tv);
+  bool operator()(const QList<qint64>& fileSizes, const QList<int>& durations);
 
   void ReadSetting();
   void showEvent(QShowEvent *event) override;
@@ -25,14 +24,16 @@ class PropertiesWindow : public QDialog {
   void subscribe();
 
   void InitCommonInfo();
-  void InitDurationInfo();
+  bool InitDurationInfo();
   void InitFileIndentifierInfo();
 
-  QStringList m_items;
-  QTextEdit* m_propertiesInfoTextEdit{new QTextEdit(this)};
 
-  QVBoxLayout* m_mainLo{new QVBoxLayout{this}};
+  QTextEdit* m_propertiesInfoTextEdit{nullptr};
+  QVBoxLayout* m_mainLo{nullptr};
   QToolBar* m_propertyTB{nullptr};
+
+  QStringList mAllItems;
+  FileSystemItemFilter::ItemStatistic mAllItemStatics;
 
   QString m_commonInfomation;
   QString m_durations;

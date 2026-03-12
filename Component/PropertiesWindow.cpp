@@ -1,18 +1,13 @@
 ﻿#include "PropertiesWindow.h"
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QPushButton>
-#include <QVBoxLayout>
-
 #include "PropertiesWindowActions.h"
 #include "TableFields.h"
 #include "FileSystemItemFilter.h"
 #include "MD5Calculator.h"
-#include "VidsDurationDisplayString.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "DataFormatter.h"
+#include "VideoDurationGetter.h"
+#include "VidsDurationDisplayString.h"
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
 
@@ -20,18 +15,21 @@ PropertiesWindow::PropertiesWindow(QWidget* parent)  //
     : QDialog{parent}                                //
 {
   m_propertyTB = g_propertiesWindowAct().getPropertiesToolBar(this);
+  m_propertiesInfoTextEdit = new (std::nothrow) QTextEdit(this);
 
+  m_mainLo = new (std::nothrow) QVBoxLayout{this};
   m_mainLo->addWidget(m_propertyTB);
   m_mainLo->addWidget(m_propertiesInfoTextEdit);
+  m_mainLo->setSpacing(0);
+  m_mainLo->setContentsMargins(0, 0, 0, 0);
   setLayout(m_mainLo);
 
-  subscribe();
   setWindowFlags(Qt::Window);  // show maximize, minimize button at title bar
-
-  layout()->setSpacing(0);
-  layout()->setContentsMargins(0, 0, 0, 0);
-  ReadSetting();
   setWindowIcon(QIcon(":img/PROPERTIES"));
+
+  ReadSetting();
+
+  subscribe();
 }
 
 bool PropertiesWindow::UpdateMessage() {
@@ -64,26 +62,32 @@ bool PropertiesWindow::UpdateMessage() {
 }
 
 void PropertiesWindow::InitCommonInfo() {
-  const auto& itemStatic = FileSystemItemFilter::ItemCounter(m_items);
-  const QString sizeMsg = DataFormatter::formatFileSizeWithBytes(itemStatic.fileSize);
-  m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(itemStatic.fileCnt).arg(itemStatic.folderCnt);
+  mAllItemStatics = FileSystemItemFilter::ItemCounter(mAllItems);
+  const QString sizeMsg = DataFormatter::formatFileSizeWithBytes(mAllItemStatics.fileSize);
+  m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(mAllItemStatics.fileCnt).arg(mAllItemStatics.folderCnt);
   m_commonInfomation += QString("Size: %3").arg(sizeMsg);
 }
 
-void PropertiesWindow::InitDurationInfo() {
-  const QStringList& mp4Files = FileSystemItemFilter::MP4Out(m_items);
-  m_durations = VidsDurationDisplayString::DisplayVideosDuration(mp4Files);
+bool PropertiesWindow::InitDurationInfo() {
+  const QStringList& fileAbsPaths{FileSystemItemFilter::MP4Out(mAllItems)};
+  VideoDurationGetter mi;
+  if (!mi.StartToGet()) {
+    return false;
+  }
+  const QList<int> durationsList {mi.GetLengthsQuick(fileAbsPaths)};
+  m_durations = VidsDurationDisplayString::DurationPrepathName2Table(durationsList, fileAbsPaths);
+  return true;
 }
 
 void PropertiesWindow::InitFileIndentifierInfo() {
-  const QStringList& files = FileSystemItemFilter::FilesOut(m_items);
+  const QStringList& files = FileSystemItemFilter::FilesOut(mAllItems);
   m_fileIdentifier = MD5Calculator::DisplayFilesMD5(files);
 }
 
 bool PropertiesWindow::operator()(const QStringList& items) {
-  m_items = items;
-  setWindowTitle(QString("Property | [%1] item(s)").arg(m_items.size()));
-  if (m_items.isEmpty()) {
+  mAllItems = items;
+  setWindowTitle(QString("Property | [%1] item(s)").arg(mAllItems.size()));
+  if (mAllItems.isEmpty()) {
     m_propertiesInfoTextEdit->setPlainText("Nothing selected");
     return true;
   }
@@ -107,27 +111,29 @@ bool PropertiesWindow::operator()(const QStringList& items) {
   return true;
 }
 
-bool PropertiesWindow::operator()(const QSqlTableModel* model, const QTableView* tv) {
-  if (model == nullptr || tv == nullptr) {
-    LOG_C("model is nullptr");
-    return false;
+bool PropertiesWindow::operator()(const QList<qint64>& fileSizes, const QList<int>& durations) {
+  setWindowTitle(QString("Property | [%1] item(s)").arg(durations.size()));
+  if (fileSizes.isEmpty() && durations.isEmpty()) {
+    m_propertiesInfoTextEdit->setPlainText("Nothing selected");
+    return true;
   }
 
-  m_commonInfomation = "not available";
-  m_durations = "not available";
   m_fileIdentifier = "not available";
 
   if (g_propertiesWindowAct().SHOW_FILES_SIZE->isChecked()) {
-    qint64 totalSz = 0;
-    const QModelIndexList& selIdxs = tv->selectionModel()->selectedRows();
-    const QModelIndex rootIndex = tv->rootIndex();
-    for (const QModelIndex& idx : selIdxs) {
-      const QModelIndex szInd = model->index(idx.row(), MOVIE_TABLE::Size, rootIndex);
-      totalSz += model->QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong();
-    }
-    m_commonInfomation = QString("Contents: %1 file(s), %2 folder(s).<br/>\n").arg(selIdxs.size()).arg(0);
-    const QString sizeMsg = DataFormatter::formatFileSizeWithBytes(totalSz);
-    m_commonInfomation += QString("Size: %3").arg(sizeMsg);
+    const qint64 totalSz{std::accumulate(fileSizes.cbegin(), fileSizes.cend(), (qint64)0)};
+    const QString sizeMsg{DataFormatter::formatFileSizeWithBytes(totalSz)};
+    m_commonInfomation = QString::asprintf("%d file(s) sizes: %s", fileSizes.size(), qPrintable(sizeMsg));
+  } else {
+    m_commonInfomation = "not available";
+  }
+
+  if (g_propertiesWindowAct().SHOW_VIDS_DURATION->isChecked()) {
+    const qint64 totalDuration{std::accumulate(durations.cbegin(), durations.cend(), (qint64)0)};
+    const QString durationMsg{DataFormatter::formatDurationISO(totalDuration)};
+    m_durations = QString::asprintf("%d file(s) durations: %s", durations.size(), qPrintable(durationMsg));
+  } else {
+    m_durations = "not available";
   }
 
   UpdateMessage();
@@ -144,6 +150,7 @@ void PropertiesWindow::ReadSetting() {
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QDialog::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
@@ -158,4 +165,3 @@ void PropertiesWindow::subscribe() {
   connect(g_propertiesWindowAct().SHOW_VIDS_DURATION, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
   connect(g_propertiesWindowAct().SHOW_FILES_MD5, &QAction::triggered, this, &PropertiesWindow::UpdateMessage);
 }
-

@@ -34,24 +34,21 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-        static T_IntoNewPath fIntoNewPath  //
-            {
-                [this](QString newPath, bool isNewPath, bool isF5Force) -> bool {        //
-                  return _view->onActionAndViewNavigate(newPath, isNewPath, isF5Force);  //
-                }                                                                        //
-            };
-        static T_on_searchTextChanged fSearchTextChanged  //
-            {
-                [this](const QString& targetStr) -> bool {        //
-                  return _view->on_searchTextChanged(targetStr);  //
-                }                                                 //
-            };
-        static T_on_searchEnterKey fSearchEnterKey  //
-            {
-                [this](const QString& targetStr) -> bool {     //
-                  return _view->on_searchEnterKey(targetStr);  //
-                }                                              //
-            };
+        T_IntoNewPath fIntoNewPath {
+            [this](QString newPath, bool isNewPath) -> bool {             //
+              return _view->onActionAndViewNavigate(newPath, isNewPath);  //
+            }                                                             //
+        };
+        T_on_searchTextChanged fSearchTextChanged {
+            [this](const QString& targetStr) -> bool {        //
+              return _view->on_searchTextChanged(targetStr);  //
+            }                                                 //
+        };
+        T_on_searchEnterKey fSearchEnterKey {
+            [this](const QString& targetStr) -> bool {     //
+              return _view->on_searchEnterKey(targetStr);  //
+            }                                              //
+        };
         _navigation->m_addressBar->BindFileSystemViewCallback(fIntoNewPath, fSearchTextChanged, fSearchEnterKey, _view->m_fsModel);
         NavigationExToolBar::BindIntoNewPathNavi(fIntoNewPath);
       }
@@ -140,7 +137,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     }
     case ViewType::MOVIE: {
       if (_view->m_movieView == nullptr) {
-        _view->mMovieDb = new (std::nothrow) FdBasedDb{SystemPath::VIDS_DATABASE(), "DBMOVIE_CONNECT", _view},
+        _view->mMovieDb = new (std::nothrow) FdBasedDb{SystemPath::VIDS_DATABASE(), SystemPath::MovieDBConnection(), _view},
         _view->m_movieDbModel = new (std::nothrow) FdBasedDbModel{_view, _view->mMovieDb->GetDb()};
         _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_movieDbModel, _view->_movieSearchBar, *(_view->mMovieDb), _view);
         _view->AddView(viewType, _view->m_movieView);
@@ -177,7 +174,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     }
     case ViewType::CAST: {
       if (_view->m_castTableView == nullptr) {
-        _view->mCastDb = new (std::nothrow) CastBaseDb{SystemPath::PEFORMERS_DATABASE(), "CAST_CONNECTION", _view},
+        _view->mCastDb = new (std::nothrow) CastBaseDb{SystemPath::PEFORMERS_DATABASE(), SystemPath::CastDBConnection(), _view},
         _view->m_castDbModel = new (std::nothrow) CastDbModel{_view, _view->mCastDb->GetDb()};
         _view->m_castTableView = new (std::nothrow) CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, *(_view->mCastDb), _view);
         _view->AddView(viewType, _view->m_castTableView);

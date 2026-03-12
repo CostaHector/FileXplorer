@@ -16,9 +16,8 @@
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
-  : QStackedWidget{parent}
-  ,                             //
-  _previewFolder{previewFolder} //
+    : QStackedWidget{parent},        //
+      _previewFolder{previewFolder}  //
 {
   m_fsModel = new (std::nothrow) FileSystemModel(this);
   layout()->setContentsMargins(0, 0, 0, 0);
@@ -27,7 +26,7 @@ ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidg
   setFocusPolicy(Qt::StrongFocus);
 }
 
-auto ViewsStackedWidget::onActionAndViewNavigate(QString newPath, bool isNewPath, bool /*isF5Force*/) -> bool {
+bool ViewsStackedWidget::onActionAndViewNavigate(QString newPath, bool isNewPath) {
   // can only be triggered by path action clicked/upTo/backTo/backTo/table view double clicked
   bool ret = onAddressToolbarPathChanged(newPath, isNewPath);
   if (!ret) {
@@ -43,7 +42,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   // can only be triggered by lineedit return pressed
   // isNewPath: bool Only differs in undo and redo operation.
   // True means newPath would be push into undo otherwise not
-  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) { // may be an shared folder cross platform
+  if (!newPath.isEmpty() && !QFileInfo(newPath).isDir()) {  // may be an shared folder cross platform
     LOG_W("Path[%s] is empty or existed directory", qPrintable(newPath));
     return false;
   }
@@ -102,7 +101,10 @@ const QRegularExpression* GetRegularExpression(const QString& targetStr, const i
   CHECK_NULLPTR_RETURN_NULLPTR(pExpr);
   if (!pExpr->isValid()) {
     LOG_D("Invalid regular expression: %s", qPrintable(targetStr));
-    delete pExpr;
+    if (pExpr != nullptr) {
+      delete pExpr;
+      pExpr = nullptr;
+    }
     return nullptr;
   }
   exprCache.insert(targetStr, pExpr);
@@ -131,7 +133,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
       return true;
     }
     default: {
-      LOG_W("ViewType[%d:%s] not support search text", (int) vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -147,7 +149,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
     case ViewType::JSON: {
       break;
     }
-    case ViewType::SCENE: { // avoid lag when text changed frequently
+    case ViewType::SCENE: {  // avoid lag when text changed frequently
       CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
       const QRegularExpression* pRegex = GetRegularExpression(targetStr);
       CHECK_NULLPTR_RETURN_FALSE(pRegex);
@@ -155,7 +157,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
       break;
     }
     default: {
-      LOG_W("ViewType[%d:%s] not support search text", (int) vt, c_str(vt));
+      LOG_W("ViewType[%d:%s] not support search text", (int)vt, c_str(vt));
       return false;
     }
   }
@@ -169,13 +171,10 @@ void ViewsStackedWidget::subscribe() {
 void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
   CHECK_NULLPTR_RETURN_VOID(addressBar)
   _addressBar = addressBar;
-  connect(_addressBar->m_addressLine,
-          &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed, //
-          this,                                                           //
-          [this](const QString& newPath) {                                //
-            onAddressToolbarPathChanged(newPath, true);                   //
-          } //
-  );
+  connect(_addressBar->m_addressLine,                                      //
+          &AddressELineEdit::pathActionsTriggeredOrLineEditReturnPressed,  //
+          this,                                                            //
+          &ViewsStackedWidget::onAddressToolbarPathChanged);               //
 }
 
 void ViewsStackedWidget::BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar) {
@@ -221,7 +220,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   if (fi.isSymLink()) {
 #ifdef _WIN32
     const QString tarPath{fi.symLinkTarget()};
-#else // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
+#else  // ref: https://doc.qt.io/qt-6/qfileinfo.html#isSymLink
     const QString tarPath{absItemPath};
 #endif
     fi.setFile(tarPath);
@@ -249,7 +248,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
-      emit g_viewActions()._HAR_VIEW->triggered();
+      emit g_viewActions()._HAR_VIEW->toggled(true);
       return true;
     } else if (FileTool::IsTorrentFile(absItemPath)) {
       return FileTool::OpenLocalTorrentFile(absItemPath);
@@ -257,12 +256,12 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   } else if (fi.isDir()) {
     ViewTypeTool::ViewType vt = GetVt();
     if (ViewTypeTool::isFSView(vt)) {
-      return onActionAndViewNavigate(absItemPath, true, true);
+      return onActionAndViewNavigate(absItemPath, true);
     }
-    if (ViewTypeTool::IsMatch(vt, (int) ViewTypeTool::ViewTypeMask::CAST)) {
-      g_viewActions()._TABLE_VIEW->setChecked(true);
-      emit g_viewActions()._TABLE_VIEW->triggered(true); // both 2 signals: 1) undo stack+1 and 2) view Switched happen
-      return onActionAndViewNavigate(absItemPath, true, true);
+    if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
+      g_viewActions()._TABLE_VIEW->setChecked(true);  // 1) undo stack+1; 2) view Switched happen
+      g_viewActions()._TABLE_VIEW->trigger();
+      return onActionAndViewNavigate(absItemPath, true);
     }
   }
   return FileTool::OpenLocalFileUsingDesktopService(absItemPath);
@@ -279,7 +278,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   }
 
   auto vt = GetVt();
-  if (ViewTypeTool::isFSView(vt)) { // anchorTags only work for file-system
+  if (ViewTypeTool::isFSView(vt)) {  // anchorTags only work for file-system
     QString parentPth = fi.absolutePath();
 #ifdef _WIN32
     if (!parentPth.isEmpty() && parentPth.back() == ':') {
@@ -304,48 +303,40 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
   disconnectSelectionChanged();
 
   auto* curView = GetCurView();
-  mSelectionChangedConn = ViewsStackedWidget::connect(curView->selectionModel(),
-                                                      &QItemSelectionModel::selectionChanged,
-                                                      this,
-                                                      &ViewsStackedWidget::on_selectionChanged);
-  mDoubleClickedConnectConn = ViewsStackedWidget::connect(curView,
-                                                          &QAbstractItemView::doubleClicked,
-                                                          this,
-                                                          &ViewsStackedWidget::on_cellDoubleClicked);
+  mSelectionChangedConn =
+      ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ViewsStackedWidget::on_selectionChanged);
+  mDoubleClickedConnectConn =
+      ViewsStackedWidget::connect(curView, &QAbstractItemView::doubleClicked, this, &ViewsStackedWidget::on_cellDoubleClicked);
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::SEARCH: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(),
-                                                        &QItemSelectionModel::currentRowChanged,
-                                                        this,
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
                                                         &ViewsStackedWidget::on_fsmCurrentRowChanged);
       break;
     }
     case ViewType::SCENE: {
       mCurrentChangedConn = ViewsStackedWidget::connect(
-          m_sceneTableView,
-          &SceneListView::currentSceneChanged,
-          _previewFolder, //
+          m_sceneTableView, &SceneListView::currentSceneChanged,
+          _previewFolder,  //
           static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
               &CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::CAST: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView,
-                                                        &CastDBView::currentRecordChanged,
-                                                        _previewFolder, //
-                                                        static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(
-                                                            &CurrentRowPreviewer::operator()));
+      mCurrentChangedConn =
+          ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
+                                      _previewFolder,  //
+                                      static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
       break;
     }
     case ViewType::JSON: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_jsonTableView,
-                                                        &JsonTableView::currentJsonSelectedChanged,
-                                                        _previewFolder, //
-                                                        static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
-                                                            &CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(
+          m_jsonTableView, &JsonTableView::currentJsonSelectedChanged,
+          _previewFolder,  //
+          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
+              &CurrentRowPreviewer::operator()));
       break;
     }
     default: {
@@ -380,7 +371,8 @@ auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
         }
         return;
       }
-      case Qt::Key_Return: {
+      case Qt::Key_Return:  // let it fall through
+      case Qt::Key_Enter: {
         on_cellDoubleClicked(GetCurView()->currentIndex());
         return;
       }
@@ -394,7 +386,9 @@ auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
 std::pair<QModelIndex, QModelIndex> ViewsStackedWidget::getTopLeftAndRightDownRectangleIndex() const {
   static const auto GetterForFsModel = [](const QAbstractItemModel* model,
                                           const QModelIndex& rootIndex) -> decltype(getTopLeftAndRightDownRectangleIndex()) {
-    return {model->index(0, 0, rootIndex), model->index(model->rowCount(rootIndex) - 1, model->columnCount(rootIndex) - 1, rootIndex)};
+    QModelIndex leftTop{model->index(0, 0, rootIndex)};
+    QModelIndex rightDown{leftTop.sibling(model->rowCount(rootIndex) - 1, model->columnCount(rootIndex) - 1)};
+    return {leftTop, rightDown};
   };
   // attention here we get the proxy rectangle index, not the source model index. for display it is ok.
   // but for records contents, mapToSource Needed Here
@@ -411,7 +405,7 @@ std::pair<QModelIndex, QModelIndex> ViewsStackedWidget::getTopLeftAndRightDownRe
     case ViewType::MOVIE:
       return GetterForFsModel(m_movieDbModel, m_movieView->rootIndex());
     case ViewType::SCENE:
-      return GetterForFsModel(m_scenesModel, m_sceneTableView->rootIndex());
+      return GetterForFsModel(m_sceneProxyModel, m_sceneTableView->rootIndex());
     case ViewType::CAST:
       return GetterForFsModel(m_castDbModel, m_castTableView->rootIndex());
     case ViewType::JSON:
@@ -475,6 +469,7 @@ QString ViewsStackedWidget::getRootPath() const {
     }
     case ViewType::CAST:
       return m_castDbModel->rootPath();
+    case ViewType::MOVIE:
     default:
       LOG_W("No rootpath in ViewType[%d]", int(vt));
       return "";
@@ -522,18 +517,35 @@ QModelIndexList ViewsStackedWidget::getSelectedRows() const {
     case ViewType::SEARCH: {
       const auto& proxyIndexesLst = m_advanceSearchView->selectionModel()->selectedRows();
       QModelIndexList srcIndexesLst;
+      srcIndexesLst.reserve(proxyIndexesLst.size());
       for (const auto& ind : proxyIndexesLst) {
         srcIndexesLst.append(m_searchProxyModel->mapToSource(ind));
       }
       return srcIndexesLst;
     }
     case ViewType::SCENE: {
-      return {};
+      const auto& proxyIndexesLst = m_sceneTableView->selectionModel()->selectedIndexes();
+      QModelIndexList srcIndexesLst;
+      srcIndexesLst.reserve(proxyIndexesLst.size());
+      for (const auto& ind : proxyIndexesLst) {
+        srcIndexesLst.append(m_sceneProxyModel->mapToSource(ind));
+      }
+      return srcIndexesLst;
     }
-    case ViewType::MOVIE:
+    case ViewType::MOVIE: {
       return m_movieView->selectionModel()->selectedRows();
-    case ViewType::JSON:
-      return m_jsonTableView->selectionModel()->selectedRows();
+    }
+    case ViewType::JSON: {
+      const auto& proxyIndexesLst = m_jsonTableView->selectionModel()->selectedRows();
+      QModelIndexList srcIndexesLst;
+      srcIndexesLst.reserve(proxyIndexesLst.size());
+      for (const auto& ind : proxyIndexesLst) {
+        srcIndexesLst.append(m_jsonProxyModel->mapToSource(ind));
+      }
+      return srcIndexesLst;
+    }
+    case ViewType::CAST:
+      return m_castTableView->selectionModel()->selectedRows();
     default:
       LOG_W("No SelectedRows in ViewType[%d]", int(vt));
       return {};
@@ -589,8 +601,9 @@ QStringList ViewsStackedWidget::getFileNames() const {
       }
       break;
     }
+    case ViewType::CAST:
     default:
-      LOG_W("No SelectedRows in ViewType[%d]", int(vt));
+      LOG_W("No FileNames in ViewType[%d]", int(vt));
       return {};
   }
   return names;
@@ -625,10 +638,6 @@ QStringList ViewsStackedWidget::getFullRecords() const {
       }
       break;
     }
-    case ViewType::SCENE: {
-      LOG_D("Todo: getFullRecords is not supported in scene model now");
-      break;
-    }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
         fullRecords.append(m_movieDbModel->fullInfo(ind));
@@ -642,8 +651,16 @@ QStringList ViewsStackedWidget::getFullRecords() const {
       }
       break;
     }
+    case ViewType::SCENE: {
+      LOG_D("not supported in scene model now");
+      break;
+    }
+    case ViewType::CAST: {
+      LOG_D("not supported in cast model now");
+      break;
+    }
     default: {
-      LOG_W("No getFullRecords ViewType:%d", (int) vt);
+      LOG_W("No getFullRecords ViewType:%d", (int)vt);
       break;
     }
   }
@@ -699,8 +716,14 @@ QStringList ViewsStackedWidget::getFilePaths() const {
       }
       break;
     }
+    case ViewType::CAST: {
+      for (const auto& ind : m_castTableView->selectionModel()->selectedRows()) {
+        filePaths.append(m_castDbModel->filePath(ind));
+      }
+      break;
+    }
     default: {
-      LOG_D("No getFilePaths ViewType:%d", (int) vt);
+      LOG_D("No getFilePaths ViewType:%d", (int)vt);
       break;
     }
   }
@@ -765,74 +788,10 @@ QStringList ViewsStackedWidget::getFilePrepaths() const {
       }
       break;
     }
+    case ViewType::CAST:
     default: {
-      LOG_D("No getFilePrepaths ViewType:%d", (int) vt);
+      LOG_D("No getFilePrepaths ViewType:%d", (int)vt);
       break;
-    }
-  }
-  return prepaths;
-}
-
-QStringList ViewsStackedWidget::getTheJpgFolderPaths() const {
-  QStringList prepaths;
-  auto vt = GetVt();
-  switch (vt) {
-    case ViewType::TABLE: {
-      for (const auto& ind : m_fsTableView->selectionModel()->selectedRows()) {
-        const QFileInfo dirFi = m_fsModel->fileInfo(ind);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(QDir::toNativeSeparators(imagePath));
-      }
-      break;
-    }
-    case ViewType::LIST: {
-      for (const auto& ind : m_fsListView->selectionModel()->selectedRows()) {
-        const QFileInfo dirFi = m_fsModel->fileInfo(ind);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(QDir::toNativeSeparators(imagePath));
-      }
-      break;
-    }
-    case ViewType::TREE: {
-      for (const auto& ind : m_fsTreeView->selectionModel()->selectedRows()) {
-        const QFileInfo dirFi = m_fsModel->fileInfo(ind);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(QDir::toNativeSeparators(imagePath));
-      }
-      break;
-    }
-    case ViewType::SEARCH: {
-      for (const auto& ind : m_advanceSearchView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_searchProxyModel->mapToSource(ind);
-        const QFileInfo dirFi = m_searchSrcModel->fileInfo(srcIndex);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(imagePath);
-      }
-      break;
-    }
-    case ViewType::SCENE: {
-      LOG_D("Todo: need complement");
-      break;
-    }
-    case ViewType::MOVIE: {
-      for (const auto& ind : m_movieView->selectionModel()->selectedRows()) {
-        const QFileInfo dirFi = m_movieDbModel->fileInfo(ind);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(imagePath);
-      }
-      break;
-    }
-    case ViewType::JSON: {
-      for (const auto& ind : m_jsonTableView->selectionModel()->selectedRows()) {
-        const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
-        const QFileInfo dirFi = m_jsonModel->fileInfo(srcIndex);
-        const QString& imagePath = QDir(dirFi.absoluteFilePath()).absoluteFilePath(dirFi.fileName() + ".jpg");
-        prepaths.append(imagePath);
-      }
-      break;
-    }
-    default: {
-      LOG_D("No getTheJpgFolderPaths");
     }
   }
   return prepaths;
@@ -858,9 +817,8 @@ MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt:
       return ret;
     }
     case ViewType::SEARCH: {
-      MimeDataMember ret = GetMimeDataMemberFromSearchModel(*m_searchSrcModel,
-                                                            *m_searchProxyModel,
-                                                            m_advanceSearchView->selectionModel()->selectedRows());
+      MimeDataMember ret =
+          GetMimeDataMemberFromSearchModel(*m_searchSrcModel, *m_searchProxyModel, m_advanceSearchView->selectionModel()->selectedRows());
       FillCutCopySomething<AdvanceSearchModel>(*m_searchSrcModel, ret.srcIndexes, dropAct);
       return ret;
     }
@@ -871,6 +829,8 @@ MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt:
     case ViewType::MOVIE: {
       return GetMimeDataMemberFromSourceModel<FdBasedDbModel>(*m_movieDbModel, m_movieView->selectionModel()->selectedRows());
     }
+    case ViewType::CAST:
+    case ViewType::JSON:
     default: {
       LOG_W("ViewType:%s not support getFilePathsAndUrls", c_str(vt));
       return {};
@@ -946,6 +906,7 @@ std::pair<QStringList, QStringList> ViewsStackedWidget::getFilePrepathsAndName(c
       }
       break;
     }
+    case ViewType::CAST:
     default: {
       LOG_D("No getFilePrepathsAndName");
       break;
@@ -999,7 +960,7 @@ QString ViewsStackedWidget::getCurFilePath() const {
       LOG_W("No getCurFilePath");
     }
   }
-  LOG_W("nothing selected in viewType[%d]", (int) vt);
+  LOG_W("nothing selected in viewType[%d]", (int)vt);
   return "";
 }
 
@@ -1027,6 +988,7 @@ QString ViewsStackedWidget::getCurFileName() const {
     case ViewType::JSON: {
       return m_jsonModel->fileName(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
     }
+    case ViewType::CAST:
     default: {
       LOG_W("No getCurFileName");
     }

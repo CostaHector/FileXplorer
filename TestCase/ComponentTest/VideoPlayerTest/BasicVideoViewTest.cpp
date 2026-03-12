@@ -93,7 +93,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     QSignalSpy reqFullscreenModeChangeSpy{&basicVideoView, &BasicVideoView::reqFullscreenModeChange};
     basicVideoView.mVideoWidget->mFullScreenAct->toggle();
     QCOMPARE(reqFullscreenModeChangeSpy.count(), 1);
-    QCOMPARE(reqFullscreenModeChangeSpy.takeLast(), (QList<QVariant>{true}));
+    QCOMPARE(reqFullscreenModeChangeSpy.takeLast(), (QVariantList{true}));
     QCOMPARE(layoutVisibilityChangedSpy.count(), 0);  // 超时才会发送
 
     // 超时后隐藏
@@ -104,7 +104,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     // 退出全屏
     basicVideoView.mVideoWidget->mFullScreenAct->toggle();
     QCOMPARE(reqFullscreenModeChangeSpy.count(), 1);
-    QCOMPARE(reqFullscreenModeChangeSpy.takeLast(), (QList<QVariant>{false}));
+    QCOMPARE(reqFullscreenModeChangeSpy.takeLast(), (QVariantList{false}));
     QCOMPARE(layoutVisibilityChangedSpy.count(), 1);  // 立刻发送
     layoutVisibilityChangedSpy.takeLast();
   }

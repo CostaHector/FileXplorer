@@ -22,7 +22,8 @@ public:
   void onPathInfoChanged(const int count, const int index = 0);
   void onMsgChanged(const QString& text = "", const STATUS_ALERT_LEVEL alertLvl = STATUS_ALERT_LEVEL::NORMAL);
 
-  QToolBar* m_viewsSwitcher{nullptr};
+  bool addViewSwitcherToRightCorner(QToolBar* viewsSwitcherTb);
+  QString GetText() const;
 private:
   QList<QLabel*> mLabelsLst; // total count, selected count, message
 };

@@ -49,7 +49,7 @@ private slots:
     emit pRegexAct->triggered(true);
 
     QTRY_COMPARE(spy.count(), 1);
-    QList<QVariant> searchModeChangeParams = spy.last();
+    QVariantList searchModeChangeParams = spy.last();
     QCOMPARE(searchModeChangeParams.size(), 1); // only 1 paramerter
     QCOMPARE(searchModeChangeParams[0].value<SearchTools::SearchModeE>(), SearchTools::SearchModeE::REGEX);
     QCOMPARE(btn.curSearchMode(), SearchTools::SearchModeE::REGEX);

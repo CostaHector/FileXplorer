@@ -26,9 +26,10 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   CHECK_NULLPTR_RETURN_VOID(mFieldCaseOperTb);
   mFieldCaseOperTb->addAction(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD);
   mFieldCaseOperTb->addAction(inst._LOWER_ALL_WORDS);
+  mFieldCaseOperTb->addAction(inst._SET_CONTENTS_UNFIXED);
   mFieldCaseOperTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mFieldCaseOperTb->setOrientation(Qt::Orientation::Vertical);
-  mFieldCaseOperTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  mFieldCaseOperTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   mFieldCaseOperTb->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mFieldCaseOperTb->layout(), Qt::AlignmentFlag::AlignLeft);
 

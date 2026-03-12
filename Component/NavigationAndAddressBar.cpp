@@ -123,7 +123,7 @@ bool NavigationAndAddressBar::onBackward() {
   bool backwardRes{false};
   const QString& undoPath = m_pathRD.onUndoPath();
   if (m_IntoNewPath != nullptr) {
-    backwardRes = m_IntoNewPath(undoPath, false, false);
+    backwardRes = m_IntoNewPath(undoPath, false);
   }
   return backwardRes;
 }
@@ -136,7 +136,7 @@ bool NavigationAndAddressBar::onForward() {
   bool forwardRes{false};
   const QString& redoPath = m_pathRD.onRedoPath();
   if (m_IntoNewPath != nullptr) {
-    forwardRes = m_IntoNewPath(redoPath, false, false);
+    forwardRes = m_IntoNewPath(redoPath, false);
   }
   return forwardRes;
 }
@@ -150,7 +150,7 @@ bool NavigationAndAddressBar::onUpTo() {
 
   bool upRes{false};
   if (m_IntoNewPath != nullptr) {
-    upRes = m_IntoNewPath(parentPath, true, false);
+    upRes = m_IntoNewPath(parentPath, true);
   }
   return upRes;
 }
@@ -171,7 +171,7 @@ bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
   const QString& newPath = parentPath + '/' + newDir;
   bool intoRes{false};
   if (m_IntoNewPath != nullptr) {
-    intoRes = m_IntoNewPath(newPath, true, false);
+    intoRes = m_IntoNewPath(newPath, true);
   } else {
     LOG_W("m_IntoNewPath is nullptr");
     return false;

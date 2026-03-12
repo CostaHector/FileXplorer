@@ -10,12 +10,13 @@ ToolBarWidget::ToolBarWidget(QBoxLayout::Direction direction, QWidget* parent) :
   setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
 }
 
-void ToolBarWidget::setDirection(QBoxLayout::Direction direction) {
+bool ToolBarWidget::setDirection(QBoxLayout::Direction direction) {
   if (mLayout->direction() == direction) {
     LOG_D("Skip, direction remains[%d] unchange no need set", direction);
-    return;
+    return false;
   }
   mLayout->setDirection(direction);
+  return true;
 }
 
 void ToolBarWidget::addWidget(QWidget* parent, int stretch) {
@@ -59,6 +60,7 @@ QFrame* ToolBarWidget::addSeparator() {
 
 int ToolBarWidget::setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool bRecursive) {
   CHECK_NULLPTR_RETURN_INT(mLayout, -1);
+  int affectedWid{0};
   QList<QToolButton*> toolButtons = this->findChildren<QToolButton*>();
   for (QToolButton* toolBtn : toolButtons) {
     if (!bRecursive && toolBtn->parentWidget() != this) {
@@ -73,32 +75,9 @@ int ToolBarWidget::setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool 
       continue;
     }
     toolBtn->setToolButtonStyle(toolButtonStyle);
+    ++affectedWid;
   }
-  return toolButtons.size();
-}
-
-QToolButton* ToolBarWidget::createToolButton(const QIcon& icon,
-                                             const QString& text,
-                                             const QString& toolTip,
-                                             bool checkable,
-                                             Qt::ToolButtonStyle toolButtonStyle,
-                                             bool bToolButtonStyleFixed) {
-  QToolButton* btn = new (std::nothrow) QToolButton{this};
-  CHECK_NULLPTR_RETURN_NULLPTR(btn);
-  QAction* tmpAct = new (std::nothrow) QAction{icon, text, this};
-  tmpAct->setObjectName(text);
-  CHECK_NULLPTR_RETURN_NULLPTR(tmpAct);
-  tmpAct->setToolTip(QString{"<b>%1 (%2)</b><br/>"}.arg(text, "") + toolTip);
-  tmpAct->setCheckable(checkable);
-
-  btn->setObjectName(text);
-  btn->setDefaultAction(tmpAct);
-  btn->setToolButtonStyle(toolButtonStyle);
-  btn->setAutoRaise(true);
-  if (bToolButtonStyleFixed) {
-    mToolButtonStyleFixedObjNameSet.insert(btn->objectName());
-  }
-  return btn;
+  return affectedWid;
 }
 
 QToolButton* ToolBarWidget::createToolButton(QAction* act, Qt::ToolButtonStyle toolButtonStyle, bool bToolButtonStyleFixed) {

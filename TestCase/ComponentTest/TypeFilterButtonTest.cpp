@@ -108,7 +108,7 @@ class TypeFilterButtonTest : public PlainTestSuite {
     QDir::Filters expectFilters{QDir::Filter::Files, QDir::Filter::Hidden};
     QDir::Filters actualFilters = btnSearch.curDirFilters();
     QCOMPARE(actualFilters, expectFilters);
-    QList<QVariant> lastSignalParams = spyFilterChanged.last();
+    QVariantList lastSignalParams = spyFilterChanged.last();
     QCOMPARE(lastSignalParams.size(), 1);
     QVariant filterParm = lastSignalParams.front();
     QCOMPARE(filterParm.typeName(), "QDir::Filters");
@@ -118,7 +118,7 @@ class TypeFilterButtonTest : public PlainTestSuite {
     QCOMPARE(spyNameFilterDisables.last().front().toBool(), false);
 
     QCOMPARE(btnSearch.curIteratorFlag(), QDirIterator::IteratorFlag::Subdirectories);  // true
-    QList<QVariant> lastIncludeSubParams = spyincludingSubdirectory.last();
+    QVariantList lastIncludeSubParams = spyincludingSubdirectory.last();
     QVariant includeParam = lastIncludeSubParams.front();
     QCOMPARE(includeParam.typeName(), "QDirIterator::IteratorFlag");
     QCOMPARE(includeParam.value<QDirIterator::IteratorFlag>(), QDirIterator::IteratorFlag::Subdirectories);

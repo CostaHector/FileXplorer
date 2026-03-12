@@ -84,7 +84,7 @@ bool HarFiles::operator()(const QString& harAbsPath) {
     LOG_W("key[%s] not exist in json dict logValueVarHash", "entries");
     return false;
   }
-  const QList<QVariant>& entries = logValueVarHash["entries"].toList();
+  const QVariantList& entries = logValueVarHash["entries"].toList();
   LOG_D("entries.size()=%d", entries.size());
   for (const QVariant& entry : entries) {
     const auto& entryHash = entry.toHash();

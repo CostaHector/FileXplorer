@@ -6,12 +6,10 @@
 class ItemView : public CustomListView {
  public:
   explicit ItemView(const QString& itemViewName, QWidget* parent = nullptr);
-  void SetCurrentModel(FloatingModels* mdl) {
-    setModel(mdl);
-    mModels = mdl;
-  }
+  bool SetCurrentModel(FloatingModels* mdl);
   void subscribe();
   bool onCellDoubleClicked(const QModelIndex& clickedIndex) const;
+  bool onPlayCurrentIndex() const;
   bool onRecycleSelections() const;
 
  private:

@@ -150,7 +150,7 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     QCOMPARE(browser.mCurIconSizeIndex, BACK_ICON_SIZE_INDEX);  // zoom in ok. now the largest icon size
     QCOMPARE(browser.mIconSize, IMAGE_SIZE::ICON_SIZE_CANDIDATES[BACK_ICON_SIZE_INDEX]);
     QCOMPARE(spy.count(), 1);
-    QList<QVariant> wheelCtrlDownParams = spy.back();
+    QVariantList wheelCtrlDownParams = spy.back();
     QCOMPARE(wheelCtrlDownParams.size(), 1);
     QCOMPARE(wheelCtrlDownParams[0].toSize(), browser.mIconSize);
 
@@ -164,7 +164,7 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     SendWheelEvent(browser, upAngelDelta, Qt::KeyboardModifier::ControlModifier, true);
     QCOMPARE(browser.mCurIconSizeIndex, FRONT_ICON_SIZE_INDEX);  // now the least icon size
     QCOMPARE(spy.count(), 2);
-    QList<QVariant> wheelCtrlUpParams = spy.back();
+    QVariantList wheelCtrlUpParams = spy.back();
     QCOMPARE(wheelCtrlUpParams.size(), 1);
     QCOMPARE(wheelCtrlUpParams[0].toSize(), browser.mIconSize);
 

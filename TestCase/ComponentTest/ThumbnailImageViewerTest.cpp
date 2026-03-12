@@ -29,7 +29,7 @@ public:
   const QString THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME = "ThumbnailImageViewer";
   const ClipboardGuard clipGuard;
 private slots:
-  void initupTestCase() {
+  void initTestCase() {
     GlobalMockObject::reset();
     MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
   }
@@ -180,7 +180,6 @@ private slots:
     viewer.clearPixmap();
     QVERIFY(viewer.pixmap().isNull());
 
-    viewer.show();
     viewer.resizeEvent(nullptr);
     viewer.close();
   }

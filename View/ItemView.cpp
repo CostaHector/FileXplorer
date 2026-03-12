@@ -5,8 +5,8 @@
 #include "UndoRedo.h"
 #include <QFile>
 
-ItemView::ItemView(const QString& itemViewName, QWidget* parent) //
-  : CustomListView{itemViewName, parent} {
+ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
+    : CustomListView{itemViewName, parent} {
   setMovement(QListView::Movement::Free);
 
   _PLAY_ITEM = new (std::nothrow) QAction{QIcon{":img/OPEN_IN_TERMINAL"}, "Open", this};
@@ -18,9 +18,16 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent) //
   subscribe();
 }
 
+bool ItemView::SetCurrentModel(FloatingModels* mdl) {
+  CHECK_NULLPTR_RETURN_FALSE(mdl);
+  setModel(mdl);
+  mModels = mdl;
+  return true;
+}
+
 void ItemView::subscribe() {
   connect(this, &QListView::doubleClicked, this, &ItemView::onCellDoubleClicked);
-  connect(_PLAY_ITEM, &QAction::triggered, this, [this]() { onCellDoubleClicked(currentIndex()); });
+  connect(_PLAY_ITEM, &QAction::triggered, this, &ItemView::onPlayCurrentIndex);
   connect(_RECYCLE_ITEM, &QAction::triggered, this, &ItemView::onRecycleSelections);
 }
 
@@ -34,10 +41,11 @@ bool ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
     LOG_INFO_P("Cannot open", "Path[%s] not exists", qPrintable(path));
     return false;
   }
-#ifdef RUNNING_UNIT_TESTS
-  return true;
-#endif
   return FileTool::OpenLocalFile(path);
+}
+
+bool ItemView::onPlayCurrentIndex() const {
+  return onCellDoubleClicked(currentIndex());
 }
 
 bool ItemView::onRecycleSelections() const {
@@ -45,12 +53,12 @@ bool ItemView::onRecycleSelections() const {
   const QModelIndexList& inds{selectionModel()->selectedIndexes()};
   if (inds.isEmpty()) {
     LOG_INFO_NP("Skip Recyle", "nothing selected");
-    return true;
+    return false;
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE removeCmds;
   removeCmds.reserve(inds.size());
-  for (const QModelIndex& ind: inds) {
+  for (const QModelIndex& ind : inds) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH("", mModels->filePath(ind)));
   }
   if (!UndoRedo::GetInst().Do(removeCmds)) {

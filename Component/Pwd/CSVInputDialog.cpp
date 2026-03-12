@@ -58,6 +58,7 @@ void DragDropTextEdit::contextMenuEvent(QContextMenuEvent *event) {
 bool DragDropTextEdit::isContainsOneFile(const QMimeData &mimeData) {
   return mimeData.hasUrls() && mimeData.urls().size() == 1;
 }
+
 bool DragDropTextEdit::onSelectEncCsvFileToParse() {
   const QString encryptCsvFilePath = QFileDialog::getOpenFileName(this,
                                                                   "Select encrypt csv file",
@@ -87,8 +88,6 @@ CSVInputDialog::CSVInputDialog(QWidget *parent) //
   CHECK_NULLPTR_RETURN_VOID(buttonBox);
   buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help);
   pOkBtn = buttonBox->button(QDialogButtonBox::Ok);
-  pCancelBtn = buttonBox->button(QDialogButtonBox::Cancel);
-  pHelpBtn = buttonBox->button(QDialogButtonBox::Help);
 
   QPalette pal = pOkBtn->palette();
   pal.setColor(QPalette::ButtonText, QColor(30, 144, 255));

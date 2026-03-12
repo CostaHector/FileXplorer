@@ -277,9 +277,9 @@ int MovieDBView::onDeleteFromTable() {
   using namespace MOVIE_TABLE;
   const QString& tbl = _movieDbSearchBar->GetCurrentTableName();
   static const QString RELATION_TEMPLATE{R"("%1" = )"};
-  static const QStringList candidates {
-      "1=1",//
-      "",//
+  static const QStringList candidates{
+      "1=1",                                            //
+      "",                                               //
       RELATION_TEMPLATE.arg(ENUM_2_STR(PrePathLeft)),   //
       RELATION_TEMPLATE.arg(ENUM_2_STR(PrePathRight)),  //
       RELATION_TEMPLATE.arg(ENUM_2_STR(Name)),          //
@@ -330,7 +330,8 @@ bool MovieDBView::onUnionTables() {
   }
   const QString confirmUnionTitle = "Confirm Union?";
   const QString confirmUnionHintMsg{QString{"All %1 tables into Table[%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
-  QMessageBox::StandardButton cfmUnionBtn = QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  QMessageBox::StandardButton cfmUnionBtn =
+      QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (cfmUnionBtn != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("[Skip] User cancel union tables", "return");
     return false;
@@ -600,6 +601,16 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
 
   LOG_OK_P("[Uncommit] SetCastOrTags", "%d row(s) %s", indexes.size(), qPrintable(fieldOperation));
   return indexes.size();
+}
+
+QList<qint64> MovieDBView::GetSelectionFileSizes() const {
+  const QModelIndexList& selIdxs = selectionModel()->selectedRows();
+  return _dbModel->GetSelectionFileSizes(selIdxs);
+}
+
+QList<int> MovieDBView::GetSelectionDurations() const {
+  const QModelIndexList& selIdxs = selectionModel()->selectedRows();
+  return _dbModel->GetSelectionDurations(selIdxs);
 }
 
 bool MovieDBView::IsHasSelection(const QString& msg) const {

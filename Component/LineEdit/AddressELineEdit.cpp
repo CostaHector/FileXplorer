@@ -26,7 +26,7 @@ bool Path2Actions(QToolBar& outTb, const QString& fullpath) {
     CHECK_NULLPTR_RETURN_FALSE(pWid);
     pWid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   }
-  return false;
+  return true;
 }
 
 QString PathFromActions(const QList<QAction*>& actions, const QAction* cursorAtAction, bool bStandalize) {  //
@@ -133,7 +133,7 @@ auto AddressELineEdit::ChangePath(const QString& path) -> bool {
     return FileTool::OpenLocalFile(pth);
   } else {
     updateAddressToolBarPathActions(pth);
-    emit pathActionsTriggeredOrLineEditReturnPressed(pth);
+    emit pathActionsTriggeredOrLineEditReturnPressed(pth, true);
     emit m_pathComboBox->focusChanged(false);
   }
   return true;

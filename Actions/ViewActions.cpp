@@ -1,11 +1,6 @@
 ﻿#include "ViewActions.h"
-#include "MemoryKey.h"
-#include "PublicMacro.h"
-#include "FileTool.h"
-#include "PublicVariable.h"
-#include "StyleSheet.h"
 #include "ViewTypeTool.h"
-#include "ViewSwitchToolBar.h"
+#include "MemoryKey.h"
 
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
@@ -99,27 +94,6 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _HAR_VIEW->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                 "Double click to open an har file")
                             .arg(_HAR_VIEW->text(), _HAR_VIEW->shortcut().toString()));
-}
-
-QToolBar* ViewActions::GetViewTB(QWidget* parent) {
-  auto* pTb = new (std::nothrow) ViewSwitchToolBar{"views switch", parent};
-  CHECK_NULLPTR_RETURN_NULLPTR(pTb);
-  pTb->mViewTypeIntAction.init({{_LIST_VIEW, ViewTypeTool::ViewType::LIST},
-                                {_TABLE_VIEW, ViewTypeTool::ViewType::TABLE},
-                                {_TREE_VIEW, ViewTypeTool::ViewType::TREE},
-                                {_MOVIE_VIEW, ViewTypeTool::ViewType::MOVIE},
-                                {_CAST_VIEW, ViewTypeTool::ViewType::CAST},
-                                {_SCENE_VIEW, ViewTypeTool::ViewType::SCENE},
-                                {_JSON_VIEW, ViewTypeTool::ViewType::JSON},
-                                {_ADVANCE_SEARCH_VIEW, ViewTypeTool::ViewType::SEARCH}},
-                               ViewTypeTool::DEFAULT_VIEW_TYPE, QActionGroup::ExclusionPolicy::Exclusive);
-  pTb->subscribe();
-  pTb->addActions(_ALL_VIEWS); // action sorted in user specified sequence
-  pTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
-  pTb->setOrientation(Qt::Orientation::Horizontal);
-  pTb->setStyleSheet("QToolBar { max-width: 256px; }");
-  pTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  return pTb;
 }
 
 ViewActions& g_viewActions() {

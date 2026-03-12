@@ -29,14 +29,16 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this}; //  docker
   m_previewFolder = new (std::nothrow) CurrentRowPreviewer{previewHtmlDock}; // previewer in docker
   m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this}; // previewer switcher
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar; // searchToolBar
-  m_navigationToolBar = new (std::nothrow) NavigationToolBar; // left navigation bar
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this}; // searchToolBar
+  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this}; // left navigation bar
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this}; // ribbon menu
+  m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
   m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
   m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget()}; // view/searchToolBar switcher
-
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget(), this}; // view/searchToolBar switcher
+  // addViewSwitcherToRightCorner;
   m_fsPanel->BindLogger(m_statusBar);
+  m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
   m_viewSwitchHelper->onSwitchByViewType(ViewTypeTool::DEFAULT_VIEW_TYPE);
 
   const QString& defaultPath = ReadSettings(args);
@@ -125,7 +127,7 @@ void FileXplorer::subscribe() {
     m_navigationToolBar->setVisible(checked);
   });
 
-  connect(m_statusBar->m_viewsSwitcher, &QToolBar::actionTriggered, this, &FileXplorer::onViewWidgetChanged);
+  connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
 
   PreviewTypeToolBar* previewToolBar = g_folderPreviewActions().GetPreviewsToolbar(this);
   connect(previewToolBar, &PreviewTypeToolBar::previewTypeChanged, this, &FileXplorer::onPreviewSwitched);
@@ -189,12 +191,8 @@ void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum)
   m_previewSwitcher->onSwitchByViewType(previewEnum);
 }
 
-void FileXplorer::onViewWidgetChanged(const QAction* pViewAct) {
-  using namespace ViewTypeTool;
-  CHECK_NULLPTR_RETURN_VOID(pViewAct);
-  const QString& viewText = pViewAct->property("ViewTypeTool::ViewType").toString();
-  ViewType vt = GetViewTypeByActionText(viewText);
-  LOG_D("actionTriggered[%s] in CustomStatusBar/QToolbar", c_str(vt));
-  m_viewSwitchHelper->onSwitchByViewType(vt);
-  m_ribbonMenu->whenViewTypeChanged(vt);
+void FileXplorer::onViewWidgetChanged(ViewTypeTool::ViewType viewType) {
+  LOG_D("actionTriggered[%s] in CustomStatusBar/QToolbar", ViewTypeTool::c_str(viewType));
+  m_viewSwitchHelper->onSwitchByViewType(viewType);
+  m_ribbonMenu->whenViewTypeChanged(viewType);
 }

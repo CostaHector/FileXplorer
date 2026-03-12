@@ -16,6 +16,7 @@ class FileOsWalker;
 
 class AdvanceRenamer : public QDialog {
 public:
+  static int execCore(AdvanceRenamer* self);
   explicit AdvanceRenamer(QWidget* parent = nullptr);
 
   void showEvent(QShowEvent* event) override;

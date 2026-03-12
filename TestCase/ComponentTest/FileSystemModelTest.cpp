@@ -134,7 +134,7 @@ class FileSystemModelTest : public PlainTestSuite {
     QCOMPARE(uniqueSpy.wait(1000), true);  // path changed directoryLoaded signal should not be emit
     QVERIFY(uniqueSpy.count() >= 1);
 
-    QList<QVariant> dirloadedParams = uniqueSpy.last();
+    QVariantList dirloadedParams = uniqueSpy.last();
     QCOMPARE(dirloadedParams.size(), 1);
     QCOMPARE(dirloadedParams[0].toString(), currentValidPath);
 

@@ -86,17 +86,14 @@ public:
     QCOMPARE(acceptSpy.count(), 0);
 
     // user click ok directly before timeout, 点击登录 将会触发自动保存密钥
-#ifdef _WIN32
     QVERIFY(credUtil.deletePassword(GetCredTargetName()));
     QCOMPARE(credUtil.readPassword(GetCredTargetName()), "");
-#endif
+
     emit widget.mDlgBtnBox->button(QDialogButtonBox::Ok)->clicked();
     QCOMPARE(widget.result(), QDialog::Accepted);
     QCOMPARE(timeoutSpy.count(), 0);
     QCOMPARE(acceptSpy.count(), 1);
-#ifdef _WIN32
     QCOMPARE(credUtil.readPassword(GetCredTargetName()), key);
-#endif
 
     // timeout trigger accept, 超时自动登录, 不会触发自动保存密钥
     LoginQryWidgetMock::beforeTimeOutIsAutoLoginCheckedMock() = true; // user accept before timeout
@@ -124,9 +121,13 @@ private slots:
     credUtil.savePassword(GetCredTargetName(), backUpCredKey);
   }
 
-  void init() { GlobalMockObject::reset(); }
+  void init() { //
+    GlobalMockObject::reset(); }
 
-  void cleanup() { GlobalMockObject::verify(); }
+  void cleanup() { //
+    GlobalMockObject::verify();
+  }
+
   void firstTime_registerNeeded() {
     QVERIFY(!tDir.exists("accounts_test.csv"));
     QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());

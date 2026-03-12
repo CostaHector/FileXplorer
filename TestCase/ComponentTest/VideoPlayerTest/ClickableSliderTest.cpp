@@ -46,7 +46,7 @@ class ClickableSliderTest : public PlainTestSuite {
 
     QCOMPARE(volumeSlider.value(), 0);
     QCOMPARE(sliderSpy.count(), 1);
-    QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{0}));
+    QCOMPARE(sliderSpy.takeLast(), (QVariantList{0}));
   }
 
   void mouse_click_ok() {
@@ -68,14 +68,14 @@ class ClickableSliderTest : public PlainTestSuite {
       QCOMPARE(volumeValueNeedSetToPlayer, 0);
       QCOMPARE(volumeSlider.value(), 0);
       QCOMPARE(sliderSpy.count(), 1);
-      QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{0}));
+      QCOMPARE(sliderSpy.takeLast(), (QVariantList{0}));
     }
 
     // 2. setValue 50
     {
       volumeSlider.setValue(50);
       QCOMPARE(sliderSpy.count(), 1);
-      QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{50}));
+      QCOMPARE(sliderSpy.takeLast(), (QVariantList{50}));
     }
 
     // 3. mouse click value 100 水平方向点击最右侧
@@ -87,14 +87,14 @@ class ClickableSliderTest : public PlainTestSuite {
       QCOMPARE(volumeValueNeedSetToPlayer, 100);
       QCOMPARE(volumeSlider.value(), 100);
       QCOMPARE(sliderSpy.count(), 1);
-      QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{100}));
+      QCOMPARE(sliderSpy.takeLast(), (QVariantList{100}));
     }
 
     // 4. setValue 14
     {
       volumeSlider.setValue(14);
       QCOMPARE(sliderSpy.count(), 1);
-      QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{14}));
+      QCOMPARE(sliderSpy.takeLast(), (QVariantList{14}));
     }
 
     // 5. mouse click value 100 垂直方向点击底部
@@ -107,7 +107,7 @@ class ClickableSliderTest : public PlainTestSuite {
       QCOMPARE(volumeValueNeedSetToPlayer, 100);
       QCOMPARE(volumeSlider.value(), 100);
       QCOMPARE(sliderSpy.count(), 1);
-      QCOMPARE(sliderSpy.takeLast(), (QList<QVariant>{100}));
+      QCOMPARE(sliderSpy.takeLast(), (QVariantList{100}));
     }
 
     // 6. 点击相同位置, 值不变, 不调用回调, 不emit valueChanged

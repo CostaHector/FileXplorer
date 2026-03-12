@@ -9,6 +9,7 @@
 #include "StackedAddressAndSearchToolBar.h"
 
 #include "ViewsStackedWidget.h"
+#include "ViewSwitchToolBar.h"
 #include "RibbonMenu.h"
 
 class FileXplorer : public QMainWindow {
@@ -36,9 +37,11 @@ public:
 
   NavigationToolBar* m_navigationToolBar{nullptr};
   RibbonMenu* m_ribbonMenu{nullptr};
+
+  ViewSwitchToolBar* m_viewSwitcher{nullptr};
   CustomStatusBar* m_statusBar{nullptr};
 private:
   void onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum);
-  void onViewWidgetChanged(const QAction* pViewAct);
+  void onViewWidgetChanged(ViewTypeTool::ViewType viewType);
 };
 #endif  // FILEXPLORER_H

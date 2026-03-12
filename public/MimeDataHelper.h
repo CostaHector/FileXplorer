@@ -17,6 +17,9 @@ struct MimeDataMember {
   QStringList texts;
   QList<QUrl> urls;
   QModelIndexList srcIndexes;
+  bool isEmpty() const {
+    return texts.isEmpty() && urls.isEmpty() && srcIndexes.isEmpty();
+  }
 };
 
 template <typename TSrcModel>

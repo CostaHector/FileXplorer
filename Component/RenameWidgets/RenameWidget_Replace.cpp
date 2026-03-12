@@ -92,7 +92,7 @@ std::pair<bool, QString> RenameWidget_Replace::QueryAndConfirm(const QString& wo
   if (disableOldNameEdit) {
     pReplacer.m_oldStrCB->setDisabled(true);
   }
-  if (pReplacer.exec() != QDialog::Accepted) {
+  if (RenameWidget_Replace::execCore(&pReplacer) != QDialog::DialogCode::Accepted) {
     LOG_D("User cancel rename %d item(s)", selectedNames.size());
     return {false, ""};
   }

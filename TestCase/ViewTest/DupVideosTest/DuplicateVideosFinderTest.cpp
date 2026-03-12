@@ -100,6 +100,7 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
       dvf.keyPressEvent(&copyEvent);
       QCOMPARE(copyEvent.isAccepted(), false);
 
+      QCOMPARE(dvf.m_rightDetailsTbl->hasFocus(), false);
       QKeyEvent doubleClickedEvent{QEvent::KeyPress, Qt::Key::Key_Enter, Qt::KeyboardModifier::NoModifier, QString(), false, 1};
       dvf.keyPressEvent(&doubleClickedEvent);
       QCOMPARE(doubleClickedEvent.isAccepted(), false);
@@ -128,11 +129,13 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
       }
       {
         dvf.show();
-        QTRY_VERIFY(QTest::qWaitForWindowActive(&dvf));
-
-        dvf.m_rightDetailsTbl->setFocus();
-        dvf.keyPressEvent(&doubleClickedEvent);
-        QCOMPARE(doubleClickedEvent.isAccepted(), true);
+        QTimer::singleShot(0, this, [this]() {
+          dvf.m_rightDetailsTbl->setFocus();
+          QCOMPARE(dvf.m_rightDetailsTbl->hasFocus(), true);
+          QKeyEvent doubleClickedEvent{QEvent::KeyPress, Qt::Key::Key_Enter, Qt::KeyboardModifier::NoModifier, QString(), false, 1};
+          dvf.keyPressEvent(&doubleClickedEvent);
+          QCOMPARE(doubleClickedEvent.isAccepted(), true);
+        });
       }
     }
     dvf.hide();

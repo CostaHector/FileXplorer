@@ -16,11 +16,6 @@ CustomStatusBar::CustomStatusBar(QWidget* parent)  //
   mLabelsLst[MSG]->setObjectName("statusMessageLabel");
 
   auto& viewInst = g_viewActions();
-
-  m_viewsSwitcher = viewInst.GetViewTB(this); // right-down corner permanent widget
-  CHECK_NULLPTR_RETURN_VOID(m_viewsSwitcher);
-  addPermanentWidget(m_viewsSwitcher);
-
   addAction(viewInst._VIEW_BACK_TO);
   addAction(viewInst._VIEW_FORWARD_TO);
 
@@ -47,3 +42,13 @@ void CustomStatusBar::onMsgChanged(const QString& text, const STATUS_ALERT_LEVEL
   mLabelsLst[MSG]->setText(text);
 }
 
+QString CustomStatusBar::GetText() const {
+  return mLabelsLst[ITEMS]->text() + mLabelsLst[SELECTED]->text() + mLabelsLst[MSG]->text();
+}
+
+bool CustomStatusBar::addViewSwitcherToRightCorner(QToolBar* viewsSwitcherTb) {
+  // right-down corner permanent widget
+  CHECK_NULLPTR_RETURN_FALSE(viewsSwitcherTb);
+  addPermanentWidget(viewsSwitcherTb);
+  return true;
+}

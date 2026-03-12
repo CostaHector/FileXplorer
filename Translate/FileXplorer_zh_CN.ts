@@ -524,7 +524,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+15"/>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+18"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -574,6 +574,16 @@
         <translation>下一视频</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>+Volume</source>
+        <translation>增大音量</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-Volume</source>
+        <translation>减少音量</translation>
+    </message>
+    <message>
         <location line="+2"/>
         <source>show frames</source>
         <translation>帧图组</translation>
@@ -584,7 +594,7 @@
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>current item once</source>
         <translation>单播</translation>
     </message>
@@ -609,12 +619,12 @@
         <translation>随机播放</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+25"/>
         <source>basic mode</source>
         <translation>基础模式</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>select video</source>
         <translation>选择视频文件</translation>
     </message>
@@ -639,7 +649,7 @@
         <translation>播放模式</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+10"/>
         <source>Play Trigger Mode</source>
         <translation>触发方式</translation>
     </message>
@@ -702,7 +712,12 @@
         <translation>固定内容</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+4"/>
+        <source>Unmark Contents Fixed</source>
+        <translation>取消固定</translation>
+    </message>
+    <message>
+        <location line="+37"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -727,7 +742,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-72"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -737,7 +752,7 @@
         <translation>格式化演员/制片厂</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+18"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
@@ -752,12 +767,12 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-35"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+40"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1243,7 +1258,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../Component/RibbonJson.cpp" line="+62"/>
+        <location filename="../Component/RibbonJson.cpp" line="+63"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>

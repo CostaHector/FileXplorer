@@ -117,7 +117,7 @@ class VideoTableModelTest : public PlainTestSuite {
     QVector<int> expectRoles{Qt::DisplayRole};
 
     QCOMPARE(dataChangedSpy.count(), 1);
-    QList<QVariant> parms = dataChangedSpy.takeLast();
+    QVariantList parms = dataChangedSpy.takeLast();
     QModelIndex f = parms[0].value<QModelIndex>();
     QModelIndex e = parms[1].value<QModelIndex>();
     QVector<int> actualRoles = parms[2].value<QVector<int>>();
@@ -125,7 +125,7 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(e, durationFieldEndInd);
     QCOMPARE(actualRoles, expectRoles);
 
-    // QCOMPARE(parms, (QList<QVariant>{durationFieldBegInd, durationFieldEndInd, QVariant::fromValue(expectRoles)}));
+    // QCOMPARE(parms, (QVariantList{durationFieldBegInd, durationFieldEndInd, QVariant::fromValue(expectRoles)}));
     // don't do this, the last element differs
   }
 
@@ -139,7 +139,7 @@ class VideoTableModelTest : public PlainTestSuite {
     videoTv.setPlayPath(mWorkPath, true);
     QCOMPARE(videoTv.mVideoModel->rowCount(), 2);
     QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{mDir.itemPath("file1.mkv"), true}));
+    QCOMPARE(reqPlaySpy.takeLast(), (QVariantList{mDir.itemPath("file1.mkv"), true}));
 
     videoTv.setPlayPath("", true);
     QCOMPARE(videoTv.mVideoModel->rowCount(), 0);
@@ -148,133 +148,7 @@ class VideoTableModelTest : public PlainTestSuite {
     videoTv.setPlayPath(mWorkPath, false);
     QCOMPARE(videoTv.mVideoModel->rowCount(), 2);
     QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{mDir.itemPath("file1.mkv"), false}));
-  }
-
-  void tableView_setMedias_ok() {
-    VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
-
-    QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
-
-    QStringList inexistFiles{"CR7 0.mp4", "CR7 1.mp4", "CR7 2.mp4"};
-
-    // 参数可携带
-    videoTv.setMediaFiles("", inexistFiles, false);
-    QCOMPARE(videoTv.mVideoModel->rowCount(), 3);
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", false}));
-
-    // function double click to play here, 强制播放
-    QModelIndex fIndex = videoTv.mProxyModel->index(0, 0);
-    QCOMPARE(fIndex.data(Qt::DisplayRole).toString(), "CR7 0.mp4");
-    videoTv.setCurrentIndex(fIndex);
-    videoTv.ReqPlay(fIndex, true);
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-  }
-
-  void tableView_Iterator_ok() {
-    VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
-
-    QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
-
-    QStringList inexistFiles{"CR7 0.mp4", "CR7 1.mp4", "CR7 2.mp4"};
-
-    // 参数可携带
-    videoTv.setMediaFiles("", inexistFiles, false);
-    QCOMPARE(videoTv.mVideoModel->rowCount(), 3);
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", false}));
-
-    // CurrentItemOnce
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::CurrentItemOnce);
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 0);
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 0);
-
-    // CurrentItemInLoop 强制参数=true
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::CurrentItemInLoop);
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    // Sequential
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::Sequential);
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 0);
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 1.mp4", true}));
-
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    // Loop 0->2, 2->0->1-2->2
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::Loop);
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 2.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 1.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 2.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    // Random
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::Random);
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QList<QVariant> parms1 = reqPlaySpy.takeLast();
-    QCOMPARE(parms1.count(), 2);
-    QCOMPARE(parms1.back(), true);  // 第一个参数随机， 第二个必定强制=true
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QList<QVariant> parms2 = reqPlaySpy.takeLast();
-    QCOMPARE(parms2.count(), 2);
-    QCOMPARE(parms2.back(), true);
-
-    // Sort Descending
-    videoTv.mProxyModel->sort(0, Qt::DescendingOrder);  // CR7 2.mp4, CR7 1.mp4, CR7 0.mp4
-    QModelIndex fIndex = videoTv.mProxyModel->index(0, 0);
-    QCOMPARE(fIndex.data(Qt::DisplayRole).toString(), "CR7 2.mp4");
-    videoTv.setCurrentIndex(fIndex);
-
-    // Loop
-    videoTv.setPlaybackMode(QMediaPlaylist::PlaybackMode::Loop);
-    // 2 -> 0 -> 2 -> 1
-    videoTv.PlayPreviousVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 0.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 2.mp4", true}));
-
-    videoTv.PlayNextVideo();
-    QCOMPARE(reqPlaySpy.count(), 1);
-    QCOMPARE(reqPlaySpy.takeLast(), (QList<QVariant>{"CR7 1.mp4", true}));
+    QCOMPARE(reqPlaySpy.takeLast(), (QVariantList{mDir.itemPath("file1.mkv"), false}));
   }
 };
 

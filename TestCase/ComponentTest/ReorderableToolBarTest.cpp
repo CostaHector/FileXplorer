@@ -126,7 +126,7 @@ class ReorderableToolBarTest : public PlainTestSuite {
         toolbar.dropEvent(&dropEvent);
 
         QCOMPARE(spy.count(), 1);
-        QList<QVariant> widgetMovedArguments = spy.last();
+        QVariantList widgetMovedArguments = spy.last();
         QCOMPARE(widgetMovedArguments.size(), 2);
         // right: 0 2; left: 1 0
         QCOMPARE(widgetMovedArguments[0].toInt(), sourceIndex);                           // fromIndex

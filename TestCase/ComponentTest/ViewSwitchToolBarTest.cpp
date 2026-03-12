@@ -18,25 +18,19 @@ public:
   ViewSwitchToolBarTest() : PlainTestSuite{} {
     LOG_D("ViewSwitchToolBarTest object created\n");
   }
-  ~ViewSwitchToolBarTest() {
-    if (mTb != nullptr)
-      delete mTb;
-    mTb = nullptr;
-  }
-
+private:
+  ViewSwitchToolBar* mTb{nullptr};
+  int serviceLogicFunctionCallTime{0};
 private slots:
   // constuctor, initTestCase, {{init, test_XXX,cleanup}_i}, cleanupTestCase, destructor
   void initTestCase() {
-    QToolBar* baseTb = g_viewActions().GetViewTB();
-    QVERIFY(baseTb != nullptr);
-
-    mTb = dynamic_cast<ViewSwitchToolBar*>(baseTb);
+    mTb = new ViewSwitchToolBar{"View Switcher"};
     QVERIFY(mTb != nullptr);
 
     // Purpose: Click on QToolbar will emit 2 signal at 1 time
     // connect(mTb, &QToolBar::actionTriggered, this, [](QAction* pAct){ // service process;})
     // connect(actGrp, &QActionGroup::triggered, this, ViewSwitchToolBar::onPushNewViewIntoUndoStack);
-    connect(mTb, &QToolBar::actionTriggered, this, [this](QAction* /*pAct*/){
+    connect(mTb, &ViewSwitchToolBar::viewTypeChanged, this, [this](ViewTypeTool::ViewType viewType){
       ++serviceLogicFunctionCallTime; // animate service process
     });
   }
@@ -51,7 +45,7 @@ private slots:
   void init() {
     serviceLogicFunctionCallTime = 0;
     QVERIFY(mTb != nullptr);
-    mTb->mViewRD = ViewTypeHistory{};
+    mTb->mViewRD.reset();
   }
 
   void test_action_clicked_will_emit_2_signals_at_one_time_normal() {
@@ -160,10 +154,6 @@ private slots:
     QCOMPARE(spyActionTriggered.count(), 1);
     QCOMPARE(spyTriggered.count(), 1);
   }
-
-private:
-  ViewSwitchToolBar* mTb{nullptr};
-  int serviceLogicFunctionCallTime{0};
 };
 
 #include "ViewSwitchToolBarTest.moc"

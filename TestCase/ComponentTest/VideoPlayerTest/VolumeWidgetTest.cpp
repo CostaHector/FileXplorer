@@ -103,13 +103,13 @@ class VolumeWidgetTest : public PlainTestSuite {
     QSignalSpy mutedStateToggledSpy(&volWid, &VolumeWidget::mutedStateToggled);
     volWid.mMuteAct->setChecked(true);
     QCOMPARE(mutedStateToggledSpy.count(), 1);
-    QCOMPARE(mutedStateToggledSpy.takeLast(), (QList<QVariant>{true}));
+    QCOMPARE(mutedStateToggledSpy.takeLast(), (QVariantList{true}));
     // 静音状态<->非静音状态切换 不会修改音量条
     QCOMPARE(volWid.volumeVal(), 77);
 
     volWid.mMuteAct->toggle();
     QCOMPARE(mutedStateToggledSpy.count(), 1);
-    QCOMPARE(mutedStateToggledSpy.takeLast(), (QList<QVariant>{false}));
+    QCOMPARE(mutedStateToggledSpy.takeLast(), (QVariantList{false}));
     QCOMPARE(volWid.volumeVal(), 77);
   }
 
@@ -134,10 +134,10 @@ class VolumeWidgetTest : public PlainTestSuite {
     // 音量条>0则可以解除静音状态
     volWid.mVolumeSlider->mousePressEventCore(55);
     QCOMPARE(mutedStateToggledSpy.count(), 1);
-    QCOMPARE(mutedStateToggledSpy.takeLast(), (QList<QVariant>{false}));
+    QCOMPARE(mutedStateToggledSpy.takeLast(), (QVariantList{false}));
     QCOMPARE(volWid.isMuted(), false);
     QCOMPARE(sliderVolumeChangedSpy.count(), 1);
-    QCOMPARE(sliderVolumeChangedSpy.takeLast(), (QList<QVariant>{30}));  // 55*55/100=3025
+    QCOMPARE(sliderVolumeChangedSpy.takeLast(), (QVariantList{30}));  // 55*55/100=3025
     QCOMPARE(volWid.volumeVal(), 55);
     QCOMPARE(volWid.mVolumeValLabel->text(), volWid.GetLabelText());
 
@@ -145,10 +145,10 @@ class VolumeWidgetTest : public PlainTestSuite {
     volWid.mVolumeSlider->mousePressEventCore(0);
     volWid.mVolumeSlider->setValue(0);
     QCOMPARE(mutedStateToggledSpy.count(), 1);
-    QCOMPARE(mutedStateToggledSpy.takeLast(), (QList<QVariant>{true}));
+    QCOMPARE(mutedStateToggledSpy.takeLast(), (QVariantList{true}));
     QCOMPARE(volWid.isMuted(), true);
     QCOMPARE(sliderVolumeChangedSpy.count(), 1);
-    QCOMPARE(sliderVolumeChangedSpy.takeLast(), (QList<QVariant>{0}));  // 0*0/100
+    QCOMPARE(sliderVolumeChangedSpy.takeLast(), (QVariantList{0}));  // 0*0/100
     QCOMPARE(volWid.volumeVal(), 0);
     QCOMPARE(volWid.mVolumeValLabel->text(), volWid.GetLabelText());
   }

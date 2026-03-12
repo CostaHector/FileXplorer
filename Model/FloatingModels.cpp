@@ -103,6 +103,8 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     }
     mPixCache.insert(imgKey, pm);
     return pm;
+  } else if (role == Qt::ToolTipRole) {
+    return mDataLst[rw];
   }
   return {};
 }

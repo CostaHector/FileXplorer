@@ -44,7 +44,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     selectionModel->setCurrentIndex(proxyIndex0, QItemSelectionModel::SelectionFlag::Select);
     selectionModel->select(proxyIndex0, QItemSelectionModel::Select);
     QCOMPARE(spy.count(), 1);
-    QList<QVariant> arguments0 = spy.back();
+    QVariantList arguments0 = spy.back();
     QCOMPARE(arguments0[0].toInt(), 0);  // row 0 selected
 
     QModelIndex sourceIndex1 = lvgt.m_leftGrpModel->index(1, 0);
@@ -52,12 +52,12 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     selectionModel->setCurrentIndex(proxyIndex1, QItemSelectionModel::SelectionFlag::Select);
     selectionModel->select(proxyIndex1, QItemSelectionModel::Select);
     QCOMPARE(spy.count(), 2);
-    QList<QVariant> arguments1 = spy.back();
+    QVariantList arguments1 = spy.back();
     QCOMPARE(arguments1[0].toInt(), 1);  // row 1 selelcted
 
     selectionModel->clearSelection();
     QCOMPARE(spy.count(), 3);
-    QList<QVariant> arguments2 = spy.back();
+    QVariantList arguments2 = spy.back();
     QCOMPARE(arguments2[0].toInt(), INVALID_LEFT_SELECTED_ROW);  // non selected
   }
 
@@ -95,7 +95,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 2);  // rowCount=2
 
     QCOMPARE(winTitleSpy.count(), 1);
-    QList<QVariant> params1 = winTitleSpy.last();
+    QVariantList params1 = winTitleSpy.last();
     QCOMPARE(params1.size(), 1);
     const QString titleMessage1 = params1[0].toString();
     QVERIFY(isTitleMessageInExpect(titleMessage1, 2, "SIZE"));
@@ -105,7 +105,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     lvgt.setDeviationSize(10240 * 2 + 1);
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 1);  // rowCount=1
     QCOMPARE(winTitleSpy.count(), 2);
-    QList<QVariant> params2 = winTitleSpy.last();
+    QVariantList params2 = winTitleSpy.last();
     QCOMPARE(params2.size(), 1);
     const QString titleMessage2 = params2[0].toString();
     QVERIFY(isTitleMessageInExpect(titleMessage2, 1, "SIZE"));
@@ -115,7 +115,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     // [2000,2000,2000] round 2000=1, [10000,10000] round 2000=5
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 2);  // rowCount=2
     QCOMPARE(winTitleSpy.count(), 3);
-    QList<QVariant> params3 = winTitleSpy.last();
+    QVariantList params3 = winTitleSpy.last();
     QCOMPARE(params3.size(), 1);
     const QString titleMessage3 = params3[0].toString();
     QVERIFY(isTitleMessageInExpect(titleMessage3, 2, "DURATION"));
@@ -125,7 +125,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     lvgt.setDeviationDuration(10000 * 2 + 1);
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 1);  // rowCount=1
     QCOMPARE(winTitleSpy.count(), 4);
-    QList<QVariant> params4 = winTitleSpy.last();
+    QVariantList params4 = winTitleSpy.last();
     QCOMPARE(params4.size(), 1);
     const QString titleMessage4 = params4[0].toString();
     QVERIFY(isTitleMessageInExpect(titleMessage4, 1, "DURATION"));

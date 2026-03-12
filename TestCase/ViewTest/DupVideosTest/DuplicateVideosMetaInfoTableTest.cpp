@@ -153,7 +153,7 @@ private slots:
     QCOMPARE(analzedTableFinishedSpy.count(), 1);
     QCOMPARE(windowTitleChangedSpy.count(), 1);
 
-    QList<QVariant> windowTitleChangedParam = windowTitleChangedSpy.back();
+    QVariantList windowTitleChangedParam = windowTitleChangedSpy.back();
     QCOMPARE(windowTitleChangedParam.size(), 1);
     const QString titleInMessage = windowTitleChangedParam[0].toString();
     QVERIFY(isTitleMessageInExpect(titleInMessage, vidNames.size(), 1));
