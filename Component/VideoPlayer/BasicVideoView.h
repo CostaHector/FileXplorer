@@ -56,6 +56,7 @@ private:
   bool deviatePositionNext();
   static bool SetPositionCore(QMediaPlayer* mPlayer, int newPosition);
   static qint64 GetPositionCore(QMediaPlayer* mPlayer);
+  bool reqPlayInSystemApplication() const;
   QMediaPlayer::Error onError(QMediaPlayer::Error error) const;
   int onAudioAvailableChanged(bool available) const;
 

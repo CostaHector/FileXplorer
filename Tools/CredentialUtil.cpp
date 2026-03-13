@@ -266,3 +266,17 @@ bool LinuxCredUtil::credentialExists(const QString& key) const {
   return false;
 }
 #endif
+
+
+bool CredUtilHelper::savePassword(const QString& key, const QString& password) {
+  return CredentialUtil::GetInst().savePassword(key, password);
+}
+QString CredUtilHelper::readPassword(const QString& key) {
+  return CredentialUtil::GetInst().readPassword(key);
+}
+bool CredUtilHelper::deletePassword(const QString& key) {
+  return CredentialUtil::GetInst().deletePassword(key);
+}
+bool CredUtilHelper::credentialExists(const QString& key) {
+  return CredentialUtil::GetInst().credentialExists(key);
+}

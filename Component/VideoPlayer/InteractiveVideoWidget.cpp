@@ -39,6 +39,8 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mShowFrames->setCheckable(true);
   mShowFrames->setChecked(false);
 
+  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/PLAY_BUTTON_ROUND"}, tr("open in system application"), this};
+
   mShowVideoList = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_LIST"}, tr("show list"), this};
   mShowVideoList->setCheckable(true);
   mShowVideoList->setChecked(true);
@@ -93,6 +95,8 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
 
   mContextMenu = new QMenu{tr("Player Menu"), this};
   mContextMenu->setToolTipsVisible(true);
+  mContextMenu->addAction(mOpenInSystemApplication);
+  mContextMenu->addSeparator();
   mContextMenu->addAction(mFullScreenAct);
   mContextMenu->addAction(mHideToolBarAct);
   mContextMenu->addAction(mShowVideoList);

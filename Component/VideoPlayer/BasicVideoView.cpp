@@ -5,6 +5,7 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "FileTool.h"
 #include <QFile>
 #include <QResizeEvent>
 
@@ -86,6 +87,8 @@ void BasicVideoView::subscribe() {
   // -10 second, +10 second
   connect(mVideoWidget->mSeekBackwardAct, &QAction::triggered, this, &BasicVideoView::deviatePositionPrevious);
   connect(mVideoWidget->mSeekForwardAct, &QAction::triggered, this, &BasicVideoView::deviatePositionNext);
+
+  connect(mVideoWidget->mOpenInSystemApplication, &QAction::triggered, this, &BasicVideoView::reqPlayInSystemApplication);
 
   connect(mPlayer, &QMediaPlayer::durationChanged, this, &BasicVideoView::onDurationChanged);
   // 直接点击滑动条->更新滑动块到点击位置, 并播放
@@ -217,6 +220,11 @@ bool BasicVideoView::SetPositionCore(QMediaPlayer* mPlayer, int newPosition) {
 qint64 BasicVideoView::GetPositionCore(QMediaPlayer* mPlayer) {
   CHECK_NULLPTR_RETURN_INT(mPlayer, (qint64)0);
   return mPlayer->position();
+}
+
+bool BasicVideoView::reqPlayInSystemApplication() const {
+  const QString& mediaPath = GetCurrentPlayingMediaPath();
+  return FileTool::OpenLocalFileUsingDesktopService(mediaPath);
 }
 
 QMediaPlayer::Error BasicVideoView::onError(QMediaPlayer::Error error) const {

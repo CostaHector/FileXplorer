@@ -8,6 +8,7 @@
 #include "BasicVideoView.h"
 #include "EndToExposePrivateMember.h"
 
+#include "FileTool.h"
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -21,19 +22,12 @@ class BasicVideoViewTest : public PlainTestSuite {
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
-  void initTestCase() {  //
-    // Configuration().clear();
-  }
-
-  void cleanupTestCase() {  //
-    // Configuration().clear();
-  }
-
   void playAVideo_trigger_disabled_ok() {
     Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
-
+    const QString existVideoPath{__FILE__};
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(existVideoPath)).will(returnValue(true));
 
     BasicVideoView basicVideoView{true, nullptr};
     QVERIFY(!basicVideoView.bPauseButtonCenterInit);
@@ -43,16 +37,18 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
 
     // 禁用触发: 非强制不可触发(暂停状态) setMedia:0 play:0
-    QVERIFY(basicVideoView.PlayAVideo(__FILE__, false));
+    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, false));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
+    basicVideoView.mVideoWidget->mOpenInSystemApplication->trigger(); // time: 1
 
     // 禁用触发: 强制播放(非暂停状态) setMedia:1 play:1
-    QVERIFY(basicVideoView.PlayAVideo(__FILE__, true));
+    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, true));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
+    basicVideoView.reqPlayInSystemApplication(); // time: 2
 
-    // // 停止播放 mStopAct -> onStopPlaying -> StopPlay
+    // 停止播放 mStopAct -> onStopPlaying -> StopPlay
     emit basicVideoView.mVideoWidget->mStopAct->triggered();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
   }

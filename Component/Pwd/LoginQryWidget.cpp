@@ -70,13 +70,12 @@ void LoginWid::subscribe() {
 }
 
 bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
-  const CredentialUtil& credUtil = CredentialUtil::GetInst();
   Configuration().setValue("REMEMBER_KEY", rememberState);
 
   const QString& keyNow = GetKey();
   switch (rememberState) {
     case Qt::CheckState::Checked: { // update into credential
-      bool saveResult = credUtil.savePassword(GetCredTargetName(), keyNow);
+      bool saveResult = CredUtilHelper::savePassword(GetCredTargetName(), keyNow);
       if (!saveResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
         return false;
@@ -85,7 +84,7 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
       break;
     }
     default: { // delete from credential
-      bool deleteResult = credUtil.deletePassword(GetCredTargetName());
+      bool deleteResult = CredUtilHelper::deletePassword(GetCredTargetName());
       if (!deleteResult) {
         LOG_WARN_P("Failed to save password", "Credential Manager[%s]", qPrintable(keyNow));
         return false;
@@ -99,7 +98,7 @@ bool LoginWid::onRemeberKeyStateChanged(int rememberState) {
 
 void LoginWid::onAutoLoginSwitchChanged(int autoLoginState) {
   if (autoLoginState == Qt::Checked) {
-    remeberKey->setChecked(true);
+    remeberKey->setChecked(Qt::Checked);
   }
   Configuration().setValue("LOG_IN_AUTOMATICALLY", autoLoginState);
   LOG_INFO_NP("Auto login switch", (autoLoginState == Qt::Checked ? "on" : "off"));
@@ -111,14 +110,13 @@ void LoginWid::InitState() {
   autoLoginTimer.setSingleShot(true);
   connect(&autoLoginTimer, &QTimer::timeout, this, &LoginWid::AutoLoginTimeoutCallback);
 
-  const CredentialUtil& credUtil = CredentialUtil::GetInst();
   if (AccountStorage::IsAccountCSVFileInexistOrEmpty()) {
     // 1.0 disabled login widget itself
     // 2.0 invalidate password in credential needed
     // 3.0 uncheck rememberKey/AutoLogin
     // 4.0 messageText: must register at first,
     this->setEnabled(false);
-    credUtil.deletePassword(GetCredTargetName());
+    CredUtilHelper::deletePassword(GetCredTargetName());
 
     Configuration().setValue("REMEMBER_KEY", Qt::CheckState::Unchecked);
     Configuration().setValue("LOG_IN_AUTOMATICALLY", Qt::CheckState::Unchecked);
@@ -131,7 +129,7 @@ void LoginWid::InitState() {
 
   // allowed login below
   if (remeberKey->checkState() == Qt::CheckState::Checked) {
-    const QString& aesKey = credUtil.readPassword(GetCredTargetName());
+    const QString& aesKey = CredUtilHelper::readPassword(GetCredTargetName());
     // key may not in system credential
     if (!aesKey.isEmpty()) {
       inputKeyLe->setText(aesKey);
@@ -300,8 +298,7 @@ void LoginQryWidget::onOkButtonClicked() {
   switch (curWidType) {
     case LOGIN: {
       if (mLoginWid->isRememberEnabled()) {
-        const CredentialUtil& credUtil = CredentialUtil::GetInst();
-        credUtil.savePassword(GetCredTargetName(), getAESKey());
+        CredUtilHelper::savePassword(GetCredTargetName(), getAESKey());
       }
       accept();
       return;

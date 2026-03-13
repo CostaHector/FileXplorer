@@ -590,6 +590,11 @@
     </message>
     <message>
         <location line="+4"/>
+        <source>open in system application</source>
+        <translation>用系统应用打开</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>current item once</source>
         <translation>单播</translation>
     </message>
@@ -639,7 +644,7 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+54"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
