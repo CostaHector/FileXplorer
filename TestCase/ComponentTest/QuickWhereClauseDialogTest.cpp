@@ -155,6 +155,14 @@ private slots:
     QCOMPARE(acceptedSpy.count(), 1);
   }
 
+  void history_empty() {
+    Configuration().clear();
+    QuickWhereClauseDialog dlg;
+    dlg.Init();
+    QVERIFY(dlg.mStrListModel != nullptr);
+    QVERIFY(dlg.mStrListModel->rowCount() > 1);
+  }
+
 private:
   QuickWhereClauseDialogMovie* dialog{nullptr};
   QuickWhereClauseDialogCast* dialogCast{nullptr};

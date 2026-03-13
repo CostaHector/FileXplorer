@@ -12,16 +12,20 @@ class ViewSwitchToolBar : public QToolBar {
   Q_OBJECT
 public:
   explicit ViewSwitchToolBar(const QString &title, QWidget *parent = nullptr);
-  EnumIntAction<ViewTypeTool::ViewType> mViewTypeIntAction;
-  void subscribe();
+  ViewTypeTool::ViewType GetCurViewType() const;
+
 signals:
   void viewTypeChanged(const ViewTypeTool::ViewType viewType);
+
 private:
+  void subscribe();
   void onViewTypeActionTriggered(QAction* viewAct);
 
   bool onViewNavigateBackward();
   bool onViewNavigateForward();
   ViewTypeHistory mViewRD;
+
+  EnumIntAction<ViewTypeTool::ViewType> mViewTypeIntAction;
 };
 
 #endif // VIEWSWITCHTOOLBAR_H

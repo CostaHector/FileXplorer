@@ -2,30 +2,27 @@
 #define FILEXPLORER_H
 
 #include <QMainWindow>
-
-#include "CustomStatusBar.h"
 #include "NavigationToolBar.h"
+#include "RibbonMenu.h"
+#include "ViewSwitchToolBar.h"
+#include "ViewsStackedWidget.h"
+#include "PreviewDockWidget.h"
 #include "CurrentRowPreviewer.h"
 #include "StackedAddressAndSearchToolBar.h"
-
-#include "ViewsStackedWidget.h"
-#include "ViewSwitchToolBar.h"
-#include "RibbonMenu.h"
+#include "CustomStatusBar.h"
 
 class FileXplorer : public QMainWindow {
 public:
   explicit FileXplorer(const QStringList& args, QWidget* parent = nullptr);
-  ~FileXplorer() = default;
-  void closeEvent(QCloseEvent* event) override;
-  void showEvent(QShowEvent *event) override;
-  static QString ReadSettings(const QStringList& args);
+  static QString GetInitialPathFromArgs(const QStringList& args);
   void RestoreWindowStateAndSetupUI();
   void InitComponentVisibility();
   void subscribe();
 
-  void keyPressEvent(QKeyEvent* ev) override;
+  ViewSwitchToolBar* m_viewSwitcher{nullptr};
+  ScenePageControl* m_scenePageControl{nullptr};
 
-  QDockWidget* previewHtmlDock{nullptr};
+  PreviewDockWidget* m_previewHtmlDock{nullptr};
 
   CurrentRowPreviewer* m_previewFolder{nullptr};
   FolderPreviewSwitcher* m_previewSwitcher{nullptr};
@@ -38,10 +35,14 @@ public:
   NavigationToolBar* m_navigationToolBar{nullptr};
   RibbonMenu* m_ribbonMenu{nullptr};
 
-  ViewSwitchToolBar* m_viewSwitcher{nullptr};
   CustomStatusBar* m_statusBar{nullptr};
+
+ protected:
+  void keyPressEvent(QKeyEvent* ev) override;
+  void closeEvent(QCloseEvent* event) override;
+  void showEvent(QShowEvent *event) override;
+
 private:
-  void onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum);
   void onViewWidgetChanged(ViewTypeTool::ViewType viewType);
 };
 #endif  // FILEXPLORER_H

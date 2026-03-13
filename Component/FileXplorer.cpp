@@ -1,54 +1,46 @@
 ﻿#include "FileXplorer.h"
-
-#include "FolderPreviewActions.h"
-#include "ViewActions.h"
-
-#include "MemoryKey.h"
-#include "StyleSheet.h"
-
 #include "FolderPreviewSwitcher.h"
 #include "ViewSwitchHelper.h"
 #include "ViewTypeTool.h"
-
-#include <QString>
-#include <QDockWidget>
+#include "ViewActions.h"
+#include "MemoryKey.h"
+#include "StyleSheet.h"
 #include <QFileInfo>
 
-class DockWidget : public QDockWidget {
-public:
-  using QDockWidget::QDockWidget;
-  void showEvent(QShowEvent* event) override {
-    QDockWidget::showEvent(event);
-    StyleSheet::UpdateTitleBar(this);
-  }
-};
-
 FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
-  : QMainWindow(parent)                                                            //
+    : QMainWindow(parent)                                           //
 {
-  previewHtmlDock = new (std::nothrow) DockWidget{"Preview", this}; //  docker
-  m_previewFolder = new (std::nothrow) CurrentRowPreviewer{previewHtmlDock}; // previewer in docker
-  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this}; // previewer switcher
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this}; // searchToolBar
-  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this}; // left navigation bar
-  m_ribbonMenu = new (std::nothrow) RibbonMenu{this}; // ribbon menu
   m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
-  m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
-  m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget(), this}; // view/searchToolBar switcher
-  // addViewSwitcherToRightCorner;
+  m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this};  // docker
+  m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
+  const ViewTypeTool::ViewType initialViewType{m_viewSwitcher->GetCurViewType()};
+
+  m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this};  // previewer in docker
+
+  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};        // previewer switcher
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this};  // searchToolBar
+  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};      // left navigation bar
+  m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                         // ribbon menu
+
+  m_statusBar = new (std::nothrow) CustomStatusBar{this};  // status bar
+
+  m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this};  // main widget
   m_fsPanel->BindLogger(m_statusBar);
   m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
-  m_viewSwitchHelper->onSwitchByViewType(ViewTypeTool::DEFAULT_VIEW_TYPE);
 
-  const QString& defaultPath = ReadSettings(args);
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, this};  // view/searchToolBar switcher
+  m_viewSwitchHelper->onSwitchByViewType(initialViewType);
+
+  const QString& defaultPath = GetInitialPathFromArgs(args);
   m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
   setCentralWidget(m_fsPanel);
 
-  previewHtmlDock->setWidget(m_previewFolder);
-  previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, previewHtmlDock);
+  m_ribbonMenu->AddScenePageControlWidget(m_scenePageControl);
+
+  m_previewHtmlDock->setWidget(m_previewFolder);
+  m_previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
+  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
 
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
   addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
@@ -62,35 +54,38 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 }
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Geometry", saveGeometry());
   Configuration().setValue("SELECTION_PREVIEWER_WIDTH", m_previewFolder->width());
   Configuration().setValue("SELECTION_PREVIEWER_HEIGHT", m_previewFolder->height());
   Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
-  return QMainWindow::closeEvent(event);
+  QMainWindow::closeEvent(event);
 }
 
 void FileXplorer::showEvent(QShowEvent* event) {
-  QMainWindow::showEvent(event);
+  CHECK_NULLPTR_RETURN_VOID(event);
   StyleSheet::UpdateTitleBar(this);
+  QMainWindow::showEvent(event);
 }
 
-QString FileXplorer::ReadSettings(const QStringList& args) {
+QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
   LOG_I("Program:[" PROJECT_NAME R"(] running with given args["%s"])", qPrintable(args.join(R"(",")")));
   // executing the program with or without command-line arguments
-  QString path{(args.size() > 1) ? args[1] : ""};
+  const bool bIsSpecifiedPath{args.size() > 1};
+  QString path{bIsSpecifiedPath ? args[1] : ""};
 #ifdef _WIN32
-  if (path.endsWith(":\"")) { // e.g. "E:\"" => "E:/"
+  if (path.endsWith(":\"")) {  // e.g. "E:\"" => "E:/"
     path.back() = '/';
   }
 #endif
-  // when argv[1] path invalid, use last time path in preference setting
-  if (!QFile::exists(path)) {
+  // when not specified or specied path is invalid, use last time path in preference setting
+  if (!bIsSpecifiedPath || (!path.isEmpty() && !QFile::exists(path))) {
     QString lastTimePath = Configuration().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
     LOG_D("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
   const QFileInfo fi{path};
-  if (!fi.isDir()) {
+  if (!path.isEmpty() && !fi.isDir()) {
     QString parentPath = fi.absolutePath();
     LOG_D("path[%s] not exists or is a file. Try using its parent path[%s] instead", qPrintable(path), qPrintable(parentPath));
     path.swap(parentPath);
@@ -112,30 +107,32 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 void FileXplorer::InitComponentVisibility() {
   const bool showNavi{Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
   if (!showNavi) {
-    m_navigationToolBar->setVisible(false);
+    m_navigationToolBar->hide();
   }
-  const int folderPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toInt();
-  if (folderPreviewType == (int)PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
-    previewHtmlDock->setVisible(false);
+
+  const bool showFolderPreview = Configuration().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool();
+  if (!showFolderPreview) {
+    m_previewHtmlDock->setVisible(false);
   }
+
+  const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};
+  m_previewSwitcher->onSwitchByPreviewType(initialPreviewType);
 }
 
 void FileXplorer::subscribe() {
   auto& vA = g_viewActions();
-  connect(vA.NAVIGATION_PANE, &QAction::toggled, this, [this](const bool checked) {
-    Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, checked);
-    m_navigationToolBar->setVisible(checked);
-  });
+  connect(vA._NAVIGATION_PANE, &QAction::toggled, m_navigationToolBar, &QWidget::setVisible);
+  connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
 
   connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
 
-  PreviewTypeToolBar* previewToolBar = g_folderPreviewActions().GetPreviewsToolbar(this);
-  connect(previewToolBar, &PreviewTypeToolBar::previewTypeChanged, this, &FileXplorer::onPreviewSwitched);
+  connect(m_previewHtmlDock, &PreviewDockWidget::previewTypeChanged, m_previewSwitcher, &FolderPreviewSwitcher::onSwitchByPreviewType);
 
-  connect(m_previewFolder, &QStackedWidget::windowTitleChanged, previewHtmlDock, &QDockWidget::setWindowTitle);
+  connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
+  CHECK_NULLPTR_RETURN_VOID(ev);
   switch (ev->key()) {
     case Qt::Key_F3: {  // F3 Search
       const auto viewType = m_fsPanel->GetVt();
@@ -150,19 +147,19 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
           }
           break;
         }
-        case ViewTypeTool::ViewType::SEARCH:{
+        case ViewTypeTool::ViewType::SEARCH: {
           if (m_fsPanel->_advanceSearchBar != nullptr) {
             m_fsPanel->_advanceSearchBar->onGetFocus();
           }
           break;
         }
-        case ViewTypeTool::ViewType::MOVIE:{
+        case ViewTypeTool::ViewType::MOVIE: {
           if (m_fsPanel->_movieSearchBar != nullptr) {
             m_fsPanel->_movieSearchBar->onGetFocus();
           }
           break;
         }
-        case ViewTypeTool::ViewType::CAST:{
+        case ViewTypeTool::ViewType::CAST: {
           if (m_fsPanel->_castSearchBar != nullptr) {
             m_fsPanel->_castSearchBar->onGetFocus();
           }
@@ -182,17 +179,7 @@ void FileXplorer::keyPressEvent(QKeyEvent* ev) {
   QMainWindow::keyPressEvent(ev);
 }
 
-void FileXplorer::onPreviewSwitched(PreviewTypeTool::PREVIEW_TYPE_E previewEnum) {
-  if (previewEnum == PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
-    LOG_W("Here should hide");
-  }
-  Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)previewEnum);
-  previewHtmlDock->setVisible(previewEnum != PreviewTypeTool::PREVIEW_TYPE_E::NONE);
-  m_previewSwitcher->onSwitchByViewType(previewEnum);
-}
-
 void FileXplorer::onViewWidgetChanged(ViewTypeTool::ViewType viewType) {
-  LOG_D("actionTriggered[%s] in CustomStatusBar/QToolbar", ViewTypeTool::c_str(viewType));
   m_viewSwitchHelper->onSwitchByViewType(viewType);
-  m_ribbonMenu->whenViewTypeChanged(viewType);
+  m_ribbonMenu->on_ViewTypeChanged(viewType);
 }

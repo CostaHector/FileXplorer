@@ -8,7 +8,6 @@
 #include "FileRenameRulerActions.h"
 #include "FileOpActs.h"
 #include "FileLeafAction.h"
-#include "FolderPreviewActions.h"
 #include "PreferenceActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
@@ -28,8 +27,6 @@
 RibbonMenu::RibbonMenu(QWidget* parent)
   : QTabWidget{parent} //
 {
-  m_scenePageControl = new (std::nothrow) ScenePageControl{"Pagination display", this};
-
   m_leafFile = LeafFile();
   m_leafHome = LeafHome();
   m_leafView = LeafView();
@@ -307,19 +304,15 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new (std::nothrow) QToolBar{"Leaf View"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
-  auto* folderPreviewToolBar = g_folderPreviewActions().GetPreviewsToolbar(leafViewWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(folderPreviewToolBar);
-  SetLayoutAlightment(folderPreviewToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-
   auto& viewInst = g_viewActions();
-
   leafViewWid->setToolTip("View Leaf");
-  leafViewWid->addAction(viewInst.NAVIGATION_PANE);
-  leafViewWid->addWidget(folderPreviewToolBar);
+  leafViewWid->addAction(viewInst._NAVIGATION_PANE);
+  leafViewWid->addSeparator();
+  leafViewWid->addActions(viewInst._ALL_VIEWS);
   leafViewWid->addSeparator();
   leafViewWid->addActions(viewInst._VIEWS_NAVIGATE);
   leafViewWid->addSeparator();
-  leafViewWid->addActions(viewInst._ALL_VIEWS);
+  leafViewWid->addAction(viewInst._PREVIEW_PANEL);
   leafViewWid->addSeparator();
   leafViewWid->addAction(viewInst._HAR_VIEW);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -345,11 +338,10 @@ QToolBar* RibbonMenu::LeafJson() const {
 }
 
 QToolBar* RibbonMenu::LeafScenesTools() const {
-  auto& ag = g_SceneInPageActions();
-
   auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
   CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
 
+  auto& ag = g_SceneInPageActions();
   QToolBar* orderTB = ag.GetOrderToolBar(sceneTB);
   CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
 
@@ -360,8 +352,6 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addAction(ag._CLEAR_SCN_FILE);
   sceneTB->addSeparator();
   sceneTB->addWidget(orderTB);
-  sceneTB->addSeparator();
-  sceneTB->addWidget(m_scenePageControl);
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }
@@ -432,6 +422,14 @@ void RibbonMenu::AfterSubscribeInitialSettings() {
   on_expandStackedWidget(_EXPAND_RIBBONS->isChecked());
 }
 
+bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
+  CHECK_NULLPTR_RETURN_FALSE(m_leafScenes);
+  CHECK_NULLPTR_RETURN_FALSE(scenePageControlWidget);
+  m_leafScenes->addSeparator();
+  m_leafScenes->addWidget(scenePageControlWidget);
+  return true;
+}
+
 #include <QPropertyAnimation>
 void RibbonMenu::on_expandStackedWidget(const bool vis) {
   Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
@@ -454,7 +452,7 @@ void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
   Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
 }
 
-void RibbonMenu::whenViewTypeChanged(ViewTypeTool::ViewType vt) {
+void RibbonMenu::on_ViewTypeChanged(ViewTypeTool::ViewType vt) {
   const int destLeafTabIndex = mViewType2LeafTabIndex[(int) vt];
   if (destLeafTabIndex == -1) {
     return;

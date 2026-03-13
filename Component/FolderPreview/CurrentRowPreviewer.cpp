@@ -15,10 +15,6 @@ CurrentRowPreviewer::CurrentRowPreviewer(QWidget* parent)  //
   }
 }
 
-CurrentRowPreviewer::~CurrentRowPreviewer() {
-  Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)mCurrentPreviewType);
-}
-
 void CurrentRowPreviewer::UpdatePreview() {
   using namespace PreviewTypeTool;
   if (mCurrentSrcFrom == SRC_FROM::FILE_SYSTEM_VIEW) {
@@ -111,8 +107,8 @@ bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E 
 }
 
 bool CurrentRowPreviewer::setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E previewType) {
-  auto prevIt = m_name2PreviewIndex.find(previewType);
   mCurrentPreviewType = previewType;
+  auto prevIt = m_name2PreviewIndex.find(previewType);
   if (prevIt == m_name2PreviewIndex.end()) {
     LOG_D("previewType[%s] not in map", PreviewTypeTool::c_str(previewType));
     return false;

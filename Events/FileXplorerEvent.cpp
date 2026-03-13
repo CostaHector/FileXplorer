@@ -1,4 +1,4 @@
-﻿#include "FileExplorerEvent.h"
+﻿#include "FileXplorerEvent.h"
 
 #include "ArchiveFilesActions.h"
 #include "FileRenameRulerActions.h"
@@ -60,20 +60,19 @@
 
 using namespace ViewTypeTool;
 
-FileExplorerEvent::FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger)
+FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger)
   : QObject{view} { //
-
-  CHECK_NULLPTR_RETURN_VOID(fsm)
   CHECK_NULLPTR_RETURN_VOID(view)
+  CHECK_NULLPTR_RETURN_VOID(view->m_fsModel)
   CHECK_NULLPTR_RETURN_VOID(logger)
-
-  _fileSysModel = fsm;
   _contentPane = view;
+  _fileSysModel = view->m_fsModel;
   _logger = logger;
+
   m_clipboard = QApplication::clipboard();
 }
 
-bool FileExplorerEvent::on_NewTextFile() { // not effect by selection;
+bool FileXplorerEvent::on_NewTextFile() { // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
@@ -87,7 +86,7 @@ bool FileExplorerEvent::on_NewTextFile() { // not effect by selection;
   return ret;
 }
 
-bool FileExplorerEvent::on_NewJsonFile() {
+bool FileXplorerEvent::on_NewJsonFile() {
   if (!__CanNewItem()) {
     return false;
   }
@@ -96,7 +95,7 @@ bool FileExplorerEvent::on_NewJsonFile() {
   return CreateFileFolderHelper::NewJsonFile(createIn, basedOnFileNames) >= 0;
 }
 
-bool FileExplorerEvent::on_NewFolder() { // not effect by selection;
+bool FileXplorerEvent::on_NewFolder() { // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
@@ -110,7 +109,7 @@ bool FileExplorerEvent::on_NewFolder() { // not effect by selection;
   return true;
 }
 
-bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
+bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -148,7 +147,7 @@ bool FileExplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
-bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
+bool FileXplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -167,7 +166,7 @@ bool FileExplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY,
   return true;
 }
 
-bool FileExplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
+bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -178,7 +177,7 @@ bool FileExplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
   return true;
 }
 
-bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist) {
+bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -210,7 +209,7 @@ bool FileExplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool ski
   return true;
 }
 
-bool FileExplorerEvent::onRateMovie(int newRate) const {
+bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
 
   if (paths.isEmpty()) {
@@ -225,7 +224,7 @@ bool FileExplorerEvent::onRateMovie(int newRate) const {
   return succeedCnt > 0;
 }
 
-bool FileExplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
+bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
   const QString rootPath{_contentPane->getRootPath()};
   const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
@@ -247,7 +246,7 @@ bool FileExplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
   return succeedCnt > 0;
 }
 
-QStringList FileExplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
+QStringList FileXplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     return {};
@@ -261,7 +260,7 @@ QStringList FileExplorerEvent::FsmSelectedItems() const { // for file-systemmode
   return filePaths;
 }
 
-bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
+bool FileXplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsChromeSearchAvail(vt)) {
     LOG_WARN_NP("Current View type not support search keyword", ViewTypeTool::c_str(vt));
@@ -291,7 +290,7 @@ bool FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
   return true;
 }
 
-bool FileExplorerEvent::on_calcMD5() const {
+bool FileXplorerEvent::on_calcMD5() const {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_NP("Current View type not support MD5 Calculator", _contentPane->GetCurViewName());
     return true;
@@ -304,7 +303,7 @@ bool FileExplorerEvent::on_calcMD5() const {
   return true;
 }
 
-bool FileExplorerEvent::on_properties() const {
+bool FileXplorerEvent::on_properties() const {
   PropertiesWindow* pW = nullptr;
   auto vt = _contentPane->GetVt();
   if (ViewTypeTool::isFSView(vt)) {
@@ -325,17 +324,17 @@ bool FileExplorerEvent::on_properties() const {
   return false;
 }
 
-void FileExplorerEvent::subsribeCompress() {
-  connect(g_AchiveFilesActions().COMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_compress);
-  connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileExplorerEvent::on_deCompress);
-  connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileExplorerEvent::on_compressImgsByGroup);
+void FileXplorerEvent::subsribeCompress() {
+  connect(g_AchiveFilesActions().COMPRESSED_HERE, &QAction::triggered, this, &FileXplorerEvent::on_compress);
+  connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileXplorerEvent::on_deCompress);
+  connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileXplorerEvent::on_compressImgsByGroup);
 
   m_archivePreview = new (std::nothrow)
       PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane, "AchiveViewerGeometry"};
-  connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::toggled, this, &FileExplorerEvent::on_archivePreview);
+  connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::toggled, this, &FileXplorerEvent::on_archivePreview);
 }
 
-void FileExplorerEvent::subscribeThumbnailActions() {
+void FileXplorerEvent::subscribeThumbnailActions() {
   auto& ins = g_ThumbnailProcessActions();
   connect(ins._CREATE_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* createThumbnailAct) {
     auto it = ins.mCreateThumbnailDimension.find(createThumbnailAct);
@@ -393,20 +392,20 @@ void FileExplorerEvent::subscribeThumbnailActions() {
   });
 }
 
-void FileExplorerEvent::subscribe() {
+void FileXplorerEvent::subscribe() {
   subsribeCompress();
   subscribeThumbnailActions();
 
   {
     auto& fileOpInst = FileOpActs::GetInst();
-    connect(fileOpInst.NEW_FOLDER, &QAction::triggered, this, &FileExplorerEvent::on_NewFolder);
-    connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewTextFile);
-    connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileExplorerEvent::on_NewJsonFile);
-    connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(false); });
-    connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileExplorerEvent::on_BatchNewFilesOrFolders(true); });
+    connect(fileOpInst.NEW_FOLDER, &QAction::triggered, this, &FileXplorerEvent::on_NewFolder);
+    connect(fileOpInst.NEW_TEXT_FILE, &QAction::triggered, this, &FileXplorerEvent::on_NewTextFile);
+    connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileXplorerEvent::on_NewJsonFile);
+    connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(false); });
+    connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(true); });
 
-    connect(fileOpInst._REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileExplorerEvent::on_revealInExplorer);
-    connect(fileOpInst._OPEN_IN_TERMINAL, &QAction::triggered, this, &FileExplorerEvent::on_OpenInTerminal);
+    connect(fileOpInst._REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileXplorerEvent::on_revealInExplorer);
+    connect(fileOpInst._OPEN_IN_TERMINAL, &QAction::triggered, this, &FileXplorerEvent::on_OpenInTerminal);
 
     connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
     connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
@@ -424,12 +423,12 @@ void FileExplorerEvent::subscribe() {
       CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record");
     });
 
-    connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileExplorerEvent::on_moveToTrashBin);
-    connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileExplorerEvent::on_deletePermanently);
+    connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileXplorerEvent::on_moveToTrashBin);
+    connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileXplorerEvent::on_deletePermanently);
 
     connect(fileOpInst.MERGE, &QAction::triggered, this, [this]() { on_Merge(false); });
     connect(fileOpInst.MERGE_REVERSE, &QAction::triggered, this, [this]() { on_Merge(true); });
-    connect(fileOpInst._TS_FILES_MERGE, &QAction::triggered, this, &FileExplorerEvent::on_TsFilesMerge);
+    connect(fileOpInst._TS_FILES_MERGE, &QAction::triggered, this, &FileXplorerEvent::on_TsFilesMerge);
 
     connect(fileOpInst._MOVE_TO, &QAction::triggered, this, [this]() { this->on_MoveTo(); });
     connect(fileOpInst._COPY_TO, &QAction::triggered, this, [this]() { this->on_CopyTo(); });
@@ -437,22 +436,22 @@ void FileExplorerEvent::subscribe() {
     connect(fileOpInst.MOVE_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_MoveTo(act->text()); });
     connect(fileOpInst.COPY_TO_PATH_HISTORY, &QActionGroup::triggered, this, [this](const QAction* const act) { on_CopyTo(act->text()); });
 
-    connect(fileOpInst.CUT, &QAction::triggered, this, &FileExplorerEvent::on_Cut);
-    connect(fileOpInst.COPY, &QAction::triggered, this, &FileExplorerEvent::on_Copy);
-    connect(fileOpInst.PASTE, &QAction::triggered, this, &FileExplorerEvent::on_Paste);
+    connect(fileOpInst.CUT, &QAction::triggered, this, &FileXplorerEvent::on_Cut);
+    connect(fileOpInst.COPY, &QAction::triggered, this, &FileXplorerEvent::on_Copy);
+    connect(fileOpInst.PASTE, &QAction::triggered, this, &FileXplorerEvent::on_Paste);
 
-    connect(fileOpInst._PACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileClassify);
-    connect(fileOpInst._UNPACK_FOLDERS, &QAction::triggered, this, &FileExplorerEvent::on_FileUnclassify);
-    connect(fileOpInst._LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileExplorerEvent::on_RemoveDuplicateImages);
+    connect(fileOpInst._PACK_FOLDERS, &QAction::triggered, this, &FileXplorerEvent::on_FileClassify);
+    connect(fileOpInst._UNPACK_FOLDERS, &QAction::triggered, this, &FileXplorerEvent::on_FileUnclassify);
+    connect(fileOpInst._LOW_RESOLUTION_IMGS_RMV, &QAction::triggered, this, &FileXplorerEvent::on_RemoveDuplicateImages);
     connect(fileOpInst._RMV_01_FILE_FOLDER, &QAction::triggered, this, [this]() {
       ZeroOrOneItemFolderProc rfr;
-      FileExplorerEvent::on_RemoveRedundantItem(rfr);
+      FileXplorerEvent::on_RemoveRedundantItem(rfr);
     });
     connect(fileOpInst._RMV_EMPTY_FOLDER, &QAction::triggered, this, [this]() {
       EmptyFolderRmv efr;
-      FileExplorerEvent::on_RemoveRedundantItem(efr);
+      FileXplorerEvent::on_RemoveRedundantItem(efr);
     });
-    connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
+    connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
 
     m_duplicateVideosFinder = new (std::nothrow)
         PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "DuplicateVideosFinderGeometry"};
@@ -460,11 +459,11 @@ void FileExplorerEvent::subscribe() {
     m_redundantImageFinder = new (std::nothrow)
         PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
-    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileExplorerEvent::on_RedunImageFinder);
+    connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
 
-    connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileExplorerEvent::on_SelectAll);
-    connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileExplorerEvent::on_SelectNone);
-    connect(fileOpInst.SELECT_INVERT, &QAction::triggered, this, &FileExplorerEvent::on_SelectInvert);
+    connect(fileOpInst.SELECT_ALL, &QAction::triggered, this, &FileXplorerEvent::on_SelectAll);
+    connect(fileOpInst.SELECT_NONE, &QAction::triggered, this, &FileXplorerEvent::on_SelectNone);
+    connect(fileOpInst.SELECT_INVERT, &QAction::triggered, this, &FileXplorerEvent::on_SelectInvert);
 
     connect(fileOpInst._LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
       RenameWidget_LongPath pToLongPath{_contentPane};
@@ -474,7 +473,7 @@ void FileExplorerEvent::subscribe() {
 
   {
     auto& rulerInst = g_NameRulerActions();
-    connect(rulerInst._NAME_RULER, &QAction::triggered, this, &FileExplorerEvent::on_NameStandardize);
+    connect(rulerInst._NAME_RULER, &QAction::triggered, this, &FileXplorerEvent::on_NameStandardize);
   }
 
   {
@@ -482,13 +481,13 @@ void FileExplorerEvent::subscribe() {
     connect(rightClickMenuInst._SEARCH_IN_NET_EXPLORER,
             &QAction::triggered,
             this,
-            &FileExplorerEvent::on_searchKeywordInSystemDefaultExplorer);
-    connect(rightClickMenuInst._CALC_MD5_ACT, &QAction::triggered, this, &FileExplorerEvent::on_calcMD5);
-    connect(rightClickMenuInst._PROPERTIES, &QAction::triggered, this, &FileExplorerEvent::on_properties);
+            &FileXplorerEvent::on_searchKeywordInSystemDefaultExplorer);
+    connect(rightClickMenuInst._CALC_MD5_ACT, &QAction::triggered, this, &FileXplorerEvent::on_calcMD5);
+    connect(rightClickMenuInst._PROPERTIES, &QAction::triggered, this, &FileXplorerEvent::on_properties);
     connect(rightClickMenuInst._FORCE_REFRESH_FILESYSTEMMODEL,
             &QAction::triggered,
             this,
-            &FileExplorerEvent::on_forceRefreshFileSystemModel);
+            &FileXplorerEvent::on_forceRefreshFileSystemModel);
   }
 
   {
@@ -537,18 +536,18 @@ void FileExplorerEvent::subscribe() {
 
   {
     auto& viewInst = g_viewActions();
-    connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileExplorerEvent::on_HarView);
-    connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileExplorerEvent::on_PlayVideo);
+    connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileXplorerEvent::on_HarView);
+    connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileXplorerEvent::on_PlayVideo);
   }
 
   {
     auto& rateInst = RateActions::GetInst();
-    connect(&rateInst, &RateActions::MovieRateChanged, this, &FileExplorerEvent::onRateMovie);
-    connect(&rateInst, &RateActions::MovieRateRecursivelyChanged, this, &FileExplorerEvent::onRateMoviesRecursively);
+    connect(&rateInst, &RateActions::MovieRateChanged, this, &FileXplorerEvent::onRateMovie);
+    connect(&rateInst, &RateActions::MovieRateRecursivelyChanged, this, &FileXplorerEvent::onRateMoviesRecursively);
   }
 }
 
-void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
+void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
   if (!_contentPane->IsCurFSView()) {
     LOG_WARN_NP("[Rename] Current view not support rename", _contentPane->GetCurViewName());
     return;
@@ -580,7 +579,7 @@ void FileExplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
   }
 }
 
-bool FileExplorerEvent::__CanNewItem() const {
+bool FileXplorerEvent::__CanNewItem() const {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_P("Reject New", "view name[%s]", _contentPane->GetCurViewName());
     return false;
@@ -592,7 +591,7 @@ bool FileExplorerEvent::__CanNewItem() const {
   return true;
 }
 
-bool FileExplorerEvent::__FocusNewItem(const QString& itemPath) {
+bool FileXplorerEvent::__FocusNewItem(const QString& itemPath) {
   if (!_contentPane->IsCurFSView()) {
     return false;
   }
@@ -607,7 +606,7 @@ bool FileExplorerEvent::__FocusNewItem(const QString& itemPath) {
   return true;
 }
 
-bool FileExplorerEvent::on_revealInExplorer() const {
+bool FileXplorerEvent::on_revealInExplorer() const {
   // hasSelection: reveal with selection
   // noSelection: folder -> open, file -> open its dir
   auto* view = _contentPane->GetCurView();
@@ -621,7 +620,7 @@ bool FileExplorerEvent::on_revealInExplorer() const {
   }
 }
 
-bool FileExplorerEvent::on_OpenInTerminal() const {
+bool FileXplorerEvent::on_OpenInTerminal() const {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsOpenInTerminalAvail(vt)) {
     LOG_WARN_NP("[Skip] Open In Terminal", _contentPane->GetCurViewName());
@@ -647,7 +646,7 @@ bool FileExplorerEvent::on_OpenInTerminal() const {
 #endif
 }
 
-bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
+bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
   if (!_contentPane->IsCurFSView()) {
     LOG_WARN_NP("[Skip] Refresh", _contentPane->GetCurViewName());
     return false;
@@ -662,7 +661,7 @@ bool FileExplorerEvent::on_forceRefreshFileSystemModel() {
   return true;
 }
 
-bool FileExplorerEvent::on_compress() {
+bool FileXplorerEvent::on_compress() {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     LOG_INFO_P("[Skip] Compress", "viewName:%s", _contentPane->GetCurViewName());
@@ -686,7 +685,7 @@ bool FileExplorerEvent::on_compress() {
   return comRet;
 }
 
-bool FileExplorerEvent::on_deCompress() {
+bool FileXplorerEvent::on_deCompress() {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     LOG_INFO_P("[Skip] Decompress", "viewName:%s", _contentPane->GetCurViewName());
@@ -721,7 +720,7 @@ bool FileExplorerEvent::on_deCompress() {
   return true;
 }
 
-bool FileExplorerEvent::on_compressImgsByGroup() {
+bool FileXplorerEvent::on_compressImgsByGroup() {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_P("[Skip] Compress images", "viewName:%s", _contentPane->GetCurViewName());
     return false;
@@ -733,7 +732,7 @@ bool FileExplorerEvent::on_compressImgsByGroup() {
   return true;
 }
 
-bool FileExplorerEvent::on_archivePreview(bool bChecked) {
+bool FileXplorerEvent::on_archivePreview(bool bChecked) {
   if (!bChecked) {
     return true;
   }
@@ -753,7 +752,7 @@ bool FileExplorerEvent::on_archivePreview(bool bChecked) {
   return previewRet;
 }
 
-bool FileExplorerEvent::on_RedunImageFinder(bool bChecked) {
+bool FileXplorerEvent::on_RedunImageFinder(bool bChecked) {
   if (!bChecked) {
     return true;
   }
@@ -763,7 +762,7 @@ bool FileExplorerEvent::on_RedunImageFinder(bool bChecked) {
   return finderRet;
 }
 
-bool FileExplorerEvent::on_moveToTrashBin() {
+bool FileXplorerEvent::on_moveToTrashBin() {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     LOG_WARN_NP("[Abort] Current view not support MoveToTrashbin", _contentPane->GetCurViewName());
@@ -800,7 +799,7 @@ bool FileExplorerEvent::on_moveToTrashBin() {
   return true;
 }
 
-bool FileExplorerEvent::on_deletePermanently() {
+bool FileXplorerEvent::on_deletePermanently() {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN_NP("[Abort] Current view not support Delete Permanently", _contentPane->GetCurViewName());
@@ -862,7 +861,7 @@ bool FileExplorerEvent::on_deletePermanently() {
   return true;
 }
 
-void FileExplorerEvent::on_SelectAll() {
+void FileXplorerEvent::on_SelectAll() {
   auto* view = _contentPane->GetCurView();
   if (!view->hasFocus()) {
     return;
@@ -870,7 +869,7 @@ void FileExplorerEvent::on_SelectAll() {
   view->selectAll();
 }
 
-void FileExplorerEvent::on_SelectNone() {
+void FileXplorerEvent::on_SelectNone() {
   auto* view = _contentPane->GetCurView();
   if (!view->hasFocus()) {
     return;
@@ -878,7 +877,7 @@ void FileExplorerEvent::on_SelectNone() {
   view->clearSelection();
 }
 
-void FileExplorerEvent::on_SelectInvert() {
+void FileXplorerEvent::on_SelectInvert() {
   QAbstractItemView* view = _contentPane->GetCurView();
   if (!view->hasFocus()) {
     return;
@@ -892,7 +891,7 @@ void FileExplorerEvent::on_SelectInvert() {
   view->selectionModel()->select(QItemSelection{leftTop, rightBottom}, QItemSelectionModel::Toggle);
 }
 
-bool FileExplorerEvent::on_HarView() {
+bool FileXplorerEvent::on_HarView() {
   if (!_contentPane->hasSelection()) {
     LOG_INFO_NP("Nothing selected", "return");
     return false;
@@ -914,7 +913,7 @@ bool FileExplorerEvent::on_HarView() {
   return true;
 }
 
-auto FileExplorerEvent::on_PlayVideo() const -> bool {
+auto FileXplorerEvent::on_PlayVideo() const -> bool {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsOpenVideosAvail(vt)) {
     LOG_INFO_NP("[Abort] Current view not support Play Video", ViewTypeTool::c_str(vt));
@@ -939,7 +938,7 @@ auto FileExplorerEvent::on_PlayVideo() const -> bool {
   return true;
 }
 
-bool FileExplorerEvent::on_Merge(const bool isReverse) {
+bool FileXplorerEvent::on_Merge(const bool isReverse) {
   if (!_contentPane->IsCurFSView()) {
     return false;
   }
@@ -983,7 +982,7 @@ bool FileExplorerEvent::on_Merge(const bool isReverse) {
   return true;
 }
 
-void FileExplorerEvent::on_TsFilesMerge() {
+void FileXplorerEvent::on_TsFilesMerge() {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN_NP("[Skip] Current view type not support ts merge", ViewTypeTool::c_str(vt));
@@ -1010,7 +1009,7 @@ void FileExplorerEvent::on_TsFilesMerge() {
   _logger->onMsgChanged(QString("Succeed merged ts file(s) into %1").arg(largeTsAbsFilePath), STATUS_ALERT_LEVEL::NORMAL);
 }
 
-bool FileExplorerEvent::on_Copy() {
+bool FileXplorerEvent::on_Copy() {
   using namespace MimeDataHelper;
   MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::CopyAction);
@@ -1019,7 +1018,7 @@ bool FileExplorerEvent::on_Copy() {
   return pathCnt >= 0;
 }
 
-bool FileExplorerEvent::on_Cut() {
+bool FileXplorerEvent::on_Cut() {
   using namespace MimeDataHelper;
   MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::MoveAction);
@@ -1028,7 +1027,7 @@ bool FileExplorerEvent::on_Cut() {
   return pathCnt >= 0;
 }
 
-bool FileExplorerEvent::on_Paste() {
+bool FileXplorerEvent::on_Paste() {
   if (!_contentPane->IsCurFSView()) {
     LOG_WARN_NP("[Skip] Current view not support paste", _contentPane->GetCurViewName());
     return false;
@@ -1075,7 +1074,7 @@ bool FileExplorerEvent::on_Paste() {
   return true;
 }
 
-bool FileExplorerEvent::on_NameStandardize() {
+bool FileXplorerEvent::on_NameStandardize() {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_NP("[Skip] Current view not support NameStandardize", _contentPane->GetCurViewName());
     return false;
@@ -1108,7 +1107,7 @@ bool FileExplorerEvent::on_NameStandardize() {
   return true;
 }
 
-bool FileExplorerEvent::on_FileClassify() {
+bool FileXplorerEvent::on_FileClassify() {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_NP("[Skip] Current view not support FileClassify", _contentPane->GetCurViewName());
     return false;
@@ -1152,7 +1151,7 @@ bool FileExplorerEvent::on_FileClassify() {
   return classifyResult;
 }
 
-bool FileExplorerEvent::on_FileUnclassify() {
+bool FileXplorerEvent::on_FileUnclassify() {
   if (!_contentPane->IsCurFSView()) {
     LOG_INFO_NP("[Skip] Current view not support FileUnclassify", _contentPane->GetCurViewName());
     return false;
@@ -1197,7 +1196,7 @@ bool FileExplorerEvent::on_FileUnclassify() {
   return unclassifyResult;
 }
 
-bool FileExplorerEvent::on_RemoveDuplicateImages() {
+bool FileXplorerEvent::on_RemoveDuplicateImages() {
   const auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN_NP("[Abort] Current View type not support RemoveDuplicateImages", ViewTypeTool::c_str(vt));
@@ -1219,7 +1218,7 @@ bool FileExplorerEvent::on_RemoveDuplicateImages() {
   return true;
 }
 
-bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
+bool FileXplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   const auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN_NP("[Abort] Current View type not support RemoveRedundantItem", ViewTypeTool::c_str(vt));
@@ -1257,7 +1256,7 @@ bool FileExplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
   return true;
 }
 
-bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {
+bool FileXplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {
   const auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     LOG_WARN_NP("[Abort] Current View type not support Move/Copy to", ViewTypeTool::c_str(vt));
@@ -1307,17 +1306,17 @@ bool FileExplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, 
   return true;
 }
 
-void FileExplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
+void FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
   const QString& keyword = QInputDialog::getItem(_contentPane, "Input keyword here", "filter", {"Marvil Films", "Fox"});
   if (keyword.size() < 3) {
     QMessageBox::warning(_contentPane, "Ignore", "keyword too short:" + keyword);
     return;
   }
   FolderNameContainKeyRmv rirbk{keyword};
-  FileExplorerEvent::on_RemoveRedundantItem(rirbk);
+  FileXplorerEvent::on_RemoveRedundantItem(rirbk);
 }
 
-bool FileExplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {
+bool FileXplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {
   auto* msgBox = new (std::nothrow)
       QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
   msgBox->setWindowIcon(QIcon(":img/PASTE_ITEM"));

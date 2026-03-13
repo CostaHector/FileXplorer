@@ -2,7 +2,6 @@
 #include "ViewActions.h"
 #include "ArchiveFiles.h"
 #include "ArchiveFilesActions.h"
-#include "FolderPreviewActions.h"
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
 #include "ThumbnailImageViewer.h"
@@ -288,7 +287,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     m_anchorTags.insert(parentPth, {current.row(), current.column()});
   }
 
-  if (_previewFolder != nullptr && _previewFolder->GetCurrentViewE() != PreviewTypeTool::PREVIEW_TYPE_E::NONE) {
+  if (_previewFolder != nullptr && !_previewFolder->isHidden()) {
     _previewFolder->operator()(fi.absoluteFilePath());
   }
 }

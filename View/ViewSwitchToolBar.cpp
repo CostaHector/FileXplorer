@@ -25,6 +25,10 @@ ViewSwitchToolBar::ViewSwitchToolBar(const QString& title, QWidget* parent) : QT
   subscribe();
 }
 
+ViewTypeTool::ViewType ViewSwitchToolBar::GetCurViewType() const {
+  return mViewTypeIntAction.curVal();
+}
+
 void ViewSwitchToolBar::subscribe() {
   connect(mViewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, &ViewSwitchToolBar::onViewTypeActionTriggered);
 

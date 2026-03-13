@@ -1,5 +1,5 @@
-﻿#ifndef FILEEXPLOREREVENT_H
-#define FILEEXPLOREREVENT_H
+#ifndef FILEXPLOREREVENT_H
+#define FILEXPLOREREVENT_H
 #include <QClipboard>
 #include "ComplexOperation.h"
 #include "RedundantFolderRemove.h"
@@ -15,9 +15,9 @@ class DuplicateVideosFinder;
 class RedundantImageFinder;
 class Archiver;
 
-class FileExplorerEvent : public QObject {
+class FileXplorerEvent : public QObject {
 public:
-  FileExplorerEvent(FileSystemModel* fsm, ViewsStackedWidget* view, CustomStatusBar* logger);
+  FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger);
   void subscribe();
 
 private:
@@ -105,4 +105,4 @@ private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode); // true: keep, false: flatten
 };
 
-#endif  // FILEEXPLOREREVENT_H
+#endif  // FILEXPLOREREVENT_H
