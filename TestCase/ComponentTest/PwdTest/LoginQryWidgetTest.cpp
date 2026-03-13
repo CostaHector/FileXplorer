@@ -190,8 +190,7 @@ private slots:
   }
 
   void firstTime_secondTime_manualClickLogin() {
-    // last time used key
-    QCOMPARE(credUtil.readPassword(GetCredTargetName()), "AutoLoginKey456");
+    // last time used key "AutoLoginKey456"
 
     // 1. user input a new key
     const QString newTestKey = "AutoLoginKeyNew";

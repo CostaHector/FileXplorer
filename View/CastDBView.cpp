@@ -34,9 +34,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
   , _castDb{castDb_}
   , mImageHost{castDbModel_->rootPath()} {
   if (!QFileInfo{mImageHost}.isDir()) {
-    QString titleMsg{QString{"ImageHostPath[%1] not exist"}.arg(mImageHost)};
-    LOG_CRIT_NP(titleMsg, mImageHost);
-    QMessageBox::critical(this, titleMsg, "Path not exist. Fix it in .ini file at first");
+    LOG_WARN_P("ImageHostPath not exist", "Fix it[%s] in .ini file", qPrintable(mImageHost));
     return;
   }
 

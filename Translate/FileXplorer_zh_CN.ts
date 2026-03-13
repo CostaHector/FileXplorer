@@ -954,7 +954,12 @@
         <translation>写入到json文件</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+3"/>
+        <source>Update by Json</source>
+        <translation>根据Json更新</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>COUNT</source>
         <translation>计数</translation>
     </message>

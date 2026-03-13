@@ -75,7 +75,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON = new (std::nothrow) QAction(QIcon(":img/DUMP_INTO_PSON_FILE"), tr("Export to Json"), this);
   CHECK_NULLPTR_RETURN_VOID(EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON);
   EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON->setToolTip("Export Duration/Studio/Cast/Tags to json file, if any field value is valid");
-  UPDATE_STUDIO_CAST_TAGS_BY_JSON = new (std::nothrow) QAction(QIcon(":img/RELOAD_FROM_DISK"), "Update by Json", this);
+  UPDATE_STUDIO_CAST_TAGS_BY_JSON = new (std::nothrow) QAction(QIcon(":/JsonEditor/RELOAD_FROM_DISK"), tr("Update by Json"), this);
   CHECK_NULLPTR_RETURN_VOID(UPDATE_STUDIO_CAST_TAGS_BY_JSON);
   UPDATE_STUDIO_CAST_TAGS_BY_JSON->setToolTip("Update Studio/Cast/Tags fields from json file, only if all field value in json are valid");
 

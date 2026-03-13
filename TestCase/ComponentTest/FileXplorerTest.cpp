@@ -82,6 +82,7 @@ class FileXplorerTest : public PlainTestSuite {
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
 
     auto& viewActInst = g_viewActions();
+    viewActInst._TABLE_VIEW->setChecked(true);
 
     // no configuration
     {
@@ -152,14 +153,13 @@ class FileXplorerTest : public PlainTestSuite {
     QCOMPARE(Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toInt(),
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
     // configuration read and used
+    viewActInst._TABLE_VIEW->setChecked(true);
     {
-      QCOMPARE(viewActInst._LIST_VIEW->isChecked(), true);
-
       FileXplorer fe{args, nullptr};
       QCOMPARE(fe.m_navigationToolBar->isHidden(), true);
       QCOMPARE(fe.m_previewHtmlDock->isHidden(), true);
       QCOMPARE(fe.m_previewFolder->isHidden(), true);
-      QCOMPARE(fe.m_fsPanel->GetVt(), ViewTypeTool::ViewType::LIST);
+      QCOMPARE(fe.m_fsPanel->GetVt(), ViewTypeTool::ViewType::TABLE);
       QCOMPARE(fe.m_fsPanel->count(), 1);
       QCOMPARE(fe.m_previewFolder->GetCurrentViewE(), PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL);
 

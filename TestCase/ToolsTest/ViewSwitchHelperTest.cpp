@@ -26,6 +26,8 @@ class ViewSwitchHelperTest : public PlainTestSuite {
 
     QVERIFY(m_fsPanel.m_fsModel != nullptr);
 
+    const QString existPath{QFileInfo{__FILE__}.absolutePath()};
+
     // will not crash
     QVERIFY(m_fsPanel.m_fsListView == nullptr);
     QVERIFY(m_stackedBar.m_addressBar == nullptr);
@@ -33,6 +35,7 @@ class ViewSwitchHelperTest : public PlainTestSuite {
     QVERIFY(m_stackedBar.m_addressBar != nullptr);
     QVERIFY(m_stackedBar.m_addressBar->m_addressLine != nullptr);
     QVERIFY(m_fsPanel.m_fsListView != nullptr);
+    QCOMPARE(m_fsPanel.onActionAndViewNavigate(existPath, true), true);
     QCOMPARE(m_fsPanel.currentWidget(), m_fsPanel.m_fsListView);
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::LIST);
     QCOMPARE(m_fsPanel.GetCurViewName(), "LIST");

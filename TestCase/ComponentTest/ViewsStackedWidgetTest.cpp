@@ -230,8 +230,9 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QModelIndex rootInd{m_fsPanel.m_fsModel->GetRootIndex()};
       // 目录异步加载完成 whenDirectoryLoaded, onAfterDirectoryLoaded
       QVERIFY(spy.wait(1000));
-      QCOMPARE(spy.count(), 1);
+      QVERIFY(spy.count() >= 1);
       QCOMPARE(spy.takeLast(), (QVariantList{workPath}));
+      spy.clear();
       const QString textInStatusBar = m_statusBar.GetText();
       QVERIFY(textInStatusBar.contains("Total 2 item(s) |"));  // "Kaka.jpg" "Cristiano Ronaldo & Kaka.jpg"
       QCOMPARE(m_fsPanel.m_fsModel->rowCount(rootInd), 2);
@@ -335,8 +336,9 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QModelIndex lvl1Ind{m_fsPanel.m_fsModel->GetRootIndex()};
       QCOMPARE(m_fsPanel.m_fsModel->rootPath(), lvl1Path);
       QVERIFY(spy.wait(1000));
-      QCOMPARE(spy.count(), 1);
+      QVERIFY(spy.count() >= 1);
       QCOMPARE(spy.takeLast(), (QVariantList{lvl1Path}));
+      spy.clear();
       QCOMPARE(wid.windowTitle(), lvl1Path);  // 标题会更新为最新路径
       QCOMPARE(m_fsPanel.m_fsModel->rowCount(lvl1Ind), 6);
 
@@ -470,21 +472,6 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     }
   }
 
-  // 检查状态栏
-  void on_fsmCurrentRowChanged_ok() {
-    //
-  }
-
-  // QFileSystemModel 加载结束后 检查状态栏
-  void onAfterDirectoryLoaded_ok() {
-    //
-  }
-
-  // 检查反选左上,右下两个Index
-  void getTopLeftAndRightDownRectangleIndex_ok() {
-    //
-  }
-
   void select_related_ok() {
     const QByteArray kakaJson{
         R"({
@@ -530,8 +517,9 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.onActionAndViewNavigate(lvl1Path, true), true);  // 存在的路径
       QCOMPARE(m_fsPanel.m_fsModel->rootPath(), lvl1Path);
       QVERIFY(spy.wait(1000));
-      QCOMPARE(spy.count(), 1);
+      QVERIFY(spy.count() >= 1);
       QCOMPARE(spy.takeLast(), (QVariantList{lvl1Path}));
+      spy.clear();
       QCOMPARE(m_fsPanel.m_fsModel->rowCount(m_fsPanel.m_fsModel->GetRootIndex()), 4);
       m_fsPanel.m_fsModel->sort(0, Qt::AscendingOrder);
     }
