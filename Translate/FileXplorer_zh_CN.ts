@@ -314,11 +314,6 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Copy the path</source>
-        <translation>复制无后缀路径</translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Copy records</source>
         <translation>复制全记录</translation>
     </message>
@@ -1046,9 +1041,9 @@
     </message>
 </context>
 <context>
-    <name>PreviewTypeToolBar</name>
+    <name>PreviewDockWidget</name>
     <message>
-        <location filename="../Component/PreviewTypeToolBar.cpp" line="+8"/>
+        <location filename="../Component/FolderPreview/PreviewDockWidget.cpp" line="+9"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1266,7 +1261,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../Component/RibbonMenu.cpp" line="+42"/>
+        <location filename="../Component/RibbonMenu.cpp" line="+39"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -1498,7 +1493,7 @@
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.cpp" line="+13"/>
+        <location filename="../Actions/ViewActions.cpp" line="+14"/>
         <source>LIST</source>
         <translation>单列文件视图</translation>
     </message>
@@ -1548,12 +1543,17 @@
         <translation>下一个视图</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-72"/>
         <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+77"/>
+        <source>Preview Panel</source>
+        <translation>预览面板</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>

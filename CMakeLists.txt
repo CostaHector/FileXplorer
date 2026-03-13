@@ -27,6 +27,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Char
 
 file(GLOB SOURCES
     Actions/*.cpp
+    Events/*.cpp
     Model/*.cpp
     View/*.cpp
     Component/*.cpp
@@ -58,6 +59,7 @@ endforeach()
 
 set(SRV_HEADER_PATH
     Actions
+    Events
     Model
     View
     Component
@@ -84,6 +86,7 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     Actions/*.h
+    Events/*.h
     Model/*.h
     View/*.h
     Component/*.h

@@ -1,6 +1,5 @@
 ﻿#include "FileSystemTableView.h"
 #include "FileOpActs.h"
-#include "FolderPreviewActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
@@ -34,7 +33,7 @@ void FileSystemTableView::subscribe() {
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
-  addAction(g_viewActions().NAVIGATION_PANE);
+  addAction(g_viewActions()._NAVIGATION_PANE);
   addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
   addActions(FileOpActs::GetInst().OPEN_AG->actions());
 

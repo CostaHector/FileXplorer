@@ -175,14 +175,16 @@ class EnumIntActionTest : public PlainTestSuite {
         VideoPlayTool::PlaybackTriggerMode::AUTO,              //
         VideoPlayTool::PlaybackTriggerMode::MANUAL,            //
         QActionGroup::ExclusionPolicy::Exclusive);
-  }
 
-  void enum_in_action_exclusive_optional() {
     EnumIntActionChecker<PreviewTypeTool::PREVIEW_TYPE_E>(  //
         PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY,          //
         PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD,  //
         PreviewTypeTool::DEFULT_PREVIEW_TYPE_E,             //
-        QActionGroup::ExclusionPolicy::ExclusiveOptional);  //
+        QActionGroup::ExclusionPolicy::Exclusive);  //
+  }
+
+  void enum_in_action_exclusive_optional() {
+
   }
 
   void enum_in_action_exclusive_none() {

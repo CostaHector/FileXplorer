@@ -10,6 +10,9 @@ class ViewActions : public QObject {
   Q_OBJECT
 public:
   friend ViewActions& g_viewActions();
+  ~ViewActions();
+
+  QAction* _NAVIGATION_PANE{nullptr};
 
   QAction* _LIST_VIEW{nullptr};
   QAction* _TABLE_VIEW{nullptr};
@@ -25,14 +28,13 @@ public:
   QAction* _VIEW_FORWARD_TO{nullptr};
   QList<QAction*> _VIEWS_NAVIGATE;
 
-  QAction* NAVIGATION_PANE{nullptr};
+  QAction* _PREVIEW_PANEL{nullptr};
 
   QAction* _SYS_VIDEO_PLAYERS{nullptr};
   QAction* _HAR_VIEW{nullptr};
 
 private:
   explicit ViewActions(QObject* parent = nullptr);
-  QActionGroup* GetPlayersActions();
 };
 
 ViewActions& g_viewActions();

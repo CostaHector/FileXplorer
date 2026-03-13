@@ -1,4 +1,4 @@
-﻿#include "FileExplorerEvent.h"
+﻿#include "FileXplorerEvent.h"
 #include "FileXplorer.h"
 #include "ExtraEvents.h"
 #include "FileTool.h"
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
   FileXplorer fileExplorer{args, nullptr};
 
-  FileExplorerEvent commonEvent{fileExplorer.m_fsPanel->m_fsModel, fileExplorer.m_fsPanel, fileExplorer.m_statusBar};
+  FileXplorerEvent commonEvent{fileExplorer.m_fsPanel, fileExplorer.m_statusBar};
   commonEvent.subscribe();
 
   ExtraEvents extraViewVisibility{fileExplorer.m_fsPanel};

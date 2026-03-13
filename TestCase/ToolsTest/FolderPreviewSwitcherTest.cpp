@@ -10,19 +10,17 @@ class FolderPreviewSwitcherTest : public PlainTestSuite {
  private slots:
   void default_ok() {
     FolderPreviewSwitcher sw{nullptr, nullptr};
-    QVERIFY(!sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::NONE));
-    QVERIFY(!sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
-    QVERIFY(!sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD));
-    QVERIFY(!sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
+    QVERIFY(!sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
+    QVERIFY(!sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD));
+    QVERIFY(!sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
   }
 
   void switch_by_viewtype_ok() {
     CurrentRowPreviewer previewer;
     FolderPreviewSwitcher sw{&previewer, nullptr};
-    QVERIFY(!sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::NONE));
-    QVERIFY(sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
-    QVERIFY(sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD));
-    QVERIFY(sw.onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
+    QVERIFY(sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
+    QVERIFY(sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD));
+    QVERIFY(sw.onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
   }
 };
 

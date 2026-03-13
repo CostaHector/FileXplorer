@@ -25,7 +25,7 @@ class RibbonMenuTest : public PlainTestSuite {
     QCOMPARE(rm._EXPAND_RIBBONS->isChecked(), true);
 
     // switch view toolbar
-    rm.whenViewTypeChanged(ViewTypeTool::ViewType::MOVIE);
+    rm.on_ViewTypeChanged(ViewTypeTool::ViewType::MOVIE);
     const int movieIndexInTabBar = rm.currentIndex();
     emit rm.currentChanged(movieIndexInTabBar);
     // memory updated

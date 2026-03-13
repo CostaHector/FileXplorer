@@ -52,6 +52,7 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
     QVERIFY(advanceSearchToolbar.m_searchCaseButton != nullptr);
     QVERIFY(advanceSearchToolbar._searchProxyModel == nullptr);
     QVERIFY(advanceSearchToolbar._searchSourceModel == nullptr);
+    advanceSearchToolbar.onGetFocus();
     // should not crash down
     {
       advanceSearchToolbar.onSearchTextChanges();

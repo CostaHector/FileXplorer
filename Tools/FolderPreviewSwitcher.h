@@ -7,7 +7,7 @@
 class FolderPreviewSwitcher : public QObject {
  public:
   explicit FolderPreviewSwitcher(CurrentRowPreviewer* folderPreview, QObject* parent = nullptr);
-  bool onSwitchByViewType(PreviewTypeTool::PREVIEW_TYPE_E viewType);
+  bool onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_E viewType);
  private:
   CurrentRowPreviewer* _folderPreview{nullptr};
 };

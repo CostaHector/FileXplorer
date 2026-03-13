@@ -83,6 +83,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     viewStkWid.SetVt(ViewTypeTool::DEFAULT_VIEW_TYPE);
     QCOMPARE(viewStkWid.GetVt(), ViewTypeTool::DEFAULT_VIEW_TYPE);
 
+    QCOMPARE(viewStkWid.currentWidget(), nullptr);
+    QCOMPARE(viewStkWid.GetCurView(), nullptr);
     viewStkWid.BindNavigationAddressBar(nullptr);
     viewStkWid.BindDatabaseSearchToolBar(nullptr);
     viewStkWid.BindAdvanceSearchToolBar(nullptr);

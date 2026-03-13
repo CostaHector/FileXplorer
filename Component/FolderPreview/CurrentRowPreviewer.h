@@ -19,11 +19,11 @@ public:
   friend class FolderPreviewSwitcher;
   friend class ViewSwitchHelper;
   explicit CurrentRowPreviewer(QWidget* parent = nullptr);
-  ~CurrentRowPreviewer();
 
   PreviewTypeTool::PREVIEW_TYPE_E GetCurrentViewE() const { return mCurrentPreviewType; }
 
   void operator()(const QString& path) {
+    emit reqWindowsTitleChange(path);
     mCurrentSrcFrom = SRC_FROM::FILE_SYSTEM_VIEW;
     m_curPath = path;
     if (isTimerDisabled()) {
@@ -35,6 +35,7 @@ public:
   }
 
   void operator()(const QSqlRecord& newRecord, const QString imageHostPath) {
+    emit reqWindowsTitleChange(imageHostPath);
     mCurrentSrcFrom = SRC_FROM::CAST;
     m_curRecord = newRecord;
     m_curImageHostPath = imageHostPath;
@@ -47,6 +48,7 @@ public:
   }
 
   void operator()(const QString& name, const QString& jsonAbsPath, const QStringList& imgPthLst, const QStringList& vidsLst) {
+    emit reqWindowsTitleChange(name);
     mCurrentSrcFrom = SRC_FROM::SCENE;
     m_sceneName = name;
     m_sceneJsonAbsFilePath = jsonAbsPath;
@@ -69,6 +71,10 @@ public:
   QSize sizeHint() const override;
 
   bool NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const;
+
+signals:
+  void reqWindowsTitleChange(const QString& newTitle);
+
 public slots:
   bool InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E previewType);
   bool setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E previewType);
@@ -108,7 +114,7 @@ private:
   static constexpr int NEXT_FOLDER_TIME_INTERVAL = 150; // f=26 frame/s T=40ms; 100ms to avoid quick locate by prefix string not work
 #endif
   // ms, when NEXT_FOLDER_TIME_INTERVAL <= 0. update preview imgs imediately(may cause lag).
-  PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::DEFULT_PREVIEW_TYPE_E};
+  PreviewTypeTool::PREVIEW_TYPE_E mCurrentPreviewType{PreviewTypeTool::PREVIEW_TYPE_E::NONE};
 
   enum class SRC_FROM {
     FILE_SYSTEM_VIEW,

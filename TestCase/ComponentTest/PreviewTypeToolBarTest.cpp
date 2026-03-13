@@ -3,10 +3,11 @@
 #include <QSignalSpy>
 
 #include "BeginToExposePrivateMember.h"
-#include "PreviewTypeToolBar.h"
+#include "PreviewDockWidget.h"
 #include "EndToExposePrivateMember.h"
 
 #include <QMetaType>
+#include <QMainWindow>
 
 Q_DECLARE_METATYPE(PreviewTypeTool::PREVIEW_TYPE_E)
 class PreviewTypeToolBarTest : public PlainTestSuite {
@@ -18,16 +19,38 @@ class PreviewTypeToolBarTest : public PlainTestSuite {
     QVERIFY(QMetaType::type("PreviewTypeTool::PREVIEW_TYPE_E") != 0);
   }
 
-  void test_preview_type_changed_signal() {
-    PreviewTypeToolBar toolbar("Preview Type Toolbar");
-    QSignalSpy spy(&toolbar, &PreviewTypeToolBar::previewTypeChanged);
-    QCOMPARE(toolbar.mCurrentPreviewType, PreviewTypeTool::DEFULT_PREVIEW_TYPE_E);
-    toolbar.CATEGORY_PRE->trigger();
+  void preview_type_changed_signal_ok() {
+    QMainWindow mw;
+    PreviewDockWidget previewDockWid("Preview Type previewDockWid");
+    mw.addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, &previewDockWid);
+
+    QSignalSpy spy(&previewDockWid, &PreviewDockWidget::previewTypeChanged);
+    QCOMPARE(previewDockWid.GetCurrentPreviewType(), PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);
+    previewDockWid.PROGRESSIVE_LOAD_PRE->setChecked(true);
+    emit previewDockWid.PROGRESSIVE_LOAD_PRE->triggered();
     QCOMPARE(spy.count(), 1);
-    QVariantList parms = spy.back();
-    QCOMPARE(parms.size(), 1);
-    QCOMPARE(parms.back().value<PreviewTypeTool::PREVIEW_TYPE_E>(), PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);
-    QCOMPARE(toolbar.mCurrentPreviewType, PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);
+    QCOMPARE(spy.takeLast(), (QVariantList{(int)PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD}));
+    QCOMPARE(previewDockWid.GetCurrentPreviewType(), PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD);
+
+    previewDockWid.CAROUSEL_PRE->setChecked(true);
+    emit previewDockWid.CAROUSEL_PRE->triggered();
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), (QVariantList{(int)PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL}));
+    QCOMPARE(previewDockWid.GetCurrentPreviewType(), PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL);
+
+    previewDockWid.CATEGORY_PRE->setChecked(true);
+    emit previewDockWid.CATEGORY_PRE->triggered();
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), (QVariantList{(int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY}));
+    QCOMPARE(previewDockWid.GetCurrentPreviewType(), PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY);
+
+    QCOMPARE(previewDockWid.isFloating(), false);
+    previewDockWid.m_floatingPanel->toggle();
+    QCOMPARE(previewDockWid.isFloating(), true);
+
+    QCOMPARE(previewDockWid.isMinimized(), false);
+    emit previewDockWid.m_minimizePanel->triggered();
+    QCOMPARE(previewDockWid.isMinimized(), true);
   }
 };
 
