@@ -17,7 +17,7 @@ class FileSystemTreeViewTest : public PlainTestSuite {
     FileSystemTreeView treeView(&fsModel);
 
     QVERIFY(treeView._fsModel != nullptr);
-    QVERIFY(treeView.m_fsMenu != nullptr);
+    QVERIFY(treeView.m_menu != nullptr);
     QCOMPARE(treeView.dragDropMode(), QAbstractItemView::DragDrop);
     QVERIFY(treeView.acceptDrops());
     QVERIFY(treeView.dragEnabled());
@@ -101,7 +101,7 @@ class FileSystemTreeViewTest : public PlainTestSuite {
     FileSystemModel fsModel;
     FileSystemTreeView treeView(&fsModel);
 
-    QVERIFY(treeView.m_fsMenu != nullptr);
+    QVERIFY(treeView.m_menu != nullptr);
 
     QContextMenuEvent contextEvent(QContextMenuEvent::Mouse, QPoint(100, 100));
     treeView.contextMenuEvent(&contextEvent);

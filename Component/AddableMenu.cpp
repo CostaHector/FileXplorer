@@ -1,12 +1,23 @@
 #include "AddableMenu.h"
 
-AddableMenu& AddableMenu::operator+=(QMenu& rhs) {
+void AddableMenu::push_front(QMenu& rhs) {
   if (this == &rhs) {
-    return *this;
+    return;
   }
-  for (QAction* action : rhs.actions()) {
-    rhs.removeAction(action);
-    addAction(action);
+  const QList<QAction*> curActs{actions()};
+  QAction* firstAct{curActs.isEmpty() ? nullptr : curActs.front()};
+  QList<QAction*> oldActs{rhs.actions()};
+  insertActions(firstAct, oldActs);
+  for (QAction* needRmvAction : oldActs) {
+    rhs.removeAction(needRmvAction);
   }
-  return *this;
+}
+
+void AddableMenu::push_front(const QList<QAction*>& acts) {
+  if (acts.isEmpty()) {
+    return;
+  }
+  const QList<QAction*> curActs{actions()};
+  QAction* firstAct{curActs.isEmpty() ? nullptr : curActs.front()};
+  insertActions(firstAct, acts);
 }

@@ -8,6 +8,7 @@
 #include "EnumIntAction.h"
 #include "MenuToolButton.h"
 #include "VideoPlayTool.h"
+#include "RateActions.h"
 
 extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
 extern template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;
@@ -30,6 +31,9 @@ public:
   bool isVideoFullScreen() const { return mFullScreenAct->isChecked(); }
   QMediaPlaylist::PlaybackMode GetPlaybackMode() const;
   VideoPlayTool::PlaybackTriggerMode GetPlaybackTriggerMode() const;
+  RateActions* GetRateActions() const {
+    return mRateActions;
+  }
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);
@@ -70,6 +74,7 @@ private:
   QAction *mSeekBackwardHotAct{nullptr}, *mSeekForwardHotAct{nullptr}; // 上一个热点, 下一个热点
   QAction *mPlayPrevAct{nullptr}, *mPlayNextAct{nullptr};              // 上一首, 下一首
   QAction *mVolumePlus{nullptr}, *mVolumeMinus{nullptr};               // 增加音量, 减少音量
+  RateActions* mRateActions{nullptr};                                  // 单文件/路径内文件递归评分
   QAction* mShowFrames{nullptr};                                       // 展示帧截图
   QAction* mShowVideoList{nullptr};                                    // 显示视频文件列表
 
@@ -88,6 +93,7 @@ private:
   QAction* mSelectVideoFileAct{nullptr}; // 选择视频文件
   QAction* mSelectVideoFolder{nullptr};  // 选择视频文件夹并播放
 
+  QMenu* mRateMenu{nullptr};
   QMenu* mPlaybackModeMenu{nullptr};
   QMenu* mContextMenu{nullptr};
 

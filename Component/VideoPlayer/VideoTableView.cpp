@@ -1,5 +1,6 @@
 #include "VideoTableView.h"
 #include "NotificatorMacro.h"
+#include "RateActions.h"
 #include <random>
 
 VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_VIEW", parent} {
@@ -15,7 +16,11 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   InitTableView();
   verticalHeader()->setVisible(false);
 
+  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
+  PushFrontExclusiveActions(rateInst.GetActionGroup()->actions());
+
   connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
+  connect(&rateInst, &RateActions::MovieRateChanged, this, &VideoTableView::onRateSelectedMovies);
 }
 
 int VideoTableView::setPlayPath(const QString& path, bool bPlayInstantly) {
@@ -115,4 +120,21 @@ void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   mVideoModel->updateDurationFields({srcIndex});
   const QString& mediaFullPath = mVideoModel->GetMediaFullPath(srcIndex);
   emit reqPlayMedia(mediaFullPath, bPlayInstantly);
+}
+
+int VideoTableView::onRateSelectedMovies(int newRate) {
+  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
+  if (proxyIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip rate", "no row selected");
+    return 0;
+  }
+  QModelIndexList srcIndexes;
+  srcIndexes.reserve(proxyIndexes.size());
+  for (const QModelIndex& proxyIndex : proxyIndexes) {
+    srcIndexes.push_back(mProxyModel->mapToSource(proxyIndex));
+  }
+  const int succeedCnt{mVideoModel->rateSelectedMovies(srcIndexes, newRate)};
+  const int totalRow{srcIndexes.size()};
+  LOG_OE_P(succeedCnt == totalRow, "Rate selection", "%d/%d row(s) succeed", succeedCnt, totalRow);
+  return succeedCnt;
 }

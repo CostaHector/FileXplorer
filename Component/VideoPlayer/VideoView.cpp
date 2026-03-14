@@ -44,8 +44,6 @@ void VideoView::onReqModeChange(bool bBasicMode) {
 }
 
 void VideoView::subscribe() {
-  connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);
-
   const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget();
   connect(inst->mPlayPrevAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
   connect(inst->mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
@@ -56,6 +54,9 @@ void VideoView::subscribe() {
 
   connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
+
+  connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);
+  connect(mBasicVideoView, &BasicVideoView::reqPlayNextOneMedia, inst->mPlayNextAct, &QAction::trigger);
 }
 
 int VideoView::PlayAPath(const QString& folderPath, bool bPlayInstantly) {

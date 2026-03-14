@@ -106,6 +106,8 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
 
   m_menu = new (std::nothrow) AddableMenu{name + "_menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->setToolTipsVisible(true);
+  AddItselfAction2Menu();
 
   InitListView();
   SubscribePublicActions();
@@ -171,14 +173,9 @@ void CustomListView::wheelEvent(QWheelEvent* event) {
   QListView::wheelEvent(event);
 }
 
-void CustomListView::BindMenu(QMenu* menu) {
-  if (menu == nullptr) {
-    LOG_W("Don't bind a nullptr menu");
-    return;
-  }
-
-  m_menu->operator+=(*menu);
-  AddItselfAction2Menu();
+void CustomListView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->push_front(acts);
 }
 
 void CustomListView::AddItselfAction2Menu() {

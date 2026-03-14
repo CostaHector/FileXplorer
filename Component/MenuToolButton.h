@@ -9,8 +9,13 @@
 #include <QActionGroup>
 
 class MenuToolButton : public QToolButton {
-public:
+ public:
   explicit MenuToolButton(QList<QAction*> dropdownActions,
+                          QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
+                          const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
+                          const int iconSize = IMAGE_SIZE::TABS_ICON_IN_MENU_48,
+                          QWidget* parent = nullptr);
+  explicit MenuToolButton(QMenu* pDropdownMenu,
                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::ToolButtonPopupMode::InstantPopup,
                           const Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
                           const int iconSize = IMAGE_SIZE::TABS_ICON_IN_MENU_48,

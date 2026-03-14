@@ -21,11 +21,6 @@ class VideoTableModel : public QAbstractTableModelPub {
     INCLUDING_SUBDIRECTORY = 1,  // all files
   };
   using QAbstractTableModelPub::QAbstractTableModelPub;
-  int setPlayPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL);
-  QString GetPlayPath() const { return mPlayPath; }
-  int setPlayMedias(const QString& rootPath, const QStringList& mediaFiles);
-  QString GetMediaFullPath(const QModelIndex& ind) const;
-  int updateDurationFields(const QModelIndexList& indexes);
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mVideosInfo.size(); }
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return VIDEO_VERTICAL_HEAD.size(); }
@@ -48,6 +43,13 @@ class VideoTableModel : public QAbstractTableModelPub {
   }
 
   Qt::ItemFlags flags(const QModelIndex& /*index*/) const override { return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable; }
+
+  int setPlayPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL);
+  QString GetPlayPath() const { return mPlayPath; }
+  int setPlayMedias(const QString& rootPath, const QStringList& mediaFiles);
+  QString GetMediaFullPath(const QModelIndex& ind) const;
+  int updateDurationFields(const QModelIndexList& indexes);
+  int rateSelectedMovies(const QModelIndexList& indexes, int newRate);
 
  private:
   QList<VideoBasicInfo> mVideosInfo;

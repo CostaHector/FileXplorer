@@ -73,7 +73,11 @@ bool RateHelper::getJsonPathForFile(const QString& fileAbsPath, QString& jsonPat
 
   QString baseName, ext;
   std::tie(baseName, ext) = PathTool::GetBaseNameExt(fileAbsPath);
-  const QString dirPath{fileAbsPath.chopped(1 + baseName.size() + ext.size())};
+  const int choppedSize{1 + baseName.size() + ext.size()};
+  if (fileAbsPath.size() < choppedSize) {
+    return false;
+  }
+  const QString dirPath{fileAbsPath.chopped(choppedSize)};
   const auto JoinDirAndBasename = [dirPath](const QString& baseName) -> QString {
     QString jsonPath;
     jsonPath.reserve(dirPath.size() + 1 + baseName.size() + 5);

@@ -1,4 +1,5 @@
 #include "InteractiveVideoWidget.h"
+#include "RateActions.h"
 #include "DualIconCheckableAction.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -93,9 +94,14 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mPlaybackModeMenu->setToolTipsVisible(true);
   mPlaybackModeMenu->addActions(mPlaybackModeIntAction.getActionEnumAscendingList());
 
+  mRateActions = new (std::nothrow) RateActions(this);
+  mRateMenu = mRateActions->GetRateMenu(this);
+
   mContextMenu = new QMenu{tr("Player Menu"), this};
   mContextMenu->setToolTipsVisible(true);
   mContextMenu->addAction(mOpenInSystemApplication);
+  mContextMenu->addSeparator();
+  mContextMenu->addMenu(mRateMenu);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mFullScreenAct);
   mContextMenu->addAction(mHideToolBarAct);

@@ -32,14 +32,14 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
   setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
 
-  m_jsonMenu = new (std::nothrow) QMenu{this};
-  CHECK_NULLPTR_RETURN_VOID(m_jsonMenu);
   {
     auto& jsonInst = g_JsonActions();
-    m_jsonMenu->addAction(jsonInst._OPEN_THIS_FILE);
-    m_jsonMenu->addAction(jsonInst._REVEAL_IN_EXPLORER);
-    m_jsonMenu->addAction(jsonInst._RENAME_JSON_AND_RELATED_FILES);
-    BindMenu(m_jsonMenu);
+    const QList<QAction*> jsonSpecialActs{
+        jsonInst._OPEN_THIS_FILE,
+        jsonInst._REVEAL_IN_EXPLORER,
+        jsonInst._RENAME_JSON_AND_RELATED_FILES
+    };
+    PushFrontExclusiveActions(jsonSpecialActs);
   }
 
   InitTableView();

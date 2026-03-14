@@ -16,7 +16,7 @@ public:
   void contextMenuEvent(QContextMenuEvent* event) override;
   void wheelEvent(QWheelEvent *event) override;
 
-  void BindMenu(QMenu* menu);
+  void PushFrontExclusiveActions(const QList<QAction*>& acts);
   void AddItselfAction2Menu();
 
   void InitListView();

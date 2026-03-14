@@ -15,7 +15,7 @@ public:
 
   virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
-  void BindMenu(QMenu* menu);
+  void PushFrontExclusiveActions(const QList<QAction*>& acts);
 
   bool ShowOrHideColumnCore();
 

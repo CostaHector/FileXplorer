@@ -7,7 +7,7 @@ MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
                                const Qt::ToolButtonStyle toolButtonStyle,   //
                                const int iconSize,                          //
                                QWidget* parent)
-  : QToolButton{parent} {
+    : QToolButton{parent} {
   setPopupMode(popupMode);
   setToolButtonStyle(toolButtonStyle);
   setAutoRaise(true);
@@ -24,6 +24,20 @@ MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
     }
   }
   pDropdownMenu->setToolTipsVisible(true);
+  setMenu(pDropdownMenu);
+}
+
+MenuToolButton::MenuToolButton(QMenu* pDropdownMenu,                        //
+                               QToolButton::ToolButtonPopupMode popupMode,  //
+                               const Qt::ToolButtonStyle toolButtonStyle,   //
+                               const int iconSize,                          //
+                               QWidget* parent)
+    : QToolButton{parent} {
+  setPopupMode(popupMode);
+  setToolButtonStyle(toolButtonStyle);
+  setAutoRaise(true);
+  setStyleSheet("QToolButton { max-width: 256px; }");
+  setIconSize(QSize{iconSize, iconSize});
   setMenu(pDropdownMenu);
 }
 
@@ -60,7 +74,7 @@ void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePers
   if (!enablePersistentBehavior) {
     return;
   }
-  connect(this, &QToolButton::triggered, this, [this, memoryKey, actsList](QAction* pAct){
+  connect(this, &QToolButton::triggered, this, [this, memoryKey, actsList](QAction* pAct) {
     CHECK_NULLPTR_RETURN_VOID(pAct);
     setDefaultAction(pAct);
     const int defIndNxtTime = actsList.indexOf(pAct);
@@ -73,8 +87,8 @@ void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePers
   });
 }
 
-void MenuToolButton::UpdateCaptionForInstantPopMode() { // for user experience after click one action. update Caption instead of defaultAction
-  connect(this, &QToolButton::triggered, this, [this](const QAction* pAct){
+void MenuToolButton::UpdateCaptionForInstantPopMode() {  // for user experience after click one action. update Caption instead of defaultAction
+  connect(this, &QToolButton::triggered, this, [this](const QAction* pAct) {
     CHECK_NULLPTR_RETURN_VOID(pAct);
     SetCaption(pAct->icon(), pAct->text(), pAct->toolTip());
   });

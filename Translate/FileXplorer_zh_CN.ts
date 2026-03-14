@@ -519,7 +519,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+18"/>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+19"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -584,17 +584,17 @@
         <translation>帧图组</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>show list</source>
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-2"/>
         <source>open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>current item once</source>
         <translation>单播</translation>
     </message>
@@ -639,12 +639,12 @@
         <translation>播放模式</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Player Menu</source>
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+54"/>
+        <location line="+57"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
@@ -1159,7 +1159,12 @@
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../Actions/RateActions.cpp" line="+30"/>
+        <location filename="../Actions/RateActions.cpp" line="+27"/>
+        <source> score</source>
+        <translation> 分</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Rate Recusively</source>
         <translation>递归设置评分</translation>
     </message>
@@ -1168,11 +1173,17 @@
         <source>Rate Recusively(Force)</source>
         <translation>递归设置评分(强制)</translation>
     </message>
+    <message>
+        <location line="+10"/>
+        <location line="+17"/>
+        <source>Rate</source>
+        <translation>评分</translation>
+    </message>
 </context>
 <context>
     <name>RegisterWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+130"/>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+128"/>
         <source>Encryption Key</source>
         <translation>设置密钥</translation>
     </message>

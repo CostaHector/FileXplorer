@@ -226,24 +226,8 @@ bool FileXplorerEvent::onRateMovie(int newRate) const {
 
 bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
   const QString rootPath{_contentPane->getRootPath()};
-  const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
-  QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
-  message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings will be affected.";
-
-  const int defaultRate = Configuration().value(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, MemoryKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
-
-  bool bOk = false;
-  const int newRate = QInputDialog::getInt(_contentPane, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1, &bOk);
-  if (!bOk) {
-    LOG_INFO_NP("User cancel rate recursively", rootPath);
-    return true;
-  }
-  if (newRate != defaultRate) {
-    Configuration().setValue(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
-  }
-  const int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate, bOverrideForce);
-  LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);
-  return succeedCnt > 0;
+  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
+  return rateInst.onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
 }
 
 QStringList FileXplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
@@ -541,7 +525,7 @@ void FileXplorerEvent::subscribe() {
   }
 
   {
-    auto& rateInst = RateActions::GetInst();
+    auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
     connect(&rateInst, &RateActions::MovieRateChanged, this, &FileXplorerEvent::onRateMovie);
     connect(&rateInst, &RateActions::MovieRateRecursivelyChanged, this, &FileXplorerEvent::onRateMoviesRecursively);
   }

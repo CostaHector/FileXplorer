@@ -1,43 +1,74 @@
 #include "RateActions.h"
 #include "PublicMacro.h"
 #include "RateHelper.h"
+#include "MenuToolButton.h"
+#include "NotificatorMacro.h"
+#include "MemoryKey.h"
+#include <QInputDialog>
 
-RateActions& RateActions::GetInst() {
-  static RateActions inst;
-  return inst;
+RateActions& RateActions::GetInst(RateRequestFrom reqFrom) {
+  if (reqFrom < RateRequestFrom::FROM_BEGIN || reqFrom >= RateRequestFrom::FROM_BUTT) {
+    LOG_C("rate request[%d] out of range[%d, %d)", (int)reqFrom, (int)RateRequestFrom::FROM_BEGIN, (int)RateRequestFrom::FROM_BUTT);
+    reqFrom = RateRequestFrom::FILE_XPLORER;
+  }
+  // RateActions of BASIC_VIDEO_PLAYER will be used in VideoView and BasicVideoView twice. so for BasicVideoView use constructor directly
+  static RateActions inst[(int)RateRequestFrom::FROM_BUTT];
+  return inst[(int)reqFrom];
 }
 
-RateActions::RateActions(QObject* parent)
-  : QObject{parent} {
+// Only call me in BasicVideoView
+RateActions::RateActions(QObject* parent) : QObject{parent} {
   RATE_AGS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(RATE_AGS);
   RATE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  for (int rate = RateHelper::MIN_V; rate < RateHelper::BUTT_V; ++rate) {
-    QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)), //
-                                               QString::asprintf("Rate %d", rate),     //
+  for (int rate = RateHelper::BUTT_V - 1; rate >= RateHelper::MIN_V; --rate) {
+    QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)),  //
+                                               QString::number(rate) + tr(" score"),     //
                                                this};
     CHECK_NULLPTR_RETURN_VOID(pAct);
     pAct->setData(rate);
     const int keypad = (rate == 10) ? Qt::Key_Plus : (Qt::Key_0 + rate);
     pAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::KeypadModifier | keypad));
     RATE_AGS->addAction(pAct);
-    RATE_ACTIONS_LIST += pAct;
+    ALL_RATE_ACTIONS_LIST += pAct;
   }
-
-  RATE_ACTIONS_LIST += nullptr;
 
   _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate Recusively"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY);
   _RATE_RECURSIVELY->setToolTip("Rate only unrated movies in selected folder and its subfolders");
-  RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
+  ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
 
   _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{tr("Rate Recusively(Force)"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY_OVERRIDE);
   _RATE_RECURSIVELY_OVERRIDE->setToolTip("Rate all movies, overwriting existing ratings");
-  RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;
+  ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;
 
   subscribe();
+}
+
+QMenu* RateActions::GetRateMenu(QWidget* notNullParent) const {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  QMenu* rateMenu = new (std::nothrow) QMenu{tr("Rate"), notNullParent};
+  rateMenu->setIcon(QIcon{":img/LIKE"});
+  rateMenu->setToolTip("Rate for your movie");
+  rateMenu->addActions(GetAllRateActionsList());
+  rateMenu->setToolTipsVisible(true);
+  return rateMenu;
+}
+
+QWidget* RateActions::GetRateToolButton(QWidget* notNullParent) const {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  QMenu* pDropdownMenu = GetRateMenu(notNullParent);
+  CHECK_NULLPTR_RETURN_NULLPTR(pDropdownMenu);
+  MenuToolButton* rateToolButton = new (std::nothrow) MenuToolButton(pDropdownMenu,                            //
+                                                                     QToolButton::InstantPopup,                //
+                                                                     Qt::ToolButtonStyle::ToolButtonIconOnly,  //
+                                                                     IMAGE_SIZE::TABS_ICON_IN_MENU_16, notNullParent);
+  CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
+  rateToolButton->SetCaption(QIcon{":img/LIKE"}, tr("Rate"), "Rate for your movie");
+  rateToolButton->addActions(RATE_AGS->actions());
+  return rateToolButton;
 }
 
 void RateActions::subscribe() {
@@ -55,3 +86,25 @@ void RateActions::onRateActionTriggered(QAction* pActTriggered) {
   }
   emit MovieRateChanged(newRate);
 }
+
+int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const {
+  const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
+  QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
+  message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings will be affected.";
+
+  const int defaultRate = Configuration().value(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, MemoryKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
+
+  bool bOk = false;
+  const int newRate = QInputDialog::getInt(parent, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1, &bOk);
+  if (!bOk) {
+    LOG_INFO_NP("User cancel rate recursively", rootPath);
+    return 0;
+  }
+  if (newRate != defaultRate) {
+    Configuration().setValue(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
+  }
+  const int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate, bOverrideForce);
+  LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);
+  return succeedCnt;
+}
+

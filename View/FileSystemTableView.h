@@ -30,7 +30,7 @@ class FileSystemTableView : public CustomTableView {
 
   void mouseMoveEvent(QMouseEvent* event) override;
 
-  auto keyPressEvent(QKeyEvent* event) -> void override;
+  void keyPressEvent(QKeyEvent* event) override;
 
  private:
   FileSystemModel* _fsModel {nullptr};

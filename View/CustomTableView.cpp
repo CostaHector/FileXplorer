@@ -106,6 +106,8 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   m_menu = new (std::nothrow) AddableMenu{m_name + "_menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu);
   m_menu->setToolTipsVisible(true);
+  AddItselfAction2Menu();
+
   SubscribeHeaderActions();
 }
 
@@ -128,10 +130,9 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   return;
 }
 
-void CustomTableView::BindMenu(QMenu* menu) {
-  CHECK_NULLPTR_RETURN_VOID(menu);
-  m_menu->operator+=(*menu);
-  AddItselfAction2Menu();
+void CustomTableView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->push_front(acts);
 }
 
 void CustomTableView::AddItselfAction2Menu() {

@@ -74,15 +74,8 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar{"corner tools", attached}};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
 
-  auto& rateInst = RateActions::GetInst();
-  auto* rateToolButton = new (std::nothrow) MenuToolButton(rateInst.GetRateActionsList(),                 //
-                                                           QToolButton::InstantPopup,                     //
-                                                           Qt::ToolButtonStyle::ToolButtonIconOnly, //
-                                                           IMAGE_SIZE::TABS_ICON_IN_MENU_16,
-                                                           menuRibbonCornerWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
-  rateToolButton->SetCaption(QIcon{":img/LIKE"}, "", "Rate for your movie");
-  rateToolButton->addActions(rateInst.RATE_AGS->actions());
+  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
+  auto* rateToolButton = rateInst.GetRateToolButton(menuRibbonCornerWid);
 
   menuRibbonCornerWid->addWidget(mActSearcher);
   menuRibbonCornerWid->addSeparator();

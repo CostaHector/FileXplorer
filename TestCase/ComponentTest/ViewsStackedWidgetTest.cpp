@@ -404,10 +404,10 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       }
 
       {
-        QSignalSpy harViewSpy{g_viewActions()._HAR_VIEW, &QAction::toggled};
+        QSignalSpy harViewSpy{g_viewActions()._HAR_VIEW, &QAction::triggered};
         m_fsPanel.on_cellDoubleClicked(harIndex);
         QCOMPARE(harViewSpy.count(), 1);
-        QCOMPARE(harViewSpy.takeLast(), (QVariantList{true}));
+        QCOMPARE(harViewSpy.takeLast(), (QVariantList{false}));
       }
 
       {

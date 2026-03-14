@@ -247,7 +247,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
-      emit g_viewActions()._HAR_VIEW->toggled(true);
+      g_viewActions()._HAR_VIEW->trigger();
       return true;
     } else if (FileTool::IsTorrentFile(absItemPath)) {
       return FileTool::OpenLocalTorrentFile(absItemPath);

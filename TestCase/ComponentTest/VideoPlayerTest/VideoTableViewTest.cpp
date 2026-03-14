@@ -20,8 +20,6 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.mPlaybackMode, QMediaPlaylist::PlaybackMode::CurrentItemOnce);
   }
 
-  void cleanupTestCase() {}
-
   void setMedias_ok() {
     VideoTableView videoTv;
     videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
@@ -173,6 +171,21 @@ class VideoTableViewTest : public PlainTestSuite {
     QVERIFY(!videoTv.nextIndex().isValid());
 
     emit videoTv.doubleClicked({});
+  }
+
+  void onRateSelectedMovies_ok() {
+    VideoTableView videoTv;
+    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
+
+    QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
+    videoTv.setMediaFiles("", inexistFiles, false);
+    videoTv.clearSelection();
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0); // no selection
+
+    QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
+    videoTv.selectAll();
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0); // no json at all
   }
 };
 

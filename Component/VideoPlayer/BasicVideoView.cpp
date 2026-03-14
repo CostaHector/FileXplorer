@@ -6,6 +6,9 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "FileTool.h"
+#include "RateHelper.h"
+#include "RateActions.h"
+#include "PathTool.h"
 #include <QFile>
 #include <QResizeEvent>
 
@@ -13,6 +16,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mProgressSlider = new (std::nothrow) ClickableSlider{Qt::Orientation::Horizontal, this};
   mProgressSlider->setRange(0, 0);
   mProgressSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
   mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
   mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -25,6 +29,8 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   MenuToolButton* playbackTriggerModeBtn = mVideoWidget->GetPlaybackTriggerModelMenuToolButton(this);
   playbackTriggerModeBtn->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
   setPlaybackTriggerMode(mVideoWidget->GetPlaybackTriggerMode());
+
+  mRateToolButton = mVideoWidget->GetRateActions()->GetRateToolButton(this);
 
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   mFunctionCtrlBar->addWidget(playbackTriggerModeBtn);
@@ -45,6 +51,8 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mFunctionCtrlBar->addAction(mVideoWidget->mBasicModeAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mHideToolBarAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mFullScreenAct);
+  mFunctionCtrlBar->addSeparator();
+  mFunctionCtrlBar->addWidget(mRateToolButton);
 
   mPauseShieldButton = new (std::nothrow) QToolButton{this};
   mPauseShieldButton->setObjectName("VideoPlayerPauseShieldButton");
@@ -106,7 +114,9 @@ void BasicVideoView::subscribe() {
 
   connect(mPlayer, &QMediaPlayer::audioAvailableChanged, this, &BasicVideoView::onAudioAvailableChanged);
 
-  connect(mPlayer, &QMediaPlayer::stateChanged, this, &BasicVideoView::onMediaPlayStateChanged);
+  connect(mPlayer, &QMediaPlayer::stateChanged, this, &BasicVideoView::onStateChanged);
+  connect(mPlayer, &QMediaPlayer::mediaStatusChanged, this, &BasicVideoView::onMediaStatusChanged);
+
   connect(mVideoWidget, &InteractiveVideoWidget::newFileSelectedByUser, this, &BasicVideoView::PlayAVideo);
   connect(mVideoWidget, &InteractiveVideoWidget::fullScreenModeToggled, this, &BasicVideoView::emitFullScreenModeReq);
   connect(mVideoWidget->mBasicModeAct, &QAction::toggled, this, &BasicVideoView::reqFunctionModeChange);
@@ -116,6 +126,10 @@ void BasicVideoView::subscribe() {
   connect(mVideoWidget, &InteractiveVideoWidget::playbackTriggerModeChanged, this, &BasicVideoView::setPlaybackTriggerMode);
 
   connect(mVideoWidget, &InteractiveVideoWidget::layoutVisibilityChanged, this, &BasicVideoView::movePauseBtnToCenter);
+
+  RateActions* rateActions = mVideoWidget->GetRateActions();
+  connect(rateActions, &RateActions::MovieRateChanged, this, &BasicVideoView::rateCurrentVideo);
+  connect(rateActions, &RateActions::MovieRateRecursivelyChanged, this, &BasicVideoView::rateAllVideoSameLevelAsCurrentVideo);
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
@@ -197,6 +211,31 @@ bool BasicVideoView::registerFullScreenToggleCallback(TFuncFullScreenToggleCallb
   return true;
 }
 
+bool BasicVideoView::rateCurrentVideo(int score) const {
+  const QString curMedia = GetCurrentPlayingMediaPath();
+  if (!QFile::exists(curMedia)) {
+    LOG_WARN_P("Cannot rate", "Media file[%s] not exist", qPrintable(curMedia));
+    return false;
+  }
+  if (!RateHelper::RateMovie(curMedia, score)) {
+    LOG_WARN_P("Cannot rate", "Media file[%s], see details in log", qPrintable(curMedia));
+    return false;
+  }
+  LOG_OK_P("Rate succeed", "Media file[%s] rate[%d]", qPrintable(curMedia), score);
+  return true;
+}
+
+int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) const {
+  const QString& curMedia = GetCurrentPlayingMediaPath();
+  const QString sameLevelPath{PathTool::absolutePath(curMedia)};
+  if (!QFile::exists(sameLevelPath)) {
+    LOG_WARN_P("Cannot rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
+    return 0;
+  }
+  RateActions* rateActions = mVideoWidget->GetRateActions();
+  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
+}
+
 bool BasicVideoView::deviatePositionPrevious() {
   return DeviatePositionCore(mPlayer, -10);
 }
@@ -267,7 +306,7 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
   }
 }
 
-void BasicVideoView::onMediaPlayStateChanged(QMediaPlayer::State state) {
+void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
   if (state == QMediaPlayer::PausedState) {
     mPauseShieldButton->raise();
     mPauseShieldButton->setVisible(true);
@@ -280,6 +319,15 @@ void BasicVideoView::onMediaPlayStateChanged(QMediaPlayer::State state) {
     mProgressSliderUpdateTimer.start();
   } else {
     mProgressSliderUpdateTimer.stop();
+  }
+}
+
+void BasicVideoView::onMediaStatusChanged(QMediaPlayer::MediaStatus status) {
+  if (status == QMediaPlayer::MediaStatus::EndOfMedia) {
+    const QMediaPlaylist::PlaybackMode curPlaybackMode {mVideoWidget->GetPlaybackMode()};
+    if (curPlaybackMode != QMediaPlaylist::PlaybackMode::CurrentItemOnce) {
+      emit reqPlayNextOneMedia();
+    }
   }
 }
 
