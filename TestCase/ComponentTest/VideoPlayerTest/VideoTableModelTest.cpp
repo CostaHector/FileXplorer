@@ -17,18 +17,19 @@ class VideoTableModelTest : public PlainTestSuite {
   TDir mDir;
   const QString mWorkPath{mDir.path()};
   const QList<FsNodeEntry> mNodes{
-      {"file2.mp4", false, "22"},              //
-      {"file1.mkv", false, "1"},               //
-      {"file3.txt", false, "333"},             //
-      {"VIDEO_TS/file5.avi", false, "55556"},  // special folder: too small ignored in NORMAL mode
-      {"folder/file4.avi", false, "4444"},     //
-      {"videos/file7.avi", false, "7777777"},  // special folder: too small ignored in NORMAL mode
-      {"vids/file6.avi", false, "666666"},     // special folder: too small ignored in NORMAL mode
+      {"file2.mp4", false, "22"},                     //
+      {"file1.mkv", false, "1"},                      //
+      {"file1.json", false, R"({"Name": "file1"})"},  //
+      {"file3.txt", false, "333"},                    //
+      {"VIDEO_TS/file5.avi", false, "55556"},         // special folder: too small ignored in NORMAL mode
+      {"folder/file4.avi", false, "4444"},            //
+      {"videos/file7.avi", false, "7777777"},         // special folder: too small ignored in NORMAL mode
+      {"vids/file6.avi", false, "666666"},            // special folder: too small ignored in NORMAL mode
   };
  private slots:
   void initTestCase() {  //
     QVERIFY(mDir.IsValid());
-    QCOMPARE(mDir.createEntries(mNodes), 7);
+    QCOMPARE(mDir.createEntries(mNodes), 8);
   }
 
   void cleanupTestCase() {  //
@@ -70,6 +71,8 @@ class VideoTableModelTest : public PlainTestSuite {
 
     QCOMPARE(videoModel.setPlayPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
     QCOMPARE(videoModel.rowCount(), 6);
+    QCOMPARE(videoModel.data({}, Qt::DisplayRole), (QVariant{}));
+    QCOMPARE(videoModel.data(videoModel.index(0, 0), Qt::BackgroundRole), (QVariant{}));
     QCOMPARE(videoModel.data(videoModel.index(0, 0), Qt::DisplayRole).toString(), "file1.mkv");
     QCOMPARE(videoModel.data(videoModel.index(1, 0), Qt::DisplayRole).toString(), "file2.mp4");
     QCOMPARE(videoModel.data(videoModel.index(2, 0), Qt::DisplayRole).toString(), "file5.avi");
@@ -127,6 +130,29 @@ class VideoTableModelTest : public PlainTestSuite {
 
     // QCOMPARE(parms, (QVariantList{durationFieldBegInd, durationFieldEndInd, QVariant::fromValue(expectRoles)}));
     // don't do this, the last element differs
+  }
+
+  void rateSelectedMovies_ok() {
+    VideoTableModel videoModel;
+    QCOMPARE(videoModel.setPlayPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
+    QCOMPARE(videoModel.rowCount(), 6);
+
+    const QModelIndex firstIndex{videoModel.index(0, 0)};
+    const QModelIndex secondIndex{videoModel.index(1, 0)}; // no json correspond
+    const QModelIndexList indexes{firstIndex, secondIndex};
+
+    QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "file1.mkv");
+    QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);
+    QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), "file2.mp4");
+    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);
+
+    QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
+    QCOMPARE(videoModel.rateSelectedMovies({}, 10), 0);
+    QCOMPARE(videoModel.rateSelectedMovies(indexes, 10), 1);
+
+    QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 10);
+    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);
+    QCOMPARE(dataChangedSpy.count(), 1);
   }
 
   void tableView_setPlayPath_ok() {

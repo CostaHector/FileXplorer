@@ -13,16 +13,10 @@ class VideoViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {  //
-    // Configuration().clear();
-  }
-
-  void cleanupTestCase() {  //
-    // Configuration().clear();
-  }
-
   void basicMode_ok() {
     VideoView videoView{false, nullptr};
+    QCOMPARE(videoView.registerFullScreenToggleCallback(nullptr), false); // not crash down
+
     InteractiveVideoWidget* videoWidget = videoView.mBasicVideoView->mVideoWidget;
     QVERIFY(videoWidget != nullptr);
 

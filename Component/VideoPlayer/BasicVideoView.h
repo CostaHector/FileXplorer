@@ -30,10 +30,13 @@ public:
   void onChangeToolBarVisibility(bool bHide);
   bool isVideoFullScreen() const;
   bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
+  bool rateCurrentVideo(int score) const;
+  int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
   void reqFullscreenModeChange(bool bFullScreen);
+  void reqPlayNextOneMedia();
 
 protected:
   void resizeEvent(QResizeEvent* e) override;
@@ -47,7 +50,8 @@ private:
   bool onUpdateProgressSliderPosition();
   void onStopPlaying();
   void onPauseActionToggled(bool pauseChecked);
-  void onMediaPlayStateChanged(QMediaPlayer::State state);
+  void onStateChanged(QMediaPlayer::State state);
+  void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
   void movePauseBtnToCenter();
   static bool SetMediaCore(QMediaPlayer* mediaPlayer, const QUrl& mediaUrl);
   static bool PlayCore(QMediaPlayer* mediaPlayer);
@@ -56,6 +60,7 @@ private:
   bool deviatePositionNext();
   static bool SetPositionCore(QMediaPlayer* mPlayer, int newPosition);
   static qint64 GetPositionCore(QMediaPlayer* mPlayer);
+  bool reqPlayInSystemApplication() const;
   QMediaPlayer::Error onError(QMediaPlayer::Error error) const;
   int onAudioAvailableChanged(bool available) const;
 
@@ -67,6 +72,7 @@ private:
   ClickableSlider* mProgressSlider{nullptr}; // 进度控制块
   QLabel* mCurrentTimeLabel{nullptr};        // 当前播放的时间点
   QLabel* mDurationLabel{nullptr};           // 视频文件时长
+  QWidget* mRateToolButton{nullptr};         // 单文件/路径内文件递归评分
   VolumeWidget* mVolumeWid{nullptr};         // 音量控制组件
 
   QVBoxLayout* mLeftLayout{nullptr}; // 左侧布局

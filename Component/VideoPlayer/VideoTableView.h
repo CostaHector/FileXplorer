@@ -15,6 +15,7 @@ public:
   int setMediaFiles(const QString& folderPath, const QStringList& mediaFiles, bool bPlayInstantly);
   void PlayPreviousVideo();
   void PlayNextVideo();
+  int onRateSelectedMovies(int newRate);
 
 signals:
   void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);

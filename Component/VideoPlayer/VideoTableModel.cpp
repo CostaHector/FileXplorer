@@ -5,11 +5,40 @@
 #include "DataFormatter.h"
 #include "RateHelper.h"
 #include "Logger.h"
+#include "RateHelper.h"
 #include <QDirIterator>
 
 constexpr int VideoBasicInfo::DURATION_FIELD, VideoBasicInfo::SCORE_FIELD;
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Relative path", "Size", "Duration", "Rate"};
+
+QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) {
+    return {};
+  }
+  int col = index.column();
+  const VideoBasicInfo& item = mVideosInfo[index.row()];
+  if (role == Qt::DisplayRole) {
+    switch (col) {
+      case 0:
+        return item.fileName;
+      case 1:
+        return item.relPath;
+      case 2:
+        return DataFormatter::formatFileSizeGMKB(item.fileSize);
+      case VideoBasicInfo::DURATION_FIELD:
+        return DataFormatter::formatDurationISO(item.duration);
+      case VideoBasicInfo::SCORE_FIELD:
+        return item.rate;
+      default:
+        return {};
+    }
+  } else if (role == Qt::DecorationRole && col == VideoBasicInfo::SCORE_FIELD) {
+    return RateHelper::GetRatePixmap(item.rate);
+  }
+
+  return {};
+}
 
 int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode) {
   if (mPlayPath == rootPath) {
@@ -64,8 +93,8 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
   }
 
-  // C:/A/B/C
-  // C:/A   file
+          // C:/A/B/C
+          // C:/A   file
   std::sort(videosList.begin(), videosList.end());
   LOG_D("%d item(s) find out under path [%s]", videosList.size(), qPrintable(mPlayPath));
 
@@ -142,34 +171,42 @@ int VideoTableModel::updateDurationFields(const QModelIndexList& indexes) {
   const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::DURATION_FIELD, {});
   const QModelIndex& backInd = sibling(maxRow, VideoBasicInfo::DURATION_FIELD, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
-  LOG_D("Duration field in row[%d, %d] get updated, count[%d]", minRow, maxRow, affectedRows);
+  LOG_D("%d in %d duration field in row[%d, %d] get updated", affectedRows, indexes.size(), minRow, maxRow);
   return affectedRows;
 }
 
-QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid()) {
-    return {};
+int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newRate) {
+  if (indexes.isEmpty()) {
+    return 0;
   }
-  int col = index.column();
-  const VideoBasicInfo& item = mVideosInfo[index.row()];
-  if (role == Qt::DisplayRole) {
-    switch (col) {
-      case 0:
-        return item.fileName;
-      case 1:
-        return item.relPath;
-      case 2:
-        return DataFormatter::formatFileSizeGMKB(item.fileSize);
-      case VideoBasicInfo::DURATION_FIELD:
-        return DataFormatter::formatDurationISO(item.duration);
-      case VideoBasicInfo::SCORE_FIELD:
-        return item.rate;
-      default:
-        return {};
+  int minRow{INT_MAX}, maxRow{-1};
+  int affectedRows{0};
+  for (const QModelIndex& ind: indexes) {
+    const int row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row[%d] out of range", row);
+      continue;
     }
-  } else if (role == Qt::DecorationRole && col == VideoBasicInfo::SCORE_FIELD) {
-    return RateHelper::GetRatePixmap(item.rate);
+    const QString mediaPath{GetMediaFullPath(ind)};
+    if (!RateHelper::RateMovie(mediaPath, newRate)) {
+      LOG_W("Rate[%s] failed", qPrintable(mediaPath));
+      continue;
+    }
+    mVideosInfo[row].rate = newRate;
+    ++affectedRows;
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
   }
-
-  return {};
+  if (maxRow < 0 || minRow > maxRow) {
+    return 0;
+  }
+  const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::SCORE_FIELD, {});
+  const QModelIndex& backInd = sibling(maxRow, VideoBasicInfo::SCORE_FIELD, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
+  LOG_D("%d in %d rate field in row[%d, %d] get updated", affectedRows, indexes.size(), minRow, maxRow);
+  return affectedRows;
 }

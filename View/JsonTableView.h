@@ -51,7 +51,7 @@ class JsonTableView : public CustomTableView {
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
   MultiLineEditDelegate* m_DetailEdit{nullptr};
-  QMenu* m_jsonMenu{nullptr};
+
 #ifdef RUNNING_UNIT_TESTS
   QWidget* pWidgetInCellMock{nullptr};
 #endif

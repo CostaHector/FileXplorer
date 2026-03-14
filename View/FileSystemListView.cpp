@@ -15,10 +15,7 @@ FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* paren
     : CustomListView{"FILE_SYSTEM_LIST", parent}, _fsModel{fsmModel}                                       //
 {
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
-  QMenu* m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
-  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
-
-  BindMenu(m_fsMenu);
+  PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(fsmModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
@@ -68,7 +65,7 @@ void FileSystemListView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(_fsModel, event);
 }
 
-auto FileSystemListView::keyPressEvent(QKeyEvent* e) -> void {
+void FileSystemListView::keyPressEvent(QKeyEvent* e) {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
     emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     return;

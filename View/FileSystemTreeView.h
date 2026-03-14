@@ -8,9 +8,9 @@
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
-#include <QMenu>
 #include <QMouseEvent>
 #include <QTreeView>
+#include <QMenu>
 
 class FileSystemTreeView : public QTreeView {
  public:
@@ -32,13 +32,13 @@ class FileSystemTreeView : public QTreeView {
 
   void mouseMoveEvent(QMouseEvent* event) override;
 
-  auto keyPressEvent(QKeyEvent* event) -> void override;
+  void keyPressEvent(QKeyEvent* event) override;
 
   void contextMenuEvent(QContextMenuEvent* event) override;
 
  private:
   FileSystemModel* _fsModel {nullptr};
-  QMenu* m_fsMenu {nullptr};
+  QMenu* m_menu {nullptr};
   QPoint mDragStartPosition;
 };
 

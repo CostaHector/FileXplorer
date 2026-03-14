@@ -1,4 +1,5 @@
 #include "InteractiveVideoWidget.h"
+#include "RateActions.h"
 #include "DualIconCheckableAction.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -38,6 +39,8 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mShowFrames = new (std::nothrow) QAction{QIcon{""}, tr("show frames"), this};
   mShowFrames->setCheckable(true);
   mShowFrames->setChecked(false);
+
+  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/PLAY_BUTTON_ROUND"}, tr("open in system application"), this};
 
   mShowVideoList = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_LIST"}, tr("show list"), this};
   mShowVideoList->setCheckable(true);
@@ -91,8 +94,15 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mPlaybackModeMenu->setToolTipsVisible(true);
   mPlaybackModeMenu->addActions(mPlaybackModeIntAction.getActionEnumAscendingList());
 
+  mRateActions = new (std::nothrow) RateActions(this);
+  mRateMenu = mRateActions->GetRateMenu(this);
+
   mContextMenu = new QMenu{tr("Player Menu"), this};
   mContextMenu->setToolTipsVisible(true);
+  mContextMenu->addAction(mOpenInSystemApplication);
+  mContextMenu->addSeparator();
+  mContextMenu->addMenu(mRateMenu);
+  mContextMenu->addSeparator();
   mContextMenu->addAction(mFullScreenAct);
   mContextMenu->addAction(mHideToolBarAct);
   mContextMenu->addAction(mShowVideoList);

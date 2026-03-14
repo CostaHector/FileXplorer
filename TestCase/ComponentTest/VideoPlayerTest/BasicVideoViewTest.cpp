@@ -7,7 +7,10 @@
 #include "BeginToExposePrivateMember.h"
 #include "BasicVideoView.h"
 #include "EndToExposePrivateMember.h"
+#include "RateHelper.h"
+#include <QInputDialog>
 
+#include "FileTool.h"
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -21,38 +24,34 @@ class BasicVideoViewTest : public PlainTestSuite {
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
-  void initTestCase() {  //
-    // Configuration().clear();
-  }
-
-  void cleanupTestCase() {  //
-    // Configuration().clear();
-  }
-
   void playAVideo_trigger_disabled_ok() {
     Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
-
+    const QString existVideoPath{__FILE__};
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(existVideoPath)).will(returnValue(true));
 
     BasicVideoView basicVideoView{true, nullptr};
     QVERIFY(!basicVideoView.bPauseButtonCenterInit);
+    QCOMPARE(basicVideoView.registerFullScreenToggleCallback(nullptr), false); // not crash down
     // 文件不存在
     QVERIFY(!basicVideoView.PlayAVideo("path/to/InexistsMediaFile.mp4", true));
     QVERIFY(basicVideoView.bPauseButtonCenterInit);
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
 
     // 禁用触发: 非强制不可触发(暂停状态) setMedia:0 play:0
-    QVERIFY(basicVideoView.PlayAVideo(__FILE__, false));
+    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, false));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
+    basicVideoView.mVideoWidget->mOpenInSystemApplication->trigger();  // time: 1
 
     // 禁用触发: 强制播放(非暂停状态) setMedia:1 play:1
-    QVERIFY(basicVideoView.PlayAVideo(__FILE__, true));
+    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, true));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
+    basicVideoView.reqPlayInSystemApplication();  // time: 2
 
-    // // 停止播放 mStopAct -> onStopPlaying -> StopPlay
+    // 停止播放 mStopAct -> onStopPlaying -> StopPlay
     emit basicVideoView.mVideoWidget->mStopAct->triggered();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
   }
@@ -127,7 +126,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.onError(QMediaPlayer::Error::NoError), QMediaPlayer::Error::NoError);
     QCOMPARE(basicVideoView.onAudioAvailableChanged(true), 98);  // floor(99*99/100)=floor(9801)=98
 
-    basicVideoView.onMediaPlayStateChanged(QMediaPlayer::State::PausedState);
+    basicVideoView.onStateChanged(QMediaPlayer::State::PausedState);
     QCOMPARE(basicVideoView.mPauseShieldButton->isHidden(), false);
 
     // PauseBtn在VideoWidget上层
@@ -176,7 +175,87 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.mProgressSlider->maximum(), 100 * 1000);
   }
 
-  void onMediaPlayStateChanged_ok() {}
+  void rateCurrentVideo_ok() {
+    BasicVideoView basicVideoView{false, nullptr};
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
+    QCOMPARE(basicVideoView.rateCurrentVideo(10), false);  // no media path
+
+    basicVideoView.PlayAVideo(__FILE__, false);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+
+    // assume the 1st time rate failed, second time succeed.
+    MOCKER(RateHelper::RateMovie).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
+
+    QCOMPARE(basicVideoView.rateCurrentVideo(10), false);
+    QCOMPARE(basicVideoView.rateCurrentVideo(10), true);
+
+    RateActions* rateActions = basicVideoView.mVideoWidget->GetRateActions();
+    QVERIFY(rateActions != nullptr);
+    emit rateActions->MovieRateChanged(9);
+  }
+
+  void rateAllVideoSameLevelAsCurrentVideo_ok() {
+    BasicVideoView basicVideoView{false, nullptr};
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
+
+    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(false), false);  // no path specified
+
+    const bool bForceRecusive{false};
+    basicVideoView.PlayAVideo(__FILE__, false);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+
+    const QString expectRatePathRecursive{QFileInfo{__FILE__}.absolutePath()};
+    const int rateSucceedFilesCnt{3};
+    const int expectScore{9};
+    bool expectOk{true};
+    MOCKER(QInputDialog::getInt)
+        .expects(exactly(2))                                                                                   //
+        .with(any(), any(), any(), any(), any(), any(), any(), outBoundP(&expectOk, sizeof(expectOk)), any())  //
+        .will(returnValue(expectScore));                                                                       //
+    MOCKER(RateHelper::RateMovieRecursively)
+        .expects(exactly(2))                                                     //
+        .with(eq(expectRatePathRecursive), eq(expectScore), eq(bForceRecusive))  //
+        .will(returnValue(rateSucceedFilesCnt));                                 // 3 file
+
+    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(bForceRecusive), rateSucceedFilesCnt);
+
+    RateActions* rateActions = basicVideoView.mVideoWidget->GetRateActions();
+    QVERIFY(rateActions != nullptr);
+    emit rateActions->MovieRateRecursivelyChanged(false);
+  }
+
+  void onMediaStatusChanged_ok() {
+    // EndOfMedia -> play Next
+    BasicVideoView basicVideoView{false, nullptr};
+    basicVideoView.mVideoWidget->mPlaybackMode_CurrentItemOnce->setChecked(true);
+
+    QSignalSpy reqPlayNextOneMediaSpy{&basicVideoView, &BasicVideoView::reqPlayNextOneMedia};
+
+    // CurrentItemOnce, 不发送
+    QCOMPARE(basicVideoView.mVideoWidget->GetPlaybackMode(), QMediaPlaylist::PlaybackMode::CurrentItemOnce);
+    basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
+
+    // 发送
+    basicVideoView.mVideoWidget->mPlaybackMode_Loop->setChecked(true);
+    basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 1);
+    reqPlayNextOneMediaSpy.takeLast();
+
+    basicVideoView.mVideoWidget->mPlaybackMode_Sequential->setChecked(true);
+    basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 1);
+    reqPlayNextOneMediaSpy.takeLast();
+    emit basicVideoView.mPlayer->mediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 1);
+    reqPlayNextOneMediaSpy.takeLast();
+
+    // 非结束状态, 不发送
+    basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::LoadedMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
+    emit basicVideoView.mPlayer->mediaStatusChanged(QMediaPlayer::MediaStatus::LoadedMedia);
+    QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
+  }
 
   void resizeEvent_ok() {
     BasicVideoView basicVideoView{false, nullptr};

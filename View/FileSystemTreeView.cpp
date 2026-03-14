@@ -14,8 +14,10 @@ FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* paren
     : QTreeView{parent}, _fsModel{fsmModel}                                         //
 {
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
-  m_fsMenu = new (std::nothrow) RightClickMenu("Right click menu", this);
-  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
+  m_menu = new (std::nothrow) QMenu{"Tree right click menu", this};
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->setToolTipsVisible(true);
+  m_menu->addActions(GetRightClickMenuActions(this));
 
   setModel(fsmModel);
   InitViewSettings();
@@ -90,7 +92,7 @@ void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(_fsModel, event);
 }
 
-auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
+void FileSystemTreeView::keyPressEvent(QKeyEvent* e) {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
     emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     return;
@@ -100,9 +102,9 @@ auto FileSystemTreeView::keyPressEvent(QKeyEvent* e) -> void {
 
 void FileSystemTreeView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  CHECK_NULLPTR_RETURN_VOID(m_fsMenu);
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
 #ifndef RUNNING_UNIT_TESTS
-  m_fsMenu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
+  m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
 #endif
 }
 

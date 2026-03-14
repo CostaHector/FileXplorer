@@ -32,10 +32,7 @@ class CustomListViewTest : public PlainTestSuite {
     Configuration().setValue(keyMemoryName + "_ICON_SIZE_INDEX", 5);
     CustomListView view(keyMemoryName);
 
-    QMenu menu;
-    view.BindMenu(nullptr);
-    view.BindMenu(&menu);
-    view.BindMenu(&menu);
+    view.PushFrontExclusiveActions({});
 
     view.contextMenuEvent(nullptr);
 

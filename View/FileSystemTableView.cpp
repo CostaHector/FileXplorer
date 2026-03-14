@@ -13,7 +13,7 @@ FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* par
   : CustomTableView{"FILE_SYSTEM", parent}
   , _fsModel{fsmModel} { //
   CHECK_NULLPTR_RETURN_VOID(_fsModel)
-  BindMenu(new (std::nothrow) RightClickMenu("Right click menu", this));
+  PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(_fsModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
@@ -68,7 +68,7 @@ void FileSystemTableView::dragLeaveEvent(QDragLeaveEvent* event) {
   View::dragLeaveEventCore(_fsModel, event);
 }
 
-auto FileSystemTableView::keyPressEvent(QKeyEvent* e) -> void {
+void FileSystemTableView::keyPressEvent(QKeyEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
   const int ky = e->key();
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && ky == Qt::Key_Delete) {

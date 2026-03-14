@@ -37,11 +37,11 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
   mNavigateIntoSub = new (std::nothrow) QCheckBox{"Navigate Into Subdirectory", this};
   mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
 
-  auto& rateInst = RateActions::GetInst();
+  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::THUMBNAIL_VIEWER);
   mControlToolBar = new (std::nothrow) QToolBar{"Recusive Navigate and Rate", this};
   mControlToolBar->addWidget(mNavigateIntoSub);
   mControlToolBar->addSeparator();
-  mControlToolBar->addActions(rateInst.RATE_AGS->actions());
+  mControlToolBar->addActions(rateInst.GetActionGroup()->actions());
 
   m_prevButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_LAST"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
