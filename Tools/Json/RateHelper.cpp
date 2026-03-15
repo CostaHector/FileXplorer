@@ -79,13 +79,7 @@ bool RateHelper::getJsonPathForFile(const QString& fileAbsPath, QString& jsonPat
   }
   const QString dirPath{fileAbsPath.chopped(choppedSize)};
   const auto JoinDirAndBasename = [dirPath](const QString& baseName) -> QString {
-    QString jsonPath;
-    jsonPath.reserve(dirPath.size() + 1 + baseName.size() + 5);
-    jsonPath += dirPath;
-    jsonPath += "/";
-    jsonPath += baseName;
-    jsonPath += ".json";
-    return jsonPath;
+    return PathTool::JoinJsonAbsFilePath(dirPath, baseName);
   };
 
   using namespace ItemsPileCategory;

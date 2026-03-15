@@ -1,6 +1,7 @@
 #include "VideoTableView.h"
 #include "NotificatorMacro.h"
 #include "RateActions.h"
+#include "BatchRenameBy.h"
 #include <random>
 
 VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_VIEW", parent} {
@@ -16,15 +17,44 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   InitTableView();
   verticalHeader()->setVisible(false);
 
-  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
-  PushFrontExclusiveActions(rateInst.GetActionGroup()->actions());
+  const auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
+  {
+    mRenameVideoRelatedFilesReplace = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related(replace)"), this);
+    mRenameVideoRelatedFilesReplace->setShortcutVisibleInContextMenu(true);
+    mRenameVideoRelatedFilesReplace->setToolTip(
+        QString("<b>%1 (%2)</b><br/>Rename selected video file(s) and associated files by replacing a substring in the file names.")  //
+            .arg(mRenameVideoRelatedFilesReplace->text())
+            .arg(mRenameVideoRelatedFilesReplace->shortcut().toString()));
 
-  connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
+    mRenameVideoRelatedFilesInsert = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("Rename related(Insert)"), this);
+    mRenameVideoRelatedFilesInsert->setShortcutVisibleInContextMenu(true);
+    mRenameVideoRelatedFilesInsert->setToolTip(
+        QString("<b>%1 (%2)</b><br/>Rename selected video file(s) and associated files by inserting a string into the file names.")  //
+            .arg(mRenameVideoRelatedFilesInsert->text())
+            .arg(mRenameVideoRelatedFilesInsert->shortcut().toString()));
+
+    mReloadCurrentPath = new (std::nothrow) QAction(QIcon(":img/REFRESH_THIS_PATH"), tr("Refresh current path"), this);
+    mReloadCurrentPath->setShortcutVisibleInContextMenu(true);
+    mReloadCurrentPath->setToolTip(QString("<b>%1 (%2)</b><br/>Force reload the file list for the current directory from disk.")  //
+                                       .arg(mReloadCurrentPath->text())
+                                       .arg(mReloadCurrentPath->shortcut().toString()));
+
+    QList<QAction*> acts{rateInst.GetActionGroup()->actions()};
+    acts.push_back(mRenameVideoRelatedFilesReplace);
+    acts.push_back(mRenameVideoRelatedFilesInsert);
+    acts.push_back(mReloadCurrentPath);
+    PushFrontExclusiveActions(acts);
+  }
+
   connect(&rateInst, &RateActions::MovieRateChanged, this, &VideoTableView::onRateSelectedMovies);
+  connect(mRenameVideoRelatedFilesReplace, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedReplace);
+  connect(mRenameVideoRelatedFilesInsert, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedInsert);
+  connect(mReloadCurrentPath, &QAction::triggered, mVideoModel, &VideoTableModel::forceReload);
+  connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
 }
 
 int VideoTableView::setPlayPath(const QString& path, bool bPlayInstantly) {
-  const int mediasCnt = mVideoModel->setPlayPath(path);
+  const int mediasCnt = mVideoModel->setRootPath(path);
   if (mediasCnt > 0) {
     selectRow(0);
     ReqPlay(currentIndex(), bPlayInstantly);
@@ -122,19 +152,60 @@ void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   emit reqPlayMedia(mediaFullPath, bPlayInstantly);
 }
 
-int VideoTableView::onRateSelectedMovies(int newRate) {
+QModelIndexList VideoTableView::selectedRowsSource() const {
   QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
-  if (proxyIndexes.isEmpty()) {
-    LOG_INFO_NP("Skip rate", "no row selected");
-    return 0;
-  }
   QModelIndexList srcIndexes;
   srcIndexes.reserve(proxyIndexes.size());
   for (const QModelIndex& proxyIndex : proxyIndexes) {
     srcIndexes.push_back(mProxyModel->mapToSource(proxyIndex));
   }
+  return srcIndexes;
+}
+
+int VideoTableView::onRateSelectedMovies(int newRate) {
+  const QModelIndexList& srcIndexes{selectedRowsSource()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip rate", "no row selected");
+    return 0;
+  }
   const int succeedCnt{mVideoModel->rateSelectedMovies(srcIndexes, newRate)};
   const int totalRow{srcIndexes.size()};
   LOG_OE_P(succeedCnt == totalRow, "Rate selection", "%d/%d row(s) succeed", succeedCnt, totalRow);
   return succeedCnt;
+}
+
+int VideoTableView::onRenameJsonAndRelatedReplace() {
+  const QModelIndexList& srcIndexes{selectedRowsSource()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip rename(replace)", "no row selected");
+    return 0;
+  }
+
+  const QString& videoLocatedInPath{mVideoModel->rootPath()};
+  const QStringList& videoFileNames{mVideoModel->rel2fileNames(srcIndexes)};
+  const int relatedFilesCnt{BatchRenameBy::ReplaceBySpecifiedJson(videoLocatedInPath, videoFileNames)};
+  if (relatedFilesCnt <= 0) {
+    return 0;
+  }
+
+  const int removeRowCnt{mVideoModel->AfterVideoFilesNameRenamed(srcIndexes)};
+  return relatedFilesCnt;
+}
+
+int VideoTableView::onRenameJsonAndRelatedInsert() {
+  const QModelIndexList& srcIndexes{selectedRowsSource()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip rename(insert)", "no row selected");
+    return 0;
+  }
+
+  const QString& videoLocatedInPath{mVideoModel->rootPath()};
+  const QStringList& videoFileNames{mVideoModel->rel2fileNames(srcIndexes)};
+  const int relatedFilesCnt{BatchRenameBy::InsertBySpecifiedJson(videoLocatedInPath, videoFileNames)};
+  if (relatedFilesCnt <= 0) {
+    return 0;
+  }
+
+  const int removeRowCnt{mVideoModel->AfterVideoFilesNameRenamed(srcIndexes)};
+  return relatedFilesCnt;
 }

@@ -86,7 +86,7 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
     Dim1ContainerTableModel rowModel;
     QCOMPARE(rowModel.rowCount(), 0);
 
-    { // 1. row count increasing
+    {  // 1. row count increasing
       QStringList rowString3{"Raphael Varane", "Mbappé", "Dembélé"};
       rowModel.RowsCountBeginChange(0, 3);
       rowModel.mData.swap(rowString3);
@@ -97,7 +97,7 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
       QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
     }
 
-    { // 1. row count remains. contents changed
+    {  // 1. row count remains. contents changed
       QStringList rowString3{"Mbappé", "Raphael Varane", "Dembélé"};
       rowModel.RowsCountBeginChange(3, 3);
       rowModel.mData.swap(rowString3);
@@ -108,7 +108,7 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
       QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
     }
 
-    { // 3. row count decreasing
+    {  // 3. row count decreasing
       QStringList rowString1{"Raphael Varane"};
       rowModel.RowsCountBeginChange(3, 1);
       rowModel.mData.swap(rowString1);
@@ -116,6 +116,13 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
       rowModel.RowsCountEndChange();
       QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Raphael Varane");
     }
+  }
+
+  void MergeList2SectionsRange_ok() {
+    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({}), (QList<std::pair<int, int>>{}));
+    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({0, 1, 2, 3}), (QList<std::pair<int, int>>{{0, 3}}));
+    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({1, 3, 4}), (QList<std::pair<int, int>>{{1, 1}, {3, 4}}));
+    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({0, 1, 2, 4}), (QList<std::pair<int, int>>{{0, 2}, {4, 4}}));
   }
 
   void dimesion2_container_model_border_test() {
@@ -139,6 +146,27 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
       QVERIFY(rowModel.mRowChangeStack.empty());
       QVERIFY(rowModel.mColumnChangeStack.empty());
     }
+  }
+
+  void onRowRemoved_ok() {
+    Dim2ContainerTableModel<SWAPPABLE_STRINGLIST_LIST> rowModel;
+    QCOMPARE(rowModel.dimension(), (std::pair<int, int>(0, 0)));
+    SWAPPABLE_STRINGLIST_LIST afterStringList31{
+        // 3-by-1
+        {"Cristiano Ronaldo"},  //
+        {"Leite Ricardo"},
+        {"Robert Lewandowski"},
+    };
+    rowModel.RowsCountBeginChange(0, 3);
+    rowModel.mData.swap(afterStringList31);
+    rowModel.RowsCountEndChange();
+    QCOMPARE(rowModel.dimension(), (std::pair<int, int>(3, 1)));  // 3*1
+
+    const auto rowElementsRmv = [&rowModel](int beg, int end) { rowModel.mData.erase(rowModel.mData.begin() + beg, rowModel.mData.begin() + end); };
+    QCOMPARE(rowModel.onRowsRemoved({}, rowElementsRmv), 0);                                                   // no index
+    QCOMPARE(rowModel.onRowsRemoved({QModelIndex{}}, rowElementsRmv), 0);                               // no valid index
+    QCOMPARE(rowModel.onRowsRemoved({rowModel.index(1, 0), rowModel.index(0, 0)}, rowElementsRmv), 2);  // 2 rows removed
+    QCOMPARE(rowModel.dimension(), (std::pair<int, int>(1, 1)));
   }
 
   void dimesion2_container_model_change_ok() {

@@ -15,12 +15,7 @@ class RenameWidget_Replace : public AdvanceRenamer {
   QStringList RenameCore(const QStringList& replaceeList) override;
   QString GetNewName() const { return m_newStrCB->currentText(); }
   void setOldNameAndNewName(const QString& oldName, const QString& newName);
-  static std::pair<bool, QString> QueryAndConfirm(const QString& workPath,
-                                                  const QStringList& selectedNames,  //
-                                                  const QString& defOldName = "",
-                                                  const QString& defNewName = "",  //
-                                                  bool disableOldNameEdit = false);
-
+  void setOldLineEditDisabled(bool bDisabled);
  protected:
   QComboBox* m_newStrCB{nullptr};
 

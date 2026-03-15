@@ -205,6 +205,16 @@ QString FileExtReplacedWithJson(QString fileName) {
   return fileName.replace(lastIndexOfExtDot + 1, JSON_EXT_SIZE, "json");
 }
 
+QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName) {
+  QString jsonPath;
+  jsonPath.reserve(rootPath.size() + 1 + baseName.size() + 5);
+  jsonPath += rootPath;
+  jsonPath += "/";
+  jsonPath += baseName;
+  jsonPath += ".json";
+  return jsonPath;
+}
+
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   prepath = fullpath.left(lastIndexOfSlash);

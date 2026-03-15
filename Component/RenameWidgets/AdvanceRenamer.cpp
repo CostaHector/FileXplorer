@@ -171,7 +171,7 @@ void AdvanceRenamer::Subscribe() {
   });
 
   connect(m_buttonBox, &QDialogButtonBox::accepted, this, [this]() {
-    onApply(false);
+    SetApplyResult(onApply(false));
     QDialog::accept();
   });
   connect(m_buttonBox->button(QDialogButtonBox::StandardButton::Help), &QPushButton::toggled, this, [this](const bool checked) {

@@ -104,18 +104,6 @@ QStringList JsonPr::GetVideosAbsPath() const {
   return vids;
 }
 
-void JsonPr::UpdateJsonNameFieldAndJsonAbsPath(const QString& newJsonName) {
-  if (newJsonName.endsWith(JsonHelper::JSON_EXT, Qt::CaseInsensitive)) {
-    // with extension
-    jsonFileName = newJsonName;
-    m_Name = newJsonName.left(newJsonName.size() - JsonHelper::JSON_EXT_LENGTH);
-  } else {
-    // without extension
-    jsonFileName = newJsonName + JsonHelper::JSON_EXT;
-    m_Name = newJsonName;
-  }
-}
-
 bool JsonPr::SyncNameValueFromFileBaseName() {
   const QString newbaseName{PathTool::GetBaseName(jsonFileName)};
   if (newbaseName == m_Name) { // no need update

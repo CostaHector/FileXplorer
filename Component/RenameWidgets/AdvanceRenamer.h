@@ -30,6 +30,7 @@ public:
   void init();
 
   void Subscribe();
+  bool GetApplyResult() const { return m_bApplyResult; }
   bool onApply(const bool isOnlyHelp = false);
   void onRegex(const int regexState);
   void onIncludingSub(int includingSubState);
@@ -71,12 +72,14 @@ protected:
   QPlainTextEdit* m_nExtTE{nullptr};
 
 private:
+  void SetApplyResult(bool applyResult) { m_bApplyResult = applyResult; }
   QTextBrowser* m_commandsPreview{nullptr};
   QDialogButtonBox* m_buttonBox{nullptr};
 
   QToolBar* m_controlBar{nullptr};
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
+  bool m_bApplyResult{false};
 };
 
 #endif  // ADVANCERENAMER_H

@@ -10,7 +10,7 @@
 #include "JsonActions.h"
 #include "TDir.h"
 #include "UserInteractiveMock.h"
-#include "RenameWidget_Replace.h"
+#include "BatchRenameBy.h"
 
 #include <QLineEdit>
 #include <QPlainTextEdit>
@@ -538,16 +538,18 @@ class JsonTableViewTest : public PlainTestSuite {
     QString expectDefNewName{"a"};
     bool expectDisableOldNameEdit{true};
 
-    std::pair<bool, QString> userRejectPr(false, "Super Hero - Captain America");
-    std::pair<bool, QString> userAcceptPr(true, "Super Hero - Captain America");
-    MOCKER(RenameWidget_Replace::QueryAndConfirm)
+    MOCKER(BatchRenameBy::ReplaceQueryAndConfirm)
         .expects(exactly(2))  //
         .with(eq(expectWorkPath), eq(expectSelectedNames), eq(expectDefOldName), eq(expectDefNewName), eq(expectDisableOldNameEdit))
-        .will(returnValue(userRejectPr))  //
-        .then(returnValue(userAcceptPr));
+        .will(returnValue(BatchRenameBy::RnmResult::SKIP))  //
+        .then(returnValue(BatchRenameBy::RnmResult::ALL_SUCCEED));
     jsonView.selectRow(0);
     QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
     QCOMPARE(jsonView.onRenameJsonAndRelated(), 2);  // two file get renamed
+    QCOMPARE(jsonModel.rowCount(), 2 - 1);           // 1 json get remove from table
+
+    jsonModel.forceReloadPath();
+    QCOMPARE(jsonModel.rowCount(), 2 - 1 + 1);  //
   }
 
   void onFixSelectionRecordContents_ok() {

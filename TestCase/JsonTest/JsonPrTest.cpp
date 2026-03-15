@@ -251,17 +251,6 @@ private slots:
     JsonPr jPr{fixedFi.fileName()};
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
-
-    // 2. rename succeed
-    {
-      jPr.UpdateJsonNameFieldAndJsonAbsPath(fixedJsonName);
-      QCOMPARE(jPr.m_Name, fixedJsonBaseName);
-      QCOMPARE(jPr.GetJsonFileName(), fixedJsonName);
-
-      jPr.UpdateJsonNameFieldAndJsonAbsPath(fixedJsonBaseName);
-      QCOMPARE(jPr.m_Name, fixedJsonBaseName);
-      QCOMPARE(jPr.GetJsonFileName(), fixedJsonName);
-    }
   }
 
   void test_Construct_Clear_CastStudioValue() {

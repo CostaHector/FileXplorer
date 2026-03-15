@@ -22,7 +22,7 @@ JsonActions::JsonActions(QObject* parent) //
   _RELOAD_JSON_FROM_FROM_DISK = new (std::nothrow) QAction(QIcon(":/JsonEditor/RELOAD_FROM_DISK"), tr("Reload from disk"), this);
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
   _RELOAD_JSON_FROM_FROM_DISK->setShortcutVisibleInContextMenu(true);
-  _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Reload json file from disk") //
+  _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Force reload json file in current path from disk again") //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->text())             //
                                               .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
@@ -61,10 +61,10 @@ JsonActions::JsonActions(QObject* parent) //
   _REVEAL_IN_EXPLORER->setToolTip(QString("<b>%1 (%2)</b><br/> Reveal this json in its parent folder.")
                                       .arg(_REVEAL_IN_EXPLORER->text())
                                       .arg(_REVEAL_IN_EXPLORER->shortcut().toString()));
-  _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename json\n(also related files)"), this);
+  _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related files"), this);
   _RENAME_JSON_AND_RELATED_FILES->setShortcut(QKeySequence(Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_F2));
   _RENAME_JSON_AND_RELATED_FILES->setShortcutVisibleInContextMenu(true);
-  _RENAME_JSON_AND_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename this json file and its related file(s)") //
+  _RENAME_JSON_AND_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected json file(s) and its related file(s) name") //
                                                  .arg(_RENAME_JSON_AND_RELATED_FILES->text())
                                                  .arg(_RENAME_JSON_AND_RELATED_FILES->shortcut().toString()));
 

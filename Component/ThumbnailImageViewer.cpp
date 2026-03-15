@@ -27,32 +27,29 @@ bool ThumbnailImageViewer::IsGifFile(const QString& fileAbsPath) {
   return fileAbsPath.endsWith(".gif", Qt::CaseInsensitive);
 }
 
-ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent) //
-  : QScrollArea{parent}
-  , //
-  m_memoryKeyName{memoryKeyName} {
+ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent)  //
+    : QScrollArea{parent},                                                                 //
+      m_memoryKeyName{memoryKeyName} {
   int iconSizeIndexHint = Configuration().value(m_memoryKeyName + "_ICON_SIZE_INDEX", mCurIconScaledSizeIndex).toInt();
   setIconSizeScaledIndex(iconSizeIndexHint);
 
   mNavigateIntoSub = new (std::nothrow) QCheckBox{"Navigate Into Subdirectory", this};
   mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
 
-  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::THUMBNAIL_VIEWER);
-  mControlToolBar = new (std::nothrow) QToolBar{"Recusive Navigate and Rate", this};
+  mControlToolBar = new (std::nothrow) QToolBar{"Recusive Navigate", this};
   mControlToolBar->addWidget(mNavigateIntoSub);
-  mControlToolBar->addSeparator();
-  mControlToolBar->addActions(rateInst.GetActionGroup()->actions());
 
   m_prevButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_LAST"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
-  m_prevButton->setShortcut(QKeySequence(Qt::Key_Left));
-  m_prevButton->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
+  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Left));
+  m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
+  m_prevButton->setFocusPolicy(Qt::NoFocus);
 
   m_nextButton = new (std::nothrow) QPushButton{QIcon{":img/PAGINATION_NEXT"}, "", this};
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
-  m_nextButton->setShortcut(QKeySequence(Qt::Key_Right));
+  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
+  m_nextButton->setFocusPolicy(Qt::NoFocus);
 
   mLabel = new (std::nothrow) QLabel{this};
   CHECK_NULLPTR_RETURN_VOID(mLabel);
@@ -77,9 +74,11 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
     connect(mNavigateIntoSub, &QCheckBox::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
     connect(mLabel, &QLabel::customContextMenuRequested, this, &ThumbnailImageViewer::onCustomContextMenuRequested);
 
-    QShortcut *escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    QShortcut* escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     connect(escShortcut, &QShortcut::activated, this, &ThumbnailImageViewer::close);
   }
+
+  setFocusPolicy(Qt::StrongFocus);
 }
 
 ThumbnailImageViewer::~ThumbnailImageViewer() {
@@ -105,6 +104,7 @@ void ThumbnailImageViewer::resizeEvent(QResizeEvent* event) {
 }
 
 void ThumbnailImageViewer::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QScrollArea::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
@@ -138,7 +138,7 @@ bool ThumbnailImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteAr
   return UpdatePixmapAndTitle();
 }
 
-QString ThumbnailImageViewer::FromPath::GetImageAbsPath() const { //
+QString ThumbnailImageViewer::FromPath::GetImageAbsPath() const {  //
   return PathTool::join(parentPath, rel2image);
 }
 
@@ -173,7 +173,7 @@ bool ThumbnailImageViewer::GetPixmap(QPixmap& pm, QString& winTitle) const {
       break;
     }
     default: {
-      LOG_W("ImageFrom[%d] not support", (int) mImageFrom);
+      LOG_W("ImageFrom[%d] not support", (int)mImageFrom);
       return false;
     }
   }
@@ -297,7 +297,7 @@ bool ThumbnailImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
     return false;
   }
   mImgIt.setIncludingSubDirectory(bInclude);
-  mImgIt(mDataFromPath.parentPath, true); // force refresh images in folder structure
+  mImgIt(mDataFromPath.parentPath, true);  // force refresh images in folder structure
   return true;
 }
 
@@ -331,7 +331,7 @@ void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
         FileTool::RevealInSystemExplorer(mDataFromPath.GetImageAbsPath());
       }
     });
-    connect(_COPY_FILE_NAME, &QAction::triggered, this, [this]() { //
+    connect(_COPY_FILE_NAME, &QAction::triggered, this, [this]() {  //
       if (mImageFrom == ImageFrom::PATH) {
         FileTool::CopyTextToSystemClipboard(mDataFromPath.GetImageAbsPath());
       }
@@ -359,4 +359,36 @@ void ThumbnailImageViewer::wheelEvent(QWheelEvent* event) {
     }
   }
   QScrollArea::wheelEvent(event);
+}
+
+#include <QScrollBar>
+void ThumbnailImageViewer::keyPressEvent(QKeyEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  QScrollBar* scrollBar{nullptr};
+  if (event->modifiers() == Qt::NoModifier) {
+    switch (event->key()) {
+      case Qt::Key_Left:
+      case Qt::Key_Right: {
+        scrollBar = horizontalScrollBar();
+        break;
+      }
+      case Qt::Key_Up:
+      case Qt::Key_Down: {
+        scrollBar = verticalScrollBar();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  if (scrollBar != nullptr && !scrollBar->isHidden()) {
+    static constexpr int pixel = 30;  // each up/down/left/right key pixels count
+    const int delta{event->key() == Qt::Key_Left || event->key() == Qt::Key_Up ? -pixel : pixel};
+    // clamp
+    const int newValue{qMax(scrollBar->minimum(), qMin(scrollBar->value() + delta, scrollBar->maximum()))};
+    scrollBar->setValue(newValue);
+    event->accept();
+    return;
+  }
+  QScrollArea::keyPressEvent(event);
 }

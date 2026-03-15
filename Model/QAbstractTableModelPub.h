@@ -6,6 +6,7 @@
 class QAbstractTableModelPub : public QAbstractTableModel {
  public:
   using QAbstractTableModel::QAbstractTableModel;
+  using FuncRemoveElementsCallback = std::function<void(int, int)>;
 
   bool RowsCountBeginChange(int beforeRow, int afterRow);
   bool RowsCountEndChange(); // must call me after RowsCountBeginChange called and data change finished
@@ -19,6 +20,9 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   };
   template <typename Swappable2DimContainerDataType>
   void DimensionCountChange(Swappable2DimContainerDataType& lhs, Swappable2DimContainerDataType& rhs, const DataChangeRangeE changeRangeE=DataChangeRangeE::ROW);
+
+  static QList<std::pair<int, int>> MergeList2SectionsRange(const QList<int>& rows);
+  int onRowsRemoved(const QModelIndexList& indexes, FuncRemoveElementsCallback fCallback);
 
  private:
   struct DimensionRange {

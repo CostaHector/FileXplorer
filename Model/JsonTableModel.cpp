@@ -27,7 +27,7 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
     }
   } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
     if (item.m_ContentFixed) {
-      static const QPixmap CONTENTS_FIXED_IMG{[](){
+      static const QPixmap CONTENTS_FIXED_IMG{[]() {
         QPixmap pixmap{":/JsonEditor/ANCHOR_DROP"};
         return pixmap.scaledToHeight(32);
       }()};
@@ -189,6 +189,25 @@ QString JsonTableModel::fullInfo(const QModelIndex& index) const {
     return {};
   }
   return mCachedJsons[row].GetJsonBA();
+}
+
+QStringList JsonTableModel::rel2fileNames(const QModelIndexList& indexes) const {
+  // full: "/home/to/a.json"
+  // root: "/home"
+  // rel2fileNames: "to/a.json"
+  QStringList relativePaths2FileName;
+  relativePaths2FileName.reserve(indexes.size());
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range", row);
+      return {};
+    }
+    const QString& fullPath = mCachedJsons[row].GetJsonFileAbsPath();
+    relativePaths2FileName.push_back(fullPath.mid(N + 1));
+  }
+  return relativePaths2FileName;
 }
 
 bool JsonTableModel::setModified(int row, bool modified) {
@@ -390,7 +409,7 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affecteRows;
     }
-    if (mCachedJsons[row].m_ContentFixed) { // will not be influenced
+    if (mCachedJsons[row].m_ContentFixed) {  // will not be influenced
       continue;
     }
     if (!mCachedJsons[row].ConstructCastStudioValue()) {
@@ -437,7 +456,7 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const Q
       return studioCnt;
     }
     auto& item = mCachedJsons[row];
-    if (item.m_ContentFixed) { // will not be influenced
+    if (item.m_ContentFixed) {  // will not be influenced
       continue;
     }
     item.HintForCastStudio(sentence, studioChanged, castChanged);
@@ -601,21 +620,12 @@ int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexe
   return cnt;
 }
 
-bool JsonTableModel::AfterJsonFileNameRenamed(const QModelIndex& ind, const QString& newJsonBaseName) {
-  if (newJsonBaseName.isEmpty()) {
-    LOG_W("new json basename cannot be empty");
-    return false;
-  }
-  int row = ind.row();
-  if (row < 0 || row >= rowCount()) {
-    LOG_W("row: %d out of range [0,%d)", row, rowCount());
-    return 0;
-  }
-  mCachedJsons[row].UpdateJsonNameFieldAndJsonAbsPath(newJsonBaseName);
-  setModifiedNoEmit(row);
-  emit dataChanged(ind, ind, {Qt::ItemDataRole::DisplayRole});
-  emit headerDataChanged(Qt::Vertical, row, row);
-  return true;
+// after call it reload and sync Name field to file Name needed
+int JsonTableModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
+  const auto rowElementsRmv = [this](int beg, int end) {
+    mCachedJsons.erase(mCachedJsons.begin() + beg, mCachedJsons.begin() + end);
+  };
+  return onRowsRemoved(indexes, rowElementsRmv);
 }
 
 int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {

@@ -4,7 +4,7 @@
 #include "StudiosManager.h"
 #include "NameTool.h"
 #include "PathTool.h"
-#include "RenameWidget_Replace.h"
+#include "BatchRenameBy.h"
 #include <QDir>
 #include <QHeaderView>
 #include <QInputDialog>
@@ -34,11 +34,7 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
 
   {
     auto& jsonInst = g_JsonActions();
-    const QList<QAction*> jsonSpecialActs{
-        jsonInst._OPEN_THIS_FILE,
-        jsonInst._REVEAL_IN_EXPLORER,
-        jsonInst._RENAME_JSON_AND_RELATED_FILES
-    };
+    const QList<QAction*> jsonSpecialActs{jsonInst._OPEN_THIS_FILE, jsonInst._REVEAL_IN_EXPLORER, jsonInst._RENAME_JSON_AND_RELATED_FILES};
     PushFrontExclusiveActions(jsonSpecialActs);
   }
 
@@ -133,45 +129,16 @@ int JsonTableView::onRenameJsonAndRelated() {
     LOG_INFO_NP("nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndex& ind = CurrentIndexSource();
-  const JsonPr& jsonPr = _JsonModel->GetJsonPr(ind);
-  const QString jsonFileName = jsonPr.GetJsonFileName();
-  QString jsonBaseName, jsonExt;
-  std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
-  const QString jsonLocatedInPath = jsonPr.GetJsonPrepath();
-  QStringList jsonRelatedFilePrePaths;
 
-  QDir sameLevelDir{jsonLocatedInPath, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
-  QString fileBaseName, fileExt;
-  static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d{1,3})$"};
-  for (const QString& fileName : sameLevelDir.entryList()) {
-    std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
-    // fileBaseName == (jsonBaseName + extraContent) + fileExt
-    if (!fileBaseName.startsWith(jsonBaseName)) {
-      continue;
-    }
-    // extraContent can be
-    // 1. "": (fileBaseName == jsonBaseName)
-    // 2. " - number": len(fileBaseName) > len(jsonBaseName)
-    // 3. " number": len(fileBaseName) > len(jsonBaseName)
-    QString extraContent = fileBaseName.mid(jsonBaseName.size());
-    if (!extraContent.isEmpty() && !JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
-      continue;
-    }
-    jsonRelatedFilePrePaths.push_back(fileName);
-  }
-
-  bool bRenamed {false};
-  QString newJsonName;
-  std::tie(bRenamed, newJsonName) = RenameWidget_Replace::QueryAndConfirm(jsonLocatedInPath, jsonRelatedFilePrePaths, jsonBaseName, jsonBaseName, true);
-  if (!bRenamed) {
-    LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", jsonRelatedFilePrePaths.size());
+  const QString& jsonLocatedInPath{_JsonModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{_JsonModel->rel2fileNames(indexes)};
+  const int relatedFilesCnt{BatchRenameBy::ReplaceBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
+  if (relatedFilesCnt <= 0) {
     return 0;
   }
-  _JsonModel->AfterJsonFileNameRenamed(ind, newJsonName);
-  LOG_OK_P("Rename Json", "[%s]\n[%s]\n and it's related %d file(s)",  //
-           qPrintable(jsonFileName), qPrintable(newJsonName), jsonRelatedFilePrePaths.size());
-  return jsonRelatedFilePrePaths.size();
+  const int removeRowCnt{_JsonModel->AfterJsonFilesNameRenamed(indexes)};
+  return relatedFilesCnt;
 }
 
 int JsonTableView::onSetStudio() {
