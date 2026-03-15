@@ -44,16 +44,23 @@ class VideoTableModel : public QAbstractTableModelPub {
 
   Qt::ItemFlags flags(const QModelIndex& /*index*/) const override { return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable; }
 
-  int setPlayPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL);
-  QString GetPlayPath() const { return mPlayPath; }
+  int setRootPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL, bool bForce=false);
+  QString rootPath() const { return mPlayPath; }
+  int forceReload();
+  VideoFindMode findMode() const { return mFindMode; }
+
   int setPlayMedias(const QString& rootPath, const QStringList& mediaFiles);
   QString GetMediaFullPath(const QModelIndex& ind) const;
   int updateDurationFields(const QModelIndexList& indexes);
   int rateSelectedMovies(const QModelIndexList& indexes, int newRate);
+  QStringList rel2fileNames(const QModelIndexList& indexes) const;
+  int AfterVideoFilesNameRenamed(const QModelIndexList& indexes);
+  static int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue = 0);
 
  private:
   QList<VideoBasicInfo> mVideosInfo;
   QString mPlayPath;
+  VideoFindMode mFindMode{VideoFindMode::NORMAL};
   static const QStringList VIDEO_VERTICAL_HEAD;
 };
 

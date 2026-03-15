@@ -41,7 +41,6 @@ struct JsonPr {
     E_RELATED_FILE_RENAME_FAILED,  //
     E_OK = 0,                      //
   };
-  void UpdateJsonNameFieldAndJsonAbsPath(const QString& newJsonName);
   bool SyncNameValueFromFileBaseName();
   bool UpdateDurationField(QString videoAbsPath="");
   bool ConstructCastStudioValue();  // contruct cast/studio

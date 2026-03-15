@@ -13,6 +13,56 @@ class VideoViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void registerFullScreenToggleCallback_ok() {
+    VideoView videoView{false, nullptr};
+    QVERIFY(videoView.GetBasicVideoView() != nullptr);
+    QCOMPARE(videoView.GetBasicVideoView(), videoView.mBasicVideoView);
+
+    BasicVideoView& basicViewView = *videoView.mBasicVideoView;
+    QVERIFY(basicViewView.GetVideoWidget() != nullptr);
+    QCOMPARE(basicViewView.GetVideoWidget(), basicViewView.mVideoWidget);
+    InteractiveVideoWidget* videoWid = basicViewView.mVideoWidget;
+    QVERIFY(videoWid != nullptr);
+
+    QVERIFY(videoView.mFullScreenCallback == nullptr);
+
+    QSignalSpy reqFullscreenModeChangeSpy(&basicViewView, &BasicVideoView::reqFullscreenModeChange);
+    emit videoWid->fullScreenModeToggled(true);
+    emit videoWid->fullScreenModeToggled(false);
+    basicViewView.emitFullScreenModeReq(true);
+    basicViewView.emitFullScreenModeReq(false);
+    QCOMPARE(reqFullscreenModeChangeSpy.count(), 4);
+    reqFullscreenModeChangeSpy.clear();
+
+    int intoFullScreenCnt{0}, exitFullScreenCnt{0};
+    const auto fullScreenCallback = [&intoFullScreenCnt, &exitFullScreenCnt](bool bFullScreen) {
+      bFullScreen ? ++intoFullScreenCnt : ++exitFullScreenCnt;
+      return true;
+    };
+
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(nullptr), false);  // not crash down
+    QVERIFY(basicViewView.mFullScreenCallback == nullptr);
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(fullScreenCallback), true);
+    QVERIFY(basicViewView.mFullScreenCallback != nullptr);
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(fullScreenCallback), false);
+    QVERIFY(basicViewView.mFullScreenCallback != nullptr);
+
+    emit videoWid->fullScreenModeToggled(true);
+    QCOMPARE(intoFullScreenCnt, 1);
+    QCOMPARE(exitFullScreenCnt, 0);
+    emit videoWid->fullScreenModeToggled(false);
+    QCOMPARE(intoFullScreenCnt, 1);
+    QCOMPARE(exitFullScreenCnt, 1);
+    basicViewView.emitFullScreenModeReq(true);
+    QCOMPARE(intoFullScreenCnt, 2);
+    QCOMPARE(exitFullScreenCnt, 1);
+    basicViewView.emitFullScreenModeReq(false);
+    QCOMPARE(intoFullScreenCnt, 2);
+    QCOMPARE(exitFullScreenCnt, 2);
+    QCOMPARE(reqFullscreenModeChangeSpy.count(), 4);
+    reqFullscreenModeChangeSpy.clear();
+  }
+
   void basicMode_ok() {
     VideoView videoView{false, nullptr};
     QCOMPARE(videoView.registerFullScreenToggleCallback(nullptr), false); // not crash down

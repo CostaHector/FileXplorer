@@ -45,7 +45,7 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
     if (!TYPE_FILTER::isDotExtVideo(ext)) {
       continue;
     }
-    const QString jPath = createIn + '/' + jsonBaseName + ".json";
+    const QString jPath = PathTool::JoinJsonAbsFilePath(createIn, jsonBaseName);
     if (QFile::exists(jPath)) {
       continue;
     }

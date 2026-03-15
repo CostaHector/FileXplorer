@@ -7,6 +7,13 @@
 #include "BeginToExposePrivateMember.h"
 #include "VideoTableView.h"
 #include "EndToExposePrivateMember.h"
+#include "BatchRenameBy.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class VideoTableViewTest : public PlainTestSuite {
   Q_OBJECT
@@ -19,6 +26,9 @@ class VideoTableViewTest : public PlainTestSuite {
     QVERIFY(videoTv.mVideoModel != nullptr);
     QCOMPARE(videoTv.mPlaybackMode, QMediaPlaylist::PlaybackMode::CurrentItemOnce);
   }
+
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
 
   void setMedias_ok() {
     VideoTableView videoTv;
@@ -181,11 +191,57 @@ class VideoTableViewTest : public PlainTestSuite {
     QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
     videoTv.setMediaFiles("", inexistFiles, false);
     videoTv.clearSelection();
-    QCOMPARE(videoTv.onRateSelectedMovies(10), 0); // no selection
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);  // no selection
 
     QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
     videoTv.selectAll();
-    QCOMPARE(videoTv.onRateSelectedMovies(10), 0); // no json at all
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);  // no json at all
+  }
+
+  void onRenameJsonAndRelated_replace_ok() {
+    VideoTableView videoTv;
+    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+
+    QStringList inexistFiles{"Kaka.mp4"};  // "Kaka.json", "Kaka 1.jpg", "Kaka 2.png"
+    videoTv.setMediaFiles("/", inexistFiles, false);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 1);
+
+    videoTv.clearSelection();
+    QCOMPARE(videoTv.onRenameJsonAndRelatedReplace(), 0);  // no row selected
+
+    videoTv.selectAll();
+    MOCKER(BatchRenameBy::ReplaceBySpecifiedJson)
+        .expects(exactly(2))    //
+        .will(returnValue(0))   // 1st: user cancel, 0 files renamed, 0 row deleted
+        .then(returnValue(3));  // 2nd: 3 files renamed, 1 row deleted
+    QCOMPARE(videoTv.onRenameJsonAndRelatedReplace(), 0);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 1);
+
+    QCOMPARE(videoTv.onRenameJsonAndRelatedReplace(), 3);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 0);  // 1 row deleted
+  }
+
+  void onRenameJsonAndRelated_Insert_ok() {
+    VideoTableView videoTv;
+    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+
+    QStringList inexistFiles{"Kaka.mp4"};  // "Kaka.json", "Kaka 1.jpg", "Kaka 2.png"
+    videoTv.setMediaFiles("/", inexistFiles, false);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 1);
+
+    videoTv.clearSelection();
+    QCOMPARE(videoTv.onRenameJsonAndRelatedInsert(), 0);  // no row selected
+
+    videoTv.selectAll();
+    MOCKER(BatchRenameBy::InsertBySpecifiedJson)
+        .expects(exactly(2))    //
+        .will(returnValue(0))   // 1st: user cancel, 0 files renamed, 0 row deleted
+        .then(returnValue(3));  // 2nd: 3 files renamed, 1 row deleted
+    QCOMPARE(videoTv.onRenameJsonAndRelatedInsert(), 0);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 1);
+
+    QCOMPARE(videoTv.onRenameJsonAndRelatedInsert(), 3);
+    QCOMPARE(videoTv.mVideoModel->rowCount(), 0);  // 1 row deleted
   }
 };
 

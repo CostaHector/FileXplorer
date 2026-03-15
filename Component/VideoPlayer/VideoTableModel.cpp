@@ -6,6 +6,7 @@
 #include "RateHelper.h"
 #include "Logger.h"
 #include "RateHelper.h"
+#include "FileTool.h"
 #include <QDirIterator>
 
 constexpr int VideoBasicInfo::DURATION_FIELD, VideoBasicInfo::SCORE_FIELD;
@@ -40,17 +41,18 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode) {
-  if (mPlayPath == rootPath) {
-    LOG_D("skip, path[%s] unchange", qPrintable(mPlayPath));
+int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode, bool bForce) {
+  if (mPlayPath == rootPath && !bForce) {
+    LOG_D("skip, path[%s] unchange and not forceMode", qPrintable(mPlayPath));
     return 0;
   }
   mPlayPath = rootPath;
+  mFindMode = findMode;
   using namespace PathTool;
 
   QList<QFileInfo> mediaFileInfoLst;
   mediaFileInfoLst.reserve(8);
-  if (findMode == VideoFindMode::INCLUDING_SUBDIRECTORY) {
+  if (mFindMode == VideoFindMode::INCLUDING_SUBDIRECTORY) {
     QDirIterator it{mPlayPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
     while (it.hasNext()) {
       it.next();
@@ -90,11 +92,13 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
   for (const QFileInfo& fi : mediaFileInfoLst) {
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
-    videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, 0});
+    const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(fi.filePath())};
+    const int scoreValue{GetRateFromJsonFile(jsonCorrespondVideo)};
+    videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, scoreValue});
   }
 
-          // C:/A/B/C
-          // C:/A   file
+  // C:/A/B/C
+  // C:/A   file
   std::sort(videosList.begin(), videosList.end());
   LOG_D("%d item(s) find out under path [%s]", videosList.size(), qPrintable(mPlayPath));
 
@@ -102,6 +106,10 @@ int VideoTableModel::setPlayPath(const QString& rootPath, VideoFindMode findMode
   mVideosInfo.swap(videosList);
   endResetModel();
   return mVideosInfo.size();
+}
+
+int VideoTableModel::forceReload() {
+  return setRootPath(rootPath(), findMode(), true);
 }
 
 int VideoTableModel::setPlayMedias(const QString& rootPath, const QStringList& mediaFiles) {
@@ -134,7 +142,7 @@ QString VideoTableModel::GetMediaFullPath(const QModelIndex& ind) const {
     return "";
   }
   const VideoBasicInfo& item = mVideosInfo[row];
-  return PathTool::GetAbsFilePathFromRootRelName(mPlayPath, item.relPath, item.fileName);
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath(), item.relPath, item.fileName);
 }
 
 int VideoTableModel::updateDurationFields(const QModelIndexList& indexes) {
@@ -181,7 +189,7 @@ int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newR
   }
   int minRow{INT_MAX}, maxRow{-1};
   int affectedRows{0};
-  for (const QModelIndex& ind: indexes) {
+  for (const QModelIndex& ind : indexes) {
     const int row = ind.row();
     if (row < 0 || row >= rowCount()) {
       LOG_W("row[%d] out of range", row);
@@ -209,4 +217,57 @@ int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newR
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   LOG_D("%d in %d rate field in row[%d, %d] get updated", affectedRows, indexes.size(), minRow, maxRow);
   return affectedRows;
+}
+
+QStringList VideoTableModel::rel2fileNames(const QModelIndexList& indexes) const {
+  // full: "/home/to/a.json"
+  // root: "/home"
+  // relPath: "/to/"
+  // name: "a.json"
+  // rel2fileNames: "to/a.json"
+  QStringList relativePaths2FileName;
+  relativePaths2FileName.reserve(indexes.size());
+  for (const QModelIndex& index : indexes) {
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range", row);
+      return {};
+    }
+    const VideoBasicInfo& item = mVideosInfo[row];
+    const QString& noPreSlash = item.relPath.mid(item.relPath.isEmpty() ? 0 : 1);
+    relativePaths2FileName.push_back(noPreSlash + item.fileName);
+  }
+  return relativePaths2FileName;
+}
+
+int VideoTableModel::AfterVideoFilesNameRenamed(const QModelIndexList& indexes) {
+  const auto rowElementsRmv = [this](int beg, int end) { mVideosInfo.erase(mVideosInfo.begin() + beg, mVideosInfo.begin() + end); };
+  return onRowsRemoved(indexes, rowElementsRmv);
+}
+
+int VideoTableModel::GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return defaultRateValue;
+  }
+  int rateIndex = contents.indexOf(R"("Rate":)");
+  if (rateIndex == -1) {
+    return defaultRateValue;
+  }
+  // 跳过"Rate":7个字符
+  int valuePos = rateIndex + 7;
+  while (valuePos < contents.size() && (contents[valuePos] == ' ' || contents[valuePos] == '\t')) {
+    ++valuePos;
+  }
+
+  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
+    return defaultRateValue; // Todo: llt cover this line
+  }
+  int rate = 0;
+  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
+    rate = rate * 10 + (contents[valuePos] - '0');
+    ++valuePos;
+  }
+  return rate;
 }

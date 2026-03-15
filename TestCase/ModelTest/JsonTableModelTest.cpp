@@ -132,7 +132,8 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.HintCastAndStudio(invalidIndexes, "learn from this sentence"), 0);
       QCOMPARE(jtm.FormatCast(invalidIndexes), 0);
       QCOMPARE(jtm.SyncFieldNameByJsonBaseName(invalidIndexes), 0);
-      QCOMPARE(jtm.AfterJsonFileNameRenamed(invalidIndex, "correct name.json"), false);
+      QCOMPARE(jtm.onRowsRemoved({}, nullptr), 0);
+      QCOMPARE(jtm.onRowsRemoved({invalidIndex}, nullptr), 0);
       QCOMPARE(jtm.SaveCurrentChanges(invalidIndexes), 0);
       QCOMPARE(jtm.ExportCastStudioToLocalDictionaryFile(invalidIndexes), (std::pair<int, int>{-1, -1}));
       QCOMPARE(jtm.ExportCastStudioToLocalDictionaryFile({}), (std::pair<int, int>{0, 0}));
@@ -773,14 +774,29 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
     QVERIFY(mJsonsFileCountInitial >= 2);
     QCOMPARE(jtm.m_modifiedRows.any(), false);
+    const auto rowElementsRmv = [&jtm](int beg, int end) { jtm.mCachedJsons.erase(jtm.mCachedJsons.begin() + beg, jtm.mCachedJsons.begin() + end); };
+    {
+      QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
+      QSignalSpy rowsAboutToBeRemovedSig{&jtm, &JsonTableModel::rowsAboutToBeRemoved};
+      QSignalSpy rowsRemovedSig{&jtm, &JsonTableModel::rowsRemoved};
+      QCOMPARE(jtm.onRowsRemoved({firstLineIndex}, rowElementsRmv), 1);
+      QCOMPARE(rowsAboutToBeRemovedSig.count(), 1);
+      QCOMPARE(rowsRemovedSig.count(), 1);
+      QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial - 1);
+    }
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QSignalSpy dataChangedSig{&jtm, &JsonTableModel::dataChanged};
-    QSignalSpy headerDataChangedSig{&jtm, &JsonTableModel::headerDataChanged};
-    QCOMPARE(jtm.AfterJsonFileNameRenamed(firstLineIndex, "GameTurbo - A rank - GGG YYYYY"), true);
-    QCOMPARE(jtm.m_modifiedRows.test(firstLineIndex.row()), true);
-    QCOMPARE(dataChangedSig.count(), 1);
-    QCOMPARE(headerDataChangedSig.count(), 1);
+    jtm.forceReloadPath();
+    QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
+
+    {
+      QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
+      QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
+      QCOMPARE(jtm.onRowsRemoved({firstLineIndex, secondLineIndex, firstLineIndex}, rowElementsRmv), 2);  // should remove duplicate
+      QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial - 2);
+    }
+
+    jtm.forceReloadPath();
+    QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
   }
 
   void proxy_model_works() {

@@ -701,10 +701,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Rename json
-(also related files)</source>
-        <translation>重命名文件
-(同步更新Name字段)</translation>
+        <source>Rename related files</source>
+        <translation>重命名相关</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -1509,6 +1507,24 @@
         <location filename="../Component/TypeFilterButton.cpp" line="+12"/>
         <source>Filter</source>
         <translation>过滤</translation>
+    </message>
+</context>
+<context>
+    <name>VideoTableView</name>
+    <message>
+        <location filename="../Component/VideoPlayer/VideoTableView.cpp" line="+22"/>
+        <source>Rename related(replace)</source>
+        <translation>重命名相关文件(替换)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Rename related(Insert)</source>
+        <translation>重命名相关文件(插入)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Refresh current path</source>
+        <translation>重新加载</translation>
     </message>
 </context>
 <context>

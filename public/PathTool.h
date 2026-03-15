@@ -131,6 +131,7 @@ QString GetBaseName(const QString& fullpath);
 QString GetFileNameExtRemoved(const QString& fileName);
 QString GetFileNameExtRemoved(QString&& fileName);
 QString FileExtReplacedWithJson(QString fileName);
+QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName);
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath);
 
 QString Path2Join(const QString& a, const QString& b);

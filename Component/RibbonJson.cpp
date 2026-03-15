@@ -13,8 +13,8 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
 
   mSyncCacheFileSystemTb = new (std::nothrow) QToolBar{"Sync cache/file system", this};
   CHECK_NULLPTR_RETURN_VOID(mSyncCacheFileSystemTb);
-  mSyncCacheFileSystemTb->addAction(inst._SYNC_NAME_FIELD_BY_FILENAME);
   mSyncCacheFileSystemTb->addAction(inst._RELOAD_JSON_FROM_FROM_DISK);
+  mSyncCacheFileSystemTb->addAction(inst._SYNC_NAME_FIELD_BY_FILENAME);
   mSyncCacheFileSystemTb->addAction(inst._EXPORT_CAST_STUDIO_TO_DICTION);
   mSyncCacheFileSystemTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mSyncCacheFileSystemTb->setOrientation(Qt::Orientation::Vertical);

@@ -20,17 +20,12 @@ public:
   static bool IsFileAbsPathImage(const QString& fileAbsPath);
   static bool IsFileImage(const QFileInfo& fi);
   static bool IsGifFile(const QString& fileAbsPath);
-
   void adjustButtonPosition();
-  void wheelEvent(QWheelEvent* event) override;
 
 signals:
   void onImageScaledIndexChanged(int newScaledIndex);
 
 public slots:
-  void resizeEvent(QResizeEvent* event) override;
-  void showEvent(QShowEvent* event) override;
-
   bool setPixmapByByteArrayData(const QByteArray& dataByteArray);
   bool setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img);
   bool refreshPixmapSize();
@@ -43,6 +38,12 @@ public slots:
   bool NavigateIntoSubdirectoryChanged(bool bInclude);
 
   void onCustomContextMenuRequested(const QPoint& pos);
+
+ protected:
+  void resizeEvent(QResizeEvent* event) override;
+  void showEvent(QShowEvent* event) override;
+  void wheelEvent(QWheelEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
 private:
   void ReadSetting();

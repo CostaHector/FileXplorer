@@ -8,9 +8,11 @@
 #include "BasicVideoView.h"
 #include "EndToExposePrivateMember.h"
 #include "RateHelper.h"
-#include <QInputDialog>
-
 #include "FileTool.h"
+
+#include <QInputDialog>
+#include <QSplitter>
+
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -24,6 +26,52 @@ class BasicVideoViewTest : public PlainTestSuite {
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
+  void registerFullScreenToggleCallback_ok() {
+    BasicVideoView basicViewView{false, nullptr};
+    QVERIFY(basicViewView.GetVideoWidget() != nullptr);
+    QCOMPARE(basicViewView.GetVideoWidget(), basicViewView.mVideoWidget);
+    InteractiveVideoWidget* videoWid = basicViewView.mVideoWidget;
+    QVERIFY(videoWid != nullptr);
+
+    QVERIFY(basicViewView.mFullScreenCallback == nullptr);
+
+    QSignalSpy reqFullscreenModeChangeSpy(&basicViewView, &BasicVideoView::reqFullscreenModeChange);
+    emit videoWid->fullScreenModeToggled(true);
+    emit videoWid->fullScreenModeToggled(false);
+    basicViewView.emitFullScreenModeReq(true);
+    basicViewView.emitFullScreenModeReq(false);
+    QCOMPARE(reqFullscreenModeChangeSpy.count(), 4);
+    reqFullscreenModeChangeSpy.clear();
+
+    int intoFullScreenCnt{0}, exitFullScreenCnt{0};
+    const auto fullScreenCallback = [&intoFullScreenCnt, &exitFullScreenCnt](bool bFullScreen) {
+      bFullScreen ? ++intoFullScreenCnt : ++exitFullScreenCnt;
+      return true;
+    };
+
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(nullptr), false);  // not crash down
+    QVERIFY(basicViewView.mFullScreenCallback == nullptr);
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(fullScreenCallback), true);
+    QVERIFY(basicViewView.mFullScreenCallback != nullptr);
+    QCOMPARE(basicViewView.registerFullScreenToggleCallback(fullScreenCallback), false);
+    QVERIFY(basicViewView.mFullScreenCallback != nullptr);
+
+    emit videoWid->fullScreenModeToggled(true);
+    QCOMPARE(intoFullScreenCnt, 1);
+    QCOMPARE(exitFullScreenCnt, 0);
+    emit videoWid->fullScreenModeToggled(false);
+    QCOMPARE(intoFullScreenCnt, 1);
+    QCOMPARE(exitFullScreenCnt, 1);
+    basicViewView.emitFullScreenModeReq(true);
+    QCOMPARE(intoFullScreenCnt, 2);
+    QCOMPARE(exitFullScreenCnt, 1);
+    basicViewView.emitFullScreenModeReq(false);
+    QCOMPARE(intoFullScreenCnt, 2);
+    QCOMPARE(exitFullScreenCnt, 2);
+    QCOMPARE(reqFullscreenModeChangeSpy.count(), 4);
+    reqFullscreenModeChangeSpy.clear();
+  }
+
   void playAVideo_trigger_disabled_ok() {
     Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
     const QString existVideoPath{__FILE__};
@@ -33,7 +81,6 @@ class BasicVideoViewTest : public PlainTestSuite {
 
     BasicVideoView basicVideoView{true, nullptr};
     QVERIFY(!basicVideoView.bPauseButtonCenterInit);
-    QCOMPARE(basicVideoView.registerFullScreenToggleCallback(nullptr), false); // not crash down
     // 文件不存在
     QVERIFY(!basicVideoView.PlayAVideo("path/to/InexistsMediaFile.mp4", true));
     QVERIFY(basicVideoView.bPauseButtonCenterInit);

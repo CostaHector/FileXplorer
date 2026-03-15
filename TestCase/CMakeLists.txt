@@ -61,6 +61,7 @@ file(GLOB SOURCES
     ComponentTest/PwdTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
+    ComponentTest/RenameTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
@@ -69,7 +70,6 @@ file(GLOB SOURCES
     ModelTest/*.cpp
     publicTest/*.cpp
     pubTestTool/*.cpp
-    RenameTest/*.cpp
     ToolsTest/*.cpp
     ToolsTest/PasswordTableTest/*.cpp
     ViewTest/*.cpp

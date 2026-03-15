@@ -71,3 +71,8 @@ QToolBar* RenameWidget_Insert::InitControlTB() {
   insertControlTb->addWidget(regexValidLabel);
   return insertControlTb;
 }
+
+void RenameWidget_Insert::setStrInsertAndIndex(const QString& strInsert, const int index) {
+  insertStrCB->setCurrentText(strInsert);
+  insertAtCB->setCurrentText(QString::number(index));
+}

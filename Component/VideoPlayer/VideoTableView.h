@@ -16,15 +16,23 @@ public:
   void PlayPreviousVideo();
   void PlayNextVideo();
   int onRateSelectedMovies(int newRate);
+  int onRenameJsonAndRelatedReplace();
+  int onRenameJsonAndRelatedInsert();
 
 signals:
   void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);
 
 private:
+  QModelIndexList selectedRowsSource() const;
+
   QModelIndex previousIndex() const;
   QModelIndex nextIndex() const;
   QModelIndex iteratorCore(int step) const;
   void ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly);
+
+  QAction* mRenameVideoRelatedFilesReplace{nullptr};
+  QAction* mRenameVideoRelatedFilesInsert{nullptr};
+  QAction* mReloadCurrentPath{nullptr};
 
   VideoTableModel* mVideoModel{nullptr};
   QSortFilterProxyModel* mProxyModel{nullptr};

@@ -259,6 +259,7 @@ class PathToolTest : public PlainTestSuite {
 
     QCOMPARE(FileExtReplacedWithJson("file.utorrent"), "file.utorrent.json");
     QCOMPARE(FileExtReplacedWithJson("/home/to/file.txt"), "/home/to/file.json");
+    QCOMPARE(JoinJsonAbsFilePath("/home/to", "file"), "/home/to/file.json");
   }
 
   void test_GetBaseNameDotBeforeSlash() {
