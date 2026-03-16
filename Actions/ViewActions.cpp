@@ -82,9 +82,10 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _VIEWS_NAVIGATE += _VIEW_BACK_TO;
   _VIEWS_NAVIGATE += _VIEW_FORWARD_TO;
 
+  const bool bShowPreviewPanel{Configuration().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool()};
   _PREVIEW_PANEL = new (std::nothrow) QAction{QIcon{":img/SHOW_FOLDER_PREVIEW"}, tr("Preview Panel"), this};
   _PREVIEW_PANEL->setCheckable(true);
-  _PREVIEW_PANEL->setChecked(true);
+  _PREVIEW_PANEL->setChecked(bShowPreviewPanel);
   _PREVIEW_PANEL->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(_PREVIEW_PANEL->text(), _PREVIEW_PANEL->shortcut().toString()));
 
