@@ -1,4 +1,4 @@
-﻿#include "SceneInfoManager.h"
+#include "SceneInfoManager.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "SceneMixed.h"

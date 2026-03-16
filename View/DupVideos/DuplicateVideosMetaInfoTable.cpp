@@ -1,4 +1,4 @@
-﻿#include "DuplicateVideosMetaInfoTable.h"
+#include "DuplicateVideosMetaInfoTable.h"
 
 #include "DuplicateVideosFinderActions.h"
 #include "NotificatorMacro.h"

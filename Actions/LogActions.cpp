@@ -1,4 +1,4 @@
-﻿#include "LogActions.h"
+#include "LogActions.h"
 #include "MemoryKey.h"
 #include "MenuToolButton.h"
 #include "PublicMacro.h"

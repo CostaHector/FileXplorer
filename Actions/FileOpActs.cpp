@@ -1,4 +1,4 @@
-﻿#include "FileOpActs.h"
+#include "FileOpActs.h"
 #include "FileOperatorPub.h"
 #include "ComplexOperation.h"
 #include "MemoryKey.h"

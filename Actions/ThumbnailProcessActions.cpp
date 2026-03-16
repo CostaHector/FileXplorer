@@ -1,4 +1,4 @@
-﻿#include "ThumbnailProcessActions.h"
+#include "ThumbnailProcessActions.h"
 #include "PublicMacro.h"
 #include "MenuToolButton.h"
 #include "MemoryKey.h"

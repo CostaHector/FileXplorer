@@ -1,4 +1,4 @@
-﻿#include "PasswordBook.h"
+#include "PasswordBook.h"
 #include "FileTool.h"
 #include "PwdPublicVariable.h"
 #include "PwdTableEditActions.h"

@@ -1,4 +1,4 @@
-﻿#include "SyncFileSystemModificationActions.h"
+#include "SyncFileSystemModificationActions.h"
 #include "SyncModifiyFileSystem.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"

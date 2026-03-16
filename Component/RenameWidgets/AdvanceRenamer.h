@@ -1,4 +1,4 @@
-﻿#ifndef ADVANCERENAMER_H
+#ifndef ADVANCERENAMER_H
 #define ADVANCERENAMER_H
 
 #include <QCheckBox>

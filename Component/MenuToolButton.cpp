@@ -1,4 +1,4 @@
-﻿#include "MenuToolButton.h"
+#include "MenuToolButton.h"
 #include "PublicMacro.h"
 #include <QMenu>
 

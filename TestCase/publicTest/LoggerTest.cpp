@@ -1,4 +1,4 @@
-﻿#include <QCoreApplication>
+#include <QCoreApplication>
 #include <QtTest>
 #include "GlbDataProtect.h"
 #include "TDir.h"

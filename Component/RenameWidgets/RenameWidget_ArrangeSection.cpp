@@ -1,4 +1,4 @@
-﻿#include "RenameWidget_ArrangeSection.h"
+#include "RenameWidget_ArrangeSection.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"

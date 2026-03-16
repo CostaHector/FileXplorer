@@ -1,4 +1,4 @@
-﻿#include "FileRenameRulerActions.h"
+#include "FileRenameRulerActions.h"
 #include "NotificatorMacro.h"
 #include "CastManager.h"
 #include "StudiosManager.h"

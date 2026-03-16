@@ -1,4 +1,4 @@
-﻿#include "PropertiesWindowActions.h"
+#include "PropertiesWindowActions.h"
 #include "PublicMacro.h"
 #include <QToolBar>
 

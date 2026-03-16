@@ -1,4 +1,4 @@
-﻿#include "RibbonJson.h"
+#include "RibbonJson.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
 #include "StyleSheet.h"

@@ -1,4 +1,4 @@
-﻿#ifndef RENAMEWIDGET_NUMERIZE_H
+#ifndef RENAMEWIDGET_NUMERIZE_H
 #define RENAMEWIDGET_NUMERIZE_H
 
 #include "AdvanceRenamer.h"
