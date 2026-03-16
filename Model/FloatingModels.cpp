@@ -1,4 +1,4 @@
-﻿#include "FloatingModels.h"
+#include "FloatingModels.h"
 #include "PathTool.h"
 #include "FileTool.h"
 #include "StringTool.h"

@@ -1,4 +1,4 @@
-﻿#include "Archiver.h"
+#include "Archiver.h"
 #include "MemoryKey.h"
 #include "DataFormatter.h"
 #include "StyleSheet.h"

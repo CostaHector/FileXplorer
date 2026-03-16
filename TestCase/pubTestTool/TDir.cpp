@@ -1,4 +1,4 @@
-﻿#include "TDir.h"
+#include "TDir.h"
 #include "PathTool.h"
 #include "FileTool.h"
 #include "Logger.h"

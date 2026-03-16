@@ -1,4 +1,4 @@
-﻿#include "PreferenceActions.h"
+#include "PreferenceActions.h"
 #include "MemoryKey.h"
 #include "MenuToolButton.h"
 #include "StyleSheet.h"

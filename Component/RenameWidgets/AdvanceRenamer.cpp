@@ -1,4 +1,4 @@
-﻿#include "AdvanceRenamer.h"
+#include "AdvanceRenamer.h"
 #include "MemoryKey.h"
 #include "PathTool.h"
 #include "FileOsWalker.h"

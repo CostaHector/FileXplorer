@@ -1,4 +1,4 @@
-﻿#include "FileLeafAction.h"
+#include "FileLeafAction.h"
 #include "MemoryKey.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"

@@ -1,4 +1,4 @@
-﻿#include "SceneListView.h"
+#include "SceneListView.h"
 #include "NotificatorMacro.h"
 #include "ScenesListModel.h"
 #include "PlayVideo.h"

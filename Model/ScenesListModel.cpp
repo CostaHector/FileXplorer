@@ -1,4 +1,4 @@
-﻿#include "ScenesListModel.h"
+#include "ScenesListModel.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"

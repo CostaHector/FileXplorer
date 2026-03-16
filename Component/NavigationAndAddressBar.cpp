@@ -1,4 +1,4 @@
-﻿#include "NavigationAndAddressBar.h"
+#include "NavigationAndAddressBar.h"
 #include "AddressBarActions.h"
 #include "RightClickMenuActions.h"
 #include "PublicMacro.h"

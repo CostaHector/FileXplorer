@@ -1,4 +1,4 @@
-﻿#include "FileFolderPreviewer.h"
+#include "FileFolderPreviewer.h"
 #include "CastBrowserHelper.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"

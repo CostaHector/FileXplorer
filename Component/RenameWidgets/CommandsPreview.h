@@ -1,4 +1,4 @@
-﻿#ifndef COMMANDSPREVIEW_H
+#ifndef COMMANDSPREVIEW_H
 #define COMMANDSPREVIEW_H
 
 #include <QTextBrowser>

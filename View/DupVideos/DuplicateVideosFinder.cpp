@@ -1,4 +1,4 @@
-﻿#include "DuplicateVideosFinder.h"
+#include "DuplicateVideosFinder.h"
 #include "RightVideoDuplicatesModel.h"
 
 #include "DuplicateVideosFinderActions.h"

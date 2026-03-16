@@ -11,19 +11,18 @@
 #include <QMenu>
 #include <QFileDialog>
 
-DragDropTextEdit::DragDropTextEdit(QWidget *parent)
-  : QTextEdit(parent) {
+DragDropTextEdit::DragDropTextEdit(QWidget* parent) : QTextEdit(parent) {
   setAcceptDrops(true);
 
   mMenu = createStandardContextMenu();
   mMenu->addSeparator();
-  QAction *mSelectEncCsvFile = mMenu->addAction(QIcon{":/edit/PARSE_ENCRYPT_CSV_FILE"}, tr("select encrypt CSV file"));
+  mSelectEncCsvFile = mMenu->addAction(QIcon{":/edit/PARSE_ENCRYPT_CSV_FILE"}, tr("select encrypt CSV file"));
   connect(mSelectEncCsvFile, &QAction::triggered, this, &DragDropTextEdit::onSelectEncCsvFileToParse);
 }
 
-void DragDropTextEdit::dragEnterEvent(QDragEnterEvent *event) {
+void DragDropTextEdit::dragEnterEvent(QDragEnterEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  const QMimeData *mimeData = event->mimeData();
+  const QMimeData* mimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(mimeData);
   if (!isContainsOneFile(*mimeData)) {
     event->ignore();
@@ -32,9 +31,9 @@ void DragDropTextEdit::dragEnterEvent(QDragEnterEvent *event) {
   event->acceptProposedAction();
 }
 
-void DragDropTextEdit::dropEvent(QDropEvent *event) {
+void DragDropTextEdit::dropEvent(QDropEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  const QMimeData *mimeData = event->mimeData();
+  const QMimeData* mimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(mimeData);
   if (!isContainsOneFile(*mimeData)) {
     event->ignore();
@@ -48,26 +47,28 @@ void DragDropTextEdit::dropEvent(QDropEvent *event) {
   event->acceptProposedAction();
 }
 
-void DragDropTextEdit::contextMenuEvent(QContextMenuEvent *event) {
+void DragDropTextEdit::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   CHECK_NULLPTR_RETURN_VOID(mMenu);
   mMenu->exec(event->globalPos());
   event->accept();
 }
 
-bool DragDropTextEdit::isContainsOneFile(const QMimeData &mimeData) {
+bool DragDropTextEdit::isContainsOneFile(const QMimeData& mimeData) {
   return mimeData.hasUrls() && mimeData.urls().size() == 1;
 }
 
 bool DragDropTextEdit::onSelectEncCsvFileToParse() {
-  const QString encryptCsvFilePath = QFileDialog::getOpenFileName(this,
-                                                                  "Select encrypt csv file",
-                                                                  AccountStorage::GetFullEncCsvFilePath(),
-                                                                  "CSV Files (*.csv)");
+  const QString encryptCsvFilePath =
+      QFileDialog::getOpenFileName(this, "Select encrypt csv file", AccountStorage::GetFullEncCsvFilePath(), "CSV Files (*.csv)");
+  if (encryptCsvFilePath.isEmpty()) {
+    LOG_INFO_NP("Cancel", "user cancel select encrypt file");
+    return false;
+  }
   return ParseEncryptCsvFileContents(encryptCsvFilePath);
 }
 
-bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString encryptCsvFilePath) {
+bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString& encryptCsvFilePath) {
   QString plainCsvFileContent;
   if (!AccountStorage::ParseEncryptCsvFile(encryptCsvFilePath, plainCsvFileContent)) {
     setText(QString{"Parse encrypt csv file[%1] failed"}.arg(encryptCsvFilePath));
@@ -77,8 +78,8 @@ bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString encryptCsvFileP
   return true;
 }
 
-CSVInputDialog::CSVInputDialog(QWidget *parent) //
-  : QDialog{parent}                             //
+CSVInputDialog::CSVInputDialog(QWidget* parent)  //
+    : QDialog{parent}                            //
 {
   textEdit = new (std::nothrow) DragDropTextEdit(this);
   CHECK_NULLPTR_RETURN_VOID(textEdit);
@@ -117,7 +118,7 @@ void CSVInputDialog::raise() {
 
 void CSVInputDialog::onHelpRequest() {
   CHECK_NULLPTR_RETURN_VOID(textEdit);
-  const QString &text = textEdit->toPlainText();
+  const QString& text = textEdit->toPlainText();
   int nonEmptyLineCount{0};
   tempAccounts = AccountStorage::GetAccountsFromPlainString(text, &nonEmptyLineCount);
 
@@ -141,7 +142,7 @@ void CSVInputDialog::onHelpRequest() {
 
 void CSVInputDialog::onContentsChanged() {
   if (!pOkBtn->isEnabled()) {
-    return; // already met requirement. skip
+    return;  // already met requirement. skip
   }
   pOkBtn->setEnabled(false);
   pOkBtn->setToolTip("Click help at first");

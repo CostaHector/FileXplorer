@@ -1,4 +1,4 @@
-﻿#include "JsonActions.h"
+#include "JsonActions.h"
 #include <QApplication>
 #include <QStyle>
 

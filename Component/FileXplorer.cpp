@@ -1,4 +1,4 @@
-﻿#include "FileXplorer.h"
+#include "FileXplorer.h"
 #include "FolderPreviewSwitcher.h"
 #include "ViewSwitchHelper.h"
 #include "ViewTypeTool.h"

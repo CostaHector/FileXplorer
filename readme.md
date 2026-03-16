@@ -1,4 +1,4 @@
-﻿# FileXplorer - Ultimate File Management Suite
+# FileXplorer - Ultimate File Management Suite
 
 ## Overview
 

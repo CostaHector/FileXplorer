@@ -1,4 +1,4 @@
-﻿#include "RedundantImageFinder.h"
+#include "RedundantImageFinder.h"
 
 #include "FileOpActs.h"
 #include "RedundantImageFinderActions.h"

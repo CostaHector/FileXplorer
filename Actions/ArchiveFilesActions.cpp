@@ -1,4 +1,4 @@
-﻿#include "ArchiveFilesActions.h"
+#include "ArchiveFilesActions.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
 

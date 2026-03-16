@@ -1,4 +1,4 @@
-﻿#ifndef ARCHIVEFILESACTIONS_H
+#ifndef ARCHIVEFILESACTIONS_H
 #define ARCHIVEFILESACTIONS_H
 
 #include <QAction>

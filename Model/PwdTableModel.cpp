@@ -1,4 +1,4 @@
-﻿#include "PwdTableModel.h"
+#include "PwdTableModel.h"
 #include <QIcon>
 
 bool AccountSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const {

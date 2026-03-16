@@ -1,4 +1,4 @@
-﻿#include "SearchProxyModel.h"
+#include "SearchProxyModel.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "FileTool.h"

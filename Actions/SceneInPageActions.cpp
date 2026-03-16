@@ -1,4 +1,4 @@
-﻿#include "SceneInPageActions.h"
+#include "SceneInPageActions.h"
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"

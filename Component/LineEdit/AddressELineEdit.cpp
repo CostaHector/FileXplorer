@@ -1,4 +1,4 @@
-﻿#include "AddressELineEdit.h"
+#include "AddressELineEdit.h"
 #include "ViewHelper.h"
 #include "PublicMacro.h"
 #include "FileTool.h"

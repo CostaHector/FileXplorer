@@ -1,4 +1,4 @@
-﻿#include "ConfigsTable.h"
+#include "ConfigsTable.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"

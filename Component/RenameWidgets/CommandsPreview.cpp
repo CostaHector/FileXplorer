@@ -1,4 +1,4 @@
-﻿#include "CommandsPreview.h"
+#include "CommandsPreview.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
 #include "PublicMacro.h"

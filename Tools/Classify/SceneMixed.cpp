@@ -1,4 +1,4 @@
-﻿#include "SceneMixed.h"
+#include "SceneMixed.h"
 #include "ItemsPileCategory.h"
 #include "PathTool.h"
 #include "FileTool.h"

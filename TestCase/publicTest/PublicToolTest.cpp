@@ -1,4 +1,4 @@
-﻿#include <QCoreApplication>
+#include <QCoreApplication>
 #include <QtTest>
 #include "PlainTestSuite.h"
 #include "FileTool.h"
