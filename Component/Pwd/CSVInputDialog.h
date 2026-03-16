@@ -21,8 +21,9 @@ protected:
 private:
   static bool isContainsOneFile(const QMimeData &mimeData);
   bool onSelectEncCsvFileToParse();
-  bool ParseEncryptCsvFileContents(const QString encryptCsvFilePath);
+  bool ParseEncryptCsvFileContents(const QString& encryptCsvFilePath);
 
+  QAction *mSelectEncCsvFile{nullptr};
   QMenu *mMenu{nullptr};
 };
 

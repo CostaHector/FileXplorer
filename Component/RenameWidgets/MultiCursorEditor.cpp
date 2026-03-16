@@ -50,6 +50,7 @@ void MultiCursorEditor::paintEvent(QPaintEvent *event) {
 }
 
 void MultiCursorEditor::keyPressEvent(QKeyEvent *event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->modifiers() == Qt::AltModifier) {
     if (mStatus == INIT) {
       IntoMultiSelectStatus();

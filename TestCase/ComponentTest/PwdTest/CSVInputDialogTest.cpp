@@ -4,15 +4,44 @@
 #include "BeginToExposePrivateMember.h"
 #include "CSVInputDialog.h"
 #include "EndToExposePrivateMember.h"
-
+#include "TDir.h"
+#include "AccountStorage.h"
 #include <QPushButton>
+#include <QFileDialog>
+#include <QAction>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class CSVInputDialogTest : public PlainTestSuite {
   Q_OBJECT
  public:
+  TDir mTDir;
+  const QList<FsNodeEntry> mNodes{
+      {"file1.csv", false, "contents not matter"},  //
+      {"file2.mp4", false, "1"},                    //
+  };
  private slots:
-  void DragDropTextEdit_ok() {
+  void initTestCase() {  //
+    QVERIFY(mTDir.IsValid());
+    QCOMPARE(mTDir.createEntries(mNodes), 2);
+  }
+
+  void cleanupTestCase() {  //
+  }
+
+  void init() { GlobalMockObject::verify(); }
+
+  void cleanup() { GlobalMockObject::reset(); }
+
+  void DragDropTextEdit_default_ok() {
     DragDropTextEdit te;
+    QVERIFY(te.mSelectEncCsvFile != nullptr);
+    QVERIFY(te.mMenu != nullptr);
+    QCOMPARE(te.acceptDrops(), true);
     te.contextMenuEvent(nullptr);
     te.dragEnterEvent(nullptr);
     te.dropEvent(nullptr);
@@ -20,12 +49,85 @@ class CSVInputDialogTest : public PlainTestSuite {
     QMimeData mimeData;
     QVERIFY(!te.isContainsOneFile(mimeData));
 
-    const QUrl fileUrl{QUrl::fromLocalFile(__FILE__)};
+    const QUrl fileUrl{QUrl::fromLocalFile(mTDir.itemPath("file1.csv"))};
     mimeData.setUrls(QList<QUrl>{fileUrl});
     QVERIFY(te.isContainsOneFile(mimeData));
 
     mimeData.setUrls(QList<QUrl>{fileUrl, fileUrl});
     QVERIFY(!te.isContainsOneFile(mimeData));
+  }
+
+  void ParseEncryptCsvFileContents_ok() {
+    MOCKER(AccountStorage::ParseEncryptCsvFile)
+        .expects(exactly(2))       //
+        .will(returnValue(false))  // 1st: parse failed
+        .then(returnValue(true));  // 2nd: parse again succeed
+
+    QString parseFailedPath = mTDir.itemPath("file1.csv");
+    DragDropTextEdit te;
+    QCOMPARE(te.ParseEncryptCsvFileContents(parseFailedPath), false);
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), true);
+
+    // here user changed the contents
+    QString parseSucceedPath{"a valid encrypted file"};
+    QCOMPARE(te.ParseEncryptCsvFileContents(parseSucceedPath), true);
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+  }
+
+  void onSelectEncCsvFileToParse_ok() {
+    MOCKER(AccountStorage::ParseEncryptCsvFile)
+        .expects(exactly(1))  //
+        .will(returnValue(true));
+
+    QString validContentsNotInital{"a valid path"};
+    MOCKER(QFileDialog::getOpenFileName)
+        .expects(exactly(2))                         //
+        .will(returnValue(QString{}))                // 1st: cancel
+        .then(returnValue(validContentsNotInital));  // 2nd: ok
+    DragDropTextEdit te;
+    te.mSelectEncCsvFile->trigger();
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+
+    QCOMPARE(te.onSelectEncCsvFileToParse(), true);
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+  }
+
+  void dragDropEnterEvent_ok() {
+    MOCKER(AccountStorage::ParseEncryptCsvFile)
+        .expects(exactly(2))  //
+        .will(returnValue(false))
+        .then(returnValue(true));
+    DragDropTextEdit te;
+    QPoint dragEnterPos{te.geometry().center()};
+
+    QMimeData textOnlyMimeData;
+    textOnlyMimeData.setText("0 urls only text");
+    QDragEnterEvent rejectDragEnter(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
+    te.dragEnterEvent(&rejectDragEnter);
+    QCOMPARE(rejectDragEnter.isAccepted(), false);
+
+    QDropEvent ignoreDropEvent(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
+    te.dropEvent(&ignoreDropEvent);
+    QCOMPARE(ignoreDropEvent.isAccepted(), false);
+
+    QMimeData urlsMimeData;
+    urlsMimeData.setText("2 urls");
+    QList<QUrl> urlsList{QUrl::fromLocalFile(mTDir.itemPath("file1.csv"))};
+    urlsMimeData.setUrls(urlsList);
+    QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+    te.dragEnterEvent(&acceptDragEnter);
+    QCOMPARE(acceptDragEnter.isAccepted(), true);
+
+    QDropEvent acceptDropEvent(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+    te.dropEvent(&acceptDropEvent);  // 1st: parse ok
+    QCOMPARE(acceptDropEvent.isAccepted(), false);
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), true);
+
+    // user fixed file content in "file1.csv"
+
+    te.dropEvent(&acceptDropEvent);  // 2nd: parse failed
+    QCOMPARE(acceptDropEvent.isAccepted(), true);
+    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
   }
 
   void test_initialization() {
