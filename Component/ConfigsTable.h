@@ -18,7 +18,7 @@ class ConfigsTable : public QDialog {
   void RefreshWindowIcon();
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
 
-  void onEditPreferenceSetting() const;
+  bool onEditPreferenceSetting() const;
 
  private:
   QLabel* m_failItemCnt{nullptr};

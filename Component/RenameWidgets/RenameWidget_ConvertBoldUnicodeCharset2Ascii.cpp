@@ -6,7 +6,7 @@ RenameWidget_ConvertBoldUnicodeCharset2Ascii::RenameWidget_ConvertBoldUnicodeCha
   : AdvanceRenamer(parent) {}
 
 QToolBar* RenameWidget_ConvertBoldUnicodeCharset2Ascii::InitControlTB() {
-  QToolBar* unicode2AsciiTb = new QToolBar{"Unicode 2 ASCII", this};
+  QToolBar* unicode2AsciiTb = new QToolBar{tr("Unicode to ASCII"), this};
   CHECK_NULLPTR_RETURN_NULLPTR(unicode2AsciiTb);
   unicode2AsciiTb->addWidget(m_nameExtIndependent);
   unicode2AsciiTb->addWidget(m_recursiveCB);

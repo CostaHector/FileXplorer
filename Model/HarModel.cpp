@@ -1,5 +1,6 @@
 #include "HarModel.h"
 #include "DataFormatter.h"
+#include "ImageTool.h"
 
 const QStringList HarModel::HAR_VERTICAL_HEAD {"Name", "Size(Byte)", "Type", "Url"};
 
@@ -45,10 +46,10 @@ QVariant HarModel::data(const QModelIndex& index, int role) const {
     return Qt::AlignLeft;
   } else if (role == Qt::DecorationRole) {
     if (index.column() == 0) {
-      return m_iconProvider.icon(QFileInfo{mHarParser[index.row()].type});
+      return ImageTool::GetIconFromCached('*'+mHarParser[index.row()].type);
     }
   }
-  return QVariant();
+  return {};
 }
 
 int HarModel::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {

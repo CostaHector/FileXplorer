@@ -5,7 +5,7 @@
 #include "ComplexOperation.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
-#include <QFileIconProvider>
+#include "ImageTool.h"
 #include <QApplication>
 #include <QDrag>
 #include <QPainter>
@@ -69,8 +69,7 @@ bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QS
 }
 
 QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
-  static QFileIconProvider iconPro;
-  QIcon ico = iconPro.icon(firstSelectedAbsPath);
+  const QIcon& ico {ImageTool::GetIconFromCachedByFullPath(firstSelectedAbsPath)};
   constexpr int DRGA_PIXMAP_SIDE_LEN = 128;
   QPixmap pixmap = ico.pixmap(DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
   if (selectedCnt > 1) {

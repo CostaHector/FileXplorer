@@ -6,7 +6,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "ClickableTextBrowser.h"
 #include "EndToExposePrivateMember.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MemoryKey.h"
 #include "ClipboardGuard.h"
 #include "SqlRecordTestHelper.h"

@@ -12,7 +12,7 @@
 
 #include "AddressBarActions.h"
 #include "ViewActions.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MouseKeyboardEventHelper.h"
 using namespace MouseKeyboardEventHelper;
 

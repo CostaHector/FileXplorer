@@ -3,6 +3,7 @@
 #include "AdvanceRenamer.h"
 
 class RenameWidget_Case : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_Case(QWidget* parent = nullptr);
   void InitExtraCommonVariable() override;

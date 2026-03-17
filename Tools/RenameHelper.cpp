@@ -31,11 +31,29 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
   return replacedLst;
 }
 
-QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& suffixs, const QString& baseName, const int startInd, const QString& namePattern, bool bUniqueExtCounter) {
+int GetDigitsCount(int number) {
+  int fieldWidth{0};
+  while (number != 0) {
+    number /= 10;
+    ++fieldWidth;
+  }
+  return fieldWidth;
+}
+
+QString GetNameWithPatternIndex(const QString& baseName, const QString& namePattern, int index, int fieldWidth) {
+  return baseName + namePattern.arg(index, fieldWidth, 10, QChar{'0'});
+}
+
+QStringList NumerizeRename(const QStringList& replaceeList,
+                           const QStringList& suffixs,
+                           const QString& baseName,
+                           const int startInd,
+                           const QString& namePattern,
+                           bool bUniqueExtCounter) {
   if (replaceeList.isEmpty()) {
     return {};
   }
-  if (replaceeList.size() == 1) { // no need add number
+  if (replaceeList.size() == 1) {  // no need add number
     return {baseName};
   }
 
@@ -46,19 +64,15 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
 
   QStringList numerizedNames;
   numerizedNames.reserve(suffixs.size());
-  if (!bUniqueExtCounter) { // 不区分后缀, 统一计数
-    int fieldWidth{0};
-    int val = startInd + suffixs.size() - 1;  // start 9, len 1, max index should be 9, not 10
-    while (val != 0) {
-      val /= 10;
-      ++fieldWidth;
-    }
+  if (!bUniqueExtCounter) {                         // 不区分后缀, 统一计数
+    const int val = startInd + suffixs.size() - 1;  // start 9, len 1, max index should be 9, not 10
+    const int fieldWidth{GetDigitsCount(val)};
     // 补充0到fieldWidth位
     for (int i = 0; i < suffixs.size(); ++i) {
-      numerizedNames.append(baseName + namePattern.arg(i + startInd, fieldWidth, 10, QChar{'0'}));
+      numerizedNames.push_back(GetNameWithPatternIndex(baseName, namePattern, i + startInd, fieldWidth));
     }
     return numerizedNames;
-  } else { // 区分后缀, 独立计数
+  } else {  // 区分后缀, 独立计数
     QMap<QString, int> sufCntMap;
     for (const QString& suf : suffixs) {
       auto extIt = sufCntMap.find(suf);
@@ -75,12 +89,8 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
         continue;
       }
       sufCurIndex[ext2Cnt.key()] = startInd;
-      int fieldWidth = 0;
-      int val = startInd + ext2Cnt.value() - 1;  // start 9, len 1, max index should be 9, not 10
-      while (val != 0) {
-        val /= 10;
-        ++fieldWidth;
-      }
+      const int val = startInd + ext2Cnt.value() - 1;  // start 9, len 1, max index should be 9, not 10
+      const int fieldWidth{GetDigitsCount(val)};
       suf2fieldWidth[ext2Cnt.key()] = fieldWidth;
     }
     for (const QString& suf : suffixs) {
@@ -88,9 +98,7 @@ QStringList NumerizeReplace(const QStringList& replaceeList, const QStringList& 
         numerizedNames.append(baseName);
         continue;
       }
-      QString newBaseName = baseName;
-      newBaseName += namePattern.arg(sufCurIndex[suf], suf2fieldWidth[suf], 10, QChar('0'));
-      numerizedNames.append(newBaseName);
+      numerizedNames.append(GetNameWithPatternIndex(baseName, namePattern, sufCurIndex[suf], suf2fieldWidth[suf]));
       sufCurIndex[suf] += 1;
     }
     return numerizedNames;
@@ -125,13 +133,13 @@ QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, 
   QStringList ansNames;
   ansNames.reserve(N1);
   for (int i = 0; i < parentFolders.size(); ++i) {
-    if (suffixs[i].isEmpty()) { // only works for files
+    if (suffixs[i].isEmpty()) {  // only works for files
       ansNames.push_back(completeNames[i]);
       continue;
     }
     QString prepath{parentFolders[i]};
     if (prepath.isEmpty()) {
-      ansNames.append(completeNames[i]); // not parent folder
+      ansNames.append(completeNames[i]);  // not parent folder
     } else {
       ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i]);
     }
@@ -140,4 +148,3 @@ QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, 
 }
 
 }  // namespace RenameHelper
-

@@ -24,7 +24,7 @@
 #include "RenameWidget_Insert.h"
 #include "RenameWidget_Numerize.h"
 #include "RenameWidget_Replace.h"
-#include "RenameWidget_ReverseNames.h"
+#include "RenameWidget_SwapFileNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
 #include "DuplicateVideosFinder.h"
 #include "HarTableView.h"
@@ -485,7 +485,7 @@ void FileXplorerEvent::subscribe() {
       on_Rename(pArrange);
     });
     connect(renameInst._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_ReverseNames pReverse{_contentPane};
+      RenameWidget_SwapFileNames pReverse{_contentPane};
       on_Rename(pReverse);
     });
     connect(renameInst._CASE_NAME, &QAction::triggered, this, [this]() -> void {

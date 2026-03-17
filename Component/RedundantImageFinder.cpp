@@ -82,6 +82,7 @@ void RedundantImageFinder::ReadSetting() {
 }
 
 void RedundantImageFinder::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
@@ -97,6 +98,24 @@ void RedundantImageFinder::ChangeWindowTitle(const QString& rootPath) {
   setWindowTitle(QString("Redundant Images Finder | Path: %1 | %2 item(s)").arg(rootPath).arg(m_imgsBunch.size()));
 }
 
+bool RedundantImageFinder::onOpenBenchmarkFolder() const {
+  const ImagesInfoManager& redunImgLibInst = ImagesInfoManager::getInst();
+  const QString benchmarkPath = redunImgLibInst.GetDynRedunPath();
+  return FileTool::OpenLocalFileUsingDesktopService(benchmarkPath);
+}
+
+bool RedundantImageFinder::onOpenImageDoubleClicked(const QModelIndex& proxyClickedIndex) const {
+  if (!proxyClickedIndex.isValid()) {
+    return false;
+  }
+  const QModelIndex srcClickedInd = m_imgProxy->mapToSource(proxyClickedIndex);
+  const QString imgPath{m_imgModel->filePath(srcClickedInd)};
+  if (!QFile::exists(imgPath)) {
+    return false;
+  }
+  return FileTool::OpenLocalImageFile(imgPath);
+}
+
 void RedundantImageFinder::subscribe() {
   auto& inst = g_redunImgFinderAg();
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &RedundantImageFinder::RecycleSelection);
@@ -104,23 +123,16 @@ void RedundantImageFinder::subscribe() {
   connect(inst.mDecideByIntAction.getActionGroup(), &QActionGroup::triggered, this, &RedundantImageFinder::whenModeChanged);
 
   ImagesInfoManager& redunImgLibInst = ImagesInfoManager::getInst();
-  connect(inst.OPEN_BENCHMARK_FOLDER, &QAction::triggered, this, [&redunImgLibInst]() {
-    const QString benchmarkPath = redunImgLibInst.GetDynRedunPath();
-    FileTool::OpenLocalFileUsingDesktopService(benchmarkPath);
-  });
+  connect(inst.OPEN_BENCHMARK_FOLDER, &QAction::triggered, this, &RedundantImageFinder::onOpenBenchmarkFolder);
   connect(inst.RELOAD_BENCHMARK_LIB, &QAction::triggered, [&redunImgLibInst]() { redunImgLibInst.ForceReloadImpl(); });
-  connect(m_table, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& proxyClickedIndex) {
-    const QModelIndex srcClickedInd = m_imgProxy->mapToSource(proxyClickedIndex);
-    const QString imgPath{m_imgModel->filePath(srcClickedInd)};
-    FileTool::OpenLocalImageFile(imgPath);
-  });
+  connect(m_table, &QAbstractItemView::doubleClicked, this, &RedundantImageFinder::onOpenImageDoubleClicked);
 }
 
-void RedundantImageFinder::RecycleSelection() {
+int RedundantImageFinder::RecycleSelection() {
   const QModelIndexList& sel = m_table->selectionModel()->selectedRows();
   const int SELECTED_CNT = sel.size();
   if (SELECTED_CNT <= 0) {
-    return;
+    return 0;
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE recycleCmds;
@@ -132,6 +144,7 @@ void RedundantImageFinder::RecycleSelection() {
   bool isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
   LOG_OE_P(isRenameAllSucceed, "Recyle redundant images", "selected count: %d", SELECTED_CNT);
   UpdateDisplayWhenRecycled();
+  return SELECTED_CNT;
 }
 
 void RedundantImageFinder::whenModeChanged() {

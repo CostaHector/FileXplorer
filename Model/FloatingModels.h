@@ -2,7 +2,6 @@
 #define FLOATINGMODELS_H
 
 #include "QAbstractListModelPub.h"
-#include <QPixmapCache>
 
 class FloatingModels : public QAbstractListModelPub {
  public:
@@ -29,11 +28,6 @@ class FloatingModels : public QAbstractListModelPub {
 class ImgsModel : public FloatingModels {
  public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
- public slots:
-  void onIconSizeChange(const QSize& newSize);
- private:
-  QPixmapCache mPixCache;
-  int mWidth = 404, mHeight = 250;
 };
 
 class VidsModel : public FloatingModels {

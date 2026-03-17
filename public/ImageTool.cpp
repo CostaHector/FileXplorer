@@ -1,0 +1,107 @@
+#include "ImageTool.h"
+#include "StringTool.h"
+#include "PathTool.h"
+#include "PublicVariable.h"
+#include <QPixmapCache>
+#include <QBuffer>
+
+namespace ImageTool {
+bool IsFileAbsPathImage(const QString& fileAbsPath) {
+  // .jpg, .webp, .avif
+  return TYPE_FILTER::isDotExtImage(PathTool::GetDotFileExtension(fileAbsPath));
+}
+
+bool IsGifFile(const QString& fileAbsPath) {
+  return fileAbsPath.endsWith(".gif", Qt::CaseInsensitive);
+}
+
+const QFileIconProvider& GetIconProvider() {
+  static const QFileIconProvider iconProv;
+  return iconProv;
+}
+
+QIcon GetIconFromCachedByFullPath(const QString& fullPath) {
+  return GetIconFromCached(PathTool::GetAsteriskDotFileExtension(fullPath));
+}
+
+QIcon GetIconFromCached(const QString& starDotExt) {
+  static const QFileIconProvider& iconProv = GetIconProvider();
+  static QHash<QString, QIcon> starDotExt2Icon{{"", iconProv.icon(QFileIconProvider::IconType::Folder)}};
+  auto it = starDotExt2Icon.constFind(starDotExt);
+  if (it == starDotExt2Icon.constEnd()) {
+    return starDotExt2Icon[starDotExt] = iconProv.icon(starDotExt);
+  }
+  return it.value();
+}
+
+QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight) {
+  QPixmap pm;
+  const QString imgKey{StringTool::PathJoinPixmapSize(fileAbsPath, expectWidth, expectHeight)};
+  if (QPixmapCache::find(imgKey, &pm)) {
+    return pm;
+  }
+  if (fileAbsPath.startsWith(':') || IsFileAbsPathImage(fileAbsPath)) {
+    if (QFile{fileAbsPath}.size() > 10 * 1024 * 1024) {  // 10MB
+      return {};                                         // image files too large
+    }
+    if (!pm.load(fileAbsPath)) {
+      return {};  // load failed
+    }
+  } else {
+    const QString& starDotExt{PathTool::GetAsteriskDotFileExtension(fileAbsPath)};
+    if (!QPixmapCache::find(starDotExt, &pm)) {
+      const QIcon& ic = GetIconFromCached(starDotExt);
+      pm = ic.pixmap(64, 64);
+      QPixmapCache::insert(starDotExt, pm);
+    }
+  }
+  if (pm.width() * expectHeight >= pm.height() * expectWidth) {
+    pm = pm.scaledToWidth(expectWidth, Qt::FastTransformation);
+  } else {
+    pm = pm.scaledToHeight(expectHeight, Qt::FastTransformation);
+  }
+  QPixmapCache::insert(imgKey, pm);
+  return pm;
+}
+
+QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase) {
+  QString imgStr;
+  static QHash<QString, QString> fileTypeImgIcons;
+  auto it = fileTypeImgIcons.find(starDotExtensionLowerCase);
+  if (it == fileTypeImgIcons.end()) {
+    static QFileIconProvider iconProv;
+    const QIcon& ic = iconProv.icon(starDotExtensionLowerCase);
+    const QPixmap pm{ic.pixmap(64, 64)};
+    QByteArray bArray;
+    QBuffer buffer(&bArray);
+    buffer.open(QIODevice::WriteOnly);
+    pm.save(&buffer, "PNG");
+    imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="64">)");
+    fileTypeImgIcons[starDotExtensionLowerCase] = imgStr;
+  } else {
+    imgStr = it.value();
+  }
+  return imgStr;
+}
+
+}  // namespace ImageTool
+
+constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_16;
+constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
+constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
+constexpr QSize IMAGE_SIZE::ICON_SIZE_CANDIDATES[];
+constexpr int IMAGE_SIZE::ICON_SIZE_CANDIDATES_N;
+
+QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex) {
+  if (scaleIndex < 0 || scaleIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+    if (isValidScaledIndex != nullptr) {
+      *isValidScaledIndex = false;
+    }
+    return QString::asprintf("[%d] out of range[0, %d)", scaleIndex, ICON_SIZE_CANDIDATES_N);
+  }
+  if (isValidScaledIndex != nullptr) {
+    *isValidScaledIndex = true;
+  }
+  return QString::asprintf("[%d] %d-by-%d", scaleIndex,  //
+                           ICON_SIZE_CANDIDATES[scaleIndex].width(), ICON_SIZE_CANDIDATES[scaleIndex].height());
+}

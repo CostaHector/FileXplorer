@@ -148,6 +148,16 @@ class TypeFilterButtonTest : public PlainTestSuite {
     const QStringList fsAndSearchkeys = Configuration().allKeys();
     QCOMPARE(fsAndSearchkeys.size(), 2 + 3);  // onlyFskeys + onlySearchKeys
   }
+
+  void EmitFilterChangedWhenResetFilters_ok() {
+    TypeFilterButton btnSearch(ModelFilterE::ADVANCE_SEARCH, nullptr);
+
+    QSignalSpy filterChangedSpy{&btnSearch, &TypeFilterButton::filterChanged};
+    btnSearch.EmitFilterChangedWhenResetFilters();
+
+    QCOMPARE(filterChangedSpy.count(), 1);
+    filterChangedSpy.clear();
+  }
 };
 
 #include "TypeFilterButtonTest.moc"

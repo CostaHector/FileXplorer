@@ -176,7 +176,7 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
     mImgTv->SetCurrentModel(mImgModel);
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     addWidget(mImgTv);
-    connect(mImgTv, &ItemView::iconSizeChanged, mImgModel, &ImgsModel::onIconSizeChange);
+    connect(mImgTv, &QListView::iconSizeChanged, mImgModel, &QAbstractListModelPub::onIconSizeChange);
   }
   Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, checked);
 

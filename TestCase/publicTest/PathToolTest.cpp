@@ -358,6 +358,8 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(PathTool::GetDotFileExtension("AAA.mp4"), ".mp4");
     QCOMPARE(PathTool::GetDotFileExtension("AAA.json"), ".json");
     QCOMPARE(PathTool::GetDotFileExtension("AAA.z01"), ".z01");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.torrent"), ".torrent");
+    QCOMPARE(PathTool::GetDotFileExtension("AAA.ntorrent"), ""); // should return empty
   }
 
   void fileExtension_1Char_test() {

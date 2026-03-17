@@ -6,9 +6,9 @@
 #include "FileTool.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
+#include "ImageTool.h"
 #include <QBuffer>
 #include <QDir>
-#include <QFileIconProvider>
 #include <QSqlField>
 #include <QImageReader>
 
@@ -80,21 +80,7 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     imgStr = QString(R"(<img src="%1" width="%2" alt="%1" />)").arg(fileAbsPath).arg(ICON_SIZE.width());
   } else {
     const QString starDotExtensionLowerCase = '*' + extension;
-    static QMap<QString, QString> fileTypeImgIcons;
-    auto it = fileTypeImgIcons.find(starDotExtensionLowerCase);
-    if (it == fileTypeImgIcons.end()) {
-      static QFileIconProvider iconProv;
-      const QIcon& ic = iconProv.icon(starDotExtensionLowerCase);
-      const QPixmap pm{ic.pixmap(64, 64)};
-      QByteArray bArray;
-      QBuffer buffer(&bArray);
-      buffer.open(QIODevice::WriteOnly);
-      pm.save(&buffer, "PNG");
-      imgStr = R"(<img src="data:image/png;base64,)" + bArray.toBase64() + QString(R"(" width="64">)");
-      fileTypeImgIcons[starDotExtensionLowerCase] = imgStr;
-    } else {
-      imgStr = it.value();
-    }
+    imgStr = ImageTool::GetBase64PixmapForHtml(starDotExtensionLowerCase);
   }
   const QFileInfo fi{fileAbsPath};
   const qint64 filesz = fi.size();

@@ -8,7 +8,7 @@
 #include "Archiver.h"
 #include "EndToExposePrivateMember.h"
 
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "DataFormatter.h"
 #include "ImageTestPrecoditionTools.h"
 using namespace ImageTestPrecoditionTools;

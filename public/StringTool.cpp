@@ -56,11 +56,8 @@ void SearchHistoryListProc(QStringList& hists) {
 }
 
 QString PathJoinPixmapSize(QString path, int width, int height) {
-  path.reserve(path.size() + 10);
-  path += '_';
-  path += QString(width).rightJustified(4, '0');;
-  path += 'x';
-  path += QString(height).rightJustified(4, '0');;
+  path.reserve(path.size() + 12);
+  path += QString::asprintf("_%dx%d", width, height);
   return path;
 }
 

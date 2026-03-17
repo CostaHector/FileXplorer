@@ -41,7 +41,7 @@ void RenameWidget_ConsecutiveFileNo::InitExtraCommonVariable() {
 QToolBar* RenameWidget_ConsecutiveFileNo::InitControlTB() {
   QToolBar* consecutiveControlTb = new (std::nothrow) QToolBar{"Consecutive file no", this};
   CHECK_NULLPTR_RETURN_NULLPTR(consecutiveControlTb);
-  auto* startNoLabel = new (std::nothrow) QLabel{"start no:", consecutiveControlTb};
+  auto* startNoLabel = new (std::nothrow) QLabel{tr("Start no.:"), consecutiveControlTb};
   CHECK_NULLPTR_RETURN_NULLPTR(startNoLabel);
   consecutiveControlTb->addWidget(startNoLabel);
   consecutiveControlTb->addWidget(m_fileNoStartIndex);

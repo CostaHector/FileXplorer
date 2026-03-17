@@ -4,6 +4,7 @@
 #include "AdvanceRenamer.h"
 
 class RenameWidget_ConvertBoldUnicodeCharset2Ascii : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_ConvertBoldUnicodeCharset2Ascii(QWidget* parent = nullptr);
   void InitExtraCommonVariable() override;

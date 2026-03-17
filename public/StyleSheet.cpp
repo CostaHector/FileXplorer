@@ -47,26 +47,6 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
 #endif
 }  // namespace StyleSheet
 
-constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_16;
-constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
-constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
-constexpr QSize IMAGE_SIZE::ICON_SIZE_CANDIDATES[];
-constexpr int IMAGE_SIZE::ICON_SIZE_CANDIDATES_N;
-
-QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex) {
-  if (scaleIndex < 0 || scaleIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
-    if (isValidScaledIndex != nullptr) {
-      *isValidScaledIndex = false;
-    }
-    return QString::asprintf("[%d] out of range[0, %d)", scaleIndex, ICON_SIZE_CANDIDATES_N);
-  }
-  if (isValidScaledIndex != nullptr) {
-    *isValidScaledIndex = true;
-  }
-  return QString::asprintf("[%d] %d-by-%d", scaleIndex, //
-                           ICON_SIZE_CANDIDATES[scaleIndex].width(), ICON_SIZE_CANDIDATES[scaleIndex].height());
-}
-
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {
   if (lay == nullptr) {
     return;

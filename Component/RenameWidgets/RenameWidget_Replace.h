@@ -4,6 +4,7 @@
 #include <QComboBox>
 
 class RenameWidget_Replace : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_Replace(QWidget* parent = nullptr);
 
@@ -16,6 +17,7 @@ class RenameWidget_Replace : public AdvanceRenamer {
   QString GetNewName() const { return m_newStrCB->currentText(); }
   void setOldNameAndNewName(const QString& oldName, const QString& newName);
   void setOldLineEditDisabled(bool bDisabled);
+
  protected:
   QComboBox* m_newStrCB{nullptr};
 

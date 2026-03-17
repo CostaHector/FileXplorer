@@ -62,5 +62,6 @@ void FileOsWalker::operator()(const QStringList& rels, const bool includingSub) 
     completeNames.push_back(item.completeNames);
     suffixs.push_back(item.suffixs);
     isFiles.push_back(item.isFiles);
+    filesFullPath.push_back(item.absFilePath);
   }
 }

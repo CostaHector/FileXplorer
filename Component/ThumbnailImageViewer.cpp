@@ -1,10 +1,12 @@
 #include "ThumbnailImageViewer.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MemoryKey.h"
 #include "PathTool.h"
 #include "FileTool.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "ImageTool.h"
+#include "StyleSheet.h"
 #include "DataFormatter.h"
 #include "CastBrowserHelper.h"
 #include "RateActions.h"
@@ -14,17 +16,8 @@
 #include <QPainter>
 #include <QShortcut>
 
-bool ThumbnailImageViewer::IsFileAbsPathImage(const QString& fileAbsPath) {
-  const QString dotExt = PathTool::GetDotFileExtension(fileAbsPath);
-  return TYPE_FILTER::isDotExtImage(dotExt);
-}
-
 bool ThumbnailImageViewer::IsFileImage(const QFileInfo& fi) {
-  return IsFileAbsPathImage(fi.absoluteFilePath());
-}
-
-bool ThumbnailImageViewer::IsGifFile(const QString& fileAbsPath) {
-  return fileAbsPath.endsWith(".gif", Qt::CaseInsensitive);
+  return ImageTool::IsFileAbsPathImage(fi.absoluteFilePath());
 }
 
 ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent)  //
@@ -241,7 +234,7 @@ QMovie* ThumbnailImageViewer::GetMovie(QString& winTitle) const {
 bool ThumbnailImageViewer::UpdatePixmapAndTitle() {
   clearPixmap();
   QString winTitle;
-  if (mImageFrom == ImageFrom::PATH && IsGifFile(mDataFromPath.rel2image)) {
+  if (mImageFrom == ImageFrom::PATH && ImageTool::IsGifFile(mDataFromPath.rel2image)) {
     mPMovie.reset(GetMovie(winTitle));
     if (mPMovie == nullptr) {
       return false;

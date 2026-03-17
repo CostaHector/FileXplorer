@@ -1,6 +1,7 @@
 ﻿#include "FileTool.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
+#include "ImageTool.h"
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "ThumbnailImageViewer.h"
@@ -138,7 +139,7 @@ bool OpenLocalFile(const QString& localFilePath) {
     LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
     return false;
   }
-  if (ThumbnailImageViewer::IsFileAbsPathImage(localFilePath)) {
+  if (ImageTool::IsFileAbsPathImage(localFilePath)) {
     return OpenLocalImageFile(localFilePath);
   }
   return OpenLocalFileUsingDesktopService(localFilePath);

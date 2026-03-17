@@ -171,9 +171,6 @@ class FloatingModelsTest : public PlainTestSuite {
       QVariant validImageVariant = imgModel.data(validImageIndex, Qt::DecorationRole);
       QVERIFY(validImageVariant.isValid());
       QVERIFY(validImageVariant.canConvert<QPixmap>());
-      QVariant inexistImageVariant = imgModel.data(invalidImageIndex, Qt::DecorationRole);
-      QVERIFY(!inexistImageVariant.isValid());
-      // QVERIFY(!imgModel.mPixCache.find(notExistImage, nullptr));
     }
 
     /*

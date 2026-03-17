@@ -34,9 +34,9 @@ protected:
   EnumIntAction<Qt::TextElideMode> mTextEditModeIntAction;
   QMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
 
-  QAction* _FLOW_ORIENTATION;
+  QAction* _FLOW_ORIENTATION_TTB;
   QAction* _VIEW_MODE_LIST_ICON{nullptr};
-  QAction* _RESIZED_MODE_FIXED_OR_ADJUST{nullptr};
+  QAction* _RESIZED_MODE_ADJUST{nullptr};
   QAction* _WRAPING_ACTIONS{nullptr};
   QAction* _UNIFORM_ITEM_SIZES{nullptr};
 

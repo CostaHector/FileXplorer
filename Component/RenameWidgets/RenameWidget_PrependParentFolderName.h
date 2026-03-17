@@ -3,7 +3,8 @@
 
 #include "AdvanceRenamer.h"
 class RenameWidget_PrependParentFolderName : public AdvanceRenamer {
-public:
+  Q_OBJECT
+ public:
   explicit RenameWidget_PrependParentFolderName(QWidget* parent = nullptr);
   void initExclusiveSetting() override;
   void InitExtraCommonVariable() override;
@@ -11,4 +12,4 @@ public:
   QStringList RenameCore(const QStringList& replaceeList) override;
 };
 
-#endif // RENAMEWIDGET_PREPENDPARENTFOLDERNAME_H
+#endif  // RENAMEWIDGET_PREPENDPARENTFOLDERNAME_H

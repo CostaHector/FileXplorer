@@ -53,11 +53,11 @@ void RenameWidget_Insert::InitExtraCommonVariable() {
 }
 
 QToolBar* RenameWidget_Insert::InitControlTB() {
-  QToolBar* insertControlTb{new (std::nothrow) QToolBar{"Insert string", this}};
+  QToolBar* insertControlTb{new (std::nothrow) QToolBar{tr("Insert string"), this}};
   CHECK_NULLPTR_RETURN_NULLPTR(insertControlTb);
-  auto* insertStringLabel = new (std::nothrow) QLabel{"String:", insertControlTb};
+  auto* insertStringLabel = new (std::nothrow) QLabel{tr("String:"), insertControlTb};
   CHECK_NULLPTR_RETURN_NULLPTR(insertStringLabel);
-  auto* insertAtLabel = new (std::nothrow) QLabel{"Index:", insertControlTb};
+  auto* insertAtLabel = new (std::nothrow) QLabel{tr("Index:"), insertControlTb};
   CHECK_NULLPTR_RETURN_NULLPTR(insertAtLabel);
 
   insertControlTb->addWidget(insertStringLabel);

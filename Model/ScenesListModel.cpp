@@ -42,24 +42,7 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
                                    ":img/IMAGE_NOT_FOUND"            //
                                                                    : //
                                    mCurBegin[linearInd].GetFirstImageAbsPath(mRootPath)};
-      const QString imgKey{StringTool::PathJoinPixmapSize(imgAbsPath, mWidth, mHeight)};
-      QPixmap pm;
-      if (mPixCache.find(imgKey, &pm)) {
-        return pm;
-      }
-      if (QFile{imgAbsPath}.size() > 10 * 1024 * 1024) { // 10MB
-        return {};                                       // files too large
-      }
-      if (!pm.load(imgAbsPath)) {
-        return {}; // load failed
-      }
-      if (pm.width() * mHeight >= pm.height() * mWidth) {
-        pm = pm.scaledToWidth(mWidth, Qt::FastTransformation);
-      } else {
-        pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
-      }
-      mPixCache.insert(imgKey, pm);
-      return pm;
+      return GetDecorationPixmap(imgAbsPath);
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (mCurBegin[linearInd].vidName.isEmpty()) {
@@ -246,15 +229,6 @@ std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPag
   const int begin = scenesCountPerPage * mPageIndex;
   const int end = scenesCountPerPage * (mPageIndex + 1);
   return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
-}
-
-void ScenesListModel::onIconSizeChange(const QSize& newSize) {
-  if (newSize.width() == mWidth && newSize.height() == mHeight) {
-    return;
-  }
-  mWidth = newSize.width();
-  mHeight = newSize.height();
-  mPixCache.clear();
 }
 
 bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) { // -1 means all, > 0 means count

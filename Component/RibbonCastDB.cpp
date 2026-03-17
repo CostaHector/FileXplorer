@@ -2,7 +2,7 @@
 #include "CastDBActions.h"
 #include "ViewActions.h"
 #include "PublicMacro.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 
 RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   : QToolBar{title, parent}                                      //

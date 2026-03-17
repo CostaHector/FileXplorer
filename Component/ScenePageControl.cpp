@@ -1,6 +1,6 @@
 #include "ScenePageControl.h"
 #include "MemoryKey.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "NotificatorMacro.h"
 #include <QIntValidator>
 #include <QLabel>

@@ -2,6 +2,7 @@
 #include "SyncModifiyFileSystem.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 
 SyncFileSystemModificationActions& g_syncFileSystemModificationActions() {

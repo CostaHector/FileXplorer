@@ -71,6 +71,29 @@
     </message>
 </context>
 <context>
+    <name>AdvanceRenamer</name>
+    <message>
+        <location filename="../Component/RenameWidgets/AdvanceRenamer.cpp" line="+26"/>
+        <source>Name Ext Independent</source>
+        <translation>名/扩展名独立</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Recursive</source>
+        <translation>穿透</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Regex expression state</source>
+        <translation>正则表达式状态</translation>
+    </message>
+    <message>
+        <location line="+94"/>
+        <source>See commands...</source>
+        <translation>查看命令...</translation>
+    </message>
+</context>
+<context>
     <name>ArchiveFilesActions</name>
     <message>
         <location filename="../Actions/ArchiveFilesActions.cpp" line="+6"/>
@@ -192,9 +215,37 @@
     </message>
 </context>
 <context>
+    <name>CustomListView</name>
+    <message>
+        <location filename="../View/CustomListView.cpp" line="+77"/>
+        <source>Flow Orientation: TopToBottom</source>
+        <translation>布局方向:从上往下</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>View Mode: Icon</source>
+        <translation>视图模式:图标</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Resize Mode: Adjust</source>
+        <translation>缩放模式:自动</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Wraping</source>
+        <translation>卷绕</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Uniform items sizes</source>
+        <translation>项大小统一</translation>
+    </message>
+</context>
+<context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
+        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+19"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
@@ -288,7 +339,7 @@
 <context>
     <name>FileOpActs</name>
     <message>
-        <location filename="../Actions/FileOpActs.cpp" line="+18"/>
+        <location filename="../Actions/FileOpActs.cpp" line="+19"/>
         <source>Reveal in explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
@@ -1270,9 +1321,123 @@
     </message>
 </context>
 <context>
+    <name>RenameWidget_ArrangeSection</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_ArrangeSection.cpp" line="+26"/>
+        <source>Swap 2 sections:</source>
+        <translation>交换两段:</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Arrange sections:</source>
+        <translation>指定段顺序:</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Record section wasted</source>
+        <translation>记录丢弃的段</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_ConsecutiveFileNo</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.cpp" line="+44"/>
+        <source>Start no.:</source>
+        <translation>编号起点:</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_ConvertBoldUnicodeCharset2Ascii</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.cpp" line="+9"/>
+        <source>Unicode to ASCII</source>
+        <translation>Unicode字符转ASCII字符</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_Insert</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_Insert.cpp" line="+56"/>
+        <source>Insert string</source>
+        <translation>插入字符串</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>String:</source>
+        <translation>字符串:</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Index:</source>
+        <translation>位置:</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_LongPath</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_LongPath.cpp" line="+13"/>
+        <source>Drop Section:</source>
+        <translation>丢弃段号:</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Max path length:</source>
+        <translation>最大路径长度:</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_Numerize</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_Numerize.cpp" line="+13"/>
+        <source>Sort by dragging</source>
+        <translation>拖拽排序</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Extension Unique Counter</source>
+        <translation>扩展名独立计数</translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Base name:</source>
+        <translation>基础名:</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Start no.:</source>
+        <translation>编号起点:</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>No. format:</source>
+        <translation>编号格式:</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_Replace</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+13"/>
+        <source>Old:</source>
+        <translation>旧:</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>New:</source>
+        <translation>新:</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_SwapFileNames</name>
+    <message>
+        <location filename="../Component/RenameWidgets/RenameWidget_SwapFileNames.cpp" line="+21"/>
+        <source>Swap 2 file names</source>
+        <translation>交换二者文件名</translation>
+    </message>
+</context>
+<context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../Component/RibbonJson.cpp" line="+63"/>
+        <location filename="../Component/RibbonJson.cpp" line="+64"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -1280,7 +1445,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../Component/RibbonMenu.cpp" line="+39"/>
+        <location filename="../Component/RibbonMenu.cpp" line="+40"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -1382,7 +1547,7 @@
 <context>
     <name>SyncFileSystemModificationActions</name>
     <message>
-        <location filename="../Actions/SyncFileSystemModificationActions.cpp" line="+13"/>
+        <location filename="../Actions/SyncFileSystemModificationActions.cpp" line="+14"/>
         <source>Sync</source>
         <translation>同步</translation>
     </message>
@@ -1395,7 +1560,7 @@
 <context>
     <name>ThumbnailImageViewer</name>
     <message>
-        <location filename="../Component/ThumbnailImageViewer.cpp" line="+306"/>
+        <location filename="../Component/ThumbnailImageViewer.cpp" line="+299"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -1585,7 +1750,7 @@
         <translation>导航面板</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+78"/>
         <source>Preview Panel</source>
         <translation>预览面板</translation>
     </message>

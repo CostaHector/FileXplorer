@@ -9,6 +9,13 @@
 #include "RedundantImageFinder.h"
 #include "EndToExposePrivateMember.h"
 #include "RedundantImageFinderActions.h"
+#include "FileTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 using namespace DuplicateImageMetaInfo;
 const QStringList GetNames(const RedundantImagesList& imgs) {
@@ -42,7 +49,31 @@ class RedundantImageFinderTest : public PlainTestSuite {
     QVERIFY(mDir.createEntries(gNode) >= gNode.size());
   }
 
-  void test_md5_duplicate_images_find_ok() {
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
+  void default_ok() {
+    RedundantImageFinder rif;
+    rif.showEvent(nullptr);
+    QShowEvent defaultShowEvent;
+    rif.showEvent(&defaultShowEvent);
+
+    QVERIFY(rif.m_table != nullptr);
+
+    const QString openMarkPath{ImagesInfoManager::GetDynRedunPath()};
+    QCOMPARE(QFile::exists(openMarkPath), true);
+
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(openMarkPath)).will(returnValue(true));
+    auto& inst = g_redunImgFinderAg();
+    inst.OPEN_BENCHMARK_FOLDER->trigger();
+    QCOMPARE(rif.onOpenBenchmarkFolder(), true);
+
+    MOCKER(FileTool::OpenLocalImageFile).expects(never()).will(ignoreReturnValue());
+    emit rif.m_table->doubleClicked({});
+    QCOMPARE(rif.onOpenImageDoubleClicked({}), false);
+  }
+
+  void md5_duplicate_images_find_ok() {
     const RedundantImagesList benchFolderDups = FindDuplicateImgs(mBenchmarkRedunFolder);
     QCOMPARE(GetNames(benchFolderDups),  //
              (QStringList{
@@ -68,7 +99,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
              }));
   }
 
-  void test_redundant_images_in_library_find_ok() {
+  void redundant_images_in_library_find_ok() {
     // procedure
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
     redunImgLib.InitializeImpl(mBenchmarkRedunFolder);
@@ -106,13 +137,23 @@ class RedundantImageFinderTest : public PlainTestSuite {
     QCOMPARE(redunInst.GetCurFindDupBy(), DEFAULT_DI_CRITERIA_E);
 
     RedundantImageFinder rif;
+    rif.m_table->sortByColumn(0, Qt::SortOrder::AscendingOrder);
 
     QCOMPARE(DEFAULT_DI_CRITERIA_E, DICriteriaE::LIBRARY);
-    QVERIFY(rif(mFolderToFindRedun));
+    QCOMPARE(rif(""), false);  // empty path
+    QCOMPARE(rif(mFolderToFindRedun), true);
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all under mFolderToFindRedun
 
     QVERIFY(rif(mBenchmarkRedunFolder));
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all mBenchmarkRedunFolder itself
+
+    QVERIFY(rif.m_imgProxy != nullptr);
+    const QModelIndex proInd = rif.m_imgProxy->index(0, 0);
+    QCOMPARE(proInd.data(Qt::DisplayRole).toString(), "a.jpg");
+    const QString imgPath{mDir.itemPath("benchmark/a.jpg")};
+    MOCKER(FileTool::OpenLocalImageFile).expects(exactly(2)).with(eq(imgPath)).will(returnValue(true));
+    emit rif.m_table->doubleClicked(proInd);
+    QCOMPARE(rif.onOpenImageDoubleClicked(proInd), true);
   }
 
   void find_redun_decide_by_md5_dup() {
@@ -168,8 +209,11 @@ class RedundantImageFinderTest : public PlainTestSuite {
     QVERIFY(rif(mBenchmarkRedunFolder));
     QCOMPARE(rif.m_imgModel->rowCount(), 3);  // all 3 under folder itself
 
-    rif.m_table->selectAll();
+    rif.m_table->clearSelection();
     emit inst.RECYLE_NOW->triggered();
+
+    rif.m_table->selectAll();
+    QCOMPARE(rif.RecycleSelection(), 3);
 
     QDir dir{mBenchmarkRedunFolder, "", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
     const QStringList items = dir.entryList();
@@ -179,7 +223,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
     QCOMPARE(redunImgLib.ImgDataStruct().size(), 0);  // 0+0
 
     Configuration().setValue(RedunImgFinderKey::RUND_IMG_PATH.name, mFolderToFindRedun);
-    emit inst.RELOAD_BENCHMARK_LIB->triggered();      // force reload from mFolderToFindRedun path
+    emit inst.RELOAD_BENCHMARK_LIB->triggered();          // force reload from mFolderToFindRedun path
     QCOMPARE(redunImgLib.ImgDataStruct().size(), 3 + 2);  // 3 different hash + 2 different size
 
     rif.close();

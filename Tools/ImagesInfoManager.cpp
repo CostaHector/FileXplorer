@@ -10,7 +10,7 @@ template class SingletonManager<ImagesInfoManager, IMG_INFO_DATA_T>;
 
 using namespace DuplicateImageMetaInfo;
 
-QString ImagesInfoManager::GetDynRedunPath() const {
+QString ImagesInfoManager::GetDynRedunPath() {
   return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
 }
 

@@ -10,9 +10,9 @@ RenameWidget_LongPath::RenameWidget_LongPath(QWidget* parent)  //
 QToolBar* RenameWidget_LongPath::InitControlTB() {
   auto* chopSectionTb = new (std::nothrow) QToolBar{"Drop Control Toolbar", this};
   CHECK_NULLPTR_RETURN_NULLPTR(chopSectionTb);
-  auto* pDropSectionLabel = new (std::nothrow) QLabel{"Drop Section:", chopSectionTb};
+  auto* pDropSectionLabel = new (std::nothrow) QLabel{tr("Drop Section:"), chopSectionTb};
   CHECK_NULLPTR_RETURN_NULLPTR(pDropSectionLabel);
-  auto* pMaxPathLength = new (std::nothrow) QLabel{"Max path length:", chopSectionTb};
+  auto* pMaxPathLength = new (std::nothrow) QLabel{tr("Max path length:"), chopSectionTb};
   CHECK_NULLPTR_RETURN_NULLPTR(pMaxPathLength);
 
   chopSectionTb->addWidget(pDropSectionLabel);

@@ -15,12 +15,11 @@
 class FileOsWalker;
 
 class AdvanceRenamer : public QDialog {
-public:
+  Q_OBJECT
+ public:
   static int execCore(AdvanceRenamer* self);
   explicit AdvanceRenamer(QWidget* parent = nullptr);
 
-  void showEvent(QShowEvent* event) override;
-  void closeEvent(QCloseEvent* event) override;
   void ReadSettings();
 
   void initCommonSetting();
@@ -40,7 +39,8 @@ public:
   void UpdateNameAndExt();
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
-
+  void setNewBaseNames(const QStringList& newBaseNames);
+  QStringList GetSelectedFilesFullPath() const { return mSelectedFilesFullPath; }
   virtual void InitExtraCommonVariable() {}
   virtual void InitExtraMemberWidget() {}
   virtual QToolBar* InitControlTB() = 0;
@@ -49,8 +49,10 @@ public:
 
   QString windowTitleFormat = "%1 | %2";
 
-protected:
+ protected:
   static constexpr char NAME_SEP = '\n';
+  void showEvent(QShowEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
 
   QCheckBox* m_nameExtIndependent{nullptr};
   QCheckBox* m_recursiveCB{nullptr};
@@ -58,7 +60,8 @@ protected:
 
   QString mWorkPath;
   QStringList mSelectedNames;
-  QStringList mRelToNameWithNoRoot; // (no root) relative path to file
+  QStringList mRelToNameWithNoRoot;  // (no root) relative path to file
+  QStringList mSelectedFilesFullPath;
 
   QStringList mNames;  // with extension or without
   QStringList mExts;   // dot and extension
@@ -71,7 +74,7 @@ protected:
   MultiCursorEditor* m_nBaseTE{nullptr};
   QPlainTextEdit* m_nExtTE{nullptr};
 
-private:
+ private:
   void SetApplyResult(bool applyResult) { m_bApplyResult = applyResult; }
   QTextBrowser* m_commandsPreview{nullptr};
   QDialogButtonBox* m_buttonBox{nullptr};

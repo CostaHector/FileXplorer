@@ -7,6 +7,7 @@
 #include <QActionGroup>
 
 class RenameWidget_ArrangeSection : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_ArrangeSection(QWidget* parent = nullptr);
   void initExclusiveSetting() override;

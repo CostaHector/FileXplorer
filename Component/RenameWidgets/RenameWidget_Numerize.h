@@ -6,8 +6,9 @@
 #include <QComboBox>
 
 class RenameWidget_Numerize : public AdvanceRenamer {
+  Q_OBJECT
  public:
-  explicit RenameWidget_Numerize(QWidget* parent = nullptr);
+  using AdvanceRenamer::AdvanceRenamer;
 
   void initExclusiveSetting() override;
   void InitExtraMemberWidget() override;
@@ -15,12 +16,14 @@ class RenameWidget_Numerize : public AdvanceRenamer {
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
   QStringList RenameCore(const QStringList& replaceeList) override;
+  bool reorderNamesInListView();
 
  private:
   QLineEdit* m_startNo{nullptr};
   QCheckBox* m_isUniqueCounterPerExtension{nullptr};
   QComboBox* m_numberPattern{nullptr};
   QLineEdit* m_completeBaseName{nullptr};
+  QAction* m_dragToReorderNames{nullptr};
   bool m_baseNameInited = false;
 };
 #endif // RENAMEWIDGET_NUMERIZE_H

@@ -11,7 +11,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QFile>
-#include <QUrl>
 
 ConfigsTable::ConfigsTable(QWidget* parent)
   : QDialog{parent} {
@@ -69,11 +68,13 @@ void ConfigsTable::ReadSettings() {
 }
 
 void ConfigsTable::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QDialog::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 
 void ConfigsTable::hideEvent(QHideEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   g_fileLeafActions()._SETTINGS->setChecked(false);
   QDialog::hideEvent(event);
 }
@@ -99,20 +100,22 @@ void ConfigsTable::RefreshWindowIcon() {
 }
 
 bool ConfigsTable::on_cellDoubleClicked(const QModelIndex& clickedIndex) const {
+  if (!clickedIndex.isValid()) {
+    return false;
+  }
   const QString& path = m_alertModel->filePath(clickedIndex);
-  const QUrl url{QUrl::fromLocalFile(path)};
-  if (!url.isLocalFile()) {
-    LOG_INFO_P("[Skip] current row is not a path", "row:%d, contents:%s", clickedIndex.row(), qPrintable(path));
+  if (!QFile::exists(path)) {
+    LOG_INFO_P("[Skip] current row is not a existed path", "row:%d, path:%s", clickedIndex.row(), qPrintable(path));
     return false;
   }
   return FileTool::OpenLocalFile(path);
 }
 
-void ConfigsTable::onEditPreferenceSetting() const {
+bool ConfigsTable::onEditPreferenceSetting() const {
   const QString iniFileAbsPath = Configuration().fileName();
   if (!QFile::exists(iniFileAbsPath)) {
     LOG_ERR_P("[Failed] Cannot edit", ".ini file[%s] not found", qPrintable(iniFileAbsPath));
-    return;
+    return false;
   }
-  FileTool::OpenLocalFile(iniFileAbsPath);
+  return FileTool::OpenLocalFile(iniFileAbsPath);
 }

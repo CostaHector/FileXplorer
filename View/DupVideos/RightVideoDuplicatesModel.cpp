@@ -2,10 +2,10 @@
 #include "JsonRenameRegex.h"
 #include "DataFormatter.h"
 #include "PublicMacro.h"
+#include "ImageTool.h"
 
 #include <QBrush>
 #include <QFileInfo>
-#include <QFileIconProvider>
 
 QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
@@ -34,8 +34,7 @@ QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) con
     }
     case Qt::DecorationRole: {
       if (column == 0) {
-        static QFileIconProvider fip;
-        return fip.icon(QFileInfo(inf.m_AbsPath));
+        return ImageTool::GetIconFromCachedByFullPath(inf.m_AbsPath);
       }
       return {};
     }

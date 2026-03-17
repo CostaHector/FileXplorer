@@ -2,6 +2,7 @@
 #include "MovieDBActions.h"
 #include "TorrDBAction.h"
 #include "ViewActions.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 #include "PublicMacro.h"
 
