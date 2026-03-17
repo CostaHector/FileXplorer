@@ -8,7 +8,6 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
-#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QSet>
 
@@ -126,7 +125,6 @@ private:
 
   QString m_rootPath;
   FilePropertyHelper::FilePropertyInfoList m_itemsLst;
-  QFileIconProvider m_iconProvider;
 
   QDir::Filters m_filters;
   QDirIterator::IteratorFlags m_iteratorFlags;

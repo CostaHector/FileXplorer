@@ -4,6 +4,7 @@
 #include <QComboBox>
 
 class RenameWidget_Insert : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_Insert(QWidget* parent = nullptr);
   void initExclusiveSetting() override;
@@ -14,7 +15,8 @@ class RenameWidget_Insert : public AdvanceRenamer {
   QStringList RenameCore(const QStringList& replaceeList) override;
 
   void setStrInsertAndIndex(const QString& strInsert, const int index);
-private:
+
+ private:
   QComboBox* insertStrCB{nullptr};
   QComboBox* insertAtCB{nullptr};
 };

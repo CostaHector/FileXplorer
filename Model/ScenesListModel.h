@@ -6,7 +6,6 @@
 #include <utility>
 #include <QSet>
 #include <QFileInfo>
-#include <QPixmapCache>
 
 class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
@@ -51,7 +50,6 @@ class ScenesListModel : public QAbstractListModelPub {
   void pagesCountChanged(int newPagesCount);
 
  public slots:
-  void onIconSizeChange(const QSize& newSize);
   bool onScenesCountsPerPageChanged(int scenesCntInAPage);
   bool onPageIndexChanged(int newPageIndex);
 
@@ -64,8 +62,5 @@ class ScenesListModel : public QAbstractListModelPub {
   QString mRootPath;
   SceneInfoList mEntryList;
   SceneInfoList::const_iterator mCurBegin{mEntryList.cbegin()}, mCurEnd{mEntryList.cend()};
-
-  QPixmapCache mPixCache;
-  int mWidth = 404, mHeight = 250;
 };
 #endif  // SCENESLISTMODEL_H

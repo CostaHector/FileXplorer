@@ -355,8 +355,8 @@ QString longestCommonPrefix(const QStringList& strs) {
 
 // contains dot itself
 QString GetDotFileExtension(const QString& path) {
-  const int lastIndexOfDot = path.lastIndexOf('.');
-  if (lastIndexOfDot == -1) {
+  const int lastIndexOfDot = path.lastIndexOf('.'); // .torrent
+  if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {
     return {};
   }
   return path.mid(lastIndexOfDot);
@@ -364,7 +364,7 @@ QString GetDotFileExtension(const QString& path) {
 
 QString GetAsteriskDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.');
-  if (lastIndexOfDot == -1) {
+  if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {
     return {};
   }
   return '*' + path.mid(lastIndexOfDot);

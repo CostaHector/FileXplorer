@@ -1,6 +1,7 @@
 #include "CustomListView.h"
 
 #include "MemoryKey.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
@@ -11,9 +12,8 @@
 
 QSet<QString> CustomListView::LISTS_SET;
 
-CustomListView::CustomListView(const QString& name, QWidget* parent) //
-  : QListView{parent}
-  , m_name{name} {
+CustomListView::CustomListView(const QString& name, QWidget* parent)  //
+    : QListView{parent}, m_name{name} {
   if (isNameExists(m_name)) {
 #ifdef RUNNING_UNIT_TESTS
     LOG_D("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
@@ -24,7 +24,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
   LISTS_SET.insert(m_name);
 
   int iconSizeIndexHint = Configuration().value(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
-  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1)); // [0, WHEEL_CANDIDATES_N)
+  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1));  // [0, WHEEL_CANDIDATES_N)
 
   setAlternatingRowColors(true);
 
@@ -58,14 +58,13 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
 
     mTextEditModeIntAction.init(
         {
-            {_TEXT_ELIDE_MODE_LEFT, Qt::TextElideMode::ElideLeft},     //
-            {_TEXT_ELIDE_MODE_RIGHT, Qt::TextElideMode::ElideRight},   //
-            {_TEXT_ELIDE_MODE_MIDDLE, Qt::TextElideMode::ElideMiddle}, //
+            {_TEXT_ELIDE_MODE_LEFT, Qt::TextElideMode::ElideLeft},      //
+            {_TEXT_ELIDE_MODE_RIGHT, Qt::TextElideMode::ElideRight},    //
+            {_TEXT_ELIDE_MODE_MIDDLE, Qt::TextElideMode::ElideMiddle},  //
             {_TEXT_ELIDE_MODE_NONE, Qt::TextElideMode::ElideNone},
-        }, //
-        Qt::TextElideMode::ElideLeft,
-        QActionGroup::ExclusionPolicy::Exclusive);
-    int elideInt = Configuration().value(m_name + "_TEXT_ELIDE_MODE", (int) mTextEditModeIntAction.defVal()).toInt();
+        },  //
+        Qt::TextElideMode::ElideLeft, QActionGroup::ExclusionPolicy::Exclusive);
+    int elideInt = Configuration().value(m_name + "_TEXT_ELIDE_MODE", (int)mTextEditModeIntAction.defVal()).toInt();
     QAction* checkedElideAct = mTextEditModeIntAction.setCheckedIfActionExist(elideInt);
     onTextElideModeChanged(checkedElideAct);
 
@@ -75,33 +74,35 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
   }
 
   {
-    _FLOW_ORIENTATION = new (std::nothrow) QAction{QIcon{":img/ALIGN_VERTICAL_TOP"}, "Flow Orientation(LR/TB)", this};
-    CHECK_FALSE_RETURN_VOID(_FLOW_ORIENTATION);
-    _FLOW_ORIENTATION->setToolTip("Set flow orientation. Unchecked for LeftToRight and Checked for TopToBottom");
-    _FLOW_ORIENTATION->setCheckable(true);
-    _FLOW_ORIENTATION->setChecked(Configuration().value(m_name + "_FLOW_ORIENTATION", false).toBool());
+    _FLOW_ORIENTATION_TTB = new (std::nothrow) QAction{QIcon{":img/ALIGN_VERTICAL_TOP"}, tr("Flow Orientation: TopToBottom"), this};
+    CHECK_FALSE_RETURN_VOID(_FLOW_ORIENTATION_TTB);
+    _FLOW_ORIENTATION_TTB->setCheckable(true);
+    _FLOW_ORIENTATION_TTB->setChecked(Configuration().value(m_name + "_FLOW_ORIENTATION", true).toBool());
+    _FLOW_ORIENTATION_TTB->setToolTip("The items layout should flow TopToBottom direction(default) if enabled, other LeftToRight");
 
-    _VIEW_MODE_LIST_ICON = new (std::nothrow) QAction{QIcon{""}, "View Mode(List/Icon)", this};
+    _VIEW_MODE_LIST_ICON = new (std::nothrow) QAction{QIcon{":img/VIEW_MODE_ICON"}, tr("View Mode: Icon"), this};
     CHECK_NULLPTR_RETURN_VOID(_VIEW_MODE_LIST_ICON);
-    _VIEW_MODE_LIST_ICON->setToolTip("Set View Mode List or Icon. Unchecked for List and Checked for Icon");
     _VIEW_MODE_LIST_ICON->setCheckable(true);
     _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(m_name + "_VIEW_MODE_LIST_ICON", false).toBool());
+    _VIEW_MODE_LIST_ICON->setToolTip("Icon if enabled, other List");
 
-    _RESIZED_MODE_FIXED_OR_ADJUST = new (std::nothrow) QAction{QIcon{""}, "Resize Mode(Fixed/Adjust)", this};
-    CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_FIXED_OR_ADJUST);
-    _RESIZED_MODE_FIXED_OR_ADJUST->setToolTip("Set Resize Mode Fixed or Adjust. Unchecked for Fixed and Checked for Adjust");
-    _RESIZED_MODE_FIXED_OR_ADJUST->setCheckable(true);
-    _RESIZED_MODE_FIXED_OR_ADJUST->setChecked(Configuration().value(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", false).toBool());
+    _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Resize Mode: Adjust"), this};
+    CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
+    _RESIZED_MODE_ADJUST->setCheckable(true);
+    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", false).toBool());
+    _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed(default)");
 
-    _WRAPING_ACTIONS = new (std::nothrow) QAction{QIcon{""}, "Wraping", this};
+    _WRAPING_ACTIONS = new (std::nothrow) QAction{QIcon{""}, tr("Wraping"), this};
     CHECK_NULLPTR_RETURN_VOID(_WRAPING_ACTIONS);
     _WRAPING_ACTIONS->setCheckable(true);
     _WRAPING_ACTIONS->setChecked(Configuration().value(m_name + "_WRAPING_ACTIONS", false).toBool());
+    _WRAPING_ACTIONS->setToolTip("The layout should wrap when there is no more space in the visible area if enabled, by default: no wrap false");
 
-    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{""}, "Uniform items sizes", this};
+    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{""}, tr("Uniform items sizes"), this};
     CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
     _UNIFORM_ITEM_SIZES->setCheckable(true);
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(m_name + "_UNIFORM_ITEM_SIZES", false).toBool());
+    _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
   }
 
   m_menu = new (std::nothrow) AddableMenu{name + "_menu", this};
@@ -116,21 +117,21 @@ CustomListView::CustomListView(const QString& name, QWidget* parent) //
 void CustomListView::SubscribePublicActions() {
   connect(mTextEditModeIntAction.getActionGroup(), &QActionGroup::triggered, this, &CustomListView::onTextElideModeChanged);
 
-  connect(_FLOW_ORIENTATION, &QAction::toggled, this, &CustomListView::onOrientationChanged);
+  connect(_FLOW_ORIENTATION_TTB, &QAction::toggled, this, &CustomListView::onOrientationChanged);
   connect(_VIEW_MODE_LIST_ICON, &QAction::toggled, this, &CustomListView::onViewModeListIconToggled);
-  connect(_RESIZED_MODE_FIXED_OR_ADJUST, &QAction::toggled, this, &CustomListView::onResizeModeToggled);
+  connect(_RESIZED_MODE_ADJUST, &QAction::toggled, this, &CustomListView::onResizeModeToggled);
   connect(_WRAPING_ACTIONS, &QAction::toggled, this, &CustomListView::onWrapingToggled);
   connect(_UNIFORM_ITEM_SIZES, &QAction::toggled, this, &CustomListView::onUniformItemSizedToggled);
 
-  onOrientationChanged(_FLOW_ORIENTATION->isChecked());
+  onOrientationChanged(_FLOW_ORIENTATION_TTB->isChecked());
   onViewModeListIconToggled(_VIEW_MODE_LIST_ICON->isChecked());
-  onResizeModeToggled(_RESIZED_MODE_FIXED_OR_ADJUST->isChecked());
+  onResizeModeToggled(_RESIZED_MODE_ADJUST->isChecked());
   onWrapingToggled(_WRAPING_ACTIONS->isChecked());
   onUniformItemSizedToggled(_UNIFORM_ITEM_SIZES->isChecked());
 }
 
 CustomListView::~CustomListView() {
-  Configuration().setValue(m_name + "_TEXT_ELIDE_MODE", (int) textElideMode());
+  Configuration().setValue(m_name + "_TEXT_ELIDE_MODE", (int)textElideMode());
 
   Configuration().setValue(m_name + "_FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
   Configuration().setValue(m_name + "_VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
@@ -145,7 +146,7 @@ void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (m_menu != nullptr) {
 #ifndef RUNNING_UNIT_TESTS
-    m_menu->popup(viewport()->mapToGlobal(event->pos())); // or QCursor::pos()
+    m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
 #endif
     event->accept();
     return;
@@ -181,9 +182,9 @@ void CustomListView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
 void CustomListView::AddItselfAction2Menu() {
   m_menu->addSeparator();
   m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
-  m_menu->addAction(_FLOW_ORIENTATION);
+  m_menu->addAction(_FLOW_ORIENTATION_TTB);
   m_menu->addAction(_VIEW_MODE_LIST_ICON);
-  m_menu->addAction(_RESIZED_MODE_FIXED_OR_ADJUST);
+  m_menu->addAction(_RESIZED_MODE_ADJUST);
   m_menu->addAction(_WRAPING_ACTIONS);
   m_menu->addAction(_UNIFORM_ITEM_SIZES);
 }

@@ -11,7 +11,7 @@
 #include "FileTool.h"
 #include "TableFields.h"
 #include "StringTool.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 
 #include <QKeySequence>
 #include <QInputDialog>

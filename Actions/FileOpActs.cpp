@@ -3,6 +3,7 @@
 #include "ComplexOperation.h"
 #include "MemoryKey.h"
 #include "StyleSheet.h"
+#include "ImageTool.h"
 #include <QToolBar>
 #include <QApplication>
 #include <QStyle>

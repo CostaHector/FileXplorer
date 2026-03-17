@@ -1,6 +1,7 @@
 #include "RibbonJson.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 #include "PublicVariable.h"
 #include "JsonActions.h"

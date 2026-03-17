@@ -94,7 +94,7 @@ int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
     const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(fi.filePath())};
     const int scoreValue{GetRateFromJsonFile(jsonCorrespondVideo)};
-    videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, scoreValue});
+    videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, (short)scoreValue});
   }
 
   // C:/A/B/C

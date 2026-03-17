@@ -2,7 +2,7 @@
 #include "MemoryKey.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include <QMenu>
 
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {

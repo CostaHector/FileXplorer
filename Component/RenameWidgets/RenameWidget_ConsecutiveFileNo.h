@@ -5,6 +5,7 @@
 #include <QLineEdit>
 
 class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_ConsecutiveFileNo(QWidget* parent = nullptr);
   void initExclusiveSetting() override;
@@ -14,8 +15,9 @@ class RenameWidget_ConsecutiveFileNo : public AdvanceRenamer {
   void extraSubscribe() override;
 
   QStringList RenameCore(const QStringList& replaceeList) override;
-private:
+
+ private:
   QLineEdit* m_fileNoStartIndex{nullptr};
 };
 
-#endif // RENAMEWIDGET_CONSECUTIVEFILENO_H
+#endif  // RENAMEWIDGET_CONSECUTIVEFILENO_H

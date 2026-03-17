@@ -96,7 +96,7 @@ private slots:
     const QString baseName{"B"};
     const int startInd{0};
     const QString namePattern{" (%1)"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, false);
+    QStringList ansLst = NumerizeRename(replaceeList, suffixs, baseName, startInd, namePattern, false);
     QCOMPARE(ansLst, expectList);
   }
 
@@ -122,7 +122,7 @@ private slots:
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{0};
     const QString& namePattern{" (%1)"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, true);
+    QStringList ansLst = NumerizeRename(replaceeList, suffixs, baseName, startInd, namePattern, true);
     QCOMPARE(ansLst, expectList);
   }
 
@@ -145,7 +145,7 @@ private slots:
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{99};
     const QString& namePattern{" %1"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern, true);
+    QStringList ansLst = NumerizeRename(replaceeList, suffixs, baseName, startInd, namePattern, true);
     QCOMPARE(ansLst, expectList);
   }
 
@@ -162,7 +162,7 @@ private slots:
     const QString& baseName{"LosAngle - hello world"};
     const int startInd{0};
     const QString& namePattern{" %1"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QStringList ansLst = NumerizeRename(replaceeList, suffixs, baseName, startInd, namePattern);
     QCOMPARE(ansLst, expectList);
   }
 
@@ -173,7 +173,7 @@ private slots:
     QString baseName {"LosAngle - hello world"};
     const int startInd{22};
     const QString& namePattern{" %1"};
-    QStringList ansLst = NumerizeReplace(replaceeList, suffixs, baseName, startInd, namePattern);
+    QStringList ansLst = NumerizeRename(replaceeList, suffixs, baseName, startInd, namePattern);
     QCOMPARE(ansLst, expectList);
   }
 

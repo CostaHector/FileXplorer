@@ -3,8 +3,6 @@
 #include "FileTool.h"
 #include "StringTool.h"
 
-#include <QPixmap>
-#include <QFileIconProvider>
 #include <QDir>
 
 constexpr int FloatingModels::BATCH_LOAD_COUNT;
@@ -85,37 +83,11 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
     return {};
   }
   if (role == Qt::DecorationRole) {
-    QPixmap pm;
-    const QString imgKey = StringTool::PathJoinPixmapSize(mDataLst[rw], mWidth, mHeight);
-    if (mPixCache.find(imgKey, &pm)) {
-      return pm;
-    }
-    if (QFile{mDataLst[rw]}.size() > 10 * 1024 * 1024) { // 10MB
-      return {};                        // files too large
-    }
-    if (!pm.load(mDataLst[rw])) {
-      return {}; // load failed
-    }
-    if (pm.width() * mHeight >= pm.height() * mWidth) {
-      pm = pm.scaledToWidth(mWidth, Qt::FastTransformation);
-    } else {
-      pm = pm.scaledToHeight(mHeight, Qt::FastTransformation);
-    }
-    mPixCache.insert(imgKey, pm);
-    return pm;
+    return GetDecorationPixmap(mDataLst[rw]);
   } else if (role == Qt::ToolTipRole) {
     return mDataLst[rw];
   }
   return {};
-}
-
-void ImgsModel::onIconSizeChange(const QSize& newSize) {
-  if (newSize.width() == mWidth && newSize.height() == mHeight) {
-    return;
-  }
-  mWidth = newSize.width();
-  mHeight = newSize.height();
-  mPixCache.clear();
 }
 
 // ----------------
@@ -128,8 +100,7 @@ QVariant VidsModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole) {
     return PathTool::GetBaseName(mDataLst[rw]);
   } else if (role == Qt::DecorationRole) {
-    static QFileIconProvider ip;
-    return ip.icon(QFileInfo{mDataLst[rw]});
+    return GetDecorationPixmap(mDataLst[rw]);
   }
   return {};
 }

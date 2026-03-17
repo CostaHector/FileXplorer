@@ -1,24 +1,24 @@
-﻿#include "RenameWidget_ReverseNames.h"
+﻿#include "RenameWidget_SwapFileNames.h"
 #include "PublicMacro.h"
 
-RenameWidget_ReverseNames::RenameWidget_ReverseNames(QWidget* parent)  //
+RenameWidget_SwapFileNames::RenameWidget_SwapFileNames(QWidget* parent)  //
     : AdvanceRenamer(parent) {
 }
 
-void RenameWidget_ReverseNames::initExclusiveSetting() {
+void RenameWidget_SwapFileNames::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
   m_nameExtIndependent->setChecked(false);
 }
 
-void RenameWidget_ReverseNames::InitExtraCommonVariable() {
+void RenameWidget_SwapFileNames::InitExtraCommonVariable() {
   windowTitleFormat = "Reverse file names | %1 item(s) under [%2]";
   setWindowTitle(windowTitleFormat);
 }
 
-QToolBar* RenameWidget_ReverseNames::InitControlTB() {
-  QToolBar* reverseLstTb{new (std::nothrow) QToolBar{"Reverse names list", this}};
+QToolBar* RenameWidget_SwapFileNames::InitControlTB() {
+  QToolBar* reverseLstTb{new (std::nothrow) QToolBar{"Swap names list", this}};
   CHECK_NULLPTR_RETURN_NULLPTR(reverseLstTb);
-  auto* reverseLstLabel = new (std::nothrow) QLabel{"Reverse rename", reverseLstTb};
+  auto* reverseLstLabel = new (std::nothrow) QLabel{tr("Swap 2 file names"), reverseLstTb};
   CHECK_NULLPTR_RETURN_NULLPTR(reverseLstLabel);
   reverseLstTb->addWidget(reverseLstLabel);
   reverseLstTb->addSeparator();
@@ -27,7 +27,7 @@ QToolBar* RenameWidget_ReverseNames::InitControlTB() {
   return reverseLstTb;
 }
 
-QStringList RenameWidget_ReverseNames::RenameCore(const QStringList& replaceeList) {
+QStringList RenameWidget_SwapFileNames::RenameCore(const QStringList& replaceeList) {
   if (replaceeList.isEmpty()) {
     return replaceeList;
   }

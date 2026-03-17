@@ -23,12 +23,12 @@ auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
 }
 
 auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
-  _SWAP_SECTION_AT_2_INDEXES = new (std::nothrow) QAction{"Swap 2 sections:", this};
+  _SWAP_SECTION_AT_2_INDEXES = new (std::nothrow) QAction{tr("Swap 2 sections:"), this};
   CHECK_NULLPTR_RETURN_VOID(_SWAP_SECTION_AT_2_INDEXES)
   _SWAP_SECTION_AT_2_INDEXES->setCheckable(true);
   _SWAP_SECTION_AT_2_INDEXES->setChecked(true);
 
-  _SECTIONS_USED_TO_JOIN = new (std::nothrow) QAction{"Arrange sections:", this};
+  _SECTIONS_USED_TO_JOIN = new (std::nothrow) QAction{tr("Arrange sections:"), this};
   CHECK_NULLPTR_RETURN_VOID(_SECTIONS_USED_TO_JOIN)
   _SECTIONS_USED_TO_JOIN->setCheckable(true);
   _SECTIONS_USED_TO_JOIN->setChecked(false);
@@ -59,7 +59,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   m_sectionsUsedToJoin->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
   m_sectionsUsedToJoin->addItem("0123456789");
 
-  m_recordWasted = new (std::nothrow) QCheckBox{"Record section wasted", this};
+  m_recordWasted = new (std::nothrow) QCheckBox{tr("Record section wasted"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recordWasted)
   m_recordWasted->setCheckable(true);
   m_recordWasted->setChecked(true);

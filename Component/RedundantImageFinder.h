@@ -19,9 +19,11 @@ public:
 
   void subscribe();
 
-  void RecycleSelection();
+  int RecycleSelection();
 
   void ChangeWindowTitle(const QString& rootPath);
+  bool onOpenBenchmarkFolder() const;
+  bool onOpenImageDoubleClicked(const QModelIndex& proxyClickedIndex) const;
 
 private:
   void whenModeChanged();

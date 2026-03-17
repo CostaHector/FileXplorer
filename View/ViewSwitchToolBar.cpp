@@ -1,6 +1,7 @@
 #include "ViewSwitchToolBar.h"
 #include "ViewActions.h"
 #include "NotificatorMacro.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 #include "ViewTypeTool.h"
 #include "ViewActions.h"

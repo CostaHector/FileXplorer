@@ -37,7 +37,7 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
 
   // only used in decide by Benchmark library
   DuplicateImageMetaInfo::RedundantImagesList FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty = true) const;
-  QString GetDynRedunPath() const;
+  static QString GetDynRedunPath();
 
  private:
   ImagesInfoManager();

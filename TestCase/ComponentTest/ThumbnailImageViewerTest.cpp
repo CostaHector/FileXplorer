@@ -7,12 +7,11 @@
 #include "BeginToExposePrivateMember.h"
 #include "ThumbnailImageViewer.h"
 #include "EndToExposePrivateMember.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MouseKeyboardEventHelper.h"
 #include "ImageTestPrecoditionTools.h"
 #include "TDir.h"
 #include "FileTool.h"
-#include "StyleSheet.h"
 #include <QScrollBar>
 #include <QDesktopServices>
 

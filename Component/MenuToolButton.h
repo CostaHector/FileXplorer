@@ -1,6 +1,6 @@
 #ifndef MENUTOOLBUTTON_H
 #define MENUTOOLBUTTON_H
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MemoryKey.h"
 #include <QToolButton>
 #include <QString>

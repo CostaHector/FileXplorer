@@ -188,6 +188,7 @@
         <file alias="NAME_RULER">Rename/NAME_RULER.svg</file>
         <file alias="PREPEND_PARENT_FOLDER_NAMES">Rename/PREPEND_PARENT_FOLDER_NAMES.svg</file>
         <file alias="COMMAND_PREVIEW">Rename/COMMAND_PREVIEW.svg</file>
+        <file alias="RENAME_REORDER_LISTVIEW">Rename/RENAME_REORDER_LISTVIEW.svg</file>
 
         <!--Browser Icon here-->
         <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
@@ -266,6 +267,7 @@
         <file alias="RESIZE_MODE_FIXED">View/RESIZE_MODE_FIXED.svg</file>
         <file alias="RESIZE_MODE_RESIZE_TO_CONTENTS">View/RESIZE_MODE_RESIZE_TO_CONTENTS.svg</file>
         <file alias="RESIZE_MODE_STRETCH">View/RESIZE_MODE_STRETCH.svg</file>
+        <file alias="VIEW_MODE_ICON">View/VIEW_MODE_ICON.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

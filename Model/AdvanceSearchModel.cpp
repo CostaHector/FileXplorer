@@ -1,6 +1,7 @@
 ﻿#include "AdvanceSearchModel.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
+#include "ImageTool.h"
 #include "PublicVariable.h"
 #include "DataFormatter.h"
 #include <QMessageBox>
@@ -110,13 +111,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
       static const QIcon COPY_ICON{":img/COPY_ITEM"};
       return COPY_ICON;
     } else {
-      static QHash<QString, QIcon> ext2Icon{{"", m_iconProvider.icon(QFileIconProvider::IconType::Folder)}};
-      const QString& extExtDot{item.m_Type};
-      auto it = ext2Icon.constFind(extExtDot);
-      if (it == ext2Icon.constEnd()) {
-        return ext2Icon[extExtDot] = m_iconProvider.icon(QFileInfo{extExtDot});
-      }
-      return it.value();
+      return ImageTool::GetIconFromCached('*' + item.m_Type);
     }
   } else if (role == Qt::TextAlignmentRole) {
     if (index.column() == PropColumnE::Size) {

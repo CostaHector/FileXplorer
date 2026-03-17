@@ -23,17 +23,17 @@ int AdvanceRenamer::execCore(AdvanceRenamer* self) {
 AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   : QDialog{parent}
 {
-  m_nameExtIndependent = new (std::nothrow) QCheckBox{"Name Ext Independent", this};
+  m_nameExtIndependent = new (std::nothrow) QCheckBox{tr("Name Ext Independent"), this};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
   m_nameExtIndependent->setToolTip(
       "Show file base name and extension respectively.\n"
       "So rename rules will work/or not work on extension");
-  m_recursiveCB = new (std::nothrow) QCheckBox{"Recursive", this};
+  m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
   m_recursiveCB->setToolTip(
       "Recursive rename.\n"
       "Rules will also work on itself and its subdirectories");
-  regexValidLabel = new (std::nothrow) StateLabel{"Regex expression state", this};
+  regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
   regexValidLabel->setVisible(false);
 
@@ -127,7 +127,7 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
 
   auto* pHelpBtn = buttonBox->button(QDialogButtonBox::Help);
   pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
-  pHelpBtn->setText("See commands...");
+  pHelpBtn->setText(tr("See commands..."));
   pHelpBtn->setCheckable(true);
   pHelpBtn->setChecked(false);
   return buttonBox;
@@ -253,13 +253,17 @@ void AdvanceRenamer::onNameExtRespective(int bStateIndependent) {
   UpdateNameAndExt();
 }
 
+void AdvanceRenamer::setNewBaseNames(const QStringList& newBaseNames) {
+  m_nBaseTE->setPlainText(newBaseNames.join(NAME_SEP));
+}
+
 void AdvanceRenamer::UpdateNameAndExt() {
   const QString& suffixs = mExts.join(NAME_SEP);
   m_oBaseTE->setPlainText(mNames.join(NAME_SEP));
   m_oExtTE->setPlainText(suffixs);
 
   const auto& newCompleteNames = RenameCore(mNames);
-  m_nBaseTE->setPlainText(newCompleteNames.join(NAME_SEP));
+  setNewBaseNames(newCompleteNames);
   m_nExtTE->setPlainText(suffixs);
 }
 
@@ -276,6 +280,7 @@ void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringL
   mRelToNameWithNoRoot.swap(osWalker.relToNames);
   mNames.swap(osWalker.completeNames);
   mExts.swap(osWalker.suffixs);
+  mSelectedFilesFullPath.swap(osWalker.filesFullPath);
   m_relNameTE->setPlainText(mRelToNameWithNoRoot.join(NAME_SEP));
 
   UpdateNameAndExt();
@@ -287,5 +292,5 @@ void AdvanceRenamer::OnlyTriggerRenameCore() {
   // will not call OSWalker; only update complete name;
   setWindowTitle(windowTitleFormat.arg(mNames.size()).arg(mWorkPath));
   const auto& newCompleteNames = RenameCore(mNames);
-  m_nBaseTE->setPlainText(newCompleteNames.join(NAME_SEP));
+  setNewBaseNames(newCompleteNames);
 }

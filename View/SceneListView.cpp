@@ -45,9 +45,8 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
 
-  m_menu->addAction(COPY_BASENAME_FROM_SCENE);
-  m_menu->addAction(OPEN_CORRESPONDING_FOLDER);
-  AddItselfAction2Menu();
+  QList<QAction*> exclusiveActions{COPY_BASENAME_FROM_SCENE, OPEN_CORRESPONDING_FOLDER};
+  PushFrontExclusiveActions(exclusiveActions);
   subscribe();
 
   // setMouseTracking(true);
@@ -83,7 +82,7 @@ bool SceneListView::onOpenCorrespondingFolder() {
 void SceneListView::subscribe() {
   connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
-  connect(this, &CustomListView::iconSizeChanged, _sceneModel, &ScenesListModel::onIconSizeChange);
+  connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);

@@ -17,9 +17,7 @@ public:
   ~ThumbnailImageViewer();
   int GetCurImageSizeScale() const { return mCurIconScaledSizeIndex; }
   QPixmap pixmap() const { return mLabel->pixmap(Qt::ReturnByValue); }
-  static bool IsFileAbsPathImage(const QString& fileAbsPath);
   static bool IsFileImage(const QFileInfo& fi);
-  static bool IsGifFile(const QString& fileAbsPath);
   void adjustButtonPosition();
 
 signals:

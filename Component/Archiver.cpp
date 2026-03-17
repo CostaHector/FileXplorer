@@ -1,6 +1,7 @@
 #include "Archiver.h"
 #include "MemoryKey.h"
 #include "DataFormatter.h"
+#include "ImageTool.h"
 #include "StyleSheet.h"
 #include "PublicVariable.h"
 #include "PathTool.h"

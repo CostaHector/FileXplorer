@@ -4,7 +4,6 @@
 #include "QAbstractTableModelPub.h"
 #include "HarFiles.h"
 #include <QItemSelectionModel>
-#include <QFileIconProvider>
 
 namespace HarFilesMocker {
 inline HarFiles& mockHarFiles() {
@@ -48,7 +47,6 @@ class HarModel : public QAbstractTableModelPub {
 
  private:
   HarFiles mHarParser;
-  QFileIconProvider m_iconProvider;
   static const QStringList HAR_VERTICAL_HEAD;
 };
 

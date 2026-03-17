@@ -3,16 +3,19 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "RenameHelper.h"
-
-RenameWidget_Numerize::RenameWidget_Numerize(QWidget* parent)  //
-  : AdvanceRenamer{parent}                                   //
-{ }
+#include "ImgReorderDialog.h"
 
 void RenameWidget_Numerize::initExclusiveSetting() {
   m_recursiveCB->setToolTip("Usually we don't suggest user enable numberize file names recursively.");
 }
 
 void RenameWidget_Numerize::InitExtraMemberWidget() {
+  m_dragToReorderNames = new (std::nothrow) QAction{QIcon{":img/RENAME_REORDER_LISTVIEW"}, tr("Sort by dragging"), this};
+  CHECK_NULLPTR_RETURN_VOID(m_dragToReorderNames);
+  m_dragToReorderNames->setShortcut(QKeySequence{Qt::Key_F2});
+  m_dragToReorderNames->setToolTip(QString{"<b>%1 (%2)</b><br/>Drag-and-drop to reorder name sequence in list view"}.arg(
+      m_dragToReorderNames->text(), m_dragToReorderNames->shortcut().toString()));
+
   m_completeBaseName = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
   m_completeBaseName->setClearButtonEnabled(true);
@@ -21,12 +24,16 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_startNo = new (std::nothrow) QLineEdit{"0", this};  // "0"
   CHECK_NULLPTR_RETURN_VOID(m_startNo)
   m_startNo->setMaximumWidth(20);
-  m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{"Extension Unique Counter", this};
-  m_isUniqueCounterPerExtension->setToolTip("Controls whether file renaming uses a shared counter across extensions:\n"
-                                            "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
-                                            "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
-                                            "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
-  const bool uniqueCnter{Configuration().value(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.v).toBool()};
+  m_startNo->setToolTip("Starting number for the sequence");
+
+  m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{tr("Extension Unique Counter"), this};
+  m_isUniqueCounterPerExtension->setToolTip(
+      "Controls whether file renaming uses a shared counter across extensions:\n"
+      "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
+      "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
+      "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
+  const bool uniqueCnter{
+      Configuration().value(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.v).toBool()};
   m_isUniqueCounterPerExtension->setChecked(uniqueCnter);
 
   m_numberPattern = new (std::nothrow) QComboBox{this};  // " - %1"
@@ -34,10 +41,14 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_numberPattern->setEditable(true);
   m_numberPattern->setDuplicatesEnabled(false);
   m_numberPattern->setMaximumWidth(60);
-  const QStringList& noFormatCandidate{Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
+  const QStringList& noFormatCandidate{
+      Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.v).toStringList()};
   m_numberPattern->addItems(noFormatCandidate);
 
-  const int noFormatDefaultIndex = Configuration().value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v).toInt();
+  const int noFormatDefaultIndex =
+      Configuration()
+          .value(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v)
+          .toInt();
   if (noFormatDefaultIndex < 0 && noFormatDefaultIndex >= noFormatCandidate.size()) {
     LOG_W("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
   } else {
@@ -59,15 +70,17 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   QToolBar* numerizeControlTb{new (std::nothrow) QToolBar{this}};
   CHECK_NULLPTR_RETURN_NULLPTR(numerizeControlTb);
 
-  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Base name:", numerizeControlTb});
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{tr("Base name:"), numerizeControlTb});
   numerizeControlTb->addWidget(m_completeBaseName);
   numerizeControlTb->addSeparator();
-  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"Start index:", numerizeControlTb});
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{tr("Start no.:"), numerizeControlTb});
   numerizeControlTb->addWidget(m_startNo);
+  numerizeControlTb->addSeparator();
+  numerizeControlTb->addAction(m_dragToReorderNames);
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(m_isUniqueCounterPerExtension);
   numerizeControlTb->addSeparator();
-  numerizeControlTb->addWidget(new (std::nothrow) QLabel{"No. format:", numerizeControlTb});
+  numerizeControlTb->addWidget(new (std::nothrow) QLabel{tr("No. format:"), numerizeControlTb});
   numerizeControlTb->addWidget(m_numberPattern);
   numerizeControlTb->addSeparator();
   numerizeControlTb->addWidget(m_nameExtIndependent);
@@ -85,7 +98,7 @@ void RenameWidget_Numerize::extraSubscribe() {
     OnlyTriggerRenameCore();
   });
 
-  connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, [this](int checked)->void{
+  connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, [this](int checked) -> void {
     Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, checked == Qt::Checked);
     OnlyTriggerRenameCore();
   });
@@ -95,6 +108,23 @@ void RenameWidget_Numerize::extraSubscribe() {
     Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
     OnlyTriggerRenameCore();
   });
+
+  connect(m_dragToReorderNames, &QAction::triggered, this, &RenameWidget_Numerize::reorderNamesInListView);
+}
+
+bool RenameWidget_Numerize::reorderNamesInListView() {
+  const QString& baseName = m_completeBaseName->text();
+  const int startNoInt = m_startNo->text().toInt();
+  const QString& namePattern = m_numberPattern->currentText();
+  ImgReorderDialog dlg;
+  dlg.setImagesToReorder(GetSelectedFilesFullPath(), baseName, startNoInt, namePattern);
+  if (ImgReorderDialog::execCore(&dlg) != QDialog::Accepted) {
+    LOG_INFO_NP("Cancel", "User cancelled reorder");
+    return false;
+  }
+  const QStringList& newNames = dlg.getOrderedNames();
+  setNewBaseNames(newNames);
+  return true;
 }
 
 QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
@@ -113,5 +143,5 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
   const bool bUniqueExtCounter = m_isUniqueCounterPerExtension->checkState() == Qt::Checked;
 
   const int startNoInt = m_startNo->text().toInt();
-  return RenameHelper::NumerizeReplace(replaceeList, suffixs, baseName, startNoInt, namePattern, bUniqueExtCounter);
+  return RenameHelper::NumerizeRename(replaceeList, suffixs, baseName, startNoInt, namePattern, bUniqueExtCounter);
 }

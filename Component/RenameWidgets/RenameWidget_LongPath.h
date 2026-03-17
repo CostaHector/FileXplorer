@@ -6,6 +6,7 @@
 #include <QLineEdit>
 
 class RenameWidget_LongPath : public AdvanceRenamer {
+  Q_OBJECT
  public:
   explicit RenameWidget_LongPath(QWidget* parent = nullptr);
 

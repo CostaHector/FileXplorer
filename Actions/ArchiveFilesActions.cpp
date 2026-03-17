@@ -1,6 +1,6 @@
 #include "ArchiveFilesActions.h"
 #include "PublicMacro.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 
 ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {
   COMPRESSED_HERE = new (std::nothrow) QAction{QIcon(":img/COMPRESSED"), tr("Compressd here"), this};

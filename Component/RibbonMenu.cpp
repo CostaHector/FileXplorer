@@ -23,6 +23,7 @@
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
+#include "StyleSheet.h"
 
 RibbonMenu::RibbonMenu(QWidget* parent)
   : QTabWidget{parent} //

@@ -10,9 +10,9 @@ RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar{"replace tb", this};
   CHECK_NULLPTR_RETURN_NULLPTR(replaceControl);
-  auto* pOldLabel = new (std::nothrow) QLabel{"Old:", replaceControl};
+  auto* pOldLabel = new (std::nothrow) QLabel{tr("Old:"), replaceControl};
   CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel);
-  auto* pNewLabel = new (std::nothrow) QLabel{"New:", replaceControl};
+  auto* pNewLabel = new (std::nothrow) QLabel{tr("New:"), replaceControl};
   CHECK_NULLPTR_RETURN_NULLPTR(pNewLabel);
 
   replaceControl->addWidget(pOldLabel);

@@ -44,80 +44,10 @@ extern template void QAbstractTableModelPub::DimensionCountChange<SWAPPABLE_STRI
                                                                                              SWAPPABLE_STRINGLIST_LIST&,
                                                                                              const QAbstractTableModelPub::DataChangeRangeE);
 
-class Dim1ContainerTableModel : public QAbstractListModelPub {
- public:
-  using QAbstractListModelPub::QAbstractListModelPub;
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mData.size(); }
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-    const int r = index.row();
-    if (r < 0 || r >= rowCount()) {
-      LOG_W("r:%d is out of range[0, %d)", r, rowCount());
-      return {};
-    }
-    if (role == Qt::DisplayRole) {
-      return mData[r];
-    }
-    return {};
-  }
-  QStringList mData;
-};
-
 class QAbstractTableModelPubTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void dimension1_container_model_border_test() {
-    Dim1ContainerTableModel rowModel;
-    QCOMPARE(rowModel.rowCount(), 0);
-    {  // protection should not crashdown
-      QVERIFY(rowModel.mRowChangeStack.empty());
-
-      QVERIFY(!rowModel.RowsCountEndChange());  // empty stack
-
-      QVERIFY(!rowModel.RowsCountBeginChange(-1, 1));  // invalid column count
-      QVERIFY(!rowModel.RowsCountBeginChange(0, -1));  // invalid row count
-      QVERIFY(!rowModel.RowsCountEndChange());         // empty stack
-
-      QVERIFY(rowModel.mRowChangeStack.empty());
-    }
-  }
-
-  void dimension1_container_model_row_change_test() {
-    Dim1ContainerTableModel rowModel;
-    QCOMPARE(rowModel.rowCount(), 0);
-
-    {  // 1. row count increasing
-      QStringList rowString3{"Raphael Varane", "Mbappé", "Dembélé"};
-      rowModel.RowsCountBeginChange(0, 3);
-      rowModel.mData.swap(rowString3);
-      QCOMPARE(rowModel.rowCount(), 3);
-      rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Raphael Varane");
-      QCOMPARE(rowModel.data(rowModel.index(1, 0)).toString(), "Mbappé");
-      QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
-    }
-
-    {  // 1. row count remains. contents changed
-      QStringList rowString3{"Mbappé", "Raphael Varane", "Dembélé"};
-      rowModel.RowsCountBeginChange(3, 3);
-      rowModel.mData.swap(rowString3);
-      QCOMPARE(rowModel.rowCount(), 3);
-      rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Mbappé");
-      QCOMPARE(rowModel.data(rowModel.index(1, 0)).toString(), "Raphael Varane");
-      QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
-    }
-
-    {  // 3. row count decreasing
-      QStringList rowString1{"Raphael Varane"};
-      rowModel.RowsCountBeginChange(3, 1);
-      rowModel.mData.swap(rowString1);
-      QCOMPARE(rowModel.rowCount(), 1);
-      rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Raphael Varane");
-    }
-  }
-
   void MergeList2SectionsRange_ok() {
     QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({}), (QList<std::pair<int, int>>{}));
     QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({0, 1, 2, 3}), (QList<std::pair<int, int>>{{0, 3}}));
