@@ -2,13 +2,14 @@
 #include "RenameHelper.h"
 #include "Logger.h"
 #include "PublicVariable.h"
+#include "PathTool.h"
 #include <QMimeData>
 
 constexpr const char* ImgReorderListModel::MIME_TYPE;
 
 bool ImgReorderListModel::setImagesToReorder(const QStringList& imgs, const QString& baseName, int startIndex, const QString& namePattern) {
   if (!namePattern.contains("%1")) {
-    LOG_E("namePattern[%s] invalid, no %1 find", qPrintable(namePattern));
+    LOG_E("namePattern[%s] invalid, no %%1 find", qPrintable(namePattern));
     return false;
   }
   beginResetModel();
@@ -31,12 +32,38 @@ QVariant ImgReorderListModel::data(const QModelIndex& index, int role) const {
     return {};
   }
   int row = index.row();
-  if (role == Qt::DisplayRole) {
-    return m_imgs[row].fullPath.right(10);
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    return m_imgs[row].number;
   } else if (role == Qt::DecorationRole) {
     return GetDecorationPixmap(m_imgs[row].fullPath);
   }
   return {};
+}
+
+bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (!index.isValid()) {
+    return false;
+  }
+  if (role != Qt::EditRole) {
+    return false;
+  }
+  const int beforeNumber = m_imgs[index.row()].number;
+  bool bOk{false};
+  const int newNumber{value.toInt(&bOk)};
+  if (!bOk) {
+    LOG_D("invalid number");
+    return false;
+  }
+  if (newNumber == beforeNumber) {
+    LOG_D("number[%d] unchanged", beforeNumber);
+    return false;
+  }
+  if (0 <= newNumber && newNumber < rowCount()) {
+    LOG_D("number[%d] in occupied range[0, %d)", newNumber, rowCount());
+    return false;
+  }
+  m_imgs[index.row()].number = newNumber;
+  return true;
 }
 
 QStringList ImgReorderListModel::getOrderedNames() const {
@@ -100,18 +127,18 @@ bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction act
   }
 
   // 计算目标行
-  int targetRow = row;  // 列表项之间
+  int targetRow = row; // 列表项之间
   if (targetRow == -1) {
-    if (parent.isValid()) {  // 在项上, 直接取项的索引
+    if (parent.isValid()) { // 在项上, 直接取项的索引
       targetRow = parent.row();
     } else {
-      targetRow = m_imgs.size();  // 放到末尾
+      targetRow = m_imgs.size(); // 放到末尾
     }
   }
 
   std::pair<bool, ImgReorderDataLst> moveResult = MoveItemsBase<ImgReorderDataLst>(m_imgs, ascSelectedRows, targetRow);
   if (!moveResult.first) {
-    return false;  // no need move
+    return false; // no need move
   }
   beginResetModel();
   m_imgs.swap(moveResult.second);

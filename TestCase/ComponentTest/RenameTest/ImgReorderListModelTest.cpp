@@ -7,12 +7,13 @@
 
 class ImgReorderListModelTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
   void default_ok() {
     ImgReorderListModel reorderModel;
     QCOMPARE(reorderModel.rowCount(), 0);
     QCOMPARE(reorderModel.data({}, Qt::DisplayRole).isValid(), false);
+    QCOMPARE(reorderModel.setData({}, 0, Qt::ItemDataRole::EditRole), false);
     QCOMPARE(reorderModel.flags({}).testFlag(Qt::ItemFlag::ItemIsDropEnabled), true);
     QCOMPARE(reorderModel.mimeTypes().count(), 1);
     QCOMPARE(reorderModel.getOrderedNames().isEmpty(), true);
@@ -35,14 +36,15 @@ class ImgReorderListModelTest : public PlainTestSuite {
     QCOMPARE(reorderModel.dropMimeData(&mimeData, Qt::DropAction::MoveAction, 0, 0, {}), false);
   }
 
-  void basic_function_ok() {
+  void dropMimeData_ok() {
     const QStringList filesMixedWithImages{"/Ricardo Leite.jpg", "/Cristiano Ronaldo.txt", "/Robert Lewandowski.png"};
     const QString baseName{"Kaka"};
     const int startNo{9};
     const QString namePattern{" %1"};
 
     ImgReorderListModel reorderModel;
-    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, "invalid pattern not contain format percentage1"), false);
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, "invalid pattern not contain format percentage1"),
+             false);
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderModel.rowCount(), 3);
     QCOMPARE(reorderModel.m_baseName, baseName);
@@ -52,9 +54,13 @@ class ImgReorderListModelTest : public PlainTestSuite {
     QModelIndex ricardoIndex{reorderModel.index(0)};
     QModelIndex cr7Index{reorderModel.index(1)};
     QModelIndex lewanIndex{reorderModel.index(2)};
-    QCOMPARE(reorderModel.data(ricardoIndex, Qt::DisplayRole).toString(), " Leite.jpg");  // display last 10 letter
-    QCOMPARE(reorderModel.data(cr7Index, Qt::DisplayRole).toString(), "onaldo.txt");
-    QCOMPARE(reorderModel.data(lewanIndex, Qt::DisplayRole).toString(), "dowski.png");
+    QCOMPARE(reorderModel.data(ricardoIndex, Qt::DisplayRole).toInt(), 0);
+    QCOMPARE(reorderModel.data(ricardoIndex, Qt::EditRole).toInt(), 0);
+    QCOMPARE(reorderModel.data(cr7Index, Qt::DisplayRole).toInt(), 1);
+    QCOMPARE(reorderModel.data(cr7Index, Qt::EditRole).toInt(), 1);
+    QCOMPARE(reorderModel.data(lewanIndex, Qt::DisplayRole).toInt(), 2);
+    QCOMPARE(reorderModel.data(lewanIndex, Qt::EditRole).toInt(), 2);
+
     QCOMPARE(reorderModel.data(lewanIndex, Qt::ForegroundRole), (QVariant()));
 
     const QVariant pxmap = reorderModel.data(cr7Index, Qt::DecorationRole);
@@ -107,6 +113,42 @@ class ImgReorderListModelTest : public PlainTestSuite {
     // clear all rows
     QCOMPARE(reorderModel.setImagesToReorder(QStringList{}, QString{}, 0, " (%1)"), true);
     QCOMPARE(reorderModel.rowCount(), 0);
+  }
+
+  void setData_ok() {
+    const QStringList filesMixedWithImages{"/Ricardo Leite.jpg", "/Cristiano Ronaldo.png"};
+    const QString baseName{"Kaka"};
+    const int startNo{90};
+    const QString namePattern{" %1"};
+
+    ImgReorderListModel reorderModel;
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
+    QCOMPARE(reorderModel.rowCount(), 2);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 91"}));
+    QModelIndex kakaIndex{reorderModel.index(0)};
+    QModelIndex cr7Index{reorderModel.index(1)};
+
+    // invalid index
+    QCOMPARE(reorderModel.setData({}, 157, Qt::EditRole), false);
+    // role not accept
+    QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::DisplayRole), false);
+    // value not change
+    QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::EditRole), false);
+    // value already occupied(0, 1)
+    QCOMPARE(reorderModel.setData(kakaIndex, 1, Qt::EditRole), false);
+    // value changed ok
+    QCOMPARE(reorderModel.setData(kakaIndex, 2, Qt::EditRole), true);
+    QCOMPARE(reorderModel.data(kakaIndex).toInt(), 2);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 91"}));
+
+    // value not change
+    QCOMPARE(reorderModel.setData(cr7Index, 1, Qt::EditRole), false);
+    // value occupied(0, 1)
+    QCOMPARE(reorderModel.setData(cr7Index, 0, Qt::EditRole), false);
+    // value changed ok
+    QCOMPARE(reorderModel.setData(cr7Index, 3, Qt::EditRole), true);
+    QCOMPARE(reorderModel.data(cr7Index).toInt(), 3);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 93"}));
   }
 };
 

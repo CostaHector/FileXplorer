@@ -13,8 +13,9 @@ class ImgReorderListModel : public QAbstractListModelPub {
 
   int rowCount(const QModelIndex& parent = QModelIndex()) const override { return m_imgs.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   Qt::ItemFlags flags(const QModelIndex& index) const override {
-    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsDragEnabled | Qt::ItemFlag::ItemIsDropEnabled;
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsDragEnabled | Qt::ItemFlag::ItemIsDropEnabled | Qt::ItemFlag::ItemIsEditable;
   }
 
   QStringList mimeTypes() const override { return {MIME_TYPE}; }
