@@ -7,16 +7,100 @@
 
 class ImgReorderListModelTest : public PlainTestSuite {
   Q_OBJECT
-public:
-private slots:
+ public:
+ private slots:
+  void BatchShiftSelectedRowsByStep_ok() {
+    ImgReorderDataLst lst;
+    ImgReorderDataLst expectsLst;
+
+    // empty data, no change
+    lst.clear();
+    expectsLst.clear();
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {0, 1, 2}, 5), std::make_pair(false, expectsLst));
+
+    // no selection, no change
+    const ImgReorderDataLst initialList{{"x", 0}, {"z", 1}, {"a", 2}, {"C", 3}, {"Y", 4}, {"T", 5}};
+    lst = initialList;
+    expectsLst.clear();
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {}, 5), std::make_pair(false, expectsLst));
+    // step=0, no change
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {0, 1, 2}, 0), std::make_pair(false, expectsLst));
+    // conflict happened, no change
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {3}, -3), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {3}, 2), std::make_pair(false, expectsLst));
+
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, -1), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, 1), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, 2), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, 3), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, 4), std::make_pair(false, expectsLst));
+
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 3, 4}, -1), std::make_pair(false, expectsLst));
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 3, 4}, 1), std::make_pair(false, expectsLst));
+
+    // ok and recover, index at {1, 2} + 5, then -5
+    lst = initialList;
+    expectsLst = ImgReorderDataLst{{"x", 0}, {"C", 3}, {"Y", 4}, {"T", 5}, {"z", 6}, {"a", 7}};
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {1, 2}, 5), std::make_pair(true, expectsLst));
+    lst = expectsLst;
+    expectsLst = initialList;
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {4, 5}, -5), std::make_pair(true, expectsLst));
+
+    // ok and recover, index at {0, 1, 2, 3, 4, 5} + 1, then -1
+    lst = initialList;
+    expectsLst = ImgReorderDataLst{{"x", 1}, {"z", 2}, {"a", 3}, {"C", 4}, {"Y", 5}, {"T", 6}};
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {0, 1, 2, 3, 4, 5}, 1), std::make_pair(true, expectsLst));
+    lst = expectsLst;
+    expectsLst = initialList;
+    QCOMPARE(BatchShiftSelectedRowsByStep(lst, {0, 1, 2, 3, 4, 5}, -1), std::make_pair(true, expectsLst));
+  }
+
+  void NormalizeKeepRelativeOrder_ok() {
+    ImgReorderDataLst lst;
+    ImgReorderDataLst expectsLst;
+
+    // empty, skip
+    lst.clear();
+    expectsLst.clear();
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(false, expectsLst));
+
+    // already normalized, skip
+    lst = ImgReorderDataLst{{"x", 0}, {"z", 1}, {"a", 2}};
+    expectsLst.clear();
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(false, expectsLst));
+
+    // need normalized
+    lst = ImgReorderDataLst{{"x", 0}, {"C", 3}, {"Y", 4}, {"T", 5}, {"z", 11}, {"a", 12}};
+    expectsLst = ImgReorderDataLst{{"x", 0}, {"C", 1}, {"Y", 2}, {"t", 3}, {"z", 4}, {"a", 5}};
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(true, expectsLst));
+
+    lst = ImgReorderDataLst{{"x", 0}, {"C", 3}, {"T", 5}, {"a", 8}, {"z", 9}, {"Y", 10}};
+    expectsLst = ImgReorderDataLst{{"x", 0}, {"C", 1}, {"T", 2}, {"a", 3}, {"z", 4}, {"Y", 5}};
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(true, expectsLst));
+
+    lst = ImgReorderDataLst{{"x", -5}, {"z", -4}, {"a", -3}};
+    expectsLst = ImgReorderDataLst{{"x", 0}, {"z", 1}, {"a", 2}};
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(true, expectsLst));
+
+    lst = ImgReorderDataLst{{"x", 100}, {"z", 101}, {"a", 102}};
+    expectsLst = ImgReorderDataLst{{"x", 0}, {"z", 1}, {"a", 2}};
+    QCOMPARE(NormalizeKeepRelativeOrder(lst), std::make_pair(true, expectsLst));
+  }
+
   void default_ok() {
     ImgReorderListModel reorderModel;
     QCOMPARE(reorderModel.rowCount(), 0);
+    QCOMPARE(reorderModel.m_occupiedRows.isEmpty(), true);
     QCOMPARE(reorderModel.data({}, Qt::DisplayRole).isValid(), false);
     QCOMPARE(reorderModel.setData({}, 0, Qt::ItemDataRole::EditRole), false);
     QCOMPARE(reorderModel.flags({}).testFlag(Qt::ItemFlag::ItemIsDropEnabled), true);
     QCOMPARE(reorderModel.mimeTypes().count(), 1);
     QCOMPARE(reorderModel.getOrderedNames().isEmpty(), true);
+
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);
+    QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), false);
+
     QCOMPARE(reorderModel.mimeData({}), nullptr);
     QCOMPARE(reorderModel.mimeData({QModelIndex{}, QModelIndex{}}), nullptr);
     QCOMPARE(reorderModel.supportedDropActions().testFlag(Qt::MoveAction), true);
@@ -43,8 +127,7 @@ private slots:
     const QString namePattern{" %1"};
 
     ImgReorderListModel reorderModel;
-    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, "invalid pattern not contain format percentage1"),
-             false);
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, "invalid pattern. not contain format percentage1"), false);
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderModel.rowCount(), 3);
     QCOMPARE(reorderModel.m_baseName, baseName);
@@ -127,28 +210,79 @@ private slots:
     QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 91"}));
     QModelIndex kakaIndex{reorderModel.index(0)};
     QModelIndex cr7Index{reorderModel.index(1)};
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1}));
 
     // invalid index
     QCOMPARE(reorderModel.setData({}, 157, Qt::EditRole), false);
     // role not accept
     QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::DisplayRole), false);
+    // not number
+    QCOMPARE(reorderModel.setData(kakaIndex, "Not number", Qt::EditRole), false);
     // value not change
     QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::EditRole), false);
     // value already occupied(0, 1)
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1}));
     QCOMPARE(reorderModel.setData(kakaIndex, 1, Qt::EditRole), false);
     // value changed ok
     QCOMPARE(reorderModel.setData(kakaIndex, 2, Qt::EditRole), true);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 1}));
     QCOMPARE(reorderModel.data(kakaIndex).toInt(), 2);
     QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 91"}));
 
     // value not change
     QCOMPARE(reorderModel.setData(cr7Index, 1, Qt::EditRole), false);
-    // value occupied(0, 1)
-    QCOMPARE(reorderModel.setData(cr7Index, 0, Qt::EditRole), false);
+    // value changed ok
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 1}));
+    QCOMPARE(reorderModel.setData(cr7Index, 0, Qt::EditRole), true);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 0}));
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 90"}));
+
     // value changed ok
     QCOMPARE(reorderModel.setData(cr7Index, 3, Qt::EditRole), true);
     QCOMPARE(reorderModel.data(cr7Index).toInt(), 3);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 3}));
     QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 93"}));
+  }
+
+  void onBatchShiftSelectedRowsByStep_ok() {
+    const QStringList filesMixedWithImages{"/Ricardo Leite.jpg", "/Cristiano Ronaldo.txt", "/Robert Lewandowski.png"};
+    const QString baseName{"Kaka"};
+    const int startNo{80};
+    const QString namePattern{" %1"};
+
+    ImgReorderListModel reorderModel;
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
+    QCOMPARE(reorderModel.rowCount(), 3);
+    QCOMPARE(reorderModel.m_baseName, baseName);
+    QCOMPARE(reorderModel.m_startNo, 80);
+    QCOMPARE(reorderModel.m_namePattern, namePattern);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 80", "Kaka 81", "Kaka 82"}));
+    QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), false);  // no need normalize
+
+    QModelIndex kakaIndex = reorderModel.index(0);
+    QModelIndex cr7Index = reorderModel.index(1);
+    QModelIndex lewanIndex = reorderModel.index(2);
+
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);                       // no selection
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);          // no step
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({kakaIndex, lewanIndex}, 0), false);  // no step
+
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1, 2}));
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({kakaIndex, lewanIndex}, 10), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 81", "Kaka 90", "Kaka 92"}));  // index at (0, 2) +10 then sort
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{10, 1, 12}));
+
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({cr7Index, lewanIndex}, -10), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 80", "Kaka 81", "Kaka 82"}));  // index at (1, 2) -10 then sort
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1, 2}));
+
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({cr7Index, lewanIndex}, -10), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 71", "Kaka 72", "Kaka 80"}));  // index at (2, 3) -10 then sort
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, -9, -8}));
+
+    QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 80", "Kaka 81", "Kaka 82"}));  // (0,1,2) + start no 80
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1, 2}));
   }
 };
 

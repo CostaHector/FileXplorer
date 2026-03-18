@@ -16,7 +16,18 @@ ImgReorderListView::ImgReorderListView(QWidget* parent) : CustomListView{"IMG_RE
   _WRAPING_ACTIONS->setChecked(true);
   _UNIFORM_ITEM_SIZES->setChecked(false);
 
+  mBatchShiftRight100 = new QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift right 100"), this};
+  mBatchShiftLeft100 = new QAction{QIcon{":img/SHIFT_RIGHT_BY_STEP"}, tr("Shift left 100"), this};
+  mNormalizeKeepRelativeOrder = new QAction{QIcon{":img/NOMARLIZE_KEEP_RELATIVE_ORDER"}, tr("Normalize keep relative order"), this};
+
+  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, mNormalizeKeepRelativeOrder};
+  PushFrontExclusiveActions(acts);
+
   connect(this, &QListView::iconSizeChanged, mImgReorderListModel, &QAbstractListModelPub::onIconSizeChange);
+  connect(mBatchShiftRight100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(100); });
+  connect(mBatchShiftLeft100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(-100); });
+  connect(mNormalizeKeepRelativeOrder, &QAction::triggered, this, &ImgReorderListView::onNormalizeKeepRelativeOrder);
+
   setWindowIcon(QIcon{":img/RENAME_REORDER_LISTVIEW"});
   setWindowTitle("Drag to reorder images names");
 }
@@ -27,6 +38,18 @@ bool ImgReorderListView::setImagesToReorder(const QStringList& imgs, const QStri
 
 QStringList ImgReorderListView::getOrderedNames() const {
   return mImgReorderListModel->getOrderedNames();
+}
+
+bool ImgReorderListView::onBatchShiftSelectedRowsByStep(int step) {
+  const QModelIndexList& indexes = selectedIndexes();
+  if (indexes.isEmpty()) {
+    return false;
+  }
+  return mImgReorderListModel->onBatchShiftSelectedRowsByStep(indexes, step);
+}
+
+bool ImgReorderListView::onNormalizeKeepRelativeOrder() {
+  return mImgReorderListModel->onNormalizeKeepRelativeOrder();
 }
 
 void ImgReorderListView::dropEvent(QDropEvent* event) {

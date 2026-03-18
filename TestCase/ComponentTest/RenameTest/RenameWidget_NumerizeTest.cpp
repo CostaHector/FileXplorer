@@ -130,6 +130,10 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
 
     const QStringList selectFileNames{"super", "Henry Cavill.jpg"};
     pNumerize.InitTextEditContent(numerizerPath, selectFileNames);
+    QCOMPARE(pNumerize.m_nBaseTE->toPlainText(), (QString{"super 1\nsuper 2"}));
+    QCOMPARE(pNumerize.m_nExtTE->toPlainText(), (QString{"\n.jpg"}));
+    pNumerize.m_nBaseTE->clear();
+    QCOMPARE(pNumerize.m_nBaseTE->toPlainText(), (QString{}));
 
     MOCKER(ImgReorderDialog::execCore)
         .expects(exactly(3))
@@ -138,14 +142,15 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
         .then(returnValue((int)QDialog::Accepted));
 
     QCOMPARE(pNumerize.reorderNamesInListView(), false);
-    QCOMPARE(pNumerize.reorderNamesInListView(), true);
+    QCOMPARE(pNumerize.m_nBaseTE->toPlainText(), (QString{})); // cancelled will not call setNewBaseNames
+    QCOMPARE(pNumerize.m_nExtTE->toPlainText(), (QString{"\n.jpg"}));
+
+    QCOMPARE(pNumerize.reorderNamesInListView(), true); // accepted will call setNewBaseNames
+    QCOMPARE(pNumerize.m_nBaseTE->toPlainText(), (QString{"super 1\nsuper 2"}));
+    QCOMPARE(pNumerize.m_nExtTE->toPlainText(), (QString{"\n.jpg"}));
+
     QVERIFY(pNumerize.m_dragToReorderNames != nullptr);
     pNumerize.m_dragToReorderNames->trigger();
-
-    const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
-    const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
-    QCOMPARE(sNewName, (QString{"super 1\nsuper 2"}));
-    QCOMPARE(sNewExt, (QString{"\n.jpg"}));
   }
 };
 

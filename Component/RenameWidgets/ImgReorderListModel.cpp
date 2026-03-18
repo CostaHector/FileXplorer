@@ -19,6 +19,7 @@ bool ImgReorderListModel::setImagesToReorder(const QStringList& imgs, const QStr
   for (int i = 0; i < imgs.size(); ++i) {
     new_imgs.push_back(ImgReorderDataType{imgs[i], i});
   }
+  initOccupiedRows(imgs.size());
   m_imgs.swap(new_imgs);
   m_baseName = baseName;
   m_startNo = startIndex;
@@ -58,10 +59,12 @@ bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& valu
     LOG_D("number[%d] unchanged", beforeNumber);
     return false;
   }
-  if (0 <= newNumber && newNumber < rowCount()) {
-    LOG_D("number[%d] in occupied range[0, %d)", newNumber, rowCount());
+  if (m_occupiedRows.contains(newNumber)) {
+    LOG_D("number[%d] is occupied", newNumber);
     return false;
   }
+  m_occupiedRows.remove(beforeNumber);
+  m_occupiedRows.insert(newNumber);
   m_imgs[index.row()].number = newNumber;
   return true;
 }
@@ -127,18 +130,18 @@ bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction act
   }
 
   // 计算目标行
-  int targetRow = row; // 列表项之间
+  int targetRow = row;  // 列表项之间
   if (targetRow == -1) {
-    if (parent.isValid()) { // 在项上, 直接取项的索引
+    if (parent.isValid()) {  // 在项上, 直接取项的索引
       targetRow = parent.row();
     } else {
-      targetRow = m_imgs.size(); // 放到末尾
+      targetRow = m_imgs.size();  // 放到末尾
     }
   }
 
   std::pair<bool, ImgReorderDataLst> moveResult = MoveItemsBase<ImgReorderDataLst>(m_imgs, ascSelectedRows, targetRow);
   if (!moveResult.first) {
-    return false; // no need move
+    return false;  // no need move
   }
   beginResetModel();
   m_imgs.swap(moveResult.second);
@@ -148,4 +151,105 @@ bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction act
 
 Qt::DropActions ImgReorderListModel::supportedDropActions() const {
   return Qt::MoveAction;
+}
+
+bool ImgReorderListModel::onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step) {
+  if (indexes.isEmpty() || step == 0) {
+    return false;
+  }
+  QList<int> selectedRows;
+  selectedRows.reserve(indexes.size());
+  for (const QModelIndex& ind : indexes) {
+    selectedRows.push_back(ind.row());
+  }
+  bool bNeedShift{false};
+  ImgReorderDataLst newImages;
+  std::tie(bNeedShift, newImages) = BatchShiftSelectedRowsByStep(m_imgs, selectedRows, step);
+  if (!bNeedShift) {
+    return false;
+  }
+
+  beginResetModel();
+  m_imgs.swap(newImages);
+  endResetModel();
+
+  updateOccupiedRows();
+  return true;
+}
+
+bool ImgReorderListModel::onNormalizeKeepRelativeOrder() {
+  if (m_imgs.isEmpty()) {
+    return false;
+  }
+
+  bool bNeedNormalize{false};
+  ImgReorderDataLst newImages;
+  std::tie(bNeedNormalize, newImages) = NormalizeKeepRelativeOrder(m_imgs);
+  if (!bNeedNormalize) {
+    return false;
+  }
+
+  beginResetModel();
+  m_imgs.swap(newImages);
+  endResetModel();
+
+  initOccupiedRows(m_imgs.size());
+  return true;
+}
+
+void ImgReorderListModel::initOccupiedRows(int n) const {
+  m_occupiedRows.clear();
+  for (int i = 0; i < n; ++i) {
+    m_occupiedRows.insert(i);
+  }
+}
+
+void ImgReorderListModel::updateOccupiedRows() const {
+  m_occupiedRows.clear();
+  for (const ImgReorderDataType& ele : m_imgs) {
+    m_occupiedRows.insert(ele.number);
+  }
+}
+
+std::pair<bool, ImgReorderDataLst> BatchShiftSelectedRowsByStep(const ImgReorderDataLst& datas, const QList<int>& selectedRows, int step) {
+  // 0. precondition: datas is strictly ascending and unqiue. selectedRows must in range of datas
+  // 1. 检查边界条件
+  if (step == 0 || datas.isEmpty() || selectedRows.isEmpty()) {
+    return {false, {}};
+  }
+  // 2. 创建datas的副本并修改选中行
+  ImgReorderDataLst newDatas = datas;
+  for (int index : selectedRows) {
+    newDatas[index] += step;
+  }
+  // 3. 检查是否冲突
+  std::sort(newDatas.begin(), newDatas.end());
+  // std::unique(newDatas.cbegin(), newDatas.cend()) != newDatas.cend() will move duplicates(if exists) to after the return iterator
+  // while adjacent_find will not, aka for (auto it = newDatas.begin(); it < newDatas.end() - 1; ++it) if (*it == *(it + 1)) return false;
+  if (std::adjacent_find(newDatas.cbegin(), newDatas.cend()) != newDatas.cend()) {
+    return {false, {}};
+  }
+  return {true, newDatas};
+}
+
+std::pair<bool, ImgReorderDataLst> NormalizeKeepRelativeOrder(const ImgReorderDataLst& datas) {
+  // precondition: datas are sorted in number ascending and unique
+  if (datas.isEmpty()) {
+    return {false, {}};
+  }
+  if (datas.front().number == 0 && datas.back().number == datas.size() - 1) {
+    // Already Normalized
+    return {false, {}};
+  }
+
+  QHash<int, int> valueToRank;
+  for (int i = 0; i < datas.size(); ++i) {
+    valueToRank[datas[i].number] = i;
+  }
+
+  ImgReorderDataLst newDatas(datas);
+  for (int i = 0; i < datas.size(); ++i) {
+    newDatas[i].number = valueToRank[newDatas[i].number];
+  }
+  return {true, newDatas};
 }
