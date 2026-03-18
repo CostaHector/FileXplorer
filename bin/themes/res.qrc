@@ -189,6 +189,9 @@
         <file alias="PREPEND_PARENT_FOLDER_NAMES">Rename/PREPEND_PARENT_FOLDER_NAMES.svg</file>
         <file alias="COMMAND_PREVIEW">Rename/COMMAND_PREVIEW.svg</file>
         <file alias="RENAME_REORDER_LISTVIEW">Rename/RENAME_REORDER_LISTVIEW.svg</file>
+        <file alias="SHIFT_LEFT_BY_STEP">Rename/SHIFT_LEFT_BY_STEP.svg</file>
+        <file alias="SHIFT_RIGHT_BY_STEP">Rename/SHIFT_RIGHT_BY_STEP.svg</file>
+        <file alias="NOMARLIZE_KEEP_RELATIVE_ORDER">Rename/NOMARLIZE_KEEP_RELATIVE_ORDER.svg</file>
 
         <!--Browser Icon here-->
         <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>

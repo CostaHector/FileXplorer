@@ -568,6 +568,24 @@
     </message>
 </context>
 <context>
+    <name>ImgReorderListView</name>
+    <message>
+        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+19"/>
+        <source>Shift right 100</source>
+        <translation>命名编号右移100</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Shift left 100</source>
+        <translation>命名编号左移100</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Normalize keep relative order</source>
+        <translation>保持相对顺序规范化命名到0基</translation>
+    </message>
+</context>
+<context>
     <name>InteractiveVideoWidget</name>
     <message>
         <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+19"/>

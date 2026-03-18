@@ -25,6 +25,7 @@ ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
   ReadSettings();
   setWindowIcon(QIcon{":img/RENAME_REORDER_LISTVIEW"});
   setWindowTitle("Drag to reorder images names");
+  setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 }
 
 ImgReorderDialog::~ImgReorderDialog() {

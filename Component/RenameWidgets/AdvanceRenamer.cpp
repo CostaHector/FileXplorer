@@ -41,7 +41,7 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
 
   ReadSettings();
-  setWindowFlag(Qt::WindowMaximizeButtonHint);  // WindowMinMaxButtonsHint;
+  setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 }
 
 void AdvanceRenamer::showEvent(QShowEvent* event) {
