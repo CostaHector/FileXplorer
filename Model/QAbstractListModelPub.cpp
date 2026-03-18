@@ -3,7 +3,36 @@
 #include "StringTool.h"
 #include "PublicVariable.h"
 #include "ImageTool.h"
+#include "MemoryKey.h"
 #include <QFile>
+
+QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObject* parent) //
+  : QAbstractListModel{parent}
+  , mMemoryName{listViewName} {
+  const int scaledIndex{IMAGE_SIZE::GetInitialScaledSize(GetName())};
+  setPixmapWidth(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].width());
+  setPixmapHeight(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].height());
+
+  m_isSmooth = Configuration().value(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
+  _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{""}, tr("Pixmap smooth transformation"), this};
+  _PIXMAP_TRANSFORMATION_SMOOTH->setCheckable(true);
+  _PIXMAP_TRANSFORMATION_SMOOTH->setChecked(m_isSmooth);
+  _PIXMAP_TRANSFORMATION_SMOOTH->setToolTip("QPixmap scaled will do smooth transformation when enabled, by default: false and do fast transformation");
+
+  subscribe();
+}
+
+QAbstractListModelPub::~QAbstractListModelPub() {
+  Configuration().setValue(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", _PIXMAP_TRANSFORMATION_SMOOTH->isChecked());
+}
+
+void QAbstractListModelPub::subscribe() {
+  connect(_PIXMAP_TRANSFORMATION_SMOOTH, &QAction::toggled, this, &QAbstractListModelPub::onPixmapSmoothTransformationToggled);
+}
+
+QList<QAction*> QAbstractListModelPub::GetExcusiveActions() const {
+  return {_PIXMAP_TRANSFORMATION_SMOOTH};
+}
 
 bool QAbstractListModelPub::RowsCountBeginChange(int beforeRow, int afterRow) {
   if (!IsDimensionCntValid(beforeRow, afterRow)) {
@@ -41,7 +70,7 @@ bool QAbstractListModelPub::RowsCountEndChange() {
 }
 
 QPixmap QAbstractListModelPub::GetDecorationPixmap(const QString& fileAbsPath) const {
-  return ImageTool::GetPixmapFromCached(fileAbsPath, getPixmapWidth(), getPixmapHeight());
+  return ImageTool::GetPixmapFromCached(fileAbsPath, getPixmapWidth(), getPixmapHeight(), isPixmapTransformationSmooth());
 }
 
 void QAbstractListModelPub::onIconSizeChange(const QSize& newSize) {
@@ -56,7 +85,12 @@ void QAbstractListModelPub::onIconSizeChange(const QSize& newSize) {
   emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::DecorationRole});
 }
 
-template <typename RandomAccessible1DimensionContainerDataType>
+void QAbstractListModelPub::onPixmapSmoothTransformationToggled(bool newSmooth) {
+  m_isSmooth = newSmooth;
+  emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::DecorationRole});
+}
+
+template<typename RandomAccessible1DimensionContainerDataType>
 std::pair<bool, RandomAccessible1DimensionContainerDataType> MoveItemsBase(const RandomAccessible1DimensionContainerDataType& dataList,
                                                                            const QList<int>& ascUnqiueSelectRows,
                                                                            int destRow) {
@@ -70,9 +104,9 @@ std::pair<bool, RandomAccessible1DimensionContainerDataType> MoveItemsBase(const
 
   // continous selection rows and destination in it
   const bool isSelectRowsContinousAndDestBeFirstSelect{
-      ascUnqiueSelectRows.back() - ascUnqiueSelectRows.front() + 1 == selectedCount      // continous
-      &&                                                                                 //
-      (ascUnqiueSelectRows.front() <= destRow && destRow <= ascUnqiueSelectRows.back())  //
+      ascUnqiueSelectRows.back() - ascUnqiueSelectRows.front() + 1 == selectedCount     // continous
+      &&                                                                                //
+      (ascUnqiueSelectRows.front() <= destRow && destRow <= ascUnqiueSelectRows.back()) //
   };
   if (isSelectRowsContinousAndDestBeFirstSelect) {
     return {false, {}};

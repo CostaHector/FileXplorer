@@ -19,7 +19,7 @@ class FloatingModelsTest : public PlainTestSuite {
   }
 
   void initalize_ok() {
-    FloatingModels model;
+    FloatingModels model{"FloatingListView"};
     // 验证初始状态
     QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.IsEmpty());
@@ -36,7 +36,7 @@ class FloatingModelsTest : public PlainTestSuite {
   }
 
   void data_retrieve_ok() {
-    FloatingModels model;
+    FloatingModels model{"FloatingListView"};
 
     // 准备测试数据
     QStringList testData = {"/path/to/file1.jpg", "/path/to/file2.png", "/path/to/file3.webp"};
@@ -70,7 +70,7 @@ class FloatingModelsTest : public PlainTestSuite {
     QList<FsNodeEntry> files = {{"image1.jpg", false, ""}, {"image2.png", false, ""}, {"image3.webp", false, ""}};
     QCOMPARE(tDir.createEntries(files), 3);
 
-    FloatingModels model;
+    FloatingModels model{"FloatingListView"};
 
     // 设置目录路径（一次性加载）
     QStringList filters = {"*.jpg", "*.png", "*.webp"};
@@ -99,7 +99,7 @@ class FloatingModelsTest : public PlainTestSuite {
       expectFilesNames.insert(tDir.itemPath(node.relativePathToNode));
     }
 
-    FloatingModels model;
+    FloatingModels model{"FloatingListView"};
 
     // 设置目录路径（增量加载）
     QStringList filters = {"*.jpg", "*.png", "*.webp"};
@@ -154,7 +154,7 @@ class FloatingModelsTest : public PlainTestSuite {
       QCOMPARE(CastBrowserHelper::GetImageSize(validImage), sourceSvgSize);
     }
 
-    ImgsModel imgModel;
+    ImgsModel imgModel{"ImgsListView"};
     const QStringList imgDatas{
         validImage,    //
         notExistImage  //
@@ -220,7 +220,7 @@ class FloatingModelsTest : public PlainTestSuite {
   }
 
   void vidsModel_ok() {
-    VidsModel vmodel;
+    VidsModel vmodel{"VidsListView"};
     const QStringList vidDatas{
         "/home/to/Chris Evans.mp4",           //
         "C:/home/to/Michael Fassbender.mp4",  //

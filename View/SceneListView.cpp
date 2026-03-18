@@ -47,6 +47,8 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   QList<QAction*> exclusiveActions{COPY_BASENAME_FROM_SCENE, OPEN_CORRESPONDING_FOLDER};
   PushFrontExclusiveActions(exclusiveActions);
+  PushBackExclusiveActions(_sceneModel->GetExcusiveActions());
+
   subscribe();
 
   // setMouseTracking(true);

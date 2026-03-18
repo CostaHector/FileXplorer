@@ -5,7 +5,7 @@
 
 ImgReorderListView::ImgReorderListView(QWidget* parent)
   : CustomListView{"IMG_REORDER_LISTVIEW", parent} {
-  mImgReorderListModel = new ImgReorderListModel{this};
+  mImgReorderListModel = new ImgReorderListModel{"IMG_REORDER_LISTVIEW", this};
   setModel(mImgReorderListModel);
   setAcceptDrops(true);
   setDragEnabled(true);
@@ -25,6 +25,7 @@ ImgReorderListView::ImgReorderListView(QWidget* parent)
 
   QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, NewSeperatorAction(this), mNormalizeKeepRelativeOrder, NewSeperatorAction(this), mOpenInSystemApplication};
   PushFrontExclusiveActions(acts);
+  PushBackExclusiveActions(mImgReorderListModel->GetExcusiveActions());
 
   connect(this, &QListView::doubleClicked, mImgReorderListModel, &ImgReorderListModel::onOpenFileInSystemApplication);
   connect(this, &QListView::iconSizeChanged, mImgReorderListModel, &QAbstractListModelPub::onIconSizeChange);

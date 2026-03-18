@@ -23,8 +23,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   }
   LISTS_SET.insert(m_name);
 
-  int iconSizeIndexHint = Configuration().value(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex).toInt();
-  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1));  // [0, WHEEL_CANDIDATES_N)
+  mCurIconSizeIndex = IMAGE_SIZE::GetInitialScaledSize(m_name);
 
   setAlternatingRowColors(true);
 
@@ -111,7 +110,7 @@ CustomListView::~CustomListView() {
   Configuration().setValue(m_name + "_WRAPING_ACTIONS", isWrapping());
   Configuration().setValue(m_name + "_UNIFORM_ITEM_SIZES", uniformItemSizes());
 
-  Configuration().setValue(m_name + "_ICON_SIZE_INDEX", mCurIconSizeIndex);
+  IMAGE_SIZE::SaveInitialScaledSize(m_name, mCurIconSizeIndex);
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
@@ -151,6 +150,11 @@ void CustomListView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
   m_menu->push_front(acts);
 }
 
+void CustomListView::PushBackExclusiveActions(const QList<QAction*>& acts) {
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->push_back(acts);
+}
+
 void CustomListView::AddItselfAction2Menu() {
   m_menu->addSeparator();
   m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
@@ -178,7 +182,6 @@ void CustomListView::onUniformItemSizedToggled(const bool bchecked) {
 }
 
 void CustomListView::InitListView() {
-  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
   // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
 }
 

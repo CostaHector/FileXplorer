@@ -2,6 +2,7 @@
 #include "StringTool.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "MemoryKey.h"
 #include <QPixmapCache>
 #include <QBuffer>
 
@@ -34,9 +35,9 @@ QIcon GetIconFromCached(const QString& starDotExt) {
   return it.value();
 }
 
-QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight) {
+QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight, bool bSmooth) {
   QPixmap pm;
-  const QString imgKey{StringTool::PathJoinPixmapSize(fileAbsPath, expectWidth, expectHeight)};
+  const QString imgKey{StringTool::PathJoinPixmapSize(fileAbsPath, expectWidth, expectHeight, bSmooth)};
   if (QPixmapCache::find(imgKey, &pm)) {
     return pm;
   }
@@ -55,10 +56,11 @@ QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int exp
       QPixmapCache::insert(starDotExt, pm);
     }
   }
+  const Qt::TransformationMode transformMode{bSmooth ? Qt::SmoothTransformation : Qt::FastTransformation};
   if (pm.width() * expectHeight >= pm.height() * expectWidth) {
-    pm = pm.scaledToWidth(expectWidth, Qt::FastTransformation);
+    pm = pm.scaledToWidth(expectWidth, transformMode);
   } else {
-    pm = pm.scaledToHeight(expectHeight, Qt::FastTransformation);
+    pm = pm.scaledToHeight(expectHeight, transformMode);
   }
   QPixmapCache::insert(imgKey, pm);
   return pm;
@@ -91,6 +93,7 @@ constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
 constexpr QSize IMAGE_SIZE::ICON_SIZE_CANDIDATES[];
 constexpr int IMAGE_SIZE::ICON_SIZE_CANDIDATES_N;
+constexpr int IMAGE_SIZE::DEFAULT_SCALED_SIZE;
 
 QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex) {
   if (scaleIndex < 0 || scaleIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
@@ -104,4 +107,13 @@ QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledInd
   }
   return QString::asprintf("[%d] %d-by-%d", scaleIndex,  //
                            ICON_SIZE_CANDIDATES[scaleIndex].width(), ICON_SIZE_CANDIDATES[scaleIndex].height());
+}
+
+int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
+  int iconSizeIndexHint = Configuration().value(name + "_ICON_SIZE_INDEX", DEFAULT_SCALED_SIZE).toInt();
+  return std::max(0, std::min(iconSizeIndexHint, ICON_SIZE_CANDIDATES_N - 1));  // [0, WHEEL_CANDIDATES_N)
+}
+
+void IMAGE_SIZE::SaveInitialScaledSize(const QString& name, int scaledIndex) {
+  Configuration().setValue(name + "_ICON_SIZE_INDEX", scaledIndex);
 }

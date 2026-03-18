@@ -6,6 +6,7 @@ class AddableMenu : public QMenu {
  public:
   using QMenu::QMenu;
   void push_front(const QList<QAction*>& acts);
+  void push_back(const QList<QAction*>& acts);
 };
 
 QAction* NewSeperatorAction(QWidget* parent);

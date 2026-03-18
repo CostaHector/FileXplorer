@@ -13,7 +13,7 @@ const QFileIconProvider& GetIconProvider();
 QIcon GetIconFromCachedByFullPath(const QString& fullPath);
 QIcon GetIconFromCached(const QString& starDotExt);
 
-QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight);
+QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight, bool bSmooth=false);
 QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase);
 }
 
@@ -44,8 +44,11 @@ struct IMAGE_SIZE {
           QSize(7985, 4935),
           QSize(12920, 7985),
       };
+  static constexpr int DEFAULT_SCALED_SIZE = 5;
   static constexpr int ICON_SIZE_CANDIDATES_N = sizeof(ICON_SIZE_CANDIDATES) / sizeof(*ICON_SIZE_CANDIDATES);
   static QString HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex=nullptr);
+  static int GetInitialScaledSize(const QString& name);
+  static void SaveInitialScaledSize(const QString& name, int scaledIndex);
 };
 
 #endif  // IMAGETOOL_H

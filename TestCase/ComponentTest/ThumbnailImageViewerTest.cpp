@@ -53,7 +53,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
 
   void default_constructor_ok() {  //
     // should not crash down
-    Configuration().setValue(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME + "_ICON_SIZE_INDEX", 1);
+    IMAGE_SIZE::SaveInitialScaledSize(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME, 1);
     ThumbnailImageViewer viewer(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME);
     QCOMPARE(viewer.m_memoryKeyName, THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME);
     // 验证默认值
@@ -167,8 +167,6 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
 
   void key_press_event_ok() {
     QString memoryName{"testImagePath_direction_key_scroll"};
-    const int largestSize = 0;
-    Configuration().value(memoryName + "_ICON_SIZE_INDEX", largestSize).toInt();
 
     ThumbnailImageViewer viewer{memoryName};
     QVERIFY(viewer.setPixmapByAbsFilePath(mTDir.itemPath("a"), "img 1.jpg"));
@@ -331,7 +329,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     }
 
     // 验证配置已保存
-    QCOMPARE(Configuration().value(key + "_ICON_SIZE_INDEX").toInt(), testIndex);
+    QCOMPARE(IMAGE_SIZE::GetInitialScaledSize(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME), testIndex);
     {
       // 重新创建viewer，验证配置加载
       ThumbnailImageViewer viewer(key);

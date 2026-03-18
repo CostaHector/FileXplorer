@@ -29,7 +29,7 @@ class CustomListViewTest : public PlainTestSuite {
 
   void test_contextMenuEvent() {
     const QString keyMemoryName = "CustomListViewTest";
-    Configuration().setValue(keyMemoryName + "_ICON_SIZE_INDEX", 5);
+    IMAGE_SIZE::SaveInitialScaledSize(keyMemoryName, 5);
     CustomListView view(keyMemoryName);
 
     view.PushFrontExclusiveActions({});
@@ -93,7 +93,7 @@ class CustomListViewTest : public PlainTestSuite {
 
   void test_wheelEvent_zoom() {
     const QString keyMemoryName = "CustomListViewTest";
-    Configuration().setValue(keyMemoryName + "_ICON_SIZE_INDEX", 5);
+    IMAGE_SIZE::SaveInitialScaledSize(keyMemoryName, 5);
     CustomListView viewer(keyMemoryName);
     QCOMPARE(viewer.GetCurImageSizeScale(), 5);
 

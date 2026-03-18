@@ -10,8 +10,8 @@
 #include <QDir>
 #include <QBrush>
 
-ScenesListModel::ScenesListModel(QObject* object) //
-  : QAbstractListModelPub(object) {
+ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object) //
+  : QAbstractListModelPub{listViewName, object} {
   int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
   mScenesCountPerPage = sceneCnt1Page > 0 ? sceneCnt1Page : 1000;
 }

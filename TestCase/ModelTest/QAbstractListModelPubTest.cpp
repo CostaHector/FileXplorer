@@ -97,7 +97,7 @@ class QAbstractListModelPubTest : public PlainTestSuite {
   }
 
   void dimension1_container_model_border_test() {
-    Dim1ContainerTableModel rowModel;
+    Dim1ContainerTableModel rowModel{"Dim1ContainerTableListView"};
     QCOMPARE(rowModel.rowCount(), 0);
     {  // protection should not crashdown
       QVERIFY(rowModel.mRowChangeStack.empty());
@@ -113,7 +113,7 @@ class QAbstractListModelPubTest : public PlainTestSuite {
   }
 
   void dimension1_container_model_row_change_test() {
-    Dim1ContainerTableModel rowModel;
+    Dim1ContainerTableModel rowModel{"Dim1ContainerTableListView"};
     QCOMPARE(rowModel.rowCount(), 0);
 
     {  // 1. row count increasing

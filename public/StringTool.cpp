@@ -55,9 +55,9 @@ void SearchHistoryListProc(QStringList& hists) {
   RemoveDuplicateKeepSequence(hists);
 }
 
-QString PathJoinPixmapSize(QString path, int width, int height) {
+QString PathJoinPixmapSize(QString path, int width, int height, bool bSmoothTrans) {
   path.reserve(path.size() + 12);
-  path += QString::asprintf("_%dx%d", width, height);
+  path += QString::asprintf("_%dx%d_%d", width, height, bSmoothTrans);
   return path;
 }
 

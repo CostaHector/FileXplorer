@@ -116,7 +116,7 @@ private slots:
   void update_json_update_scene_slot_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
 
-    ScenesListModel sceneModel;
+    ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
@@ -177,7 +177,7 @@ private slots:
   void select_scene_slot_interact_with_sort_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
 
-    ScenesListModel sceneModel;
+    ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
@@ -233,7 +233,7 @@ private slots:
   }
 
   void copy_name_open_folder_ok() {
-    ScenesListModel sceneModel;
+    ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
@@ -277,7 +277,7 @@ private slots:
     sceneAct._BY_RATE->setChecked(true);
     sceneAct._REVERSE_SORT->setChecked(false); // by rate ascending
 
-    ScenesListModel sceneModel;
+    ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};

@@ -99,7 +99,7 @@ class ImgReorderListModelTest : public PlainTestSuite {
   }
 
   void default_ok() {
-    ImgReorderListModel reorderModel;
+    ImgReorderListModel reorderModel{"ImgReorderList"};
     QCOMPARE(reorderModel.rowCount(), 0);
     QCOMPARE(reorderModel.m_occupiedRows.isEmpty(), true);
     QCOMPARE(reorderModel.data({}, Qt::DisplayRole).isValid(), false);
@@ -139,7 +139,7 @@ class ImgReorderListModelTest : public PlainTestSuite {
     const int startNo{9};
     const QString namePattern{" %1"};
 
-    ImgReorderListModel reorderModel;
+    ImgReorderListModel reorderModel{"ImgReorderList"};
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, "invalid pattern. not contain format percentage1"), false);
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderModel.rowCount(), 3);
@@ -225,7 +225,7 @@ class ImgReorderListModelTest : public PlainTestSuite {
     const int startNo{90};
     const QString namePattern{" %1"};
 
-    ImgReorderListModel reorderModel;
+    ImgReorderListModel reorderModel{"ImgReorderList"};
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderModel.rowCount(), 2);
     QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 91"}));
@@ -271,7 +271,7 @@ class ImgReorderListModelTest : public PlainTestSuite {
     const int startNo{80};
     const QString namePattern{" %1"};
 
-    ImgReorderListModel reorderModel;
+    ImgReorderListModel reorderModel{"ImgReorderList"};
     QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderModel.rowCount(), 3);
     QCOMPARE(reorderModel.m_baseName, baseName);

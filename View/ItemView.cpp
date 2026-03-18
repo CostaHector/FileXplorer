@@ -18,8 +18,13 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
 
 bool ItemView::SetCurrentModel(FloatingModels* mdl) {
   CHECK_NULLPTR_RETURN_FALSE(mdl);
+  if (mModels != nullptr) {
+    LOG_W("Cannot rebind again");
+    return false;
+  }
   setModel(mdl);
   mModels = mdl;
+  PushBackExclusiveActions(mdl->GetExcusiveActions());
   return true;
 }
 

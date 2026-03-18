@@ -32,7 +32,7 @@ class ItemViewTest : public PlainTestSuite {
   void cleanupTestCase() {}
 
   void default_constructor() {
-    ImgsModel mImgModel;
+    ImgsModel mImgModel{"ImgsListView"};
     QCOMPARE(mImgModel.setDirPath(mTDir.itemPath("emptyImageFolder"), {}, false), 0);
     QVERIFY(mImgModel.index(0, 0).data(Qt::DisplayRole).isNull());
 
@@ -62,7 +62,7 @@ class ItemViewTest : public PlainTestSuite {
   void subscribe_ok() {
     MOCKER(FileTool::OpenLocalFile).stubs().will(invoke(FileToolMock::invokeOpenLocalFile));
 
-    ImgsModel mImgModel;
+    ImgsModel mImgModel{"ImgsListView"};
     QCOMPARE(mImgModel.setDirPath(mTDir.itemPath("3ImagesFolder"), {"*CR7*"}, true), 2);
 
     ItemView mImgTv{"ItemView Test"};

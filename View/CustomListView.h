@@ -16,12 +16,14 @@ public:
 
   void PushFrontExclusiveActions(const QList<QAction*>& acts);
   void AddItselfAction2Menu();
+  void PushBackExclusiveActions(const QList<QAction*>& acts);
 
   void InitListView();
   void mousePressEvent(QMouseEvent* event) override;
 
   int GetCurImageSizeScale() const {return mCurIconSizeIndex;}
   bool setIconSizeScaledIndex(int newScaledIndex);
+
 protected:
   QString m_name;
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};

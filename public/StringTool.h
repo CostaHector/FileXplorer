@@ -26,7 +26,7 @@ int RemoveDuplicateKeepSequence(QStringList& hists);
 int TrimEachElementAndRemoveEmpty(QStringList& keywords);
 void SearchHistoryListProc(QStringList& hists);
 
-QString PathJoinPixmapSize(QString path, int width, int height);
+QString PathJoinPixmapSize(QString path, int width, int height, bool bSmoothTrans);
 }
 
 #endif // STRINGTOOL_H
