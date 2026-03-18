@@ -7,17 +7,21 @@ ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString &name, QWidget *parent)
   CHECK_NULLPTR_RETURN_VOID(parent);
   CHECK_FALSE_RETURN_VOID(!name.isEmpty());
 
-  _AS_NEEDED = addAction("As Needed");
+  _AS_NEEDED = addAction(tr("As Needed"));
   CHECK_NULLPTR_RETURN_VOID(_AS_NEEDED);
   _AS_NEEDED->setCheckable(true);
 
-  _ALWAYS_OFF = addAction("Always Off");
+  _ALWAYS_OFF = addAction(tr("Always Off"));
   CHECK_NULLPTR_RETURN_VOID(_ALWAYS_OFF);
   _ALWAYS_OFF->setCheckable(true);
 
-  _ALWAYS_ON = addAction("Always On");
+  const bool isHor{name.contains("hor", Qt::CaseInsensitive)};
+  const QIcon alwaysOnIcon{isHor ? ":img/SCROLL_BAR_POLICY_HOR" : ":img/SCROLL_BAR_POLICY_VER"};
+
+  _ALWAYS_ON = addAction(tr("Always On"));
   CHECK_NULLPTR_RETURN_VOID(_ALWAYS_ON);
   _ALWAYS_ON->setCheckable(true);
+  _ALWAYS_ON->setIcon(alwaysOnIcon);
 
   mScrollBarPolicyIntAction.init(
       {

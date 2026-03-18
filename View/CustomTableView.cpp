@@ -35,7 +35,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   defaultFont.setPointSize(fontSize);
   setFont(defaultFont);
   // 1.
-  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, "Show Horizontal Header", this);
+  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, tr("Show Horizontal Header"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_HORIZONTAL_HEADER);
   _SHOW_HORIZONTAL_HEADER->setCheckable(true);
   _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, true).toBool());
@@ -50,7 +50,7 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   setSortingEnabled(m_horHeader->isSortingEnabled());
 
   // 2.
-  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction(QIcon{":img/VERTICAL_HEADER"}, "Show Vertical Header", this);
+  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction(QIcon{":img/VERTICAL_HEADER"}, tr("Show Vertical Header"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_VERTICAL_HEADER);
   _SHOW_VERTICAL_HEADER->setCheckable(true);
   _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, true).toBool());
@@ -63,30 +63,30 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   }
   setVerticalHeader(m_verHeader);
 
-  _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), "Resize Rows to Contents", this);
+  _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), tr("Resize Rows to Contents"), this);
   _RESIZE_ROW_TO_CONTENTS->setToolTip(
       QString("<b>%1</b><br/>Adjust row heights to fit content (one-time operation)").arg(_RESIZE_ROW_TO_CONTENTS->text()));
 
-  _RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), "Resize Columns to Contents", this);
+  _RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), tr("Resize Columns to Contents"), this);
   _RESIZE_COLUMN_TO_CONTENTS->setToolTip(
       QString("<b>%1</b><br/>Adjust column widths to fit content (one-time operation)").arg(_RESIZE_COLUMN_TO_CONTENTS->text()));
 
   // 3.
-  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, "Auto Scroll", this);
+  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, tr("Auto Scroll"), this);
   CHECK_NULLPTR_RETURN_VOID(_AUTO_SCROLL);
   _AUTO_SCROLL->setCheckable(true);
   _AUTO_SCROLL->setChecked(Configuration().value(m_autoScrollKey, true).toBool());
   setAutoScroll(_AUTO_SCROLL->isChecked());
 
   // 4.
-  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, "Alternating row colors", this);
+  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, tr("Alternating row colors"), this);
   CHECK_NULLPTR_RETURN_VOID(_ALTERNATING_ROW_COLORS);
   _ALTERNATING_ROW_COLORS->setCheckable(true);
   _ALTERNATING_ROW_COLORS->setChecked(Configuration().value(m_alternatingRowColorsKey, true).toBool());
   setAlternatingRowColors(_ALTERNATING_ROW_COLORS->isChecked());
 
   // 5.
-  _SHOW_GRID = new (std::nothrow) QAction(QIcon{":img/VIEW_GRID_ON"}, "Show grid", this);
+  _SHOW_GRID = new (std::nothrow) QAction(QIcon{":img/VIEW_GRID_ON"}, tr("Show grid"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_GRID);
   _SHOW_GRID->setCheckable(true);
   _SHOW_GRID->setChecked(Configuration().value(m_showGridKey, false).toBool());

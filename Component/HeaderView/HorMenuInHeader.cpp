@@ -17,10 +17,10 @@ HorMenuInHeader::HorMenuInHeader(const QString &proName, QWidget *parent)
   , m_columnVisibiltyKey{GetName() + "_COLUMN_VISIBILITY"}
   , m_sortByColumnSwitchKey{GetName() + "_SORT_BY_COLUMN_SWITCH"}
   , m_columnsShowSwitch{Configuration().value(m_columnVisibiltyKey, DEFAULT_SWITCHES()).toString()} {
-  _COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, "Column visibility", this);
-  _HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, "Hide this column", this);
+  _COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, tr("Column visibility"), this);
+  _HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, tr("Hide this column"), this);
 
-  _ENABLE_COLUMN_SORT = new (std::nothrow) QAction(QIcon{":img/SORTING_FILE_FOLDER"}, "Enable column sort", this);
+  _ENABLE_COLUMN_SORT = new (std::nothrow) QAction(QIcon{":img/SORTING_FILE_FOLDER"}, tr("Enable column sort"), this);
   _ENABLE_COLUMN_SORT->setCheckable(true);
   _ENABLE_COLUMN_SORT->setChecked(Configuration().value(m_sortByColumnSwitchKey, true).toBool());
   _ENABLE_COLUMN_SORT->setToolTip(QString("<b>%1 (%2)</b><br/> Enable/Disable sort by click on horizontal header")

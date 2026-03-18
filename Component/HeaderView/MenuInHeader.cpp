@@ -31,30 +31,30 @@ MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget 
   , m_resizeModeKey{GetName() + "_RESIZE_MODE"}
   , m_headerStateKey{GetName() + "_HEADER_GEOMETRY"} {
   const QString sectionSizeIconPath{orientation() == Qt::Orientation::Horizontal ? ":img/DEFAULT_COLUMN_WIDTH" : ":img/DEFAULT_ROW_HEIGHT"};
-  _SET_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(sectionSizeIconPath), "Set default section size", this);
+  _SET_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(sectionSizeIconPath), tr("Set default section size"), this);
   CHECK_NULLPTR_RETURN_VOID(_SET_DEFAULT_SECTION_SIZE);
-  _SET_MAX_SECTION_SIZE = new (std::nothrow) QAction("Set max section size", this);
+  _SET_MAX_SECTION_SIZE = new (std::nothrow) QAction(tr("Set max section size"), this);
   CHECK_NULLPTR_RETURN_VOID(_SET_MAX_SECTION_SIZE);
 
-  _STRETCH_DETAIL_SECTION = new (std::nothrow) QAction("Stretch last column", this);
+  _STRETCH_DETAIL_SECTION = new (std::nothrow) QAction(tr("Stretch last column"), this);
   CHECK_NULLPTR_RETURN_VOID(_STRETCH_DETAIL_SECTION);
   _STRETCH_DETAIL_SECTION->setCheckable(true);
   _STRETCH_DETAIL_SECTION->setChecked(Configuration().value(m_stretchLastSectionKey, false).toBool());
 
   {
-    _RESIZE_MODE_INTERACTIVE = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE"}, "Interactive", this};
+    _RESIZE_MODE_INTERACTIVE = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE"}, tr("Interactive"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_INTERACTIVE);
     _RESIZE_MODE_INTERACTIVE->setCheckable(true);
 
-    _RESIZE_MODE_STRETCH = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_STRETCH"}, "Stretch", this};
+    _RESIZE_MODE_STRETCH = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_STRETCH"}, tr("Stretch"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_STRETCH);
     _RESIZE_MODE_STRETCH->setCheckable(true);
 
-    _RESIZE_MODE_FIXED = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, "Fixed", this};
+    _RESIZE_MODE_FIXED = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Fixed"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_FIXED);
     _RESIZE_MODE_FIXED->setCheckable(true);
 
-    _RESIZE_MODE_RESIZE_TO_CONTENTS = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_RESIZE_TO_CONTENTS"}, "Resize to contents", this};
+    _RESIZE_MODE_RESIZE_TO_CONTENTS = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_RESIZE_TO_CONTENTS"}, tr("Resize to contents"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZE_MODE_RESIZE_TO_CONTENTS);
     _RESIZE_MODE_RESIZE_TO_CONTENTS->setCheckable(true);
 
@@ -77,7 +77,7 @@ MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget 
     m_menu->addAction(_SET_DEFAULT_SECTION_SIZE);
     m_menu->addAction(_SET_MAX_SECTION_SIZE);
     m_menu->addAction(_STRETCH_DETAIL_SECTION);
-    QMenu *sectionResizeModeMenu = m_menu->addMenu(QIcon{":img/RESIZE_MODE"}, "Section resize mode");
+    QMenu *sectionResizeModeMenu = m_menu->addMenu(QIcon{":img/RESIZE_MODE"}, tr("Section resize mode"));
     CHECK_NULLPTR_RETURN_VOID(sectionResizeModeMenu);
     sectionResizeModeMenu->addActions(mResizeModeIntAction.getActionEnumAscendingList());
 

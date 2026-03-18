@@ -40,19 +40,19 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   setFont(defaultFont);
 
   {
-    _TEXT_ELIDE_MODE_LEFT = new (std::nothrow) QAction{QIcon{""}, "Elide Left", this};
+    _TEXT_ELIDE_MODE_LEFT = new (std::nothrow) QAction{QIcon{""}, tr("Elide Left"), this};
     CHECK_FALSE_RETURN_VOID(_TEXT_ELIDE_MODE_LEFT);
     _TEXT_ELIDE_MODE_LEFT->setCheckable(true);
 
-    _TEXT_ELIDE_MODE_RIGHT = new (std::nothrow) QAction{QIcon{""}, "Elide Right", this};
+    _TEXT_ELIDE_MODE_RIGHT = new (std::nothrow) QAction{QIcon{""}, tr("Elide Right"), this};
     CHECK_FALSE_RETURN_VOID(_TEXT_ELIDE_MODE_RIGHT);
     _TEXT_ELIDE_MODE_RIGHT->setCheckable(true);
 
-    _TEXT_ELIDE_MODE_MIDDLE = new (std::nothrow) QAction{QIcon{""}, "Elide Middle", this};
+    _TEXT_ELIDE_MODE_MIDDLE = new (std::nothrow) QAction{QIcon{""}, tr("Elide Middle"), this};
     CHECK_FALSE_RETURN_VOID(_TEXT_ELIDE_MODE_MIDDLE);
     _TEXT_ELIDE_MODE_MIDDLE->setCheckable(true);
 
-    _TEXT_ELIDE_MODE_NONE = new (std::nothrow) QAction{QIcon{""}, "Elide None", this};
+    _TEXT_ELIDE_MODE_NONE = new (std::nothrow) QAction{QIcon{""}, tr("Elide None"), this};
     CHECK_FALSE_RETURN_VOID(_TEXT_ELIDE_MODE_NONE);
     _TEXT_ELIDE_MODE_NONE->setCheckable(true);
 
@@ -68,7 +68,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     QAction* checkedElideAct = mTextEditModeIntAction.setCheckedIfActionExist(elideInt);
     onTextElideModeChanged(checkedElideAct);
 
-    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) QMenu{QString{"%1 Text Elide Mode"}.arg(m_name), this};
+    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) QMenu{QString{"%1"}.arg(m_name) + tr("Text Elide Mode"), this};
     CHECK_NULLPTR_RETURN_VOID(_TEXT_ELIDE_MODE_MENU);
     _TEXT_ELIDE_MODE_MENU->addActions(mTextEditModeIntAction.getActionEnumAscendingList());
   }
