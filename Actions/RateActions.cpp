@@ -22,6 +22,7 @@ RateActions::RateActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(RATE_AGS);
   RATE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
+  ALL_RATE_ACTIONS_LIST.reserve(RateHelper::BUTT_V - RateHelper::MIN_V);
   for (int rate = RateHelper::BUTT_V - 1; rate >= RateHelper::MIN_V; --rate) {
     QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)),  //
                                                QString::number(rate) + tr(" score"),    //
@@ -31,18 +32,16 @@ RateActions::RateActions(QObject* parent) : QObject{parent} {
     const int keypad = (rate == 10) ? Qt::Key_Plus : (Qt::Key_0 + rate);
     pAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::KeypadModifier | keypad));
     RATE_AGS->addAction(pAct);
-    ALL_RATE_ACTIONS_LIST += pAct;
+    ALL_RATE_ACTIONS_LIST.push_back(pAct);
   }
 
   _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate recusively"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY);
   _RATE_RECURSIVELY->setToolTip("Rate only unrated movies in selected folder and its subfolders");
-  ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
 
   _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{tr("Rate recusively(force)"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY_OVERRIDE);
   _RATE_RECURSIVELY_OVERRIDE->setToolTip("Rate all movies, overwriting existing ratings");
-  ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;
 
   _INCREASING_RATING = new QAction{QIcon{":img/INCREASING_RATING"}, tr("Increase rating"), this};
   _INCREASING_RATING->setToolTip("Increase the movie rating by 1 point");
@@ -53,11 +52,6 @@ RateActions::RateActions(QObject* parent) : QObject{parent} {
   _DECREASING_RATETING_RECURSIVELY = new QAction{tr("Decrease rating recusively"), this};
   _DECREASING_RATETING_RECURSIVELY->setToolTip("Decrease the movie under path rating by 1 point");
 
-  ALL_RATE_ACTIONS_LIST += _INCREASING_RATING;
-  ALL_RATE_ACTIONS_LIST += _DECREASING_RATING;
-  ALL_RATE_ACTIONS_LIST += _INCREASING_RATETING_RECURSIVELY;
-  ALL_RATE_ACTIONS_LIST += _DECREASING_RATETING_RECURSIVELY;
-
   subscribe();
 }
 
@@ -66,7 +60,17 @@ QMenu* RateActions::GetRateMenu(QWidget* notNullParent) const {
   QMenu* rateMenu = new (std::nothrow) QMenu{tr("Rate"), notNullParent};
   rateMenu->setIcon(QIcon{":img/LIKE"});
   rateMenu->setToolTip("Rate for your movie");
+  rateMenu->addSection("Specify a rate value");
   rateMenu->addActions(GetAllRateActionsList());
+  rateMenu->addSeparator();
+  rateMenu->addSection("Adjust +1/-1 rate point");
+  rateMenu->addActions(GetAdjustRateActions());
+  rateMenu->addAction(_INCREASING_RATETING_RECURSIVELY);
+  rateMenu->addAction(_DECREASING_RATETING_RECURSIVELY);
+  rateMenu->addSeparator();
+  rateMenu->addSection("Recursively rate all videos with user specified value");
+  rateMenu->addAction(_RATE_RECURSIVELY);
+  rateMenu->addAction(_RATE_RECURSIVELY_OVERRIDE);
   rateMenu->setToolTipsVisible(true);
   return rateMenu;
 }
