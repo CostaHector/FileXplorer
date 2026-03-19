@@ -40,9 +40,9 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy basename", this};
+  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "copy basename", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/PLAY_BUTTON_ROUND"), "Play this folder", this};
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/SYSTEM_APPLICATION_VIDEO"), "play this folder", this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
 
   QList<QAction*> exclusiveActions{COPY_BASENAME_FROM_SCENE, OPEN_CORRESPONDING_FOLDER};

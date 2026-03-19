@@ -21,7 +21,7 @@ bool ValueChecker::isFolderExist(const QString& path) {
 }
 
 bool ValueChecker::isStrInCandidate(const QString& str) const {
-  return m_strCandidates.isEmpty() or m_strCandidates.contains(str);
+  return m_strCandidates.isEmpty() || m_strCandidates.contains(str);
 }
 
 bool ValueChecker::isSpecifiedExtensionFileExist(const QString& path) const {

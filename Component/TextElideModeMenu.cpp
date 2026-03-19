@@ -32,7 +32,7 @@ TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& mem
        {_TEXT_ELIDE_MODE_MIDDLE, Qt::TextElideMode::ElideMiddle},  //
        {_TEXT_ELIDE_MODE_NONE, Qt::TextElideMode::ElideNone},
        },  //
-      Qt::TextElideMode::ElideLeft, QActionGroup::ExclusionPolicy::Exclusive);
+      Qt::TextElideMode::ElideNone, QActionGroup::ExclusionPolicy::Exclusive);
   int elideInt = Configuration().value(GetName(), (int)mTextEditModeIntAction.defVal()).toInt();
   mTextEditModeIntAction.setCheckedIfActionExist(elideInt);
 

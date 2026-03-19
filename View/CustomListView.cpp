@@ -59,8 +59,8 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Resize Mode: Adjust"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
     _RESIZED_MODE_ADJUST->setCheckable(true);
-    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", false).toBool());
-    _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed(default)");
+    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", true).toBool());
+    _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed. by default: adjust");
 
     _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, tr("Wrapping"), this};
     CHECK_NULLPTR_RETURN_VOID(_WRAPPING_ACTIONS);
@@ -68,7 +68,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     _WRAPPING_ACTIONS->setChecked(Configuration().value(m_name + "_WRAPPING_ACTIONS", false).toBool());
     _WRAPPING_ACTIONS->setToolTip("The layout should wrap when there is no more space in the visible area if enabled, by default: no wrap false");
 
-    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{""}, tr("Uniform items sizes"), this};
+    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, tr("Uniform items sizes"), this};
     CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
     _UNIFORM_ITEM_SIZES->setCheckable(true);
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(m_name + "_UNIFORM_ITEM_SIZES", false).toBool());

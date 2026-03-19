@@ -40,7 +40,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mShowFrames->setCheckable(true);
   mShowFrames->setChecked(false);
 
-  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/PLAY_BUTTON_ROUND"}, tr("open in system application"), this};
+  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("open in system application"), this};
 
   mShowVideoList = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_LIST"}, tr("show list"), this};
   mShowVideoList->setCheckable(true);
@@ -83,6 +83,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mBasicModeAct = new QAction(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"}, tr("basic mode"), this);
   mBasicModeAct->setCheckable(true);
   mBasicModeAct->setChecked(bBasicMode);
+  mBasicModeAct->setToolTip("Compact interface with only essential functions when enabled, otherwise standard interface with all features");
 
   mHideToolBarAct = DualIconCheckableAction::CreateHideToolBarAction(this, false);
   mFullScreenAct = DualIconCheckableAction::CreateFullScreenAction(this, false);

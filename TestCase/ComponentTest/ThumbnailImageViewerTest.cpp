@@ -329,7 +329,7 @@ class ThumbnailImageViewerTest : public PlainTestSuite {
     }
 
     // 验证配置已保存
-    QCOMPARE(IMAGE_SIZE::GetInitialScaledSize(THUMBNAIL_IMAGE_VIEWER_MEMORY_NAME), testIndex);
+    QCOMPARE(IMAGE_SIZE::GetInitialScaledSize(key), testIndex);
     {
       // 重新创建viewer，验证配置加载
       ThumbnailImageViewer viewer(key);

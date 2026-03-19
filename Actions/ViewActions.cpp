@@ -89,7 +89,7 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _PREVIEW_PANEL->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(_PREVIEW_PANEL->text(), _PREVIEW_PANEL->shortcut().toString()));
 
-  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/PLAY_BUTTON_ROUND"), tr("Play"), this);
+  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/SYSTEM_APPLICATION_VIDEO"), tr("play in system application"), this);
   _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
   _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
   _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"

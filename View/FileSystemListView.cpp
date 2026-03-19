@@ -15,18 +15,16 @@ FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* paren
     : CustomListView{"FILE_SYSTEM_LIST", parent}, _fsModel{fsmModel}                                       //
 {
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
-  PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(fsmModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
-
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
+  PushFrontExclusiveActions(GetRightClickMenuActions(this));
+
   subscribe();
-  setWrapping(true);
-  setUniformItemSizes(true);
 }
 
 void FileSystemListView::subscribe() {

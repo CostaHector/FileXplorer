@@ -9,8 +9,8 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
     : CustomListView{itemViewName, parent} {
   setMovement(QListView::Movement::Free);
 
-  _PLAY_ITEM = new (std::nothrow) QAction{QIcon{":img/OPEN_IN_TERMINAL"}, "Open", this};
-  _RECYCLE_ITEM = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this};
+  _PLAY_ITEM = new (std::nothrow) QAction{tr("Open"), this};
+  _RECYCLE_ITEM = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle"), this};
   QList<QAction*> exclusiveActions{_PLAY_ITEM, NewSeperatorAction(this), _RECYCLE_ITEM};
   PushFrontExclusiveActions(exclusiveActions);
   subscribe();
@@ -48,7 +48,11 @@ bool ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
 }
 
 bool ItemView::onPlayCurrentIndex() const {
-  return onCellDoubleClicked(currentIndex());
+  const QModelIndex curIndex = currentIndex();
+  if (!curIndex.isValid()) {
+    return false;
+  }
+  return onCellDoubleClicked(curIndex);
 }
 
 bool ItemView::onRecycleSelections() const {

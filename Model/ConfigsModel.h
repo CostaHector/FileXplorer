@@ -2,12 +2,18 @@
 #define CONFIGSMODEL_H
 
 #include <QAbstractTableModel>
+class QSettings;
+class KV;
 
 class ConfigsModel : public QAbstractTableModel {
 public:
-  explicit ConfigsModel(QObject* parent = nullptr);
+  enum DataType {
+    NAME = 0,
+    INITIAL_VALUE = 1,
+    CURRENT_VALUE = 2,
+  };
 
-  QModelIndex setRootPath(const QString& /*path*/) {return {};}
+  using QAbstractTableModel::QAbstractTableModel;
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override;
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return CONFIGS_TABLE_HEADER.size(); }
@@ -32,17 +38,17 @@ public:
   }
 
   Qt::ItemFlags flags(const QModelIndex& index) const override {
-    if (index.column() == VALUE_COLUMN) {
+    if (index.column() == CURRENT_VALUE) {
       return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
     }
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
 
   QString filePath(const QModelIndex& index) const;
+  static bool isCfgPass(const QSettings& curCfg, const KV& record);
 
 private:
   static const QStringList CONFIGS_TABLE_HEADER;
-  static constexpr int VALUE_COLUMN{1};
 };
 
 #endif  // CONFIGSMODEL_H

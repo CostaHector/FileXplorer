@@ -6,6 +6,7 @@
 #include <QAction>
 
 class QAbstractListModelPub : public QAbstractListModel {
+  Q_OBJECT
  public:
   explicit QAbstractListModelPub(const QString& listViewName, QObject *parent = nullptr);
   ~QAbstractListModelPub();
@@ -23,8 +24,8 @@ class QAbstractListModelPub : public QAbstractListModel {
   QList<QAction*> GetExcusiveActions() const;
 
  public slots:
-  void onIconSizeChange(const QSize& newSize);
-  void onPixmapSmoothTransformationToggled(bool bSmooth);
+  bool onIconSizeChange(const QSize& newSize);
+  bool onPixmapSmoothTransformationToggled(bool bSmooth);
 
  private:
   void subscribe();

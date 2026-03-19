@@ -5,22 +5,24 @@
 #include "PathTool.h"
 #include <QIcon>
 
-const QStringList ConfigsModel::CONFIGS_TABLE_HEADER{"Name", "Current value", "Initial value"};
-constexpr int ConfigsModel::VALUE_COLUMN;
+const QStringList ConfigsModel::CONFIGS_TABLE_HEADER{"Name", "Initial value", "Current value"};
 
-ConfigsModel::ConfigsModel(QObject* parent) : QAbstractTableModel{parent} {}
+bool ConfigsModel::isCfgPass(const QSettings& curCfg, const KV& record) {
+  return record.checker(curCfg.value(record.name, record.v));
+}
 
 int ConfigsModel::rowCount(const QModelIndex& /*parent*/) const {
   return KV::mEditableKVs.size();
 }
 
 int ConfigsModel::failCount() const {
-  static const QSettings& curCfg = Configuration();
-  int fails = 0;
-  for (const KV* record: KV::mEditableKVs) {
-    fails += (1 - record->checker(curCfg.value(record->name)));  // 1 - bool, revert
+  const QSettings& curCfg = Configuration();
+  int succeeCnt = 0;
+  for (const KV* record : KV::mEditableKVs) {
+    const bool isPass{isCfgPass(curCfg, *record)};
+    succeeCnt += isPass;
   }
-  return fails;
+  return rowCount() - succeeCnt;
 }
 
 QVariant ConfigsModel::data(const QModelIndex& index, int role) const {
@@ -31,41 +33,42 @@ QVariant ConfigsModel::data(const QModelIndex& index, int role) const {
     return {};
   }
   const KV* record = KV::mEditableKVs[index.row()];
-  static const QSettings& curCfg = Configuration();
+  const QSettings& curCfg = Configuration();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
-      case 0: // name
+      case NAME:  // name
         return record->name;
-      case 1: // current value
-        return record->valueToString(curCfg.value(record->name, record->v));
-      case 2: // inital value
-        return record->InitialValueToString();
+      case INITIAL_VALUE:
+        return record->v;
+      case CURRENT_VALUE:
+        return curCfg.value(record->name, record->v);
       default:
         return {};
     }
-  } else if (role == Qt::DecorationRole && index.column() == 0) {
-    static const QIcon PASS_OR_NOT_ICONS_ARR[] {QIcon{":img/WRONG"}, QIcon{":img/CORRECT"}};
-    return PASS_OR_NOT_ICONS_ARR[(int)record->checker(curCfg.value(record->name, record->v))];
+  } else if (role == Qt::DecorationRole && index.column() == NAME) {
+    static const QIcon PASS_OR_NOT_ICONS_ARR[]{QIcon{":img/WRONG"}, QIcon{":img/CORRECT"}};
+    const bool isPass{isCfgPass(curCfg, *record)};
+    return PASS_OR_NOT_ICONS_ARR[(int)isPass];
   }
   return {};
 }
 
 bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (role == Qt::EditRole && index.column() == VALUE_COLUMN) {
+  if (role == Qt::EditRole && flags(index).testFlag(Qt::ItemFlag::ItemIsEditable)) {
     // for direct edit, using EditRole
     const KV* record = KV::mEditableKVs[index.row()];
     if (!record->checker(value)) {
       LOG_D("Edit %s[newValue] not pass the checker", qPrintable(record->name));
       return false;
     }
-    static auto& curCfg = Configuration();
+    QSettings& curCfg = Configuration();
     if (record->isPath()) {
       const QString& stdPath = PathTool::normPath(value.toString());
       curCfg.setValue(record->name, stdPath);
     } else {
       curCfg.setValue(record->name, value);
     }
-    emit dataChanged(index, index, {Qt::DisplayRole});
+    emit dataChanged(index.siblingAtColumn(NAME), index.siblingAtColumn(NAME), {Qt::DecorationRole});
     return true;
   }
   return QAbstractItemModel::setData(index, value, role);
@@ -73,7 +76,8 @@ bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int 
 
 QString ConfigsModel::filePath(const QModelIndex& index) const {
   if (!index.isValid()) {
+    LOG_W("index invalid");
     return "";
   }
-  return data(index.siblingAtColumn(VALUE_COLUMN), Qt::DisplayRole).toString();
+  return index.siblingAtColumn(CURRENT_VALUE).data().toString();
 }
