@@ -75,7 +75,7 @@ QMenu* RateActions::GetRateMenu(QWidget* notNullParent) const {
   return rateMenu;
 }
 
-QWidget* RateActions::GetRateToolButton(QWidget* notNullParent) const {
+QWidget* RateActions::GetRateToolButton(QWidget* notNullParent, bool bShortCutEnabled) const {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
   QMenu* pDropdownMenu = GetRateMenu(notNullParent);
   CHECK_NULLPTR_RETURN_NULLPTR(pDropdownMenu);
@@ -85,7 +85,9 @@ QWidget* RateActions::GetRateToolButton(QWidget* notNullParent) const {
                                                                      IMAGE_SIZE::TABS_ICON_IN_MENU_16, notNullParent);
   CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
   rateToolButton->SetCaption(QIcon{":img/LIKE"}, tr("Rate"), "Rate for your movie");
-  rateToolButton->addActions(RATE_AGS->actions()); // for shortcut key only, not for display menu
+  if (bShortCutEnabled) {
+    rateToolButton->addActions(RATE_AGS->actions()); // for shortcut key only, not for display menu
+  }
   return rateToolButton;
 }
 

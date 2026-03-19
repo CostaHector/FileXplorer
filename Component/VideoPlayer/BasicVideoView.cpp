@@ -30,7 +30,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   playbackTriggerModeBtn->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
   setPlaybackTriggerMode(mVideoWidget->GetPlaybackTriggerMode());
 
-  mRateToolButton = mVideoWidget->GetRateActions()->GetRateToolButton(this);
+  mRateToolButton = mVideoWidget->GetRateActions()->GetRateToolButton(this, false);
 
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   mFunctionCtrlBar->addWidget(playbackTriggerModeBtn);
