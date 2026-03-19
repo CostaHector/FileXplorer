@@ -14,7 +14,7 @@
 
 class FileSystemListView : public CustomListView {
  public:
-  FileSystemListView(FileSystemModel* fsmModel, QWidget* parent=nullptr);
+  explicit FileSystemListView(FileSystemModel* fsmModel, QWidget* parent=nullptr);
 
   void subscribe();
 

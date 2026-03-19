@@ -145,7 +145,7 @@ class ScenesListModelTest : public PlainTestSuite {
   void initalized_ok() {
     Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);  //
 
-    ScenesListModel defaultConstruct;
+    ScenesListModel defaultConstruct{"ScenesListView"};
     QVERIFY(defaultConstruct.data(QModelIndex{}, Qt::DisplayRole).isNull());
     // will not crash down
     QCOMPARE(defaultConstruct.rowCount(), 0);
@@ -182,7 +182,7 @@ class ScenesListModelTest : public PlainTestSuite {
   void setRootPath_works_ok() {
     Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
     SceneInfoManager::mockScenesInfoList().clear();
-    ScenesListModel slm;
+    ScenesListModel slm{"ScenesListView"};
     {
       // 1 预期有3行, 因为有3个json读取到了
       QVERIFY(slm.setRootPath(bambooPath, false));
@@ -213,7 +213,7 @@ class ScenesListModelTest : public PlainTestSuite {
         QCOMPARE(imgsAtFirstRow.size(), 2);
         QCOMPARE(imgsAtFirstRow.front(), firstImagePath);
         QCOMPARE(slm.mCurBegin[0].GetFirstImageAbsPath(slm.rootPath()), firstImagePath);
-        // const QString imgKey = StringTool::PathJoinPixmapSize(firstImagePath, 540, 360); // decide by svg width-height
+        const QString imgKey = StringTool::PathJoinPixmapSize(firstImagePath, 540, 360, true); // decide by svg width-height
         // QVERIFY(slm.mPixCache.find(imgKey, nullptr)); todo
         slm.data(slm.index(0), Qt::DecorationRole);
 
@@ -339,7 +339,7 @@ class ScenesListModelTest : public PlainTestSuite {
   void sort_only_one_dimension_sorted() {
     Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
 
-    ScenesListModel slm;
+    ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     sspm.setSourceModel(&slm);
     {  // MOVIE_PATH
@@ -462,7 +462,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(manualAppendToAInExistPath.size(), 15);
     SceneInfoManager::mockScenesInfoList() = manualAppendToAInExistPath;  // the mock works here
 
-    ScenesListModel slm;
+    ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     {
       sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // nothing happend

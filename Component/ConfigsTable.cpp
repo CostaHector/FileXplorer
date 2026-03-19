@@ -12,32 +12,32 @@
 #include <QVBoxLayout>
 #include <QFile>
 
-ConfigsTable::ConfigsTable(QWidget* parent)
-  : QDialog{parent} {
+ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
   setFont(StyleSheet::TEXT_EDIT_FONT);
 
   m_failItemCnt = new (std::nothrow) QLabel{"Configs status here", this};
-  CHECK_NULLPTR_RETURN_VOID(m_failItemCnt)
+  CHECK_NULLPTR_RETURN_VOID(m_failItemCnt);
   m_alertModel = new (std::nothrow) ConfigsModel{this};
-  CHECK_NULLPTR_RETURN_VOID(m_alertModel)
-  m_alertModel->setRootPath("");
+  CHECK_NULLPTR_RETURN_VOID(m_alertModel);
 
   m_alertsTable = new (std::nothrow) CustomTableView{"CONFIGS_TABLE", this};
-  CHECK_NULLPTR_RETURN_VOID(m_alertsTable)
+  CHECK_NULLPTR_RETURN_VOID(m_alertsTable);
   m_alertsTable->setModel(m_alertModel);
   m_alertsTable->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
-  auto* dlgBtnBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry, Qt::Orientation::Horizontal, this};
-  CHECK_NULLPTR_RETURN_VOID(dlgBtnBox)
+  const QDialogButtonBox::StandardButtons stdBtns{QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry};
 
-  auto* pOk = dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok);
+  m_dlgBtnBox = new (std::nothrow) QDialogButtonBox{stdBtns, Qt::Orientation::Horizontal, this};
+  CHECK_NULLPTR_RETURN_VOID(m_dlgBtnBox);
+
+  auto* pOk = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok);
   pOk->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOk->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
-  auto* pOpen = dlgBtnBox->button(QDialogButtonBox::StandardButton::Open);
+  auto* pOpen = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Open);
   pOpen->setText("Edit");
   pOpen->setIcon(QIcon(":img/CONFIGURE"));
   pOpen->setToolTip("Edit in config file directly");
-  auto* pRetry = dlgBtnBox->button(QDialogButtonBox::StandardButton::Retry);
+  auto* pRetry = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Retry);
   pRetry->setText("Recheck");
   pRetry->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
 
@@ -45,13 +45,13 @@ ConfigsTable::ConfigsTable(QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(lo)
   lo->addWidget(m_failItemCnt);
   lo->addWidget(m_alertsTable);
-  lo->addWidget(dlgBtnBox);
+  lo->addWidget(m_dlgBtnBox);
   setLayout(lo);
 
   connect(m_alertsTable, &QTableView::doubleClicked, this, &ConfigsTable::on_cellDoubleClicked);
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &ConfigsTable::RefreshWindowIcon);
 
-  connect(pOk, &QPushButton::clicked, this, &QDialog::accept);
+  connect(m_dlgBtnBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(pOpen, &QPushButton::clicked, this, &ConfigsTable::onEditPreferenceSetting);
   connect(pRetry, &QPushButton::clicked, this, &ConfigsTable::RefreshWindowIcon);
 
@@ -77,10 +77,6 @@ void ConfigsTable::hideEvent(QHideEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   g_fileLeafActions()._SETTINGS->setChecked(false);
   QDialog::hideEvent(event);
-}
-
-void ConfigsTable::closeEvent(QCloseEvent* event) {
-  return QDialog::closeEvent(event);
 }
 
 void ConfigsTable::RefreshWindowIcon() {

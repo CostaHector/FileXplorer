@@ -10,7 +10,7 @@
 class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
  public:
-  explicit ScenesListModel(QObject* object = nullptr);
+  explicit ScenesListModel(const QString& listViewName, QObject* object = nullptr);
 
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   inline QString rootPath() const { return mRootPath; }

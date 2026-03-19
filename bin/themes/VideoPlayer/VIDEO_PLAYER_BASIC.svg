@@ -1,25 +1,2 @@
-<?xml version="1.0" ?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 -70.28 512 512" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<style>.cls-1{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:20px;}</style>
-</defs>
-<g data-name="Layer 2" id="Layer_2">
-<g data-name="E417, Media, media player, multimedia, player, video player" id="E417_Media_media_player_multimedia_player_video_player">
-<rect class="cls-1" height="351.43" width="492" x="10" y="10"/>
-<polygon class="cls-1" points="191.83 271.28 191.83 100.15 352.26 185.71 191.83 271.28"/>
-<rect class="cls-1" height="45.4" width="82" x="10" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="92" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="174" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="256" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="338" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="420" y="10"/>
-<rect class="cls-1" height="45.4" width="82" x="10" y="316.03"/>
-<rect class="cls-1" height="45.4" width="82" x="92" y="316.03"/>
-<rect class="cls-1" height="45.4" width="82" x="174" y="316.03"/>
-<rect class="cls-1" height="45.4" width="82" x="256" y="316.03"/>
-<rect class="cls-1" height="45.4" width="82" x="338" y="316.03"/>
-<rect class="cls-1" height="45.4" width="82" x="420" y="316.03"/>
-</g>
-</g>
-</svg>
+<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg fill="#000000" width="800px" height="800px" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M12.855 10.064c-.505.163-.855.68-.855 1.248v7.374c0 .574.354 1.094.86 1.254.51.16 1.083-.004 1.576-.407l3.562-2.918c.585-.48 1-.992 1.002-1.615.002-.623-.415-1.145-1.006-1.62-.63-.506-2.37-1.943-3.558-2.917-.497-.407-1.075-.562-1.58-.4zm.948 1.176c1.186.97 2.917 2.4 3.564 2.92.485.39.634.668.633.84 0 .172-.155.445-.637.84l-3.56 2.918c-.44.44-.803.183-.803-.072v-7.374c0-.543.476-.4.803-.072zM1.5 4C.678 4 0 4.678 0 5.5v19c0 .822.678 1.5 1.5 1.5h27c.822 0 1.5-.678 1.5-1.5v-19c0-.822-.678-1.5-1.5-1.5h-27zm0 1h27c.286 0 .5.214.5.5v19c0 .286-.214.5-.5.5h-27c-.286 0-.5-.214-.5-.5v-19c0-.286.214-.5.5-.5z"/></svg>

@@ -46,7 +46,7 @@
         <file alias="THUMBNAIL_EXTRACTOR_0_4">Media/THUMBNAIL_EXTRACTOR_0_4.svg</file>
         <file alias="THUMBNAIL_EXTRACTOR_B_E">Media/THUMBNAIL_EXTRACTOR_B_E.svg</file>
         <file alias="MUSIC_PLAYER">Media/MUSIC_PLAYER.svg</file>
-        <file alias="PLAY_BUTTON_ROUND">Media/PLAY_BUTTON_ROUND.svg</file>
+        <file alias="SYSTEM_APPLICATION_VIDEO">Media/SYSTEM_APPLICATION_VIDEO.svg</file>
         <file alias="FAIL_FAST">Media/FAIL_FAST.svg</file>
         <file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
         <file alias="LIKE">Media/LIKE.svg</file>
@@ -276,6 +276,8 @@
         <file alias="LIST_TEXT_ELIDE_MODE_LEFT">View/LIST_TEXT_ELIDE_MODE_LEFT.svg</file>
         <file alias="LIST_TEXT_ELIDE_MODE_MIDDLE">View/LIST_TEXT_ELIDE_MODE_MIDDLE.svg</file>
         <file alias="LIST_TEXT_ELIDE_MODE_RIGHT">View/LIST_TEXT_ELIDE_MODE_RIGHT.svg</file>
+        <file alias="IMAGE_TRANSFORMATION_SMOOTH">View/IMAGE_TRANSFORMATION_SMOOTH.svg</file>
+        <file alias="UNIFORM_ITEM_SIZES">View/UNIFORM_ITEM_SIZES.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
@@ -352,7 +354,7 @@
 
     <qresource prefix="/VideoPlayer">
         <!--VideoPlayer icon here-->
-        <file alias="VIDEO_PLAYER">VideoPlayer/VIDEO_PLAYER.svg</file>
+        <file alias="VIDEO_VIEW">VideoPlayer/VIDEO_VIEW.svg</file>
         <file alias="VIDEO_PLAYER_BASIC">VideoPlayer/VIDEO_PLAYER_BASIC.svg</file>
         <file alias="OPEN_A_VIDEO">VideoPlayer/OPEN_A_VIDEO.svg</file>
         <file alias="OPEN_A_FOLDER">VideoPlayer/OPEN_A_FOLDER.svg</file>

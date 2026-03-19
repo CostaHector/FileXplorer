@@ -4,6 +4,7 @@
 #include "FloatingModels.h"
 
 class ItemView : public CustomListView {
+  Q_OBJECT
  public:
   explicit ItemView(const QString& itemViewName, QWidget* parent = nullptr);
   bool SetCurrentModel(FloatingModels* mdl);

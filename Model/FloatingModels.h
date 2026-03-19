@@ -27,13 +27,18 @@ class FloatingModels : public QAbstractListModelPub {
 
 class ImgsModel : public FloatingModels {
  public:
+  using FloatingModels::FloatingModels;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 };
 
 class VidsModel : public FloatingModels {
  public:
+  using FloatingModels::FloatingModels;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 };
 
-class OthersModel : public VidsModel {};
+class OthersModel : public VidsModel {
+public:
+  using VidsModel::VidsModel;
+};
 #endif  // FLOATINGMODELS_H

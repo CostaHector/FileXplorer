@@ -217,7 +217,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+43"/>
+        <location filename="../View/CustomListView.cpp" line="+42"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -774,10 +774,10 @@
     <message>
         <location line="+25"/>
         <source>basic mode</source>
-        <translation>基础模式</translation>
+        <translation>简洁模式</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>select video</source>
         <translation>选择视频文件</translation>
     </message>
@@ -805,6 +805,19 @@
         <location line="+10"/>
         <source>Play Trigger Mode</source>
         <translation>触发方式</translation>
+    </message>
+</context>
+<context>
+    <name>ItemView</name>
+    <message>
+        <location filename="../View/ItemView.cpp" line="+12"/>
+        <source>Open</source>
+        <translation>打开</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Recycle</source>
+        <translation>回收</translation>
     </message>
 </context>
 <context>
@@ -1351,6 +1364,14 @@
     </message>
 </context>
 <context>
+    <name>QAbstractListModelPub</name>
+    <message>
+        <location filename="../Model/QAbstractListModelPub.cpp" line="+18"/>
+        <source>smooth transformation</source>
+        <translation>平滑变换</translation>
+    </message>
+</context>
+<context>
     <name>RateActions</name>
     <message>
         <location filename="../Actions/RateActions.cpp" line="+27"/>
@@ -1746,7 +1767,7 @@
 <context>
     <name>ThumbnailImageViewer</name>
     <message>
-        <location filename="../Component/ThumbnailImageViewer.cpp" line="+299"/>
+        <location filename="../Component/ThumbnailImageViewer.cpp" line="+298"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -1931,7 +1952,12 @@
         <translation>下一个视图</translation>
     </message>
     <message>
-        <location line="-72"/>
+        <location line="+12"/>
+        <source>play in system application</source>
+        <translation>在系统应用中打开</translation>
+    </message>
+    <message>
+        <location line="-84"/>
         <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>
@@ -1941,12 +1967,7 @@
         <translation>预览面板</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Play</source>
-        <translation>播放</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location line="+13"/>
         <source>Har View</source>
         <translation>Har视图</translation>
     </message>

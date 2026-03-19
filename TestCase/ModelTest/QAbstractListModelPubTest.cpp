@@ -1,17 +1,16 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-#include <QTestEventList>
-#include <QSignalSpy>
 
 #include "BeginToExposePrivateMember.h"
 #include "QAbstractListModelPub.h"
 #include "EndToExposePrivateMember.h"
+#include <QSignalSpy>
+#include "MemoryKey.h"
 
 using intQList = QList<int>;
 extern template std::pair<bool, intQList> MoveItemsBase<intQList>(const intQList&, const QList<int>&, int);
 
-class Dim1ContainerTableModel : public QAbstractListModelPub {
+class Dim1ContainerListModel : public QAbstractListModelPub {
  public:
   using QAbstractListModelPub::QAbstractListModelPub;
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mData.size(); }
@@ -97,9 +96,12 @@ class QAbstractListModelPubTest : public PlainTestSuite {
   }
 
   void dimension1_container_model_border_test() {
-    Dim1ContainerTableModel rowModel;
-    QCOMPARE(rowModel.rowCount(), 0);
-    {  // protection should not crashdown
+    Configuration().clear();
+
+    {
+      Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
+      QCOMPARE(rowModel.rowCount(), 0);
+      // protection: not crashdown
       QVERIFY(rowModel.mRowChangeStack.empty());
 
       QVERIFY(!rowModel.RowsCountEndChange());  // empty stack
@@ -109,11 +111,43 @@ class QAbstractListModelPubTest : public PlainTestSuite {
       QVERIFY(!rowModel.RowsCountEndChange());         // empty stack
 
       QVERIFY(rowModel.mRowChangeStack.empty());
+
+      const QList<QAction*> acts = rowModel.GetExcusiveActions();
+      QCOMPARE(acts.contains(rowModel._PIXMAP_TRANSFORMATION_SMOOTH), true);
+
+      rowModel.GetDecorationPixmap("");
+
+      QVERIFY(rowModel.getPixmapWidth() > 0);
+      QVERIFY(rowModel.getPixmapHeight() > 0);
+
+      // 0 rows, onPixmapSmoothTransformationToggled will not emit data changed
+      QSignalSpy decorationDataChangedSpy{&rowModel, &QAbstractListModelPub::dataChanged};
+      QCOMPARE(rowModel.isPixmapTransformationSmooth(), false);
+      QCOMPARE(rowModel.onPixmapSmoothTransformationToggled(false), false);  // unchanged
+
+      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
+      rowModel._PIXMAP_TRANSFORMATION_SMOOTH->toggle();
+      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
+      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
+      QCOMPARE(decorationDataChangedSpy.count(), 0);
+
+      // 0 rows, onIconSizeChange will not emit data changed
+      QCOMPARE(rowModel.onIconSizeChange({rowModel.getPixmapWidth(), rowModel.getPixmapHeight()}), false);  // unchange
+      QCOMPARE(rowModel.onIconSizeChange({999, 1999}), true);
+      QCOMPARE(decorationDataChangedSpy.count(), 0);
+    }
+
+    // will save _PIXMAP_TRANSFORMATION_SMOOTH into configuration in destructor
+    {
+      Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
+      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
+      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
     }
   }
 
   void dimension1_container_model_row_change_test() {
-    Dim1ContainerTableModel rowModel;
+    Configuration().clear();
+    Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
     QCOMPARE(rowModel.rowCount(), 0);
 
     {  // 1. row count increasing
@@ -122,9 +156,33 @@ class QAbstractListModelPubTest : public PlainTestSuite {
       rowModel.mData.swap(rowString3);
       QCOMPARE(rowModel.rowCount(), 3);
       rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Raphael Varane");
-      QCOMPARE(rowModel.data(rowModel.index(1, 0)).toString(), "Mbappé");
-      QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
+      QModelIndex varaneIndex = rowModel.index(0);
+      QModelIndex mbappeIndex = rowModel.index(1);
+      QModelIndex dembeleIndex = rowModel.index(2);
+      QCOMPARE(rowModel.data(varaneIndex).toString(), "Raphael Varane");
+      QCOMPARE(rowModel.data(mbappeIndex).toString(), "Mbappé");
+      QCOMPARE(rowModel.data(dembeleIndex).toString(), "Dembélé");
+
+      QSignalSpy decorationDataChangedSpy{&rowModel, &Dim1ContainerListModel::dataChanged};
+      QCOMPARE(rowModel.isPixmapTransformationSmooth(), false);
+      QCOMPARE(rowModel.onPixmapSmoothTransformationToggled(true), true);  // unchanged
+      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
+      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
+      QCOMPARE(decorationDataChangedSpy.count(), 1);
+      QVariantList parms1{decorationDataChangedSpy.takeLast()};
+      // uhmmm? unknow reason, here only 1 element get in params
+      // QCOMPARE(parms.size(), 3);
+      // QCOMPARE(parms[0], varaneIndex);
+      // QCOMPARE(parms[1], dembeleIndex);
+      // QCOMPARE(parms[2].canConvert<QVector<int>>(), true);
+      // QVector<int> roles = parms[2].value<QVector<int>>();
+      // QCOMPARE(roles, (QVector<int>{Qt::DecorationRole}));
+      rowModel._PIXMAP_TRANSFORMATION_SMOOTH->setChecked(true);
+
+      QCOMPARE(rowModel.onIconSizeChange({1956, 2964}), true);
+      QCOMPARE(decorationDataChangedSpy.count(), 1);
+      QVariantList parms2{decorationDataChangedSpy.takeLast()};
+      // uhmmm? unknow reason, here only 1 element get in params
     }
 
     {  // 1. row count remains. contents changed

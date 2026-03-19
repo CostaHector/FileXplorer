@@ -3,7 +3,36 @@
 #include "StringTool.h"
 #include "PublicVariable.h"
 #include "ImageTool.h"
+#include "MemoryKey.h"
 #include <QFile>
+
+QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObject* parent)  //
+    : QAbstractListModel{parent}, mMemoryName{listViewName} {
+  const int scaledIndex{IMAGE_SIZE::GetInitialScaledSize(GetName())};
+  setPixmapWidth(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].width());
+  setPixmapHeight(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].height());
+
+  m_isSmooth = Configuration().value(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
+  _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{":img/IMAGE_TRANSFORMATION_SMOOTH"}, tr("smooth transformation"), this};
+  _PIXMAP_TRANSFORMATION_SMOOTH->setCheckable(true);
+  _PIXMAP_TRANSFORMATION_SMOOTH->setChecked(m_isSmooth);
+  _PIXMAP_TRANSFORMATION_SMOOTH->setToolTip(
+      "QPixmap resize is transformed using bilinear filtering(smooth) when enabled, by default(false): no smooth");
+
+  subscribe();
+}
+
+QAbstractListModelPub::~QAbstractListModelPub() {
+  Configuration().setValue(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", _PIXMAP_TRANSFORMATION_SMOOTH->isChecked());
+}
+
+void QAbstractListModelPub::subscribe() {
+  connect(_PIXMAP_TRANSFORMATION_SMOOTH, &QAction::toggled, this, &QAbstractListModelPub::onPixmapSmoothTransformationToggled);
+}
+
+QList<QAction*> QAbstractListModelPub::GetExcusiveActions() const {
+  return {_PIXMAP_TRANSFORMATION_SMOOTH};
+}
 
 bool QAbstractListModelPub::RowsCountBeginChange(int beforeRow, int afterRow) {
   if (!IsDimensionCntValid(beforeRow, afterRow)) {
@@ -41,19 +70,34 @@ bool QAbstractListModelPub::RowsCountEndChange() {
 }
 
 QPixmap QAbstractListModelPub::GetDecorationPixmap(const QString& fileAbsPath) const {
-  return ImageTool::GetPixmapFromCached(fileAbsPath, getPixmapWidth(), getPixmapHeight());
+  return ImageTool::GetPixmapFromCached(fileAbsPath, getPixmapWidth(), getPixmapHeight(), isPixmapTransformationSmooth());
 }
 
-void QAbstractListModelPub::onIconSizeChange(const QSize& newSize) {
-  if (newSize.width() == getPixmapWidth() && newSize.height() == getPixmapHeight()) {
-    return;
+bool QAbstractListModelPub::onIconSizeChange(const QSize& newSize) {
+  if (getPixmapWidth() == newSize.width() && getPixmapHeight() == newSize.height()) {
+    return false;
   }
   setPixmapWidth(newSize.width());
   setPixmapHeight(newSize.height());
-  if (rowCount() == 0) {
-    return;
+  if (rowCount() != 0) {
+    emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::DecorationRole});
   }
-  emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::DecorationRole});
+  return true;
+}
+
+#include <QDebug>
+bool QAbstractListModelPub::onPixmapSmoothTransformationToggled(bool newSmooth) {
+  if (isPixmapTransformationSmooth() == newSmooth) {
+    return false;
+  }
+  m_isSmooth = newSmooth;
+  if (rowCount() != 0) {
+    connect(this, &QAbstractListModelPub::dataChanged, [](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
+      qWarning() << "dataChanged emitted with roles:" << roles << topLeft << bottomRight;
+    });
+    emit dataChanged(index(0), index(rowCount() - 1), {Qt::ItemDataRole::DecorationRole});
+  }
+  return true;
 }
 
 template <typename RandomAccessible1DimensionContainerDataType>

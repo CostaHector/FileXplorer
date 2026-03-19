@@ -23,8 +23,7 @@ bool ThumbnailImageViewer::IsFileImage(const QFileInfo& fi) {
 ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent)  //
     : QScrollArea{parent},                                                                 //
       m_memoryKeyName{memoryKeyName} {
-  int iconSizeIndexHint = Configuration().value(m_memoryKeyName + "_ICON_SIZE_INDEX", mCurIconScaledSizeIndex).toInt();
-  setIconSizeScaledIndex(iconSizeIndexHint);
+  setIconSizeScaledIndex(IMAGE_SIZE::GetInitialScaledSize(m_memoryKeyName));
 
   mNavigateIntoSub = new (std::nothrow) QCheckBox{"Navigate Into Subdirectory", this};
   mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
@@ -79,7 +78,7 @@ ThumbnailImageViewer::~ThumbnailImageViewer() {
     mPMovie->stop();
   }
   Configuration().setValue(m_memoryKeyName + "_GEOMETRY", saveGeometry());
-  Configuration().setValue(m_memoryKeyName + "_ICON_SIZE_INDEX", mCurIconScaledSizeIndex);
+  IMAGE_SIZE::SaveInitialScaledSize(m_memoryKeyName, mCurIconScaledSizeIndex);
 }
 
 void ThumbnailImageViewer::ReadSetting() {

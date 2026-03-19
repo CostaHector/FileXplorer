@@ -167,15 +167,15 @@ void ImgVidOthInFolderPreviewer::subscribe() {
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   m_bImgVisible = checked;
   if (mImgTv == nullptr) {
-    mImgModel = new (std::nothrow) ImgsModel;
+    mImgModel = new (std::nothrow) ImgsModel{GetMemoryName() + "_IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgModel)
     mImgTv = new (std::nothrow) ItemView{GetMemoryName() + "_IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgTv)
     mImgTv->setViewMode(QListView::ViewMode::IconMode);
-    mImgModel->onIconSizeChange(mImgTv->iconSize());
     mImgTv->SetCurrentModel(mImgModel);
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     addWidget(mImgTv);
+
     connect(mImgTv, &QListView::iconSizeChanged, mImgModel, &QAbstractListModelPub::onIconSizeChange);
   }
   Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, checked);
@@ -202,7 +202,7 @@ void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
 void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
   m_bOthVisible = checked;
   if (mOthTv == nullptr) {
-    mOthModel = new (std::nothrow) OthersModel;
+    mOthModel = new (std::nothrow) OthersModel{GetMemoryName() + "_OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthModel)
     mOthTv = new (std::nothrow) ItemView{GetMemoryName() + "_OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthTv)
