@@ -217,7 +217,12 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+77"/>
+        <location filename="../View/CustomListView.cpp" line="+43"/>
+        <source>Text elide mode</source>
+        <translation>文本省略模式</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Flow Orientation: TopToBottom</source>
         <translation>布局方向:从上往下</translation>
     </message>
@@ -229,17 +234,73 @@
     <message>
         <location line="+6"/>
         <source>Resize Mode: Adjust</source>
-        <translation>缩放模式:自动</translation>
+        <translation>大小调整:自适应</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Wraping</source>
-        <translation>卷绕</translation>
+        <source>Wrapping</source>
+        <translation>卷绕显示</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Uniform items sizes</source>
         <translation>项大小统一</translation>
+    </message>
+</context>
+<context>
+    <name>CustomTableView</name>
+    <message>
+        <location filename="../View/CustomTableView.cpp" line="+38"/>
+        <source>Show Horizontal Header</source>
+        <translation>显示水平表头</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Show Vertical Header</source>
+        <translation>显示垂直表头</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Resize Rows to Contents</source>
+        <translation>调正行高适应内容</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Resize Columns to Contents</source>
+        <translation>调整列宽适应内容</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Auto Scroll</source>
+        <translation>自动滚动</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Alternating row colors</source>
+        <translation>交替行颜色</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Show grid</source>
+        <translation>显示网格</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Horizontal scroll bar policy</source>
+        <translation>水平滚动条显示策略</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Vertical scroll bar policy</source>
+        <translation>竖直滚动条显示策略</translation>
+    </message>
+</context>
+<context>
+    <name>DoubleRowHeader</name>
+    <message>
+        <location filename="../Component/HeaderView/DoubleRowHeader.cpp" line="+9"/>
+        <source>Enable filters for each column</source>
+        <translation>允许全列过滤</translation>
     </message>
 </context>
 <context>
@@ -568,9 +629,27 @@
     </message>
 </context>
 <context>
+    <name>HorMenuInHeader</name>
+    <message>
+        <location filename="../Component/HeaderView/HorMenuInHeader.cpp" line="+20"/>
+        <source>Column visibility</source>
+        <translation>列可见性</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hide this column</source>
+        <translation>隐藏本列</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Enable column sort</source>
+        <translation>允许按列排序</translation>
+    </message>
+</context>
+<context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+19"/>
+        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+20"/>
         <source>Shift right 100</source>
         <translation>命名编号右移100</translation>
     </message>
@@ -580,9 +659,14 @@
         <translation>命名编号左移100</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Normalize keep relative order</source>
         <translation>保持相对顺序规范化命名到0基</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>open in system application</source>
+        <translation>用系统应用打开</translation>
     </message>
 </context>
 <context>
@@ -791,12 +875,12 @@
     <message>
         <location line="+25"/>
         <source>Infer cast from selection</source>
-        <translation>推测演员根据选中</translation>
+        <translation>根据选中推测演员</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Infer cast from upper selection</source>
-        <translation>推测演员根据大写选中</translation>
+        <translation>根据大写选中推测演员</translation>
     </message>
     <message>
         <location line="-47"/>
@@ -961,6 +1045,49 @@
         <location line="+7"/>
         <source>Entire File</source>
         <translation>全文件字节</translation>
+    </message>
+</context>
+<context>
+    <name>MenuInHeader</name>
+    <message>
+        <location filename="../Component/HeaderView/MenuInHeader.cpp" line="+34"/>
+        <source>Set default section size</source>
+        <translation>设置默认尺寸</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Set max section size</source>
+        <translation>设置最大尺寸</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Stretch last column</source>
+        <translation>拉伸最后一列</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Interactive</source>
+        <translation>交互</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Stretch</source>
+        <translation>拉伸</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Fixed</source>
+        <translation>固定</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Resize to contents</source>
+        <translation>适应内容</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Section resize mode</source>
+        <translation>大小调整模式</translation>
     </message>
 </context>
 <context>
@@ -1563,6 +1690,24 @@
     </message>
 </context>
 <context>
+    <name>ScrollBarPolicyMenu</name>
+    <message>
+        <location filename="../Component/ScrollBarPolicyMenu.cpp" line="+14"/>
+        <source>As Needed</source>
+        <translation>需要时</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Always Off</source>
+        <translation>总是隐藏</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Always On</source>
+        <translation>总是显示</translation>
+    </message>
+</context>
+<context>
     <name>SyncFileSystemModificationActions</name>
     <message>
         <location filename="../Actions/SyncFileSystemModificationActions.cpp" line="+14"/>
@@ -1573,6 +1718,29 @@
         <location line="+6"/>
         <source>reverse back</source>
         <translation>反向同步</translation>
+    </message>
+</context>
+<context>
+    <name>TextElideModeMenu</name>
+    <message>
+        <location filename="../Component/TextElideModeMenu.cpp" line="+12"/>
+        <source>Elide Left</source>
+        <translation>省略左侧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide Right</source>
+        <translation>省略右侧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide Middle</source>
+        <translation>省略中间</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide None</source>
+        <translation>不省略</translation>
     </message>
 </context>
 <context>

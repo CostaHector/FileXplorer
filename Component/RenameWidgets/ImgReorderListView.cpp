@@ -3,7 +3,8 @@
 #include <QDropEvent>
 #include <QMimeData>
 
-ImgReorderListView::ImgReorderListView(QWidget* parent) : CustomListView{"IMG_REORDER_LISTVIEW", parent} {
+ImgReorderListView::ImgReorderListView(QWidget* parent)
+  : CustomListView{"IMG_REORDER_LISTVIEW", parent} {
   mImgReorderListModel = new ImgReorderListModel{this};
   setModel(mImgReorderListModel);
   setAcceptDrops(true);
@@ -13,20 +14,24 @@ ImgReorderListView::ImgReorderListView(QWidget* parent) : CustomListView{"IMG_RE
 
   _FLOW_ORIENTATION_TTB->setChecked(false);
   _VIEW_MODE_LIST_ICON->setChecked(true);
-  _WRAPING_ACTIONS->setChecked(true);
+  _WRAPPING_ACTIONS->setChecked(true);
   _UNIFORM_ITEM_SIZES->setChecked(false);
 
-  mBatchShiftRight100 = new QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift right 100"), this};
-  mBatchShiftLeft100 = new QAction{QIcon{":img/SHIFT_RIGHT_BY_STEP"}, tr("Shift left 100"), this};
-  mNormalizeKeepRelativeOrder = new QAction{QIcon{":img/NOMARLIZE_KEEP_RELATIVE_ORDER"}, tr("Normalize keep relative order"), this};
+  mBatchShiftRight100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift right 100"), this};
+  mBatchShiftLeft100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_RIGHT_BY_STEP"}, tr("Shift left 100"), this};
+  mNormalizeKeepRelativeOrder = new (std::nothrow)
+      QAction{QIcon{":img/NOMARLIZE_KEEP_RELATIVE_ORDER"}, tr("Normalize keep relative order"), this};
+  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/LARGE"}, tr("open in system application"), this};
 
-  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, mNormalizeKeepRelativeOrder};
+  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, NewSeperatorAction(this), mNormalizeKeepRelativeOrder, NewSeperatorAction(this), mOpenInSystemApplication};
   PushFrontExclusiveActions(acts);
 
+  connect(this, &QListView::doubleClicked, mImgReorderListModel, &ImgReorderListModel::onOpenFileInSystemApplication);
   connect(this, &QListView::iconSizeChanged, mImgReorderListModel, &QAbstractListModelPub::onIconSizeChange);
   connect(mBatchShiftRight100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(100); });
   connect(mBatchShiftLeft100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(-100); });
   connect(mNormalizeKeepRelativeOrder, &QAction::triggered, this, &ImgReorderListView::onNormalizeKeepRelativeOrder);
+  connect(mOpenInSystemApplication, &QAction::triggered, this, &ImgReorderListView::onOpenCurrentIndexInSystemApplication);
 
   setWindowIcon(QIcon{":img/RENAME_REORDER_LISTVIEW"});
   setWindowTitle("Drag to reorder images names");
@@ -50,6 +55,14 @@ bool ImgReorderListView::onBatchShiftSelectedRowsByStep(int step) {
 
 bool ImgReorderListView::onNormalizeKeepRelativeOrder() {
   return mImgReorderListModel->onNormalizeKeepRelativeOrder();
+}
+
+bool ImgReorderListView::onOpenCurrentIndexInSystemApplication() const {
+  const QModelIndex& ind{currentIndex()};
+  if (!ind.isValid()) {
+    return false;
+  }
+  return mImgReorderListModel->onOpenFileInSystemApplication(ind);
 }
 
 void ImgReorderListView::dropEvent(QDropEvent* event) {

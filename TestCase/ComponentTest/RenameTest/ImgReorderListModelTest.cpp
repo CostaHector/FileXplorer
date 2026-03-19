@@ -5,10 +5,21 @@
 #include "ImgReorderListModel.h"
 #include "EndToExposePrivateMember.h"
 
+#include "FileTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
 class ImgReorderListModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void initTestCase() { GlobalMockObject::reset(); }
+  void cleanupTestCase() { GlobalMockObject::verify(); }
+
   void BatchShiftSelectedRowsByStep_ok() {
     ImgReorderDataLst lst;
     ImgReorderDataLst expectsLst;
@@ -96,6 +107,8 @@ class ImgReorderListModelTest : public PlainTestSuite {
     QCOMPARE(reorderModel.flags({}).testFlag(Qt::ItemFlag::ItemIsDropEnabled), true);
     QCOMPARE(reorderModel.mimeTypes().count(), 1);
     QCOMPARE(reorderModel.getOrderedNames().isEmpty(), true);
+    QCOMPARE(reorderModel.filePath({}), "");
+    QCOMPARE(reorderModel.onOpenFileInSystemApplication({}), false);
 
     QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);
     QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);
@@ -137,6 +150,14 @@ class ImgReorderListModelTest : public PlainTestSuite {
     QModelIndex ricardoIndex{reorderModel.index(0)};
     QModelIndex cr7Index{reorderModel.index(1)};
     QModelIndex lewanIndex{reorderModel.index(2)};
+
+    QCOMPARE(reorderModel.filePath(ricardoIndex), "/Ricardo Leite.jpg");
+    QCOMPARE(reorderModel.filePath(cr7Index), "/Cristiano Ronaldo.txt");
+    QCOMPARE(reorderModel.filePath(lewanIndex), "/Robert Lewandowski.png");
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(QString{"/Ricardo Leite.jpg"})).will(returnValue(false)).then(returnValue(true));
+    QCOMPARE(reorderModel.onOpenFileInSystemApplication(ricardoIndex), false); // at first assume filePath not exist
+    QCOMPARE(reorderModel.onOpenFileInSystemApplication(ricardoIndex), true); // then assume filePath exist
+
     QCOMPARE(reorderModel.data(ricardoIndex, Qt::DisplayRole).toInt(), 0);
     QCOMPARE(reorderModel.data(ricardoIndex, Qt::EditRole).toInt(), 0);
     QCOMPARE(reorderModel.data(cr7Index, Qt::DisplayRole).toInt(), 1);

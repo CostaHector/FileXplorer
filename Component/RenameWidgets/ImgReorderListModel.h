@@ -11,7 +11,7 @@ class ImgReorderListModel : public QAbstractListModelPub {
  public:
   using QAbstractListModelPub::QAbstractListModelPub;
   bool setImagesToReorder(const QStringList& imgs, const QString& baseName, int startIndex = 0, const QString& namePattern = " %1");
-
+  QString filePath(const QModelIndex& ind) const;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override { return m_imgs.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
@@ -29,6 +29,7 @@ class ImgReorderListModel : public QAbstractListModelPub {
 
   bool onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step=100);
   bool onNormalizeKeepRelativeOrder();
+  bool onOpenFileInSystemApplication(const QModelIndex& ind);
 
  private:
   void initOccupiedRows(int n) const;

@@ -4,27 +4,41 @@
 #include "BeginToExposePrivateMember.h"
 #include "ImgReorderListView.h"
 #include "EndToExposePrivateMember.h"
+#include "FileTool.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class ImgReorderListViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void initTestCase() { GlobalMockObject::reset(); }
+  void cleanupTestCase() { GlobalMockObject::verify(); }
+
   void default_ok() {
     ImgReorderListView reorderList;
     QVERIFY(reorderList.mImgReorderListModel != nullptr);
     QVERIFY(reorderList.mBatchShiftRight100 != nullptr);
     QVERIFY(reorderList.mBatchShiftLeft100 != nullptr);
     QVERIFY(reorderList.mNormalizeKeepRelativeOrder != nullptr);
+    QVERIFY(reorderList.mOpenInSystemApplication != nullptr);
     const QList<QAction*> actionsInMenu = reorderList.m_menu->actions();
     QVERIFY(actionsInMenu.contains(reorderList.mBatchShiftRight100));
     QVERIFY(actionsInMenu.contains(reorderList.mBatchShiftLeft100));
     QVERIFY(actionsInMenu.contains(reorderList.mNormalizeKeepRelativeOrder));
+    QVERIFY(actionsInMenu.contains(reorderList.mOpenInSystemApplication));
 
     const int N = reorderList.mImgReorderListModel->rowCount();
     QCOMPARE(N, 0);
     QCOMPARE(reorderList.selectionModel()->hasSelection(), false);
     QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(), false);
     QCOMPARE(reorderList.onNormalizeKeepRelativeOrder(), false);
+    QCOMPARE(reorderList.currentIndex().isValid(), false);
+    QCOMPARE(reorderList.onOpenCurrentIndexInSystemApplication(), false);
 
     // properties ok
     QCOMPARE(reorderList.isWrapping(), true);
@@ -154,6 +168,29 @@ class ImgReorderListViewTest : public PlainTestSuite {
     reorderList.clearSelection();
     reorderList.mNormalizeKeepRelativeOrder->trigger();
     QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
+  }
+
+  void double_clicked_to_open_ok() {
+    const QStringList filesMixedWithImages{"/Ricardo Leite.jpg"};
+    const QString baseName{"Kaka"};
+    const int startNo{0};
+    const QString namePattern{" %1"};
+
+    ImgReorderListView reorderList;
+    QCOMPARE(reorderList.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
+
+    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(QString{"/Ricardo Leite.jpg"})).will(returnValue(false));
+
+    const QModelIndex kakaIndex{reorderList.mImgReorderListModel->index(0)};
+    // invalid index
+    reorderList.setCurrentIndex({});
+    QCOMPARE(reorderList.onOpenCurrentIndexInSystemApplication(), false);
+
+    // valid index but file not exist
+    reorderList.setCurrentIndex(kakaIndex);
+    QCOMPARE(reorderList.onOpenCurrentIndexInSystemApplication(), false);
+
+    emit reorderList.doubleClicked(kakaIndex);
   }
 };
 

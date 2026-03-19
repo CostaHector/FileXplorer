@@ -271,6 +271,11 @@
         <file alias="RESIZE_MODE_RESIZE_TO_CONTENTS">View/RESIZE_MODE_RESIZE_TO_CONTENTS.svg</file>
         <file alias="RESIZE_MODE_STRETCH">View/RESIZE_MODE_STRETCH.svg</file>
         <file alias="VIEW_MODE_ICON">View/VIEW_MODE_ICON.svg</file>
+        <file alias="LIST_WRAPPING">View/LIST_WRAPPING.svg</file>
+        <file alias="LIST_TEXT_ELIDE_MODE">View/LIST_TEXT_ELIDE_MODE.svg</file>
+        <file alias="LIST_TEXT_ELIDE_MODE_LEFT">View/LIST_TEXT_ELIDE_MODE_LEFT.svg</file>
+        <file alias="LIST_TEXT_ELIDE_MODE_MIDDLE">View/LIST_TEXT_ELIDE_MODE_MIDDLE.svg</file>
+        <file alias="LIST_TEXT_ELIDE_MODE_RIGHT">View/LIST_TEXT_ELIDE_MODE_RIGHT.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

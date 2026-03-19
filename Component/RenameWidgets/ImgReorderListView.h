@@ -12,6 +12,7 @@ class ImgReorderListView : public CustomListView {
   QStringList getOrderedNames() const;
   bool onBatchShiftSelectedRowsByStep(int step = 100);
   bool onNormalizeKeepRelativeOrder();
+  bool onOpenCurrentIndexInSystemApplication() const;
 
  protected:
   void dropEvent(QDropEvent* event) override;
@@ -21,6 +22,7 @@ class ImgReorderListView : public CustomListView {
 
   QAction *mBatchShiftRight100{nullptr}, *mBatchShiftLeft100{nullptr};
   QAction* mNormalizeKeepRelativeOrder{nullptr};
+  QAction* mOpenInSystemApplication{nullptr};
   ImgReorderListModel* mImgReorderListModel{nullptr};
 };
 
