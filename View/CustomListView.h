@@ -4,9 +4,7 @@
 #include <QAction>
 #include <QListView>
 #include "AddableMenu.h"
-#include "EnumIntAction.h"
-
-extern template struct EnumIntAction<Qt::TextElideMode>;
+#include "TextElideModeMenu.h"
 
 class CustomListView : public QListView {
   Q_OBJECT
@@ -26,25 +24,17 @@ public:
   bool setIconSizeScaledIndex(int newScaledIndex);
 protected:
   QString m_name;
-
-  QAction* _TEXT_ELIDE_MODE_LEFT{nullptr};
-  QAction* _TEXT_ELIDE_MODE_RIGHT{nullptr};
-  QAction* _TEXT_ELIDE_MODE_MIDDLE{nullptr};
-  QAction* _TEXT_ELIDE_MODE_NONE{nullptr};
-  EnumIntAction<Qt::TextElideMode> mTextEditModeIntAction;
-  QMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
-
+  TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   QAction* _FLOW_ORIENTATION_TTB;
   QAction* _VIEW_MODE_LIST_ICON{nullptr};
   QAction* _RESIZED_MODE_ADJUST{nullptr};
-  QAction* _WRAPING_ACTIONS{nullptr};
+  QAction* _WRAPPING_ACTIONS{nullptr};
   QAction* _UNIFORM_ITEM_SIZES{nullptr};
 
   AddableMenu* m_menu {nullptr};
 private:
   void SubscribePublicActions();
 
-  void onTextElideModeChanged(const QAction* pAct);
   void onOrientationChanged(const bool bchecked);
   void onViewModeListIconToggled(const bool bchecked);
   void onResizeModeToggled(const bool bchecked);

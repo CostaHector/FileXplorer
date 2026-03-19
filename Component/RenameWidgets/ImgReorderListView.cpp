@@ -14,7 +14,7 @@ ImgReorderListView::ImgReorderListView(QWidget* parent)
 
   _FLOW_ORIENTATION_TTB->setChecked(false);
   _VIEW_MODE_LIST_ICON->setChecked(true);
-  _WRAPING_ACTIONS->setChecked(true);
+  _WRAPPING_ACTIONS->setChecked(true);
   _UNIFORM_ITEM_SIZES->setChecked(false);
 
   mBatchShiftRight100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift right 100"), this};
@@ -23,7 +23,7 @@ ImgReorderListView::ImgReorderListView(QWidget* parent)
       QAction{QIcon{":img/NOMARLIZE_KEEP_RELATIVE_ORDER"}, tr("Normalize keep relative order"), this};
   mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/LARGE"}, tr("open in system application"), this};
 
-  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, mNormalizeKeepRelativeOrder, mOpenInSystemApplication};
+  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, NewSeperatorAction(this), mNormalizeKeepRelativeOrder, NewSeperatorAction(this), mOpenInSystemApplication};
   PushFrontExclusiveActions(acts);
 
   connect(this, &QListView::doubleClicked, mImgReorderListModel, &ImgReorderListModel::onOpenFileInSystemApplication);

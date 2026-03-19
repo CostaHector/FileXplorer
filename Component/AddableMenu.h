@@ -8,4 +8,6 @@ class AddableMenu : public QMenu {
   void push_front(const QList<QAction*>& acts);
 };
 
+QAction* NewSeperatorAction(QWidget* parent);
+
 #endif  // ADDABLEMENU_H

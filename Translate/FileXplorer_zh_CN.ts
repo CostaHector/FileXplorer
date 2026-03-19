@@ -218,31 +218,11 @@
     <name>CustomListView</name>
     <message>
         <location filename="../View/CustomListView.cpp" line="+43"/>
-        <source>Elide Left</source>
-        <translation>省略左侧</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Elide Right</source>
-        <translation>省略右侧</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Elide Middle</source>
-        <translation>省略中间</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Elide None</source>
-        <translation>不省略</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Text Elide Mode</source>
+        <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Flow Orientation: TopToBottom</source>
         <translation>布局方向:从上往下</translation>
     </message>
@@ -258,8 +238,8 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Wraping</source>
-        <translation>卷绕</translation>
+        <source>Wrapping</source>
+        <translation>卷绕显示</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -303,6 +283,16 @@
         <location line="+7"/>
         <source>Show grid</source>
         <translation>显示网格</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Horizontal scroll bar policy</source>
+        <translation>水平滚动条显示策略</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Vertical scroll bar policy</source>
+        <translation>竖直滚动条显示策略</translation>
     </message>
 </context>
 <context>
@@ -1702,7 +1692,7 @@
 <context>
     <name>ScrollBarPolicyMenu</name>
     <message>
-        <location filename="../Component/ScrollBarPolicyMenu.cpp" line="+10"/>
+        <location filename="../Component/ScrollBarPolicyMenu.cpp" line="+14"/>
         <source>As Needed</source>
         <translation>需要时</translation>
     </message>
@@ -1728,6 +1718,29 @@
         <location line="+6"/>
         <source>reverse back</source>
         <translation>反向同步</translation>
+    </message>
+</context>
+<context>
+    <name>TextElideModeMenu</name>
+    <message>
+        <location filename="../Component/TextElideModeMenu.cpp" line="+12"/>
+        <source>Elide Left</source>
+        <translation>省略左侧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide Right</source>
+        <translation>省略右侧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide Middle</source>
+        <translation>省略中间</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Elide None</source>
+        <translation>不省略</translation>
     </message>
 </context>
 <context>

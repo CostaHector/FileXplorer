@@ -40,8 +40,10 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
                                        .arg(mReloadCurrentPath->shortcut().toString()));
 
     QList<QAction*> acts{rateInst.GetActionGroup()->actions()};
+    acts.push_back(NewSeperatorAction(this));
     acts.push_back(mRenameVideoRelatedFilesReplace);
     acts.push_back(mRenameVideoRelatedFilesInsert);
+    acts.push_back(NewSeperatorAction(this));
     acts.push_back(mReloadCurrentPath);
     PushFrontExclusiveActions(acts);
   }

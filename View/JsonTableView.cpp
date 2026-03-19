@@ -34,7 +34,7 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
 
   {
     auto& jsonInst = g_JsonActions();
-    const QList<QAction*> jsonSpecialActs{jsonInst._OPEN_THIS_FILE, jsonInst._REVEAL_IN_EXPLORER, jsonInst._RENAME_JSON_AND_RELATED_FILES};
+    const QList<QAction*> jsonSpecialActs{jsonInst._OPEN_THIS_FILE, jsonInst._REVEAL_IN_EXPLORER, NewSeperatorAction(this), jsonInst._RENAME_JSON_AND_RELATED_FILES};
     PushFrontExclusiveActions(jsonSpecialActs);
   }
 

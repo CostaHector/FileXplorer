@@ -11,7 +11,7 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
 
   _PLAY_ITEM = new (std::nothrow) QAction{QIcon{":img/OPEN_IN_TERMINAL"}, "Open", this};
   _RECYCLE_ITEM = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle", this};
-  QList<QAction*> exclusiveActions{_PLAY_ITEM, _RECYCLE_ITEM};
+  QList<QAction*> exclusiveActions{_PLAY_ITEM, NewSeperatorAction(this), _RECYCLE_ITEM};
   PushFrontExclusiveActions(exclusiveActions);
   subscribe();
 }
