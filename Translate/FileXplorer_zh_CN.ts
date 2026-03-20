@@ -797,7 +797,7 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+55"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
@@ -1374,7 +1374,7 @@
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../Actions/RateActions.cpp" line="+27"/>
+        <location filename="../Actions/RateActions.cpp" line="+28"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
@@ -1384,12 +1384,12 @@
         <translation>穿透评分</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Rate recusively(force)</source>
         <translation>穿透评分(强制)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Increase rating</source>
         <translation>+1分</translation>
     </message>
@@ -1409,8 +1409,8 @@
         <translation>穿透-1分</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+17"/>
+        <location line="+8"/>
+        <location line="+27"/>
         <source>Rate</source>
         <translation>评分</translation>
     </message>
@@ -1579,7 +1579,7 @@
         <translation>拖拽排序</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Extension Unique Counter</source>
         <translation>扩展名独立计数</translation>
     </message>
@@ -1610,6 +1610,11 @@
         <location line="+2"/>
         <source>New:</source>
         <translation>新:</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Regex</source>
+        <translation>正则</translation>
     </message>
 </context>
 <context>

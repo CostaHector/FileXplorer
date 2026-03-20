@@ -3,10 +3,6 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 
-RenameWidget_Replace::RenameWidget_Replace(QWidget* parent)  //
-    : AdvanceRenamer{parent}                                 //
-{}
-
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar{"replace tb", this};
   CHECK_NULLPTR_RETURN_NULLPTR(replaceControl);
@@ -51,8 +47,9 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   m_newStrCB->setEditable(true);
   m_newStrCB->setCompleter(nullptr);
 
-  m_regexCB = new (std::nothrow) QCheckBox{"Regex", this};
+  m_regexCB = new (std::nothrow) QCheckBox{tr("Regex"), this};
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
+  m_regexCB->setIcon(QIcon(":img/REGEX"));
   m_regexCB->setToolTip("Enable regex");
   m_regexCB->setChecked(Configuration().value(MemoryKey::RENAMER_REGEX_ENABLED.name, MemoryKey::RENAMER_REGEX_ENABLED.v).toBool());
 }

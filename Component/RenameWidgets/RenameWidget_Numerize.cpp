@@ -19,14 +19,16 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_completeBaseName = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
   m_completeBaseName->setClearButtonEnabled(true);
-  m_completeBaseName->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 
-  m_startNo = new (std::nothrow) QLineEdit{"0", this};  // "0"
-  CHECK_NULLPTR_RETURN_VOID(m_startNo)
-  m_startNo->setMaximumWidth(20);
-  m_startNo->setToolTip("Starting number for the sequence");
+  m_startNo = new (std::nothrow) QComboBox{this};  // "0"
+  CHECK_NULLPTR_RETURN_VOID(m_startNo);
+  m_startNo->setEditable(true);
+  m_startNo->setDuplicatesEnabled(false);
+  m_startNo->setToolTip("Starting no for the sequence");
+  m_startNo->addItems({"0", "260"});
 
   m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{tr("Extension Unique Counter"), this};
+  CHECK_NULLPTR_RETURN_VOID(m_isUniqueCounterPerExtension);
   m_isUniqueCounterPerExtension->setToolTip(
       "Controls whether file renaming uses a shared counter across extensions:\n"
       "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
@@ -88,7 +90,7 @@ QToolBar* RenameWidget_Numerize::InitControlTB() {
   return numerizeControlTb;
 }
 void RenameWidget_Numerize::extraSubscribe() {
-  connect(m_startNo, &QLineEdit::textChanged, this, [this](const QString& startNoStr) -> void {
+  connect(m_startNo, &QComboBox::currentTextChanged, this, [this](const QString& startNoStr) -> void {
     bool isNumber = false;
     int startNo = startNoStr.toInt(&isNumber);
     if (!isNumber) {
@@ -114,7 +116,7 @@ void RenameWidget_Numerize::extraSubscribe() {
 
 bool RenameWidget_Numerize::reorderNamesInListView() {
   const QString& baseName = m_completeBaseName->text();
-  const int startNoInt = m_startNo->text().toInt();
+  const int startNoInt = m_startNo->currentText().toInt();
   const QString& namePattern = m_numberPattern->currentText();
   ImgReorderDialog dlg;
   dlg.setImagesToReorder(GetSelectedFilesFullPath(), baseName, startNoInt, namePattern);
@@ -142,6 +144,6 @@ QStringList RenameWidget_Numerize::RenameCore(const QStringList& replaceeList) {
   const QString& namePattern = m_numberPattern->currentText();
   const bool bUniqueExtCounter = m_isUniqueCounterPerExtension->checkState() == Qt::Checked;
 
-  const int startNoInt = m_startNo->text().toInt();
+  const int startNoInt = m_startNo->currentText().toInt();
   return RenameHelper::NumerizeRename(replaceeList, suffixs, baseName, startNoInt, namePattern, bUniqueExtCounter);
 }

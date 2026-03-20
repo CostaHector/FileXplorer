@@ -19,7 +19,7 @@ class RenameWidget_Numerize : public AdvanceRenamer {
   bool reorderNamesInListView();
 
  private:
-  QLineEdit* m_startNo{nullptr};
+  QComboBox* m_startNo{nullptr};
   QCheckBox* m_isUniqueCounterPerExtension{nullptr};
   QComboBox* m_numberPattern{nullptr};
   QLineEdit* m_completeBaseName{nullptr};
