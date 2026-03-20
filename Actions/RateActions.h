@@ -13,9 +13,10 @@ public:
   static RateActions& GetInst(RateRequestFrom reqFrom = RateRequestFrom::FILE_XPLORER);
   explicit RateActions(QObject* parent = nullptr);
   const QActionGroup* GetActionGroup() const {return RATE_AGS;}
+  QList<QAction*> GetAdjustRateActions() const { return {_INCREASING_RATING, _DECREASING_RATING}; }
   QList<QAction*> GetAllRateActionsList() const {return ALL_RATE_ACTIONS_LIST;}
   QMenu* GetRateMenu(QWidget* notNullParent) const;
-  QWidget* GetRateToolButton(QWidget* notNullParent) const;
+  QWidget* GetRateToolButton(QWidget* notNullParent, bool bShortCutEnabled = false) const;
 
 signals:
   void RateMovieReq(int newRate);

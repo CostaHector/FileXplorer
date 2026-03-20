@@ -148,8 +148,6 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 }
 
-InteractiveVideoWidget::~InteractiveVideoWidget() {}
-
 MenuToolButton* InteractiveVideoWidget::GetPlaybackModelMenuToolButton(QWidget* notNullParent) const {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
   MenuToolButton* playbackModeToolButton =
