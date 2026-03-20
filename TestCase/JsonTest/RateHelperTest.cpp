@@ -7,6 +7,12 @@
 #include "TDir.h"
 #include "JsonHelper.h"
 
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
 using namespace JsonHelper;
 
 class RateHelperTest : public PlainTestSuite {
@@ -25,10 +31,22 @@ class RateHelperTest : public PlainTestSuite {
         {"rate failed.webp", false, ""},                  // no json["Name"] correspond in current folder, rate failed
         {"rate failed.json", false, R"({"random":""})"},  // no json["Name"] correspond in current folder, rate failed
         {"rate failed 2.json", false, R"({"Name":""})"},
+        {"no json correspond.mp4", false, ""},
         {"subfolder/rate failed.json", false, R"({"Name":""})"},
         {"subfolder/subfolder.json", false, R"({"Name":""})"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
+  }
+
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
+  void getBaseNameForImage_ok() {
+    QCOMPARE(RateHelper::getBaseNameForImage("a"), "a");
+    QCOMPARE(RateHelper::getBaseNameForImage("a 1"), "a");
+    QCOMPARE(RateHelper::getBaseNameForImage("a - 1"), "a");
+    QCOMPARE(RateHelper::getBaseNameForImage("a - 99"), "a");
+    QCOMPARE(RateHelper::getBaseNameForImage("a - 99999999999"), "a - 99999999999");
   }
 
   void ratingCalculation_ok() {
@@ -96,21 +114,43 @@ class RateHelperTest : public PlainTestSuite {
   }
 
   void invalid_scenario() {
+    // delta = 0
+    { QVERIFY(!RateHelper::AdjustRateMovie(tDir.itemPath("rate ok.json"), 0)); }
+
     // Missing JSON test
     {
       QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate failed.mp4"), 5));
       QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate failed.webp"), 5));
+      QVERIFY(!RateHelper::AdjustRateMovie(tDir.itemPath("rate failed.webp"), 5));
     }
 
     // Invalid JSON content
-    { QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate failed.json"), 5)); }
+    {
+      QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate failed.json"), 5));
+      QVERIFY(!RateHelper::AdjustRateMovie(tDir.itemPath("rate failed.json"), 5));
+    }
+
+    // no json correspond file
+    {
+      QVERIFY(!RateHelper::RateMovie(tDir.itemPath("no json correspond.mp4"), 5));
+      QVERIFY(!RateHelper::AdjustRateMovie(tDir.itemPath("no json correspond.mp4"), 5));
+    }
+
+    // write file failed
+    {
+      MOCKER(JsonHelper::DumpJsonDict).expects(exactly(2)).will(returnValue(false));
+      QVERIFY(!RateHelper::AdjustRateMovie(tDir.itemPath("rate ok.json"), 10));
+      QVERIFY(!RateHelper::RateMovie(tDir.itemPath("rate ok.json"), 10));
+    }
   }
 
   void rate_helper_comprehensive() {
+    QVariantHash data;
+
     // WEBP rating test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok.webp"), 9));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 9);
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok.webp"), 9));  // nothing should happened
     }
@@ -118,48 +158,55 @@ class RateHelperTest : public PlainTestSuite {
     // PNG re-rating test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 8));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 8);
     }
 
     // JPG re-rating test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok 2.jpg"), 7));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 7);
     }
 
     // Direct JSON test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok.json"), 6));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 6);
     }
 
     // Folder test passed
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("subfolder"), 1));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("subfolder/subfolder.json"));
+      data = MovieJsonLoader(tDir.itemPath("subfolder/subfolder.json"));
       QCOMPARE(data["Rate"].toInt(), 1);
     }
 
     // Boundary
     {
-      QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 0));   // 最小值
-      QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 10));  // 最大值
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      int newRate{-10};
+      QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 0));         // 最小值
+      QVERIFY(RateHelper::AdjustRateMovie(tDir.itemPath("rate ok - 1.png"), -1, &newRate));  // 被clamp
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      QCOMPARE(data["Rate"].toInt(), 0);
+      QCOMPARE(newRate, 0);
+
+      QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 10));       // 最大值
+      QVERIFY(RateHelper::AdjustRateMovie(tDir.itemPath("rate ok - 1.png"), 1));  // 被clamp
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
       QCOMPARE(data["Rate"].toInt(), 10);  // 最后一次评分应该是10
     }
 
     // rating clamping
     {
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), 15));
-      QVariantHash data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
-      QCOMPARE(data["Rate"].toInt(), 10);  // 应该被钳制到10
+      data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
+      QCOMPARE(data["Rate"].toInt(), 10);  // 应该被clamp到10
 
       QVERIFY(RateHelper::RateMovie(tDir.itemPath("rate ok - 1.png"), -15));
       data = MovieJsonLoader(tDir.itemPath("rate ok.json"));
-      QCOMPARE(data["Rate"].toInt(), 0);  // 应该被钳制到0
+      QCOMPARE(data["Rate"].toInt(), 0);  // 应该被clamp到0
     }
   }
 
@@ -183,18 +230,30 @@ class RateHelperTest : public PlainTestSuite {
       return beforeRateList;
     };
 
+    QList<int> actualRates;
     {
       QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 10, false), 4);  // non override
       const QList<int> expectsRates{0, 10, 10, 1};
-      QList<int> actualRates = GetRatesFromJson(jsonsPath);
-      QCOMPARE(actualRates, expectsRates);
+      actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, (QList<int>{0, 10, 10, 1}));
     }
 
     {
       QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 3, true), 4);  // force override
-      const QList<int> expectsRates{3, 3, 3, 3};
-      QList<int> actualRates = GetRatesFromJson(jsonsPath);
-      QCOMPARE(actualRates, expectsRates);
+      actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, (QList<int>{3, 3, 3, 3}));
+    }
+
+    {
+      QCOMPARE(RateHelper::AdjustRateMovieRecursively(tDir.path(), 5), 4);  // +5
+      actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, (QList<int>{3 + 5, 3 + 5, 3 + 5, 3 + 5}));
+    }
+
+    {
+      QCOMPARE(RateHelper::AdjustRateMovieRecursively(tDir.path(), -5), 4);  // -5
+      actualRates = GetRatesFromJson(jsonsPath);
+      QCOMPARE(actualRates, (QList<int>{3 + 5 - 5, 3 + 5 - 5, 3 + 5 - 5, 3 + 5 - 5}));
     }
   }
 };

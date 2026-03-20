@@ -58,14 +58,12 @@ bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& valu
     return false;
   }
   const int beforeNumber = m_imgs[index.row()].number;
-  bool bOk{false};
-  const int newNumber{value.toInt(&bOk)};
-  if (!bOk) {
-    LOG_D("invalid number");
+  bool bIsInt{false};
+  const int newNumber{value.toInt(&bIsInt)};
+  if (!bIsInt) {
     return false;
   }
   if (newNumber == beforeNumber) {
-    LOG_D("number[%d] unchanged", beforeNumber);
     return false;
   }
   if (m_occupiedRows.contains(newNumber)) {

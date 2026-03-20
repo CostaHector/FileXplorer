@@ -230,22 +230,30 @@ class BasicVideoViewTest : public PlainTestSuite {
     basicVideoView.PlayAVideo(__FILE__, false);
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
 
-    // assume the 1st time rate failed, second time succeed.
+    // rateCurrentVideo: assume the 1st time rate failed, second time succeed.
     MOCKER(RateHelper::RateMovie).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
 
-    QCOMPARE(basicVideoView.rateCurrentVideo(10), false);
-    QCOMPARE(basicVideoView.rateCurrentVideo(10), true);
+    QCOMPARE(basicVideoView.rateCurrentVideo(10), false);  // 1st
+    QCOMPARE(basicVideoView.rateCurrentVideo(10), true);   // 2nd
 
     RateActions* rateActions = basicVideoView.mVideoWidget->GetRateActions();
     QVERIFY(rateActions != nullptr);
-    emit rateActions->MovieRateChanged(9);
+    emit rateActions->RateMovieReq(9);  // 3rd
+
+    // adjustRateCurrentVideo assume the 1st time rate failed, second time succeed.
+    MOCKER(RateHelper::AdjustRateMovie).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
+    QCOMPARE(basicVideoView.adjustRateCurrentVideo(0), true);   // delta=0, skipped
+    QCOMPARE(basicVideoView.adjustRateCurrentVideo(3), false);  // 1st
+    QCOMPARE(basicVideoView.adjustRateCurrentVideo(4), true);   // 2nd
+    emit rateActions->AdjustRateMovieReq(5);  // 3rd
   }
 
   void rateAllVideoSameLevelAsCurrentVideo_ok() {
     BasicVideoView basicVideoView{false, nullptr};
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
 
-    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(false), false);  // no path specified
+    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(false), 0);    // no path specified
+    QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(5), 0);  // no path specified
 
     const bool bForceRecusive{false};
     basicVideoView.PlayAVideo(__FILE__, false);
@@ -264,11 +272,18 @@ class BasicVideoViewTest : public PlainTestSuite {
         .with(eq(expectRatePathRecursive), eq(expectScore), eq(bForceRecusive))  //
         .will(returnValue(rateSucceedFilesCnt));                                 // 3 file
 
-    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(bForceRecusive), rateSucceedFilesCnt);
-
+    QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(bForceRecusive), rateSucceedFilesCnt);  // 1st
     RateActions* rateActions = basicVideoView.mVideoWidget->GetRateActions();
     QVERIFY(rateActions != nullptr);
-    emit rateActions->MovieRateRecursivelyChanged(false);
+    emit rateActions->RateMovieRecursivelyReq(false);  // 2nd
+
+    const int expectDelta{9};
+    MOCKER(RateHelper::AdjustRateMovieRecursively)
+        .expects(exactly(2))                                                                     //
+        .with(eq(expectRatePathRecursive), eq(expectDelta))                                      //
+        .will(returnValue(rateSucceedFilesCnt));                                                 // 3 file
+    QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(expectDelta), rateSucceedFilesCnt);  // 1st
+    emit rateActions->AdjustRateMovieRecursivelyReq(expectDelta);                                          // 2nd
   }
 
   void onMediaStatusChanged_ok() {

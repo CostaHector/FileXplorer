@@ -128,8 +128,10 @@ void BasicVideoView::subscribe() {
   connect(mVideoWidget, &InteractiveVideoWidget::layoutVisibilityChanged, this, &BasicVideoView::movePauseBtnToCenter);
 
   RateActions* rateActions = mVideoWidget->GetRateActions();
-  connect(rateActions, &RateActions::MovieRateChanged, this, &BasicVideoView::rateCurrentVideo);
-  connect(rateActions, &RateActions::MovieRateRecursivelyChanged, this, &BasicVideoView::rateAllVideoSameLevelAsCurrentVideo);
+  connect(rateActions, &RateActions::RateMovieReq, this, &BasicVideoView::rateCurrentVideo);
+  connect(rateActions, &RateActions::RateMovieRecursivelyReq, this, &BasicVideoView::rateAllVideoSameLevelAsCurrentVideo);
+  connect(rateActions, &RateActions::AdjustRateMovieReq, this, &BasicVideoView::adjustRateCurrentVideo);
+  connect(rateActions, &RateActions::AdjustRateMovieRecursivelyReq, this, &BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo);
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
@@ -225,6 +227,23 @@ bool BasicVideoView::rateCurrentVideo(int score) const {
   return true;
 }
 
+bool BasicVideoView::adjustRateCurrentVideo(int delta) const {
+  if (delta == 0) {
+    return true;
+  }
+  const QString curMedia = GetCurrentPlayingMediaPath();
+  if (!QFile::exists(curMedia)) {
+    LOG_WARN_P("Cannot rate", "Media file[%s] not exist", qPrintable(curMedia));
+    return false;
+  }
+  if (!RateHelper::AdjustRateMovie(curMedia, delta)) {
+    LOG_WARN_P("Cannot adjust rate", "Media file[%s], see details in log", qPrintable(curMedia));
+    return false;
+  }
+  LOG_OK_P("Adjust Rate succeed", "Media file[%s] rate adjust[%d]", qPrintable(curMedia), delta);
+  return true;
+}
+
 int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) const {
   const QString& curMedia = GetCurrentPlayingMediaPath();
   const QString sameLevelPath{PathTool::absolutePath(curMedia)};
@@ -233,7 +252,20 @@ int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) con
     return 0;
   }
   RateActions* rateActions = mVideoWidget->GetRateActions();
-  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
+  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr);  // no need modal widget
+}
+
+int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
+  if (delta == 0) {
+    return 0;
+  }
+  const QString& curMedia = GetCurrentPlayingMediaPath();
+  const QString sameLevelPath{PathTool::absolutePath(curMedia)};
+  if (!QFile::exists(sameLevelPath)) {
+    LOG_WARN_P("Cannot adjust rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
+    return 0;
+  }
+  return RateHelper::AdjustRateMovieRecursively(sameLevelPath, delta);  // no need widget
 }
 
 bool BasicVideoView::deviatePositionPrevious() {
@@ -324,7 +356,7 @@ void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
 
 void BasicVideoView::onMediaStatusChanged(QMediaPlayer::MediaStatus status) {
   if (status == QMediaPlayer::MediaStatus::EndOfMedia) {
-    const QMediaPlaylist::PlaybackMode curPlaybackMode {mVideoWidget->GetPlaybackMode()};
+    const QMediaPlaylist::PlaybackMode curPlaybackMode{mVideoWidget->GetPlaybackMode()};
     if (curPlaybackMode != QMediaPlaylist::PlaybackMode::CurrentItemOnce) {
       emit reqPlayNextOneMedia();
     }

@@ -106,3 +106,16 @@ QVariant VidsModel::data(const QModelIndex& index, int role) const {
 }
 
 // ----------------
+
+QVariant OthersModel::data(const QModelIndex& index, int role) const {
+  const int rw = index.row();
+  if (isOuterBound(rw)) {
+    return {};
+  }
+  if (role == Qt::DisplayRole) {
+    return PathTool::fileName(mDataLst[rw]);
+  } else if (role == Qt::DecorationRole) {
+    return GetDecorationPixmap(mDataLst[rw]);
+  }
+  return {};
+}

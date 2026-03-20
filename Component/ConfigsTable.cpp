@@ -51,7 +51,7 @@ ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
   connect(m_alertsTable, &QTableView::doubleClicked, this, &ConfigsTable::on_cellDoubleClicked);
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &ConfigsTable::RefreshWindowIcon);
 
-  connect(m_dlgBtnBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+  connect(pOk, &QPushButton::clicked, this, &QDialog::accept);
   connect(pOpen, &QPushButton::clicked, this, &ConfigsTable::onEditPreferenceSetting);
   connect(pRetry, &QPushButton::clicked, this, &ConfigsTable::RefreshWindowIcon);
 

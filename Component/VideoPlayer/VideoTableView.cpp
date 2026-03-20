@@ -11,7 +11,7 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   mProxyModel->setSourceModel(mVideoModel);
   setModel(mProxyModel);
 
-  setEditTriggers(QAbstractItemView::NoEditTriggers);
+  setEditTriggers(QAbstractItemView::SelectedClicked);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
   InitTableView();
@@ -48,7 +48,8 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
     PushFrontExclusiveActions(acts);
   }
 
-  connect(&rateInst, &RateActions::MovieRateChanged, this, &VideoTableView::onRateSelectedMovies);
+  connect(&rateInst, &RateActions::RateMovieReq, this, &VideoTableView::onRateSelectedMovies);
+  connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &VideoTableView::onAdjustSelectedMoviesRate);
   connect(mRenameVideoRelatedFilesReplace, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedReplace);
   connect(mRenameVideoRelatedFilesInsert, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedInsert);
   connect(mReloadCurrentPath, &QAction::triggered, mVideoModel, &VideoTableModel::forceReload);
@@ -173,6 +174,22 @@ int VideoTableView::onRateSelectedMovies(int newRate) {
   const int succeedCnt{mVideoModel->rateSelectedMovies(srcIndexes, newRate)};
   const int totalRow{srcIndexes.size()};
   LOG_OE_P(succeedCnt == totalRow, "Rate selection", "%d/%d row(s) succeed", succeedCnt, totalRow);
+  return succeedCnt;
+}
+
+int VideoTableView::onAdjustSelectedMoviesRate(int delta) {
+  if (delta == 0) {
+    LOG_INFO_NP("Skip adjust rate", "delta=0");
+    return 0;
+  }
+  const QModelIndexList& srcIndexes{selectedRowsSource()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip adjust rate", "no row selected");
+    return 0;
+  }
+  const int succeedCnt{mVideoModel->adjustRateSelectedMovies(srcIndexes, delta)};
+  const int totalRow{srcIndexes.size()};
+  LOG_OE_P(succeedCnt == totalRow, "Adjust rate selection", "%d/%d row(s) succeed adjust[%1]", succeedCnt, totalRow, delta);
   return succeedCnt;
 }
 

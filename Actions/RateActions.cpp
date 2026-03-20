@@ -24,7 +24,7 @@ RateActions::RateActions(QObject* parent) : QObject{parent} {
 
   for (int rate = RateHelper::BUTT_V - 1; rate >= RateHelper::MIN_V; --rate) {
     QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)),  //
-                                               QString::number(rate) + tr(" score"),     //
+                                               QString::number(rate) + tr(" score"),    //
                                                this};
     CHECK_NULLPTR_RETURN_VOID(pAct);
     pAct->setData(rate);
@@ -34,15 +34,29 @@ RateActions::RateActions(QObject* parent) : QObject{parent} {
     ALL_RATE_ACTIONS_LIST += pAct;
   }
 
-  _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate Recusively"), this};
+  _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate recusively"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY);
   _RATE_RECURSIVELY->setToolTip("Rate only unrated movies in selected folder and its subfolders");
   ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY;
 
-  _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{tr("Rate Recusively(Force)"), this};
+  _RATE_RECURSIVELY_OVERRIDE = new (std::nothrow) QAction{tr("Rate recusively(force)"), this};
   CHECK_NULLPTR_RETURN_VOID(_RATE_RECURSIVELY_OVERRIDE);
   _RATE_RECURSIVELY_OVERRIDE->setToolTip("Rate all movies, overwriting existing ratings");
   ALL_RATE_ACTIONS_LIST += _RATE_RECURSIVELY_OVERRIDE;
+
+  _INCREASING_RATING = new QAction{QIcon{":img/INCREASING_RATING"}, tr("Increase rating"), this};
+  _INCREASING_RATING->setToolTip("Increase the movie rating by 1 point");
+  _DECREASING_RATING = new QAction{QIcon{":img/DECREASING_RATING"}, tr("Decrease rating"), this};
+  _DECREASING_RATING->setToolTip("Decrease the movie rating by 1 point");
+  _INCREASING_RATETING_RECURSIVELY = new QAction{tr("Increase rating recusively"), this};
+  _INCREASING_RATETING_RECURSIVELY->setToolTip("Increase all movies under path rating by 1 point");
+  _DECREASING_RATETING_RECURSIVELY = new QAction{tr("Decrease rating recusively"), this};
+  _DECREASING_RATETING_RECURSIVELY->setToolTip("Decrease the movie under path rating by 1 point");
+
+  ALL_RATE_ACTIONS_LIST += _INCREASING_RATING;
+  ALL_RATE_ACTIONS_LIST += _DECREASING_RATING;
+  ALL_RATE_ACTIONS_LIST += _INCREASING_RATETING_RECURSIVELY;
+  ALL_RATE_ACTIONS_LIST += _DECREASING_RATETING_RECURSIVELY;
 
   subscribe();
 }
@@ -67,14 +81,18 @@ QWidget* RateActions::GetRateToolButton(QWidget* notNullParent) const {
                                                                      IMAGE_SIZE::TABS_ICON_IN_MENU_16, notNullParent);
   CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
   rateToolButton->SetCaption(QIcon{":img/LIKE"}, tr("Rate"), "Rate for your movie");
-  rateToolButton->addActions(RATE_AGS->actions());
+  rateToolButton->addActions(RATE_AGS->actions()); // for shortcut key only, not for display menu
   return rateToolButton;
 }
 
 void RateActions::subscribe() {
   connect(RATE_AGS, &QActionGroup::triggered, this, &RateActions::onRateActionTriggered);
-  connect(_RATE_RECURSIVELY, &QAction::triggered, this, [this]() { emit MovieRateRecursivelyChanged(false); });
-  connect(_RATE_RECURSIVELY_OVERRIDE, &QAction::triggered, this, [this]() { emit MovieRateRecursivelyChanged(true); });
+  connect(_RATE_RECURSIVELY, &QAction::triggered, this, [this]() { emit RateMovieRecursivelyReq(false); });
+  connect(_RATE_RECURSIVELY_OVERRIDE, &QAction::triggered, this, [this]() { emit RateMovieRecursivelyReq(true); });
+  connect(_INCREASING_RATING, &QAction::triggered, this, [this]() {emit AdjustRateMovieReq(1);});
+  connect(_DECREASING_RATING, &QAction::triggered, this, [this]() {emit AdjustRateMovieReq(-1);});
+  connect(_INCREASING_RATETING_RECURSIVELY, &QAction::triggered, this, [this]() {emit AdjustRateMovieRecursivelyReq(1);});
+  connect(_DECREASING_RATETING_RECURSIVELY, &QAction::triggered, this, [this]() {emit AdjustRateMovieRecursivelyReq(-1);});
 }
 
 void RateActions::onRateActionTriggered(QAction* pActTriggered) {
@@ -84,7 +102,7 @@ void RateActions::onRateActionTriggered(QAction* pActTriggered) {
     LOG_W("data property in QAction is not a number");
     return;
   }
-  emit MovieRateChanged(newRate);
+  emit RateMovieReq(newRate);
 }
 
 int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const {
@@ -107,4 +125,3 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
   LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);
   return succeedCnt;
 }
-

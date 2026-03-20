@@ -16,6 +16,7 @@ public:
   void PlayPreviousVideo();
   void PlayNextVideo();
   int onRateSelectedMovies(int newRate);
+  int onAdjustSelectedMoviesRate(int delta);
   int onRenameJsonAndRelatedReplace();
   int onRenameJsonAndRelatedInsert();
 

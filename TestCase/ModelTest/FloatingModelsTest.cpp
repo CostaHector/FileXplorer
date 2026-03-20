@@ -227,15 +227,34 @@ class FloatingModelsTest : public PlainTestSuite {
         "C:/home/Ben Afleck.mp4",             //
     };                                        //
     QCOMPARE(vmodel.UpdateData(vidDatas), 3);
+    QVERIFY(vmodel.data(QModelIndex{}).isNull());                        // out of range
+    QVERIFY(vmodel.data(vmodel.index(0, Qt::ForegroundRole)).isNull());  // not specified
+
     QCOMPARE(vmodel.data(vmodel.index(0, Qt::DisplayRole)).toString(), "Chris Evans");
     QCOMPARE(vmodel.data(vmodel.index(1, Qt::DisplayRole)).toString(), "Michael Fassbender");
     QCOMPARE(vmodel.data(vmodel.index(2, Qt::DisplayRole)).toString(), "Ben Afleck");
 
     const QVariant iconFromProvider = vmodel.data(vmodel.index(2), Qt::DecorationRole);
     QVERIFY(!iconFromProvider.isNull());
+  }
 
-    QVERIFY(vmodel.data(QModelIndex{}).isNull());                        // out of range
-    QVERIFY(vmodel.data(vmodel.index(0, Qt::ForegroundRole)).isNull());  // not set
+  void othersModel_ok() {
+    OthersModel oModel{"VidsListView"};
+    const QStringList vidDatas{
+        "/home/to/Chris Evans.txt",           //
+        "C:/home/to/Michael Fassbender.md",  //
+        "C:/home/Ben Afleck.json",             //
+    };                                        //
+    QCOMPARE(oModel.UpdateData(vidDatas), 3);
+    QVERIFY(oModel.data(QModelIndex{}).isNull());                        // out of range
+    QVERIFY(oModel.data(oModel.index(0, Qt::ForegroundRole)).isNull());  // not specified
+
+    QCOMPARE(oModel.data(oModel.index(0, Qt::DisplayRole)).toString(), "Chris Evans.txt");
+    QCOMPARE(oModel.data(oModel.index(1, Qt::DisplayRole)).toString(), "Michael Fassbender.md");
+    QCOMPARE(oModel.data(oModel.index(2, Qt::DisplayRole)).toString(), "Ben Afleck.json");
+
+    const QVariant iconFromProvider = oModel.data(oModel.index(2), Qt::DecorationRole);
+    QVERIFY(!iconFromProvider.isNull());
   }
 };
 

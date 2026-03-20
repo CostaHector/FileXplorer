@@ -1366,7 +1366,7 @@
 <context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../Model/QAbstractListModelPub.cpp" line="+18"/>
+        <location filename="../Model/QAbstractListModelPub.cpp" line="+16"/>
         <source>smooth transformation</source>
         <translation>平滑变换</translation>
     </message>
@@ -1380,16 +1380,36 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Rate Recusively</source>
-        <translation>递归设置评分</translation>
+        <source>Rate recusively</source>
+        <translation>穿透评分</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Rate Recusively(Force)</source>
-        <translation>递归设置评分(强制)</translation>
+        <source>Rate recusively(force)</source>
+        <translation>穿透评分(强制)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+5"/>
+        <source>Increase rating</source>
+        <translation>+1分</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Decrease rating</source>
+        <translation>-1分</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Increase rating recusively</source>
+        <translation>穿透+1分</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Decrease rating recusively</source>
+        <translation>穿透-1分</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <location line="+17"/>
         <source>Rate</source>
         <translation>评分</translation>
