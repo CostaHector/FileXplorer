@@ -68,6 +68,60 @@ int RateHelper::RateMovieRecursively(const QString& folderAbsPath, int rate, boo
   return succeedCnt;
 }
 
+bool RateHelper::AdjustRateMovie(const QString& fileAbsPath, int delta, int* newRateValue) {
+  if (delta == 0) {
+    return false;
+  }
+  QString jsonPath;
+  if (!getJsonPathForFile(fileAbsPath, jsonPath)) {
+    LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
+    return false;
+  }
+  using namespace JsonHelper;
+  using namespace MOVIE_TABLE;
+  QVariantHash data = MovieJsonLoader(jsonPath);
+  if (!data.contains(ENUM_2_STR(Name))) {
+    LOG_D("JSON data[%s] not contains key" ENUM_2_STR(Name), qPrintable(jsonPath));
+    return false;
+  }
+
+  using namespace PERFORMER_DB_HEADER_KEY;
+  auto itRate = data.find(ENUM_2_STR(Rate));
+  const int beforeValue{itRate != data.end() ? itRate.value().toInt() : MIN_V};
+  const int afterValue{clampRate(beforeValue + delta)};
+  if (newRateValue != nullptr) {
+    *newRateValue = afterValue;
+  }
+
+  if (afterValue == beforeValue) { // already reach border, get clamp
+    return true;
+  }
+
+  if (itRate != data.end()) {
+    itRate->setValue(afterValue);
+  } else {
+    data[ENUM_2_STR(Rate)] = afterValue;
+  }
+
+  if (!DumpJsonDict(data, jsonPath)) {
+    LOG_E("Failed to save JSON data to: %s", qPrintable(jsonPath));
+    return false;
+  }
+  return true;
+}
+
+int RateHelper::AdjustRateMovieRecursively(const QString& folderAbsPath, int delta) {
+  QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  int succeedCnt{0}, totalCnt{0};
+  while (it.hasNext()) {
+    succeedCnt += AdjustRateMovie(it.next(), delta);
+    ++totalCnt;
+  }
+  LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) rate value have been [%d]", succeedCnt, totalCnt, delta);
+
+  return succeedCnt;
+}
+
 bool RateHelper::getJsonPathForFile(const QString& fileAbsPath, QString& jsonPath) {
   jsonPath.clear();
 

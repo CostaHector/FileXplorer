@@ -36,6 +36,22 @@ class VideoTableModelTest : public PlainTestSuite {
     mDir.ClearAll();
   }
 
+  void default_ok() {
+    VideoTableModel videoModel;
+    QCOMPARE(videoModel.flags({}).testFlag(Qt::ItemFlag::ItemIsEditable), false);
+    QCOMPARE(videoModel.data({}).isValid(), false);
+    QCOMPARE(videoModel.setData({}, 10, Qt::EditRole), false);
+
+    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), Qt::AlignRight);
+    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
+             VideoTableModel::VIDEO_VERTICAL_HEAD[0]);
+    QCOMPARE(videoModel.headerData(1, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
+             VideoTableModel::VIDEO_VERTICAL_HEAD[1]);
+    QCOMPARE(videoModel.headerData(99, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toInt(), 100);
+    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 1);
+    QCOMPARE(videoModel.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 2);
+  }
+
   void setPlayPath_ok() {
     VideoTableModel videoModel;
     QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
@@ -57,37 +73,27 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.rowCount(), 2);
     QCOMPARE(videoModel.rootPath(), mWorkPath);
     QCOMPARE(videoModel.findMode(), VideoTableModel::VideoFindMode::NORMAL);
-    QCOMPARE(videoModel.data(videoModel.index(0, 0), Qt::DisplayRole).toString(), "file1.mkv");
-    QCOMPARE(videoModel.data(videoModel.index(1, 0), Qt::DisplayRole).toString(), "file2.mp4");
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_NAME), Qt::DisplayRole).toString(), "file1.mkv");
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::FILE_NAME), Qt::DisplayRole).toString(), "file2.mp4");
   }
 
   void data_ok() {
     VideoTableModel videoModel;
-    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), Qt::AlignRight);
-
-    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
-             VideoTableModel::VIDEO_VERTICAL_HEAD[0]);
-    QCOMPARE(videoModel.headerData(1, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(),
-             VideoTableModel::VIDEO_VERTICAL_HEAD[1]);
-    QCOMPARE(videoModel.headerData(99, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toInt(), 100);
-    QCOMPARE(videoModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 1);
-    QCOMPARE(videoModel.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 2);
-
     QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
     QCOMPARE(videoModel.rowCount(), 6);
     QCOMPARE(videoModel.data({}, Qt::DisplayRole), (QVariant{}));
-    QCOMPARE(videoModel.data(videoModel.index(0, 0), Qt::BackgroundRole), (QVariant{}));
-    QCOMPARE(videoModel.data(videoModel.index(0, 0), Qt::DisplayRole).toString(), "file1.mkv");
-    QCOMPARE(videoModel.data(videoModel.index(1, 0), Qt::DisplayRole).toString(), "file2.mp4");
-    QCOMPARE(videoModel.data(videoModel.index(2, 0), Qt::DisplayRole).toString(), "file5.avi");
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_NAME), Qt::BackgroundRole), (QVariant{}));
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_NAME), Qt::DisplayRole).toString(), "file1.mkv");
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::FILE_NAME), Qt::DisplayRole).toString(), "file2.mp4");
+    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::FILE_NAME), Qt::DisplayRole).toString(), "file5.avi");
 
-    QCOMPARE(videoModel.data(videoModel.index(0, 1), Qt::DisplayRole).toString(), "/");
-    QCOMPARE(videoModel.data(videoModel.index(1, 1), Qt::DisplayRole).toString(), "/");
-    QCOMPARE(videoModel.data(videoModel.index(2, 1), Qt::DisplayRole).toString(), "/VIDEO_TS/");
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::REL_PATH), Qt::DisplayRole).toString(), "/");
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::REL_PATH), Qt::DisplayRole).toString(), "/");
+    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::REL_PATH), Qt::DisplayRole).toString(), "/VIDEO_TS/");
 
-    QCOMPARE(videoModel.data(videoModel.index(0, 2), Qt::DisplayRole).toString(), "0'0'0'1");
-    QCOMPARE(videoModel.data(videoModel.index(1, 2), Qt::DisplayRole).toString(), "0'0'0'2");
-    QCOMPARE(videoModel.data(videoModel.index(2, 2), Qt::DisplayRole).toString(), "0'0'0'5");
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'1");
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'2");
+    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'5");
 
     QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::DURATION_FIELD), Qt::DisplayRole).toString(), "00:00:00");
     QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::DURATION_FIELD), Qt::DisplayRole).toString(), "00:00:00");
@@ -96,6 +102,10 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::SCORE_FIELD), Qt::DisplayRole).toInt(), 9);
     QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::SCORE_FIELD), Qt::DisplayRole).toInt(), 0);
     QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::SCORE_FIELD), Qt::DisplayRole).toInt(), 0);
+
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 9);
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 0);
+    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 0);
 
     QVariant pixmapVar = videoModel.data(videoModel.index(0, VideoBasicInfo::SCORE_FIELD), Qt::DecorationRole);
     QVERIFY(pixmapVar.isValid());
@@ -115,8 +125,8 @@ class VideoTableModelTest : public PlainTestSuite {
 
     QModelIndexList indexes;
     indexes.reserve(2);
-    indexes.push_back(videoModel.index(1, 0));
-    indexes.push_back(videoModel.index(3, 0));
+    indexes.push_back(videoModel.index(1, VideoBasicInfo::FILE_NAME));
+    indexes.push_back(videoModel.index(3, VideoBasicInfo::FILE_NAME));
     QCOMPARE(videoModel.updateDurationFields(indexes), 2);
 
     QModelIndex durationFieldBegInd{indexes.front().siblingAtColumn(VideoBasicInfo::DURATION_FIELD)};
@@ -141,22 +151,62 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
     QCOMPARE(videoModel.rowCount(), 6);
 
-    const QModelIndex firstIndex{videoModel.index(0, 0)};
-    const QModelIndex secondIndex{videoModel.index(1, 0)};  // no json correspond
+    const QModelIndex firstIndex{videoModel.index(0, VideoBasicInfo::FILE_NAME)};
+    const QModelIndex secondIndex{videoModel.index(1, VideoBasicInfo::FILE_NAME)};  // no json correspond
     const QModelIndexList indexes{firstIndex, secondIndex};
 
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "file1.mkv");
     QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 9);
     QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), "file2.mp4");
-    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);
+    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);  // no json correspond
 
     QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
     QCOMPARE(videoModel.rateSelectedMovies({}, 10), 0);
-    QCOMPARE(videoModel.rateSelectedMovies(indexes, 10), 1);
+    QCOMPARE(videoModel.rateSelectedMovies(indexes, 10), 1);  // 1st time
 
     QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 10);
-    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);
+    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);  // no json correspond
     QCOMPARE(dataChangedSpy.count(), 1);
+    dataChangedSpy.takeLast();
+
+    QCOMPARE(videoModel.adjustRateSelectedMovies({}, 10), 0);
+    QCOMPARE(videoModel.adjustRateSelectedMovies(indexes, 0), 0);  // delta = 0, skip
+
+    QCOMPARE(videoModel.adjustRateSelectedMovies(indexes, -2), 1);
+    QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 8);  // 1st time: 10-2
+    QCOMPARE(videoModel.adjustRateSelectedMovies(indexes, 2), 1);
+    QCOMPARE(firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 10);  // 2nd time: 10-2+2
+    QCOMPARE(secondIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD).data(Qt::DisplayRole).toInt(), 0);  // no json correspond
+    QCOMPARE(dataChangedSpy.count(), 2);
+    dataChangedSpy.clear();
+  }
+
+  void setData_ok() {
+    VideoTableModel videoModel;
+    QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
+    QCOMPARE(videoModel.rowCount(), 6);
+
+    const QModelIndex firstIndex{videoModel.index(0, VideoBasicInfo::FILE_NAME)};
+    const QModelIndex firstEditIndex{firstIndex.siblingAtColumn(VideoBasicInfo::SCORE_FIELD)};
+    QCOMPARE(videoModel.flags(firstIndex).testFlag(Qt::ItemFlag::ItemIsEditable), false);
+    QCOMPARE(videoModel.flags(firstEditIndex).testFlag(Qt::ItemFlag::ItemIsEditable), true);
+    const int beforeRate = firstEditIndex.data().toInt();
+    QCOMPARE(beforeRate, 10);
+    const int newRate{9};
+
+    // setData->rateSelectedMovies->emit dataChanged(index, index, {displayRole, decorationRole});
+    QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
+
+    QCOMPARE(videoModel.setData(firstIndex, newRate, Qt::EditRole), false);           // column not accept
+    QCOMPARE(videoModel.setData(firstEditIndex, newRate, Qt::DisplayRole), false);    // role not accept
+    QCOMPARE(videoModel.setData(firstEditIndex, "not number", Qt::EditRole), false);  // value not accept
+
+    QCOMPARE(videoModel.setData(firstEditIndex, beforeRate, Qt::EditRole), false);  // unchange not accept
+    QCOMPARE(videoModel.setData(firstEditIndex, newRate, Qt::EditRole), true);      // changed ok
+    QCOMPARE(videoModel.setData(firstEditIndex, beforeRate, Qt::EditRole), true);   // changed ok
+
+    QCOMPARE(dataChangedSpy.count(), 2);
+    dataChangedSpy.clear();
   }
 
   void tableView_setPlayPath_ok() {
@@ -186,10 +236,10 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
     QCOMPARE(videoModel.rowCount(), 6);
     QModelIndexList lst{
-        videoModel.index(0, 0),
-        videoModel.index(1, 0),
-        videoModel.index(3, 0),
-        videoModel.index(4, 0),
+        videoModel.index(0, VideoBasicInfo::FILE_NAME),
+        videoModel.index(1, VideoBasicInfo::FILE_NAME),
+        videoModel.index(3, VideoBasicInfo::FILE_NAME),
+        videoModel.index(4, VideoBasicInfo::FILE_NAME),
     };
     QCOMPARE(videoModel.AfterVideoFilesNameRenamed(lst), 4);
     QCOMPARE(videoModel.rowCount(), 2);

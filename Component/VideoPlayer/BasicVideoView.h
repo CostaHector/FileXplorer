@@ -32,6 +32,8 @@ public:
   bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
   bool rateCurrentVideo(int score) const;
   int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
+  bool adjustRateCurrentVideo(int delta) const;
+  int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);

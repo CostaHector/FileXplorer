@@ -39,7 +39,7 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& index) const override {
     if (index.column() == CURRENT_VALUE) {
-      return Qt::ItemFlag::ItemIsEditable | Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
+      return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
     }
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }

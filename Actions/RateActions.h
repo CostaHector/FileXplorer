@@ -9,7 +9,7 @@
 class RateActions : public QObject {
   Q_OBJECT
 public:
-  enum class RateRequestFrom {FROM_BEGIN=0, FILE_XPLORER=FROM_BEGIN, THUMBNAIL_VIEWER, VIDEO_TABLE_VIEW, FROM_BUTT};
+  enum class RateRequestFrom {FROM_BEGIN=0, FILE_XPLORER=FROM_BEGIN, VIDEO_TABLE_VIEW, FROM_BUTT};
   static RateActions& GetInst(RateRequestFrom reqFrom = RateRequestFrom::FILE_XPLORER);
   explicit RateActions(QObject* parent = nullptr);
   const QActionGroup* GetActionGroup() const {return RATE_AGS;}
@@ -18,8 +18,10 @@ public:
   QWidget* GetRateToolButton(QWidget* notNullParent) const;
 
 signals:
-  void MovieRateChanged(int newRate);
-  void MovieRateRecursivelyChanged(bool bOverrideForce);
+  void RateMovieReq(int newRate);
+  void RateMovieRecursivelyReq(bool bOverrideForce);
+  void AdjustRateMovieReq(int delta = 1);
+  void AdjustRateMovieRecursivelyReq(int delta = 1);
 
 public slots:
   int onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const;
@@ -32,6 +34,9 @@ private:
   QActionGroup* RATE_AGS {nullptr};
   QAction* _RATE_RECURSIVELY{nullptr};
   QAction* _RATE_RECURSIVELY_OVERRIDE{nullptr};
+
+  QAction* _INCREASING_RATING{nullptr}, *_DECREASING_RATING{nullptr};
+  QAction* _INCREASING_RATETING_RECURSIVELY{nullptr}, *_DECREASING_RATETING_RECURSIVELY{nullptr};
 };
 
 #endif // RATEACTIONS_H

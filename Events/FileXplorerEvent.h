@@ -42,6 +42,8 @@ private:
 
   bool onRateMovie(int newRate) const;
   bool onRateMoviesRecursively(bool bOverrideForce) const;
+  bool onAdjustRateMovie(int delta) const;
+  bool onAdjustRateMoviesRecursively(int delta) const;
 
   QStringList FsmSelectedItems() const;
 

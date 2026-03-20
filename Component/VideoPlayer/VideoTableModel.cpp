@@ -9,9 +9,7 @@
 #include "FileTool.h"
 #include <QDirIterator>
 
-constexpr int VideoBasicInfo::DURATION_FIELD, VideoBasicInfo::SCORE_FIELD;
-
-const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Relative path", "Size", "Duration", "Rate"};
+const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Rate", "Duration", "Size", "Relative path"};
 
 QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
@@ -19,18 +17,18 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   }
   int col = index.column();
   const VideoBasicInfo& item = mVideosInfo[index.row()];
-  if (role == Qt::DisplayRole) {
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
-      case 0:
+      case VideoBasicInfo::FILE_NAME:
         return item.fileName;
-      case 1:
-        return item.relPath;
-      case 2:
-        return DataFormatter::formatFileSizeGMKB(item.fileSize);
-      case VideoBasicInfo::DURATION_FIELD:
-        return DataFormatter::formatDurationISO(item.duration);
       case VideoBasicInfo::SCORE_FIELD:
         return item.rate;
+      case VideoBasicInfo::DURATION_FIELD:
+        return DataFormatter::formatDurationISO(item.duration);
+      case VideoBasicInfo::FILE_SIZE:
+        return DataFormatter::formatFileSizeGMKB(item.fileSize);
+      case VideoBasicInfo::REL_PATH:
+        return item.relPath;
       default:
         return {};
     }
@@ -39,6 +37,22 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   }
 
   return {};
+}
+
+bool VideoTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (role == Qt::EditRole && flags(index).testFlag(Qt::ItemFlag::ItemIsEditable)) {
+    bool bIsInt{false};
+    const short newRate{value.toInt(&bIsInt)};
+    if (!bIsInt) {
+      return false;
+    }
+    VideoBasicInfo& item = mVideosInfo[index.row()];
+    if (item.rate == newRate) {
+      return false;  // unchange
+    }
+    return rateSelectedMovies({index}, newRate);
+  }
+  return QAbstractItemModel::setData(index, value, role);
 }
 
 int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode, bool bForce) {
@@ -214,8 +228,45 @@ int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newR
   }
   const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::SCORE_FIELD, {});
   const QModelIndex& backInd = sibling(maxRow, VideoBasicInfo::SCORE_FIELD, {});
-  emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole, Qt::DecorationRole});
   LOG_D("%d in %d rate field in row[%d, %d] get updated", affectedRows, indexes.size(), minRow, maxRow);
+  return affectedRows;
+}
+
+int VideoTableModel::adjustRateSelectedMovies(const QModelIndexList& indexes, int delta) {
+  if (indexes.isEmpty() || delta == 0) {
+    return 0;
+  }
+  int minRow{INT_MAX}, maxRow{-1};
+  int affectedRows{0};
+  int newRate{0};
+  for (const QModelIndex& ind : indexes) {
+    const int row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row[%d] out of range", row);
+      continue;
+    }
+    const QString mediaPath{GetMediaFullPath(ind)};
+    if (!RateHelper::AdjustRateMovie(mediaPath, delta, &newRate)) {
+      LOG_W("Rate[%s] failed", qPrintable(mediaPath));
+      continue;
+    }
+    mVideosInfo[row].rate = newRate;
+    ++affectedRows;
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    return 0;
+  }
+  const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::SCORE_FIELD, {});
+  const QModelIndex& backInd = sibling(maxRow, VideoBasicInfo::SCORE_FIELD, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
+  LOG_D("%d in %d rate field in row[%d, %d] get adjust[%d]", affectedRows, indexes.size(), minRow, maxRow, delta);
   return affectedRows;
 }
 
@@ -262,7 +313,7 @@ int VideoTableModel::GetRateFromJsonFile(const QString& jsonFullPath, int defaul
   }
 
   if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
-    return defaultRateValue; // Todo: llt cover this line
+    return defaultRateValue;  // Todo: llt cover this line
   }
   int rate = 0;
   while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {

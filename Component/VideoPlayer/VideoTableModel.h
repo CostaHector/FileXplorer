@@ -8,9 +8,14 @@ struct VideoBasicInfo {
   QString relPath;
   qint64 fileSize;
   int duration;
-  static constexpr int DURATION_FIELD = 3;
   short rate;
-  static constexpr int SCORE_FIELD = 4;
+  enum DataType {
+    FILE_NAME = 0,
+    SCORE_FIELD = 1,
+    DURATION_FIELD = 2,
+    FILE_SIZE = 3,
+    REL_PATH = 4,
+  };
   bool operator<(const VideoBasicInfo& rhs) const { return relPath < rhs.relPath || (relPath == rhs.relPath && fileName < rhs.fileName); }
 };
 
@@ -26,6 +31,7 @@ class VideoTableModel : public QAbstractTableModelPub {
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return VIDEO_VERTICAL_HEAD.size(); }
 
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override {
     if (role == Qt::TextAlignmentRole) {
@@ -42,7 +48,12 @@ class VideoTableModel : public QAbstractTableModelPub {
     return QAbstractTableModel::headerData(section, orientation, role);
   }
 
-  Qt::ItemFlags flags(const QModelIndex& /*index*/) const override { return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable; }
+  Qt::ItemFlags flags(const QModelIndex& index) const override {
+    if (index.column() == VideoBasicInfo::SCORE_FIELD) {
+      return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
+    }
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
+  }
 
   int setRootPath(const QString& rootPath, VideoFindMode findMode = VideoFindMode::NORMAL, bool bForce=false);
   QString rootPath() const { return mPlayPath; }
@@ -53,6 +64,7 @@ class VideoTableModel : public QAbstractTableModelPub {
   QString GetMediaFullPath(const QModelIndex& ind) const;
   int updateDurationFields(const QModelIndexList& indexes);
   int rateSelectedMovies(const QModelIndexList& indexes, int newRate);
+  int adjustRateSelectedMovies(const QModelIndexList& indexes, int delta);
   QStringList rel2fileNames(const QModelIndexList& indexes) const;
   int AfterVideoFilesNameRenamed(const QModelIndexList& indexes);
   static int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue = 0);

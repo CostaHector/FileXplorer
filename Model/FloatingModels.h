@@ -37,8 +37,9 @@ class VidsModel : public FloatingModels {
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 };
 
-class OthersModel : public VidsModel {
+class OthersModel : public FloatingModels {
 public:
-  using VidsModel::VidsModel;
+  using FloatingModels::FloatingModels;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 };
 #endif  // FLOATINGMODELS_H

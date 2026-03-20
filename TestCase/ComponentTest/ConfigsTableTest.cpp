@@ -73,10 +73,10 @@ class ConfigsTableTest : public PlainTestSuite {
 
     QCOMPARE(cfgTbl.on_cellDoubleClicked({}), false);
 
-    QSignalSpy acceptedWhenOkClicked{&cfgTbl, &QDialog::accepted};
+    QSignalSpy dlgAcceptedWhenOkClicked{&cfgTbl, &QDialog::accepted};
     emit cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Ok)->click();
-    QCOMPARE(acceptedWhenOkClicked.count(), 1);
-    acceptedWhenOkClicked.takeLast();
+    QCOMPARE(dlgAcceptedWhenOkClicked.count(), 1);
+    dlgAcceptedWhenOkClicked.takeLast();
   }
 
   void label_message_after_user_edit_ok() {
@@ -115,12 +115,14 @@ class ConfigsTableTest : public PlainTestSuite {
     QVERIFY(!stillFailed3ItemsMsg.contains("All 4 setting passed"));
 
     // 点击Retry刷新标签
+    QSignalSpy dialogNotAcceptedWhenRetryClicked{&cfgTbl, &QDialog::accepted};
     QPushButton* retryBtn = cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Retry);
     QVERIFY(retryBtn != nullptr);
     retryBtn->click();
     const QString failed1ItemsMsg = cfgTbl.m_failItemCnt->text();
     QVERIFY(failed1ItemsMsg.contains("1 in 4 setting(s) error"));
     QVERIFY(!failed1ItemsMsg.contains("All 4 setting passed"));
+    QCOMPARE(dialogNotAcceptedWhenRetryClicked.count(), 0);
 
     // 通过model修改正确1条, 将自动刷新标签, 剩余失败数=1-1=0条
     QCOMPARE(model.setData(volumeValueIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE), correctVolumeValue, Qt::EditRole), true);
