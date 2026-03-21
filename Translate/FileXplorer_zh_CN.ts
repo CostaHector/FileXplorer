@@ -881,7 +881,12 @@
         <translation>取消固定</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+14"/>
+        <source>Update MD5</source>
+        <translation>更新哈希字段</translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -923,15 +928,10 @@
     <message>
         <location line="+4"/>
         <source>Update size</source>
-        <translation>更新文件大小字段</translation>
+        <translation>更新大小字段</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Update hash</source>
-        <translation>更新哈希字段</translation>
-    </message>
-    <message>
-        <location line="-35"/>
+        <location line="-31"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
@@ -1584,7 +1584,7 @@
         <translation>扩展名独立计数</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+45"/>
         <source>Base name:</source>
         <translation>基础名:</translation>
     </message>
@@ -1602,7 +1602,7 @@
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+13"/>
+        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+9"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>

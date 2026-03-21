@@ -14,6 +14,7 @@
 #include <QJsonDocument>
 #include "DataFormatter.h"
 #include "VideoDurationGetter.h"
+#include "MD5Calculator.h"
 
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
@@ -113,17 +114,37 @@ bool JsonPr::SyncNameValueFromFileBaseName() {
   return true;
 }
 
+QString JsonPr::FindVideoAbsPath() const {
+  const QString& jsonFileBaseName = PathTool::GetBaseName(jsonFileName);
+  QString videoAbsPath = m_Prepath + '/' + jsonFileBaseName;
+  const int beforeSize = videoAbsPath.size();
+  videoAbsPath.reserve(beforeSize + 7);
+  for (const QString& ext: TYPE_FILTER::VIDEO_TYPE_SET) {
+    videoAbsPath += ext.midRef(1);
+    if (QFile::exists(videoAbsPath)) {
+      return videoAbsPath;
+    }
+    videoAbsPath.chop(videoAbsPath.size() - beforeSize);
+  }
+  return "";
+}
+
+bool JsonPr::UpdateVideoSizeField(QString videoAbsPath) {
+  if (videoAbsPath.isEmpty()) {
+    videoAbsPath = FindVideoAbsPath();
+  }
+  const QFile fi{videoAbsPath};
+  if (!fi.exists()) {
+    LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
+    return false;
+  }
+  m_Size = fi.size();
+  return true;
+}
+
 bool JsonPr::UpdateDurationField(QString videoAbsPath) {
   if (videoAbsPath.isEmpty()) {
-    const QString& jsonFileBaseName = PathTool::GetBaseName(jsonFileName);
-    videoAbsPath = m_Prepath + '/' + jsonFileBaseName;
-    for (const QString& ext: TYPE_FILTER::VIDEO_TYPE_SET) {
-      videoAbsPath += ext.midRef(1);
-      if (QFile::exists(videoAbsPath)) {
-        break;
-      }
-      videoAbsPath.chop(ext.midRef(1).size());
-    }
+    videoAbsPath = FindVideoAbsPath();
   }
   if (!QFile::exists(videoAbsPath)) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
@@ -131,6 +152,18 @@ bool JsonPr::UpdateDurationField(QString videoAbsPath) {
   }
   m_Duration = VideoDurationGetter::ReadAVideo(videoAbsPath);
   return m_Duration > 0;
+}
+
+bool JsonPr::UpdateVideoMD5Field(QString videoAbsPath) {
+  if (videoAbsPath.isEmpty()) {
+    videoAbsPath = FindVideoAbsPath();
+  }
+  if (!QFile::exists(videoAbsPath)) {
+    LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
+    return false;
+  }
+  m_MD5 = MD5Calculator::GetFileMD5(videoAbsPath, BytesRangeTool::BytesRangeE::SAMPLED_128_KB);
+  return true;
 }
 
 bool JsonPr::ConstructCastStudioValue() {

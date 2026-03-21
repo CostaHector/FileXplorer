@@ -594,16 +594,22 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonProxyModel.index(1, JSON_KEY_E::Name).data(Qt::DisplayRole).toString(), "b");
 
     jsonView.clearSelection();
+    QCOMPARE(jsonView.onUpdateFileSize(), 0);
     QCOMPARE(jsonView.onUpdateDuration(), 0);
+    QCOMPARE(jsonView.onUpdateFileMD5(), 0);
 
-    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).with(tDir.itemPath("a.mp4")).will(returnValue(10 * 60 * 1000));  // 10min
     jsonView.selectAll();
-    QCOMPARE(jsonView.onUpdateDuration(), 1);  // only a.json contains a.mp4
+    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).with(tDir.itemPath("a.mp4")).will(returnValue(10 * 60 * 1000));  // 10min
+    QCOMPARE(jsonView.onUpdateFileSize(), 1);  // only a.json contains a.mp4
+    QCOMPARE(jsonView.onUpdateDuration(), 1);
+    QCOMPARE(jsonView.onUpdateFileMD5(), 1);
 
-    // only select "b.json", but "b.json" have no mp4
+    // only select "b.json", but "b.json" have no mp4, no update FileSize/Duration/FileMD5
     jsonView.clearSelection();
     jsonView.selectRow(1);
+    QCOMPARE(jsonView.onUpdateFileSize(), 0);
     QCOMPARE(jsonView.onUpdateDuration(), 0);
+    QCOMPARE(jsonView.onUpdateFileMD5(), 0);
   }
 };
 

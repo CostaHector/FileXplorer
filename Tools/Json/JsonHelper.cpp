@@ -8,6 +8,7 @@
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "TableFields.h"
+#include "MD5Calculator.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -19,7 +20,9 @@
 
 namespace JsonHelper {
 QByteArray SerializedJsonDict2ByteArray(const QVariantHash& dict) {
-  if (dict.isEmpty()) {return "{}";}   // JSON标准兼容性——RFC7159
+  if (dict.isEmpty()) {
+    return "{}";
+  }  // JSON标准兼容性——RFC7159
   const QJsonObject& jsonObject{QJsonObject::fromVariantHash(dict)};
   QJsonDocument document;
   document.setObject(jsonObject);
@@ -27,13 +30,15 @@ QByteArray SerializedJsonDict2ByteArray(const QVariantHash& dict) {
 }
 
 QVariantHash DeserializedJsonByteArray2Dict(const QByteArray& jsonBa, bool* bParseOk) {
-  if (jsonBa.isEmpty()) { // JSON标准兼容性——RFC7159
-    if (bParseOk) *bParseOk = false;
+  if (jsonBa.isEmpty()) {  // JSON标准兼容性——RFC7159
+    if (bParseOk)
+      *bParseOk = false;
     LOG_W("Deserialized empty ByteArray failed");
     return {};
   }
-  if (jsonBa.simplified() == "{}") {   // 尝试解析最小化形式（无空白）的空对象
-    if (bParseOk) *bParseOk = true;
+  if (jsonBa.simplified() == "{}") {  // 尝试解析最小化形式（无空白）的空对象
+    if (bParseOk)
+      *bParseOk = true;
     return {};
   }
   QJsonParseError jsonErr;
@@ -113,7 +118,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   }
   if (!cast.isEmpty()) {
     const QStringList& castLst = cast.split(ELEMENT_JOINER);  // casts must seperated by comma only
-    it = dict.find(ENUM_2_STR(Cast));                     // here cast is the Performers
+    it = dict.find(ENUM_2_STR(Cast));                         // here cast is the Performers
     if (it != dict.cend() && it->toStringList() != castLst) {
       it->setValue(castLst);
       changed = true;
@@ -161,6 +166,57 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
   }
   LOG_D("%d json file contains Studio|Cast|Tags Field", fileNameHash2Json.size());
   return fileNameHash2Json;
+}
+
+int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return defaultRateValue;
+  }
+  int rateIndex = contents.indexOf(R"("Rate":)");
+  if (rateIndex == -1) {
+    return defaultRateValue;
+  }
+  // 跳过"Rate":7个字符
+  int valuePos = rateIndex + 7;
+  while (valuePos < contents.size() && contents[valuePos] == ' ') {
+    ++valuePos;
+  }
+
+  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
+    return defaultRateValue;  // Todo: llt cover this line
+  }
+  int rate = 0;
+  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
+    rate = rate * 10 + (contents[valuePos] - '0');
+    ++valuePos;
+  }
+  return rate;
+}
+
+QByteArray GetMD5FromJsonFile(const QString& jsonFullPath) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return {};
+  }
+  int rateIndex = contents.indexOf(R"("MD5":)");
+  if (rateIndex == -1) {
+    return {};
+  }
+  // 跳过"MD5":6个字符
+  int valuePos = rateIndex + 6;
+  while (valuePos < contents.size() && contents[valuePos] == ' ') {
+    ++valuePos;
+  }
+  if (contents.mid(valuePos, 2) == R"("")") {  // empty md5
+    return {};
+  }
+  if (valuePos + 1 + MD5Calculator::FIXED_MD5_LENGTH + 1 > contents.size()) {  // fixed length: 32, 2 quotes
+    return {};
+  }
+  return contents.mid(valuePos + 1, MD5Calculator::FIXED_MD5_LENGTH);
 }
 
 uint CalcFileHash(const QString& vidPth) {
