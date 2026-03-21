@@ -1708,6 +1708,19 @@
     </message>
 </context>
 <context>
+    <name>SceneListView</name>
+    <message>
+        <location filename="../View/SceneListView.cpp" line="+43"/>
+        <source>copy basename</source>
+        <translation>复制基名</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>play this folder</source>
+        <translation>播放此文件夹</translation>
+    </message>
+</context>
+<context>
     <name>ScenePageControl</name>
     <message>
         <location filename="../Component/ScenePageControl.cpp" line="+10"/>
