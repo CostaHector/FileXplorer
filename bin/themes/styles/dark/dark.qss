@@ -1,7 +1,7 @@
 ﻿/* 基础设置 */
 QWidget {
     background-color: #000000;
-    color: #d4d4d4;
+    color: #FFFFFF;
     selection-background-color: #264f78;
 }
 
@@ -13,7 +13,7 @@ QMainWindow {
 /* 文本编辑区 */
 QPlainTextEdit, QTextEdit {
     background-color: #252525;
-    color: #d4d4d4;
+    color: #FFFFFF;
     selection-background-color: #264f78;
 }
 
@@ -30,19 +30,19 @@ QPushButton:hover {
 
 /* 输入框 */
 QLineEdit {
-    background-color: #4F4B49;
+    background-color: #3F3B39;
     border: 1px solid rgb(160, 160, 160);
     margin: 1px;
     color: #FFFFFF;
 }
 
 QStatusBar, QRadioButton, QCheckBox {
-    background-color: #4F4B49;
+    background-color: #3F3B39;
     color: #FFFFFF;
 }
 
 QLabel {
-    background-color: #4F4B49;
+    background-color: #3F3B39;
     color: #FFFFFF;
 }
 /* For Custom Status Bar Message Label Only. 0: normal, 1: abnormal */
@@ -95,7 +95,7 @@ QTabBar {
 
 QTabWidget::tab {
     background: #252525;
-    color: #d4d4d4;
+    color: #FFFFFF;
     border: 1px solid #3c3c3c;
     border-bottom: none;
 }
@@ -108,19 +108,19 @@ QTabWidget::pane {
 }
 QTabBar::tab {
     background-color: #252525;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 15px;
     padding-right: 15px;
-    margin-top: 1px;
     min-width: 75px;
+    min-height: 20px;
     font-size: 15px;
 }
 QTabBar::tab:!selected {
     border-bottom: 1px solid rgba(160, 160, 160, 255);
 }
 QTabBar::tab:selected {
-    background-color: rgb(117, 106, 61);
+    background-color: #3F3B39;
     border-top: 1px solid rgba(160, 160, 160, 255);
     border-right: 1px solid rgba(160, 160, 160, 255);
     border-left: 1px solid rgba(160, 160, 160, 255);
@@ -136,7 +136,7 @@ QTabBar::tab:selected:hover {
 
 QHeaderView::section {
     background-color: #252525;
-    color: #d4d4d4;
+    color: #FFFFFF;
 }
 
 /* 左上角全选按钮基础样式 */
@@ -276,9 +276,11 @@ QScrollBar::add-page, QScrollBar::sub-page {
 
 /* 工具栏基础样式 */
 QToolBar {
-    background: #4F4B49;
+    background: #3F3B39;
     border: 1px solid #000000;
 }
+
+
 QToolBar QToolBar {
     margin: 0px;
     border: 0px;
@@ -286,26 +288,26 @@ QToolBar QToolBar {
 QToolBar QComboBox {
     margin: 0px;
     border: 0px;
-    border: 1px solid #d0d0d0;
+    border: 1px solid #FFFFFF;
 }
 
 QToolBar QLineEdit {
     margin: 0px;
-    border: 1px solid #d0d0d0;
+    border: 1px solid #FFFFFF;
 }
 
 QComboBox QLineEdit {
     margin: 0px;
-    border: 0px;
-    border: 1px solid #d0d0d0;
+    padding: 0px 1px;
+    border: none;          /* 移除QLineEdit自身边框 */
 }
 
 /* 基础样式 */
 QToolBar QToolButton {
     background: transparent;
-    color: #d4d4d4;
+    color: #FFFFFF;
     border: 1px solid transparent; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 /* 悬停状态 */
 QToolBar QToolButton:hover {
@@ -349,9 +351,9 @@ QToolBar QToolButton:disabled {
 /* 基础样式 */
 QWidget QToolButton {
     background: transparent;
-    color: #d4d4d4;
+    color: #FFFFFF;
     border: 1px solid transparent; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 /* 悬停状态 */
 QWidget QToolButton:hover {
@@ -422,9 +424,14 @@ QToolButton::menu-arrow {
 
 QComboBox {
     padding: 0px;
-    background-color: #4F4B49;
-    color: #d0d0d0;
-    font-size: 15px;
+    background-color: #3F3B39;
+    color: #FFFFFF;
+    font-size: 14px;
+}
+
+QLineEdit {
+    padding: 0px;
+    font-size: 14px;
 }
 
 QComboBox QAbstractItemView {
@@ -433,23 +440,18 @@ QComboBox QAbstractItemView {
     selection-color: #FFFFFF;
 }
 
-QComboBox QLineEdit {
-    margin: 0px;
-    padding: 0px 1px;
-    border: none;          /* 移除QLineEdit自身边框 */
-}
 
 /* 菜单容器 */
 QMenu {
     background-color: #333333;
     border-right: 3px solid #444444; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* 菜单项基础样式 */
 QMenu::item {
     background-color: transparent;
-    color: #d0d0d0;
+    color: #FFFFFF;
 }
 
 /* 选中状态（checked） */

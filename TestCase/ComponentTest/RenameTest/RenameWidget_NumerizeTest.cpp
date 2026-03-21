@@ -51,7 +51,7 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
     pNumerize.m_recursiveCB->setChecked(true);         // including sub
 
     pNumerize.m_completeBaseName->setText("super");
-    pNumerize.m_startNo->setText("1");
+    pNumerize.m_startNo->setCurrentText("1");
     pNumerize.m_isUniqueCounterPerExtension->setChecked(false);
     pNumerize.m_numberPattern->setCurrentText(" (%1)");
 
@@ -95,7 +95,7 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
     }
 
     {  // when number start index changed
-      pNumerize.m_startNo->setText("99");
+      pNumerize.m_startNo->setCurrentText("99");
       const QString& sNewName = pNumerize.m_nBaseTE->toPlainText();
       const QString& sNewExt = pNumerize.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "Captain CE [099]\nCaptain CE [100]\nCaptain CE [101]\nCaptain CE [102]");
@@ -124,7 +124,7 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
     pNumerize.m_recursiveCB->setChecked(false);        // not include sub
 
     pNumerize.m_completeBaseName->setText("super");
-    pNumerize.m_startNo->setText("1");
+    pNumerize.m_startNo->setCurrentText("1");
     pNumerize.m_isUniqueCounterPerExtension->setChecked(false);
     pNumerize.m_numberPattern->setCurrentText(" %1");
 

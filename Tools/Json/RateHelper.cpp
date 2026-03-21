@@ -49,7 +49,7 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOv
 
 bool RateHelper::RateMovie(const QString& fileAbsPath, int rate) {
   QString jsonPath;
-  if (!getJsonPathForFile(fileAbsPath, jsonPath)) {
+  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
     LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
@@ -73,7 +73,7 @@ bool RateHelper::AdjustRateMovie(const QString& fileAbsPath, int delta, int* new
     return false;
   }
   QString jsonPath;
-  if (!getJsonPathForFile(fileAbsPath, jsonPath)) {
+  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
     LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
@@ -122,7 +122,7 @@ int RateHelper::AdjustRateMovieRecursively(const QString& folderAbsPath, int del
   return succeedCnt;
 }
 
-bool RateHelper::getJsonPathForFile(const QString& fileAbsPath, QString& jsonPath) {
+bool RateHelper::getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPath) {
   jsonPath.clear();
 
   QString baseName, ext;

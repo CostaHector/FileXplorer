@@ -797,7 +797,7 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+55"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
@@ -881,7 +881,12 @@
         <translation>取消固定</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+14"/>
+        <source>Update MD5</source>
+        <translation>更新哈希字段</translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -923,15 +928,10 @@
     <message>
         <location line="+4"/>
         <source>Update size</source>
-        <translation>更新文件大小字段</translation>
+        <translation>更新大小字段</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Update hash</source>
-        <translation>更新哈希字段</translation>
-    </message>
-    <message>
-        <location line="-35"/>
+        <location line="-31"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
@@ -1374,7 +1374,7 @@
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../Actions/RateActions.cpp" line="+27"/>
+        <location filename="../Actions/RateActions.cpp" line="+28"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
@@ -1384,12 +1384,12 @@
         <translation>穿透评分</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Rate recusively(force)</source>
         <translation>穿透评分(强制)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Increase rating</source>
         <translation>+1分</translation>
     </message>
@@ -1409,8 +1409,8 @@
         <translation>穿透-1分</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+17"/>
+        <location line="+8"/>
+        <location line="+27"/>
         <source>Rate</source>
         <translation>评分</translation>
     </message>
@@ -1579,12 +1579,12 @@
         <translation>拖拽排序</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Extension Unique Counter</source>
         <translation>扩展名独立计数</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+45"/>
         <source>Base name:</source>
         <translation>基础名:</translation>
     </message>
@@ -1602,7 +1602,7 @@
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+13"/>
+        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+9"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>
@@ -1610,6 +1610,11 @@
         <location line="+2"/>
         <source>New:</source>
         <translation>新:</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Regex</source>
+        <translation>正则</translation>
     </message>
 </context>
 <context>

@@ -543,30 +543,61 @@ int JsonTableModel::FormatCast(const QModelIndexList& rowIndexes) {
   return affectedRows;
 }
 
-int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
+QHash<QString, QString> JsonTableModel::GetVidBaseName2FullPath() const {
+  QHash<QString, QString> vidBaseName2FullPath;
+  QDirIterator it{mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  while (it.hasNext()) {
+    QString vidFullPath = it.next();
+    QString vidBaseName = PathTool::GetFileNameExtRemoved(vidFullPath);
+    vidBaseName2FullPath[vidBaseName] = vidFullPath;
+  }
+  return vidBaseName2FullPath;
+}
+
+int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JSON_KEY_E field, const int ITERATE_FOLDER_FIRST_LIMIT) {
+  JsonPr::UPDATER_FUNC func{nullptr};
+  switch (field) {
+    case JSON_KEY_E::Size:
+      func = &JsonPr::UpdateVideoSizeField;
+      break;
+    case JSON_KEY_E::Duration:
+      func = &JsonPr::UpdateDurationField;
+      break;
+    case JSON_KEY_E::MD5:
+      func = &JsonPr::UpdateVideoMD5Field;
+      break;
+    default:
+      LOG_W("The field[%d] no support update", field);
+      return -1;
+  }
+  if (rowIndexes.isEmpty()) {
+    LOG_D("no row need update at all");
+    return 0;
+  }
+
   QHash<QString, QString> vidBaseName2FullPath;
   if (rowIndexes.size() >= ITERATE_FOLDER_FIRST_LIMIT) {
-    QDirIterator it{mRootPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-    while (it.hasNext()) {
-      QString vidFullPath = it.next();
-      QString vidBaseName = PathTool::GetFileNameExtRemoved(vidFullPath);
-      vidBaseName2FullPath[vidBaseName] = vidFullPath;
-    }
+    vidBaseName2FullPath = GetVidBaseName2FullPath();
   }
 
   int affectedRows{0};
   int row{-1};
   int minRow{INT_MAX}, maxRow{-1};
+  QString vidFullPath;
   for (const QModelIndex& ind : rowIndexes) {
     row = ind.row();
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    const QString& jsonFullPath = mCachedJsons[row].GetJsonFileAbsPath();
-    const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
-    const QString& vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
-    affectedRows += (int)mCachedJsons[row].UpdateDurationField(vidFullPath);
+    if (!vidBaseName2FullPath.isEmpty()) {
+      const QString& jsonFullPath = mCachedJsons[row].GetJsonFileAbsPath();
+      const QString& jsonBaseName = PathTool::GetFileNameExtRemoved(jsonFullPath);
+      vidFullPath = vidBaseName2FullPath.value(jsonBaseName, "");
+    } else {
+      vidFullPath.clear();
+    }
+    affectedRows += (int)(mCachedJsons[row].*func)(vidFullPath);
     setModifiedNoEmit(row);
     if (row > maxRow) {
       maxRow = row;
@@ -579,11 +610,23 @@ int JsonTableModel::UpdateDuration(const QModelIndexList& rowIndexes, const int 
     LOG_W("Cast Field of %d row(s) NO format at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Duration, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Duration, {});
+  const QModelIndex& frontInd = sibling(minRow, field, {});
+  const QModelIndex& backInd = sibling(maxRow, field, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   return affectedRows;
+}
+
+int JsonTableModel::UpdateFizeSizeField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
+  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::Size, ITERATE_FOLDER_FIRST_LIMIT);
+}
+
+int JsonTableModel::UpdateDurationField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
+  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::Duration, ITERATE_FOLDER_FIRST_LIMIT);
+}
+
+int JsonTableModel::UpdateMD5Field(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
+  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::MD5, ITERATE_FOLDER_FIRST_LIMIT);
 }
 
 int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes) {
@@ -622,9 +665,7 @@ int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexe
 
 // after call it reload and sync Name field to file Name needed
 int JsonTableModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
-  const auto rowElementsRmv = [this](int beg, int end) {
-    mCachedJsons.erase(mCachedJsons.begin() + beg, mCachedJsons.begin() + end);
-  };
+  const auto rowElementsRmv = [this](int beg, int end) { mCachedJsons.erase(mCachedJsons.begin() + beg, mCachedJsons.begin() + end); };
   return onRowsRemoved(indexes, rowElementsRmv);
 }
 

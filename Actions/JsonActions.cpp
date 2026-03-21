@@ -101,13 +101,13 @@ JsonActions::JsonActions(QObject* parent) //
                                          .arg(_UPDATE_DURATION_FIELD->text())
                                          .arg(_UPDATE_DURATION_FIELD->shortcut().toString()));
   _UPDATE_SIZE_FIELD = new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, tr("Update size"), this};
-  _UPDATE_SIZE_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Update size field") //
+  _UPDATE_SIZE_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the file size information from video file and write into json file") //
                                      .arg(_UPDATE_SIZE_FIELD->text())
                                      .arg(_UPDATE_SIZE_FIELD->shortcut().toString()));
-  _UPDATE_HASH_FIELD = new (std::nothrow) QAction{QIcon{":img/MD5_FILE_IDENTIFIER_PATH"}, tr("Update hash"), this};
-  _UPDATE_HASH_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Update hash field") //
-                                     .arg(_UPDATE_HASH_FIELD->text())
-                                     .arg(_UPDATE_HASH_FIELD->shortcut().toString()));
+  _UPDATE_MD5_FIELD = new (std::nothrow) QAction{QIcon{":img/MD5_FILE_IDENTIFIER_PATH"}, tr("Update MD5"), this};
+  _UPDATE_MD5_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the hash information from video file and write into json file") //
+                                     .arg(_UPDATE_MD5_FIELD->text())
+                                     .arg(_UPDATE_MD5_FIELD->shortcut().toString()));
 
   _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":/JsonEditor/STUDIO"), tr("Set Studio"));
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field") //

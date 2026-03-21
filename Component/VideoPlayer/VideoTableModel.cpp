@@ -7,6 +7,7 @@
 #include "Logger.h"
 #include "RateHelper.h"
 #include "FileTool.h"
+#include "JsonHelper.h"
 #include <QDirIterator>
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Rate", "Duration", "Size", "Relative path"};
@@ -107,7 +108,7 @@ int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
     const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(fi.filePath())};
-    const int scoreValue{GetRateFromJsonFile(jsonCorrespondVideo)};
+    const int scoreValue{JsonHelper::GetRateFromJsonFile(jsonCorrespondVideo)};
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, (short)scoreValue});
   }
 
@@ -294,31 +295,4 @@ QStringList VideoTableModel::rel2fileNames(const QModelIndexList& indexes) const
 int VideoTableModel::AfterVideoFilesNameRenamed(const QModelIndexList& indexes) {
   const auto rowElementsRmv = [this](int beg, int end) { mVideosInfo.erase(mVideosInfo.begin() + beg, mVideosInfo.begin() + end); };
   return onRowsRemoved(indexes, rowElementsRmv);
-}
-
-int VideoTableModel::GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
-  bool bReadResult{false};
-  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
-  if (!bReadResult) {
-    return defaultRateValue;
-  }
-  int rateIndex = contents.indexOf(R"("Rate":)");
-  if (rateIndex == -1) {
-    return defaultRateValue;
-  }
-  // 跳过"Rate":7个字符
-  int valuePos = rateIndex + 7;
-  while (valuePos < contents.size() && (contents[valuePos] == ' ' || contents[valuePos] == '\t')) {
-    ++valuePos;
-  }
-
-  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
-    return defaultRateValue;  // Todo: llt cover this line
-  }
-  int rate = 0;
-  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
-    rate = rate * 10 + (contents[valuePos] - '0');
-    ++valuePos;
-  }
-  return rate;
 }

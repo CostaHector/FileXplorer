@@ -16,6 +16,8 @@
 #include "StudioActorManagerTestHelper.h"
 
 #include "VideoDurationGetter.h"
+#include "MD5Calculator.h"
+
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -140,7 +142,11 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.AppendCastFromSentence(invalidIndex, "world AAA BB world", true), -1);
       QCOMPARE(jtm.AppendCastFromSentence(invalidIndex, "hello Aaa Bb world", false), -1);
 
-      QCOMPARE(jtm.UpdateDuration({}), 0);
+      QCOMPARE(jtm.UpdateFizeSizeField({}), 0);
+      QCOMPARE(jtm.UpdateDurationField({}), 0);
+      QCOMPARE(jtm.UpdateMD5Field({}), 0);
+      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JSON_KEY_E::Name), -1); // field cannot update
+      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JSON_KEY_E::Detail), -1);
     }
   }
 
@@ -306,7 +312,7 @@ class JsonTableModelTest : public PlainTestSuite {
 })"};
     const QString rootPath{mTDir.itemPath("duration_check")};
     mTDir.touch("duration_check/duration_test.json", durationJson);
-    mTDir.touch("duration_check/duration_test.mp4", durationJson);
+    mTDir.touch("duration_check/duration_test.mp4", "not zero size video");
     ON_SCOPE_EXIT {
       QVERIFY(QDir(mTDir.itemPath("duration_check")).removeRecursively());
     };
@@ -314,13 +320,24 @@ class JsonTableModelTest : public PlainTestSuite {
     JsonTableModel jtm;
     QCOMPARE(jtm.setRootPath(rootPath), 1);
     QCOMPARE(jtm.rowCount(), 1);
-    QModelIndex ind = jtm.index(0, JsonKey::Duration);
+
+    const QModelIndex ind = jtm.index(0, JsonKey::Duration);
+    QCOMPARE(ind.siblingAtColumn(JsonKey::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
+    QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 1);
+    QVERIFY(ind.siblingAtColumn(JsonKey::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
+
     MOCKER(VideoDurationGetter::ReadAVideo)
         .expects(exactly(1))
         .with(mTDir.itemPath("duration_check/duration_test.mp4"))
         .will(returnValue(10 * 60 * 1000));  // 10min
-    QCOMPARE(jtm.UpdateDuration({ind}, 1), 1);
+    QCOMPARE(ind.siblingAtColumn(JsonKey::Duration).data(Qt::DisplayRole).toString(), "00:00:00");
+    QCOMPARE(jtm.UpdateDurationField({ind}, 1), 1);
     QCOMPARE(ind.siblingAtColumn(JsonKey::Duration).data(Qt::DisplayRole).toString(), "00:10:00");
+
+    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));  // 10min
+    QCOMPARE(ind.siblingAtColumn(JsonKey::MD5).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(jtm.UpdateMD5Field({ind}, 1), 1);
+    QCOMPARE(ind.siblingAtColumn(JsonKey::MD5).data(Qt::DisplayRole).toString(), "AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD");
   }
 
   void jsonFileProperty_retrieve_correct() {

@@ -231,15 +231,36 @@ int JsonTableView::onFormatCast() {
   return indexes.size();
 }
 
+int JsonTableView::onUpdateFileSize() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("[Skip]nothing selected", "skip file size update");
+    return 0;
+  }
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Size);
+  const int cnt = _JsonModel->UpdateFizeSizeField(indexes);
+  LOG_OK_P("File size field has been update", "%d/%d row(s)", cnt, indexes.size());
+  return cnt;
+}
+
 int JsonTableView::onUpdateDuration() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("[Skip]nothing selected", "skip duration update");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Duration);
-  const int cnt = _JsonModel->UpdateDuration(indexes);
-
+  const int cnt = _JsonModel->UpdateDurationField(indexes);
   LOG_OK_P("Duration field has been update", "%d/%d row(s)", cnt, indexes.size());
+  return cnt;
+}
+
+int JsonTableView::onUpdateFileMD5() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("[Skip]nothing selected", "skip file md5 update");
+    return 0;
+  }
+  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::MD5);
+  const int cnt = _JsonModel->UpdateMD5Field(indexes);
+  LOG_OK_P("File md5 field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
 }
 
@@ -472,7 +493,9 @@ void JsonTableView::subscribe() {
 
   connect(inst._INFER_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
   connect(inst._FORMAT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onFormatCast);
+  connect(inst._UPDATE_SIZE_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileSize);
   connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
+  connect(inst._UPDATE_MD5_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileMD5);
 
   connect(inst._INIT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);

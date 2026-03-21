@@ -82,7 +82,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   CHECK_NULLPTR_RETURN_VOID(mUpdateFieldTb);
   mUpdateFieldTb->addAction(inst._UPDATE_DURATION_FIELD);
   mUpdateFieldTb->addAction(inst._UPDATE_SIZE_FIELD);
-  mUpdateFieldTb->addAction(inst._UPDATE_HASH_FIELD);
+  mUpdateFieldTb->addAction(inst._UPDATE_MD5_FIELD);
   mUpdateFieldTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mUpdateFieldTb->setOrientation(Qt::Orientation::Vertical);
   mUpdateFieldTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));

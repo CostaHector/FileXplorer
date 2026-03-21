@@ -67,7 +67,6 @@ class VideoTableModel : public QAbstractTableModelPub {
   int adjustRateSelectedMovies(const QModelIndexList& indexes, int delta);
   QStringList rel2fileNames(const QModelIndexList& indexes) const;
   int AfterVideoFilesNameRenamed(const QModelIndexList& indexes);
-  static int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue = 0);
 
  private:
   QList<VideoBasicInfo> mVideosInfo;

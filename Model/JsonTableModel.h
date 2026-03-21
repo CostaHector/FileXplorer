@@ -33,7 +33,9 @@ class JsonTableModel : public QAbstractTableModelPub {
   int InitCastAndStudio(const QModelIndexList& rowIndexes);
   int HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence);
   int FormatCast(const QModelIndexList& rowIndexes);
-  int UpdateDuration(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT=50);
+  int UpdateFizeSizeField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT=50);
+  int UpdateDurationField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT=50);
+  int UpdateMD5Field(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT=50);
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
   int SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed=true);
@@ -49,6 +51,8 @@ class JsonTableModel : public QAbstractTableModelPub {
   }
 
  private:
+  int JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JSON_KEY_E field, const int ITERATE_FOLDER_FIRST_LIMIT=50);
+  QHash<QString, QString> GetVidBaseName2FullPath() const;
   bool setModified(int row, bool modified = true);
   bool setModifiedNoEmit(int row, bool modified = true);
   QVector<JsonPr> mCachedJsons;

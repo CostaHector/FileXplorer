@@ -8,14 +8,6 @@
 
 namespace DataFormatter {
 
-const QVariant& formatDefault(const QVariant& v) {  //
-  return v;
-}
-
-QString formatFloat2Prec(float value) {  //
-  return QString::number(value, 'f', 2);
-}
-
 bool writeQString(QString& dst, const QVariant& src) {
   QString srcValue{src.toString()};
   if (dst == srcValue) {
@@ -27,6 +19,15 @@ bool writeQString(QString& dst, const QVariant& src) {
 
 bool writeInt(int& dst, const QVariant& src) {
   int srcValue{src.toInt()};
+  if (dst == srcValue) {
+    return false;
+  }
+  std::swap(dst, srcValue);
+  return true;
+}
+
+bool writeqint64(qint64& dst, const QVariant& src) {
+  qint64 srcValue{src.toLongLong()};
   if (dst == srcValue) {
     return false;
   }
@@ -51,12 +52,97 @@ bool writeDouble(double& dst, const QVariant& src) {
   return true;
 }
 
+bool writeQByteArray(QByteArray& dst, const QVariant& src) {
+  QByteArray srcByteArray = src.toString().toUtf8();
+  if (dst == srcByteArray) {
+    return false;
+  }
+  dst.swap(srcByteArray);
+  return true;
+}
+
+bool writeQStringLst(QStringList& container, const QVariant& src) {
+  QStringList newTags = src.toString().split(NameTool::CSV_COMMA);
+  if (container == newTags) {
+    return false;
+  }
+  container.swap(newTags);
+  return true;
+}
+
+bool writeGender(Gender& dst, const QVariant& src) {
+  QString srcStr{src.toString()};
+  Gender srcValue{srcStr == "male" ? Gender::male : Gender::female};
+  if (dst == srcValue) {
+    return false;
+  }
+  std::swap(dst, srcValue);
+  return true;
+}
+
+bool writePhoneNumber(QString& dst, const QVariant& src) {
+  QString srcStr{src.toString()};
+  srcStr.remove('-');
+  if (dst == srcStr) {
+    return false;
+  }
+  dst.swap(srcStr);
+  return true;
+}
+
+bool writeRateAnnual(QList<char>& dst, const QVariant& src) {
+  QStringList lstStrValue = src.toString().split(',', Qt::SplitBehaviorFlags::SkipEmptyParts);
+  QList<char> lstValue;
+  lstValue.reserve(lstStrValue.size());
+  for (QString& s : lstStrValue) {
+    s = s.trimmed();
+    if (s.isEmpty()) {
+      continue;
+    }
+    lstValue.append(s[0].toLatin1());
+  }
+  if (dst == lstValue) {
+    return false;
+  }
+  dst.swap(lstValue);
+  return true;
+}
+
+bool writeHobbies(QStringList& dst, const QVariant& src) {
+  QStringList lstValue = src.toString().split(',');
+  if (dst == lstValue) {
+    return false;
+  }
+  dst.swap(lstValue);
+  return true;
+}
+
+bool writeBool(bool& dst, const QVariant& src) {  //
+  QString srcStr{src.toString().toLower()};
+  bool srcValue{false};
+  if (srcStr == "true" || srcStr == "1") {
+    srcValue = true;
+  } else if (srcStr == "false" || srcStr == "0") {
+    srcValue = false;
+  }
+  if (dst == srcValue) {
+    return false;
+  }
+  std::swap(dst, srcValue);
+  return true;
+}
+
+// -----------------------------------------------------------------------------
 QString initQString(const QJsonObject& json, const QString& key, const QString& defaultValue) {
   return json.value(key).toString(defaultValue);
 }
 
 int initInt(const QJsonObject& json, const QString& key, const int& defaultValue) {
   return json.value(key).toInt(defaultValue);
+}
+
+qint64 initFileSizeQint64(const QJsonObject& json, const QString& key, const qint64& defaultValue) {
+  return (qint64)json.value(key).toDouble(defaultValue);
 }
 
 bool initBool(const QJsonObject& json, const QString& key, const bool& defaultValue) {
@@ -88,6 +174,11 @@ SortedUniqStrLst initCastSortedLst(const QJsonObject& json, const QString& key, 
   return SortedUniqStrLst{defaultValue};
 }
 
+QByteArray initQByteArray(const QJsonObject& json, const QString& key, const QByteArray& defaultValue) {
+  const QString defaultByteArrayInString{QString::fromUtf8(defaultValue)};
+  return json.value(key).toString(defaultByteArrayInString).toUtf8();
+}
+
 QString initStudioQString(const QJsonObject& json, const QString& key, const QString& defaultValue) {
   // 2. standardlize ProductionStudio=>Studio
   auto it = json.constFind(key);
@@ -102,129 +193,12 @@ QString initStudioQString(const QJsonObject& json, const QString& key, const QSt
   return defaultValue;
 }
 
-const QString& formatSortedLst(const SortedUniqStrLst& container) {
-  return container.join();
-}
-
-bool writeSortedLst(SortedUniqStrLst& container, const QVariant& src) {
-  QString newTags = src.toString();
-  if (container.join() == newTags) {
-    return false;
-  }
-  container.setBatchFromSentence(newTags);
-  return true;
-}
-
-QString formatQStringLst(const QStringList& container) {
-  return container.join(NameTool::CSV_COMMA);
-}
-
-bool writeQStringLst(QStringList& container, const QVariant& src) {
-  QStringList newTags = src.toString().split(NameTool::CSV_COMMA);
-  if (container == newTags) {
-    return false;
-  }
-  container.swap(newTags);
-  return true;
-}
-
-QString formatGender(Gender gen) {  //
-  return (gen == Gender::male) ? "male" : "female";
-}
-
-bool writeGender(Gender& dst, const QVariant& src) {
-  QString srcStr{src.toString()};
-  Gender srcValue{srcStr == "male" ? Gender::male : Gender::female};
-  if (dst == srcValue) {
-    return false;
-  }
-  std::swap(dst, srcValue);
-  return true;
-}
-
-QString formatPhoneNumber(const QString& phone) {
-  if (phone.length() < 11) {
-    return phone;
-  }
-  return QString("%1-%2-%3-%4").arg(phone.left(2)).arg(phone.mid(2, 3)).arg(phone.mid(5, 4)).arg(phone.mid(9, 4));
-}
-bool writePhoneNumber(QString& dst, const QVariant& src) {
-  QString srcStr{src.toString()};
-  srcStr.remove('-');
-  if (dst == srcStr) {
-    return false;
-  }
-  dst.swap(srcStr);
-  return true;
-}
-
-QString formatRateAnnual(const QList<char>& rates) {
-  if (rates.isEmpty()) {
-    return {};
-  }
-  QString s;
-  s.reserve(rates.size() * 2);
-  for (char c : rates) {
-    s += c;
-    s += ',';
-  }
-  s.chop(1);
-  return s;
-}
-
-bool writeRateAnnual(QList<char>& dst, const QVariant& src) {
-  QStringList lstStrValue = src.toString().split(',', Qt::SplitBehaviorFlags::SkipEmptyParts);
-  QList<char> lstValue;
-  lstValue.reserve(lstStrValue.size());
-  for (QString& s : lstStrValue) {
-    s = s.trimmed();
-    if (s.isEmpty()) {
-      continue;
-    }
-    lstValue.append(s[0].toLatin1());
-  }
-  if (dst == lstValue) {
-    return false;
-  }
-  dst.swap(lstValue);
-  return true;
-}
-
-QString formatHobbies(QStringList hobbies) {
-  hobbies.sort(Qt::CaseSensitivity::CaseInsensitive);
-  return hobbies.join(",");
-}
-
-bool writeHobbies(QStringList& dst, const QVariant& src) {
-  QStringList lstValue = src.toString().split(',');
-  if (dst == lstValue) {
-    return false;
-  }
-  dst.swap(lstValue);
-  return true;
-}
-
-QString formatBool(bool value) {  //
-  return value ? "true" : "false";
-}
-
-bool writeBool(bool& dst, const QVariant& src) {  //
-  QString srcStr{src.toString().toLower()};
-  bool srcValue{false};
-  if (srcStr == "true" || srcStr == "1") {
-    srcValue = true;
-  } else if (srcStr == "false" || srcStr == "0") {
-    srcValue = false;
-  }
-  if (dst == srcValue) {
-    return false;
-  }
-  std::swap(dst, srcValue);
-  return true;
-}
-
+// -----------------------------------------------------------------------------
 void writeJsonObjectInt(QJsonObject& json, const QString& key, const int& val) {
   json[key] = val;
+}
+void writeJsonObjectFileSizeQint64(QJsonObject& json, const QString& key, const qint64& val) {
+  json[key] = (double)val;
 }
 void writeJsonObjectFloat(QJsonObject& json, const QString& key, const float& val) {
   json[key] = val;
@@ -258,11 +232,71 @@ void writeJsonObjectSortedStrLst(QJsonObject& json, const QString& key, const So
   json[key] = QJsonArray::fromStringList(val.toSortedList());
 }
 
+void writeJsonObjectQByteArray(QJsonObject& json, const QString& key, const QByteArray& val) {
+  json[key] = QString::fromUtf8(val);
+}
+
+// -----------------------------------------------------------------------------
+bool writeSortedLst(SortedUniqStrLst& container, const QVariant& src) {
+  QString newTags = src.toString();
+  if (container.join() == newTags) {
+    return false;
+  }
+  container.setBatchFromSentence(newTags);
+  return true;
+}
+
+const QVariant& formatDefault(const QVariant& v) {  //
+  return v;
+}
+
+QString formatFloat2Prec(float value) {  //
+  return QString::number(value, 'f', 2);
+}
+
+const QString& formatSortedLst(const SortedUniqStrLst& container) {
+  return container.join();
+}
+
+QString formatQStringLst(const QStringList& container) {
+  return container.join(NameTool::CSV_COMMA);
+}
+QString formatGender(Gender gen) {  //
+  return (gen == Gender::male) ? "male" : "female";
+}
+QString formatPhoneNumber(const QString& phone) {
+  if (phone.length() < 11) {
+    return phone;
+  }
+  return QString("%1-%2-%3-%4").arg(phone.left(2)).arg(phone.mid(2, 3)).arg(phone.mid(5, 4)).arg(phone.mid(9, 4));
+}
+
+QString formatRateAnnual(const QList<char>& rates) {
+  if (rates.isEmpty()) {
+    return {};
+  }
+  QString s;
+  s.reserve(rates.size() * 2);
+  for (char c : rates) {
+    s += c;
+    s += ',';
+  }
+  s.chop(1);
+  return s;
+}
+QString formatHobbies(QStringList hobbies) {
+  hobbies.sort(Qt::CaseSensitivity::CaseInsensitive);
+  return hobbies.join(",");
+}
+QString formatBool(bool value) {  //
+  return value ? "true" : "false";
+}
+
 QString formatDateIsoMs(const qint64 ms) {
-  return  QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODateWithMs);
+  return QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODateWithMs);
 }
 QString formatDateIso(const qint64 ms) {
-  return  QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODate);
+  return QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODate);
 }
 QString formatDurationISOMs(const qint64 ms) {
   return QTime::fromMSecsSinceStartOfDay(ms).toString(Qt::ISODateWithMs);

@@ -15,34 +15,40 @@
 #include "PathTool.h"
 #include "PublicMacro.h"
 #include "JsonTestPrecoditionTools.h"
+#include "MD5Calculator.h"
+#include "VideoDurationGetter.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class JsonPrTest : public PlainTestSuite {
   Q_OBJECT
-public:
-  JsonPrTest()
-    : PlainTestSuite{} {}
-  TDir mDir;
-  QString rootpath{mDir.path()};
+ public:
+  TDir mTDir;
+  QString rootpath{mTDir.path()};
   QList<FsNodeEntry> gNodeEntries;
   const QString fixedJsonName = "SuperMan - Henry Cavill.json";
   const QString fixedJsonBaseName = "SuperMan - Henry Cavill";
   const QString newJsonName = "SuperMan - Chris Evans.json";
   const QString occupiedJsonName = "My Good Boy.json";
   const QString fixedAbsPath{rootpath + '/' + fixedJsonName};
-private slots:
+ private slots:
   void initTestCase() {
-    QVERIFY(mDir.IsValid());
-    gNodeEntries = QList<FsNodeEntry> //
+    QVERIFY(mTDir.IsValid());
+    gNodeEntries = QList<FsNodeEntry>  //
         {
-            FsNodeEntry{"cast_list.txt", false, {}},                                         //
-            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS}, //
-            FsNodeEntry{"studio_list.txt", false, {}},                                       //
-            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                         //
-            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, {}},                       //
-            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                           //
+            FsNodeEntry{"cast_list.txt", false, {}},                                          //
+            FsNodeEntry{"My Good Boy.json", false, JsonTestPrecoditionTools::JSON_CONTENTS},  //
+            FsNodeEntry{"studio_list.txt", false, {}},                                        //
+            FsNodeEntry{"SuperMan - Henry Cavill 1.jpg", false, {}},                          //
+            FsNodeEntry{"SuperMan - Henry Cavill 999.mp4", false, "aa"},                      //
+            FsNodeEntry{"SuperMan - Henry Cavill.jpg", false, {}},                            //
             FsNodeEntry{"SuperMan - Henry Cavill.json", false, {}},
         };
-    mDir.createEntries(gNodeEntries);
+    mTDir.createEntries(gNodeEntries);
   }
 
   void init() {
@@ -50,9 +56,12 @@ private slots:
     if (fixedJsonFile.size() != 0) {
       fixedJsonFile.resize(0);
     }
+    GlobalMockObject::reset();
   }
 
-  void test_HintForCastStudio() { //
+  void cleanup() { GlobalMockObject::verify(); }
+
+  void HintForCastStudio_ok() {  //
     JsonPr jpr;
     bool studioChange{true}, castChanged{true};
     jpr.HintForCastStudio("", studioChange, castChanged);
@@ -80,8 +89,8 @@ private slots:
     {
       QString sentence_bothStudioCastNotInTable{"NotInTableStudio - X1 Y1, X4 Y4"};
       jpr.m_Name = sentence_bothStudioCastNotInTable;
-      jpr.m_Studio = "NotInTableStudio"; // not in ProStudioMap
-      jpr.m_Cast = SortedUniqStrLst{QStringList{"X1 Y1", "X4 Y4"}}; // not in CastSet
+      jpr.m_Studio = "NotInTableStudio";                             // not in ProStudioMap
+      jpr.m_Cast = SortedUniqStrLst{QStringList{"X1 Y1", "X4 Y4"}};  // not in CastSet
       studioChange = true;
       castChanged = true;
       jpr.HintForCastStudio(sentence_bothStudioCastNotInTable, studioChange, castChanged);
@@ -94,7 +103,7 @@ private slots:
       QString sentence{"A1 C1, G1, A1 B1, B1 D1.mp4"};
       jpr.m_Name = "Marvel Films- Read Madrid - A1 C1, G1, A1 B1";
       jpr.m_Studio = "OtherStudio";
-      jpr.m_Cast = SortedUniqStrLst{QStringList{"B1 D1"}}; // casts delta: only a1b1 and a1c1
+      jpr.m_Cast = SortedUniqStrLst{QStringList{"B1 D1"}};  // casts delta: only a1b1 and a1c1
 
       studioChange = false;
       castChanged = false;
@@ -102,7 +111,7 @@ private slots:
       QCOMPARE(studioChange, true);
       QCOMPARE(castChanged, true);
 
-      QCOMPARE(jpr.hintCast, "A1 B1,A1 C1"); // hint cast no need sorted
+      QCOMPARE(jpr.hintCast, "A1 B1,A1 C1");  // hint cast no need sorted
       jpr.RejectCastHint();
       QCOMPARE(jpr.hintCast, "");
 
@@ -110,22 +119,22 @@ private slots:
       jpr.RejectStudioHint();
       QCOMPARE(jpr.hintStudio, "");
 
-      QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1"); // name not change
-      QCOMPARE(jpr.m_Studio, "OtherStudio");                                // studio not fill automatically
-      QCOMPARE(jpr.m_Cast, SortedUniqStrLst{QStringList{"B1 D1"}});         // cast not fill automatically
+      QCOMPARE(jpr.m_Name, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1");  // name not change
+      QCOMPARE(jpr.m_Studio, "OtherStudio");                                 // studio not fill automatically
+      QCOMPARE(jpr.m_Cast, SortedUniqStrLst{QStringList{"B1 D1"}});          // cast not fill automatically
     }
   }
 
-  void test_fromJsonFile() {
+  void fromJsonFile_ok() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
-    QCOMPARE(fixedFi.size(), 0); // empty at first
+    QCOMPARE(fixedFi.size(), 0);  // empty at first
     const auto& jPr = JsonPr::fromJsonFile(fixedFi.fileName());
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 2. "Name" find, other key need insert by StandardlizeKeyValue ok
-    QVERIFY(jPr.m_Name != PathTool::GetBaseName(fixedJsonName)); // should not be replaced automatically
+    QVERIFY(jPr.m_Name != PathTool::GetBaseName(fixedJsonName));  // should not be replaced automatically
     QCOMPARE(jPr.m_Name, "");
     QVERIFY(jPr.m_Cast.isEmpty());
     QVERIFY(jPr.m_Studio.isEmpty());
@@ -150,7 +159,7 @@ private slots:
     QCOMPARE(jPr3, jPr2);
   }
 
-  void test_construct_ok() {
+  void construct_ok() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
     QCOMPARE(fixedFi.size(), 0);
@@ -196,14 +205,14 @@ private slots:
     QVERIFY(!writedJson.contains(ENUM_2_STR(Performers)));
     QCOMPARE(writedJson[ENUM_2_STR(Name)], dict[ENUM_2_STR(Name)]);
     QCOMPARE(writedJson[ENUM_2_STR(Studio)], dict["ProductionStudio"]);
-    QCOMPARE(writedJson[ENUM_2_STR(Cast)], (QStringList{"Chris Evans", "Henry Cavill"})); // Cast should sorted
-    QCOMPARE(writedJson[ENUM_2_STR(Tags)], (QStringList{"friction", "science"}));         // Tags should also sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Cast)], (QStringList{"Chris Evans", "Henry Cavill"}));  // Cast should sorted
+    QCOMPARE(writedJson[ENUM_2_STR(Tags)], (QStringList{"friction", "science"}));          // Tags should also sorted
     QCOMPARE(writedJson[ENUM_2_STR(Detail)], dict[ENUM_2_STR(Detail)]);
     QCOMPARE(writedJson[ENUM_2_STR(ImgName)], dict[ENUM_2_STR(ImgName)]);
     QCOMPARE(writedJson[ENUM_2_STR(VidName)], dict[ENUM_2_STR(VidName)]);
   }
 
-  void test_Sync_Name_value_by_Json_file_basename() {
+  void Sync_Name_value_by_Json_file_basename_ok() {
     // precondition
     const QFile fixedFi{fixedAbsPath};
     QCOMPARE(fixedFi.size(), 0);
@@ -221,20 +230,20 @@ private slots:
     QVERIFY(jPr.m_Name == fixedJsonBaseName);
   }
 
-  void test_Rename_ok() {
+  void Rename_ok() {
     const QStringList relatedNames{
         // environment exist MUST
-        "SuperMan - Henry Cavill.json",   // fixedJsonName
-        "SuperMan - Henry Cavill.jpg",    //
-        "SuperMan - Henry Cavill 1.jpg",  //
-        "SuperMan - Henry Cavill 999.mp4" //
+        "SuperMan - Henry Cavill.json",    // fixedJsonName
+        "SuperMan - Henry Cavill.jpg",     //
+        "SuperMan - Henry Cavill 1.jpg",   //
+        "SuperMan - Henry Cavill 999.mp4"  //
     };
     const QStringList newRelatedNames{
         // environment not exist MUST
-        "SuperMan - Chris Evans.json",   // newJsonName
-        "SuperMan - Chris Evans.jpg",    //
-        "SuperMan - Chris Evans 1.jpg",  //
-        "SuperMan - Chris Evans 999.mp4" //
+        "SuperMan - Chris Evans.json",    // newJsonName
+        "SuperMan - Chris Evans.jpg",     //
+        "SuperMan - Chris Evans 1.jpg",   //
+        "SuperMan - Chris Evans 999.mp4"  //
     };
     QCOMPARE(relatedNames.size(), newRelatedNames.size());
 
@@ -253,7 +262,7 @@ private slots:
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
   }
 
-  void test_Construct_Clear_CastStudioValue() {
+  void Construct_Clear_CastStudioValue_ok() {
     auto& pm = CastManager::getInst();
     auto& psm = StudiosManager::getInst();
     CAST_MGR_DATA_T tempCastsList{"chris hemsworth", "keanu reeves", "chris evans"};
@@ -307,7 +316,7 @@ private slots:
     QVERIFY(jr.m_Studio.isEmpty());
   }
 
-  void test_SetStudio_ok() {
+  void SetStudio_ok() {
     JsonPr jr{""};
     // set new name first time, change
     QString newStudioName = "New XXX Studio";
@@ -319,7 +328,7 @@ private slots:
     QCOMPARE(jr.m_Studio, newStudioName);
   }
 
-  void test_SetCastOrTags_ok() {
+  void SetCastOrTags_ok() {
     JsonPr jrDefaultConstuct;
     QCOMPARE(jrDefaultConstuct.m_Name, "");
     QCOMPARE(jrDefaultConstuct.jsonFileName, "");
@@ -389,6 +398,56 @@ private slots:
     // set an empty sentence should empty all
     QVERIFY(jr.SetCastOrTags("", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET));
     QVERIFY(jr.m_Tags.isEmpty());
+  }
+
+  void UpdateDurationField_ok() {
+    QString videoPath{__FILE__};
+    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
+    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).will(returnValue(60 * 1000));
+    JsonPr jpr;
+    QCOMPARE(jpr.FindVideoAbsPath(), "");
+    QCOMPARE(jpr.UpdateVideoSizeField(), false);
+    QCOMPARE(jpr.UpdateDurationField(), false);
+    QCOMPARE(jpr.UpdateVideoMD5Field(), false);
+
+    QCOMPARE(jpr.m_Size, 0);
+    QCOMPARE(jpr.UpdateVideoSizeField(videoPath), true);
+    QVERIFY(jpr.m_Size > 0);
+
+    QCOMPARE(jpr.m_Duration, 0);
+    QCOMPARE(jpr.UpdateDurationField(videoPath), true);
+    QCOMPARE(jpr.m_Duration, 60 * 1000);
+
+    QCOMPARE(jpr.m_MD5, QString());
+    QCOMPARE(jpr.UpdateVideoMD5Field(videoPath), true);
+    QCOMPARE(jpr.m_MD5, QString("AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"));
+  }
+
+  void FindVideoAbsPath_ok() {
+    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
+    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).will(returnValue(60 * 1000));
+    JsonPr jpr{"any random file.json"};  // no video at all
+    QCOMPARE(jpr.FindVideoAbsPath(), "");
+    QCOMPARE(jpr.UpdateVideoSizeField(), false);
+    QCOMPARE(jpr.UpdateDurationField(), false);
+    QCOMPARE(jpr.UpdateVideoMD5Field(), false);
+
+    QString videoContainsMP4 = mTDir.itemPath("SuperMan - Henry Cavill 999.mp4");
+    QString notExistJsonPath = mTDir.itemPath("SuperMan - Henry Cavill 999.json");
+    JsonPr jpr2{notExistJsonPath};  // no video at all
+    QCOMPARE(jpr2.FindVideoAbsPath(), videoContainsMP4);
+
+    QCOMPARE(jpr2.m_Size, 0);
+    QCOMPARE(jpr2.UpdateVideoSizeField(), true);
+    QCOMPARE(jpr2.m_Size, QFile(videoContainsMP4).size());
+
+    QCOMPARE(jpr2.m_Duration, 0);
+    QCOMPARE(jpr2.UpdateDurationField(), true);
+    QCOMPARE(jpr2.m_Duration, 60 * 1000);
+
+    QCOMPARE(jpr2.m_MD5, QString());
+    QCOMPARE(jpr2.UpdateVideoMD5Field(), true);
+    QCOMPARE(jpr2.m_MD5, QString("AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"));
   }
 };
 

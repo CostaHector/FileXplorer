@@ -26,26 +26,26 @@ QTabBar::close-button:hover {
     image: url(":/qss_icons/default/rc/CLOSE_HOVER.svg");
 }
 QTabWidget::pane {
-    background-color: rgba(255, 255, 255, 255);
+    background-color: rgb(255, 255, 255);
     border-top: 1px solid rgba(160, 160, 160, 255); /* tabWidget addTab top */
     position: absolute;
     top: -1px; /* overlap to tab */
     border-bottom: 1px solid rgba(160, 160, 160, 255);  /* tabWidget addTab bottom */
 }
 QTabBar::tab {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 15px;
     padding-right: 15px;
-    margin-top: 1px;
     min-width: 75px;
+    min-height: 20px;
     font-size: 15px;
 }
 QTabBar::tab:!selected {
     border-bottom: 1px solid rgba(160, 160, 160, 255);
 }
 QTabBar::tab:selected {
-    background-color: rgba(255, 255, 255, 255);
+    background-color: rgb(255, 255, 255);
     border-top: 1px solid rgba(160, 160, 160, 255);
     border-right: 1px solid rgba(160, 160, 160, 255);
     border-left: 1px solid rgba(160, 160, 160, 255);
@@ -174,6 +174,8 @@ QScrollBar::add-page, QScrollBar::sub-page {
 QToolBar {
     border: 1px solid #FFFFFF;
 }
+
+
 QToolBar QToolBar {
     margin: 0px;
     border: 0px;
@@ -191,14 +193,14 @@ QToolBar QLineEdit {
 
 QComboBox QLineEdit {
     margin: 0px;
-    border: 0px;
-    border: 1px solid #000000;
+    padding: 0px 1px;
+    border: none;          /* 移除QLineEdit自身边框 */
 }
 
 /* 基础样式 */
 QToolBar QToolButton {
     border: 1px solid transparent; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 /* 悬停状态 */
 QToolBar QToolButton:hover {
@@ -236,7 +238,7 @@ QToolBar QToolButton:disabled {
 /* 基础样式 */
 QWidget QToolButton {
     border: 1px solid transparent; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 /* 悬停状态 */
 QWidget QToolButton:hover {
@@ -306,7 +308,12 @@ QToolButton::menu-arrow {
 
 QComboBox {
     padding: 0px;
-    font-size: 15px;
+    font-size: 14px;
+}
+
+QLineEdit {
+    padding: 0px;
+    font-size: 14px;
 }
 
 QComboBox QAbstractItemView {
@@ -314,17 +321,11 @@ QComboBox QAbstractItemView {
     selection-color: #000000;
 }
 
-QComboBox QLineEdit {
-    margin: 0px;
-    padding: 0px 1px;
-    border: none;          /* 移除QLineEdit自身边框 */
-    color: #000000;
-}
 
 /* 菜单容器 */
 QMenu {
     border-right: 3px solid transparent; /* 预先占用边框空间 */
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* 菜单项基础样式 */

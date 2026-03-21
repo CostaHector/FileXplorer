@@ -15,6 +15,7 @@ QString DisplayFilesMD5(const QStringList& fileAbsPaths);
 QString MD5PrepathName2Table(const QList<QByteArray>& md5s, const QStringList& fileAbsPaths);
 QString MD5DetailHtmlTable(const QList<QByteArray>& md5s, const QStringList& fileNames, const QStringList& fileDirs);
 QString GetHashPlatformDependent(const QString& absFilePath);
+constexpr int FIXED_MD5_LENGTH{32};
 }  // namespace MD5Calculator
 
 #endif  // MD5CALCULATOR_H

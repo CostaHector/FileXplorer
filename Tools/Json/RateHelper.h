@@ -28,7 +28,7 @@ class RateHelper {
  private:
   static bool RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
 
-  static bool getJsonPathForFile(const QString& fileAbsPath, QString& jsonPath);
+  static bool getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPath);
   static QString getBaseNameForImage(const QString& imagePath);
 
   static QPixmap GenerateRatePixmap(int r, const int sliceCount = MAX_V, const bool hasBorder = false);

@@ -66,7 +66,7 @@ class FdBasedDbTest : public PlainTestSuite {
     }
   }
 
-  void test_createTable_DropTable_ok() {
+  void createTable_DropTable_ok() {
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateDatabase());
     QVERIFY(dbManager.CreateTable("VOLUME_E", FdBasedDb::CREATE_TABLE_TEMPLATE));
@@ -79,7 +79,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(QFile{dbName}.exists());
   }
 
-  void test_GetSelectMovieByCastStatement_ok() {
+  void GetSelectMovieByCastStatement_ok() {
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
 
@@ -136,7 +136,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(actualMovieNameSet, expectMovieNameSet);
   }
 
-  void test_ReadADirectory_invalid() {
+  void ReadADirectory_invalid_ok() {
     // precondition
     QVERIFY(!QFile{dbName}.exists());  // should created
     FdBasedDb dbManager{dbName, connName};
@@ -160,7 +160,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.ReadADirectory(inexistTableName, rootpath), FD_TABLE_INEXIST);
   }
 
-  void test_ReadADirectory_incremental() {
+  void ReadADirectory_incremental_ok() {
     // Procedure
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
@@ -178,7 +178,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.CountRow(tableName), 3);
   }
 
-  void test_adt() {
+  void adt_ok() {
     using namespace MOVIE_TABLE;
     // precondition
     FdBasedDb dbManager{dbName, connName};
@@ -225,7 +225,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(oldActualNames, (QSet<QString>()));
   }
 
-  void test_SetDuration() {
+  void SetDuration_ok() {
     // Procedure
     MOCKER(VideoDurationGetter::GetLengthQuickStatic)  //
         .stubs()                                       //
@@ -245,7 +245,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(actualDurations, (QSet<int>{20, 40, 30, 60}));
   }
 
-  void test_ExportDurationStudioCastTagsToJson() {
+  void ExportDurationStudioCastTagsToJson_ok() {
     MOCKER(FdBasedDb::IsTableVolumeOnline)
         .stubs()  //
         .will(returnValue(false))

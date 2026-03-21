@@ -7,6 +7,7 @@
 
 using namespace JsonKey;
 struct JsonPr {
+  using UPDATER_FUNC = bool(JsonPr::*)(QString);
   static JsonPr fromJsonFile(const QString& jsonAbsFile);
 
   JsonPr() = default;
@@ -42,7 +43,10 @@ struct JsonPr {
     E_OK = 0,                      //
   };
   bool SyncNameValueFromFileBaseName();
+  QString FindVideoAbsPath() const;
+  bool UpdateVideoSizeField(QString videoAbsPath="");
   bool UpdateDurationField(QString videoAbsPath="");
+  bool UpdateVideoMD5Field(QString videoAbsPath="");
   bool ConstructCastStudioValue();  // contruct cast/studio
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);
