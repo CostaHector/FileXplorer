@@ -107,7 +107,7 @@ CustomListView::~CustomListView() {
   Configuration().setValue(m_name + "_FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
   Configuration().setValue(m_name + "_VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
   Configuration().setValue(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", (resizeMode() == QListView::ResizeMode::Adjust));
-  Configuration().setValue(m_name + "_WRAPING_ACTIONS", isWrapping());
+  Configuration().setValue(m_name + "_WRAPPING_ACTIONS", isWrapping());
   Configuration().setValue(m_name + "_UNIFORM_ITEM_SIZES", uniformItemSizes());
 
   IMAGE_SIZE::SaveInitialScaledSize(m_name, mCurIconSizeIndex);
@@ -182,6 +182,7 @@ void CustomListView::onUniformItemSizedToggled(const bool bchecked) {
 }
 
 void CustomListView::InitListView() {
+  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
   // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
 }
 
