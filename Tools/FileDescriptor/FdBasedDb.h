@@ -31,8 +31,9 @@ class FdBasedDb : public DbManager {
   static const QString WHERE_NAME_CORE_TEMPLATE;
 
  private:
-  FD_ERROR_CODE Insert(const QString& tableName, const QSet<QByteArray>&needInsertFds, const QHash<QByteArray, QString>& newFd2Pth, int& insertCnt);
-  FD_ERROR_CODE Delete(const QString& tableName, const QSet<QByteArray>&needDeleteFds, int& deleteCnt);
+  FD_ERROR_CODE InsertSimple(const QString& tableName, const QHash<QByteArray, QString>& newFd2Pth, int& insertCnt);
+  FD_ERROR_CODE Insert(const QString& tableName, const QSet<QByteArray>& needInsertFds, const QHash<QByteArray, QString>& newFd2Pth, int& insertCnt);
+  FD_ERROR_CODE Delete(const QString& tableName, const QSet<QByteArray>& needDeleteFds, int& deleteCnt);
   FD_ERROR_CODE Update(const QString& tableName, const QSet<QByteArray>& needUpdateFds, const QHash<QByteArray, QString>& newFd2Pth, int& updateCnt);
 };
 #endif  // FDBASEDDB_H

@@ -32,8 +32,8 @@ class DataFormatterTest : public PlainTestSuite {
   }
 
   void fileSizeqint64_readFromJsonDouble_saveToJson_ok() {
-    qint64 defaultSz = 4 * 1024 * 1024 * 1024;  // 4GiB
-    qint64 expectSz = 5 * 1024 * 1024 * 1024;   // 5GiB
+    qint64 defaultSz = (qint64)4 * 1024 * 1024 * 1024;  // 4GiB
+    qint64 expectSz = (qint64)5 * 1024 * 1024 * 1024;   // 5GiB
 
     // read from jsonObject
     {

@@ -56,9 +56,11 @@ class FdBasedDbTest : public PlainTestSuite {
     };
     VideoDurationGetterMock::PresetVidsDuration(presetVidDurations);
   }
+
   void init() {  //
     GlobalMockObject::reset();
   }
+
   void cleanup() {
     GlobalMockObject::verify();
     if (QFile{dbName}.exists()) {
@@ -160,16 +162,19 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.ReadADirectory(inexistTableName, rootpath), FD_TABLE_INEXIST);
   }
 
-  void ReadADirectory_incremental_ok() {
+  void ReadADirectory_ok() {
     // Procedure
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
 
     QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 2);
+    QCOMPARE(dbManager.CountRow(tableName), 2);
     QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 2);
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 0);
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 0);  // fd already in table
+    QCOMPARE(dbManager.CountRow(tableName), 2 + 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 2);
+    QCOMPARE(dbManager.CountRow(tableName), 4);
 
     using namespace MOVIE_TABLE;
     const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(ENUM_2_STR(Name))};
@@ -286,7 +291,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(dict.value(ENUM_2_STR(Cast)).toStringList() != notExpectCastLst);
   }
 
-  void test_UpdateStudioCastTagsByJson() {
+  void UpdateStudioCastTagsByJson_ok() {
     using namespace JsonHelper;
     const QString path1 = tDir.itemPath("path1");
     MOCKER(FdBasedDb::IsTableVolumeOnline)

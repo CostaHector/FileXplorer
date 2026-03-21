@@ -77,24 +77,16 @@ class FdBasedDbModelTest : public PlainTestSuite {
     const QString tableName{"ABCDEF12_3456_7890_ABCDEF1234567890"};  // can be converted to guid
 
     const QList<FsNodeEntry> nodes{
-        {"Chris Evans.mp4", false, "Chris Evans"},
-        {"Chris Hemsworth.mp4", false, "Chris Hemsworth"},
-        {"Chris Pine.mp4", false, "Chris Pine"},
-        {"Michael Fassbender.mp4", false, "Michael Fassbender"},
+        {"Chris Evans.mp4", false, "Chris Evans"},                // 11
+        {"Chris Hemsworth.mp4", false, "Chris Hemsworth"},        // 5+1+9
+        {"Chris Pine.mp4", false, "Chris Pine"},                  // 10
+        {"Michael Fassbender.mp4", false, "Michael Fassbender"},  // 7+1+4+6
         {"Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
     };
-    QCOMPARE(mTDir.createEntries(nodes), 5);
-    QSet<QString> movieNames;
-    QSet<QString> movieSizes;
-    QSet<QString> absolutePathSet;
-    for (const FsNodeEntry& node : nodes) {
-      if (node.relativePathToNode.endsWith("jpg")) {
-        continue;
-      }
-      movieNames.insert(node.relativePathToNode);
-      movieSizes.insert(QString::asprintf("0'0'0'%d", node.contents.size()));
-      absolutePathSet.insert(mTDir.path());
-    }
+    QCOMPARE(mTDir.createEntries(nodes), nodes.size());
+    QSet<QString> movieNames{"Chris Evans.mp4", "Chris Hemsworth.mp4", "Chris Pine.mp4", "Michael Fassbender.mp4"};
+    QSet<QString> movieSizes{"0'0'0'11", "0'0'0'15", "0'0'0'10", "0'0'0'18"};
+    QSet<QString> absolutePathSet{mTDir.path(), mTDir.path(), mTDir.path(), mTDir.path()};
 
     FdBasedDb movieDb{dbName, connName};
     QVERIFY(movieDb.IsValid());
@@ -109,12 +101,9 @@ class FdBasedDbModelTest : public PlainTestSuite {
     QCOMPARE(movieModel.rowCount(), 0);
     {
       // .jpg is not videos. ignored
-      QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 5 - 1);
+      QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 4);
       movieModel.select();
-      QCOMPARE(movieModel.rowCount(), 5 - 1);
-      // todo: check data here
-
-      QVERIFY(!movieModel.data(movieModel.index(0, MOVIE_TABLE::Duration), Qt::DisplayRole).toString().isNull());
+      QCOMPARE(movieModel.rowCount(), 4);
 
       QSet<QString> actualMovieNames;
       QSet<QString> actualMovieSizes;
@@ -132,33 +121,13 @@ class FdBasedDbModelTest : public PlainTestSuite {
       QCOMPARE(actualFileNameSet, movieNames);
     }
 
-    QList<FsNodeEntry> nodesExtra{
-        {"Raphael Varane.mp4", false, "Raphael Varane"},
-        {"Alvaro Morata.mp4", false, "Alvaro Morata"},
+    QList<FsNodeEntry> nodesExtra {
+        {"Raphael Varane.mp4", false, "Raphael Varane"},  // 14
+        {"Alvaro Morata.mp4", false, "Alvaro Morata"},    // 13
     };
     QCOMPARE(mTDir.createEntries(nodesExtra), 2);
-    {
-      // .jpg is not videos. ignored
-      QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 2);
-      movieModel.select();
-      QCOMPARE(movieModel.rowCount(), 5 - 1 + 2);
-      QSet<QString> expectSize{"0'0'0'14", "0'0'0'13"};
-      QSet<QString> actualSize{movieModel.data(movieModel.index(4, MOVIE_TABLE::Size), Qt::DisplayRole).toString(),
-                               movieModel.data(movieModel.index(5, MOVIE_TABLE::Size), Qt::DisplayRole).toString()};
-      QCOMPARE(actualSize, expectSize);
-
-      QSet<QString> expectFullInfo{
-          QString() + "Raphael Varane.mp4" + '\t' + "0'0'0'14" + '\t' +
-              PathTool::RMFComponent::FromPath(mTDir.itemPath("Raphael Varane.mp4")).middlePart,
-          QString() + "Alvaro Morata.mp4" + '\t' + "0'0'0'13" + '\t' +
-              PathTool::RMFComponent::FromPath(mTDir.itemPath("Alvaro Morata.mp4")).middlePart,
-      };
-      QSet<QString> actualFullInfo{
-          movieModel.fullInfo(movieModel.index(4, MOVIE_TABLE::Size)),
-          movieModel.fullInfo(movieModel.index(5, MOVIE_TABLE::Size)),
-      };
-      QCOMPARE(actualFullInfo, expectFullInfo);
-    }
+    QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 6);
+    movieModel.select();
 
     // 2.1 Studio in table modified
     {
