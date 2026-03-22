@@ -45,7 +45,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(reqPlaySpy.takeLast(), (QVariantList{"CR7 0.mp4", false}));
 
     // function double click to play here, 强制播放
-    QModelIndex fIndex = videoTv.mProxyModel->index(0, 0);
+    QModelIndex fIndex = videoTv.mProxyModel->index(0, VideoBasicInfo::FILE_NAME);
     QCOMPARE(fIndex.data(Qt::DisplayRole).toString(), "CR7 0.mp4");
     videoTv.setCurrentIndex(fIndex);
     videoTv.ReqPlay(fIndex, true);
@@ -139,7 +139,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
     // Sort Descending
     videoTv.mProxyModel->sort(0, Qt::DescendingOrder);  // CR7 2.mp4, CR7 1.mp4, CR7 0.mp4
-    QModelIndex fIndex = videoTv.mProxyModel->index(0, 0);
+    QModelIndex fIndex = videoTv.mProxyModel->index(0, VideoBasicInfo::FILE_NAME);
     QCOMPARE(fIndex.data(Qt::DisplayRole).toString(), "CR7 2.mp4");
     videoTv.setCurrentIndex(fIndex);
 
@@ -246,4 +246,4 @@ class VideoTableViewTest : public PlainTestSuite {
 };
 
 #include "VideoTableViewTest.moc"
-REGISTER_TEST(VideoTableViewTest, false)
+REGISTER_TEST(VideoTableViewTest, true)

@@ -372,5 +372,6 @@ void InteractiveVideoWidget::onLongTimeNoEventHappen() {
   // 全屏模式下 hide everything except video itself
   if (isVideoFullScreen()) {
     changeAllToolbarVisibility(false);
+    GetFocusCore(this);
   }
 }

@@ -95,7 +95,7 @@ class CustomListViewTest : public PlainTestSuite {
     const QString keyMemoryName = "CustomListViewTest";
     IMAGE_SIZE::SaveInitialScaledSize(keyMemoryName, 5);
     CustomListView viewer(keyMemoryName);
-    QCOMPARE(viewer.GetCurImageSizeScale(), 5);
+    QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), 5);
 
     const QPoint downAngelDelta{0, 8 * 15};
     const QPoint upAngelDelta{0, -8 * 15};
@@ -103,7 +103,7 @@ class CustomListViewTest : public PlainTestSuite {
     QSignalSpy spy(&viewer, &CustomListView::iconSizeChanged);
     {  // +1 accept
       QVERIFY(SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
-      QCOMPARE(viewer.GetCurImageSizeScale(), 6);
+      QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), 6);
       QVERIFY(!spy.isEmpty());
       QVariantList params = spy.back();
       QCOMPARE(params.size(), 1);
@@ -114,7 +114,7 @@ class CustomListViewTest : public PlainTestSuite {
 
     {  // -1 accept
       QVERIFY(SendWheelEvent(viewer, upAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
-      QCOMPARE(viewer.GetCurImageSizeScale(), 5);
+      QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), 5);
       QVERIFY(!spy.isEmpty());
       QVariantList params = spy.back();
       QCOMPARE(params.size(), 1);
@@ -124,23 +124,23 @@ class CustomListViewTest : public PlainTestSuite {
     }
 
     {  // already 0, cannot -1. not accept
-      viewer.setIconSizeScaledIndex(0);
+      viewer._ICON_SIZE_MENU->UpdateScaledIndexInWheelEvent(0);
       QVERIFY(SendWheelEvent(viewer, upAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
-      QCOMPARE(viewer.GetCurImageSizeScale(), 0);
+      QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), 0);
       QCOMPARE(spy.count(), 2);
     }
 
     {
       // already max, cannot +1. not accept
-      viewer.setIconSizeScaledIndex(IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
+      viewer._ICON_SIZE_MENU->UpdateScaledIndexInWheelEvent(IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
       QVERIFY(SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
-      QCOMPARE(viewer.GetCurImageSizeScale(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
+      QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
       QCOMPARE(spy.count(), 2);
     }
 
     {  // not with control modifier, will not change icon size, don't expect here
       SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::NoModifier, true);
-      QCOMPARE(viewer.GetCurImageSizeScale(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
+      QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
       QCOMPARE(spy.count(), 2);
     }
   }

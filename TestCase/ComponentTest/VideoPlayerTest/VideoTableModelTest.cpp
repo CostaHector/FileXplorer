@@ -205,7 +205,7 @@ class VideoTableModelTest : public PlainTestSuite {
 
   void tableView_setPlayPath_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
 
@@ -241,4 +241,4 @@ class VideoTableModelTest : public PlainTestSuite {
 };
 
 #include "VideoTableModelTest.moc"
-REGISTER_TEST(VideoTableModelTest, false)
+REGISTER_TEST(VideoTableModelTest, true)
