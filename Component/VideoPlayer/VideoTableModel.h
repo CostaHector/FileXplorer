@@ -10,8 +10,8 @@ struct VideoBasicInfo {
   int duration;
   short rate;
   enum DataType {
-    FILE_NAME = 0,
-    SCORE_FIELD = 1,
+    SCORE_FIELD = 0,
+    FILE_NAME = 1,
     DURATION_FIELD = 2,
     FILE_SIZE = 3,
     REL_PATH = 4,
