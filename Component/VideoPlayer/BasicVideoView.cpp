@@ -16,6 +16,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mProgressSlider = new (std::nothrow) ClickableSlider{Qt::Orientation::Horizontal, this};
   mProgressSlider->setRange(0, 0);
   mProgressSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  mProgressSlider->setSingleStep(10 * 1000); // 10 second
 
   mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
   mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

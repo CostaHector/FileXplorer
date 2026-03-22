@@ -13,6 +13,7 @@ class ClickableSlider : public QSlider {
 
  protected:
   void mousePressEvent(QMouseEvent* ev) override;
+  void keyPressEvent(QKeyEvent* ev) override;
 
  private:
   void mousePressEventCore(int curClickedPositionValue);
