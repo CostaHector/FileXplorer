@@ -90,6 +90,16 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
+int ImgsModel::UpdateData(const QStringList& newDataLst) {
+  beginResetModel();
+
+  mDataLst = newDataLst;
+  m_curLoadedCount = mDataLst.size();
+
+  endResetModel();
+  return mDataLst.size();
+}
+
 // ----------------
 
 QVariant VidsModel::data(const QModelIndex& index, int role) const {

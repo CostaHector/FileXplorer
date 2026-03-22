@@ -29,6 +29,7 @@ class ImgsModel : public FloatingModels {
  public:
   using FloatingModels::FloatingModels;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  int UpdateData(const QStringList& newDataLst) override;
 };
 
 class VidsModel : public FloatingModels {
