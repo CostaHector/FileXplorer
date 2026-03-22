@@ -217,7 +217,12 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+42"/>
+        <location filename="../View/CustomListView.cpp" line="+40"/>
+        <source>Icon size</source>
+        <translation>图片大小</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>

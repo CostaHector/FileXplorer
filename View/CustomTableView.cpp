@@ -93,13 +93,13 @@ CustomTableView::CustomTableView(const QString& name, QWidget* parent)
   setShowGrid(_SHOW_GRID->isChecked());
 
   // 6.
-  const QString horMenuName{m_name + " " + tr("Horizontal scroll bar policy")}, horMenuMemoryName{m_name + "_HorizontalScrollBarPolicy"};
-  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, horMenuMemoryName, this};
+  const QString horMenuName{m_name + " " + tr("Horizontal scroll bar policy")};
+  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, m_name + "_Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
 
-  const QString verMenuName{m_name + " " + tr("Vertical scroll bar policy")}, verMenuMemoryName{m_name + "_VerticalScrollBarPolicy"};
-  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, verMenuMemoryName , this};
+  const QString verMenuName{m_name + " " + tr("Vertical scroll bar policy")};
+  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, m_name + "_Vertical", this};
   CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
 

@@ -109,11 +109,22 @@ QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledInd
                            ICON_SIZE_CANDIDATES[scaleIndex].width(), ICON_SIZE_CANDIDATES[scaleIndex].height());
 }
 
+int IMAGE_SIZE::clampScaledIndex(int newScaledIndex) {
+  if (newScaledIndex < 0) {
+    return 0;
+  }
+  if (newScaledIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
+    return IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1;
+  }
+  return newScaledIndex;
+}
+
 int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
   int iconSizeIndexHint = Configuration().value(name + "_ICON_SIZE_INDEX", DEFAULT_SCALED_SIZE).toInt();
-  return std::max(0, std::min(iconSizeIndexHint, ICON_SIZE_CANDIDATES_N - 1));  // [0, WHEEL_CANDIDATES_N)
+  return clampScaledIndex(iconSizeIndexHint);  // [0, WHEEL_CANDIDATES_N)
 }
 
 void IMAGE_SIZE::SaveInitialScaledSize(const QString& name, int scaledIndex) {
   Configuration().setValue(name + "_ICON_SIZE_INDEX", scaledIndex);
 }
+

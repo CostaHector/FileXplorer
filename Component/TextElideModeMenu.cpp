@@ -2,10 +2,10 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 
-TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& memoryName, QWidget* parent)
-    : QMenu{menuName, parent}, m_memoryName{memoryName} {
+TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
+    : QMenu{menuName, parent}, m_memoryName{belongToName + "_TextElideMode"} {
   CHECK_NULLPTR_RETURN_VOID(parent);
-  CHECK_FALSE_RETURN_VOID(!memoryName.isEmpty());
+  CHECK_FALSE_RETURN_VOID(!belongToName.isEmpty());
 
   setIcon(QIcon{":img/LIST_TEXT_ELIDE_MODE"});
 

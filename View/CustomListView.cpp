@@ -23,8 +23,6 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   }
   LISTS_SET.insert(m_name);
 
-  mCurIconSizeIndex = IMAGE_SIZE::GetInitialScaledSize(m_name);
-
   setAlternatingRowColors(true);
 
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
@@ -39,8 +37,11 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   setFont(defaultFont);
 
   {
-    const QString textElideModeMenuName{m_name + " " + tr("Text elide mode")}, textElideModeMenuMemoryName{m_name + "_TextElideMode"};
-    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, textElideModeMenuMemoryName, this};
+    const QString iconSizeMenuName{m_name + " " + tr("Icon size")};
+    _ICON_SIZE_MENU = new (std::nothrow) IconSizeMenu{iconSizeMenuName, m_name, this};
+
+    const QString textElideModeMenuName{m_name + " " + tr("Text elide mode")};
+    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, m_name, this};
   }
 
   {
@@ -85,6 +86,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
 }
 
 void CustomListView::SubscribePublicActions() {
+  connect(_ICON_SIZE_MENU, &IconSizeMenu::iconScaledIndexChanged, this, &CustomListView::onIconScaledIndexChanged);
   connect(_TEXT_ELIDE_MODE_MENU, &TextElideModeMenu::reqTextElideModeChanged, this, &QListView::setTextElideMode);
 
   connect(_FLOW_ORIENTATION_TTB, &QAction::toggled, this, &CustomListView::onOrientationChanged);
@@ -102,15 +104,11 @@ void CustomListView::SubscribePublicActions() {
 }
 
 CustomListView::~CustomListView() {
-  Configuration().setValue(m_name + "_TEXT_ELIDE_MODE", (int)textElideMode());
-
   Configuration().setValue(m_name + "_FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
   Configuration().setValue(m_name + "_VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
   Configuration().setValue(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", (resizeMode() == QListView::ResizeMode::Adjust));
   Configuration().setValue(m_name + "_WRAPPING_ACTIONS", isWrapping());
   Configuration().setValue(m_name + "_UNIFORM_ITEM_SIZES", uniformItemSizes());
-
-  IMAGE_SIZE::SaveInitialScaledSize(m_name, mCurIconSizeIndex);
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
@@ -130,19 +128,23 @@ void CustomListView::wheelEvent(QWheelEvent* event) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
       int numSteps = numDegrees.y() / 15;
-      int newSizeIndex = mCurIconSizeIndex + (numSteps > 0 ? 1 : -1);
-      if (!setIconSizeScaledIndex(newSizeIndex)) {
+      const int oldScaledIndex = _ICON_SIZE_MENU->GetScaledIndex();
+      if (!_ICON_SIZE_MENU->UpdateScaledIndexInWheelEvent(oldScaledIndex + (numSteps > 0 ? 1 : -1))) {
         return;
       }
-      const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
-      setIconSize(newIconSize);
-      LOG_OK_P("[Change] Icon size", "[%d] %d x %d", mCurIconSizeIndex, newIconSize.width(), newIconSize.height());
-      emit iconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+      onIconScaledIndexChanged(_ICON_SIZE_MENU->GetScaledIndex());
       event->accept();
       return;
     }
   }
   QListView::wheelEvent(event);
+}
+
+void CustomListView::onIconScaledIndexChanged(int newScaledIndex) {
+  const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex];
+  setIconSize(newIconSize);
+  emit iconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex]);
+  LOG_OK_NP("[Change] Icon size", IMAGE_SIZE::HumanReadFriendlySize(newScaledIndex));
 }
 
 void CustomListView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
@@ -157,6 +159,7 @@ void CustomListView::PushBackExclusiveActions(const QList<QAction*>& acts) {
 
 void CustomListView::AddItselfAction2Menu() {
   m_menu->addSeparator();
+  m_menu->addMenu(_ICON_SIZE_MENU);
   m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
   m_menu->addAction(_FLOW_ORIENTATION_TTB);
   m_menu->addAction(_VIEW_MODE_LIST_ICON);
@@ -182,8 +185,9 @@ void CustomListView::onUniformItemSizedToggled(const bool bchecked) {
 }
 
 void CustomListView::InitListView() {
-  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
-  // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex]);
+  const int sizeScaledIndex = _ICON_SIZE_MENU->GetScaledIndex();
+  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[sizeScaledIndex]);
+  // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex]);
 }
 
 void CustomListView::mousePressEvent(QMouseEvent* event) {
@@ -193,12 +197,4 @@ void CustomListView::mousePressEvent(QMouseEvent* event) {
     return;
   }
   QListView::mousePressEvent(event);
-}
-
-bool CustomListView::setIconSizeScaledIndex(int newScaledIndex) {
-  if (newScaledIndex < 0 || newScaledIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
-    return false;
-  }
-  mCurIconSizeIndex = newScaledIndex;
-  return true;
 }
