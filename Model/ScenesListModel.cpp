@@ -231,6 +231,20 @@ std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPag
   return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
 }
 
+QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const {
+  // full: "/home/to/a.json"
+  // root: "/home"
+  // rel2fileNames: "to/a.json"
+  QStringList relativePaths2FileName;
+  relativePaths2FileName.reserve(indexes.size());
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const QString& fullPath = GetJson(index);
+    relativePaths2FileName.push_back(fullPath.isEmpty() ? "" : fullPath.mid(N + 1));
+  }
+  return relativePaths2FileName;
+}
+
 bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) { // -1 means all, > 0 means count
   const int beforeRowCnt = rowCount();
   int startIndex{-1}, endIndex{-1};
@@ -292,4 +306,20 @@ bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
   mCurEnd = lst.cbegin() + endIndex;
   endResetModel();
   return true;
+}
+
+int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
+  const SceneInfoList& lst = GetEntryList();
+  int deviation = mCurBegin - lst.cbegin();
+  const auto rowElementsRmv = [this, deviation](int beg, int end) {
+    mEntryList.erase(mEntryList.begin() + deviation + beg, mEntryList.begin() + deviation + end);
+  };
+  int rowRmvedCnt{onRowsRemoved(indexes, rowElementsRmv)};
+
+  const int TOTAL_N = GetEntryListLen();
+  const int startIndex = std::min(mScenesCountPerPage * mPageIndex, TOTAL_N);
+  const int endIndex = std::min(mScenesCountPerPage * (mPageIndex + 1), TOTAL_N);
+  mCurBegin = lst.cbegin() + startIndex;
+  mCurEnd = lst.cbegin() + endIndex;
+  return rowRmvedCnt;
 }

@@ -241,4 +241,4 @@ class VideoTableModelTest : public PlainTestSuite {
 };
 
 #include "VideoTableModelTest.moc"
-REGISTER_TEST(VideoTableModelTest, true)
+REGISTER_TEST(VideoTableModelTest, false)

@@ -10,7 +10,6 @@
 #include "SceneListView.h"
 #include "EndToExposePrivateMember.h"
 
-#include "ClipboardGuard.h"
 #include "TDir.h"
 #include "JsonKey.h"
 #include "SceneInPageActions.h"
@@ -97,7 +96,6 @@ private slots:
     QVERIFY(sceneView._sceneModel == nullptr);
     QVERIFY(sceneView._sceneSortProxyModel == nullptr);
     QVERIFY(sceneView._scenePageControl == nullptr);
-    QVERIFY(sceneView.COPY_BASENAME_FROM_SCENE == nullptr);
     QVERIFY(sceneView.OPEN_CORRESPONDING_FOLDER == nullptr);
     QVERIFY(sceneView.mAlignDelegate == nullptr);
     // call onClickEvent with invalid index should not crash down
@@ -250,19 +248,6 @@ private slots:
 
     sceneView.setCurrentIndex(QModelIndex{});
     QVERIFY(!sceneView.currentIndex().isValid());
-    QVERIFY(!sceneView.onCopyBaseName()); // current index invalid
-
-    sceneView.setCurrentIndex(firstIndex);
-    {
-      // copy basename ok
-      ClipboardGuard clipGuard;
-      QClipboard* clipboard = clipGuard.clipBoard();
-      QVERIFY(clipboard != nullptr);
-      QVERIFY(sceneView.onCopyBaseName());
-      QString copiedText = clipboard->text();
-      QCOMPARE(copiedText, "Chris Evans");
-      // auto recover
-    }
 
     { // open folder
       sceneView.setCurrentIndex(QModelIndex{});

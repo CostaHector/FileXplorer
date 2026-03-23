@@ -34,7 +34,10 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
 
   {
     auto& jsonInst = g_JsonActions();
-    const QList<QAction*> jsonSpecialActs{jsonInst._OPEN_THIS_FILE, jsonInst._REVEAL_IN_EXPLORER, NewSeperatorAction(this), jsonInst._RENAME_JSON_AND_RELATED_FILES};
+    const QList<QAction*> jsonSpecialActs{
+        jsonInst._RENAME_JSON_AND_RELATED_FILES,   //
+        jsonInst._OPEN_THIS_FILE,                  //
+    };
     PushFrontExclusiveActions(jsonSpecialActs);
   }
 
@@ -126,7 +129,7 @@ int JsonTableView::onExportCastStudioToDictonary() {
 
 int JsonTableView::onRenameJsonAndRelated() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("nothing selected", "skip sync name field");
+    LOG_INFO_NP("nothing selected", "skip rename");
     return 0;
   }
 

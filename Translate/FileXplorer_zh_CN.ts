@@ -866,17 +866,12 @@
         <translation>打开此json文件</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Reveal in explorer</source>
-        <translation>在资源管理器中显示</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Rename related files</source>
         <translation>重命名相关</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+28"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -941,7 +936,12 @@
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="-6"/>
+        <source>recycle related files</source>
+        <translation>回收相关文件</translation>
+    </message>
+    <message>
+        <location line="+46"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1715,14 +1715,19 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+43"/>
-        <source>copy basename</source>
-        <translation>复制基名</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location filename="../View/SceneListView.cpp" line="+38"/>
         <source>play this folder</source>
         <translation>播放此文件夹</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>recycle related files</source>
+        <translation>回收相关文件</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>rename related files</source>
+        <translation>重命名相关文件</translation>
     </message>
 </context>
 <context>

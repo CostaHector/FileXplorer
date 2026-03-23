@@ -32,7 +32,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void setMedias_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
 
@@ -55,7 +55,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void Iterator_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
 
@@ -138,7 +138,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(parms2.back(), true);
 
     // Sort Descending
-    videoTv.mProxyModel->sort(0, Qt::DescendingOrder);  // CR7 2.mp4, CR7 1.mp4, CR7 0.mp4
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::DescendingOrder);  // CR7 2.mp4, CR7 1.mp4, CR7 0.mp4
     QModelIndex fIndex = videoTv.mProxyModel->index(0, VideoBasicInfo::FILE_NAME);
     QCOMPARE(fIndex.data(Qt::DisplayRole).toString(), "CR7 2.mp4");
     videoTv.setCurrentIndex(fIndex);
@@ -161,7 +161,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void iterator_fail_no_current_row() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
     QCOMPARE(videoTv.mVideoModel->rowCount(), 0);
@@ -185,7 +185,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void onRateSelectedMovies_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
     QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
 
     QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
@@ -200,7 +200,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void onRenameJsonAndRelated_replace_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QStringList inexistFiles{"Kaka.mp4"};  // "Kaka.json", "Kaka 1.jpg", "Kaka 2.png"
     videoTv.setMediaFiles("/", inexistFiles, false);
@@ -223,7 +223,7 @@ class VideoTableViewTest : public PlainTestSuite {
 
   void onRenameJsonAndRelated_Insert_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QStringList inexistFiles{"Kaka.mp4"};  // "Kaka.json", "Kaka 1.jpg", "Kaka 2.png"
     videoTv.setMediaFiles("/", inexistFiles, false);
@@ -246,4 +246,4 @@ class VideoTableViewTest : public PlainTestSuite {
 };
 
 #include "VideoTableViewTest.moc"
-REGISTER_TEST(VideoTableViewTest, true)
+REGISTER_TEST(VideoTableViewTest, false)

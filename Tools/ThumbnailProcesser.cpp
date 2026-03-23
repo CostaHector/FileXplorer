@@ -182,7 +182,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
       continue;
     }
 #ifndef RUNNING_UNIT_TESTS
-    if (fi.size() < 50 * 1024 * 1024) { // skip: if file size under 50 MiB
+    if (fi.size() < 5 * 1024 * 1024) { // skip: if file size under 50 MiB
       LOG_D("Skip file[%s] size under threshold", qPrintable(pth));
       continue;
     }
