@@ -232,10 +232,9 @@ class RateHelperTest : public PlainTestSuite {
 
     QList<int> actualRates;
     {
-      QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 10, false), 4);  // non override
-      const QList<int> expectsRates{0, 10, 10, 1};
+      QCOMPARE(RateHelper::RateMovieRecursively(tDir.path(), 10, false), 4);  // non override(rate>0 will no modified)
       actualRates = GetRatesFromJson(jsonsPath);
-      QCOMPARE(actualRates, (QList<int>{0, 10, 10, 1}));
+      QCOMPARE(actualRates, (QList<int>{10, 10, 10, 1}));
     }
 
     {
