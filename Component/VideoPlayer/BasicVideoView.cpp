@@ -30,8 +30,6 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   playbackTriggerModeBtn->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
   setPlaybackTriggerMode(mVideoWidget->GetPlaybackTriggerMode());
 
-  mRateToolButton = mVideoWidget->GetRateActions()->GetRateToolButton(this, false);
-
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   mFunctionCtrlBar->addWidget(playbackTriggerModeBtn);
   mFunctionCtrlBar->addSeparator();
@@ -51,8 +49,6 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mFunctionCtrlBar->addAction(mVideoWidget->mBasicModeAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mHideToolBarAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mFullScreenAct);
-  mFunctionCtrlBar->addSeparator();
-  mFunctionCtrlBar->addWidget(mRateToolButton);
 
   mPauseShieldButton = new (std::nothrow) QToolButton{this};
   mPauseShieldButton->setObjectName("VideoPlayerPauseShieldButton");

@@ -9,7 +9,7 @@ extern template struct EnumIntAction<Qt::ScrollBarPolicy>;
 class ScrollBarPolicyMenu : public QMenu {
   Q_OBJECT
 public:
-  ScrollBarPolicyMenu(const QString& menuName, const QString& memoryName, QWidget* parent = nullptr);
+  ScrollBarPolicyMenu(const QString& menuName, const QString& belongToName, QWidget* parent = nullptr);
   ~ScrollBarPolicyMenu();
   Qt::ScrollBarPolicy GetScrollBarPolicy() const;
 

@@ -74,7 +74,6 @@ private:
   ClickableSlider* mProgressSlider{nullptr}; // 进度控制块
   QLabel* mCurrentTimeLabel{nullptr};        // 当前播放的时间点
   QLabel* mDurationLabel{nullptr};           // 视频文件时长
-  QWidget* mRateToolButton{nullptr};         // 单文件/路径内文件递归评分
   VolumeWidget* mVolumeWid{nullptr};         // 音量控制组件
 
   QVBoxLayout* mLeftLayout{nullptr}; // 左侧布局

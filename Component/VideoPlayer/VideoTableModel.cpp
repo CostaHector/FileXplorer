@@ -10,7 +10,7 @@
 #include "JsonHelper.h"
 #include <QDirIterator>
 
-const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"File name", "Rate", "Duration", "Size", "Relative path"};
+const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"Rate", "File name", "Duration", "Size", "Relative path"};
 
 QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
@@ -20,10 +20,10 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
   const VideoBasicInfo& item = mVideosInfo[index.row()];
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
-      case VideoBasicInfo::FILE_NAME:
-        return item.fileName;
       case VideoBasicInfo::SCORE_FIELD:
         return item.rate;
+      case VideoBasicInfo::FILE_NAME:
+        return item.fileName;
       case VideoBasicInfo::DURATION_FIELD:
         return DataFormatter::formatDurationISO(item.duration);
       case VideoBasicInfo::FILE_SIZE:
@@ -33,8 +33,6 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
       default:
         return {};
     }
-  } else if (role == Qt::DecorationRole && col == VideoBasicInfo::SCORE_FIELD) {
-    return RateHelper::GetRatePixmap(item.rate);
   }
 
   return {};

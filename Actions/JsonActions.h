@@ -23,7 +23,6 @@ public:
 
   // **File Operation**
   QAction* _OPEN_THIS_FILE{nullptr};
-  QAction* _REVEAL_IN_EXPLORER{nullptr};
   QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
 
   // **Studio/Cast/Tags Field Operation**

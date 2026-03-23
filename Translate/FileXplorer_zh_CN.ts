@@ -217,7 +217,12 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+42"/>
+        <location filename="../View/CustomListView.cpp" line="+40"/>
+        <source>Icon size</source>
+        <translation>图片大小</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -861,17 +866,12 @@
         <translation>打开此json文件</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Reveal in explorer</source>
-        <translation>在资源管理器中显示</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Rename related files</source>
         <translation>重命名相关</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+28"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -936,7 +936,12 @@
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="-6"/>
+        <source>recycle related files</source>
+        <translation>回收相关文件</translation>
+    </message>
+    <message>
+        <location line="+46"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1705,6 +1710,24 @@
         <location line="+52"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
+    </message>
+</context>
+<context>
+    <name>SceneListView</name>
+    <message>
+        <location filename="../View/SceneListView.cpp" line="+38"/>
+        <source>play this folder</source>
+        <translation>播放此文件夹</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>recycle related files</source>
+        <translation>回收相关文件</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>rename related files</source>
+        <translation>重命名相关文件</translation>
     </message>
 </context>
 <context>

@@ -8,40 +8,47 @@
 
 class ScenesListModel;
 
-namespace SceneListViewMocker{
+namespace SceneListViewMocker {
 inline bool& MockSetRootPathQuery() {
   static bool bConfirm = false;
   return bConfirm;
 }
-}
+}  // namespace SceneListViewMocker
 
 class SceneListView : public CustomListView {
   Q_OBJECT
-public:
-  explicit SceneListView(ScenesListModel* sceneModel, SceneSortProxyModel* sceneSortProxyModel, ScenePageControl* scenePageControl, QWidget* parent = nullptr);
+ public:
+  explicit SceneListView(ScenesListModel* sceneModel,
+                         SceneSortProxyModel* sceneSortProxyModel,
+                         ScenePageControl* scenePageControl,
+                         QWidget* parent = nullptr);
   void setRootPath(const QString& rootPath);
   int onUpdateJsonFiles();
   int onUpdateScnFiles();
   int onClearScnFiles();
   void subscribe();
-  bool onCopyBaseName();
   bool onOpenCorrespondingFolder();
-  bool onClickEvent(const QModelIndex &idx);
+  bool onClickEvent(const QModelIndex& idx);
 
-signals:
+ signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
   void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
 
  public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
+  int onRenameSceneAndRelated();
+  int onRecycleSceneAndRelated();
 
-protected:
+ protected:
   void mousePressEvent(QMouseEvent* event) override;
 
-private:
+ private:
   static bool IsPathAtShallowDepth(const QString& path);
-  QAction* COPY_BASENAME_FROM_SCENE{nullptr};
+  QModelIndexList selectedRowsSource() const;
+
   QAction* OPEN_CORRESPONDING_FOLDER{nullptr};
+  QAction* _RENAME_SCENE_RELATED_FILES{nullptr};
+  QAction* _RECYCLE_SCENE_RELATED_FILES{nullptr};
   ScenesListModel* _sceneModel{nullptr};
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   SceneStyleDelegate* mAlignDelegate{nullptr};

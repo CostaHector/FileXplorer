@@ -76,7 +76,7 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
 
   auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-  auto* rateToolButton = rateInst.GetRateToolButton(menuRibbonCornerWid, true);
+  auto* rateToolButton = rateInst.GetRateToolButton(menuRibbonCornerWid);
 
   menuRibbonCornerWid->addWidget(mActSearcher);
   menuRibbonCornerWid->addSeparator();

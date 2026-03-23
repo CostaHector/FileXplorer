@@ -3,26 +3,26 @@
 #include "ScenesListModel.h"
 #include "PlayVideo.h"
 #include "PublicMacro.h"
+#include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
+#include "BatchRenameBy.h"
+#include "FileOperatorPub.h"
+#include "UndoRedo.h"
+
 #include <QHeaderView>
 #include <QMessageBox>
-#include <QApplication>
-#include <QClipboard>
 #include <QMouseEvent>
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent) //
-  : CustomListView{"SCENES_TABLE", parent}
-  , //
-  _sceneModel{sceneModel}
-  , //
-  _sceneSortProxyModel{sceneSortProxyModel}
-  ,                                   //
-  _scenePageControl{scenePageControl} //
+                             QWidget* parent)     //
+    : CustomListView{"SCENES_TABLE", parent},     //
+      _sceneModel{sceneModel},                    //
+      _sceneSortProxyModel{sceneSortProxyModel},  //
+      _scenePageControl{scenePageControl}         //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -40,12 +40,21 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  COPY_BASENAME_FROM_SCENE = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "copy basename", this};
-  CHECK_NULLPTR_RETURN_VOID(COPY_BASENAME_FROM_SCENE)
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon(":img/SYSTEM_APPLICATION_VIDEO"), "play this folder", this};
+  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("play this folder"), this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
+  _RENAME_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon(":img/RENAME"), tr("rename related files"), this};
+  CHECK_NULLPTR_RETURN_VOID(_RENAME_SCENE_RELATED_FILES)
+  _RENAME_SCENE_RELATED_FILES->setShortcutVisibleInContextMenu(true);
+  _RENAME_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected scene related file(s) name")  //
+                                              .arg(_RENAME_SCENE_RELATED_FILES->text())
+                                              .arg(_RENAME_SCENE_RELATED_FILES->shortcut().toString()));
+  _RECYCLE_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("recycle related files"), this};
+  CHECK_NULLPTR_RETURN_VOID(_RECYCLE_SCENE_RELATED_FILES)
+  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin")  //
+                                               .arg(_RECYCLE_SCENE_RELATED_FILES->text())
+                                               .arg(_RECYCLE_SCENE_RELATED_FILES->shortcut().toString()));
 
-  QList<QAction*> exclusiveActions{COPY_BASENAME_FROM_SCENE, OPEN_CORRESPONDING_FOLDER};
+  QList<QAction*> exclusiveActions{_RENAME_SCENE_RELATED_FILES, _RECYCLE_SCENE_RELATED_FILES, OPEN_CORRESPONDING_FOLDER};
   PushFrontExclusiveActions(exclusiveActions);
   PushBackExclusiveActions(_sceneModel->GetExcusiveActions());
 
@@ -54,19 +63,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   // setMouseTracking(true);
   // setAttribute(Qt::WA_Hover, true);
   // viewport()->setMouseTracking(true);
-}
-
-bool SceneListView::onCopyBaseName() {
-  const QModelIndex& curInd = currentIndex();
-  if (!curInd.isValid()) {
-    return false;
-  }
-  const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(curInd);
-  const QString& copiedStr = _sceneModel->baseName(srcInd);
-  auto* cb = QApplication::clipboard();
-  cb->setText(copiedStr, QClipboard::Mode::Clipboard);
-  LOG_D("user copied str: [%s]", qPrintable(copiedStr));
-  return true;
 }
 
 bool SceneListView::onOpenCorrespondingFolder() {
@@ -82,9 +78,10 @@ bool SceneListView::onOpenCorrespondingFolder() {
 }
 
 void SceneListView::subscribe() {
-  connect(COPY_BASENAME_FROM_SCENE, &QAction::triggered, this, &SceneListView::onCopyBaseName);
   connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
+  connect(_RENAME_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelated);
+  connect(_RECYCLE_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRecycleSceneAndRelated);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
@@ -101,21 +98,19 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
+  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
     LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
     const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-                            "Loading it could cause performance issues.\n\n"
-                            "Directory: "
-                            + rootPath + "\n\n Do you want to proceed?";
+    const QString hintMsg =
+        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+        "Loading it could cause performance issues.\n\n"
+        "Directory: " +
+        rootPath + "\n\n Do you want to proceed?";
     QMessageBox::StandardButton retBtn;
 #ifdef RUNNING_UNIT_TESTS
     retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-    retBtn = QMessageBox::warning(this,
-                                  cfmTitle,
-                                  hintMsg,
-                                  QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
                                   QMessageBox::StandardButton::No);
 #endif
     if (retBtn != QMessageBox::StandardButton::Yes) {
@@ -140,11 +135,11 @@ int SceneListView::onUpdateJsonFiles() {
   ScnMgr scnMgr;
   Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated",
-           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]",  //
            cnt.m_jsonUpdatedCnt,
-           cnt.m_jsonUsedCnt, //
+           cnt.m_jsonUsedCnt,  //
            cnt.m_ImgNameKeyFieldUpdatedCnt,
-           cnt.m_VidNameKeyFieldUpdatedCnt, //
+           cnt.m_VidNameKeyFieldUpdatedCnt,  //
            qPrintable(workPath));
   return cnt.m_jsonUpdatedCnt;
 }
@@ -188,18 +183,28 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
 #else
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // linux path start with '/'
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
+}
+
+QModelIndexList SceneListView::selectedRowsSource() const {
+  const QModelIndexList& proIndexes = selectedIndexes();
+  QModelIndexList srcIndexes;
+  srcIndexes.reserve(proIndexes.size());
+  for (const auto& proIndex : proIndexes) {
+    srcIndexes.append(_sceneSortProxyModel->mapToSource(proIndex));
+  }
+  return srcIndexes;
 }
 
 void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::MouseButton::LeftButton) {
     const QPoint pos = event->pos();
-    const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
+    const QModelIndex proIndex = indexAt(pos);  // here no need use mapToSource
     if (mLastClickedIndex != proIndex) {
       onClickEvent(proIndex);
     }
@@ -216,4 +221,43 @@ void SceneListView::onCellVisualUpdateRequested(const QModelIndex& ind) {
     return;
   }
   update(ind);
+}
+
+int SceneListView::onRenameSceneAndRelated() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip rename");
+    return 0;
+  }
+
+  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
+  const int relatedFilesCnt{BatchRenameBy::ReplaceBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
+  if (relatedFilesCnt <= 0) {
+    return 0;
+  }
+  const int removeRowCnt{_sceneModel->AfterJsonFilesNameRenamed(indexes)};
+  return relatedFilesCnt;
+}
+
+int SceneListView::onRecycleSceneAndRelated() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip recycle");
+    return 0;
+  }
+  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
+  const int relatedFilesCnt{filesNeedRecycle.size()};
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relatedFilesCnt);
+  for (const auto& nm : filesNeedRecycle) {
+    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
+  }
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
+  const int removeRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
+  LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
+  return relatedFilesCnt;
 }

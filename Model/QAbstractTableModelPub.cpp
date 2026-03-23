@@ -70,56 +70,15 @@ bool QAbstractTableModelPub::ColumnsCountEndChange() {  // must call me after Co
   return true;
 }
 
-QList<std::pair<int, int>> QAbstractTableModelPub::MergeList2SectionsRange(const QList<int>& rows) {
-  if (rows.isEmpty()) {
-    return {};
-  }
-  QList<std::pair<int, int>> ranges;
-  int start = rows.first();
-  int end = start;
-  for (int i = 1; i < rows.size(); ++i) {
-    if (rows[i] == end + 1) {
-      // 连续行，扩展范围
-      end = rows[i];
-    } else {
-      // 不连续，保存当前范围并开始新范围
-      ranges.push_back(std::make_pair(start, end));
-      start = rows[i];
-      end = start;
-    }
-  }
-  // 添加最后一个范围
-  ranges.append(std::make_pair(start, end));
-  return ranges;
-}
-
-int QAbstractTableModelPub::onRowsRemoved(const QModelIndexList& indexes, FuncRemoveElementsCallback fCallback) {
+int QAbstractTableModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback) {
   if (indexes.isEmpty()) {
     LOG_D("Indexes list empty. skip");
     return 0;
   }
   // 获取有效行
-  QList<int> validRows;
-  validRows.reserve(indexes.size());
-  {
-    for (const QModelIndex& index : indexes) {
-      int row = index.row();
-      if (row < 0 || row >= rowCount()) {
-        LOG_W("row: %d out of range [0, %d)", row, rowCount());
-        continue;
-      }
-      validRows.append(row);
-    }
-    if (validRows.isEmpty()) {
-      LOG_W("No valid rows to remove");
-      return false;
-    }
-    std::sort(validRows.begin(), validRows.end());
-    auto firstDuplicateIt = std::unique(validRows.begin(), validRows.end());
-    validRows.erase(firstDuplicateIt, validRows.end());
-  }
+  QList<int> validRows = ModelTools::GetIndexesRows(indexes);
   // 合并行号到区间
-  QList<std::pair<int, int>> ranges = MergeList2SectionsRange(validRows);
+  QList<std::pair<int, int>> ranges = ModelTools::MergeList2SectionsRange(validRows);
   // 倒序删行区间
   {
     for (auto it = ranges.rbegin(); it != ranges.rend(); ++it) {

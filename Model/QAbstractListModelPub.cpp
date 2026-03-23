@@ -69,6 +69,30 @@ bool QAbstractListModelPub::RowsCountEndChange() {
   return true;
 }
 
+int QAbstractListModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback) {
+  if (indexes.isEmpty()) {
+    LOG_D("Indexes list empty. skip");
+    return 0;
+  }
+  // 获取有效行
+  QList<int> validRows = ModelTools::GetIndexesRows(indexes);
+  // 合并行号到区间
+  QList<std::pair<int, int>> ranges = ModelTools::MergeList2SectionsRange(validRows);
+  // 倒序删行区间
+  {
+    beginResetModel();
+    for (auto it = ranges.rbegin(); it != ranges.rend(); ++it) {
+      int frontRow = it->first;
+      int backRow = it->second;
+      if (fCallback) {
+        fCallback(frontRow, backRow + 1);
+      }
+    }
+    endResetModel();
+  }
+  return validRows.size();
+}
+
 QPixmap QAbstractListModelPub::GetDecorationPixmap(const QString& fileAbsPath) const {
   return ImageTool::GetPixmapFromCached(fileAbsPath, getPixmapWidth(), getPixmapHeight(), isPixmapTransformationSmooth());
 }

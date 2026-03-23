@@ -45,6 +45,7 @@ class ScenesListModel : public QAbstractListModelPub {
   inline const SceneInfoList& GetEntryList() const { return mEntryList; }
   inline int GetEntryListLen() const { return GetEntryList().size(); }
   inline SceneInfoList::const_iterator GetFirstIterator() const { return mCurBegin; }
+  QStringList rel2fileNames(const QModelIndexList& indexes) const;
 
  signals:
   void pagesCountChanged(int newPagesCount);
@@ -52,6 +53,7 @@ class ScenesListModel : public QAbstractListModelPub {
  public slots:
   bool onScenesCountsPerPageChanged(int scenesCntInAPage);
   bool onPageIndexChanged(int newPageIndex);
+  int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);

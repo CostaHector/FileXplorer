@@ -6,6 +6,8 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "ModelTools.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "QAbstractTableModelPub.h"
 #include "QAbstractListModelPub.h"
@@ -49,10 +51,10 @@ class QAbstractTableModelPubTest : public PlainTestSuite {
  public:
  private slots:
   void MergeList2SectionsRange_ok() {
-    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({}), (QList<std::pair<int, int>>{}));
-    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({0, 1, 2, 3}), (QList<std::pair<int, int>>{{0, 3}}));
-    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({1, 3, 4}), (QList<std::pair<int, int>>{{1, 1}, {3, 4}}));
-    QCOMPARE(QAbstractTableModelPub::MergeList2SectionsRange({0, 1, 2, 4}), (QList<std::pair<int, int>>{{0, 2}, {4, 4}}));
+    QCOMPARE(ModelTools::MergeList2SectionsRange({}), (QList<std::pair<int, int>>{}));
+    QCOMPARE(ModelTools::MergeList2SectionsRange({0, 1, 2, 3}), (QList<std::pair<int, int>>{{0, 3}}));
+    QCOMPARE(ModelTools::MergeList2SectionsRange({1, 3, 4}), (QList<std::pair<int, int>>{{1, 1}, {3, 4}}));
+    QCOMPARE(ModelTools::MergeList2SectionsRange({0, 1, 2, 4}), (QList<std::pair<int, int>>{{0, 2}, {4, 4}}));
   }
 
   void dimesion2_container_model_border_test() {

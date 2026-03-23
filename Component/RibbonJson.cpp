@@ -93,8 +93,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   addSeparator();
   addAction(inst._SAVE_CURRENT_CHANGES);
   addSeparator();
-  addAction(inst._RENAME_JSON_AND_RELATED_FILES);
-  addSeparator();
   addWidget(mSyncCacheFileSystemTb);
   addSeparator();
   addWidget(mFieldCaseOperTb);

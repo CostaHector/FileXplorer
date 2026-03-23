@@ -9,7 +9,7 @@ extern template struct EnumIntAction<Qt::TextElideMode>;
 class TextElideModeMenu : public QMenu {
   Q_OBJECT
  public:
-  TextElideModeMenu(const QString& menuName, const QString& memoryName, QWidget* parent = nullptr);
+  TextElideModeMenu(const QString& menuName, const QString& belongToName, QWidget* parent = nullptr);
   ~TextElideModeMenu();
   Qt::TextElideMode GetTextElideMode() const;
 

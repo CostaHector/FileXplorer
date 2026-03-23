@@ -2,12 +2,12 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 
-ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString& menuName, const QString& memoryName, QWidget* parent)
-    : QMenu{menuName, parent}, m_memoryName{memoryName} {
+ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
+    : QMenu{menuName, parent}, m_memoryName{belongToName + "_ScrollBarPolicy"} {
   CHECK_NULLPTR_RETURN_VOID(parent);
-  CHECK_FALSE_RETURN_VOID(!memoryName.isEmpty());
+  CHECK_FALSE_RETURN_VOID(!belongToName.isEmpty());
 
-  const bool isHor{memoryName.contains("hor", Qt::CaseInsensitive)};
+  const bool isHor{belongToName.contains("hor", Qt::CaseInsensitive)};
   const QIcon alwaysOnIcon{isHor ? ":img/SCROLL_BAR_POLICY_HOR" : ":img/SCROLL_BAR_POLICY_VER"};
   setIcon(alwaysOnIcon);
 
@@ -38,10 +38,7 @@ ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString& menuName, const QString&
 }
 
 ScrollBarPolicyMenu::~ScrollBarPolicyMenu() {
-  const QString& scrollBarPolicyKey = GetName();
-  if (!scrollBarPolicyKey.isEmpty()) {
-    Configuration().setValue(scrollBarPolicyKey, GetScrollBarPolicy());
-  }
+  Configuration().setValue(GetName(), GetScrollBarPolicy());
 }
 
 void ScrollBarPolicyMenu::onActionInMenuTriggered(const QAction* pScrollBarPolicyAct) {

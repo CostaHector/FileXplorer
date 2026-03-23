@@ -4,6 +4,7 @@
 #include <stack>
 #include <QPixmap>
 #include <QAction>
+#include "ModelTools.h"
 
 class QAbstractListModelPub : public QAbstractListModel {
   Q_OBJECT
@@ -26,6 +27,7 @@ class QAbstractListModelPub : public QAbstractListModel {
  public slots:
   bool onIconSizeChange(const QSize& newSize);
   bool onPixmapSmoothTransformationToggled(bool bSmooth);
+  int onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback);
 
  private:
   void subscribe();

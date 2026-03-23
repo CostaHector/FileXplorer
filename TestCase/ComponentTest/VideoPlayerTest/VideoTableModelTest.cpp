@@ -106,12 +106,6 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 9);
     QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 0);
     QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::SCORE_FIELD), Qt::EditRole).toInt(), 0);
-
-    QVariant pixmapVar = videoModel.data(videoModel.index(0, VideoBasicInfo::SCORE_FIELD), Qt::DecorationRole);
-    QVERIFY(pixmapVar.isValid());
-    QVERIFY(pixmapVar.canConvert<QPixmap>());
-    const QPixmap pixmapVarRate = pixmapVar.value<QPixmap>();
-    QVERIFY(!pixmapVarRate.isNull());
   }
 
   void updateDurationFields_ok() {
@@ -194,7 +188,7 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(beforeRate, 10);
     const int newRate{9};
 
-    // setData->rateSelectedMovies->emit dataChanged(index, index, {displayRole, decorationRole});
+    // setData->rateSelectedMovies->emit dataChanged(index, index, {displayRole});
     QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
 
     QCOMPARE(videoModel.setData(firstIndex, newRate, Qt::EditRole), false);           // column not accept
@@ -211,7 +205,7 @@ class VideoTableModelTest : public PlainTestSuite {
 
   void tableView_setPlayPath_ok() {
     VideoTableView videoTv;
-    videoTv.mProxyModel->sort(0, Qt::AscendingOrder);
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
 
     QSignalSpy reqPlaySpy{&videoTv, &VideoTableView::reqPlayMedia};
 
