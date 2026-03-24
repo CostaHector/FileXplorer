@@ -871,7 +871,7 @@
         <translation>重命名相关</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -936,12 +936,7 @@
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <source>recycle related files</source>
-        <translation>回收相关文件</translation>
-    </message>
-    <message>
-        <location line="+46"/>
+        <location line="+40"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1715,7 +1710,7 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+38"/>
+        <location filename="../View/SceneListView.cpp" line="+43"/>
         <source>play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -1943,6 +1938,11 @@
     </message>
     <message>
         <location line="+7"/>
+        <source>Update duration</source>
+        <translation>更新时长字段</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Refresh current path</source>
         <translation>重新加载</translation>
     </message>
