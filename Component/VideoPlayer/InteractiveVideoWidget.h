@@ -30,12 +30,11 @@ public:
   bool isVideoFullScreen() const { return mFullScreenAct->isChecked(); }
   QMediaPlaylist::PlaybackMode GetPlaybackMode() const;
   VideoPlayTool::PlaybackTriggerMode GetPlaybackTriggerMode() const;
-  RateActions* GetRateActions() const {
-    return mRateActions;
-  }
+  RateActions* GetRateActions() const { return mRateActions; }
   bool isClickPressHappend() { return mClickPressHappend; }
   void clearClickPressHappend() { mClickPressHappend = false; }
   void onUserMouseClickOrKeyPressEvent() { mClickPressHappend = true; }
+  bool isAutoHideToolBarDisabled() { return mDisableAutoHideToolBar->isChecked(); }
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);
@@ -64,6 +63,7 @@ private:
   void onQuitFullScreenMode();
   bool onSelectAFile();
   bool onSelectAFolder();
+  void tryStartAutoHideTimer();
 
   QAction                         // 播放触发模式
       *mPlaybackTrigger_MANUAL,   // 播放触发模式-手动播放
@@ -92,8 +92,9 @@ private:
   QAction* mFullScreenAct{nullptr};           // 全屏播放
   QAction* mOpenInSystemApplication{nullptr}; // 用系统应用打开
 
-  QAction* mSelectVideoFileAct{nullptr}; // 选择视频文件
-  QAction* mSelectVideoFolder{nullptr};  // 选择视频文件夹并播放
+  QAction* mSelectVideoFileAct{nullptr};     // 选择视频文件
+  QAction* mSelectVideoFolder{nullptr};      // 选择视频文件夹并播放
+  QAction* mDisableAutoHideToolBar{nullptr}; // 禁用自动隐藏工具栏
 
   QMenu* mRateMenu{nullptr};
   QMenu* mPlaybackModeMenu{nullptr};
@@ -104,7 +105,6 @@ private:
   void onLongTimeNoEventHappen();
   QTimer mLongTimeNoClickTimer;
   bool mClickPressHappend{false};
-  static constexpr int TIMER_INTERVAL = 10 * 1000;
 };
 
 #endif // INTERACTIVEVIDEOWIDGET_H

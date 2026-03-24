@@ -677,7 +677,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+19"/>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+24"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -792,7 +792,12 @@
         <translation>选择文件夹</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>disable auto hide</source>
+        <translation>禁用自动隐藏</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Playerback mode</source>
         <translation>播放模式</translation>
     </message>
@@ -802,7 +807,7 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+56"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
@@ -1939,7 +1944,7 @@
     <message>
         <location line="+7"/>
         <source>Update duration</source>
-        <translation>更新时长字段</translation>
+        <translation>更新时长</translation>
     </message>
     <message>
         <location line="+6"/>
