@@ -161,9 +161,6 @@ bool FileXplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, 
 }
 
 bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
-  if (!__CanNewItem()) {
-    return false;
-  }
   const QString rootPath = _contentPane->getRootPath();
   ThumbnailProcesser tp{skipIfExist};
   bool renameResult = tp.RenameThumbnailGeneratedByPotPlayer(rootPath);

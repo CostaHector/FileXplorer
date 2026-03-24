@@ -190,11 +190,11 @@ class VideoTableViewTest : public PlainTestSuite {
 
     QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
     videoTv.setMediaFiles("", inexistFiles, false);
+    QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
     videoTv.clearSelection();
     QCOMPARE(videoTv.onRateSelectedMovies(10), 0);       // no selection
     QCOMPARE(videoTv.onAdjustSelectedMoviesRate(5), 0);  // no selection
 
-    QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
     videoTv.selectAll();
     QCOMPARE(videoTv.onRateSelectedMovies(10), 0);       // no json at all
     QCOMPARE(videoTv.onAdjustSelectedMoviesRate(0), 0);  // delta=0
@@ -247,6 +247,22 @@ class VideoTableViewTest : public PlainTestSuite {
 
     QCOMPARE(videoTv.onRenameJsonAndRelatedInsert(), 3);
     QCOMPARE(videoTv.mVideoModel->rowCount(), 0);  // 1 row deleted
+  }
+
+  void onUpdateDurationFields_ok() {
+    VideoTableView videoTv;
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
+
+    QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
+    videoTv.setMediaFiles("", inexistFiles, false);
+    QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
+
+    videoTv.clearSelection();
+    QCOMPARE(videoTv.onUpdateDurationFields(), 0);       // no selection
+
+    videoTv.selectAll();
+    QCOMPARE(videoTv.onUpdateDurationFields(), 0);       // no json at all
   }
 };
 

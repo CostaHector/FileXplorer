@@ -13,7 +13,6 @@
 #include <QFileDialog>
 
 constexpr QMediaPlaylist::PlaybackMode InteractiveVideoWidget::DEFAULT_PLAYBACK_MODE;
-constexpr int InteractiveVideoWidget::TIMER_INTERVAL;
 
 InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent) : QVideoWidget{parent} {
   mPlaybackTrigger_MANUAL = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_MANUAL"}, tr("Manual play"), this};
@@ -90,6 +89,10 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
 
   mSelectVideoFileAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/OPEN_A_VIDEO"}, tr("select video"), this};
   mSelectVideoFolder = new (std::nothrow) QAction{QIcon{":/VideoPlayer/OPEN_A_FOLDER"}, tr("select a folder"), this};
+  mDisableAutoHideToolBar = new (std::nothrow) QAction{QIcon{":/VideoPlayer/DISABLE_AUTO_HIDE"}, tr("disable auto hide"), this};
+  mDisableAutoHideToolBar->setCheckable(true);
+  const bool isAutoHideDisabled = Configuration().value(MemoryKey::VIDEO_PLAYER_AUTO_HIDE_TOOLBAR.name, MemoryKey::VIDEO_PLAYER_AUTO_HIDE_TOOLBAR.v).toBool();
+  mDisableAutoHideToolBar->setChecked(isAutoHideDisabled);
 
   mPlaybackModeMenu = new QMenu{tr("Playerback mode"), this};
   mPlaybackModeMenu->setToolTipsVisible(true);
@@ -127,16 +130,18 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addSeparator();
   mContextMenu->addAction(mBasicModeAct);
   mContextMenu->addAction(mShowFrames);
+  mContextMenu->addAction(mDisableAutoHideToolBar);
   mContextMenu->addSeparator();
   mContextMenu->addMenu(mPlaybackModeMenu);
 
   mLongTimeNoClickTimer.setSingleShot(true);
-  mLongTimeNoClickTimer.setInterval(TIMER_INTERVAL);
+  mLongTimeNoClickTimer.setInterval(10 * 1000); // 10s
 
   connect(&mLongTimeNoClickTimer, &QTimer::timeout, this, &InteractiveVideoWidget::onLongTimeNoEventHappen);
   connect(mFullScreenAct, &QAction::toggled, this, &InteractiveVideoWidget::onFullScreenActionToggled);
   connect(mSelectVideoFileAct, &QAction::triggered, this, &InteractiveVideoWidget::onSelectAFile);
   connect(mSelectVideoFolder, &QAction::triggered, this, &InteractiveVideoWidget::onSelectAFolder);
+  connect(mDisableAutoHideToolBar, &QAction::toggled, &mLongTimeNoClickTimer, &QTimer::stop);
 
   connect(mPlaybackModeIntAction.getActionGroup(),
           &QActionGroup::triggered,  //
@@ -146,6 +151,10 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
           this, &InteractiveVideoWidget::onPlaybackTriggerModeTriggered);
 
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+}
+
+InteractiveVideoWidget::~InteractiveVideoWidget() {
+  Configuration().setValue(MemoryKey::VIDEO_PLAYER_AUTO_HIDE_TOOLBAR.name, isAutoHideToolBarDisabled());
 }
 
 MenuToolButton* InteractiveVideoWidget::GetPlaybackModelMenuToolButton(QWidget* notNullParent) const {
@@ -191,6 +200,7 @@ QWidget* InteractiveVideoWidget::GetExtendedFunctionCtrlBar(QWidget* notNullPare
   extendedFunctionCtrlBar->addWidget(playbackModeBtn);
   extendedFunctionCtrlBar->addAction(mShowFrames);
   extendedFunctionCtrlBar->addStretch();
+  extendedFunctionCtrlBar->addAction(mDisableAutoHideToolBar);
   extendedFunctionCtrlBar->addAction(mShowVideoList);
   return extendedFunctionCtrlBar;
 }
@@ -212,7 +222,7 @@ bool InteractiveVideoWidget::GetFocusCore(InteractiveVideoWidget* self) {
 
 void InteractiveVideoWidget::onIntoFullScreenMode() {
   GetFocusCore(this);
-  mLongTimeNoClickTimer.start();
+  tryStartAutoHideTimer();
 }
 
 void InteractiveVideoWidget::onQuitFullScreenMode() {
@@ -253,6 +263,12 @@ bool InteractiveVideoWidget::onSelectAFolder() {
   Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, dirSelected);
   emit newFolderSelectedChangedByUser(dirSelected, true);
   return true;
+}
+
+void InteractiveVideoWidget::tryStartAutoHideTimer() {
+  if (!isAutoHideToolBarDisabled()) {
+    mLongTimeNoClickTimer.start();
+  }
 }
 
 bool InteractiveVideoWidget::updatePauseActionState(bool bPauseChecked) {
@@ -358,7 +374,7 @@ void InteractiveVideoWidget::onMouseRightClickEventHappend() {
   changeAllToolbarVisibility(true);
   if (isVideoFullScreen()) {
     // 全屏模式下, 重新开始计时
-    mLongTimeNoClickTimer.start();
+    tryStartAutoHideTimer();
   }
 }
 
@@ -381,7 +397,7 @@ void InteractiveVideoWidget::onLongTimeNoEventHappen() {
   if (isClickPressHappend()) {
     // 超时后, 发现之前有鼠标/键盘事件, 重新启动, 实现延迟超时
     clearClickPressHappend();
-    mLongTimeNoClickTimer.start();
+    tryStartAutoHideTimer();
     return;
   }
   // 全屏模式下 hide everything except video itself

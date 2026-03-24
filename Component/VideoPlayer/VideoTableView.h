@@ -19,6 +19,7 @@ public:
   int onAdjustSelectedMoviesRate(int delta);
   int onRenameJsonAndRelatedReplace();
   int onRenameJsonAndRelatedInsert();
+  int onUpdateDurationFields();
 
 signals:
   void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);
@@ -33,6 +34,7 @@ private:
 
   QAction* mRenameVideoRelatedFilesReplace{nullptr};
   QAction* mRenameVideoRelatedFilesInsert{nullptr};
+  QAction* mUpdateDurations{nullptr};
   QAction* mReloadCurrentPath{nullptr};
 
   VideoTableModel* mVideoModel{nullptr};

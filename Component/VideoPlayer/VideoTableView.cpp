@@ -33,6 +33,12 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
             .arg(mRenameVideoRelatedFilesInsert->text())
             .arg(mRenameVideoRelatedFilesInsert->shortcut().toString()));
 
+    mUpdateDurations = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, tr("Update duration"), this};
+    mUpdateDurations->setShortcutVisibleInContextMenu(true);
+    mUpdateDurations->setToolTip(QString("<b>%1 (%2)</b><br/> Read the duration information from video file")
+                                           .arg(mUpdateDurations->text())
+                                           .arg(mUpdateDurations->shortcut().toString()));
+
     mReloadCurrentPath = new (std::nothrow) QAction(QIcon(":img/REFRESH_THIS_PATH"), tr("Refresh current path"), this);
     mReloadCurrentPath->setShortcutVisibleInContextMenu(true);
     mReloadCurrentPath->setToolTip(QString("<b>%1 (%2)</b><br/>Force reload the file list for the current directory from disk.")  //
@@ -47,6 +53,7 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
     acts.push_back(NewSeperatorAction(this));
     acts.push_back(mRenameVideoRelatedFilesReplace);
     acts.push_back(mRenameVideoRelatedFilesInsert);
+    acts.push_back(mUpdateDurations);
     acts.push_back(NewSeperatorAction(this));
     acts.push_back(mReloadCurrentPath);
     PushFrontExclusiveActions(acts);
@@ -56,6 +63,7 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &VideoTableView::onAdjustSelectedMoviesRate);
   connect(mRenameVideoRelatedFilesReplace, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedReplace);
   connect(mRenameVideoRelatedFilesInsert, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedInsert);
+  connect(mUpdateDurations, &QAction::triggered, this, &VideoTableView::onUpdateDurationFields);
   connect(mReloadCurrentPath, &QAction::triggered, mVideoModel, &VideoTableModel::forceReload);
   connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
 }
@@ -231,4 +239,13 @@ int VideoTableView::onRenameJsonAndRelatedInsert() {
 
   const int removeRowCnt{mVideoModel->AfterVideoFilesNameRenamed(srcIndexes)};
   return relatedFilesCnt;
+}
+
+int VideoTableView::onUpdateDurationFields() {
+  const QModelIndexList& srcIndexes{selectedRowsSource()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip update durations", "no row selected");
+    return 0;
+  }
+  return mVideoModel->updateDurationFields(srcIndexes);
 }

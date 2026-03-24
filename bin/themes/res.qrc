@@ -390,6 +390,7 @@
         <file alias="PLAY_TRIGGER_MANUAL">VideoPlayer/PLAY_TRIGGER_MANUAL.svg</file>
         <file alias="PLAY_TRIGGER_AUTO">VideoPlayer/PLAY_TRIGGER_AUTO.svg</file>
         <file alias="PLAY_TRIGGER_DISABLED">VideoPlayer/PLAY_TRIGGER_DISABLED.svg</file>
+        <file alias="DISABLE_AUTO_HIDE">VideoPlayer/DISABLE_AUTO_HIDE.svg</file>
     </qresource>
 
     <qresource prefix="/">
