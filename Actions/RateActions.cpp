@@ -111,7 +111,7 @@ void RateActions::onRateActionTriggered(QAction* pActTriggered) {
 int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const {
   const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
-  message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings will be affected.";
+  message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";
 
   const int defaultRate = Configuration().value(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, MemoryKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
 
