@@ -72,7 +72,7 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
       break;
     }
     case Qt::ForegroundRole: {
-      if (orientation == Qt::Vertical && (0 <= section && section < rowCount()) && m_modifiedRows.test(section)) {
+      if (orientation == Qt::Vertical && (0 <= section && section < rowCount()) && section < m_modifiedRows.size() && m_modifiedRows.test(section)) {
         return QBrush(Qt::GlobalColor::red);
       }
       break;
@@ -222,7 +222,9 @@ bool JsonTableModel::setModifiedNoEmit(int row, bool modified) {
   if (row < 0 || row >= rowCount()) {
     return false;
   }
-  m_modifiedRows.set(row, modified);
+  if (row < m_modifiedRows.size()) {
+    m_modifiedRows.set(row, modified);
+  }
   return true;
 }
 
@@ -679,7 +681,7 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return cnt;
     }
-    if (!m_modifiedRows.test(row)) {
+    if (row < m_modifiedRows.size() && !m_modifiedRows.test(row)) {
       continue;
     }
     if (!mCachedJsons[row].WriteIntoFiles()) {
