@@ -130,6 +130,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addSeparator();
   mContextMenu->addAction(mBasicModeAct);
   mContextMenu->addAction(mShowFrames);
+  mContextMenu->addAction(mDisableAutoHideToolBar);
   mContextMenu->addSeparator();
   mContextMenu->addMenu(mPlaybackModeMenu);
 
@@ -150,6 +151,10 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
           this, &InteractiveVideoWidget::onPlaybackTriggerModeTriggered);
 
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+}
+
+InteractiveVideoWidget::~InteractiveVideoWidget() {
+  Configuration().setValue(MemoryKey::VIDEO_PLAYER_AUTO_HIDE_TOOLBAR.name, isAutoHideToolBarDisabled());
 }
 
 MenuToolButton* InteractiveVideoWidget::GetPlaybackModelMenuToolButton(QWidget* notNullParent) const {

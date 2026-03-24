@@ -21,6 +21,8 @@ public:
   friend class VideoView;
 
   explicit InteractiveVideoWidget(bool bBasicMode = false, QWidget* parent = nullptr);
+  ~InteractiveVideoWidget();
+
   MenuToolButton* GetPlaybackModelMenuToolButton(QWidget* notNullParent) const;
   MenuToolButton* GetPlaybackTriggerModelMenuToolButton(QWidget* notNullParent) const;
   QWidget* GetExtendedFunctionCtrlBar(QWidget* notNullParent) const;
