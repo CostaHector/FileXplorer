@@ -39,8 +39,10 @@ signals:
   void reqFunctionModeChange(bool bBasicMode);
   void reqFullscreenModeChange(bool bFullScreen);
   void reqPlayNextOneMedia();
+  void userMousePressOrKeyPressHappened();
 
 protected:
+  bool eventFilter(QObject *watched, QEvent *event);
   void resizeEvent(QResizeEvent* e) override;
   QMediaPlayer* GetPlayer() { return mPlayer; }
   const QMediaPlayer* GetPlayer() const { return mPlayer; }

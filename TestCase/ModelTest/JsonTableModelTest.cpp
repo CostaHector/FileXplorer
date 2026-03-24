@@ -93,6 +93,8 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.headerData(0, Qt::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), ((int)Qt::AlignRight));
     QCOMPARE(jtm.headerData(102400000, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole).isNull(), true);
 
+    QVERIFY(jtm.rel2fileNames({}).isEmpty());
+
     {  // should not crash down
       QCOMPARE(jtm.setModified(102400, true), false);
       QCOMPARE(jtm.setModifiedNoEmit(102400, true), false);

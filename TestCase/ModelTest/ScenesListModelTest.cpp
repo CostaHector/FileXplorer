@@ -85,19 +85,19 @@ bool isValidPixmap(const QVariant& pixmapVar) {
 class ScenesListModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TDir tDir;  // 类内常驻, 不要手动清理, 由合成析构自动清理
+  TDir mTDir;
   QString lastFight1SvgContents = GetSvgContentTemplate().arg(SVG_FILL_COLORS[0]).arg("The Last Fight 1");
   QString ironMenSvgContents = GetSvgContentTemplate().arg(SVG_FILL_COLORS[2]).arg("Iron Man");
 
   QList<FsNodeEntry> nodeBamboo;
   QList<FsNodeEntry> nodeGrapes;
 
-  const QString bambooPath = tDir.itemPath("Bamboo");
-  const QString grapePath = tDir.itemPath("Grapes");
+  const QString bambooPath = mTDir.itemPath("Bamboo");
+  const QString grapePath = mTDir.itemPath("Grapes");
 
  private slots:
   void initTestCase() {
-    QVERIFY(tDir.IsValid());
+    QVERIFY(mTDir.IsValid());
     QVERIFY(SVG_FILL_COLORS_COUNT > 3);
 
     nodeBamboo =  //
@@ -112,11 +112,11 @@ class ScenesListModelTest : public PlainTestSuite {
             {"Bamboo/Avengers/Captain America.json", false, JsonKey::ConstructJsonByteArray("Captain America")},  //
             {"Bamboo/Avengers/Captain America.mp4", false, ""},                                                   //
         };
-    QCOMPARE(tDir.createEntries(nodeBamboo), nodeBamboo.size());  // 3json
+    QCOMPARE(mTDir.createEntries(nodeBamboo), nodeBamboo.size());  // 3json
     {
       ScnMgr scnMgr1;
       QCOMPARE(scnMgr1(bambooPath), Counter(3, 3, 3, 2));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(ScnMgr::UpdateScnFiles(bambooPath), 2);        // 2 scn file writed ok
+      QCOMPARE(ScnMgr::UpdateScnFiles(bambooPath), 2);     // 2 scn file writed ok
     }
 
     nodeGrapes =  //                                                                                       //
@@ -130,21 +130,24 @@ class ScenesListModelTest : public PlainTestSuite {
             {"Grapes/Avengers/Thor.json", false, JsonKey::ConstructJsonByteArray("Thor")},                        //
             {"Grapes/Avengers/Loki.json", false, JsonKey::ConstructJsonByteArray("Loki")},                        //
         };
-    QCOMPARE(tDir.createEntries(nodeGrapes), nodeGrapes.size());  // 8json. no ImgName, No VidName
+    QCOMPARE(mTDir.createEntries(nodeGrapes), nodeGrapes.size());  // 8json. no ImgName, No VidName
     {
       ScnMgr scnMgr2;
       QCOMPARE(scnMgr2(grapePath), Counter(0, 8, 0, 0));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(ScnMgr::UpdateScnFiles(grapePath), 2);       // 2 scn file writed ok
+      QCOMPARE(ScnMgr::UpdateScnFiles(grapePath), 2);     // 2 scn file writed ok
     }
   }
 
-  void cleanupTestCase() {
+  void cleanupTestCase() {  //
+    SceneInfoManager::mockScenesInfoList().clear();
+  }
+
+  void init() {
+    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
     SceneInfoManager::mockScenesInfoList().clear();
   }
 
   void initalized_ok() {
-    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);  //
-
     ScenesListModel defaultConstruct{"ScenesListView"};
     QVERIFY(defaultConstruct.data(QModelIndex{}, Qt::DisplayRole).isNull());
     // will not crash down
@@ -177,16 +180,16 @@ class ScenesListModelTest : public PlainTestSuite {
 
     QCOMPARE(defaultConstruct.GetPageCnt(), 0);
     QCOMPARE(defaultConstruct.GetEntryListLen(), 0);
+
+    QVERIFY(defaultConstruct.rel2fileNames({}).isEmpty());
   }
 
   void setRootPath_works_ok() {
-    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
-    SceneInfoManager::mockScenesInfoList().clear();
     ScenesListModel slm{"ScenesListView"};
     {
       // 1 预期有3行, 因为有3个json读取到了
       QVERIFY(slm.setRootPath(bambooPath, false));
-      QCOMPARE(slm.rootPath(), tDir.itemPath("Bamboo"));
+      QCOMPARE(slm.rootPath(), mTDir.itemPath("Bamboo"));
       QCOMPARE(slm.rowCount(), 3);
 
       // data retrieve ok
@@ -195,6 +198,10 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.data(slm.index(0), Qt::DisplayRole).toString(), "The Last Fight");   // 2 images, 1 video
       QCOMPARE(slm.data(slm.index(1), Qt::DisplayRole).toString(), "Captain America");  // 0 image, 1 video
       QCOMPARE(slm.data(slm.index(2), Qt::DisplayRole).toString(), "Iron Man");         // 1 image, 1 video
+
+      QCOMPARE(slm.GetJson(slm.index(0)), mTDir.itemPath("Bamboo/The Last Fight.json"));
+      QCOMPARE(slm.rel2fileNames({slm.index(0), slm.index(1), slm.index(2)}),
+               (QStringList{"The Last Fight.json", "Avengers/Captain America.json", "Avengers/Iron Man.json"}));
 
       {
         QCOMPARE(slm.GetImgs(slm.index(0)).size(), 2);
@@ -209,11 +216,11 @@ class ScenesListModelTest : public PlainTestSuite {
 
         // this time read it from pixmap directly
         QStringList imgsAtFirstRow = slm.GetImgs(slm.index(0));
-        const QString firstImagePath = tDir.itemPath("Bamboo/The Last Fight 1.jpg");
+        const QString firstImagePath = mTDir.itemPath("Bamboo/The Last Fight 1.jpg");
         QCOMPARE(imgsAtFirstRow.size(), 2);
         QCOMPARE(imgsAtFirstRow.front(), firstImagePath);
         QCOMPARE(slm.mCurBegin[0].GetFirstImageAbsPath(slm.rootPath()), firstImagePath);
-        const QString imgKey = StringTool::PathJoinPixmapSize(firstImagePath, 540, 360, true); // decide by svg width-height
+        const QString imgKey = StringTool::PathJoinPixmapSize(firstImagePath, 540, 360, true);  // decide by svg width-height
         // QVERIFY(slm.mPixCache.find(imgKey, nullptr)); todo
         slm.data(slm.index(0), Qt::DecorationRole);
 
@@ -243,13 +250,13 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.baseName(slm.index(1)), "Captain America");
       QCOMPARE(slm.baseName(slm.index(2)), "Iron Man");
 
-      QCOMPARE(slm.absolutePath(slm.index(0)), tDir.itemPath("Bamboo") + "/");
-      QCOMPARE(slm.absolutePath(slm.index(1)), tDir.itemPath("Bamboo") + "/Avengers/");
-      QCOMPARE(slm.absolutePath(slm.index(2)), tDir.itemPath("Bamboo") + "/Avengers/");
+      QCOMPARE(slm.absolutePath(slm.index(0)), mTDir.itemPath("Bamboo") + "/");
+      QCOMPARE(slm.absolutePath(slm.index(1)), mTDir.itemPath("Bamboo") + "/Avengers/");
+      QCOMPARE(slm.absolutePath(slm.index(2)), mTDir.itemPath("Bamboo") + "/Avengers/");
 
-      QCOMPARE(slm.filePath(slm.index(0)), tDir.itemPath("Bamboo") + "/" + "The Last Fight.mp4");
-      QCOMPARE(slm.filePath(slm.index(1)), tDir.itemPath("Bamboo") + "/Avengers/" + "Captain America.mp4");
-      QCOMPARE(slm.filePath(slm.index(2)), tDir.itemPath("Bamboo") + "/Avengers/" + "Iron Man.mp4");
+      QCOMPARE(slm.filePath(slm.index(0)), mTDir.itemPath("Bamboo") + "/" + "The Last Fight.mp4");
+      QCOMPARE(slm.filePath(slm.index(1)), mTDir.itemPath("Bamboo") + "/Avengers/" + "Captain America.mp4");
+      QCOMPARE(slm.filePath(slm.index(2)), mTDir.itemPath("Bamboo") + "/Avengers/" + "Iron Man.mp4");
 
       QCOMPARE(slm.fileInfo(slm.index(0)).absoluteFilePath(), slm.filePath(slm.index(0)));
       QCOMPARE(slm.fileInfo(slm.index(1)).absoluteFilePath(), slm.filePath(slm.index(1)));
@@ -263,12 +270,12 @@ class ScenesListModelTest : public PlainTestSuite {
     // 2. 手动增加一条json, 测试row增加
     SceneInfoList manualAppendToBamboo{
         SceneInfo{"/",                                           //
-                   "Henry Cavill",                                //
-                   {"Henry Cavill 1.jpg", "Henry Cavill 2.jpg"},  //
-                   {"Henry Cavill Biology.mp4"},                  //
-                   50 * 1024 * 1024,                              //
-                   99,                                            //
-                   ""},                                           //
+                  "Henry Cavill",                                //
+                  {"Henry Cavill 1.jpg", "Henry Cavill 2.jpg"},  //
+                  {"Henry Cavill Biology.mp4"},                  //
+                  50 * 1024 * 1024,                              //
+                  99,                                            //
+                  ""},                                           //
     };
     SceneInfoManager::mockScenesInfoList().append(manualAppendToBamboo);
     ON_SCOPE_EXIT {
@@ -301,6 +308,11 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.GetVids(slm.index(0)).size(), 1);  // no vid, return a placeholder vidName
       const QVariant& vidBgAtRow0 = slm.data(slm.index(0), Qt::BackgroundRole);
       QVERIFY(!vidBgAtRow0.isNull());
+
+      QVERIFY(slm.fileName(slm.index(0)).isEmpty());                      // no vid
+      QCOMPARE(slm.GetRate(slm.index(999)), 0);                           // out of range
+      QCOMPARE(slm.GetRate(slm.index(0)), 0);                             // no vid
+      QCOMPARE(slm.ModifySceneInfoRateValue(slm.index(999), 10), false);  // out of range
     }
 
     {  // 4. Show by page works fine 每页显示3个场景
@@ -337,8 +349,6 @@ class ScenesListModelTest : public PlainTestSuite {
   }
 
   void sort_only_one_dimension_sorted() {
-    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
-
     ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     sspm.setSourceModel(&slm);
@@ -438,8 +448,6 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void sort_no_directory_system_ok() {
     // precondition
-    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 1024);
-
     SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "2000-06-16 00:00:60"};
     SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "2000-06-16 00:00:59"};
     SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "2000-06-16 00:00:58"};
@@ -466,7 +474,7 @@ class ScenesListModelTest : public PlainTestSuite {
     SceneSortProxyModel sspm;
     {
       sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // nothing happend
-      sspm.setSourceModel(nullptr);                                                  // ignored
+      sspm.setSourceModel(nullptr);                                                               // ignored
       sspm.setSourceModel(&slm);
       sspm.setSourceModel(&slm);  // ignored
     }
@@ -555,7 +563,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     {
       // 本就是MOVIE_PATH 升序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder); // ascending
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // ascending
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 4));
@@ -567,7 +575,7 @@ class ScenesListModelTest : public PlainTestSuite {
     }
     {
       // 本就是MOVIE_SIZE 降序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder); // ascending
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);  // ascending
       QVERIFY(checkIndexMatch(slm, 0, sspm, 4));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 3));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 0));
@@ -576,6 +584,57 @@ class ScenesListModelTest : public PlainTestSuite {
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 4, sspm, 4));
+    }
+  }
+  void AfterJsonFilesNameRenamed_ok() {
+    ScenesListModel slm{"ScenesListView"};
+    // 1 预期有3行, 因为有3个json读取到了
+    QVERIFY(slm.setRootPath(bambooPath, false));
+    QCOMPARE(slm.rootPath(), mTDir.itemPath("Bamboo"));
+    QCOMPARE(slm.rowCount(), 3);
+    QCOMPARE(slm.GetPageCnt(), 1);
+
+    // data retrieve ok
+    // rel2Scn of the first 3 row is "/", "/Avengers/", "/Avengers/" respectively.
+    // we sort scenes by rel2Scn acii ascending. if rel2Scn equal, by names ascending.
+    QCOMPARE(slm.data(slm.index(0), Qt::DisplayRole).toString(), "The Last Fight");   // 2 images, 1 video
+    QCOMPARE(slm.data(slm.index(1), Qt::DisplayRole).toString(), "Captain America");  // 0 image, 1 video
+    QCOMPARE(slm.data(slm.index(2), Qt::DisplayRole).toString(), "Iron Man");         // 1 image, 1 video
+
+    // only 1 page, delete no row
+    {
+      auto beforeCurBegin = slm.mCurBegin;
+      auto beforeCurEnd = slm.mCurEnd;
+      auto beforeEntryList = slm.GetEntryList();
+      QCOMPARE(slm.AfterJsonFilesNameRenamed({}), 0);
+      QCOMPARE(slm.mCurBegin, beforeCurBegin);
+      QCOMPARE(slm.mCurEnd, beforeCurEnd);
+      QCOMPARE(slm.GetEntryList(), beforeEntryList);
+    }
+
+    // only 1 page, delete medium row
+    {
+      auto secondRowIndex = slm.index(1);
+      QCOMPARE(slm.AfterJsonFilesNameRenamed({secondRowIndex}), 1);
+      QCOMPARE(slm.mCurBegin, slm.GetEntryList().cbegin());
+      QCOMPARE(slm.mCurEnd, slm.mCurBegin + 2);
+      QCOMPARE(slm.GetEntryList().size(), 2);
+    }
+
+    QCOMPARE(slm.rowCount(), 2);
+    slm.onScenesCountsPerPageChanged(1);
+    QCOMPARE(slm.GetPageCnt(), 2);
+    QCOMPARE(slm.mPageIndex, 0);
+    QCOMPARE(slm.rowCount(), 1);
+
+    // 2 page, each page 1 element, delete element in 0th page
+    {
+      QCOMPARE(slm.AfterJsonFilesNameRenamed({slm.index(0)}), 1);
+      QCOMPARE(slm.GetPageCnt(), 1);
+      QCOMPARE(slm.mPageIndex, 0);
+      QCOMPARE(slm.rowCount(), 1);
+      QCOMPARE(slm.mCurBegin, slm.GetEntryList().cbegin());
+      QCOMPARE(slm.mCurEnd, slm.mCurBegin + 1);
     }
   }
 };

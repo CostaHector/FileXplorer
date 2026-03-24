@@ -30,6 +30,8 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
       QCOMPARE(videoWid.mPauseAct->isChecked(), true);
       QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
       QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
+      QCOMPARE(videoWid.mLongTimeNoClickTimer.isActive(), false);
+      QCOMPARE(videoWid.isClickPressHappend(), false);
 
       QWidget* extToolBarHide = videoWid.GetExtendedFunctionCtrlBar(&videoWid);
       QVERIFY(extToolBarHide != nullptr);
@@ -79,14 +81,12 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     }
   }
 
-  void cleanupTestCase() {  //
-  }
-
   void keyboard_event_ok() {
     // 初始状态下无焦点, 全屏模式下获得焦点, 响应键盘案件
     MOCKER(InteractiveVideoWidget::GetFocusCore).expects(exactly(1)).will(returnValue(true));
 
     InteractiveVideoWidget videoWid;
+    QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
     QCOMPARE(videoWid.hasFocus(), false);
     QCOMPARE(videoWid.isVideoFullScreen(), false);
     QCOMPARE(videoWid.mFullScreenAct->isChecked(), false);
@@ -94,6 +94,24 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     QCOMPARE(videoWid.mFullScreenAct->isChecked(), true);
     QCOMPARE(videoWid.isVideoFullScreen(), true);
     // QCOMPARE(videoWid.hasFocus(), true); // 没有调用show, 此处不检查, 而是检查是否调用了GetFocusCore
+    {
+      QSignalSpy toggleToolBarSpy{videoWid.mHideToolBarAct, &QAction::toggled};
+      QKeyEvent altReturnEvent1(QEvent::KeyPress, Qt::Key_Return, Qt::AltModifier);
+      videoWid.keyPressEvent(&altReturnEvent1);
+      QCOMPARE(altReturnEvent1.isAccepted(), true);
+      QCOMPARE(videoWid.mHideToolBarAct->isChecked(), true);
+      QCOMPARE(toggleToolBarSpy.count(), 1);
+      QCOMPARE(toggleToolBarSpy.takeLast(), (QVariantList{true}));
+      toggleToolBarSpy.clear();
+
+      QKeyEvent altReturnEvent2(QEvent::KeyPress, Qt::Key_Return, Qt::AltModifier);
+      videoWid.keyPressEvent(&altReturnEvent2);
+      QCOMPARE(altReturnEvent2.isAccepted(), true);
+      QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
+      QCOMPARE(toggleToolBarSpy.count(), 1);
+      QCOMPARE(toggleToolBarSpy.takeLast(), (QVariantList{false}));
+      toggleToolBarSpy.clear();
+    }
 
     {
       QKeyEvent next10SecondsEvent(QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier);
@@ -204,10 +222,24 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     QCOMPARE(videoWid.mFullScreenAct->isChecked(), true);
     QVERIFY(videoWid.mLongTimeNoClickTimer.isActive());  // 活跃
 
-    // 超时后, 将自动隐藏工具栏和视频文件列表
+    // 用户点击/按下键盘事件
+    videoWid.onUserMouseClickOrKeyPressEvent();
+    QCOMPARE(videoWid.isClickPressHappend(), true);
+
+    // 模拟首次超时， 重启定时器， 下次再隐藏
+    videoWid.mLongTimeNoClickTimer.stop();  //
+    videoWid.onLongTimeNoEventHappen();
+    QVERIFY(videoWid.mLongTimeNoClickTimer.isActive());
+    QCOMPARE(videoWid.isClickPressHappend(), false);
+    QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
+    QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
+    QCOMPARE(layoutVisibilityChangedSpy.count(), 0);
+
+    // 第二次超时后, 将自动隐藏工具栏和视频文件列表
     videoWid.mLongTimeNoClickTimer.stop();  // 模拟超时停止
     videoWid.onLongTimeNoEventHappen();
     QVERIFY(!videoWid.mLongTimeNoClickTimer.isActive());  // 停用定时器
+    QCOMPARE(videoWid.isClickPressHappend(), false);
 
     QCOMPARE(videoWid.mHideToolBarAct->isChecked(), true);
     QCOMPARE(videoWid.mShowVideoList->isChecked(), false);

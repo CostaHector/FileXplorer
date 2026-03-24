@@ -31,6 +31,7 @@ class QAbstractListModelPubTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void init() { Configuration().clear(); }
 
   void MoveItemsBase_ok() {
     intQList datas{0, 1, 2, 3, 4};
@@ -95,79 +96,76 @@ class QAbstractListModelPubTest : public PlainTestSuite {
     QCOMPARE(MoveItemsBase<intQList>(datas, QList<int>{0, 1, 2, 3, 4}, 4), failedResult);
   }
 
-  void dimension1_container_model_border_test() {
-    Configuration().clear();
-
+  void border_ok() {
     {
-      Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
-      QCOMPARE(rowModel.rowCount(), 0);
+      Dim1ContainerListModel model{"Dim1ContainerTableListView"};
+      QCOMPARE(model.rowCount(), 0);
       // protection: not crashdown
-      QVERIFY(rowModel.mRowChangeStack.empty());
+      QVERIFY(model.mRowChangeStack.empty());
 
-      QVERIFY(!rowModel.RowsCountEndChange());  // empty stack
+      QVERIFY(!model.RowsCountEndChange());  // empty stack
 
-      QVERIFY(!rowModel.RowsCountBeginChange(-1, 1));  // invalid column count
-      QVERIFY(!rowModel.RowsCountBeginChange(0, -1));  // invalid row count
-      QVERIFY(!rowModel.RowsCountEndChange());         // empty stack
+      QVERIFY(!model.RowsCountBeginChange(-1, 1));  // invalid column count
+      QVERIFY(!model.RowsCountBeginChange(0, -1));  // invalid row count
+      QVERIFY(!model.RowsCountEndChange());         // empty stack
 
-      QVERIFY(rowModel.mRowChangeStack.empty());
+      QVERIFY(model.mRowChangeStack.empty());
 
-      const QList<QAction*> acts = rowModel.GetExcusiveActions();
-      QCOMPARE(acts.contains(rowModel._PIXMAP_TRANSFORMATION_SMOOTH), true);
+      const QList<QAction*> acts = model.GetExcusiveActions();
+      QCOMPARE(acts.contains(model._PIXMAP_TRANSFORMATION_SMOOTH), true);
 
-      rowModel.GetDecorationPixmap("");
+      model.GetDecorationPixmap("");
 
-      QVERIFY(rowModel.getPixmapWidth() > 0);
-      QVERIFY(rowModel.getPixmapHeight() > 0);
+      QVERIFY(model.getPixmapWidth() > 0);
+      QVERIFY(model.getPixmapHeight() > 0);
 
       // 0 rows, onPixmapSmoothTransformationToggled will not emit data changed
-      QSignalSpy decorationDataChangedSpy{&rowModel, &QAbstractListModelPub::dataChanged};
-      QCOMPARE(rowModel.isPixmapTransformationSmooth(), false);
-      QCOMPARE(rowModel.onPixmapSmoothTransformationToggled(false), false);  // unchanged
+      QSignalSpy decorationDataChangedSpy{&model, &QAbstractListModelPub::dataChanged};
+      QCOMPARE(model.isPixmapTransformationSmooth(), false);
+      QCOMPARE(model.onPixmapSmoothTransformationToggled(false), false);  // unchanged
 
-      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
-      rowModel._PIXMAP_TRANSFORMATION_SMOOTH->toggle();
-      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
-      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
+      QCOMPARE(model._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
+      model._PIXMAP_TRANSFORMATION_SMOOTH->toggle();
+      QCOMPARE(model._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
+      QCOMPARE(model.isPixmapTransformationSmooth(), true);
       QCOMPARE(decorationDataChangedSpy.count(), 0);
 
       // 0 rows, onIconSizeChange will not emit data changed
-      QCOMPARE(rowModel.onIconSizeChange({rowModel.getPixmapWidth(), rowModel.getPixmapHeight()}), false);  // unchange
-      QCOMPARE(rowModel.onIconSizeChange({999, 1999}), true);
+      QCOMPARE(model.onIconSizeChange({model.getPixmapWidth(), model.getPixmapHeight()}), false);  // unchange
+      QCOMPARE(model.onIconSizeChange({999, 1999}), true);
       QCOMPARE(decorationDataChangedSpy.count(), 0);
     }
 
     // will save _PIXMAP_TRANSFORMATION_SMOOTH into configuration in destructor
     {
-      Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
-      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
-      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
+      Dim1ContainerListModel model{"Dim1ContainerTableListView"};
+      QCOMPARE(model.isPixmapTransformationSmooth(), true);
+      QCOMPARE(model._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), true);
     }
   }
 
-  void dimension1_container_model_row_change_test() {
-    Configuration().clear();
-    Dim1ContainerListModel rowModel{"Dim1ContainerTableListView"};
-    QCOMPARE(rowModel.rowCount(), 0);
+  void RowsCountBeginChange_ok() {
+    Dim1ContainerListModel model{"Dim1ContainerTableListView"};
+    QCOMPARE(model.rowCount(), 0);
 
     {  // 1. row count increasing
       QStringList rowString3{"Raphael Varane", "Mbappé", "Dembélé"};
-      rowModel.RowsCountBeginChange(0, 3);
-      rowModel.mData.swap(rowString3);
-      QCOMPARE(rowModel.rowCount(), 3);
-      rowModel.RowsCountEndChange();
-      QModelIndex varaneIndex = rowModel.index(0);
-      QModelIndex mbappeIndex = rowModel.index(1);
-      QModelIndex dembeleIndex = rowModel.index(2);
-      QCOMPARE(rowModel.data(varaneIndex).toString(), "Raphael Varane");
-      QCOMPARE(rowModel.data(mbappeIndex).toString(), "Mbappé");
-      QCOMPARE(rowModel.data(dembeleIndex).toString(), "Dembélé");
+      model.RowsCountBeginChange(0, 3);
+      model.mData.swap(rowString3);
+      QCOMPARE(model.rowCount(), 3);
+      model.RowsCountEndChange();
+      QModelIndex varaneIndex = model.index(0);
+      QModelIndex mbappeIndex = model.index(1);
+      QModelIndex dembeleIndex = model.index(2);
+      QCOMPARE(model.data(varaneIndex).toString(), "Raphael Varane");
+      QCOMPARE(model.data(mbappeIndex).toString(), "Mbappé");
+      QCOMPARE(model.data(dembeleIndex).toString(), "Dembélé");
 
-      QSignalSpy decorationDataChangedSpy{&rowModel, &Dim1ContainerListModel::dataChanged};
-      QCOMPARE(rowModel.isPixmapTransformationSmooth(), false);
-      QCOMPARE(rowModel.onPixmapSmoothTransformationToggled(true), true);  // unchanged
-      QCOMPARE(rowModel.isPixmapTransformationSmooth(), true);
-      QCOMPARE(rowModel._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
+      QSignalSpy decorationDataChangedSpy{&model, &Dim1ContainerListModel::dataChanged};
+      QCOMPARE(model.isPixmapTransformationSmooth(), false);
+      QCOMPARE(model.onPixmapSmoothTransformationToggled(true), true);  // unchanged
+      QCOMPARE(model.isPixmapTransformationSmooth(), true);
+      QCOMPARE(model._PIXMAP_TRANSFORMATION_SMOOTH->isChecked(), false);
       QCOMPARE(decorationDataChangedSpy.count(), 1);
       QVariantList parms1{decorationDataChangedSpy.takeLast()};
       // uhmmm? unknow reason, here only 1 element get in params
@@ -177,9 +175,9 @@ class QAbstractListModelPubTest : public PlainTestSuite {
       // QCOMPARE(parms[2].canConvert<QVector<int>>(), true);
       // QVector<int> roles = parms[2].value<QVector<int>>();
       // QCOMPARE(roles, (QVector<int>{Qt::DecorationRole}));
-      rowModel._PIXMAP_TRANSFORMATION_SMOOTH->setChecked(true);
+      model._PIXMAP_TRANSFORMATION_SMOOTH->setChecked(true);
 
-      QCOMPARE(rowModel.onIconSizeChange({1956, 2964}), true);
+      QCOMPARE(model.onIconSizeChange({1956, 2964}), true);
       QCOMPARE(decorationDataChangedSpy.count(), 1);
       QVariantList parms2{decorationDataChangedSpy.takeLast()};
       // uhmmm? unknow reason, here only 1 element get in params
@@ -187,23 +185,46 @@ class QAbstractListModelPubTest : public PlainTestSuite {
 
     {  // 1. row count remains. contents changed
       QStringList rowString3{"Mbappé", "Raphael Varane", "Dembélé"};
-      rowModel.RowsCountBeginChange(3, 3);
-      rowModel.mData.swap(rowString3);
-      QCOMPARE(rowModel.rowCount(), 3);
-      rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Mbappé");
-      QCOMPARE(rowModel.data(rowModel.index(1, 0)).toString(), "Raphael Varane");
-      QCOMPARE(rowModel.data(rowModel.index(2, 0)).toString(), "Dembélé");
+      model.RowsCountBeginChange(3, 3);
+      model.mData.swap(rowString3);
+      QCOMPARE(model.rowCount(), 3);
+      model.RowsCountEndChange();
+      QCOMPARE(model.data(model.index(0, 0)).toString(), "Mbappé");
+      QCOMPARE(model.data(model.index(1, 0)).toString(), "Raphael Varane");
+      QCOMPARE(model.data(model.index(2, 0)).toString(), "Dembélé");
     }
 
     {  // 3. row count decreasing
       QStringList rowString1{"Raphael Varane"};
-      rowModel.RowsCountBeginChange(3, 1);
-      rowModel.mData.swap(rowString1);
-      QCOMPARE(rowModel.rowCount(), 1);
-      rowModel.RowsCountEndChange();
-      QCOMPARE(rowModel.data(rowModel.index(0, 0)).toString(), "Raphael Varane");
+      model.RowsCountBeginChange(3, 1);
+      model.mData.swap(rowString1);
+      QCOMPARE(model.rowCount(), 1);
+      model.RowsCountEndChange();
+      QCOMPARE(model.data(model.index(0, 0)).toString(), "Raphael Varane");
     }
+  }
+
+  void onRowsRemoved_ok() {
+    Dim1ContainerListModel model{"Dim1ContainerTableListView"};
+    QCOMPARE(model.rowCount(), 0);
+
+    QStringList rowString3{"Raphael Varane", "Kaka", "Cristiano Ronaldo"};
+    model.RowsCountBeginChange(0, 3);
+    model.mData.swap(rowString3);
+    model.RowsCountEndChange();
+    QCOMPARE(model.rowCount(), 3);
+
+    QStringList& dataList = model.mData;
+    const auto rowElementsRmv = [&dataList](int beg, int end) { dataList.erase(dataList.begin() + beg, dataList.begin() + end); };
+    QCOMPARE(model.onRowsRemoved({}, rowElementsRmv), 0);
+    QCOMPARE(model.rowCount(), 3);
+
+    QModelIndex KakaIndex = model.index(1);
+    QCOMPARE(model.onRowsRemoved({KakaIndex}, nullptr), 1);
+    QCOMPARE(model.rowCount(), 3);
+
+    QCOMPARE(model.onRowsRemoved({KakaIndex}, rowElementsRmv), 1);
+    QCOMPARE(model.rowCount(), 2);
   }
 };
 

@@ -272,6 +272,7 @@ VideoPlayTool::PlaybackTriggerMode InteractiveVideoWidget::GetPlaybackTriggerMod
 }
 
 void InteractiveVideoWidget::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::MouseButton::LeftButton) {
     mPauseAct->toggle();
     event->setAccepted(true);
@@ -285,6 +286,8 @@ void InteractiveVideoWidget::mousePressEvent(QMouseEvent* event) {
 }
 
 void InteractiveVideoWidget::keyPressEvent(QKeyEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  const Qt::KeyboardModifiers modifier = event->modifiers();
   switch (event->key()) {
     case Qt::Key::Key_Left: {
       mSeekBackwardAct->trigger();
@@ -317,6 +320,12 @@ void InteractiveVideoWidget::keyPressEvent(QKeyEvent* event) {
     case Qt::Key::Key_Escape: {
       if (isVideoFullScreen()) {
         mFullScreenAct->setChecked(false);
+      }
+      break;
+    }
+    case Qt::Key::Key_Return: {
+      if (modifier == Qt::KeyboardModifier::AltModifier) {
+        mHideToolBarAct->toggle();
       }
       break;
     }
@@ -369,6 +378,12 @@ void InteractiveVideoWidget::changeAllToolbarVisibility(bool visible) {
 }
 
 void InteractiveVideoWidget::onLongTimeNoEventHappen() {
+  if (isClickPressHappend()) {
+    // 超时后, 发现之前有鼠标/键盘事件, 重新启动, 实现延迟超时
+    clearClickPressHappend();
+    mLongTimeNoClickTimer.start();
+    return;
+  }
   // 全屏模式下 hide everything except video itself
   if (isVideoFullScreen()) {
     changeAllToolbarVisibility(false);

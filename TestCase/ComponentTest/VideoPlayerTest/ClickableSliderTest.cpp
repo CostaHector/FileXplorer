@@ -121,6 +121,33 @@ class ClickableSliderTest : public PlainTestSuite {
       QCOMPARE(sliderSpy.count(), 0);
     }
   }
+
+  void keyPressEvent_ok() {
+    int volumeValueNeedSetToPlayer{-1};
+
+    ClickableSlider volumeSlider{Qt::Orientation::Horizontal};
+    volumeSlider.setRange(0, 100 * 1000);
+    volumeSlider.setValue(0);
+    volumeSlider.setSingleStep(10 * 1000);
+
+    volumeSlider.regMouseEventProcessor([&volumeValueNeedSetToPlayer](int newPosition) { volumeValueNeedSetToPlayer = newPosition; });
+
+    QKeyEvent rightKey{QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier};
+    volumeSlider.keyPressEvent(&rightKey);
+    QVERIFY(rightKey.isAccepted());
+    QCOMPARE(volumeSlider.value(), 10 * 1000);
+    QCOMPARE(volumeValueNeedSetToPlayer, 10 * 1000);
+
+    QKeyEvent leftKey{QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier};
+    volumeSlider.keyPressEvent(&leftKey);
+    QVERIFY(leftKey.isAccepted());
+    QCOMPARE(volumeSlider.value(), 0 * 1000);
+    QCOMPARE(volumeValueNeedSetToPlayer, 0 * 1000);
+
+    QKeyEvent enterKey{QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier};
+    volumeSlider.keyPressEvent(&enterKey);
+    QVERIFY(!enterKey.isAccepted());
+  }
 };
 
 #include "ClickableSliderTest.moc"

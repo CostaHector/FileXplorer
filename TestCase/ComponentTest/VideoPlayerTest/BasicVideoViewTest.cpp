@@ -176,6 +176,11 @@ class BasicVideoViewTest : public PlainTestSuite {
     basicVideoView.onStateChanged(QMediaPlayer::State::PausedState);
     QCOMPARE(basicVideoView.mPauseShieldButton->isHidden(), false);
 
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
+    QCOMPARE(basicVideoView.adjustRateCurrentVideo(5), false);                 // curMedia empty
+    QCOMPARE(basicVideoView.adjustRateCurrentVideo(0), true);                  // delta = 0
+    QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(0), 0);  // delta = 0
+
     // PauseBtn在VideoWidget上层
     const QObjectList& children = basicVideoView.children();
     const int levelOfVideoWidget = children.indexOf(basicVideoView.mVideoWidget);
@@ -245,7 +250,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(0), true);   // delta=0, skipped
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(3), false);  // 1st
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(4), true);   // 2nd
-    emit rateActions->AdjustRateMovieReq(5);  // 3rd
+    emit rateActions->AdjustRateMovieReq(5);                    // 3rd
   }
 
   void rateAllVideoSameLevelAsCurrentVideo_ok() {
@@ -279,9 +284,9 @@ class BasicVideoViewTest : public PlainTestSuite {
 
     const int expectDelta{9};
     MOCKER(RateHelper::AdjustRateMovieRecursively)
-        .expects(exactly(2))                                                                     //
-        .with(eq(expectRatePathRecursive), eq(expectDelta))                                      //
-        .will(returnValue(rateSucceedFilesCnt));                                                 // 3 file
+        .expects(exactly(2))                                                                               //
+        .with(eq(expectRatePathRecursive), eq(expectDelta))                                                //
+        .will(returnValue(rateSucceedFilesCnt));                                                           // 3 file
     QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(expectDelta), rateSucceedFilesCnt);  // 1st
     emit rateActions->AdjustRateMovieRecursivelyReq(expectDelta);                                          // 2nd
   }
@@ -325,6 +330,27 @@ class BasicVideoViewTest : public PlainTestSuite {
 
     QResizeEvent resizeEvent{QSize{480, 360}, QSize{360, 270}};
     basicVideoView.resizeEvent(&resizeEvent);
+  }
+
+  void eventFilter_ok() {
+    BasicVideoView basicVideoView{false, nullptr};
+
+    QSignalSpy spy{&basicVideoView, &BasicVideoView::userMousePressOrKeyPressHappened};
+    QEvent mouseBtnPressEvent{QEvent::Type::MouseButtonPress};
+    basicVideoView.eventFilter(&basicVideoView, &mouseBtnPressEvent);
+    QCOMPARE(spy.count(), 1);
+    spy.takeLast();
+    QCOMPARE(basicVideoView.mVideoWidget->isClickPressHappend(), true);
+
+    QEvent keyPressEvent{QEvent::Type::KeyPress};
+    basicVideoView.eventFilter(&basicVideoView, &keyPressEvent);
+    QCOMPARE(spy.count(), 1);
+    spy.takeLast();
+    QCOMPARE(basicVideoView.mVideoWidget->isClickPressHappend(), true);
+
+    QEvent keyReleaseEvent{QEvent::Type::KeyRelease};
+    basicVideoView.eventFilter(&basicVideoView, &keyReleaseEvent);
+    QCOMPARE(spy.count(), 0);
   }
 };
 

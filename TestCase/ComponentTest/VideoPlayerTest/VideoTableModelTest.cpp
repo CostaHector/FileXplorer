@@ -50,6 +50,8 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.headerData(99, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toInt(), 100);
     QCOMPARE(videoModel.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 1);
     QCOMPARE(videoModel.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::DisplayRole).toInt(), 2);
+
+    QVERIFY(videoModel.rel2fileNames({}).isEmpty());
   }
 
   void setPlayPath_ok() {

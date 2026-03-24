@@ -17,7 +17,6 @@ inline QString& mockExportToPath() {
 class HarTableView : public CustomTableView {
 public:
   explicit HarTableView(QWidget* parent = nullptr);
-  ~HarTableView() = default;
   int operator()(const QString& harAbsPath);
   void subscribe();
   int SaveSelectionFilesTo() const;

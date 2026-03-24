@@ -191,11 +191,16 @@ class VideoTableViewTest : public PlainTestSuite {
     QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
     videoTv.setMediaFiles("", inexistFiles, false);
     videoTv.clearSelection();
-    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);  // no selection
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);       // no selection
+    QCOMPARE(videoTv.onAdjustSelectedMoviesRate(5), 0);  // no selection
 
     QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
     videoTv.selectAll();
-    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);  // no json at all
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);       // no json at all
+    QCOMPARE(videoTv.onAdjustSelectedMoviesRate(0), 0);  // delta=0
+
+    QCOMPARE(videoTv.onAdjustSelectedMoviesRate(-1), 0);  // no json at all
+    QCOMPARE(videoTv.onAdjustSelectedMoviesRate(1), 0);   // no json at all
   }
 
   void onRenameJsonAndRelated_replace_ok() {
