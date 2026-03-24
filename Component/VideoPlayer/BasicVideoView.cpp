@@ -16,6 +16,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mProgressSlider = new (std::nothrow) ClickableSlider{Qt::Orientation::Horizontal, this};
   mProgressSlider->setRange(0, 0);
   mProgressSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  mProgressSlider->setSingleStep(10 * 1000); // 10 second
 
   mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
   mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -44,7 +45,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mCurrentTimeLabel = mFunctionCtrlBar->addString("00:00:00");
   mFunctionCtrlBar->addString("/");
   mDurationLabel = mFunctionCtrlBar->addString("00:00:00");
-  mFunctionCtrlBar->addWidget(mVolumeWid, 2);
+  mFunctionCtrlBar->addWidget(mVolumeWid);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mBasicModeAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mHideToolBarAct);
@@ -65,9 +66,12 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"});
   setWindowTitle("Basic Video Player");
 
-  mProgressSliderUpdateTimer.setInterval(1 * 1000);
+  mProgressSliderUpdateTimer.setInterval(1 * 1000); // refresh frequency: 1Hz
   mProgressSliderUpdateTimer.setSingleShot(false);
   QTimer::singleShot(0, this, [this]() { movePauseBtnToCenter(); });
+
+  mProgressSlider->installEventFilter(this);
+  mVideoWidget->installEventFilter(this);
 }
 
 BasicVideoView::~BasicVideoView() {
@@ -86,6 +90,8 @@ BasicVideoView::~BasicVideoView() {
 }
 
 void BasicVideoView::subscribe() {
+  connect(this, &BasicVideoView::userMousePressOrKeyPressHappened, mVideoWidget, &InteractiveVideoWidget::onUserMouseClickOrKeyPressEvent);
+
   connect(mVideoWidget->mPauseAct, &QAction::toggled, this, &BasicVideoView::onPauseActionToggled);
   connect(mVideoWidget->mStopAct, &QAction::triggered, this, &BasicVideoView::onStopPlaying);
   // -10 second, +10 second
@@ -357,6 +363,13 @@ void BasicVideoView::onMediaStatusChanged(QMediaPlayer::MediaStatus status) {
       emit reqPlayNextOneMedia();
     }
   }
+}
+
+bool BasicVideoView::eventFilter(QObject *watched, QEvent *event) {
+  if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::KeyPress) {
+    emit userMousePressOrKeyPressHappened();
+  }
+  return QWidget::eventFilter(watched, event);
 }
 
 void BasicVideoView::resizeEvent(QResizeEvent* e) {

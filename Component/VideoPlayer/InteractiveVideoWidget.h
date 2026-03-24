@@ -33,6 +33,9 @@ public:
   RateActions* GetRateActions() const {
     return mRateActions;
   }
+  bool isClickPressHappend() { return mClickPressHappend; }
+  void clearClickPressHappend() { mClickPressHappend = false; }
+  void onUserMouseClickOrKeyPressEvent() { mClickPressHappend = true; }
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);
@@ -100,6 +103,7 @@ private:
   void changeAllToolbarVisibility(bool visible);
   void onLongTimeNoEventHappen();
   QTimer mLongTimeNoClickTimer;
+  bool mClickPressHappend{false};
   static constexpr int TIMER_INTERVAL = 10 * 1000;
 };
 

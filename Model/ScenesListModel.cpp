@@ -129,11 +129,11 @@ QString ScenesListModel::fileName(const QModelIndex& index) const {
 int ScenesListModel::GetRate(const QModelIndex& index) const {
   int linearInd{-1};
   if (!isIndexValid(index, linearInd)) {
-    return {};
+    return 0;
   }
   if (mCurBegin[linearInd].vidName.isEmpty()) {
     LOG_D("vidName is empty");
-    return {};
+    return 0;
   }
   return mCurBegin[linearInd].rate;
 }

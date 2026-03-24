@@ -27,13 +27,12 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOv
   using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
   if (itRate != data.cend()) { // Rate already exist
-    if (!bOverrideForce) {
-      return true; // no need override Rate
-    }
-
     int beforeValue = itRate.value().toInt();
     if (afterValue == beforeValue) { // same, skip
       return true;
+    }
+    if (beforeValue > 0 && !bOverrideForce) {
+      return true; // no need override valid Rate(>0)
     }
     itRate->setValue(afterValue);
   } else {
