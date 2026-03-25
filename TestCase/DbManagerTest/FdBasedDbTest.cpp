@@ -24,12 +24,13 @@
 #include "VideoDurationGetterMock.h"
 USING_MOCKCPP_NS
 
-const QString rootpath = TESTCASE_ROOT_PATH "/test/TestEnvVideosDurationGetter";
+#include "VideoTestPrecoditionTools.h"
 
 class FdBasedDbTest : public PlainTestSuite {
   Q_OBJECT
  public:
   FdBasedDbTest() : PlainTestSuite{} {}
+  const QString rootpath{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
   TDir tDir;
   const QString dbName = tDir.itemPath("FD_MOVIE_DB_CONN.db");
   const QString connName = "FD_MOVIE_DB_CONN";

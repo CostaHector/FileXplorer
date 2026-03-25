@@ -14,7 +14,7 @@ class DetailPreview : public FullScreenableSplitter {
   void SetCastHtmlParts(const CastHtmlParts& castHtmls);
   void UpdateHtmlContents();
 
-  void StopPlay();
+  void onStopPlaying();
   void UpdateWhenSelectAFile(const QString& pth);
 
  protected:

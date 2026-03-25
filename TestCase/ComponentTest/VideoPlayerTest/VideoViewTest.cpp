@@ -131,7 +131,7 @@ class VideoViewTest : public PlainTestSuite {
     QCOMPARE(reqPlayMediaSpy.count(), 0);
     QCOMPARE(videoView.GetCurrentPlayingMediaPath(), "");
 
-    videoView.StopPlay();
+    videoView.onStopPlaying();
   }
 
   void playVideos_ok() {
@@ -162,7 +162,7 @@ class VideoViewTest : public PlainTestSuite {
     QCOMPARE(reqPlayMediaSpy.takeLast(), (QVariantList{"Path/to/InexistFolder/file1.mp4", true}));
     QCOMPARE(videoView.GetCurrentPlayingMediaPath(), "");
 
-    videoView.StopPlay();
+    videoView.onStopPlaying();
   }
 };
 

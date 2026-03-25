@@ -26,7 +26,7 @@ public:
   bool onSelectMediaFiles();
   QString GetCurrentPlayingMediaPath() const { return mBasicVideoView == nullptr ? "" : mBasicVideoView->GetCurrentPlayingMediaPath(); }
   const BasicVideoView* GetBasicVideoView() const { return mBasicVideoView; }
-  void StopPlay();
+  void onStopPlaying();
   void onChangeToolBarVisibility(bool bHide);
   void onChangeListVisibility(bool visibility);
   bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);

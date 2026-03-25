@@ -16,7 +16,7 @@ public:
   void operator()(const QString& pth); // file system view
   void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst); // scene view
 
-  void StopPlay();
+  void onStopPlaying();
   bool UpdateImgs(const QString& name, const QStringList& imgPthLst);
   bool UpdateVids(const QString& rootPath, const QStringList& vidsLst);
   bool UpdateOthers(const QStringList& dataLst);

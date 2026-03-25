@@ -43,8 +43,8 @@ void DetailPreview::UpdateHtmlContents() {
   mDetailTextBrowser->UpdateHtmlContents();
 }
 
-void DetailPreview::StopPlay() {
-  mBasicVideoView->StopPlay();
+void DetailPreview::onStopPlaying() {
+  mBasicVideoView->onStopPlaying();
 }
 
 void DetailPreview::UpdateWhenSelectAFile(const QString& pth) {
