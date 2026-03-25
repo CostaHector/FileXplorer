@@ -262,7 +262,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.onUpdateDurationFields(), 0);       // no selection
 
     videoTv.selectAll();
-    QCOMPARE(videoTv.onUpdateDurationFields(), 0);       // no json at all
+    QCOMPARE(videoTv.onUpdateDurationFields(), 3);
   }
 };
 

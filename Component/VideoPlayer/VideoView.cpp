@@ -67,9 +67,9 @@ int VideoView::PlayVideos(const QString& rootPath, const QStringList& mediafileN
   return mVideoList->setMediaFiles(rootPath, mediafileNames, bPlayInstantly);
 }
 
-void VideoView::StopPlay() {
+void VideoView::onStopPlaying() {
   if (mBasicVideoView != nullptr) {
-    mBasicVideoView->StopPlay();
+    mBasicVideoView->onStopPlaying();
   }
 }
 

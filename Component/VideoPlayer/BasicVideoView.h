@@ -24,10 +24,10 @@ public:
   virtual ~BasicVideoView();
 
   bool PlayAVideo(const QString& filePath, bool forcePlayInstantly = false);
-  bool StopPlay();
   QString GetCurrentPlayingMediaPath() const { return mCurrentPlayingMediaPath; }
   const InteractiveVideoWidget* GetVideoWidget() const { return mVideoWidget; }
   void onChangeToolBarVisibility(bool bHide);
+  void onStopPlaying();
   bool isVideoFullScreen() const;
   bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
   bool rateCurrentVideo(int score) const;
@@ -52,12 +52,11 @@ private:
   void emitFullScreenModeReq(bool bFullScreen);
   void onDurationChanged(qint64 duration);
   bool onUpdateProgressSliderPosition();
-  void onStopPlaying();
   void onPauseActionToggled(bool pauseChecked);
   void onStateChanged(QMediaPlayer::State state);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
   void movePauseBtnToCenter();
-  static bool SetMediaCore(QMediaPlayer* mediaPlayer, const QUrl& mediaUrl);
+  static bool SetMediaCore(BasicVideoView* self, const QString& mediaAbsPath);
   static bool PlayCore(QMediaPlayer* mediaPlayer);
   static bool DeviatePositionCore(QMediaPlayer* mPlayer, int deviationInSeconds);
   bool deviatePositionPrevious();
@@ -67,6 +66,7 @@ private:
   bool reqPlayInSystemApplication() const;
   QMediaPlayer::Error onError(QMediaPlayer::Error error) const;
   int onAudioAvailableChanged(bool available) const;
+  void setMediaWithStatus(const QString &filePath, QIODevice *stream = nullptr);
 
   QMediaPlayer* mPlayer{nullptr};
   InteractiveVideoWidget* mVideoWidget{nullptr}; // 播放显示框
@@ -89,6 +89,7 @@ private:
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
   bool bPauseButtonCenterInit = false;
+  bool mIsMediaCleared{false};
 
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };

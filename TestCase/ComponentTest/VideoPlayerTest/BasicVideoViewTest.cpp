@@ -9,6 +9,7 @@
 #include "EndToExposePrivateMember.h"
 #include "RateHelper.h"
 #include "FileTool.h"
+#include "VideoTestPrecoditionTools.h"
 
 #include <QInputDialog>
 #include <QSplitter>
@@ -22,7 +23,12 @@ USING_MOCKCPP_NS
 class BasicVideoViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
+  const QString mExistVidPath{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4")};
  private slots:
+  void initTestCase() {  //
+    QVERIFY(QFile::exists(mExistVidPath));
+  }
+
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
@@ -98,9 +104,31 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
     basicVideoView.reqPlayInSystemApplication();  // time: 2
 
-    // 停止播放 mStopAct -> onStopPlaying -> StopPlay
+    // 停止播放 mStopAct -> onStopPlaying 清理设置的media, 解除占用, 同时设置暂停按钮选中
     emit basicVideoView.mVideoWidget->mStopAct->triggered();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
+  }
+
+  void onStopPlaying_release_file_ok() {
+    Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+
+    BasicVideoView basicVideoView{true, nullptr};
+    QCOMPARE(basicVideoView.mIsMediaCleared, false);
+    basicVideoView.PlayAVideo(mExistVidPath, true);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), mExistVidPath);
+
+    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), false);
+
+    emit basicVideoView.mVideoWidget->mStopAct->triggered();
+    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
+    QCOMPARE(basicVideoView.mPlayer->mediaStatus(), QMediaPlayer::MediaStatus::NoMedia);
+    QCOMPARE(basicVideoView.mIsMediaCleared, true);
+
+    basicVideoView.mVideoWidget->mPauseAct->toggle();
+    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
+    QVERIFY(basicVideoView.mPlayer->mediaStatus() != QMediaPlayer::MediaStatus::NoMedia);
+    QCOMPARE(basicVideoView.mIsMediaCleared, false);
   }
 
   void playAVideo_trigger_manual_ok() {
@@ -164,8 +192,8 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(BasicVideoView::GetPositionCore(nullptr), 0);
     QCOMPARE(BasicVideoView::GetPositionCore(basicVideoView.mPlayer), 77);
 
-    QCOMPARE(BasicVideoView::SetMediaCore(nullptr, QUrl::fromLocalFile(__FILE__)), false);
-    QCOMPARE(BasicVideoView::SetMediaCore(basicVideoView.mPlayer, QUrl::fromLocalFile(__FILE__)), true);
+    QCOMPARE(BasicVideoView::SetMediaCore(nullptr, __FILE__), false);
+    QCOMPARE(BasicVideoView::SetMediaCore(&basicVideoView, __FILE__), true);
 
     QCOMPARE(BasicVideoView::PlayCore(nullptr), false);
     QCOMPARE(BasicVideoView::PlayCore(basicVideoView.mPlayer), true);

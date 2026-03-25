@@ -99,9 +99,9 @@ void ImgVidOthInFolderPreviewer::operator()(const QString& name,
   }
 }
 
-void ImgVidOthInFolderPreviewer::StopPlay() {
+void ImgVidOthInFolderPreviewer::onStopPlaying() {
   CHECK_NULLPTR_RETURN_VOID(mVidTv);
-  mVidTv->StopPlay();
+  mVidTv->onStopPlaying();
 }
 
 bool ImgVidOthInFolderPreviewer::UpdateImgs(const QString& name, const QStringList& imgPthLst) {
@@ -119,7 +119,7 @@ bool ImgVidOthInFolderPreviewer::UpdateVids(const QString& rootPath, const QStri
     return false;
   }
   CHECK_NULLPTR_RETURN_FALSE(mVidTv)
-  mVidTv->StopPlay();
+  mVidTv->onStopPlaying();
   mVidTv->PlayVideos(rootPath, vidsLst, false);
   return true;
 }
