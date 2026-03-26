@@ -460,14 +460,21 @@ QString ViewsStackedWidget::getRootPath() const {
   switch (vt) {
     case ViewType::LIST:
     case ViewType::TABLE:
-    case ViewType::TREE:
-    case ViewType::SEARCH:
-    case ViewType::SCENE:
-    case ViewType::JSON: {
+    case ViewType::TREE: {
       return m_fsModel->rootPath();
     }
-    case ViewType::CAST:
+    case ViewType::SEARCH: {
+      return m_searchSrcModel->rootPath();
+    }
+    case ViewType::JSON: {
+      return m_jsonModel->rootPath();
+    }
+    case ViewType::SCENE:{
+      return m_scenesModel->rootPath();
+    }
+    case ViewType::CAST: {
       return m_castDbModel->rootPath();
+    }
     case ViewType::MOVIE:
     default:
       LOG_W("No rootpath in ViewType[%d]", int(vt));
