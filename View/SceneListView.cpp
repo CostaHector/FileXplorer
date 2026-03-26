@@ -10,6 +10,7 @@
 #include "BatchRenameBy.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
+#include "RecycleCfmDlg.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -18,11 +19,14 @@
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent)     //
-    : CustomListView{"SCENES_TABLE", parent},     //
-      _sceneModel{sceneModel},                    //
-      _sceneSortProxyModel{sceneSortProxyModel},  //
-      _scenePageControl{scenePageControl}         //
+                             QWidget* parent) //
+  : CustomListView{"SCENES_TABLE", parent}
+  , //
+  _sceneModel{sceneModel}
+  , //
+  _sceneSortProxyModel{sceneSortProxyModel}
+  ,                                   //
+  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -40,21 +44,22 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("play this folder"), this};
-  CHECK_NULLPTR_RETURN_VOID(OPEN_CORRESPONDING_FOLDER)
-  _RENAME_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon(":img/RENAME"), tr("rename related files"), this};
+  _RENAME_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon(":img/RENAME"), tr("Rename related files"), this};
   CHECK_NULLPTR_RETURN_VOID(_RENAME_SCENE_RELATED_FILES)
   _RENAME_SCENE_RELATED_FILES->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected scene related file(s) name")  //
+  _RENAME_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected scene related file(s) name") //
                                               .arg(_RENAME_SCENE_RELATED_FILES->text())
                                               .arg(_RENAME_SCENE_RELATED_FILES->shortcut().toString()));
-  _RECYCLE_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("recycle related files"), this};
+  _RECYCLE_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
   CHECK_NULLPTR_RETURN_VOID(_RECYCLE_SCENE_RELATED_FILES)
-  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin")  //
+  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin") //
                                                .arg(_RECYCLE_SCENE_RELATED_FILES->text())
                                                .arg(_RECYCLE_SCENE_RELATED_FILES->shortcut().toString()));
 
-  QList<QAction*> exclusiveActions{_RENAME_SCENE_RELATED_FILES, _RECYCLE_SCENE_RELATED_FILES, OPEN_CORRESPONDING_FOLDER};
+  _OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("Play this folder"), this};
+  CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
+
+  QList<QAction*> exclusiveActions{_RENAME_SCENE_RELATED_FILES, _RECYCLE_SCENE_RELATED_FILES, _OPEN_CORRESPONDING_FOLDER};
   PushFrontExclusiveActions(exclusiveActions);
   PushBackExclusiveActions(_sceneModel->GetExcusiveActions());
 
@@ -78,7 +83,7 @@ bool SceneListView::onOpenCorrespondingFolder() {
 }
 
 void SceneListView::subscribe() {
-  connect(OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
+  connect(_OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
   connect(_RENAME_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelated);
   connect(_RECYCLE_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRecycleSceneAndRelated);
@@ -98,19 +103,21 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
+  if (IsPathAtShallowDepth(rootPath)) { // Potential large directory
     LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
     const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg =
-        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-        "Loading it could cause performance issues.\n\n"
-        "Directory: " +
-        rootPath + "\n\n Do you want to proceed?";
+    const QString hintMsg = "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+                            "Loading it could cause performance issues.\n\n"
+                            "Directory: "
+                            + rootPath + "\n\n Do you want to proceed?";
     QMessageBox::StandardButton retBtn;
 #ifdef RUNNING_UNIT_TESTS
     retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+    retBtn = QMessageBox::warning(this,
+                                  cfmTitle,
+                                  hintMsg,
+                                  QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
                                   QMessageBox::StandardButton::No);
 #endif
     if (retBtn != QMessageBox::StandardButton::Yes) {
@@ -135,11 +142,11 @@ int SceneListView::onUpdateJsonFiles() {
   ScnMgr scnMgr;
   Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated",
-           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]",  //
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
            cnt.m_jsonUpdatedCnt,
-           cnt.m_jsonUsedCnt,  //
+           cnt.m_jsonUsedCnt, //
            cnt.m_ImgNameKeyFieldUpdatedCnt,
-           cnt.m_VidNameKeyFieldUpdatedCnt,  //
+           cnt.m_VidNameKeyFieldUpdatedCnt, //
            qPrintable(workPath));
   return cnt.m_jsonUpdatedCnt;
 }
@@ -183,9 +190,9 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
 
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // windows path start with disk letter
 #else
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2; // linux path start with '/'
 #endif
   return path.count('/') < NEAR_ROOT_PATH_LIMIT;
 }
@@ -204,7 +211,7 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::MouseButton::LeftButton) {
     const QPoint pos = event->pos();
-    const QModelIndex proIndex = indexAt(pos);  // here no need use mapToSource
+    const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
     if (mLastClickedIndex != proIndex) {
       onClickEvent(proIndex);
     }
@@ -250,6 +257,11 @@ int SceneListView::onRecycleSceneAndRelated() {
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
   const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
+
+  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
+    return 0;
+  }
 
   FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
   removeCmds.reserve(relatedFilesCnt);

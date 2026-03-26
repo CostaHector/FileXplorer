@@ -299,7 +299,6 @@ QMediaPlayer::Error BasicVideoView::onError(QMediaPlayer::Error error) const {
 
 int BasicVideoView::onAudioAvailableChanged(bool available) const {
   int volValue = mPlayer->volume();
-  LOG_D("Audio available: %d, volume:%d", available, volValue);
   return volValue;
 }
 

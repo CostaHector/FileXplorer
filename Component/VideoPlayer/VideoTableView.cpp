@@ -2,6 +2,9 @@
 #include "NotificatorMacro.h"
 #include "RateActions.h"
 #include "BatchRenameBy.h"
+#include "FileOperatorPub.h"
+#include "UndoRedo.h"
+#include "RecycleCfmDlg.h"
 #include <random>
 
 VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_VIEW", parent} {
@@ -36,14 +39,19 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
     mUpdateDurations = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, tr("Update duration"), this};
     mUpdateDurations->setShortcutVisibleInContextMenu(true);
     mUpdateDurations->setToolTip(QString("<b>%1 (%2)</b><br/> Read the duration information from video file")
-                                           .arg(mUpdateDurations->text())
-                                           .arg(mUpdateDurations->shortcut().toString()));
+                                     .arg(mUpdateDurations->text())
+                                     .arg(mUpdateDurations->shortcut().toString()));
 
     mReloadCurrentPath = new (std::nothrow) QAction(QIcon(":img/REFRESH_THIS_PATH"), tr("Refresh current path"), this);
     mReloadCurrentPath->setShortcutVisibleInContextMenu(true);
     mReloadCurrentPath->setToolTip(QString("<b>%1 (%2)</b><br/>Force reload the file list for the current directory from disk.")  //
                                        .arg(mReloadCurrentPath->text())
                                        .arg(mReloadCurrentPath->shortcut().toString()));
+
+    mRecycleRelatedFiles = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
+    mRecycleRelatedFiles->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected video(s) related file(s) to trash bin")  //
+                                         .arg(mRecycleRelatedFiles->text())
+                                         .arg(mRecycleRelatedFiles->shortcut().toString()));
 
     QList<QAction*> acts;
     acts.reserve(20);
@@ -54,8 +62,8 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
     acts.push_back(mRenameVideoRelatedFilesReplace);
     acts.push_back(mRenameVideoRelatedFilesInsert);
     acts.push_back(mUpdateDurations);
-    acts.push_back(NewSeperatorAction(this));
     acts.push_back(mReloadCurrentPath);
+    acts.push_back(mRecycleRelatedFiles);
     PushFrontExclusiveActions(acts);
   }
 
@@ -65,6 +73,7 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   connect(mRenameVideoRelatedFilesInsert, &QAction::triggered, this, &VideoTableView::onRenameJsonAndRelatedInsert);
   connect(mUpdateDurations, &QAction::triggered, this, &VideoTableView::onUpdateDurationFields);
   connect(mReloadCurrentPath, &QAction::triggered, mVideoModel, &VideoTableModel::forceReload);
+  connect(mRecycleRelatedFiles, &QAction::triggered, this, &VideoTableView::onRecycleVideoAndRelated);
   connect(this, &QTableView::doubleClicked, this, [this](const QModelIndex& proIndex) { ReqPlay(proIndex, true); });
 }
 
@@ -248,4 +257,31 @@ int VideoTableView::onUpdateDurationFields() {
     return 0;
   }
   return mVideoModel->updateDurationFields(srcIndexes);
+}
+
+int VideoTableView::onRecycleVideoAndRelated() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip recycle");
+    return 0;
+  }
+  const QString& jsonLocatedInPath{mVideoModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{mVideoModel->rel2fileNames(indexes)};
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
+  const int relatedFilesCnt{filesNeedRecycle.size()};
+
+  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
+    return 0;
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relatedFilesCnt);
+  for (const auto& nm : filesNeedRecycle) {
+    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
+  }
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
+  const int removeRowCnt = mVideoModel->AfterVideoFilesNameRenamed(indexes);
+  LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
+  return relatedFilesCnt;
 }

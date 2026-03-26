@@ -17,6 +17,7 @@
 #include "JsonHelper.h"
 #include "UndoRedo.h"
 #include "BatchRenameBy.h"
+#include "RecycleCfmDlg.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -107,7 +108,7 @@ class SceneListViewTest : public PlainTestSuite {
     QVERIFY(sceneView._sceneModel == nullptr);
     QVERIFY(sceneView._sceneSortProxyModel == nullptr);
     QVERIFY(sceneView._scenePageControl == nullptr);
-    QVERIFY(sceneView.OPEN_CORRESPONDING_FOLDER == nullptr);
+    QVERIFY(sceneView._OPEN_CORRESPONDING_FOLDER == nullptr);
     QVERIFY(sceneView.mAlignDelegate == nullptr);
     // call onClickEvent with invalid index should not crash down
     sceneView.onClickEvent(QModelIndex());
@@ -269,6 +270,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void onRenameSceneAndRelated_ok() {
+    MOCKER(RecycleCfmDlg::recycleQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
@@ -284,7 +286,7 @@ class SceneListViewTest : public PlainTestSuite {
 
     sceneView.clearSelection();
     QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0); // no selection
     QCOMPARE(sceneModel.rowCount(), 2);
 
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
@@ -293,7 +295,8 @@ class SceneListViewTest : public PlainTestSuite {
 
     sceneView.clearSelection();
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 3); // 3 files related to json(include json self)
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0); // 1st. user click cancel
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 3); // 2nd. user click yes 3 files related to json(include json self)
     QCOMPARE(sceneModel.rowCount(), 0);
 
     QVERIFY(UndoRedo::GetInst().on_Undo());

@@ -20,6 +20,7 @@ public:
   int onRenameJsonAndRelatedReplace();
   int onRenameJsonAndRelatedInsert();
   int onUpdateDurationFields();
+  int onRecycleVideoAndRelated();
 
 signals:
   void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);
@@ -36,6 +37,7 @@ private:
   QAction* mRenameVideoRelatedFilesInsert{nullptr};
   QAction* mUpdateDurations{nullptr};
   QAction* mReloadCurrentPath{nullptr};
+  QAction* mRecycleRelatedFiles{nullptr};
 
   VideoTableModel* mVideoModel{nullptr};
   QSortFilterProxyModel* mProxyModel{nullptr};
