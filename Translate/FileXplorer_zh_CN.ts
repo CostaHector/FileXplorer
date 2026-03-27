@@ -1589,7 +1589,7 @@
         <translation>扩展名独立计数</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+43"/>
         <source>Base name:</source>
         <translation>基础名:</translation>
     </message>
@@ -1707,12 +1707,12 @@
         <translation>反转排序</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Sort Current Page Only</source>
         <translation>仅排序当前页面</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+53"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
     </message>
@@ -1720,7 +1720,7 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+44"/>
+        <location filename="../View/SceneListView.cpp" line="+42"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
@@ -1731,6 +1731,11 @@
     </message>
     <message>
         <location line="+7"/>
+        <source>Rename (ith)</source>
+        <translation>重命名(编号)</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Recycle related files</source>
         <translation>回收相关文件</translation>
     </message>
