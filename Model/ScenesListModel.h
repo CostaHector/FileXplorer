@@ -3,26 +3,30 @@
 
 #include "QAbstractListModelPub.h"
 #include "SceneInfoManager.h"
+#include "PaginatedList.h"
 #include <utility>
 #include <QSet>
 #include <QFileInfo>
+
+extern template class PaginatedList<SceneInfo>;
+using PaginatedSceneList = PaginatedList<SceneInfo>;
 
 class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
  public:
   explicit ScenesListModel(const QString& listViewName, QObject* object = nullptr);
+  void initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bDescendingReverse);
+  bool setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension);
+  bool setSortOrderReverse(bool bDescendingReverse);
 
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   inline QString rootPath() const { return mRootPath; }
 
-  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mCurEnd - mCurBegin; }
-  enum CustomRoles {
-    RatingRole = Qt::UserRole + 100  // 使用一个较大的偏移量避免冲突
-  };
+  int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
+  enum CustomRole { RatingRole = Qt::UserRole + 100 };
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
-  bool isIndexValid(const QModelIndex& index, int& linearInd) const;
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
@@ -34,18 +38,10 @@ class ScenesListModel : public QAbstractListModelPub {
   QString GetJson(const QModelIndex& index) const;
   QString GetScn(const QModelIndex& index) const;
 
-  std::pair<int, int> GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const;
-
-  inline int GetPageCnt() const {
-    int N = GetEntryListLen();
-    if (mScenesCountPerPage <= 0) return 0;
-    return (N + mScenesCountPerPage - 1) / mScenesCountPerPage;
-  }
-
-  inline const SceneInfoList& GetEntryList() const { return mEntryList; }
-  inline int GetEntryListLen() const { return GetEntryList().size(); }
-  inline SceneInfoList::const_iterator GetFirstIterator() const { return mCurBegin; }
   QStringList rel2fileNames(const QModelIndexList& indexes) const;
+
+  bool isLocalIndexValid(const QModelIndex& localIndex, int& localInd) const { return mPagedData.isLocalIndexValid(localIndex, localInd); }
+  SceneInfoList::const_iterator constBeginCurPage() const { return mPagedData.constBeginCurPage(); }
 
  signals:
   void pagesCountChanged(int newPagesCount);
@@ -54,15 +50,13 @@ class ScenesListModel : public QAbstractListModelPub {
   bool onScenesCountsPerPageChanged(int scenesCntInAPage);
   bool onPageIndexChanged(int newPageIndex);
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
+  void EmitPagesCountChanged(int newPagesCount) { emit pagesCountChanged(newPagesCount); }
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);
 
-  int mPageIndex{0};
-  int mScenesCountPerPage{12};  // 4-by-3
   QString mPattern;
   QString mRootPath;
-  SceneInfoList mEntryList;
-  SceneInfoList::const_iterator mCurBegin{mEntryList.cbegin()}, mCurEnd{mEntryList.cend()};
+  PaginatedSceneList mPagedData;
 };
 #endif  // SCENESLISTMODEL_H

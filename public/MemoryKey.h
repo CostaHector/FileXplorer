@@ -106,8 +106,12 @@ struct MemoryKey {
   static const KV RETURN_ERRORCODE_UPON_ANY_FAILURE;
 
   static const KV RATE_MOVIE_DEFAULT_VALUE;
+};
+
+struct SceneKey {
   static const KV SCENE_SORT_ORDER;
   static const KV SCENE_SORT_BY_DIMENSION;
+  static const KV SCENES_COUNT_EACH_PAGE;
 };
 
 struct BrowserKey {

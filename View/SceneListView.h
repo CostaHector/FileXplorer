@@ -37,6 +37,7 @@ class SceneListView : public CustomListView {
  public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
   int onRenameSceneAndRelated();
+  int onRenameSceneAndRelatedInsert();
   int onRecycleSceneAndRelated();
 
  protected:
@@ -47,6 +48,7 @@ class SceneListView : public CustomListView {
   QModelIndexList selectedRowsSource() const;
 
   QAction* _RENAME_SCENE_RELATED_FILES{nullptr};
+  QAction* _RENAME_SCENE_RELATED_FILES_INSERT{nullptr};
   QAction* _RECYCLE_SCENE_RELATED_FILES{nullptr};
   QAction* _OPEN_CORRESPONDING_FOLDER{nullptr};
 

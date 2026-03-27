@@ -83,15 +83,13 @@ class SceneListViewTest : public PlainTestSuite {
         QStringList{tDir.itemPath("Henry Cavill.png")},  //
         QStringList{tDir.itemPath("Henry Cavill.mp4")},
     };
-
-    SceneInfoManager::mockScenesInfoList().clear();
     Configuration().clear();
   }
 
   void init() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_MOVIE_PATH->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(false);  // by name ascending chris -> henry
+    sceneAct._REVERSE_ORDER->setChecked(false);  // by name ascending chris -> henry
     GlobalMockObject::reset();
   }
 
@@ -99,7 +97,6 @@ class SceneListViewTest : public PlainTestSuite {
 
   void cleanupTestCase() {  //
     SceneListViewMocker::MockSetRootPathQuery() = true;
-    SceneInfoManager::mockScenesInfoList().clear();
   }
 
   void default_constructor_ok() {
@@ -225,7 +222,7 @@ class SceneListViewTest : public PlainTestSuite {
     }
 
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(true);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_ORDER->setChecked(true);  // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Henry Cavill");
@@ -234,7 +231,7 @@ class SceneListViewTest : public PlainTestSuite {
     QCOMPARE(spy.count(), 4);
     QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_HenryCavill);
 
-    sceneAct._REVERSE_SORT->setChecked(false);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_ORDER->setChecked(false);  // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Chris Evans");
@@ -283,20 +280,27 @@ class SceneListViewTest : public PlainTestSuite {
     QCOMPARE(sceneModel.rowCount(), 2);
 
     MOCKER(BatchRenameBy::ReplaceBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
+    MOCKER(BatchRenameBy::InsertBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
 
     sceneView.clearSelection();
-    QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0); // no selection
+    QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);        // no selection
+    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 0);  // no selection
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);       // no selection
     QCOMPARE(sceneModel.rowCount(), 2);
 
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
     QCOMPARE(sceneView.onRenameSceneAndRelated(), 1);
+
+    sceneModel.setRootPath(tDir.path(), true);
+    QCOMPARE(sceneModel.rowCount(), 2);
+    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
+    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 1);
     QCOMPARE(sceneModel.rowCount(), 1);
 
     sceneView.clearSelection();
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0); // 1st. user click cancel
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 3); // 2nd. user click yes 3 files related to json(include json self)
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);  // 1st. user click cancel
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 3);  // 2nd. user click yes 3 files related to json(include json self)
     QCOMPARE(sceneModel.rowCount(), 0);
 
     QVERIFY(UndoRedo::GetInst().on_Undo());
@@ -305,7 +309,7 @@ class SceneListViewTest : public PlainTestSuite {
   void delegate_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_SORT->setChecked(false);  // by rate ascending
+    sceneAct._REVERSE_ORDER->setChecked(false);  // by rate ascending
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
@@ -357,9 +361,9 @@ class SceneListViewTest : public PlainTestSuite {
 
     auto checkNameAndRate = [&](const QString& expect0Name, int expect0Rate, const QString& expect1Name, int expect1Rate) -> void {
       QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), expect0Name);
-      QCOMPARE(firstIndex.data(ScenesListModel::CustomRoles::RatingRole).toInt(), expect0Rate);
+      QCOMPARE(firstIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect0Rate);
       QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), expect1Name);
-      QCOMPARE(secondIndex.data(ScenesListModel::CustomRoles::RatingRole).toInt(), expect1Rate);
+      QCOMPARE(secondIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect1Rate);
     };
 
     auto checkJsonScnRate = [&](const int expectChrisRate, const int expectHenryRate) {
@@ -370,9 +374,7 @@ class SceneListViewTest : public PlainTestSuite {
 
       SceneInfoList parsedScenes = SceneHelper::ParseAScnFile(scnAbsPath, "/");
       QCOMPARE(parsedScenes.size(), 2);
-      std::sort(parsedScenes.begin(), parsedScenes.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
-        return lhs.lessThanName(rhs);
-      });
+      std::sort(parsedScenes.begin(), parsedScenes.end(), SceneInfo::lessThanName);
       QCOMPARE(parsedScenes[0].rate, expectChrisRate);
       QCOMPARE(parsedScenes[1].rate, expectHenryRate);
     };
@@ -498,4 +500,4 @@ class SceneListViewTest : public PlainTestSuite {
 };
 
 #include "SceneListViewTest.moc"
-REGISTER_TEST(SceneListViewTest, false)
+REGISTER_TEST(SceneListViewTest, true)

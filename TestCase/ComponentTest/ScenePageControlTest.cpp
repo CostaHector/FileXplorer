@@ -15,7 +15,6 @@ class ScenePageControlTest : public PlainTestSuite {
  public:
  private slots:
   void initialized_ok() {
-    Configuration().setValue("SCENES_COUNT_EACH_PAGE", 999);
     ScenePageControl spc{"Page Navigation Control"};
 
     QVERIFY(spc._THE_FRONT_PAGE != nullptr);

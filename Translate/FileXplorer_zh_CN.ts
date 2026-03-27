@@ -1702,12 +1702,17 @@
         <translation>清除场景</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <source>Descending</source>
-        <translation>降序排列场景</translation>
+        <location line="+25"/>
+        <source>Reverse</source>
+        <translation>反转排序</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+7"/>
+        <source>Sort Current Page Only</source>
+        <translation>仅排序当前页面</translation>
+    </message>
+    <message>
+        <location line="+40"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
     </message>
@@ -1715,12 +1720,17 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+47"/>
-        <source>Rename related files</source>
-        <translation>重命名相关文件</translation>
+        <location filename="../View/SceneListView.cpp" line="+44"/>
+        <source>Rename related(replace)</source>
+        <translation>重命名相关文件(替换)</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
+        <source>Rename related(Insert)</source>
+        <translation>重命名相关文件(插入)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Recycle related files</source>
         <translation>回收相关文件</translation>
     </message>

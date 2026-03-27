@@ -51,38 +51,24 @@ class SceneInfoTest : public PlainTestSuite {
     SceneInfoList siList{si1, si2, si3};
 
     // name: France(2) < Singapore(3) < The U.S.(1)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
-      return lhs.lessThanName(rhs);
-    });
+    std::sort(siList.begin(), siList.end(), SceneInfo::lessThanName);
     QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
 
     // / and France(2) < / and The U.S.(1) < /Asia and Singapore(3)
 
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_PATH);
-      return (lhs.*pComparator)(rhs);
-    });
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_PATH));
     QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
 
     // 100k(1) < 150k(3) < 200k(2)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_SIZE);
-      return (lhs.*pComparator)(rhs);
-    });
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_SIZE));
     QCOMPARE(siList, (SceneInfoList{si1, si3, si2}));
 
     // 95(2) < 96(3) < 98(1)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::RATE);
-      return (lhs.*pComparator)(rhs);
-    });
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::RATE));
     QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
 
     // 1960(2) < 1980(1) < 2000(3)
-    std::sort(siList.begin(), siList.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {
-      auto pComparator = SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::UPLOADED_TIME);
-      return (lhs.*pComparator)(rhs);
-    });
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::UPLOADED_TIME));
     QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
   }
 
@@ -115,7 +101,7 @@ class SceneInfoTest : public PlainTestSuite {
       QVERIFY(saveFi.open(QIODevice::WriteOnly));
       QVERIFY(saveFi.commit());
       SceneInfoList result = ParseAScnFile(scnAbsFilePath, "/");
-      QVERIFY(result.isEmpty());
+      QVERIFY(result.empty());
     }
 
     {
@@ -135,7 +121,7 @@ class SceneInfoTest : public PlainTestSuite {
       QVERIFY(saveFi.commit());
 
       SceneInfoList result = ParseAScnFile(scnAbsFilePath, "/");
-      QVERIFY(result.isEmpty());
+      QVERIFY(result.empty());
     }
 
     {
@@ -155,7 +141,7 @@ class SceneInfoTest : public PlainTestSuite {
       QVERIFY(saveFi.commit());
 
       SceneInfoList result = ParseAScnFile(scnAbsFilePath, "/");
-      QVERIFY(result.isEmpty());
+      QVERIFY(result.empty());
     }
 
     {
@@ -214,7 +200,7 @@ class SceneInfoTest : public PlainTestSuite {
       QVERIFY(saveFi.commit());
 
       SceneInfoList result = ParseAScnFile(scnAbsFilePath, "/");
-      QVERIFY(result.isEmpty());
+      QVERIFY(result.empty());
     }
 
     {
@@ -238,9 +224,7 @@ class SceneInfoTest : public PlainTestSuite {
       QCOMPARE(result[1].rel2scn, "/");
       result[0].rel2scn = "";
       result[1].rel2scn = "";
-      std::sort(result.begin(), result.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
-        return lhs.lessThanName(rhs);
-      });
+      std::sort(result.begin(), result.end(), SceneInfo::lessThanName);
       QCOMPARE(result, marvelRootPathScenes);
     }
   }
@@ -291,9 +275,7 @@ class SceneInfoTest : public PlainTestSuite {
 
     SceneInfoList allScenesInRoot = GetScnsLstFromPath(tDir.path());
     QCOMPARE(allScenesInRoot.size(), 2 + 1);
-    std::sort(allScenesInRoot.begin(), allScenesInRoot.end(), [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
-      return lhs.lessThanName(rhs);
-    });
+    std::sort(allScenesInRoot.begin(), allScenesInRoot.end(), SceneInfo::lessThanName);
     QCOMPARE(allScenesInRoot[0].rel2scn, "/");
     QCOMPARE(allScenesInRoot[1].rel2scn, "/");
     QCOMPARE(allScenesInRoot[2].rel2scn, "/Forbes/");
@@ -301,6 +283,7 @@ class SceneInfoTest : public PlainTestSuite {
     allScenesInRoot[1].rel2scn = "";
     allScenesInRoot[2].rel2scn = "";
     SceneInfoList expectAllScenes;
+    expectAllScenes.reserve(marvelRootPathScenes.size() + forbesXMenPathScenes.size());
     expectAllScenes += marvelRootPathScenes;
     expectAllScenes += forbesXMenPathScenes;
     QCOMPARE(allScenesInRoot, expectAllScenes);

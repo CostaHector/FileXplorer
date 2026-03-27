@@ -50,56 +50,64 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(_BY_UPLOADED_TIME);
   _BY_UPLOADED_TIME->setCheckable(true);
 
-  _REVERSE_SORT = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Descending"), this);
-  CHECK_NULLPTR_RETURN_VOID(_REVERSE_SORT);
-  _REVERSE_SORT->setCheckable(true);
-  _REVERSE_SORT->setChecked(Configuration().value(MemoryKey::SCENE_SORT_ORDER.name, MemoryKey::SCENE_SORT_ORDER.v).toInt() ==
-                            Qt::SortOrder::DescendingOrder);
+  bool reverseOrder{Configuration().value(SceneKey::SCENE_SORT_ORDER.name, SceneKey::SCENE_SORT_ORDER.v).toBool()};
+  _REVERSE_ORDER = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Reverse"), this);
+  CHECK_NULLPTR_RETURN_VOID(_REVERSE_ORDER);
+  _REVERSE_ORDER->setCheckable(true);
+  _REVERSE_ORDER->setChecked(reverseOrder);
+  _REVERSE_ORDER->setToolTip("Toggle between ascending and descending order");
+
+  _SORT_RANGE_CURRENT_PAGE = new (std::nothrow) QAction(tr("Sort Current Page Only"), this);
+  CHECK_NULLPTR_RETURN_VOID(_REVERSE_ORDER);
+  _SORT_RANGE_CURRENT_PAGE->setCheckable(true);
+  _SORT_RANGE_CURRENT_PAGE->setChecked(false);
+  _SORT_RANGE_CURRENT_PAGE->setToolTip("Apply sorting to current page only (unchecked by default: sort entire list)");
 
   mSortOrderIntAction.init({{_BY_MOVIE_PATH, SortDimE::MOVIE_PATH},
                             {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
                             {_BY_RATE, SortDimE::RATE},
                             {_BY_UPLOADED_TIME, SortDimE::UPLOADED_TIME}},
                            DEFAULT_SCENE_SORT_ORDER, QActionGroup::ExclusionPolicy::Exclusive);
-  const int sortDim = Configuration().value(MemoryKey::SCENE_SORT_BY_DIMENSION.name, MemoryKey::SCENE_SORT_BY_DIMENSION.v).toInt();
+  const int sortDim = Configuration().value(SceneKey::SCENE_SORT_BY_DIMENSION.name, SceneKey::SCENE_SORT_BY_DIMENSION.v).toInt();
   mSortOrderIntAction.setCheckedIfActionExist(sortDim);
 
   subscribe();
 }
 
 SceneInPageActions::~SceneInPageActions() {
-  SceneSortOrderHelper::SortDimE sortDimension = SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER;
-  Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
-  std::tie(sortDimension, sortOrder) = GetSortSetting();
-
-  Configuration().setValue(MemoryKey::SCENE_SORT_ORDER.name, (int)sortOrder);
-  Configuration().setValue(MemoryKey::SCENE_SORT_BY_DIMENSION.name, (int)sortDimension);
+  Configuration().setValue(SceneKey::SCENE_SORT_ORDER.name, GetSortOrderReverse());
+  Configuration().setValue(SceneKey::SCENE_SORT_BY_DIMENSION.name, (int)GetSortDimension());
 }
 
 void SceneInPageActions::subscribe() {
-  connect(_REVERSE_SORT, &QAction::toggled, this, &SceneInPageActions::EmitScenesSortPolicyChangedSignal);
-  connect(mSortOrderIntAction.getActionGroup(), &QActionGroup::triggered, this, &SceneInPageActions::EmitScenesSortPolicyChangedSignal);
+  connect(_REVERSE_ORDER, &QAction::toggled, this, &SceneInPageActions::onReverseSortOrderToggled);
+  connect(mSortOrderIntAction.getActionGroup(), &QActionGroup::triggered, this, &SceneInPageActions::onSortDimensionTriggered);
 }
 
-std::pair<SceneSortOrderHelper::SortDimE, Qt::SortOrder> SceneInPageActions::GetSortSetting() const {
-  SceneSortOrderHelper::SortDimE sortDimension = mSortOrderIntAction.curVal();
-  Qt::SortOrder sortOrder = _REVERSE_SORT->isChecked() ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
-  return {sortDimension, sortOrder};
+void SceneInPageActions::onReverseSortOrderToggled(bool bReverseDescend) {
+  if (GetSortRangeCurrentPageOnly()) {
+    Qt::SortOrder newOrder = bReverseDescend ? Qt::DescendingOrder : Qt::AscendingOrder;
+    emit scenesSortPolicyChanged(GetSortDimension(), newOrder);
+  } else {
+    emit sceneSortReverseOrderChanged(bReverseDescend);
+  }
 }
 
-void SceneInPageActions::EmitScenesSortPolicyChangedSignal() {
-  SceneSortOrderHelper::SortDimE sortDimension = SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER;
-  Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
-  std::tie(sortDimension, sortOrder) = GetSortSetting();
-  LOG_D("Signal emit with parms sortDim[%s] order:%d", SceneSortOrderHelper::c_str(sortDimension), (int)sortOrder);
-  emit scenesSortPolicyChanged(sortDimension, sortOrder);
+void SceneInPageActions::onSortDimensionTriggered(QAction* triggeredAct) {
+  SceneSortOrderHelper::SortDimE sortDimension = mSortOrderIntAction.act2Enum(triggeredAct);
+  if (GetSortRangeCurrentPageOnly()) {
+    Qt::SortOrder newOrder = GetSortOrderReverse() ? Qt::DescendingOrder : Qt::AscendingOrder;
+    emit scenesSortPolicyChanged(sortDimension, newOrder);
+  } else {
+    emit sceneSortDimensionChanged(sortDimension);
+  }
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
   auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(),  //
                                                             QToolButton::InstantPopup,                         //
                                                             Qt::ToolButtonStyle::ToolButtonTextBesideIcon,     //
-                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_48,                  //
+                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,                  //
                                                             parent);
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, tr("Sort Dimension"));
@@ -108,9 +116,11 @@ QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
 
   orderTB->addWidget(orderToolButton);
-  orderTB->addAction(_REVERSE_SORT);
+  orderTB->addAction(_REVERSE_ORDER);
+  orderTB->addAction(_SORT_RANGE_CURRENT_PAGE);
   orderTB->setOrientation(Qt::Orientation::Vertical);
   orderTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  orderTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});
 
   SetLayoutAlightment(orderTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return orderTB;
