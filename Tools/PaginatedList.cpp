@@ -131,7 +131,7 @@ bool PaginatedList<SceneElementType>::setSorter(SceneElementSorter sorter) {
 }
 
 template <typename SceneElementType>
-bool PaginatedList<SceneElementType>::setSortOrder(bool bDescendingReverse) {
+bool PaginatedList<SceneElementType>::setSortOrderReverse(bool bDescendingReverse) {
   if (m_sortDescending == bDescendingReverse) {
     return false;
   }

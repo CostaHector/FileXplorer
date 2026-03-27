@@ -53,7 +53,7 @@ class PaginatedList {
     };
   }
   bool setSorter(SceneElementSorter sorter);
-  bool setSortOrder(bool bDescendingReverse);
+  bool setSortOrderReverse(bool bDescendingReverse);
 
   bool sort();
   typename SceneElementTypeList::const_iterator constBeginCurPage() const { return mDataList.cbegin() + mCurPageStart; } // used in SceneSortProxyModel

@@ -32,7 +32,7 @@ bool ScenesListModel::setSortDimension(SceneSortOrderHelper::SortDimE newSortDim
 }
 
 bool ScenesListModel::setSortOrderReverse(bool bDescendingReverse) {
-  return mPagedData.setSortOrder(bDescendingReverse);
+  return mPagedData.setSortOrderReverse(bDescendingReverse);
 }
 
 QVariant ScenesListModel::data(const QModelIndex& index, int role) const {

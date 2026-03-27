@@ -31,6 +31,13 @@ void AfterDataResetCallable() {
 void EmitPageCntChangedCallable(int newPageCnt) {
   ++m_TEmitPageCntChangedCallableCallTime;
 }
+
+bool lessInt(const int& lhs, const int& rhs) {
+  return lhs < rhs;
+}
+bool greaterInt(const int& lhs, const int& rhs) {
+  return lhs > rhs;
+}
 }  // namespace
 
 class PaginatedListTest : public PlainTestSuite {
@@ -61,6 +68,10 @@ class PaginatedListTest : public PlainTestSuite {
     QCOMPARE(lst.constEndCurPage(), lst.mDataList.cbegin() + 0);
 
     QCOMPARE(lst.setCurPageIndex(-1), false);
+    QVERIFY(lst.m_sorter == nullptr);
+    QCOMPARE(lst.m_sortDescending, false);
+    QCOMPARE(lst.setSorter(nullptr), false);
+    QCOMPARE(lst.setSortOrderReverse(false), false);  // unchange
   }
 
   void setData_no_register_ok() {
@@ -368,6 +379,71 @@ class PaginatedListTest : public PlainTestSuite {
     QCOMPARE(lst[3], 3);
     QCOMPARE(lst[4], 4);
     QCOMPARE(lst[5], 5);
+  }
+
+  void initSortSetting_ok() {
+    {  // no sort pointer, registered
+      PaginatedIntList lst;
+      lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
+      QVERIFY(lst.m_sorter == nullptr);
+      QCOMPARE(lst.m_sortDescending, false);
+      lst.initPerPageCnt(1000);
+      lst.setData({2, 1, 3, 0, 4});
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 1);
+      initCallTime();
+
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      QCOMPARE(lst.sort(), false);
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 0);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 0);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+    }
+
+    {  // sort ascending/descending, registered
+      PaginatedIntList lst;
+      lst.initPerPageCnt(1000);
+      lst.initSortSetting(&::lessInt, false);
+      lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
+      initCallTime();
+      lst.setData({2, 1, 3, 0, 4});
+      QCOMPARE(lst.mDataList, (QList<int>{0, 1, 2, 3, 4}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 1);  // 0->1
+      initCallTime();
+
+      QCOMPARE(lst.setSortOrderReverse(true), true);
+      QCOMPARE(lst.mDataList, (QList<int>{4, 3, 2, 1, 0}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);  // will never call this
+      initCallTime();
+      QCOMPARE(lst.setSortOrderReverse(true), false);  // unchange
+    }
+  }
+
+  void setSorter_ok() {
+    PaginatedIntList lst;
+    lst.initPerPageCnt(1000);
+    lst.initSortSetting(&::lessInt, true);  // less, reverse
+    lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
+    initCallTime();
+    lst.setData({2, 1, 3, 0, 4});
+    QCOMPARE(lst.mDataList, (QList<int>{4, 3, 2, 1, 0}));
+    QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+    QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+    QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 1);
+
+    QCOMPARE(lst.setSorter(nullptr), false);  // nullptr
+    QCOMPARE(lst.setSorter(lessInt), false);  // unchange
+
+    QCOMPARE(lst.setSorter(greaterInt), true);  // greater, reverse
+    QCOMPARE(lst.mDataList, (QList<int>{0, 1, 2, 3, 4}));
   }
 };
 
