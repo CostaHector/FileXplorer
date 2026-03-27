@@ -220,6 +220,9 @@ extern template class PaginatedListRangeEraseGuard<SceneInfo>;
 using PaginatedSceneListRangeEraseGuard = PaginatedListRangeEraseGuard<SceneInfo>;
 
 int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
   PaginatedSceneListRangeEraseGuard guard(&mPagedData);
   const auto rowElementsRmv = mPagedData.GetRangeEraser();
   const int rowRmvedCnt{onRowsRemoved(indexes, rowElementsRmv)};

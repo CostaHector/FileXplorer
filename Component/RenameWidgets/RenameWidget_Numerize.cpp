@@ -56,8 +56,6 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   } else {
     m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
   }
-  m_nameExtIndependent->setCheckState(Qt::CheckState::Unchecked);
-  m_recursiveCB->setCheckState(Qt::CheckState::Unchecked);
 }
 
 void RenameWidget_Numerize::InitExtraCommonVariable() {

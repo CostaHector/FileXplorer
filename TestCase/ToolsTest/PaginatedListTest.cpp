@@ -448,4 +448,4 @@ class PaginatedListTest : public PlainTestSuite {
 };
 
 #include "PaginatedListTest.moc"
-REGISTER_TEST(PaginatedListTest, true)
+REGISTER_TEST(PaginatedListTest, false)

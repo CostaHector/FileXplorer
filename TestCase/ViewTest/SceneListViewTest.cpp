@@ -281,13 +281,15 @@ class SceneListViewTest : public PlainTestSuite {
 
     MOCKER(BatchRenameBy::ReplaceBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
     MOCKER(BatchRenameBy::InsertBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
+    MOCKER(BatchRenameBy::NumerizerBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
 
     sceneView.clearSelection();
-    QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);        // no selection
-    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 0);  // no selection
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);       // no selection
-    QCOMPARE(sceneModel.rowCount(), 2);
+    QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);          // no selection
+    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 0);    // no selection
+    QCOMPARE(sceneView.onRenameSceneAndRelatedNumerize(), 0);  // no selection
+    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);         // no selection
 
+    QCOMPARE(sceneModel.rowCount(), 2);
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
     QCOMPARE(sceneView.onRenameSceneAndRelated(), 1);
 
@@ -295,6 +297,12 @@ class SceneListViewTest : public PlainTestSuite {
     QCOMPARE(sceneModel.rowCount(), 2);
     sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
     QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 1);
+    QCOMPARE(sceneModel.rowCount(), 1);
+
+    sceneModel.setRootPath(tDir.path(), true);
+    QCOMPARE(sceneModel.rowCount(), 2);
+    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::SelectCurrent);
+    QCOMPARE(sceneView.onRenameSceneAndRelatedNumerize(), 1);
     QCOMPARE(sceneModel.rowCount(), 1);
 
     sceneView.clearSelection();
@@ -500,4 +508,4 @@ class SceneListViewTest : public PlainTestSuite {
 };
 
 #include "SceneListViewTest.moc"
-REGISTER_TEST(SceneListViewTest, true)
+REGISTER_TEST(SceneListViewTest, false)

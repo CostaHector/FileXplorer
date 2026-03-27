@@ -2,6 +2,7 @@
 #include "PathTool.h"
 #include "RenameWidget_Replace.h"
 #include "RenameWidget_Insert.h"
+#include "RenameWidget_Numerize.h"
 #include "NotificatorMacro.h"
 #include <QDir>
 
@@ -28,7 +29,7 @@ QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames
       // 3. " number": len(fileBaseName) > len(jsonBaseName)
       QString extraContent = fileBaseName.mid(jsonBaseName.size());
       if (!extraContent.isEmpty() && !JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
-        continue; // Todo: llt cover this line
+        continue;  // Todo: llt cover this line
       }
       filesNeedRename.push_back(fileName);
     }
@@ -79,6 +80,23 @@ RnmResult ReplaceQueryAndConfirm(const QString& workPath,           //
   return pReplacer.GetApplyResult() ? RnmResult::ALL_SUCCEED : RnmResult::PARTIAL_FAILED;
 }
 
+RnmResult NumerizerQueryAndConfirm(const QString& workPath,  //
+                                   const QStringList& selectedNames) {
+  if (selectedNames.isEmpty()) {
+    return RnmResult::SKIP;
+  }
+  RenameWidget_Numerize pNumerize{nullptr};
+  pNumerize.init();
+  pNumerize.setModal(true);
+  pNumerize.InitTextEditContent(workPath, selectedNames);
+
+  if (RenameWidget_Numerize::execCore(&pNumerize) != QDialog::DialogCode::Accepted) {
+    LOG_D("Skip, user cancel numerize rename %d item(s)", selectedNames.size());
+    return RnmResult::SKIP;
+  }
+  return pNumerize.GetApplyResult() ? RnmResult::ALL_SUCCEED : RnmResult::PARTIAL_FAILED;
+}
+
 int InsertBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
   const QStringList& filesNeedRename{GetFilesNeedRename(path, jsonNames)};
   if (filesNeedRename.isEmpty()) {
@@ -89,7 +107,7 @@ int InsertBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
     LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
     return 0;
   }
-  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename json/video related",  //
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Insert) json/video related",  //
            "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
   return filesNeedRename.size();
 }
@@ -117,7 +135,22 @@ int ReplaceBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
     LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
     return 0;
   }
-  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename json/video related",  //
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Replace) json/video related",  //
+           "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
+  return filesNeedRename.size();
+}
+
+int NumerizerBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
+  const QStringList& filesNeedRename{GetFilesNeedRename(path, jsonNames)};
+  if (filesNeedRename.isEmpty()) {
+    return 0;
+  }
+  const RnmResult rnmResult{NumerizerQueryAndConfirm(path, filesNeedRename)};
+  if (rnmResult == RnmResult::SKIP) {
+    LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
+    return 0;
+  }
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Numerize) json/video related",  //
            "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
   return filesNeedRename.size();
 }
