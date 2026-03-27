@@ -677,7 +677,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+24"/>
+        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+18"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -807,7 +807,7 @@
         <translation>播放器菜单</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+61"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>
@@ -1702,12 +1702,17 @@
         <translation>清除场景</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <source>Descending</source>
-        <translation>降序排列场景</translation>
+        <location line="+25"/>
+        <source>Reverse</source>
+        <translation>反转排序</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+7"/>
+        <source>Sort Current Page Only</source>
+        <translation>仅排序当前页面</translation>
+    </message>
+    <message>
+        <location line="+40"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
     </message>
@@ -1715,19 +1720,24 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+43"/>
-        <source>play this folder</source>
-        <translation>播放此文件夹</translation>
+        <location filename="../View/SceneListView.cpp" line="+44"/>
+        <source>Rename related(replace)</source>
+        <translation>重命名相关文件(替换)</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>recycle related files</source>
+        <location line="+7"/>
+        <source>Rename related(Insert)</source>
+        <translation>重命名相关文件(插入)</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Recycle related files</source>
         <translation>回收相关文件</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <source>rename related files</source>
-        <translation>重命名相关文件</translation>
+        <location line="+6"/>
+        <source>Play this folder</source>
+        <translation>播放此文件夹</translation>
     </message>
 </context>
 <context>
@@ -1932,7 +1942,7 @@
 <context>
     <name>VideoTableView</name>
     <message>
-        <location filename="../Component/VideoPlayer/VideoTableView.cpp" line="+22"/>
+        <location filename="../Component/VideoPlayer/VideoTableView.cpp" line="+25"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
@@ -1950,6 +1960,11 @@
         <location line="+6"/>
         <source>Refresh current path</source>
         <translation>重新加载</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Recycle related files</source>
+        <translation>回收相关文件</translation>
     </message>
 </context>
 <context>

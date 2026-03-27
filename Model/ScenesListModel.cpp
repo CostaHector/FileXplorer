@@ -10,48 +10,53 @@
 #include <QDir>
 #include <QBrush>
 
-ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object) //
-  : QAbstractListModelPub{listViewName, object} {
-  int sceneCnt1Page = Configuration().value("SCENES_COUNT_EACH_PAGE", 0).toInt();
-  mScenesCountPerPage = sceneCnt1Page > 0 ? sceneCnt1Page : 1000;
+ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  //
+    : QAbstractListModelPub{listViewName, object} {
+  const int perPageCnt{Configuration().value(SceneKey::SCENES_COUNT_EACH_PAGE.name, SceneKey::SCENES_COUNT_EACH_PAGE.v).toInt()};
+  mPagedData.initPerPageCnt(perPageCnt);
+  mPagedData.registerCallback(                                                         //
+      std::bind(&ScenesListModel::beginResetModel, this),                              //
+      std::bind(&ScenesListModel::endResetModel, this),                                //
+      std::bind(&ScenesListModel::EmitPagesCountChanged, this, std::placeholders::_1)  //
+  );
 }
 
-bool ScenesListModel::isIndexValid(const QModelIndex& index, int& linearInd) const {
-  if (!index.isValid()) {
-    return false;
-  }
-  linearInd = index.row();
-  if (mCurBegin + linearInd >= mCurEnd) {
-    LOG_W("Invalid index(%d) user input", linearInd);
-    return false;
-  }
-  return true;
+void ScenesListModel::initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bDescendingReverse) {
+  auto comparator = SceneInfo::getCompareFunc(newSortDimension);
+  mPagedData.initSortSetting(comparator, bDescendingReverse);
+}
+
+bool ScenesListModel::setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension) {
+  auto comparator = SceneInfo::getCompareFunc(newSortDimension);
+  return mPagedData.setSorter(comparator);
+}
+
+bool ScenesListModel::setSortOrderReverse(bool bDescendingReverse) {
+  return mPagedData.setSortOrderReverse(bDescendingReverse);
 }
 
 QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
-  int linearInd = -1;
-  if (!isIndexValid(index, linearInd)) {
+  int i = -1;
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
+  const SceneInfo& item = mPagedData[i];
   switch (role) {
     case Qt::ItemDataRole::DisplayRole: {
-      return mCurBegin[linearInd].name;
+      return item.name;
     }
     case Qt::ItemDataRole::DecorationRole: {
-      const QString imgAbsPath{mCurBegin[linearInd].imgs.isEmpty() ? //
-                                   ":img/IMAGE_NOT_FOUND"            //
-                                                                   : //
-                                   mCurBegin[linearInd].GetFirstImageAbsPath(mRootPath)};
+      const QString imgAbsPath{item.imgs.isEmpty() ? ":img/IMAGE_NOT_FOUND" : item.GetFirstImageAbsPath(mRootPath)};
       return GetDecorationPixmap(imgAbsPath);
     }
     case Qt::ItemDataRole::BackgroundRole: {
-      if (mCurBegin[linearInd].vidName.isEmpty()) {
+      if (item.vidName.isEmpty()) {
         return QBrush(Qt::GlobalColor::darkGray, Qt::BrushStyle::SolidPattern);
       }
       break;
     }
-    case CustomRoles::RatingRole: {
-      return mCurBegin[linearInd].rate;
+    case CustomRole::RatingRole: {
+      return item.rate;
     }
     default:
       break;
@@ -60,45 +65,40 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
 }
 
 bool ScenesListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (role == CustomRoles::RatingRole) {
+  if (index.isValid() && role == CustomRole::RatingRole) {
     return ModifySceneInfoRateValue(index, value.toInt());
   }
   return QAbstractListModel::setData(index, value, role);
 }
 
 bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int newRate) {
-  int linearInd = -1;
-  if (!isIndexValid(index, linearInd)) {
+  int i = -1;
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return false;
   }
-  int beginIndex = std::distance(mEntryList.cbegin(), mCurBegin);
-  int sourceDev = beginIndex + linearInd;
-  const int beforeRate = mEntryList[sourceDev].rate;
+  SceneInfo& item = mPagedData[i];
+  const int beforeRate = item.rate;
   if (beforeRate == newRate) {
     LOG_INFO_P("Rate no need change", "value remains %d", beforeRate);
     return true;
   }
-  mEntryList[sourceDev].rate = newRate;
-  emit dataChanged(index, index, {CustomRoles::RatingRole});
+  item.rate = newRate;
+  emit dataChanged(index, index, {CustomRole::RatingRole});
 
   const QString scnAbsFilePath = GetScn(index);
-  const QString eleRel2Scn = mEntryList[sourceDev].rel2scn;
-  const QString eleBaseName = mEntryList[sourceDev].name;
+  const QString eleRel2Scn = item.rel2scn;
+  const QString eleBaseName = item.name;
 
   const bool bScnUpdatedOk = SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, eleBaseName, newRate);
   const QString jsonAbsFilePath = GetJson(index);
   const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
   const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
 
-  LOG_OE_P(bothUpdatedOk,
-           "Rate Modify",
-           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]", //
+  LOG_OE_P(bothUpdatedOk, "Rate Modify",
+           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]",  //
            qPrintable(eleRel2Scn),
-           qPrintable(eleBaseName), //
-           beforeRate,
-           newRate,
-           bScnUpdatedOk,
-           bJsonUpdatedOk);
+           qPrintable(eleBaseName),  //
+           beforeRate, newRate, bScnUpdatedOk, bJsonUpdatedOk);
   return bothUpdatedOk;
 }
 
@@ -107,51 +107,47 @@ QFileInfo ScenesListModel::fileInfo(const QModelIndex& index) const {
 }
 
 QString ScenesListModel::filePath(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].GetVideoAbsPath(mRootPath);
+  return mPagedData[i].GetVideoAbsPath(mRootPath);
 }
 
 QString ScenesListModel::fileName(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  if (mCurBegin[linearInd].vidName.isEmpty()) {
+  if (mPagedData[i].vidName.isEmpty()) {
     LOG_D("vidName is empty");
     return {};
   }
-  return mCurBegin[linearInd].vidName;
+  return mPagedData[i].vidName;
 }
 
 int ScenesListModel::GetRate(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return 0;
   }
-  if (mCurBegin[linearInd].vidName.isEmpty()) {
-    LOG_D("vidName is empty");
-    return 0;
-  }
-  return mCurBegin[linearInd].rate;
+  return mPagedData[i].rate;
 }
 
 QString ScenesListModel::baseName(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].name;
+  return mPagedData[i].name;
 }
 
 QString ScenesListModel::absolutePath(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].GetAbsolutePath(mRootPath);
+  return mPagedData[i].GetAbsolutePath(mRootPath);
 }
 
 bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
@@ -160,57 +156,33 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
     return false;
   }
   mRootPath = rootPath;
-
-  SceneInfoList newEntryList = SceneHelper::GetScnsLstFromPath(mRootPath);
-#ifdef RUNNING_UNIT_TESTS
-  newEntryList += SceneInfoManager::mockScenesInfoList();
-#endif
-
-  LOG_D("new path[%s], imgs[%d]", qPrintable(mRootPath), newEntryList.size());
-
-  const int ELE_N = newEntryList.size();
-  int newBegin{0}, newEnd{0};
-  std::tie(newBegin, newEnd) = GetEntryIndexBE(mScenesCountPerPage, ELE_N);
-
-  const int beforeRow = rowCount();
-  const int afterRow = newEnd - newBegin;
-  LOG_D("Entry elements: %d->%d", mEntryList.size(), newEntryList.size());
-  LOG_D("setRootPath. RowCountChanged: %d->%d", beforeRow, afterRow);
-  RowsCountBeginChange(beforeRow, afterRow);
-
-  mEntryList.swap(newEntryList);
-  mCurBegin = mEntryList.cbegin() + newBegin;
-  mCurEnd = mEntryList.cbegin() + newEnd;
-
-  RowsCountEndChange();
-
-  emit pagesCountChanged(GetPageCnt());
-
+  const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath)};
+  mPagedData.setData(newEntryList);
   return true;
 }
 
 QStringList ScenesListModel::GetImgs(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].GetImagesAbsPathList(mRootPath);
+  return mPagedData[i].GetImagesAbsPathList(mRootPath);
 }
 
 QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].GetVideosAbsPath(mRootPath);
+  return mPagedData[i].GetVideosAbsPath(mRootPath);
 }
 
 QString ScenesListModel::GetJson(const QModelIndex& index) const {
-  int linearInd{-1};
-  if (!isIndexValid(index, linearInd)) {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mCurBegin[linearInd].GetJsonAbsPath(mRootPath);
+  return mPagedData[i].GetJsonAbsPath(mRootPath);
 }
 
 QString ScenesListModel::GetScn(const QModelIndex& index) const {
@@ -220,15 +192,6 @@ QString ScenesListModel::GetScn(const QModelIndex& index) const {
   }
   folderPath.chop(1);
   return SceneInfoManager::ScnMgr::GetScnAbsFilePath(folderPath);
-}
-
-std::pair<int, int> ScenesListModel::GetEntryIndexBE(const int scenesCountPerPage, const int maxLen) const {
-  if (scenesCountPerPage < 0) {
-    return std::make_pair(0, maxLen);
-  }
-  const int begin = scenesCountPerPage * mPageIndex;
-  const int end = scenesCountPerPage * (mPageIndex + 1);
-  return std::make_pair(std::min(begin, maxLen), std::min(end, maxLen));
 }
 
 QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const {
@@ -245,81 +208,23 @@ QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const
   return relativePaths2FileName;
 }
 
-bool ScenesListModel::onScenesCountsPerPageChanged(int scenesCntInAPage) { // -1 means all, > 0 means count
-  const int beforeRowCnt = rowCount();
-  int startIndex{-1}, endIndex{-1};
-
-  const SceneInfoList& lst = GetEntryList();
-  const int totalScenesCount = GetEntryListLen();
-  if (scenesCntInAPage == 0) {
-    LOG_W("none in one page");
-    startIndex = 0;
-    endIndex = 0;
-  } else if (scenesCntInAPage < 0) {
-    LOG_D("all items in one page");
-    startIndex = 0;
-    endIndex = totalScenesCount;
-  } else {
-    LOG_D("%d items in one page", scenesCntInAPage);
-    std::tie(startIndex, endIndex) = GetEntryIndexBE(scenesCntInAPage, totalScenesCount);
-  }
-  const int afterRowCnt = endIndex - startIndex;
-  LOG_OK_P("Scenes Count per Page Changed", "%d scenes/Page. rowCnt:%d->%d", scenesCntInAPage, beforeRowCnt, afterRowCnt);
-  RowsCountBeginChange(beforeRowCnt, afterRowCnt);
-
-  mScenesCountPerPage = scenesCntInAPage;
-  mCurBegin = lst.cbegin() + startIndex;
-  mCurEnd = lst.cbegin() + endIndex;
-
-  RowsCountEndChange();
-
-  emit pagesCountChanged(GetPageCnt());
-  return true;
+bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {
+  return mPagedData.setPerPageEleCnt(newPerPage);
 }
 
 bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
-  if (mScenesCountPerPage < 0) {
-    LOG_D("display all scenes in 1 page. no need pagination");
-    return true;
-  }
-  if (newPageIndex < 0) {
-    LOG_D("invalid page index[%d]", newPageIndex);
-    return false;
-  }
-  if (newPageIndex == mPageIndex) {
-    LOG_D("page index remains[%d]", newPageIndex);
-    return true;
-  }
-
-  const SceneInfoList& lst = GetEntryList();
-  const int TOTAL_N = GetEntryListLen();
-  const int startIndex = std::min(mScenesCountPerPage * newPageIndex, TOTAL_N);
-  const int endIndex = std::min(mScenesCountPerPage * (newPageIndex + 1), TOTAL_N);
-
-  const int beforeRowCnt = rowCount();
-  const int afterRowCnt = endIndex - startIndex;
-  LOG_OK_P("Page Changed", "Now page:%d rowCnt:%d->%d", newPageIndex, beforeRowCnt, afterRowCnt);
-  // Don't use RowsCountBeginChange, RowsCountEndChange(); here. QPixmap Image varies here
-  beginResetModel();
-  mPageIndex = newPageIndex;
-  mCurBegin = lst.cbegin() + startIndex;
-  mCurEnd = lst.cbegin() + endIndex;
-  endResetModel();
-  return true;
+  return mPagedData.setCurPageIndex(newPageIndex);
 }
 
-int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
-  const SceneInfoList& lst = GetEntryList();
-  int deviation = mCurBegin - lst.cbegin();
-  const auto rowElementsRmv = [this, deviation](int beg, int end) {
-    mEntryList.erase(mEntryList.begin() + deviation + beg, mEntryList.begin() + deviation + end);
-  };
-  int rowRmvedCnt{onRowsRemoved(indexes, rowElementsRmv)};
+extern template class PaginatedListRangeEraseGuard<SceneInfo>;
+using PaginatedSceneListRangeEraseGuard = PaginatedListRangeEraseGuard<SceneInfo>;
 
-  const int TOTAL_N = GetEntryListLen();
-  const int startIndex = std::min(mScenesCountPerPage * mPageIndex, TOTAL_N);
-  const int endIndex = std::min(mScenesCountPerPage * (mPageIndex + 1), TOTAL_N);
-  mCurBegin = lst.cbegin() + startIndex;
-  mCurEnd = lst.cbegin() + endIndex;
+int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  PaginatedSceneListRangeEraseGuard guard(&mPagedData);
+  const auto rowElementsRmv = mPagedData.GetRangeEraser();
+  const int rowRmvedCnt{onRowsRemoved(indexes, rowElementsRmv)};
   return rowRmvedCnt;
 }

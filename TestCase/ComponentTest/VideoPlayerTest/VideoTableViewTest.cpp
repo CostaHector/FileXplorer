@@ -8,6 +8,7 @@
 #include "VideoTableView.h"
 #include "EndToExposePrivateMember.h"
 #include "BatchRenameBy.h"
+#include "RecycleCfmDlg.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -259,10 +260,28 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
 
     videoTv.clearSelection();
-    QCOMPARE(videoTv.onUpdateDurationFields(), 0);       // no selection
+    QCOMPARE(videoTv.onUpdateDurationFields(), 0);  // no selection
 
     videoTv.selectAll();
     QCOMPARE(videoTv.onUpdateDurationFields(), 3);
+  }
+
+  void onRecycleVideoAndRelated_ok() {
+    MOCKER(RecycleCfmDlg::recycleQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
+    VideoTableView videoTv;
+    videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
+    QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
+
+    QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
+    videoTv.setMediaFiles("", inexistFiles, false);
+    QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
+
+    videoTv.clearSelection();
+    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // no selection
+
+    videoTv.selectAll();
+    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // 1st. user click cancel
+    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // 2nd. user click yes. 3 files related to video(include json self), but not exist
   }
 };
 

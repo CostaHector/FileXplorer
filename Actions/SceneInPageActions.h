@@ -26,13 +26,31 @@ class SceneInPageActions : public QObject {
   QAction* _BY_MOVIE_SIZE{nullptr};
   QAction* _BY_RATE{nullptr};
   QAction* _BY_UPLOADED_TIME{nullptr};
-  QAction* _REVERSE_SORT{nullptr};
 
-  std::pair<SceneSortOrderHelper::SortDimE, Qt::SortOrder> GetSortSetting() const;
+  QAction* _REVERSE_ORDER{nullptr};
+
+  QAction* _SORT_RANGE_CURRENT_PAGE{nullptr};
+
+  SceneSortOrderHelper::SortDimE GetSortDimension() const {
+    return mSortOrderIntAction.curVal();
+  }
+  bool GetSortOrderReverse() const {
+    return _REVERSE_ORDER != nullptr && _REVERSE_ORDER->isChecked();
+  }
+  bool GetSortRangeCurrentPageOnly() const {
+    return _SORT_RANGE_CURRENT_PAGE != nullptr && _SORT_RANGE_CURRENT_PAGE->isChecked();
+  }
+
  signals:
-  void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order); // sortDimension is type of SceneSortOrderHelper::SortDimE
+  void sceneSortDimensionChanged(SceneSortOrderHelper::SortDimE newSortDimension);
+  void sceneSortReverseOrderChanged(bool bReverse);
+
+  // used in proxy model only
+  void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order);
+
  private:
-  void EmitScenesSortPolicyChangedSignal();
+  void onReverseSortOrderToggled(bool bReverseDescend);
+  void onSortDimensionTriggered(QAction* triggeredAct);
   void subscribe();
   EnumIntAction<SceneSortOrderHelper::SortDimE> mSortOrderIntAction;
 };

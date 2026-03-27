@@ -17,7 +17,7 @@ SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash) {
       varHash.value("Name", "").toString(),         //
       varHash.value("ImgName", "").toStringList(),  //
       varHash.value("VidName", "").toString(),      //
-      varHash.value("Size", 0).toLongLong(),       //
+      varHash.value("Size", 0).toLongLong(),        //
       varHash.value("Rate", 0).toInt(),             //
       varHash.value("Uploaded", "").toString(),     //
   };
@@ -49,12 +49,12 @@ QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
 
 QStringList SceneInfo::GetVideosAbsPath(const QString& rootPath) const {
   if (vidName.isEmpty()) {
-    static auto GetVideosListUnderPath = [] (const QString& path) -> QStringList {
+    static auto GetVideosListUnderPath = [](const QString& path) -> QStringList {
       QDir subDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
       subDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
       QStringList vids;
-      for (const QFileInfo& vidInfo: subDir.entryInfoList()) {
-        if (vidInfo.size() < 10 * 1024 * 1024) { // 10MiB
+      for (const QFileInfo& vidInfo : subDir.entryInfoList()) {
+        if (vidInfo.size() < 10 * 1024 * 1024) {  // 10MiB
           continue;
         }
         vids.push_back(vidInfo.filePath());
@@ -70,6 +70,7 @@ QStringList SceneInfo::GetVideosAbsPath(const QString& rootPath) const {
     if (QFileInfo(videosPath).isDir()) {
       return GetVideosListUnderPath(videosPath);
     }
+    return {};
   }
   return {PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName)};
 }
@@ -82,7 +83,7 @@ SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE 
   using namespace SceneSortOrderHelper;
   switch (dim) {
     case SortDimE::MOVIE_PATH:
-      return &SceneInfo::operator<;
+      return &SceneInfo::less;
     case SortDimE::MOVIE_SIZE:
       return &SceneInfo::lessThanVidSize;
     case SortDimE::RATE:
@@ -104,20 +105,24 @@ bool SceneInfo::operator==(const SceneInfo& rhs) const {
          uploaded == rhs.uploaded;
 }
 
-bool SceneInfo::lessThanName(const SceneInfo& other) const {
-  return name < other.name;
+bool SceneInfo::less(const SceneInfo& self, const SceneInfo& other) {
+  return self < other;
 }
 
-bool SceneInfo::lessThanVidSize(const SceneInfo& other) const {
-  return vidSize < other.vidSize;
+bool SceneInfo::lessThanName(const SceneInfo& self, const SceneInfo& other) {
+  return self.name < other.name;
 }
 
-bool SceneInfo::lessThanRate(const SceneInfo& other) const {
-  return rate < other.rate;
+bool SceneInfo::lessThanVidSize(const SceneInfo& self, const SceneInfo& other) {
+  return self.vidSize < other.vidSize;
 }
 
-bool SceneInfo::lessThanUploaded(const SceneInfo& other) const {
-  return uploaded < other.uploaded;
+bool SceneInfo::lessThanRate(const SceneInfo& self, const SceneInfo& other) {
+  return self.rate < other.rate;
+}
+
+bool SceneInfo::lessThanUploaded(const SceneInfo& self, const SceneInfo& other) {
+  return self.uploaded < other.uploaded;
 }
 
 bool SceneInfo::GetNameFromStream(QDataStream& stream) {

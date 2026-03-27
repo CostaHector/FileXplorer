@@ -11,6 +11,7 @@
 
 #include "AdvanceRenamer.h"
 #include "TDir.h"
+#include "UndoRedo.h"
 #include <QDialog>
 
 #include <mockcpp/mokc.h>
@@ -40,6 +41,8 @@ class BatchRenameByTest : public PlainTestSuite {
 
     QCOMPARE(mTDir.createEntries(nodesEntries), 6);
   }
+
+  void cleanupTestCase() { Configuration().clear(); }
 
   void init() {
     GlobalMockObject::reset();
@@ -149,6 +152,56 @@ class BatchRenameByTest : public PlainTestSuite {
     QCOMPARE(snapshot4, snapshot1);
   }
 
+  void NumerizerQueryAndConfirm_ok() {
+    Configuration().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, true);
+    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, false);
+    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, " %1");
+    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, 0);
+
+    using namespace AdvanceRenamerTestTool;
+    set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted});
+    MOCKER(AdvanceRenamer::execCore).expects(exactly(2)).will(invoke(execCoreMock));
+
+    QString workPath = mTDir.itemPath("replace/pattern");
+    const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
+
+    QStringList beforePatterns{"Chris Evans.json"};
+    const QStringList beforeSelectedNames{GetFilesNeedRename(workPath, beforePatterns)};
+
+    // {"replace/pattern/Chris Evans.jpg", false, ""},          //
+    // {"replace/pattern/Chris Evans.json", false, ""},         //
+    // {"replace/pattern/Chris Hemsworth_a.pson", false, ""},   //
+    // {"replace/pattern/Jensen Ackles.mp4", false, ""},        //
+    // {"replace/pattern/Jensen Ackles.pson", false, ""},       //
+    // {"replace/pattern/Michael Fassbender.json", false, ""},  //
+
+    // 默认入参not crash
+    QCOMPARE(NumerizerQueryAndConfirm({}, {}), RnmResult::SKIP);
+
+    QCOMPARE(NumerizerQueryAndConfirm(workPath, beforeSelectedNames), RnmResult::SKIP);
+    const QSet<QString> snapshot2 = mTDir.SnapshotAtPath(workPath);
+    QCOMPARE(snapshot2, snapshot1);  // user skip insert unchange
+
+    // 编号, 后缀统一计数, 后缀和基础名分开, 从0开始计数, 格式为" %1", 预期只改两个文件名
+    QCOMPARE(NumerizerQueryAndConfirm(workPath, beforeSelectedNames), RnmResult::ALL_SUCCEED);
+    const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
+    QVERIFY(snapshot3 != snapshot1);
+    const QSet<QString> expectAfterRename{
+        "Chris Evans 0.jpg",       //
+        "Chris Evans 1.json",      //
+        "Chris Hemsworth_a.pson",  //
+        "Jensen Ackles.mp4",       //
+        "Jensen Ackles.pson",      //
+        "Michael Fassbender.json"  //
+    };
+    QCOMPARE(snapshot3, expectAfterRename);
+
+    // undo it
+    QCOMPARE(UndoRedo::on_Undo(), true);
+    const QSet<QString> snapshot4 = mTDir.SnapshotAtPath(workPath);
+    QCOMPARE(snapshot4, snapshot1);
+  }
+
   void ReplaceBySpecifiedJson_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     MOCKER(ReplaceQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
@@ -186,6 +239,26 @@ class BatchRenameByTest : public PlainTestSuite {
     const QStringList filesNeedRename_cnt2{GetFilesNeedRename(workPath, json1Names)};
     QCOMPARE(filesNeedRename_cnt2.size(), 2);
     QCOMPARE(InsertBySpecifiedJson(workPath, json1Names), 2);
+    // 2 file renamed by this 1 pattern
+  }
+
+  void NumerizerBySpecifiedJson_ok() {
+    QString workPath = mTDir.itemPath("replace/pattern");
+    MOCKER(NumerizerQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
+
+    // default not crash down
+    QCOMPARE(NumerizerBySpecifiedJson({}, {}), 0);
+
+    const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
+    const QStringList filesNeedRename_cnt3{GetFilesNeedRename(workPath, json2Names)};
+    QCOMPARE(filesNeedRename_cnt3.size(), 3);
+    QCOMPARE(NumerizerBySpecifiedJson(workPath, json2Names), 3);
+    // 3 file renamed by this 2 pattern
+
+    const QStringList& json1Names{"Chris Evans.json"};
+    const QStringList filesNeedRename_cnt2{GetFilesNeedRename(workPath, json1Names)};
+    QCOMPARE(filesNeedRename_cnt2.size(), 2);
+    QCOMPARE(NumerizerBySpecifiedJson(workPath, json1Names), 2);
     // 2 file renamed by this 1 pattern
   }
 };

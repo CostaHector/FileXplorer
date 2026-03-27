@@ -270,7 +270,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     {
       // 1. 基本功能测试：单个组场景
       {  // bounder test
-        QVERIFY(ParseAScnFile("/home/to/inexist path", "").isEmpty());
+        QVERIFY(ParseAScnFile("/home/to/inexist path", "").empty());
       }
 
       // 准备测试数据
@@ -293,7 +293,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       //  here mRootPath=tDir.path(); tDir.path() + "/Marvel/" + Marvel.scn=the json scn
       QCOMPARE(parsedScenes.size(), 1);
 
-      const SceneInfo& parsedScene = parsedScenes.first();
+      const SceneInfo& parsedScene = parsedScenes.front();
       QCOMPARE(parsedScene.rel2scn, "/Marvel/");
       QCOMPARE(parsedScene.name, "Captain America");
       QCOMPARE(parsedScene.imgs, QStringList({"cap1.jpg", "cap2.jpg"}));
@@ -342,7 +342,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       SceneInfoList parsedScenes = ParseAScnFile(scnFilePath, "/Avengers/");
       std::sort(parsedScenes.begin(), parsedScenes.end(),                 //
                 [](const SceneInfo& lhs, const SceneInfo& rhs) -> bool {  //
-                  return !lhs.lessThanRate(rhs);
+                  return !SceneInfo::lessThanRate(lhs, rhs);
                 });
 
       QCOMPARE(parsedScenes.size(), 3);

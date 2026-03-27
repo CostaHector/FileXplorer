@@ -7,13 +7,6 @@
 
 namespace SceneInfoManager {
 
-#ifdef RUNNING_UNIT_TESTS
-inline SceneInfoList& mockScenesInfoList() {
-  static SceneInfoList staticSceneInfoList;
-  return staticSceneInfoList;
-}
-#endif
-
 struct Counter {
   Counter(int jsonUpdatedCnt = 0, int jsonUsedCnt = 0, int vidNameKeyFieldUpdatedCnt = 0, int imgNameKeyFieldUpdatedCnt = 0)
       : m_jsonUpdatedCnt{jsonUpdatedCnt},

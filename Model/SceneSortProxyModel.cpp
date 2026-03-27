@@ -50,14 +50,14 @@ bool SceneSortProxyModel::lessThan(const QModelIndex& source_left, const QModelI
     return false;
   }
   int leftRow = 0, rightRow = 0;
-  if (!m_sourceModel->isIndexValid(source_left, leftRow)) {
+  if (!m_sourceModel->isLocalIndexValid(source_left, leftRow)) {
     return false;
   }
-  if (!m_sourceModel->isIndexValid(source_right, rightRow)) {
+  if (!m_sourceModel->isLocalIndexValid(source_right, rightRow)) {
     return false;
   }
-  const SceneInfoList::const_iterator iter = m_sourceModel->GetFirstIterator();
-  return (iter[leftRow].*mComparator)(iter[rightRow]);;
+  const SceneInfoList::const_iterator iter = m_sourceModel->constBeginCurPage();
+  return mComparator(iter[leftRow], iter[rightRow]);
 }
 
 #ifdef RUNNING_UNIT_TESTS

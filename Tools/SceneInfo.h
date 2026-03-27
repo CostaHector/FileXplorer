@@ -25,16 +25,17 @@ struct SceneInfo {
   QStringList GetVideosAbsPath(const QString& rootPath) const;
   QString GetJsonAbsPath(const QString& rootPath) const;
 
-  using CompareFunc = bool (SceneInfo::*)(const SceneInfo&) const;
+  using CompareFunc = bool(*)(const SceneInfo&, const SceneInfo&);
   static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
 
   bool operator<(const SceneInfo& other) const;
   bool operator==(const SceneInfo& rhs) const;
 
-  bool lessThanName(const SceneInfo& other) const;
-  bool lessThanVidSize(const SceneInfo& other) const;
-  bool lessThanRate(const SceneInfo& other) const;
-  bool lessThanUploaded(const SceneInfo& other) const;
+  static bool less(const SceneInfo& self, const SceneInfo& other);
+  static bool lessThanName(const SceneInfo& self, const SceneInfo& other);
+  static bool lessThanVidSize(const SceneInfo& self, const SceneInfo& other);
+  static bool lessThanRate(const SceneInfo& self, const SceneInfo& other);
+  static bool lessThanUploaded(const SceneInfo& self, const SceneInfo& other);
 
   bool GetNameFromStream(QDataStream& stream);
   bool DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate);
