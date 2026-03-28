@@ -109,12 +109,11 @@ const KV MemoryKey::RATE_MOVIE_DEFAULT_VALUE{"RATE_MOVIE_DEFAULT_VALUE", 10, Val
 const KV SceneKey::SCENE_SORT_ORDER{"SCENE_SORT_ORDER", false, ValueChecker{PLAIN_BOOL}}; // true: reverse, false: not reverse
 const KV SceneKey::SCENE_SORT_BY_DIMENSION{"SCENE_SORT_BY_DIMENSION", 0, ValueChecker{0, 4}};
 const KV SceneKey::SCENE_DISABLE_IMAGE_DECORATION{"SCENE_DISABLE_IMAGE_DECORATION", false, ValueChecker{PLAIN_BOOL}};
-const KV SceneKey::SCENES_COUNT_EACH_PAGE{"SCENES_COUNT_EACH_PAGE", 1000, ValueChecker{1, 9999}};
+const KV SceneKey::SCENES_COUNT_EACH_PAGE{"SCENES_COUNT_EACH_PAGE", 40, ValueChecker{1, 9999}};
 
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrowser/ShowRelatedImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE{"Cast/PreviewBrowser/FontPointSize", 12, ValueChecker{PLAIN_INT}};
-const KV BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX{"Cast/PreviewBrowser/IconSizeIndex", 1, ValueChecker{PLAIN_INT}};
 const KV BrowserKey::FLOATING_IMAGE_VIEW_SHOW{"FLOATING_IMAGE_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::FLOATING_VIDEO_VIEW_SHOW{"FLOATING_VIDEO_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::FLOATING_OTHER_VIEW_SHOW{"FLOATING_OTHER_VIEW_SHOW", true, ValueChecker{PLAIN_BOOL}};

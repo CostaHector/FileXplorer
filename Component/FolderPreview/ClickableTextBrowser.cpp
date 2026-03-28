@@ -35,8 +35,6 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   mCastImagesVisisble = Configuration()
                             .value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v)
                             .toBool();
-  mCurIconSizeIndex = BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v.toInt();
-
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
@@ -46,9 +44,7 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   curFont.setPointSizeF(fontPointSize);
   setFont(curFont);
 
-  int iconSizeIndexHint =
-      Configuration().value(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.v).toInt();
-  mCurIconSizeIndex = std::max(0, std::min(iconSizeIndexHint, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1));  // [0, WHEEL_CANDIDATES_N)
+  mCurIconSizeIndex = IMAGE_SIZE::GetInitialScaledSize("ClickableTextBrowser");  // [0, WHEEL_CANDIDATES_N)
   mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
 
   auto& inst = BrowserActions::GetInst();
@@ -73,7 +69,7 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
 
 ClickableTextBrowser::~ClickableTextBrowser() {
   Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, font().pointSizeF());
-  Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, mCurIconSizeIndex);
+  IMAGE_SIZE::SaveInitialScaledSize("ClickableTextBrowser", mCurIconSizeIndex);
   Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
   Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);
 }

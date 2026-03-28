@@ -159,16 +159,16 @@ class ScenesListModelTest : public PlainTestSuite {
         .will(returnValue(scenesLstInPath1))  //
         .id("1");
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelSetRootPath"};
     QCOMPARE(slm.rootPath(), "");
-    QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 1000);
+    QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 40);
     QSignalSpy pgCntSpy{&slm, &ScenesListModel::pagesCountChanged};
 
     QCOMPARE(slm.setRootPath("inexist/path0"), true);  // GetScnsLstFromPath: 1, emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                       // 1 item
     QCOMPARE(pgCntSpy.count(), 1);
-    QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/1000)
+    QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/40)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
     QCOMPARE(slm.rel2fileNames({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
 
@@ -206,7 +206,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
@@ -273,7 +273,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
