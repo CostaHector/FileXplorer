@@ -69,9 +69,9 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
 
   QList<QAction*> exclusiveActions{
-      _RENAME_SCENE_RELATED_FILES_NUMERIZE,  //
       _RENAME_SCENE_RELATED_FILES_REPLACE,   //
       _RENAME_SCENE_RELATED_FILES_INSERT,    //
+      _RENAME_SCENE_RELATED_FILES_NUMERIZE,  //
       _RECYCLE_SCENE_RELATED_FILES,          //
       _OPEN_CORRESPONDING_FOLDER,            //
   };
@@ -109,8 +109,9 @@ void SceneListView::subscribe() {
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
   connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
   SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  connect(&sceneActInst, &SceneInPageActions::disableImageDecorationChanged, _sceneModel, &ScenesListModel::onDisableImageDecorationChanged);
   connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneModel, &ScenesListModel::setSortDimension);
-  connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortOrderReverse);
+  connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
   connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);

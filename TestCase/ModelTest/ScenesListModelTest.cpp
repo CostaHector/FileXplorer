@@ -12,13 +12,8 @@
 #include "EndToExposePrivateMember.h"
 
 #include "SceneInfoManager.h"
-#include "ImageTestPrecoditionTools.h"
 #include "StringTool.h"
-#include <QDir>
-#include <QDirIterator>
-#include "TDir.h"
 
-#include "JsonTestPrecoditionTools.h"
 #include "JsonKey.h"
 #include "RateHelper.h"
 #include <random>
@@ -29,7 +24,6 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace ImageTestPrecoditionTools;
 using namespace SceneInfoManager;
 
 bool checkIndexMatch(const QAbstractListModel& srcModel, int srcR, const QSortFilterProxyModel& proModel, int proR) {
@@ -92,80 +86,33 @@ bool isValidPixmap(const QVariant& pixmapVar) {
 class ScenesListModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TDir mTDir;
-  QString lastFight1SvgContents = GetSvgContentTemplate().arg(SVG_FILL_COLORS[0]).arg("The Last Fight 1");
-  QString ironMenSvgContents = GetSvgContentTemplate().arg(SVG_FILL_COLORS[2]).arg("Iron Man");
-
-  QList<FsNodeEntry> nodeBamboo;
-  QList<FsNodeEntry> nodeGrapes;
-
-  const QString bambooPath = mTDir.itemPath("Bamboo");
-  const QString grapePath = mTDir.itemPath("Grapes");
-
  private slots:
-  void initTestCase() {
-    Configuration().clear();
-
-    QVERIFY(mTDir.IsValid());
-    QVERIFY(SVG_FILL_COLORS_COUNT > 3);
-
-    nodeBamboo =  //
-        {
-            {"Bamboo/The Last Fight.json", false, JsonKey::ConstructJsonByteArray("The Last Fight")},             //
-            {"Bamboo/The Last Fight 1.jpg", false, lastFight1SvgContents.toUtf8()},                               //
-            {"Bamboo/The Last Fight 2.jpg", false, ""},                                                           //
-            {"Bamboo/The Last Fight.mp4", false, ""},                                                             //
-            {"Bamboo/Avengers/Iron Man.json", false, JsonKey::ConstructJsonByteArray("Iron Man")},                //
-            {"Bamboo/Avengers/Iron Man.jpg", false, ironMenSvgContents.toUtf8()},                                 //
-            {"Bamboo/Avengers/Iron Man.mp4", false, ""},                                                          //
-            {"Bamboo/Avengers/Captain America.json", false, JsonKey::ConstructJsonByteArray("Captain America")},  //
-            {"Bamboo/Avengers/Captain America.mp4", false, ""},                                                   //
-        };
-    QCOMPARE(mTDir.createEntries(nodeBamboo), nodeBamboo.size());  // 3json
-    {
-      ScnMgr scnMgr1;
-      QCOMPARE(scnMgr1(bambooPath), Counter(3, 3, 3, 2));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(ScnMgr::UpdateScnFiles(bambooPath), 2);     // 2 scn file writed ok
-    }
-
-    nodeGrapes =  //                                                                                       //
-        {
-            {"Grapes/The Last Fight.json", false, JsonKey::ConstructJsonByteArray("The Last Fight")},             //
-            {"Grapes/Michael Fassbender.json", false, JsonKey::ConstructJsonByteArray("Michael Fassbender")},     //
-            {"Grapes/Jane Grey.json", false, JsonKey::ConstructJsonByteArray("Jane Grey")},                       //
-            {"Grapes/Storm.json", false, JsonKey::ConstructJsonByteArray("Storm")},                               //
-            {"Grapes/Avengers/Iron Man.json", false, JsonKey::ConstructJsonByteArray("Iron Man")},                //
-            {"Grapes/Avengers/Captain America.json", false, JsonKey::ConstructJsonByteArray("Captain America")},  //
-            {"Grapes/Avengers/Thor.json", false, JsonKey::ConstructJsonByteArray("Thor")},                        //
-            {"Grapes/Avengers/Loki.json", false, JsonKey::ConstructJsonByteArray("Loki")},                        //
-        };
-    QCOMPARE(mTDir.createEntries(nodeGrapes), nodeGrapes.size());  // 8json. no ImgName, No VidName
-    {
-      ScnMgr scnMgr2;
-      QCOMPARE(scnMgr2(grapePath), Counter(0, 8, 0, 0));  // 3updated, 3used,3VidUpdated,2ImgNameUpdated
-      QCOMPARE(ScnMgr::UpdateScnFiles(grapePath), 2);     // 2 scn file writed ok
-    }
-  }
+  void initTestCase() { Configuration().clear(); }
+  void cleanupTestCase() { Configuration().clear(); }
 
   void init() {
     GlobalMockObject::reset();
     Configuration().remove(SceneKey::SCENES_COUNT_EACH_PAGE.name);
+    Configuration().remove(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name);
   }
 
-  void cleanup() {
+  void cleanup() {  //
     GlobalMockObject::verify();
-    Configuration().remove(SceneKey::SCENES_COUNT_EACH_PAGE.name);
   }
 
   void initalized_ok() {
     ScenesListModel defModel{"ScenesListView"};
+    // will not crash down
+    QCOMPARE(defModel.rowCount(), 0);
     QVERIFY(defModel.mPagedData.GetPerPageEleCnt() >= 10);
+
     QCOMPARE(defModel.rootPath(), "");
     QVERIFY(defModel.data({}, Qt::DisplayRole).isNull());
     QCOMPARE(defModel.setData({}, 999, Qt::EditRole), false);
 
-    // will not crash down
-    QCOMPARE(defModel.rowCount(), 0);
+    QCOMPARE(defModel.m_bDisableImage, false);
+    QCOMPARE(defModel.onDisableImageDecorationChanged(false), false);
+    QCOMPARE(defModel.onDisableImageDecorationChanged(true), true);  // no row at all
 
     QModelIndex invalidIndex;
     int linearInd = -1;
@@ -223,6 +170,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(pgCntSpy.count(), 1);
     QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/1000)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
+    QCOMPARE(slm.rel2fileNames({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
 
     QCOMPARE(slm.setRootPath("inexist/path0"), false);  // again and not force->ignore, no emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                        // 1 item
@@ -269,8 +217,13 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.data(slm.index(0), Qt::DisplayRole).toString(), "Kaka");               // 0 image, 0 video
     QCOMPARE(slm.data(slm.index(1), Qt::DisplayRole).toString(), "Cristiano Ronaldo");  // 0 image, 0 video
 
+    slm.onDisableImageDecorationChanged(false);
     QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 1 image, but not exist, load failed
     QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 0 image, use default from res.qrc
+
+    slm.onDisableImageDecorationChanged(true);
+    QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), false);  // disabled
+    QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), false);  //
 
     QCOMPARE(slm.data(slm.index(0), Qt::BackgroundRole).isValid(), true);   // 0 video, specify solid pattern
     QCOMPARE(slm.data(slm.index(1), Qt::BackgroundRole).isValid(), false);  // 1 video, no pattern
@@ -311,9 +264,6 @@ class ScenesListModelTest : public PlainTestSuite {
     MOCKER(RateHelper::RateMovie)  //
         .expects(exactly(2))       //
         .will(returnValue(true));
-    // const bool bScnUpdatedOk = SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, eleBaseName, newRate);
-    // const QString jsonAbsFilePath = GetJson(index);
-    // const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
 
     SceneInfo si0{"/", "Kaka", {"Kaka.png"}, {}, 0, 9, "2000-06-16 00:00:60"};
     const SceneInfoList sceneList{si0};
@@ -465,8 +415,8 @@ class ScenesListModelTest : public PlainTestSuite {
       sspm.setSourceModel(&slm);  // rebind, ignored
 
       QCOMPARE(sspm.sortOrder(), Qt::SortOrder::AscendingOrder);
-      QCOMPARE(sspm.m_sortDimension, SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER);
-      QVERIFY(sspm.mComparator != nullptr);
+      QCOMPARE(sspm.m_sortDimension, SceneSortOrderHelper::SortDimE::END_INVALID);
+      QVERIFY(sspm.mComparator == nullptr);
       QVERIFY(sspm.m_sourceModel != nullptr);
     }
 
@@ -483,6 +433,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.rowCount(), 6);
 
     {
+      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
       QCOMPARE(sspm.sortOrder(), Qt::SortOrder::AscendingOrder);  // by default ascending in MoviePath
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));                  // 0<->0
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));                  // 1<->1
@@ -579,7 +530,7 @@ class ScenesListModelTest : public PlainTestSuite {
     MOCKER(SceneHelper::GetScnsLstFromPath).expects(exactly(1)).with(eq(QString{"inexist/GlobalSortPath"})).will(returnValue(scenesLst));
 
     Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 4);
-    // rate descending
+    // global rate descending
     ScenesListModel slm{"ScenesListViewGlobalSort"};
     slm.initSortSetting(SceneSortOrderHelper::SortDimE::RATE, true);
     QCOMPARE(slm.setRootPath("inexist/GlobalSortPath"), true);
@@ -591,15 +542,15 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.baseName(slm.index(2)), "Kaka");
     QCOMPARE(slm.baseName(slm.index(3)), "Chris Evans");
 
-    // size descending
+    // global size descending
     QCOMPARE(slm.setSortDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE), true);
     QCOMPARE(slm.baseName(slm.index(0)), "Ben Affleck");
     QCOMPARE(slm.baseName(slm.index(1)), "Brad Pitt");
     QCOMPARE(slm.baseName(slm.index(2)), "Chris Evans");
     QCOMPARE(slm.baseName(slm.index(3)), "Kaka");
 
-    // size ascending
-    QCOMPARE(slm.setSortOrderReverse(false), true);
+    // global size ascending
+    QCOMPARE(slm.setSortResultReverse(false), true);
     QCOMPARE(slm.baseName(slm.index(0)), "Alvaro Morata");
     QCOMPARE(slm.baseName(slm.index(1)), "Raphael Varane");
     QCOMPARE(slm.baseName(slm.index(2)), "Kaka");

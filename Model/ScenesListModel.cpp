@@ -12,6 +12,8 @@
 
 ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  //
     : QAbstractListModelPub{listViewName, object} {
+  m_bDisableImage = Configuration().value(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, SceneKey::SCENE_DISABLE_IMAGE_DECORATION.v).toBool();
+
   const int perPageCnt{Configuration().value(SceneKey::SCENES_COUNT_EACH_PAGE.name, SceneKey::SCENES_COUNT_EACH_PAGE.v).toInt()};
   mPagedData.initPerPageCnt(perPageCnt);
   mPagedData.registerCallback(                                                         //
@@ -21,9 +23,9 @@ ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  
   );
 }
 
-void ScenesListModel::initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bDescendingReverse) {
+void ScenesListModel::initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bResultReverse) {
   auto comparator = SceneInfo::getCompareFunc(newSortDimension);
-  mPagedData.initSortSetting(comparator, bDescendingReverse);
+  mPagedData.initSortSetting(comparator, bResultReverse);
 }
 
 bool ScenesListModel::setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension) {
@@ -31,8 +33,8 @@ bool ScenesListModel::setSortDimension(SceneSortOrderHelper::SortDimE newSortDim
   return mPagedData.setSorter(comparator);
 }
 
-bool ScenesListModel::setSortOrderReverse(bool bDescendingReverse) {
-  return mPagedData.setSortOrderReverse(bDescendingReverse);
+bool ScenesListModel::setSortResultReverse(bool bResultReverse) {
+  return mPagedData.setSortResultReverse(bResultReverse);
 }
 
 QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
@@ -46,6 +48,9 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       return item.name;
     }
     case Qt::ItemDataRole::DecorationRole: {
+      if (m_bDisableImage) {
+        return {};
+      }
       const QString imgAbsPath{item.imgs.isEmpty() ? ":img/IMAGE_NOT_FOUND" : item.GetFirstImageAbsPath(mRootPath)};
       return GetDecorationPixmap(imgAbsPath);
     }
@@ -214,6 +219,19 @@ bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {
 
 bool ScenesListModel::onPageIndexChanged(int newPageIndex) {
   return mPagedData.setCurPageIndex(newPageIndex);
+}
+
+bool ScenesListModel::onDisableImageDecorationChanged(bool bDisabled) {
+  if (m_bDisableImage == bDisabled) {
+    return false;
+  }
+  int cnt = rowCount();
+  if (cnt == 0) {
+    return true;
+  }
+  m_bDisableImage = bDisabled;
+  emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole});
+  return true;
 }
 
 extern template class PaginatedListRangeEraseGuard<SceneInfo>;

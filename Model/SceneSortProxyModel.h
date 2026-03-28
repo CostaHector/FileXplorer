@@ -20,9 +20,9 @@ class SceneSortProxyModel : public QSortFilterProxyModel {
   bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override;
 
  private:
-  SceneSortOrderHelper::SortDimE m_sortDimension = SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER;
-  SceneInfo::CompareFunc mComparator = SceneInfo::getCompareFunc(m_sortDimension);
-  ScenesListModel* m_sourceModel = nullptr;
+  SceneSortOrderHelper::SortDimE m_sortDimension{SceneSortOrderHelper::SortDimE::END_INVALID};
+  SceneInfo::CompareFunc mComparator{nullptr};
+  ScenesListModel* m_sourceModel{nullptr};
 
 #ifdef RUNNING_UNIT_TESTS
   void ForceCompleteSort();

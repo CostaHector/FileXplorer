@@ -21,7 +21,7 @@ class PaginatedList {
   void initPerPageCnt(int perPageCnt) { mPerPageEleCnt = perPageCnt; }
   void initSortSetting(SceneElementSorter sorter, bool bDescending) {
     m_sorter = sorter;
-    m_sortDescending = bDescending;
+    m_sortResultReverse = bDescending;
   }
   void registerCallback(TBeforeDataResetCallable befFunc, TAfterDataResetCallable aftFunc, TEmitPageCntChangedCallable emitFunc) {
     mBeforeDataResetFunc = befFunc;
@@ -53,7 +53,7 @@ class PaginatedList {
     };
   }
   bool setSorter(SceneElementSorter sorter);
-  bool setSortOrderReverse(bool bDescendingReverse);
+  bool setSortResultReverse(bool bResultReverse);
 
   bool sort();
   typename SceneElementTypeList::const_iterator constBeginCurPage() const { return mDataList.cbegin() + mCurPageStart; } // used in SceneSortProxyModel
@@ -87,7 +87,7 @@ class PaginatedList {
   TEmitPageCntChangedCallable mEmitPageCntChangedFunc;
 
   SceneElementSorter m_sorter{nullptr};
-  bool m_sortDescending{false}; // aka reverse order
+  bool m_sortResultReverse{false}; // aka reverse order
 };
 
 template <typename SceneElementType>

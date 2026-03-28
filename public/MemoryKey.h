@@ -46,6 +46,7 @@ struct MemoryKey {
   static const KV SHOW_FLOATING_PREVIEW;
 
   static const KV SHOW_QUICK_NAVIGATION_TOOL_BAR;
+  static const KV EXPAND_QUICK_NAVIGATION_TOOL_BAR;
   static const KV SHOW_FRAMELESS_WINDOW;
   static const KV EXPAND_OFFICE_STYLE_MENUBAR;
   static const KV QUICK_WHERE_CLAUSE_AUTO_COMLETE_AKA;
@@ -111,6 +112,7 @@ struct MemoryKey {
 struct SceneKey {
   static const KV SCENE_SORT_ORDER;
   static const KV SCENE_SORT_BY_DIMENSION;
+  static const KV SCENE_DISABLE_IMAGE_DECORATION;
   static const KV SCENES_COUNT_EACH_PAGE;
 };
 

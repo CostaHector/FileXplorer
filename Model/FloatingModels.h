@@ -6,20 +6,28 @@
 class FloatingModels : public QAbstractListModelPub {
  public:
   using QAbstractListModelPub::QAbstractListModelPub;
+  QString rootPath() const { return mRootPath; }
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return m_curLoadedCount; }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   virtual int UpdateData(const QStringList& newDataLst);  // load all in a time
   QString filePath(const QModelIndex& index) const;
   bool IsEmpty() const { return mDataLst.isEmpty(); }
   void Clear() { UpdateData({}); }
+  QStringList rel2fileNames(const QModelIndexList& indexes) const;
+
  public slots:
   int setDirPath(const QString& path, const QStringList& sFilters, bool loadAllIn1Time = true);
+  int AfterRowsRemoved(const QModelIndexList& indexes);
 
  protected:
   bool canFetchMore(const QModelIndex& parent) const override;
   void fetchMore(const QModelIndex& parent) override;
   inline bool isOuterBound(const int& r) const { return r < 0 || r >= mDataLst.size(); }
+  void setRootPath(QString newRootPath) {
+    mRootPath = newRootPath;
+  }
 
+  QString mRootPath;
   QStringList mDataLst;
   int m_curLoadedCount{0};  // already loaded items count
   static constexpr int BATCH_LOAD_COUNT = 8;

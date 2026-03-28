@@ -4,6 +4,7 @@
 #include "PublicMacro.h"
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
+#include <QPushButton>
 
 int ImgReorderDialog::execCore(ImgReorderDialog* self) {
   CHECK_NULLPTR_RETURN_INT(self, -1);
@@ -18,6 +19,12 @@ ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
 
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   layout->addWidget(m_buttonBox);
+  if (QPushButton* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok)) {
+    pOkBtn->setShortcut(Qt::Key_F10);
+    pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Finish numerize")  //
+                           .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+    pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+  }
 
   connect(m_buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);

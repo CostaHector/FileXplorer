@@ -343,6 +343,9 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addSeparator();
   sceneTB->addAction(ag._UPDATE_JSON);
   sceneTB->addAction(ag._UPDATE_SCN);
+  sceneTB->addSeparator();
+  sceneTB->addAction(ag._DISABLE_IMAGE_DECORATION);
+  sceneTB->addSeparator();
   sceneTB->addAction(ag._CLEAR_SCN_FILE);
   sceneTB->addSeparator();
   sceneTB->addWidget(orderTB);
