@@ -1274,7 +1274,7 @@
     <message>
         <location line="+1"/>
         <source>Pictures</source>
-        <translation>图片\</translation>
+        <translation>图片</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1735,7 +1735,7 @@
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../Actions/SceneInPageActions.cpp" line="+12"/>
+        <location filename="../Actions/SceneInPageActions.cpp" line="+13"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -1745,7 +1745,7 @@
         <translation>更新场景</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Performance mode(disable image)</source>
         <translation>性能模式(禁用图片)</translation>
     </message>
@@ -1765,7 +1765,7 @@
         <translation>页内排序</translation>
     </message>
     <message>
-        <location line="+54"/>
+        <location line="+61"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
     </message>
