@@ -11,9 +11,6 @@
 #include <QActionGroup>
 #include <QMimeData>
 #include <QFileInfo>
-#include <QApplication>
-#include <QLayout>
-#include <QStyle>
 
 T_IntoNewPath NavigationExToolBar::m_IntoNewPathNavi{nullptr};
 constexpr char NavigationExToolBar::EXTRA_NAVI_DICT[];
@@ -168,13 +165,13 @@ void NavigationExToolBar::contextMenuEvent(QContextMenuEvent* event) {
 }
 
 void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folderName2AbsPath) {
-  static const QIcon dirIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon);
   for (auto it = folderName2AbsPath.cbegin(); it != folderName2AbsPath.cend(); ++it) {
     const QString& folderName = it.key();
     const QString& absPath = it.value();
-    QAction* pCollectionAct = new (std::nothrow) QAction{dirIcon, folderName, this};
+    QAction* pCollectionAct = new (std::nothrow) QAction{folderName, this};
     CHECK_NULLPTR_RETURN_VOID(pCollectionAct)
     pCollectionAct->setData(absPath);
+    pCollectionAct->setToolTip(QString{"<b>Folder: %1</b><br/>%2"}.arg(folderName, absPath));
     addAction(pCollectionAct);
   }
   SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);

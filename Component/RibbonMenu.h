@@ -28,11 +28,13 @@ class RibbonMenu : public QTabWidget {
   bool AddScenePageControlWidget(QWidget* scenePageControlWidget);
 
  public slots:
-  void on_expandStackedWidget(const bool vis);
+  void on_expandStackedWidget(bool bExpand);
   void on_currentTabChangedRecordIndex(const int tabIndex);
   void on_ViewTypeChanged(ViewTypeTool::ViewType vt);
 
  private:
+  void updateStackedWidgetHeight(bool bExpand, bool bAnimationEnabled);
+
   QAction* _EXPAND_RIBBONS{nullptr};
   QToolBar* m_corner{nullptr};
 

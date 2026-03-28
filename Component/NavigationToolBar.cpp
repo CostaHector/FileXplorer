@@ -3,14 +3,16 @@
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
+#include "SizeChangeAnimation.h"
 #include <QApplication>
 #include <QDir>
 #include <QStyle>
+#include <QTimer>
 
 constexpr int NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND, NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND;
 
-NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
-    : QToolBar{title, parent}                                                //
+NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
+  : QToolBar{title, parent}                                                 //
 {
   setObjectName(title);
 
@@ -18,7 +20,6 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
       Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
-  updateToolbarButtonStyle(bExpandSideBar);
 
   // 0. expand and minimum
   {
@@ -59,6 +60,12 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
     pPictures->setData(SystemPath::HOME_PATH() + "/Pictures");
     pVideos->setData(SystemPath::HOME_PATH() + "/Videos");
     pFavorite->setData(SystemPath::HOME_PATH() + "/Documents");
+    pDesktop->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDesktop->text(), pDesktop->data().toString()));
+    pDocument->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDocument->text(), pDocument->data().toString()));
+    pDownloads->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDownloads->text(), pDownloads->data().toString()));
+    pPictures->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pPictures->text(), pPictures->data().toString()));
+    pVideos->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pVideos->text(), pVideos->data().toString()));
+    pFavorite->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pFavorite->text(), pFavorite->data().toString()));
     addSeparator();
 
     m_pathActionGroups = new (std::nothrow) QActionGroup{this};
@@ -72,9 +79,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
 
     // 3. all volumes
     foreach (const QFileInfo& fi, QDir::drives()) {
-      auto* pVolume = addAction(fi.absoluteFilePath());
+      const QString diskAbsPath{fi.absoluteFilePath()};
+      auto* pVolume = addAction(diskAbsPath);
       CHECK_NULLPTR_RETURN_VOID(pVolume)
-      pVolume->setData(fi.absoluteFilePath());
+      pVolume->setData(diskAbsPath);
+      pVolume->setToolTip(QString{"<b>Disk: %1</b>"}.arg(diskAbsPath));
       m_pathActionGroups->addAction(pVolume);
     }
     addSeparator();
@@ -86,11 +95,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
   addWidget(m_extraAppendTB);
 
   SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
-
+  QTimer::singleShot(0, this, [this]() { updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false); });
   subscribe();
 }
 
-NavigationToolBar::~NavigationToolBar() {  //
+NavigationToolBar::~NavigationToolBar() { //
   Configuration().setValue(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, EXPAND_SIDEBAR->isChecked());
 }
 
@@ -102,14 +111,18 @@ void NavigationToolBar::subscribe() {
 }
 
 void NavigationToolBar::onExpandSidebar(bool bExpand) {
-  updateToolbarButtonStyle(bExpand);
+  updateToolbarButtonStyle(bExpand, true);
 }
 
-void NavigationToolBar::updateToolbarButtonStyle(bool bExpand) {
-  setToolButtonStyle(bExpand ? Qt::ToolButtonStyle::ToolButtonTextBesideIcon : Qt::ToolButtonStyle::ToolButtonIconOnly);
-  if (bExpand) {
-    setMaximumWidth(MAXIMUM_WIDTH_WHEN_EXPAND);
-  } else {
-    setMaximumWidth(MAXIMUM_WIDTH_WHEN_NOT_EXPAND);
+void NavigationToolBar::updateToolbarButtonStyle(bool bExpand, bool bAnimationEnabled) {
+#ifdef RUNNING_UNIT_TESTS // no need animation in testcase
+  bAnimationEnabled = false;
+#endif
+  SizeChangeAnimation ani{orientation(), MAXIMUM_WIDTH_WHEN_EXPAND, MAXIMUM_WIDTH_WHEN_NOT_EXPAND, bAnimationEnabled};
+  if (bExpand) { // 扩展场景, 需要事先设置Icon旁文字, 这样计算的宽度是最终宽度
+    ani.registerCallbackBeforeStart([this] { setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon); });
+  } else { // 收缩场景, 先收缩到一个很小值, 再设置仅文字
+    ani.registerCallbackWhenFinished([this] { setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly); });
   }
+  ani(this, width(), bExpand);
 }
