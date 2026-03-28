@@ -7,6 +7,7 @@
 #include "TDir.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
+#include "BatchRenameBy.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -30,6 +31,13 @@ class ItemViewTest : public PlainTestSuite {
     QCOMPARE(mTDir.createEntries(nodes), 4);
   }
   void cleanupTestCase() {}
+  void init() {  //
+    GlobalMockObject::reset();
+  }
+
+  void cleanup() {  //
+    GlobalMockObject::verify();
+  }
 
   void default_constructor() {
     ImgsModel mImgModel{"ImgsListView"};
@@ -79,6 +87,33 @@ class ItemViewTest : public PlainTestSuite {
     QCOMPARE(mTDir.exists("3ImagesFolder/CR7 1.png"), false);
     QCOMPARE(mImgModel.index(1, 0).isValid(), true);
     QCOMPARE(mImgTv.onCellDoubleClicked(mImgModel.index(1, 0)), false);
+  }
+
+  void onRenameSelectedItems_ok() {
+    MOCKER(BatchRenameBy::NumerizerQueryAndConfirm).stubs().will(returnValue(BatchRenameBy::RnmResult::ALL_SUCCEED));
+
+    ImgsModel mImgModel{"ImgsModel"};
+    mImgModel.UpdateData({
+        "selected/Chris.jpg",
+        "selected/Chris 1.jpg",
+        "selected/Chris 2.jpg",
+        "selected/Chris Evans.jpg",
+        "selected/Kaka.jpg",
+    });
+    QCOMPARE(mImgModel.rowCount(), 5);
+
+    ItemView mImgTv{"ImagesItemView"};
+    mImgTv.setViewMode(QListView::ViewMode::IconMode);
+    mImgTv.SetCurrentModel(&mImgModel);
+
+    mImgTv.clearSelection();
+    QCOMPARE(mImgTv.onRenameSelectedItems(), 0);
+
+    mImgTv.selectionModel()->select(mImgModel.index(0), QItemSelectionModel::SelectionFlag::Select);
+    mImgTv.selectionModel()->select(mImgModel.index(4), QItemSelectionModel::SelectionFlag::Select);
+
+    QCOMPARE(mImgTv.onRenameSelectedItems(), 2);
+    QCOMPARE(mImgModel.rowCount(), 5 - 2);
   }
 };
 

@@ -89,7 +89,7 @@ class SceneListViewTest : public PlainTestSuite {
   void init() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_MOVIE_PATH->setChecked(true);
-    sceneAct._REVERSE_ORDER->setChecked(false);  // by name ascending chris -> henry
+    sceneAct._REVERSE_RESULT->setChecked(false);  // by name ascending chris -> henry
     GlobalMockObject::reset();
   }
 
@@ -222,7 +222,7 @@ class SceneListViewTest : public PlainTestSuite {
     }
 
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_ORDER->setChecked(true);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_RESULT->setChecked(true);  // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Henry Cavill");
@@ -231,7 +231,7 @@ class SceneListViewTest : public PlainTestSuite {
     QCOMPARE(spy.count(), 4);
     QCOMPARE(spy.back(), expectCurrentSceneChangedArgs_HenryCavill);
 
-    sceneAct._REVERSE_ORDER->setChecked(false);  // by rate descending, henry 8, chris 3
+    sceneAct._REVERSE_RESULT->setChecked(false);  // by rate descending, henry 8, chris 3
     firstIndex = sceneProxyModel.index(0, 0);
     secondIndex = sceneProxyModel.index(1, 0);
     QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), "Chris Evans");
@@ -317,7 +317,7 @@ class SceneListViewTest : public PlainTestSuite {
   void delegate_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
     sceneAct._BY_RATE->setChecked(true);
-    sceneAct._REVERSE_ORDER->setChecked(false);  // by rate ascending
+    sceneAct._REVERSE_RESULT->setChecked(false);  // by rate ascending
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;

@@ -88,7 +88,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+95"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -820,12 +820,17 @@
 <context>
     <name>ItemView</name>
     <message>
-        <location filename="../View/ItemView.cpp" line="+12"/>
+        <location filename="../View/ItemView.cpp" line="+13"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>Rename (ith)</source>
+        <translation>重命名(编号)</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
@@ -1240,6 +1245,49 @@
     </message>
 </context>
 <context>
+    <name>NavigationToolBar</name>
+    <message>
+        <location filename="../Component/NavigationToolBar.cpp" line="+25"/>
+        <source>Expand sidebar</source>
+        <translation>展开侧边栏</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Devices and Drives</source>
+        <translation>设备和磁盘</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Desktop</source>
+        <translation>桌面</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Documents</source>
+        <translation>文档</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Downloads</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pictures</source>
+        <translation>图片\</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Videos</source>
+        <translation>视频</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Favorites</source>
+        <translation>收藏</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceActions</name>
     <message>
         <location filename="../Actions/PreferenceActions.cpp" line="+44"/>
@@ -1589,7 +1637,7 @@
         <translation>扩展名独立计数</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+43"/>
         <source>Base name:</source>
         <translation>基础名:</translation>
     </message>
@@ -1697,22 +1745,27 @@
         <translation>更新场景</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
+        <source>Performance mode(disable image)</source>
+        <translation>性能模式(禁用图片)</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Clear scn</source>
         <translation>清除场景</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Reverse</source>
-        <translation>反转排序</translation>
+        <source>Reverse result</source>
+        <translation>倒序</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Sort Current Page Only</source>
-        <translation>仅排序当前页面</translation>
+        <location line="+6"/>
+        <source>Sort Per Page</source>
+        <translation>页内排序</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+54"/>
         <source>Sort Dimension</source>
         <translation>排序维度</translation>
     </message>
@@ -1720,7 +1773,7 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+44"/>
+        <location filename="../View/SceneListView.cpp" line="+42"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
@@ -1731,6 +1784,11 @@
     </message>
     <message>
         <location line="+7"/>
+        <source>Rename (ith)</source>
+        <translation>重命名(编号)</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Recycle related files</source>
         <translation>回收相关文件</translation>
     </message>

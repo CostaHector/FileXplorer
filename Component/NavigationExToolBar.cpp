@@ -41,9 +41,6 @@ NavigationExToolBar::NavigationExToolBar(const QString& title, QWidget* parent) 
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
-  // setContextMenuPolicy(Qt::CustomContextMenu);
-  // connect(this, &QToolBar::customContextMenuRequested, this, &NavigationExToolBar::CustomContextMenuEvent);
-
   setAcceptDrops(true);
 
   ReadSettings();
@@ -113,7 +110,7 @@ void NavigationExToolBar::SaveName2PathLink() {
     }
     Configuration().setArrayIndex(extraIndex);
     Configuration().setValue(EXTRA_NAVI_DICT_KEY, pPathAct->text());
-    Configuration().setValue(EXTRA_NAVI_DICT_VALUE, pPathAct->toolTip());
+    Configuration().setValue(EXTRA_NAVI_DICT_VALUE, pPathAct->data().toString());
     ++extraIndex;
   }
   Configuration().endArray();
@@ -177,7 +174,7 @@ void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folde
     const QString& absPath = it.value();
     QAction* pCollectionAct = new (std::nothrow) QAction{dirIcon, folderName, this};
     CHECK_NULLPTR_RETURN_VOID(pCollectionAct)
-    pCollectionAct->setToolTip(absPath);
+    pCollectionAct->setData(absPath);
     addAction(pCollectionAct);
   }
   SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
@@ -186,5 +183,6 @@ void NavigationExToolBar::AppendExtraActions(const QMap<QString, QString>& folde
 bool NavigationExToolBar::onPathActionTriggeredNavi(const QAction* pAct) {
   CHECK_NULLPTR_RETURN_FALSE(m_IntoNewPathNavi);
   CHECK_NULLPTR_RETURN_FALSE(pAct);
-  return m_IntoNewPathNavi(pAct->toolTip(), true);
+  const QVariant& pathVar{pAct->data()};
+  return m_IntoNewPathNavi(pathVar.toString(), true);
 }

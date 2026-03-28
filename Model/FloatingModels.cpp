@@ -19,6 +19,8 @@ QVariant FloatingModels::data(const QModelIndex& index, int role) const {
 }
 
 int FloatingModels::UpdateData(const QStringList& newDataLst) { // dont use newImgsLst after
+  setRootPath(PathTool::longestCommonPrefix(newDataLst));
+
   RowsCountBeginChange(mDataLst.size(), newDataLst.size());
 
   mDataLst = newDataLst;
@@ -30,7 +32,7 @@ int FloatingModels::UpdateData(const QStringList& newDataLst) { // dont use newI
 
 QString FloatingModels::filePath(const QModelIndex& index) const {
   const int rw = index.row();
-  if (rw < 0 || rw >= mDataLst.size()) {
+  if (isOuterBound(rw)) {
     return {};
   }
   return mDataLst[rw];
@@ -76,6 +78,30 @@ void FloatingModels::fetchMore(const QModelIndex& parent) {
   endInsertRows();
 }
 
+QStringList FloatingModels::rel2fileNames(const QModelIndexList& indexes) const {
+  if (indexes.isEmpty()) {
+    return {};
+  }
+  QStringList relativePaths2FileName;
+  relativePaths2FileName.reserve(indexes.size());
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const QString& fullPath = filePath(index);
+    relativePaths2FileName.push_back(fullPath.isEmpty() ? "" : fullPath.mid(N + 1));
+  }
+  return relativePaths2FileName;
+}
+
+int FloatingModels::AfterRowsRemoved(const QModelIndexList& indexes) {
+  if (indexes.isEmpty()) {
+    return {};
+  }
+  const auto rowElementsRmv = [this](int beg, int end) { mDataLst.erase(mDataLst.begin() + beg, mDataLst.begin() + end); };
+  int rmvedCnt = onRowsRemoved(indexes, rowElementsRmv);
+  m_curLoadedCount = mDataLst.size();
+  return rmvedCnt;
+}
+
 // ------------------
 QVariant ImgsModel::data(const QModelIndex& index, int role) const {
   const int rw = index.row();
@@ -91,6 +117,8 @@ QVariant ImgsModel::data(const QModelIndex& index, int role) const {
 }
 
 int ImgsModel::UpdateData(const QStringList& newDataLst) {
+  setRootPath(PathTool::longestCommonPrefix(newDataLst));
+
   beginResetModel();
 
   mDataLst = newDataLst;

@@ -26,6 +26,17 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
+  bool disableImage{Configuration().value(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, SceneKey::SCENE_DISABLE_IMAGE_DECORATION.v).toBool()};
+  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance mode(disable image)"), this);
+  CHECK_NULLPTR_RETURN_VOID(_DISABLE_IMAGE_DECORATION);
+  _DISABLE_IMAGE_DECORATION->setCheckable(true);
+  _DISABLE_IMAGE_DECORATION->setChecked(disableImage);
+  _DISABLE_IMAGE_DECORATION->setShortcutVisibleInContextMenu(true);
+  _DISABLE_IMAGE_DECORATION->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                                "Hide images for faster performance. Otherwise show movie posters by default.\n"
+                                                "(<i>Useful for faster sorting and filtering</i>)")
+                                            .arg(_DISABLE_IMAGE_DECORATION->text(), _DISABLE_IMAGE_DECORATION->shortcut().toString()));
+
   _CLEAR_SCN_FILE = new (std::nothrow) QAction(QIcon(":img/CLEAR_SCN_FILES"), tr("Clear scn"), this);
   CHECK_NULLPTR_RETURN_VOID(_CLEAR_SCN_FILE);
   _CLEAR_SCN_FILE->setToolTip(QString("<b>%1 (%2)</b><br/>"
@@ -51,17 +62,17 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   _BY_UPLOADED_TIME->setCheckable(true);
 
   bool reverseOrder{Configuration().value(SceneKey::SCENE_SORT_ORDER.name, SceneKey::SCENE_SORT_ORDER.v).toBool()};
-  _REVERSE_ORDER = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Reverse"), this);
-  CHECK_NULLPTR_RETURN_VOID(_REVERSE_ORDER);
-  _REVERSE_ORDER->setCheckable(true);
-  _REVERSE_ORDER->setChecked(reverseOrder);
-  _REVERSE_ORDER->setToolTip("Toggle between ascending and descending order");
+  _REVERSE_RESULT = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Reverse result"), this);
+  CHECK_NULLPTR_RETURN_VOID(_REVERSE_RESULT);
+  _REVERSE_RESULT->setCheckable(true);
+  _REVERSE_RESULT->setChecked(reverseOrder);
+  _REVERSE_RESULT->setToolTip("Toggle between ascending and descending order");
 
-  _SORT_RANGE_CURRENT_PAGE = new (std::nothrow) QAction(tr("Sort Current Page Only"), this);
-  CHECK_NULLPTR_RETURN_VOID(_REVERSE_ORDER);
-  _SORT_RANGE_CURRENT_PAGE->setCheckable(true);
-  _SORT_RANGE_CURRENT_PAGE->setChecked(false);
-  _SORT_RANGE_CURRENT_PAGE->setToolTip("Apply sorting to current page only (unchecked by default: sort entire list)");
+  _SORT_RANGE_PAGE_BY_PAGE = new (std::nothrow) QAction(tr("Sort Per Page"), this);
+  CHECK_NULLPTR_RETURN_VOID(_SORT_RANGE_PAGE_BY_PAGE);
+  _SORT_RANGE_PAGE_BY_PAGE->setCheckable(true);
+  _SORT_RANGE_PAGE_BY_PAGE->setChecked(false);
+  _SORT_RANGE_PAGE_BY_PAGE->setToolTip("Sort each page independently when enabled. Otherwise sort entire list by default");
 
   mSortOrderIntAction.init({{_BY_MOVIE_PATH, SortDimE::MOVIE_PATH},
                             {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
@@ -80,7 +91,8 @@ SceneInPageActions::~SceneInPageActions() {
 }
 
 void SceneInPageActions::subscribe() {
-  connect(_REVERSE_ORDER, &QAction::toggled, this, &SceneInPageActions::onReverseSortOrderToggled);
+  connect(_DISABLE_IMAGE_DECORATION, &QAction::toggled, this, &SceneInPageActions::disableImageDecorationChanged);
+  connect(_REVERSE_RESULT, &QAction::toggled, this, &SceneInPageActions::onReverseSortOrderToggled);
   connect(mSortOrderIntAction.getActionGroup(), &QActionGroup::triggered, this, &SceneInPageActions::onSortDimensionTriggered);
 }
 
@@ -116,8 +128,8 @@ QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
 
   orderTB->addWidget(orderToolButton);
-  orderTB->addAction(_REVERSE_ORDER);
-  orderTB->addAction(_SORT_RANGE_CURRENT_PAGE);
+  orderTB->addAction(_REVERSE_RESULT);
+  orderTB->addAction(_SORT_RANGE_PAGE_BY_PAGE);
   orderTB->setOrientation(Qt::Orientation::Vertical);
   orderTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   orderTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});

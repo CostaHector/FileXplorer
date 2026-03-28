@@ -31,13 +31,11 @@ bool PaginatedList<SceneElementType>::sort() {
   if (m_sorter == nullptr) {
     return false;
   }
-  auto beg{mDataList.begin()};
-  auto end{mDataList.end()};
-  if (m_sortDescending) {
+  if (m_sortResultReverse) {
     auto localSorter = m_sorter;
-    std::sort(beg, end, [localSorter](const SceneElementType& lhs, const SceneElementType& rhs) -> bool { return localSorter(rhs, lhs); });
+    std::sort(mDataList.begin(), mDataList.end(), [localSorter](const SceneElementType& lhs, const SceneElementType& rhs) -> bool { return localSorter(rhs, lhs); });
   } else {
-    std::sort(beg, end, m_sorter);
+    std::sort(mDataList.begin(), mDataList.end(), m_sorter);
   }
   return true;
 }
@@ -131,11 +129,11 @@ bool PaginatedList<SceneElementType>::setSorter(SceneElementSorter sorter) {
 }
 
 template <typename SceneElementType>
-bool PaginatedList<SceneElementType>::setSortOrderReverse(bool bDescendingReverse) {
-  if (m_sortDescending == bDescendingReverse) {
+bool PaginatedList<SceneElementType>::setSortResultReverse(bool bResultReverse) {
+  if (m_sortResultReverse == bResultReverse) {
     return false;
   }
-  m_sortDescending = bDescendingReverse;
+  m_sortResultReverse = bResultReverse;
   if (mBeforeDataResetFunc) {
     mBeforeDataResetFunc();
   }

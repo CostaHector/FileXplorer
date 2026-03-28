@@ -46,7 +46,7 @@ void SceneSortProxyModel::sortByFieldDimension(SceneSortOrderHelper::SortDimE ne
 }
 
 bool SceneSortProxyModel::lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const {
-  if (m_sourceModel == nullptr) {
+  if (m_sourceModel == nullptr || mComparator == nullptr) {
     return false;
   }
   int leftRow = 0, rightRow = 0;

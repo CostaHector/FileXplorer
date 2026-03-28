@@ -69,9 +69,9 @@ class PaginatedListTest : public PlainTestSuite {
 
     QCOMPARE(lst.setCurPageIndex(-1), false);
     QVERIFY(lst.m_sorter == nullptr);
-    QCOMPARE(lst.m_sortDescending, false);
+    QCOMPARE(lst.m_sortResultReverse, false);
     QCOMPARE(lst.setSorter(nullptr), false);
-    QCOMPARE(lst.setSortOrderReverse(false), false);  // unchange
+    QCOMPARE(lst.setSortResultReverse(false), false);  // unchange
   }
 
   void setData_no_register_ok() {
@@ -382,11 +382,11 @@ class PaginatedListTest : public PlainTestSuite {
   }
 
   void initSortSetting_ok() {
-    {  // no sort pointer, registered
+    {  // no sort pointer, globally, registered
       PaginatedIntList lst;
       lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
       QVERIFY(lst.m_sorter == nullptr);
-      QCOMPARE(lst.m_sortDescending, false);
+      QCOMPARE(lst.m_sortResultReverse, false);
       lst.initPerPageCnt(1000);
       lst.setData({2, 1, 3, 0, 4});
       QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
@@ -404,46 +404,113 @@ class PaginatedListTest : public PlainTestSuite {
       initCallTime();
     }
 
-    {  // sort ascending/descending, registered
+    {  // sort ascending/descending only 1 page. globally, registered
       PaginatedIntList lst;
       lst.initPerPageCnt(1000);
-      lst.initSortSetting(&::lessInt, false);
+      lst.initSortSetting(&::lessInt, false);  // less, no reverse, global
       lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
       initCallTime();
       lst.setData({2, 1, 3, 0, 4});
+      QCOMPARE(lst.GetPageCnt(), 1);
       QCOMPARE(lst.mDataList, (QList<int>{0, 1, 2, 3, 4}));
       QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
       QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
       QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 1);  // 0->1
       initCallTime();
 
-      QCOMPARE(lst.setSortOrderReverse(true), true);
+      QCOMPARE(lst.setSortResultReverse(true), true);
       QCOMPARE(lst.mDataList, (QList<int>{4, 3, 2, 1, 0}));
       QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
       QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
       QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);  // will never call this
       initCallTime();
-      QCOMPARE(lst.setSortOrderReverse(true), false);  // unchange
+      QCOMPARE(lst.setSortResultReverse(true), false);  // unchange
     }
   }
 
   void setSorter_ok() {
     PaginatedIntList lst;
     lst.initPerPageCnt(1000);
-    lst.initSortSetting(&::lessInt, true);  // less, reverse
+    lst.initSortSetting(&::lessInt, true);  // less, reverse, global
     lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
-    initCallTime();
     lst.setData({2, 1, 3, 0, 4});
     QCOMPARE(lst.mDataList, (QList<int>{4, 3, 2, 1, 0}));
     QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
     QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
     QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 1);
+    initCallTime();
 
     QCOMPARE(lst.setSorter(nullptr), false);  // nullptr
     QCOMPARE(lst.setSorter(lessInt), false);  // unchange
 
     QCOMPARE(lst.setSorter(greaterInt), true);  // greater, reverse
     QCOMPARE(lst.mDataList, (QList<int>{0, 1, 2, 3, 4}));
+  }
+
+  void setSortResultReverse_ok() {
+    // only one page
+    {
+      PaginatedIntList lst;
+      lst.initPerPageCnt(1000);
+      lst.initSortSetting(nullptr, false);  // no sort, no reverse, global
+      lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
+      lst.setData({2, 1, 3, 0, 4});
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(false), false);  // unchange
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 0);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 0);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(true), true);  // simply reverse result
+      QCOMPARE(lst.mDataList, (QList<int>{4, 0, 3, 1, 2}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(false), true);  // simply reverse result again
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+    }
+
+    // 2 page global
+    {
+      PaginatedIntList lst;
+      lst.initPerPageCnt(3);
+      lst.initSortSetting(nullptr, false);  // no sort, no reverse, global
+      lst.registerCallback(&BeforeDataResetCallable, &AfterDataResetCallable, &EmitPageCntChangedCallable);
+      lst.setData({2, 1, 3, 0, 4});
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(false), false);  // unchange
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 0);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 0);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(true), true);  // simply reverse result
+      QCOMPARE(lst.mDataList, (QList<int>{4, 0, 3, 1, 2}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+
+      QCOMPARE(lst.setSortResultReverse(false), true);  // simply reverse result again
+      QCOMPARE(lst.mDataList, (QList<int>{2, 1, 3, 0, 4}));
+      QCOMPARE(m_TBeforeDataResetCallableCallTime, 1);
+      QCOMPARE(m_TAfterDataResetCallableCallTime, 1);
+      QCOMPARE(m_TEmitPageCntChangedCallableCallTime, 0);
+      initCallTime();
+    }
   }
 };
 

@@ -3,6 +3,7 @@
 #include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
+#include "BatchRenameBy.h"
 #include <QFile>
 
 ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
@@ -10,8 +11,13 @@ ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
   setMovement(QListView::Movement::Free);
 
   _PLAY_ITEM = new (std::nothrow) QAction{tr("Open"), this};
+  _RENAME_SCENE_RELATED_FILES_NUMERIZE = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"), this);
+  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setShortcutVisibleInContextMenu(true);
+  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setToolTip(QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.")
+                                                       .arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->text())
+                                                       .arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->shortcut().toString()));
   _RECYCLE_ITEM = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle"), this};
-  QList<QAction*> exclusiveActions{_PLAY_ITEM, NewSeperatorAction(this), _RECYCLE_ITEM};
+  QList<QAction*> exclusiveActions{_RENAME_SCENE_RELATED_FILES_NUMERIZE, _PLAY_ITEM, _RECYCLE_ITEM};
   PushFrontExclusiveActions(exclusiveActions);
   subscribe();
 }
@@ -31,6 +37,7 @@ bool ItemView::SetCurrentModel(FloatingModels* mdl) {
 void ItemView::subscribe() {
   connect(this, &QListView::doubleClicked, this, &ItemView::onCellDoubleClicked);
   connect(_PLAY_ITEM, &QAction::triggered, this, &ItemView::onPlayCurrentIndex);
+  connect(_RENAME_SCENE_RELATED_FILES_NUMERIZE, &QAction::triggered, this, &ItemView::onRenameSelectedItems);
   connect(_RECYCLE_ITEM, &QAction::triggered, this, &ItemView::onRecycleSelections);
 }
 
@@ -74,4 +81,18 @@ bool ItemView::onRecycleSelections() const {
   }
   LOG_OK_P("[MoveToTrash] ok", "%d item(s) recycled succeed", inds.size());
   return true;
+}
+
+int ItemView::onRenameSelectedItems() {
+  const QModelIndexList& srcIndexes{selectionModel()->selectedRows()};
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip rename(numerize)", "no row selected");
+    return 0;
+  }
+
+  const QString& localPath{mModels->rootPath()};
+  const QStringList& fileNamesSelected{mModels->rel2fileNames(srcIndexes)};
+  const BatchRenameBy::RnmResult rnmResult{BatchRenameBy::NumerizerQueryAndConfirm(localPath, fileNamesSelected)};
+  const int removeRowCnt{mModels->AfterRowsRemoved(srcIndexes)};
+  return fileNamesSelected.size();
 }

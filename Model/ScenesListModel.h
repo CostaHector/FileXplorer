@@ -15,9 +15,9 @@ class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
  public:
   explicit ScenesListModel(const QString& listViewName, QObject* object = nullptr);
-  void initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bDescendingReverse);
+  void initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bResultReverse);
   bool setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension);
-  bool setSortOrderReverse(bool bDescendingReverse);
+  bool setSortResultReverse(bool bResultReverse);
 
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   inline QString rootPath() const { return mRootPath; }
@@ -51,6 +51,7 @@ class ScenesListModel : public QAbstractListModelPub {
   bool onPageIndexChanged(int newPageIndex);
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
   void EmitPagesCountChanged(int newPagesCount) { emit pagesCountChanged(newPagesCount); }
+  bool onDisableImageDecorationChanged(bool bDisabled);
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);
@@ -58,5 +59,6 @@ class ScenesListModel : public QAbstractListModelPub {
   QString mPattern;
   QString mRootPath;
   PaginatedSceneList mPagedData;
+  bool m_bDisableImage{false};
 };
 #endif  // SCENESLISTMODEL_H

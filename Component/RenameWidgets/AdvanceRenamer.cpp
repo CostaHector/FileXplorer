@@ -119,17 +119,19 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
   CHECK_NULLPTR_RETURN_NULLPTR(buttonBox)
   buttonBox->setOrientation(Qt::Orientation::Horizontal);
 
-  auto* pOkBtn = buttonBox->button(QDialogButtonBox::Ok);
-  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
-  pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
-                         .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+  if (QPushButton* pOkBtn = buttonBox->button(QDialogButtonBox::Ok)) {
+    pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
+    pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
+                           .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+    pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+  }
 
-  auto* pHelpBtn = buttonBox->button(QDialogButtonBox::Help);
-  pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
-  pHelpBtn->setText(tr("See commands..."));
-  pHelpBtn->setCheckable(true);
-  pHelpBtn->setChecked(false);
+  if (QPushButton* pHelpBtn = buttonBox->button(QDialogButtonBox::Help)) {
+    pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
+    pHelpBtn->setText(tr("See commands..."));
+    pHelpBtn->setCheckable(true);
+    pHelpBtn->setChecked(false);
+  }
   return buttonBox;
 }
 
