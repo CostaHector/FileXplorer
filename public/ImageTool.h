@@ -44,7 +44,7 @@ struct IMAGE_SIZE {
           QSize(7985, 4935),
           QSize(12920, 7985),
       };
-  static constexpr int DEFAULT_SCALED_SIZE = 5;
+  static constexpr int DEFAULT_IMAGE_SCALED_SIZE = 5, DEFAULT_NON_IMAGE_SCALED_SIZE = 0;
   static constexpr int ICON_SIZE_CANDIDATES_N = sizeof(ICON_SIZE_CANDIDATES) / sizeof(*ICON_SIZE_CANDIDATES);
   static QString HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex=nullptr);
   static int clampScaledIndex(int newScaledIndex);

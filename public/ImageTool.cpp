@@ -42,11 +42,11 @@ QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int exp
     return pm;
   }
   if (fileAbsPath.startsWith(':') || IsFileAbsPathImage(fileAbsPath)) {
-    if (QFile{fileAbsPath}.size() > 10 * 1024 * 1024) {  // 10MB
-      return {};                                         // image files too large
+    if (QFile{fileAbsPath}.size() > 10 * 1024 * 1024) { // 10MB
+      return {};                                        // image files too large
     }
     if (!pm.load(fileAbsPath)) {
-      return {};  // load failed
+      return {}; // load failed
     }
   } else {
     const QString& starDotExt{PathTool::GetAsteriskDotFileExtension(fileAbsPath)};
@@ -86,14 +86,14 @@ QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase) {
   return imgStr;
 }
 
-}  // namespace ImageTool
+} // namespace ImageTool
 
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_16;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_24;
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_48;
 constexpr QSize IMAGE_SIZE::ICON_SIZE_CANDIDATES[];
 constexpr int IMAGE_SIZE::ICON_SIZE_CANDIDATES_N;
-constexpr int IMAGE_SIZE::DEFAULT_SCALED_SIZE;
+constexpr int IMAGE_SIZE::DEFAULT_IMAGE_SCALED_SIZE, IMAGE_SIZE::DEFAULT_NON_IMAGE_SCALED_SIZE;
 
 QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledIndex) {
   if (scaleIndex < 0 || scaleIndex >= IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
@@ -105,8 +105,10 @@ QString IMAGE_SIZE::HumanReadFriendlySize(int scaleIndex, bool* isValidScaledInd
   if (isValidScaledIndex != nullptr) {
     *isValidScaledIndex = true;
   }
-  return QString::asprintf("[%d] %d-by-%d", scaleIndex,  //
-                           ICON_SIZE_CANDIDATES[scaleIndex].width(), ICON_SIZE_CANDIDATES[scaleIndex].height());
+  return QString::asprintf("[%d] %d-by-%d",
+                           scaleIndex, //
+                           ICON_SIZE_CANDIDATES[scaleIndex].width(),
+                           ICON_SIZE_CANDIDATES[scaleIndex].height());
 }
 
 int IMAGE_SIZE::clampScaledIndex(int newScaledIndex) {
@@ -120,11 +122,17 @@ int IMAGE_SIZE::clampScaledIndex(int newScaledIndex) {
 }
 
 int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
-  int iconSizeIndexHint = Configuration().value(name + "_ICON_SIZE_INDEX", DEFAULT_SCALED_SIZE).toInt();
-  return clampScaledIndex(iconSizeIndexHint);  // [0, WHEEL_CANDIDATES_N)
+  const bool isImageRelated{
+      name.contains("img", Qt::CaseSensitivity::CaseInsensitive)        //
+      || name.contains("image", Qt::CaseSensitivity::CaseInsensitive)   //
+      || name.contains("scene", Qt::CaseSensitivity::CaseInsensitive)   //
+      || name.contains("browser", Qt::CaseSensitivity::CaseInsensitive) //
+  }; //
+  const int defaultScaledSize{isImageRelated ? DEFAULT_IMAGE_SCALED_SIZE : DEFAULT_NON_IMAGE_SCALED_SIZE};
+  int iconSizeIndexHint = Configuration().value(name + "_ICON_SIZE_INDEX", defaultScaledSize).toInt();
+  return clampScaledIndex(iconSizeIndexHint); // [0, WHEEL_CANDIDATES_N)
 }
 
 void IMAGE_SIZE::SaveInitialScaledSize(const QString& name, int scaledIndex) {
   Configuration().setValue(name + "_ICON_SIZE_INDEX", scaledIndex);
 }
-
