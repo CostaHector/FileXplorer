@@ -12,7 +12,7 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _SETTINGS->setShortcutVisibleInContextMenu(true);
   _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
 
-  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/PASSWORD_TABLE"), tr("Pwd book"), this};
+  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/PASSWORD_TABLE"), tr("Password book"), this};
   CHECK_NULLPTR_RETURN_VOID(_PWD_BOOK);
   _PWD_BOOK->setCheckable(true);
   _PWD_BOOK->setShortcutVisibleInContextMenu(true);
@@ -22,10 +22,11 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   CHECK_NULLPTR_RETURN_VOID(_ABOUT_FILE_EXPLORER);
   _ABOUT_FILE_EXPLORER->setCheckable(true);
 
-  _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), tr("Language"), this};
+  _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), "语言/Language", this};
   CHECK_NULLPTR_RETURN_VOID(_LANUAGE);
   _LANUAGE->setCheckable(true);
   _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool());
+  _LANUAGE->setToolTip("Toggle language between 中文(Chinese) and English, by default: English");
 
   _CPU_MEMORY_USAGE_MONITOR = new (std::nothrow) QAction{QIcon(":img/USAGE_MONITOR"), tr("Usage Monitor"), this};
   CHECK_NULLPTR_RETURN_VOID(_CPU_MEMORY_USAGE_MONITOR);

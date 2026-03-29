@@ -228,16 +228,16 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>Flow Orientation: TopToBottom</source>
-        <translation>布局方向:从上往下</translation>
+        <source>Flow Orientation: Left2Right</source>
+        <translation>布局:从左往右</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>View Mode: Icon</source>
         <translation>视图模式:图标</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Resize Mode: Adjust</source>
         <translation>大小调整:自适应</translation>
     </message>
@@ -247,7 +247,7 @@
         <translation>卷绕显示</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Uniform items sizes</source>
         <translation>项大小统一</translation>
     </message>
@@ -367,22 +367,17 @@
         <translation>设置</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Pwd book</source>
-        <translation>密码簿</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+12"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Language</source>
-        <translation>语言</translation>
+        <location line="-6"/>
+        <source>Password book</source>
+        <translation>密码本</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>Usage Monitor</source>
         <translation>性能监控</translation>
     </message>
@@ -654,7 +649,7 @@
 <context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+20"/>
+        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
         <source>Shift right 100</source>
         <translation>命名编号右移100</translation>
     </message>
@@ -1247,7 +1242,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../Component/NavigationToolBar.cpp" line="+25"/>
+        <location filename="../Component/NavigationToolBar.cpp" line="+26"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1689,7 +1684,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../Component/RibbonMenu.cpp" line="+40"/>
+        <location filename="../Component/RibbonMenu.cpp" line="+42"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>

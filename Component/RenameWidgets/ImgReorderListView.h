@@ -19,6 +19,7 @@ class ImgReorderListView : public CustomListView {
 
  private:
   int calculateInsertionRow(const QPoint& pos) const;
+  void initExclusivePreferenceSetting() override;
 
   QAction *mBatchShiftRight100{nullptr}, *mBatchShiftLeft100{nullptr};
   QAction* mNormalizeKeepRelativeOrder{nullptr};

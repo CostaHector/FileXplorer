@@ -21,6 +21,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
 
   void default_ok() {
     ImgReorderListView reorderList;
+    reorderList.InitListView();
     QVERIFY(reorderList.mImgReorderListModel != nullptr);
     QVERIFY(reorderList.mBatchShiftRight100 != nullptr);
     QVERIFY(reorderList.mBatchShiftLeft100 != nullptr);
@@ -75,6 +76,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
     const QString namePattern{" %1"};
 
     ImgReorderListView reorderList;
+    reorderList.InitListView();
     QCOMPARE(reorderList.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     const int N = reorderList.mImgReorderListModel->rowCount();
     QCOMPARE(N, 3);
@@ -139,6 +141,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
     const QString namePattern{" %1"};
 
     ImgReorderListView reorderList;
+    reorderList.InitListView();
     QCOMPARE(reorderList.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
 
@@ -177,6 +180,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
     const QString namePattern{" %1"};
 
     ImgReorderListView reorderList;
+    reorderList.InitListView();
     QCOMPARE(reorderList.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
 
     MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(QString{"/Ricardo Leite.jpg"})).will(returnValue(false));

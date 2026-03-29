@@ -41,6 +41,18 @@ void ItemView::subscribe() {
   connect(_RECYCLE_ITEM, &QAction::triggered, this, &ItemView::onRecycleSelections);
 }
 
+void ItemView::initExclusivePreferenceSetting() {
+  if (CustomListView::m_name.contains("img", Qt::CaseSensitivity::CaseInsensitive) ||
+      CustomListView::m_name.contains("image", Qt::CaseSensitivity::CaseInsensitive)) {
+    CustomListView::m_defaultFlowLeft2Right = true;
+    CustomListView::m_defaultViewModeIcon = true;
+  } else {
+    CustomListView::m_defaultFlowLeft2Right = false;
+    CustomListView::m_defaultViewModeIcon = false;
+  }
+  CustomListView::m_defaultWrapping = true;
+}
+
 bool ItemView::onCellDoubleClicked(const QModelIndex& clickedIndex) const {
   CHECK_NULLPTR_RETURN_FALSE(mModels);
   if (!clickedIndex.isValid()) {

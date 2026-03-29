@@ -171,7 +171,7 @@ void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
     CHECK_NULLPTR_RETURN_VOID(mImgModel)
     mImgTv = new (std::nothrow) ItemView{GetMemoryName() + "_IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgTv)
-    mImgTv->setViewMode(QListView::ViewMode::IconMode);
+    mImgTv->InitListView();
     mImgTv->SetCurrentModel(mImgModel);
     mImgTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     addWidget(mImgTv);
@@ -205,7 +205,8 @@ void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
     mOthModel = new (std::nothrow) OthersModel{GetMemoryName() + "_OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthModel)
     mOthTv = new (std::nothrow) ItemView{GetMemoryName() + "_OTHER", this};
-    CHECK_NULLPTR_RETURN_VOID(mOthTv)
+    CHECK_NULLPTR_RETURN_VOID(mOthTv);
+    mOthTv->InitListView();
     mOthTv->SetCurrentModel(mOthModel);
     mOthTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     addWidget(mOthTv);

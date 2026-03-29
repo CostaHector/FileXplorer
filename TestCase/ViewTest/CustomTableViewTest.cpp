@@ -42,7 +42,7 @@ public:
   explicit SimpleCustomTableView(QStandardItemModel* pModel, QWidget* parent = nullptr)
     : CustomTableView{SIMPLE_TABLE_VIEW, parent} {
     setModel(pModel);
-    InitTableView(true);
+    InitTableView();
   }
 
 private:
@@ -134,7 +134,7 @@ private slots:
       QVERIFY(tv.m_horHeader != nullptr);
       QVERIFY(tv.m_verHeader != nullptr);
       tv.setModel(&model);
-      tv.InitTableView(true);
+      tv.InitTableView();
       DoubleRowHeader& horHeader = *tv.m_horHeader;
       VerMenuInHeader& verHeader = *tv.m_verHeader;
 
@@ -263,7 +263,7 @@ private slots:
       InitModel(model);
       SimpleCustomTableView tv{&model};
       tv.setModel(&model);
-      tv.InitTableView(true);
+      tv.InitTableView();
       DoubleRowHeader& horHeader = *tv.m_horHeader;
       VerMenuInHeader& verHeader = *tv.m_verHeader;
 
@@ -422,7 +422,7 @@ private slots:
       InitModel(model);
       SimpleCustomTableView tv{&model};
       tv.setModel(&model);
-      tv.InitTableView(true);
+      tv.InitTableView();
       DoubleRowHeader& horHeader = *tv.m_horHeader;
       VerMenuInHeader& verHeader = *tv.m_verHeader;
 

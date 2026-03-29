@@ -52,6 +52,7 @@ private:
 
   FdBasedDb& _fdBasedDb;
 
+  bool m_isHeaderStateAlreadyInited{false};
   QStringList m_studioCandidates;
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
 };

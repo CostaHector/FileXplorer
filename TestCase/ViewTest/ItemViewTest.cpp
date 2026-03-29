@@ -8,6 +8,7 @@
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "BatchRenameBy.h"
+#include "MemoryKey.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -30,7 +31,9 @@ class ItemViewTest : public PlainTestSuite {
     };
     QCOMPARE(mTDir.createEntries(nodes), 4);
   }
+
   void cleanupTestCase() {}
+
   void init() {  //
     GlobalMockObject::reset();
   }
@@ -40,13 +43,20 @@ class ItemViewTest : public PlainTestSuite {
   }
 
   void default_constructor() {
+    Configuration().clear();
+
     ImgsModel mImgModel{"ImgsListView"};
     QCOMPARE(mImgModel.setDirPath(mTDir.itemPath("emptyImageFolder"), {}, false), 0);
     QVERIFY(mImgModel.index(0, 0).data(Qt::DisplayRole).isNull());
 
     QCOMPARE(mImgModel.setDirPath(mTDir.itemPath("3ImagesFolder"), {}, false), 3);
-    ItemView mImgTv{"ItemView Test"};
+    ItemView mImgTv{"ItemViewImageTest"};
+    mImgTv.InitListView();
+    QCOMPARE(mImgTv.viewMode(), QListView::ViewMode::IconMode); // default ok
+    QCOMPARE(mImgTv.flow(), QListView::Flow::LeftToRight);
+    QCOMPARE(mImgTv.isWrapping(), true);
     mImgTv.setViewMode(QListView::ViewMode::IconMode);
+
     QCOMPARE(mImgTv.SetCurrentModel(nullptr), false);
     QCOMPARE(mImgTv.onCellDoubleClicked({}), false);  // will not crash
     QCOMPARE(mImgTv.onPlayCurrentIndex(), false);     // will not crash
@@ -73,7 +83,8 @@ class ItemViewTest : public PlainTestSuite {
     ImgsModel mImgModel{"ImgsListView"};
     QCOMPARE(mImgModel.setDirPath(mTDir.itemPath("3ImagesFolder"), {"*CR7*"}, true), 2);
 
-    ItemView mImgTv{"ItemView Test"};
+    ItemView mImgTv{"ItemViewImageTest"};
+    mImgTv.InitListView();
     mImgTv.setViewMode(QListView::ViewMode::IconMode);
     mImgTv.SetCurrentModel(&mImgModel);
 
@@ -103,6 +114,7 @@ class ItemViewTest : public PlainTestSuite {
     QCOMPARE(mImgModel.rowCount(), 5);
 
     ItemView mImgTv{"ImagesItemView"};
+    mImgTv.InitListView();
     mImgTv.setViewMode(QListView::ViewMode::IconMode);
     mImgTv.SetCurrentModel(&mImgModel);
 

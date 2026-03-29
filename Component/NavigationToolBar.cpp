@@ -95,7 +95,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
   addWidget(m_extraAppendTB);
 
   SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
+#ifdef RUNNING_UNIT_TESTS
+  updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
+#else
   QTimer::singleShot(0, this, [this]() { updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false); });
+#endif
   subscribe();
 }
 

@@ -83,7 +83,6 @@ class SceneListViewTest : public PlainTestSuite {
         QStringList{tDir.itemPath("Henry Cavill.png")},  //
         QStringList{tDir.itemPath("Henry Cavill.mp4")},
     };
-    Configuration().clear();
   }
 
   void init() {
@@ -93,14 +92,23 @@ class SceneListViewTest : public PlainTestSuite {
     GlobalMockObject::reset();
   }
 
-  void cleanup() { GlobalMockObject::verify(); }
+  void cleanup() {  //
+    GlobalMockObject::verify();
+  }
 
   void cleanupTestCase() {  //
     SceneListViewMocker::MockSetRootPathQuery() = true;
+    Configuration().clear();
   }
 
   void default_constructor_ok() {
+    Configuration().clear();
     SceneListView sceneView{nullptr, nullptr, nullptr, nullptr};
+    sceneView.InitListView();
+    QCOMPARE(sceneView.viewMode(), QListView::ViewMode::IconMode);  // default ok
+    QCOMPARE(sceneView.flow(), QListView::Flow::LeftToRight);
+    QCOMPARE(sceneView.isWrapping(), true);
+
     // all memebers should be nullptr.
     QVERIFY(sceneView._sceneModel == nullptr);
     QVERIFY(sceneView._sceneSortProxyModel == nullptr);
@@ -129,7 +137,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
-
+    sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     {
       // 1. setRootPath on an rootPath "/", _sceneModel->rootPath() should not change
@@ -190,7 +198,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
-
+    sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
 
     QVERIFY(QFile::exists(scnAbsPath));
@@ -246,7 +254,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
-
+    sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     QVERIFY(QFile::exists(scnAbsPath));
     SceneListViewMocker::MockSetRootPathQuery() = true;
@@ -272,7 +280,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
-
+    sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     QVERIFY(QFile::exists(scnAbsPath));
     SceneListViewMocker::MockSetRootPathQuery() = true;
@@ -323,6 +331,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    sceneView.InitListView();
     sceneView.setFlow(QListView::Flow::LeftToRight);
     sceneView.setFixedSize(RateHelper::RATING_BAR_HEIGHT * 9, RateHelper::RATING_BAR_HEIGHT * 3);  // show two item in one row
     sceneModel.onIconSizeChange(listViewImageSize);

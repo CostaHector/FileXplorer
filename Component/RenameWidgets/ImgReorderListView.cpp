@@ -12,11 +12,6 @@ ImgReorderListView::ImgReorderListView(QWidget* parent)
   setDropIndicatorShown(true);
   setDragDropMode(QAbstractItemView::DragDrop);
 
-  _FLOW_ORIENTATION_TTB->setChecked(false);
-  _VIEW_MODE_LIST_ICON->setChecked(true);
-  _WRAPPING_ACTIONS->setChecked(true);
-  _UNIFORM_ITEM_SIZES->setChecked(false);
-
   mBatchShiftRight100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift right 100"), this};
   mBatchShiftLeft100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_RIGHT_BY_STEP"}, tr("Shift left 100"), this};
   mNormalizeKeepRelativeOrder = new (std::nothrow)
@@ -110,4 +105,10 @@ int ImgReorderListView::calculateInsertionRow(const QPoint& pos) const {
     return N;
   }
   return ind.row();
+}
+
+void ImgReorderListView::initExclusivePreferenceSetting() {
+  CustomListView::m_defaultFlowLeft2Right = true;
+  CustomListView::m_defaultViewModeIcon = true;
+  CustomListView::m_defaultWrapping = true;
 }

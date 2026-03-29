@@ -105,7 +105,12 @@ bool MovieDBView::InitMoviesTables() {
 
 bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   LOG_D("Set current table[%s]", qPrintable(movieTableName));
-  InitTableView(false);  // restore state must ahead of data load
+  if (!m_isHeaderStateAlreadyInited) {
+    // 所有表的结构都一致, 所以无需每次都设置列可见性/列过滤器/列宽信息
+    // restore header state must ahead of data load
+    InitTableView();
+    m_isHeaderStateAlreadyInited = true;
+  }
   Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   _dbModel->setTable(movieTableName);
   _dbModel->select();

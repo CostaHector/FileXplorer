@@ -33,6 +33,8 @@ class FileSystemListView : public CustomListView {
   void keyPressEvent(QKeyEvent* event) override;
 
  private:
+  void initExclusivePreferenceSetting() override;
+
   FileSystemModel* _fsModel {nullptr};
   QPoint mDragStartPosition;
 };

@@ -169,10 +169,8 @@ bool CustomTableView::ShowOrHideColumnCore() {
   return true;
 }
 
-void CustomTableView::InitTableView(const bool bHideShowCol) {
-  if (bHideShowCol) {
-    ShowOrHideColumnCore();
-  }
+void CustomTableView::InitTableView() {
+  ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
 }

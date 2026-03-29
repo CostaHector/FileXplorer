@@ -13,6 +13,7 @@ int ImgReorderDialog::execCore(ImgReorderDialog* self) {
 
 ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
   m_reorderListView = new ImgReorderListView(this);
+  m_reorderListView->InitListView();
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(m_reorderListView);

@@ -45,6 +45,8 @@ class SceneListView : public CustomListView {
   void mousePressEvent(QMouseEvent* event) override;
 
  private:
+  void initExclusivePreferenceSetting() override;
+
   static bool IsPathAtShallowDepth(const QString& path);
   QModelIndexList selectedRowsSource() const;
 

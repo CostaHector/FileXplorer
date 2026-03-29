@@ -91,3 +91,9 @@ void FileSystemListView::mouseMoveEvent(QMouseEvent* event) {
   }
   return QListView::mouseMoveEvent(event);
 }
+
+void FileSystemListView::initExclusivePreferenceSetting() {
+  CustomListView::m_defaultFlowLeft2Right = false;
+  CustomListView::m_defaultViewModeIcon = false;
+  CustomListView::m_defaultWrapping = true;
+}

@@ -96,6 +96,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     case ViewType::LIST: {
       if (_view->m_fsListView == nullptr) {
         _view->m_fsListView = new FileSystemListView(_view->m_fsModel);
+        _view->m_fsListView->InitListView();
         _view->AddView(viewType, _view->m_fsListView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
@@ -165,6 +166,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->m_scenesModel = new ScenesListModel{"SCENES_TABLE"};
         _view->m_sceneProxyModel = new SceneSortProxyModel;
         _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _scenePageControl, _view);
+        _view->m_sceneTableView->InitListView();
         _view->AddView(viewType, _view->m_sceneTableView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
