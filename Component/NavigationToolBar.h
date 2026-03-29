@@ -14,7 +14,7 @@ class NavigationToolBar : public QToolBar {
  private:
   void subscribe();
   void onExpandSidebar(bool bExpand);
-  void updateToolbarButtonStyle(bool bExpand);
+  void updateToolbarButtonStyle(bool bExpand, bool bAnimation);
 
   QAction* EXPAND_SIDEBAR{nullptr};
   QAction* DEVICES_AND_DRIVES{nullptr};

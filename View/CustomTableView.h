@@ -19,7 +19,7 @@ public:
 
   bool ShowOrHideColumnCore();
 
-  void InitTableView(const bool bHideShowCol = true);
+  void InitTableView();
   void SubscribeHeaderActions();
 
   void mousePressEvent(QMouseEvent* event) override;

@@ -11,6 +11,28 @@ class NavigationToolBarTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void D2Ev_D0Ev_ok() {
+    Configuration().remove(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name);
+    QCOMPARE(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool(), false);
+    {  // 普通析构函数
+      NavigationToolBar naviTooBar{"NaviToolbarOnExpandSidebar"};
+      QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), false);
+      QCOMPARE(naviTooBar.toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonIconOnly);
+      QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND);
+
+      naviTooBar.EXPAND_SIDEBAR->toggle();
+
+      QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), true);
+      QCOMPARE(naviTooBar.toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+      QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND);
+    }
+    QVERIFY(Configuration().contains(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name));
+    QVERIFY(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
+
+    {  // 删除析构函数
+      std::unique_ptr<NavigationToolBar> d0ev{new NavigationToolBar};
+    }
+  }
   void user_path_exist() {          //
     NavigationToolBar naviToolbar;  //
     const QList<QAction*> actions = naviToolbar.actions();
@@ -75,25 +97,6 @@ class NavigationToolBarTest : public PlainTestSuite {
         continue;
       }
     }
-  }
-
-  void onExpandSidebar_ok() {
-    Configuration().remove(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name);
-    QCOMPARE(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool(), false);
-    {
-      NavigationToolBar naviTooBar{"NaviToolbarOnExpandSidebar"};
-      QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), false);
-      QCOMPARE(naviTooBar.toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonIconOnly);
-      QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND);
-
-      naviTooBar.EXPAND_SIDEBAR->toggle();
-
-      QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), true);
-      QCOMPARE(naviTooBar.toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-      QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND);
-    }
-    QVERIFY(Configuration().contains(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name));
-    QVERIFY(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
   }
 };
 

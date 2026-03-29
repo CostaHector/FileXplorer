@@ -45,17 +45,15 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   }
 
   {
-    _FLOW_ORIENTATION_TTB = new (std::nothrow) QAction{QIcon{":img/ALIGN_VERTICAL_TOP"}, tr("Flow Orientation: TopToBottom"), this};
-    CHECK_FALSE_RETURN_VOID(_FLOW_ORIENTATION_TTB);
-    _FLOW_ORIENTATION_TTB->setCheckable(true);
-    _FLOW_ORIENTATION_TTB->setChecked(Configuration().value(m_name + "_FLOW_ORIENTATION", true).toBool());
-    _FLOW_ORIENTATION_TTB->setToolTip("The items layout should flow TopToBottom direction(default) if enabled, other LeftToRight");
+    _FLOW_ORIENTATION_LTR = new (std::nothrow) QAction{QIcon{":img/ALIGN_HORIZONTAL_LEFT"}, tr("Flow Orientation: Left2Right"), this};
+    CHECK_FALSE_RETURN_VOID(_FLOW_ORIENTATION_LTR);
+    _FLOW_ORIENTATION_LTR->setCheckable(true);
+    _FLOW_ORIENTATION_LTR->setToolTip("The items layout should flow LeftToRight if enabled, other Top2Bottom(by default)");
 
     _VIEW_MODE_LIST_ICON = new (std::nothrow) QAction{QIcon{":img/VIEW_MODE_ICON"}, tr("View Mode: Icon"), this};
     CHECK_NULLPTR_RETURN_VOID(_VIEW_MODE_LIST_ICON);
     _VIEW_MODE_LIST_ICON->setCheckable(true);
-    _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(m_name + "_VIEW_MODE_LIST_ICON", false).toBool());
-    _VIEW_MODE_LIST_ICON->setToolTip("Icon if enabled, other List");
+    _VIEW_MODE_LIST_ICON->setToolTip("Icon if enabled, other List(by default)");
 
     _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Resize Mode: Adjust"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
@@ -66,7 +64,6 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, tr("Wrapping"), this};
     CHECK_NULLPTR_RETURN_VOID(_WRAPPING_ACTIONS);
     _WRAPPING_ACTIONS->setCheckable(true);
-    _WRAPPING_ACTIONS->setChecked(Configuration().value(m_name + "_WRAPPING_ACTIONS", false).toBool());
     _WRAPPING_ACTIONS->setToolTip("The layout should wrap when there is no more space in the visible area if enabled, by default: no wrap false");
 
     _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, tr("Uniform items sizes"), this};
@@ -81,7 +78,6 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   m_menu->setToolTipsVisible(true);
   AddItselfAction2Menu();
 
-  InitListView();
   SubscribePublicActions();
 }
 
@@ -89,18 +85,11 @@ void CustomListView::SubscribePublicActions() {
   connect(_ICON_SIZE_MENU, &IconSizeMenu::iconScaledIndexChanged, this, &CustomListView::onIconScaledIndexChanged);
   connect(_TEXT_ELIDE_MODE_MENU, &TextElideModeMenu::reqTextElideModeChanged, this, &QListView::setTextElideMode);
 
-  connect(_FLOW_ORIENTATION_TTB, &QAction::toggled, this, &CustomListView::onOrientationChanged);
+  connect(_FLOW_ORIENTATION_LTR, &QAction::toggled, this, &CustomListView::onFlowOrientationChanged);
   connect(_VIEW_MODE_LIST_ICON, &QAction::toggled, this, &CustomListView::onViewModeListIconToggled);
   connect(_RESIZED_MODE_ADJUST, &QAction::toggled, this, &CustomListView::onResizeModeToggled);
   connect(_WRAPPING_ACTIONS, &QAction::toggled, this, &CustomListView::onWrapingToggled);
   connect(_UNIFORM_ITEM_SIZES, &QAction::toggled, this, &CustomListView::onUniformItemSizedToggled);
-
-  setTextElideMode(_TEXT_ELIDE_MODE_MENU->GetTextElideMode());
-  onOrientationChanged(_FLOW_ORIENTATION_TTB->isChecked());
-  onViewModeListIconToggled(_VIEW_MODE_LIST_ICON->isChecked());
-  onResizeModeToggled(_RESIZED_MODE_ADJUST->isChecked());
-  onWrapingToggled(_WRAPPING_ACTIONS->isChecked());
-  onUniformItemSizedToggled(_UNIFORM_ITEM_SIZES->isChecked());
 }
 
 CustomListView::~CustomListView() {
@@ -161,33 +150,46 @@ void CustomListView::AddItselfAction2Menu() {
   m_menu->addSeparator();
   m_menu->addMenu(_ICON_SIZE_MENU);
   m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
-  m_menu->addAction(_FLOW_ORIENTATION_TTB);
+  m_menu->addAction(_FLOW_ORIENTATION_LTR);
   m_menu->addAction(_VIEW_MODE_LIST_ICON);
   m_menu->addAction(_RESIZED_MODE_ADJUST);
   m_menu->addAction(_WRAPPING_ACTIONS);
   m_menu->addAction(_UNIFORM_ITEM_SIZES);
 }
 
-void CustomListView::onOrientationChanged(const bool bchecked) {
-  setFlow(bchecked ? QListView::Flow::TopToBottom : QListView::Flow::LeftToRight);
+void CustomListView::onFlowOrientationChanged(const bool bLeft2Right) {
+  setFlow(bLeft2Right ? QListView::Flow::LeftToRight : QListView::Flow::TopToBottom);
 }
-void CustomListView::onViewModeListIconToggled(const bool bchecked) {
-  setViewMode(bchecked ? QListView::ViewMode::IconMode : QListView::ViewMode::ListMode);
+void CustomListView::onViewModeListIconToggled(const bool bIconMode) {
+  setViewMode(bIconMode ? QListView::ViewMode::IconMode : QListView::ViewMode::ListMode);
 }
-void CustomListView::onResizeModeToggled(const bool bchecked) {
-  setResizeMode(bchecked ? QListView::ResizeMode::Adjust : QListView::ResizeMode::Fixed);
+void CustomListView::onResizeModeToggled(const bool bAdjust) {
+  setResizeMode(bAdjust ? QListView::ResizeMode::Adjust : QListView::ResizeMode::Fixed);
 }
-void CustomListView::onWrapingToggled(const bool bchecked) {
-  setWrapping(bchecked);
+void CustomListView::onWrapingToggled(const bool bWapping) {
+  setWrapping(bWapping);
 }
-void CustomListView::onUniformItemSizedToggled(const bool bchecked) {
-  setUniformItemSizes(bchecked);
+void CustomListView::onUniformItemSizedToggled(const bool bUniform) {
+  setUniformItemSizes(bUniform);
 }
 
 void CustomListView::InitListView() {
+  initExclusivePreferenceSetting();
+  // top2bottom, list
+  _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(m_name + "_FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());
+  _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(m_name + "_VIEW_MODE_LIST_ICON", m_defaultViewModeIcon).toBool());
+  _WRAPPING_ACTIONS->setChecked(Configuration().value(m_name + "_WRAPPING_ACTIONS", m_defaultWrapping).toBool());
+
   const int sizeScaledIndex = _ICON_SIZE_MENU->GetScaledIndex();
   setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[sizeScaledIndex]);
   // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex]);
+  setTextElideMode(_TEXT_ELIDE_MODE_MENU->GetTextElideMode());
+
+  onFlowOrientationChanged(_FLOW_ORIENTATION_LTR->isChecked());
+  onViewModeListIconToggled(_VIEW_MODE_LIST_ICON->isChecked());
+  onResizeModeToggled(_RESIZED_MODE_ADJUST->isChecked());
+  onWrapingToggled(_WRAPPING_ACTIONS->isChecked());
+  onUniformItemSizedToggled(_UNIFORM_ITEM_SIZES->isChecked());
 }
 
 void CustomListView::mousePressEvent(QMouseEvent* event) {

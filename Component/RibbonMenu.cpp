@@ -20,10 +20,12 @@
 #include "RibbonCastDB.h"
 #include "RibbonJson.h"
 #include "RibbonMovieDB.h"
+#include "SizeChangeAnimation.h"
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
+#include <QTimer>
 
 RibbonMenu::RibbonMenu(QWidget* parent)
   : QTabWidget{parent} //
@@ -416,7 +418,7 @@ void RibbonMenu::Subscribe() {
 
 void RibbonMenu::AfterSubscribeInitialSettings() {
   setCurrentIndex(Configuration().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
-  on_expandStackedWidget(_EXPAND_RIBBONS->isChecked());
+  QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
 }
 
 bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
@@ -427,22 +429,19 @@ bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
   return true;
 }
 
-#include <QPropertyAnimation>
-void RibbonMenu::on_expandStackedWidget(const bool vis) {
-  Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, vis);
+void RibbonMenu::on_expandStackedWidget(bool bExpand) {
+  Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, bExpand);
+  updateStackedWidgetHeight(bExpand, true);
+}
+
+void RibbonMenu::updateStackedWidgetHeight(bool bExpand, bool bAnimationEnabled) {
 #ifdef RUNNING_UNIT_TESTS // no need animation in testcase
-  setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
-#else
-  QPropertyAnimation* animation = new (std::nothrow) QPropertyAnimation{this, "maximumHeight", this};
-  if (animation == nullptr) {
-    setMaximumHeight(vis ? sizeHint().height() : tabBar()->height());
-    return;
-  }
-  animation->setDuration(200);
-  animation->setStartValue(maximumHeight());
-  animation->setEndValue(vis ? sizeHint().height() : tabBar()->height());
-  animation->start(QAbstractAnimation::DeleteWhenStopped);
+  bAnimationEnabled = false;
 #endif
+  static const int EXPAND_HEIGHT{std::max(sizeHint().height(), tabBar()->height())};
+  static const int NO_EXPAND_HEIGHT{std::min(sizeHint().height(), tabBar()->height())};
+  SizeChangeAnimation animation{Qt::Horizontal, EXPAND_HEIGHT, NO_EXPAND_HEIGHT, bAnimationEnabled};
+  animation(this, height(), bExpand);
 }
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {

@@ -17,6 +17,8 @@ class ItemView : public CustomListView {
 
  private:
   void subscribe();
+  void initExclusivePreferenceSetting();
+
   FloatingModels* mModels{nullptr};
   QAction* _PLAY_ITEM{nullptr};
   QAction* _RENAME_SCENE_RELATED_FILES_NUMERIZE{nullptr};

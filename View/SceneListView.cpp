@@ -205,6 +205,12 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
   return true;
 }
 
+void SceneListView::initExclusivePreferenceSetting() {
+  CustomListView::m_defaultFlowLeft2Right = true;
+  CustomListView::m_defaultViewModeIcon = true;
+  CustomListView::m_defaultWrapping = true;
+}
+
 bool SceneListView::IsPathAtShallowDepth(const QString& path) {
 #ifdef _WIN32
   static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter

@@ -12,33 +12,28 @@ class FileSystemListViewTest : public PlainTestSuite {
  public:
  private slots:
   void testConstructor() {
-    // 创建文件系统模型
     FileSystemModel fsModel;
 
-    // 创建列表视图
     FileSystemListView listView(&fsModel);
+    listView.InitListView();
 
-    // 验证基本属性
     QVERIFY(listView._fsModel != nullptr);
     QCOMPARE(listView.dragDropMode(), QAbstractItemView::DragDrop);
     QVERIFY(listView.acceptDrops());
     QVERIFY(listView.dragEnabled());
   }
   void testDragEvents() {
-    // 创建文件系统模型
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
-
+    listView.InitListView();
     QPoint centerPnt = listView.geometry().center();
 
-    // 创建模拟事件
     QMimeData mimeData;
     QDragEnterEvent dragEnterEvent(centerPnt, Qt::CopyAction, &mimeData, Qt::LeftButton, Qt::NoModifier);
     QDragMoveEvent dragMoveEvent(centerPnt, Qt::CopyAction, &mimeData, Qt::LeftButton, Qt::NoModifier);
     QDragLeaveEvent dragLeaveEvent;
     QDropEvent dropEvent(centerPnt, Qt::CopyAction, &mimeData, Qt::LeftButton, Qt::NoModifier);
 
-    // 验证事件处理不会崩溃
     listView.dragEnterEvent(&dragEnterEvent);
     listView.dragMoveEvent(&dragMoveEvent);
     listView.dragLeaveEvent(&dragLeaveEvent);
@@ -48,6 +43,7 @@ class FileSystemListViewTest : public PlainTestSuite {
   void testKeyEvents() {
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
+    listView.InitListView();
 
     // 测试 Delete 键触发
     QSignalSpy moveToTrashSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN, &QAction::triggered);
@@ -63,9 +59,9 @@ class FileSystemListViewTest : public PlainTestSuite {
   }
 
   void testMouseEvents() {
-    // 创建文件系统模型
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
+    listView.InitListView();
 
     // 测试左键按下设置拖拽起始位置
     const QPoint testPos(50, 60);

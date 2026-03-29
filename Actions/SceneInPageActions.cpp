@@ -8,7 +8,8 @@ SceneInPageActions& g_SceneInPageActions() {
   return ins;
 }
 
-SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
+SceneInPageActions::SceneInPageActions(QObject* parent)
+  : QObject{parent} {
   _UPDATE_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON"), tr("Update K-V"), this);
   CHECK_NULLPTR_RETURN_VOID(_UPDATE_JSON);
   _UPDATE_JSON->setToolTip(QString("<b>%1 (%2)</b><br/>"
@@ -26,8 +27,10 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
-  bool disableImage{Configuration().value(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, SceneKey::SCENE_DISABLE_IMAGE_DECORATION.v).toBool()};
-  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance mode(disable image)"), this);
+  bool disableImage{
+      Configuration().value(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, SceneKey::SCENE_DISABLE_IMAGE_DECORATION.v).toBool()};
+  _DISABLE_IMAGE_DECORATION = new (std::nothrow)
+      QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance mode(disable image)"), this);
   CHECK_NULLPTR_RETURN_VOID(_DISABLE_IMAGE_DECORATION);
   _DISABLE_IMAGE_DECORATION->setCheckable(true);
   _DISABLE_IMAGE_DECORATION->setChecked(disableImage);
@@ -78,7 +81,8 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                             {_BY_MOVIE_SIZE, SortDimE::MOVIE_SIZE},
                             {_BY_RATE, SortDimE::RATE},
                             {_BY_UPLOADED_TIME, SortDimE::UPLOADED_TIME}},
-                           DEFAULT_SCENE_SORT_ORDER, QActionGroup::ExclusionPolicy::Exclusive);
+                           DEFAULT_SCENE_SORT_ORDER,
+                           QActionGroup::ExclusionPolicy::Exclusive);
   const int sortDim = Configuration().value(SceneKey::SCENE_SORT_BY_DIMENSION.name, SceneKey::SCENE_SORT_BY_DIMENSION.v).toInt();
   mSortOrderIntAction.setCheckedIfActionExist(sortDim);
 
@@ -87,13 +91,19 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
 
 SceneInPageActions::~SceneInPageActions() {
   Configuration().setValue(SceneKey::SCENE_SORT_ORDER.name, GetSortOrderReverse());
-  Configuration().setValue(SceneKey::SCENE_SORT_BY_DIMENSION.name, (int)GetSortDimension());
+  Configuration().setValue(SceneKey::SCENE_SORT_BY_DIMENSION.name, (int) GetSortDimension());
 }
 
 void SceneInPageActions::subscribe() {
-  connect(_DISABLE_IMAGE_DECORATION, &QAction::toggled, this, &SceneInPageActions::disableImageDecorationChanged);
+  connect(_DISABLE_IMAGE_DECORATION, &QAction::toggled, this, &SceneInPageActions::onDisableImageDecorationToggled);
   connect(_REVERSE_RESULT, &QAction::toggled, this, &SceneInPageActions::onReverseSortOrderToggled);
   connect(mSortOrderIntAction.getActionGroup(), &QActionGroup::triggered, this, &SceneInPageActions::onSortDimensionTriggered);
+}
+
+void SceneInPageActions::onDisableImageDecorationToggled(bool bDisabled) {
+  // user may want to disable image decoration before show scene view, so here must write changes into memory
+  Configuration().setValue(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, bDisabled);
+  emit disableImageDecorationChanged(bDisabled);
 }
 
 void SceneInPageActions::onReverseSortOrderToggled(bool bReverseDescend) {
@@ -116,10 +126,10 @@ void SceneInPageActions::onSortDimensionTriggered(QAction* triggeredAct) {
 }
 
 QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
-  auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(),  //
-                                                            QToolButton::InstantPopup,                         //
-                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,     //
-                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,                  //
+  auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(), //
+                                                            QToolButton::InstantPopup,                        //
+                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,    //
+                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,                 //
                                                             parent);
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, tr("Sort Dimension"));

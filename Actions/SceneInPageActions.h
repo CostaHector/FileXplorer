@@ -52,6 +52,7 @@ class SceneInPageActions : public QObject {
   void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order);
 
  private:
+  void onDisableImageDecorationToggled(bool bDisabled);
   void onReverseSortOrderToggled(bool bReverseDescend);
   void onSortDimensionTriggered(QAction* triggeredAct);
   void subscribe();
