@@ -4,6 +4,7 @@
 #include "PublicMacro.h"
 #include "StyleSheet.h"
 #include "SizeChangeAnimation.h"
+#include "ImageTool.h"
 #include <QApplication>
 #include <QDir>
 #include <QStyle>
@@ -20,6 +21,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
       Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+  setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
 
   // 0. expand and minimum
   {
