@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "PlainTestSuite.h"

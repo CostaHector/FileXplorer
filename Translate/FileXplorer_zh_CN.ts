@@ -360,6 +360,62 @@
     </message>
 </context>
 <context>
+    <name>FavoritesTreeModel</name>
+    <message>
+        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+26"/>
+        <source>Work</source>
+        <translation>工作</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Life</source>
+        <translation>生活</translation>
+    </message>
+</context>
+<context>
+    <name>FavoritesTreeView</name>
+    <message>
+        <location filename="../Component/Navigation/FavoritesTreeView.cpp" line="+36"/>
+        <source>Expand All</source>
+        <translation>展开所有项</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Collapse All</source>
+        <translation>收拢所有项</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Enable Animation</source>
+        <translation>允许动画</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Rename</source>
+        <translation>重命名</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Add Group</source>
+        <translation>增加一个组</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Delete Selected</source>
+        <translation>删除选中</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Skip Saving</source>
+        <translation>本轮不保存</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Save Now</source>
+        <translation>立即保存</translation>
+    </message>
+</context>
+<context>
     <name>FileLeafActions</name>
     <message>
         <location filename="../Actions/FileLeafAction.cpp" line="+9"/>
@@ -1229,7 +1285,7 @@
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../Component/NavigationAndAddressBar.cpp" line="+58"/>
+        <location filename="../Component/Navigation/NavigationAndAddressBar.cpp" line="+58"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
@@ -1242,7 +1298,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../Component/NavigationToolBar.cpp" line="+26"/>
+        <location filename="../Component/Navigation/NavigationToolBar.cpp" line="+28"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
