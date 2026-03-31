@@ -2,28 +2,19 @@
 #define SCENESORTPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "ScenePageNaviHelper.h"
 #include "SceneInfoManager.h"
-#include "ScenesListModel.h"
 
 class SceneSortProxyModel : public QSortFilterProxyModel {
   Q_OBJECT
  public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
-
-  void setSourceModel(QAbstractItemModel* sourceModel) override;
-
-  void sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, Qt::SortOrder newOrder);
-
- protected:
-  void sort(int column, Qt::SortOrder newOrder = Qt::AscendingOrder) override;
-  bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override;
+  bool isSortProxyInited() const { return m_bSortProxyInited; }
+  void initSortProxy(SceneInfo::Role initRole, bool bReverseOrder);
+  void setSortOrder(bool bReverseOrder);
 
  private:
-  SceneSortOrderHelper::SortDimE m_sortDimension{SceneSortOrderHelper::SortDimE::END_INVALID};
-  SceneInfo::CompareFunc mComparator{nullptr};
-  ScenesListModel* m_sourceModel{nullptr};
-
+  Qt::SortOrder mSortOrder{Qt::SortOrder::AscendingOrder};
+  bool m_bSortProxyInited{false};
 #ifdef RUNNING_UNIT_TESTS
   void ForceCompleteSort();
 #endif

@@ -4,7 +4,6 @@
 #include <QString>
 #include <QList>
 #include <QDataStream>
-#include "ScenePageNaviHelper.h"
 
 struct SceneInfo {
   friend QDataStream& operator<<(QDataStream& os, const SceneInfo& item);
@@ -18,6 +17,16 @@ struct SceneInfo {
   int rate;          // video rate, from json file, key"Rate"
   QString uploaded;  // from json file, key"Uploaded"
 
+  enum Role {
+    DEF_BEGIN_ROLE = Qt::DisplayRole,
+    DEF_NAME_TEXT_ROLE = DEF_BEGIN_ROLE,  // name
+    REL_PATH_ROLE = Qt::UserRole + 1,     // rel2scn + name
+    VID_SIZE_ROLE,                        // vidSize
+    RATE_ROLE,                            // rate
+    UPLOADED_ROLE,                        // uploaded
+    INVALID_BUTT_ROLE,
+  };
+
   QString GetAbsolutePath(const QString& rootPath) const;
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
@@ -25,8 +34,8 @@ struct SceneInfo {
   QStringList GetVideosAbsPath(const QString& rootPath) const;
   QString GetJsonAbsPath(const QString& rootPath) const;
 
-  using CompareFunc = bool(*)(const SceneInfo&, const SceneInfo&);
-  static CompareFunc getCompareFunc(SceneSortOrderHelper::SortDimE dim);
+  using CompareFunc = bool (*)(const SceneInfo&, const SceneInfo&);
+  static CompareFunc getCompareFunc(SceneInfo::Role dim);
 
   bool operator<(const SceneInfo& other) const;
   bool operator==(const SceneInfo& rhs) const;
@@ -44,6 +53,16 @@ struct SceneInfo {
   static constexpr quint16 CURRENT_VERSION = 1;
   static constexpr quint16 MIN_SUPPORTED_VERSION = 1;
   using ELEMENT_COUNT_TYPE = int;
+
+  static Role GetInitialSortRole();
+  static void SaveInitialSortRole(Role sortRole);
+  static bool GetInitialSortOrderReverse();
+  static void SaveSortOrderReverse(bool bReverse);
+  static bool GetInitialDisableImageDecoration();
+  static void SaveDisableImageDecoration(bool bDisable);
+
+  static constexpr int SORT_COLUMN = 0;
+  static constexpr Role DEF_SORT_ROLE = REL_PATH_ROLE;
 };
 typedef QList<SceneInfo> SceneInfoList;
 inline QDataStream& operator<<(QDataStream& os, const SceneInfo& item) {

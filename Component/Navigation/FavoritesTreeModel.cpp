@@ -22,16 +22,7 @@ FavoritesTreeModel::FavoritesTreeModel(const QString& belongToName, QObject* par
   if (!bInitialCollectionsWhenEmpty) {
     return;
   }
-  // initial configs
-  QStandardItem* workGroup = addGroup(tr("Work"), nullptr);
-  addPath("Documents", SystemPath::HOME_PATH() + "/Documents", workGroup);
-  addPath("Project Configurations", SystemPath::HOME_PATH(), workGroup);
-
-  QStandardItem* lifeGroup = addGroup(tr("Life"), nullptr);
-  addPath("Pictures", SystemPath::HOME_PATH() + "/Pictures", lifeGroup);
-  addPath("Videos", SystemPath::HOME_PATH() + "/Videos", lifeGroup);
-
-  addPath("Code", SystemPath::HOME_PATH() + "/code", nullptr);
+  addInitialFavoritesGroup();
 }
 
 FavoritesTreeModel::~FavoritesTreeModel() {
@@ -250,10 +241,10 @@ QString FavoritesTreeModel::filePath(const QModelIndex& parentIndex) const {
   if (item == nullptr) {
     return "";
   }
-  if (item->data(IS_GROUP_ROLE).toBool()) {
+  if (item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
     return "";
   }
-  return item->data(FULL_PATH_ROLE).toString();
+  return item->data(FavoriteItemData::Role::FULL_PATH_ROLE).toString();
 }
 
 bool FavoritesTreeModel::isGroup(const QModelIndex& parentIndex) const {
@@ -264,7 +255,7 @@ bool FavoritesTreeModel::isGroup(const QModelIndex& parentIndex) const {
   if (item == nullptr) {
     return false;  // failed
   }
-  return item->data(IS_GROUP_ROLE).toBool();
+  return item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool();
 }
 
 QString FavoritesTreeModel::groupName(const QModelIndex& parentIndex) const {
@@ -282,10 +273,10 @@ FavoriteItemData FavoritesTreeModel::convertItemToData(QStandardItem* item) {
 
   FavoriteItemData data;
   data.name = item->text();
-  data.isGroup = item->data(IS_GROUP_ROLE).toBool();
-  data.fullPath = item->data(FULL_PATH_ROLE).toString();
-  data.lastAccess = item->data(LAST_ACCESS_ROLE).toInt();
-  data.accessCount = item->data(ACCESS_COUNT_ROLE).toInt();
+  data.isGroup = item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool();
+  data.fullPath = item->data(FavoriteItemData::Role::FULL_PATH_ROLE).toString();
+  data.lastAccess = item->data(FavoriteItemData::Role::LAST_ACCESS_ROLE).toInt();
+  data.accessCount = item->data(FavoriteItemData::Role::ACCESS_COUNT_ROLE).toInt();
 
   // 递归处理子项
   for (int i = 0; i < item->rowCount(); ++i) {
@@ -311,10 +302,10 @@ QStandardItem* FavoritesTreeModel::convertDataToItem(const FavoriteItemData& dat
     item->setToolTip(QString("<b>%1</b><br>%2").arg(data.name, data.fullPath));
   }
   item->setEditable(true);  // 允许重命名
-  item->setData(data.isGroup, IS_GROUP_ROLE);
-  item->setData(data.fullPath, FULL_PATH_ROLE);
-  item->setData(data.lastAccess, LAST_ACCESS_ROLE);
-  item->setData(data.accessCount, ACCESS_COUNT_ROLE);
+  item->setData(data.isGroup, FavoriteItemData::Role::IS_GROUP_ROLE);
+  item->setData(data.fullPath, FavoriteItemData::Role::FULL_PATH_ROLE);
+  item->setData(data.lastAccess, FavoriteItemData::Role::LAST_ACCESS_ROLE);
+  item->setData(data.accessCount, FavoriteItemData::Role::ACCESS_COUNT_ROLE);
 
   // 递归创建子项
   for (const FavoriteItemData& childData : data.children) {
@@ -341,7 +332,7 @@ QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, const QModel
 
 QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, QStandardItem* parentItem) {
   if (parentItem) {
-    if (!parentItem->data(IS_GROUP_ROLE).toBool()) {
+    if (!parentItem->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
       LOG_D("Cannot insert under non-group item");
       return nullptr;
     }
@@ -349,8 +340,8 @@ QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, QStandardIte
     parentItem = invisibleRootItem();
   }
   QStandardItem* item = new QStandardItem(grpName);
-  item->setData(true, IS_GROUP_ROLE);
-  item->setData("", FULL_PATH_ROLE);
+  item->setData(true, FavoriteItemData::Role::IS_GROUP_ROLE);
+  item->setData("", FavoriteItemData::Role::FULL_PATH_ROLE);
   item->setEditable(true);
   parentItem->appendRow(item);
   LOG_D("Group[%s] added successfully", qPrintable(grpName));
@@ -371,7 +362,7 @@ QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& p
 
 QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& path, QStandardItem* parentItem) {
   if (parentItem) {
-    if (!parentItem->data(IS_GROUP_ROLE).toBool()) {
+    if (!parentItem->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
       LOG_D("Cannot insert under non-group item");
       return nullptr;
     }
@@ -379,8 +370,8 @@ QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& p
     parentItem = invisibleRootItem();
   }
   QStandardItem* item = new QStandardItem(QIcon(":img/FAVORITES_LINK"), name);
-  item->setData(false, IS_GROUP_ROLE);
-  item->setData(path, FULL_PATH_ROLE);
+  item->setData(false, FavoriteItemData::Role::IS_GROUP_ROLE);
+  item->setData(path, FavoriteItemData::Role::FULL_PATH_ROLE);
   item->setEditable(true);  // 允许重命名
   item->setToolTip(QString("<b>%1</b><br>%2").arg(name, path));
   parentItem->appendRow(item);
@@ -412,7 +403,7 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
       }
       uniqueItems.insert(item);
 
-      if (item->data(IS_GROUP_ROLE).toBool()) {
+      if (item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
         groupsToDelete.insert(item);
       } else {
         itemsToDelete.append(item);
@@ -548,6 +539,19 @@ int FavoritesTreeModel::removeParentIndexes(const QModelIndexList& parentIndexes
 
 bool FavoritesTreeModel::onRename(const QModelIndex& parentIndex, const QString& newName) {
   return setData(parentIndex, newName);
+}
+
+void FavoritesTreeModel::addInitialFavoritesGroup() {
+  // initial configs
+  QStandardItem* workGroup = addGroup(tr("Work"), nullptr);
+  addPath("Documents", SystemPath::HOME_PATH() + "/Documents", workGroup);
+  addPath("Project Configurations", SystemPath::HOME_PATH(), workGroup);
+
+  QStandardItem* lifeGroup = addGroup(tr("Life"), nullptr);
+  addPath("Pictures", SystemPath::HOME_PATH() + "/Pictures", lifeGroup);
+  addPath("Videos", SystemPath::HOME_PATH() + "/Videos", lifeGroup);
+
+  addPath("Code", SystemPath::HOME_PATH() + "/code", nullptr);
 }
 
 void FavoritesTreeModel::saveToSettings() {

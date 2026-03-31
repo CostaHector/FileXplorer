@@ -25,7 +25,9 @@ class CustomListViewTest : public PlainTestSuite {
     Configuration().clear();
   }
 
-  void cleanupTestCase() { Configuration().clear(); }
+  void cleanupTestCase() { //
+    Configuration().clear();
+  }
 
   void test_contextMenuEvent() {
     const QString keyMemoryName = "CustomListViewTest";
@@ -143,6 +145,36 @@ class CustomListViewTest : public PlainTestSuite {
       QCOMPARE(viewer._ICON_SIZE_MENU->GetScaledIndex(), IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
       QCOMPARE(spy.count(), 2);
     }
+  }
+
+  void iconScaledIndexChanged_ok() {
+    Configuration().clear();
+
+    QWidget wid;
+    IconSizeMenu fsMenu{"iconMenuUsedIn_ListFileSystemView", "FileSystemListView", &wid};
+    int index0 = fsMenu.GetScaledIndex();
+
+    IconSizeMenu sceneMenu{"iconMenuUsedIn_ListFileSystemView", "SceneListView", &wid};
+    int index1 = sceneMenu.GetScaledIndex();
+    // 含有Scene, Image/img的无记录时的初始值会大于不含有的
+    QVERIFY(index1 > index0);
+
+    QSignalSpy iconScaledIndexChangedSpy{&sceneMenu, &IconSizeMenu::iconScaledIndexChanged};
+
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(nullptr), false);
+
+    QAction pAct;
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false); // no value in data
+    QCOMPARE(iconScaledIndexChangedSpy.count(), 0);
+
+    pAct.setData(index1);
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false); // unchange
+    QCOMPARE(iconScaledIndexChangedSpy.count(), 0);
+
+    pAct.setData(index0);
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), true); // changed
+    QCOMPARE(iconScaledIndexChangedSpy.count(), 1);
+    QCOMPARE(iconScaledIndexChangedSpy.takeLast(), (QVariantList{index0}));
   }
 };
 

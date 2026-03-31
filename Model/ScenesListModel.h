@@ -15,15 +15,15 @@ class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
  public:
   explicit ScenesListModel(const QString& listViewName, QObject* object = nullptr);
-  void initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bResultReverse);
-  bool setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension);
+  bool isSortProxyInited() const { return m_bSortProxyInited; }
+  void initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse);
+  bool setSortDimension(SceneInfo::Role newSortDimension);
   bool setSortResultReverse(bool bResultReverse);
 
   bool setRootPath(const QString& rootPath, const bool bForce = false);
   inline QString rootPath() const { return mRootPath; }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
-  enum CustomRole { RatingRole = Qt::UserRole + 100 };
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
@@ -59,6 +59,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QString mPattern;
   QString mRootPath;
   PaginatedSceneList mPagedData;
+  bool m_bSortProxyInited{false};
   bool m_bDisableImage{false};
 };
 #endif  // SCENESLISTMODEL_H

@@ -46,4 +46,4 @@ class FavoriteItemDataTest : public PlainTestSuite {
 };
 
 #include "FavoriteItemDataTest.moc"
-REGISTER_TEST(FavoriteItemDataTest, true)
+REGISTER_TEST(FavoriteItemDataTest, false)

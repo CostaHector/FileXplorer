@@ -10,7 +10,7 @@ class ActionsSearcher : public QComboBox {
   ActionsSearcher(QWidget* parent = nullptr);
   void subscribe();
  private:
-  void onActionSearchTextEdit(const QString& text);
+  bool onActionSearchTextEdit(const QString& text);
   QLineEdit* actionKeyLineEdit{nullptr};
   QStringListModel* mActionsTextModel{nullptr};
   QAction* mLastValidAct{nullptr};

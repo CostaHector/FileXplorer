@@ -56,19 +56,19 @@ class SceneInfoTest : public PlainTestSuite {
 
     // / and France(2) < / and The U.S.(1) < /Asia and Singapore(3)
 
-    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_PATH));
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::REL_PATH_ROLE));
     QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
 
     // 100k(1) < 150k(3) < 200k(2)
-    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::MOVIE_SIZE));
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::VID_SIZE_ROLE));
     QCOMPARE(siList, (SceneInfoList{si1, si3, si2}));
 
     // 95(2) < 96(3) < 98(1)
-    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::RATE));
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::RATE_ROLE));
     QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
 
     // 1960(2) < 1980(1) < 2000(3)
-    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE::UPLOADED_TIME));
+    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::UPLOADED_ROLE));
     QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
   }
 

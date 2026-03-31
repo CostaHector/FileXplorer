@@ -28,9 +28,6 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
   CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
-
-  const SceneInPageActions& sceneActInst = g_SceneInPageActions();
-  _sceneModel->initSortSetting(sceneActInst.GetSortDimension(), sceneActInst.GetSortOrderReverse());
   _sceneSortProxyModel->setSourceModel(_sceneModel);
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
@@ -109,16 +106,48 @@ void SceneListView::subscribe() {
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
   connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
   SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  {
+    // initial signal-slot connection
+    toggleSortRequestImplementer(sceneActInst.GetSortRangeCurrentPageOnly());
+  }
+
+  connect(&sceneActInst, &SceneInPageActions::sortImplementerChanged, this, &SceneListView::toggleSortRequestImplementer);
   connect(&sceneActInst, &SceneInPageActions::disableImageDecorationChanged, _sceneModel, &ScenesListModel::onDisableImageDecorationChanged);
-  connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneModel, &ScenesListModel::setSortDimension);
-  connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
-  connect(&sceneActInst, &SceneInPageActions::scenesSortPolicyChanged, _sceneSortProxyModel, &SceneSortProxyModel::sortByFieldDimension);
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
-
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
+}
+
+void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
+  if (mSortRoleConn) {
+    SceneListView::disconnect(mSortRoleConn);
+  }
+  if (mSortOrderReverseConn) {
+    SceneListView::disconnect(mSortOrderReverseConn);
+  }
+
+  const SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  if (bPageByPage) {  // locally
+    if (!_sceneSortProxyModel->isSortProxyInited()) {
+      const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
+      const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
+      _sceneSortProxyModel->initSortProxy(initSortRole, bOrderReverse);
+    }
+    mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortRole);
+    mSortOrderReverseConn =
+        connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortOrder);
+  } else {  // globally
+    if (!_sceneModel->isSortProxyInited()) {
+      const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
+      const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
+      _sceneModel->initSortSetting(initSortRole, bOrderReverse);
+    }
+    mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneModel, &ScenesListModel::setSortDimension);
+    mSortOrderReverseConn =
+        connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
+  }
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {

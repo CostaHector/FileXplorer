@@ -20,12 +20,12 @@ ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {
   COMPRESSED_IMAGES->setToolTip("Compress images in current folder and its directly sub folder.");
 }
 
-QToolBar* GetArchiveTooBar() {
-  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress"};
+QToolBar* ArchiveFilesActions::GetArchiveTooBar(QWidget* parent) {
+  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(compressToolBar);
-  compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
-  compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_IMAGES);
-  compressToolBar->addAction(g_AchiveFilesActions().DECOMPRESSED_HERE);
+  compressToolBar->addAction(COMPRESSED_HERE);
+  compressToolBar->addAction(COMPRESSED_IMAGES);
+  compressToolBar->addAction(DECOMPRESSED_HERE);
   compressToolBar->setOrientation(Qt::Orientation::Vertical);
   compressToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   compressToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));

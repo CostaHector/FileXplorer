@@ -22,9 +22,8 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
-  setHeaderHidden(true);
-  setRootIsDecorated(true);
   setExpandsOnDoubleClick(true);
+  setSortingEnabled(true);
 
   const int fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
   QFont defaultFont(font());
@@ -44,10 +43,62 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
   // Animated
   mAnimatedEnableAct = mMenu->addAction(tr("Enable Animation"));
   mAnimatedEnableAct->setToolTip("Enable or disable smooth expand/collapse animations");
-  const bool bDefAnimated{false};
-  mAnimatedEnableAct->setCheckable(true);
-  mAnimatedEnableAct->setChecked(bDefAnimated);
-  setAnimated(bDefAnimated);
+  {
+    const bool bDefAnimated{false};
+    mAnimatedEnableAct->setCheckable(true);
+    mAnimatedEnableAct->setChecked(bDefAnimated);
+    setAnimated(bDefAnimated);
+  }
+
+  mHeaderHidden = mMenu->addAction(tr("Hide Header"));
+  {
+    const bool bHiddenHeader{false};
+    mHeaderHidden->setCheckable(true);
+    mHeaderHidden->setChecked(bHiddenHeader);
+    setHeaderHidden(bHiddenHeader);
+  }
+
+  mRootDecorationEnabled = mMenu->addAction(tr("Root Decoration"));
+  {
+    const bool bShowRootDecoration{true};
+    mRootDecorationEnabled->setCheckable(true);
+    mRootDecorationEnabled->setChecked(bShowRootDecoration);
+    setRootIsDecorated(bShowRootDecoration);
+  }
+
+  mMenu->addSeparator();
+
+  {
+    mSortRoleMenu = mMenu->addMenu(tr("Sort"));
+    mSortByName = mSortRoleMenu->addAction(tr("Name"));
+    mSortByIsGroup = mSortRoleMenu->addAction(tr("Is Group"));
+    mSortByFullPathRole = mSortRoleMenu->addAction(tr("Full Path"));
+    mSortByLastAccessTime = mSortRoleMenu->addAction(tr("Last Access Time"));
+    mSortByAccessCount = mSortRoleMenu->addAction(tr("Access Count"));
+    mSortByName->setCheckable(true);
+    mSortByIsGroup->setCheckable(true);
+    mSortByFullPathRole->setCheckable(true);
+    mSortByLastAccessTime->setCheckable(true);
+    mSortByAccessCount->setCheckable(true);
+    mSortRoleIntAction.init(
+        {
+            {mSortByName, FavoriteItemData::Role::DEF_NAME_TEXT_ROLE},          //
+            {mSortByIsGroup, FavoriteItemData::Role::IS_GROUP_ROLE},            //
+            {mSortByFullPathRole, FavoriteItemData::Role::FULL_PATH_ROLE},      //
+            {mSortByLastAccessTime, FavoriteItemData::Role::LAST_ACCESS_ROLE},  //
+            {mSortByAccessCount, FavoriteItemData::Role::ACCESS_COUNT_ROLE},    //
+        },
+        FavoriteItemData::DEF_SORT_ROLE, QActionGroup::ExclusionPolicy::Exclusive);
+    const FavoriteItemData::Role initMemoryRole{FavoriteItemData::GetInitialSortRole()};
+    mSortRoleIntAction.setCheckedIfActionExist(initMemoryRole);
+
+    const bool isSortReverse{FavoriteItemData::GetInitialSortOrderReverse()};
+    mSortReverse = mMenu->addAction(tr("Sort Reverse"));
+    mSortReverse->setCheckable(true);
+    mSortReverse->setChecked(isSortReverse);
+
+    mFavProxyModel->initSortProxy(initMemoryRole, isSortReverse);
+  }
 
   mMenu->addSeparator();
 
@@ -65,6 +116,9 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
 
   mMenu->addSeparator();
 
+  // Add initial examples
+  mAddInitialExamples = mMenu->addAction(tr("Add Initial Examples"));
+
   // Skip saving
   mNotSavedDatasThisTime = mMenu->addAction(tr("Skip Saving"));
   mNotSavedDatasThisTime->setCheckable(true);
@@ -80,13 +134,24 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
   connect(mCollapseAll, &QAction::triggered, this, &FavoritesTreeView::collapseAll);
 
   connect(mAnimatedEnableAct, &QAction::toggled, this, &FavoritesTreeView::setAnimated);
+  connect(mHeaderHidden, &QAction::toggled, this, &FavoritesTreeView::setHeaderHidden);
+  connect(mRootDecorationEnabled, &QAction::toggled, this, &FavoritesTreeView::setRootIsDecorated);
+
+  connect(mSortRoleIntAction.getActionGroup(), &QActionGroup::triggered, this, &FavoritesTreeView::onSortRoleActionTriggered);
+  connect(mSortReverse, &QAction::toggled, mFavProxyModel, &RecursiveFilterProxyTreeModel::setSortOrder);
 
   connect(mRenameDisplayRole, &QAction::triggered, this, &FavoritesTreeView::onRenameDisplayRole);
   connect(mAddAGroup, &QAction::triggered, this, &FavoritesTreeView::onAddAGroup);
   connect(mRemoveSelection, &QAction::triggered, this, &FavoritesTreeView::onRemoveSelection);
 
+  connect(mAddInitialExamples, &QAction::triggered, mFavModel, &FavoritesTreeModel::addInitialFavoritesGroup);
   connect(mNotSavedDatasThisTime, &QAction::toggled, mFavModel, &FavoritesTreeModel::setThisTimeNotSave);
   connect(mSaveRightNow, &QAction::triggered, mFavModel, &FavoritesTreeModel::saveToSettings);
+}
+
+FavoritesTreeView::~FavoritesTreeView() {
+  FavoriteItemData::SaveInitialSortRole(mSortRoleIntAction.curVal());
+  FavoriteItemData::SaveSortOrderReverse(mSortReverse->isChecked());
 }
 
 void FavoritesTreeView::setFilter(const QString& filter) {
@@ -168,6 +233,11 @@ bool FavoritesTreeView::onItemClicked(const QModelIndex& proIndex) {
   QString filePath = mFavModel->filePath(srcInd);
   emit reqIntoAPath(filePath, true);
   return true;
+}
+
+void FavoritesTreeView::onSortRoleActionTriggered(const QAction* newSortRoleAction) {
+  FavoriteItemData::Role newSortRole = mSortRoleIntAction.act2Enum(newSortRoleAction);
+  mFavProxyModel->setSortRole(newSortRole);
 }
 
 bool FavoritesTreeView::isExactlyOneGroupSelected(QModelIndex* grpSrcIndex) const {

@@ -14,10 +14,6 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {}
-
-  void cleanupTestCase() {}
-
   void init() {  //
     Configuration().remove("BelongToFavoritesTreeView_DATAS");
   }
@@ -125,6 +121,14 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     elements.push_back(FavoriteItemData{"non_group", "path/to/non_group_folder"});  // valid element 2
     QCOMPARE(model.setDatas(elements), true);
     QCOMPARE(model.rowCount({}), 2);
+
+    auto r00 = model.index(0, 0, {});
+    auto r10 = model.index(1, 0, {});
+
+    QCOMPARE(model.data(r00, Qt::DisplayRole).toString(), "group");
+    QCOMPARE(model.data(r00, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "");
+    QCOMPARE(model.data(r10, Qt::DisplayRole).toString(), "non_group");
+    QCOMPARE(model.data(r10, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "path/to/non_group_folder");
 
     QCOMPARE(model.convertDataToItem(FavoriteItemData{}), nullptr);
     QCOMPARE(model.convertItemToData(nullptr), (FavoriteItemData{}));
@@ -314,12 +318,14 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.setDatas(elements), true);
     QCOMPARE(model.rowCount({}), 2);
 
-    QCOMPARE(model.onRenameGroupName({}, "Hallo"), false);                               // cannot rename root
-    QCOMPARE(model.onRenameGroupName(model.index(0, 0, {}), "nonGroup0"), false);        // name no change
-    QCOMPARE(model.onRenameGroupName(model.index(0, 0, {}), "hallo nonGroup0"), false);  // cannot rename nongroup
+    QCOMPARE(model.onRename({}, "Hallo"), false);                              // cannot rename root
+    QCOMPARE(model.onRename(model.index(0, 0, {}), "nonGroup0"), true);        // name no change(here we don't check)
+    QCOMPARE(model.onRename(model.index(0, 0, {}), "hallo nonGroup0"), true);  // can rename nongroup
+    QCOMPARE(model.index(0, 0, {}).data().toString(), "hallo nonGroup0");
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, {}))->text(), "hallo nonGroup0");
 
-    QCOMPARE(model.onRenameGroupName(model.index(1, 0, {}), "group0Child"), false);       // name no change
-    QCOMPARE(model.onRenameGroupName(model.index(1, 0, {}), "hallo group0Child"), true);  // cannot rename nongroup
+    QCOMPARE(model.onRename(model.index(1, 0, {}), "group0Child"), true);        // name no change(here we don't check)
+    QCOMPARE(model.onRename(model.index(1, 0, {}), "hallo group0Child"), true);  // can rename nongroup
     QCOMPARE(model.groupName(model.index(1, 0, {})), "hallo group0Child");
   }
 
@@ -485,9 +491,14 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.setDatas(QByteArray{}), true);
     QCOMPARE(model.rowCount(), 0);
 
+    QString urlPath{__FILE__};
+    QString expectParentPath{QFileInfo(urlPath).absolutePath()};
+
     QList<QUrl> urls;
+    urls.push_back(QUrl());  // non
     urls.push_back(QUrl::fromLocalFile(SystemPath::HOME_PATH()));
     urls.push_back(QUrl::fromLocalFile(SystemPath::STARRED_PATH()));
+    urls.push_back(QUrl::fromLocalFile(urlPath));  // file
     QMimeData mimeData;
     mimeData.setUrls(urls);
 
@@ -495,9 +506,13 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QVERIFY(model.canDropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
     QVERIFY(model.dropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
 
-    QCOMPARE(model.rowCount(), 2);
+    QCOMPARE(model.index(0, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), SystemPath::HOME_PATH());
+    QCOMPARE(model.index(1, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), SystemPath::STARRED_PATH());
+    QCOMPARE(model.index(2, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), expectParentPath);
+
+    QCOMPARE(model.rowCount(), 3);
   }
 };
 
 #include "FavoritesTreeModelTest.moc"
-REGISTER_TEST(FavoritesTreeModelTest, true)
+REGISTER_TEST(FavoritesTreeModelTest, false)

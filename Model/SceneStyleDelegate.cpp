@@ -35,7 +35,7 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
     QRect imageRect{GetRealImageVisualRect(index, option.rect)};
     drawRatingGrid(painter, RateHelper::getRatingRect(imageRect), mRateMachine.oldRate(), mRateMachine.newRate());
   }
-  const int rating = index.data(ScenesListModel::RatingRole).toInt();
+  const int rating = index.data(SceneInfo::Role::RATE_ROLE).toInt();
   QRect currentRateTextRect = option.rect;
   currentRateTextRect.setHeight(32);
   currentRateTextRect.setWidth(32);

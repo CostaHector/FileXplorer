@@ -7,12 +7,6 @@
 class FavoritesTreeModel : public QStandardItemModel {
   Q_OBJECT
  public:
-  enum Role {
-    IS_GROUP_ROLE = Qt::UserRole + 1,
-    FULL_PATH_ROLE,
-    LAST_ACCESS_ROLE,
-    ACCESS_COUNT_ROLE,
-  };
   explicit FavoritesTreeModel(const QString& belongToName, QObject* parent = nullptr, bool bInitialCollectionsWhenEmpty = true);
   ~FavoritesTreeModel();
 
@@ -48,6 +42,7 @@ class FavoritesTreeModel : public QStandardItemModel {
   int moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& dest);
   int removeParentIndexes(const QModelIndexList& parentIndexes);
   bool onRename(const QModelIndex& parentIndex, const QString& newName);
+  void addInitialFavoritesGroup();
   void setThisTimeNotSave(bool bWillNotSaveDataThisTime) { mNotSaveDatasThisTimeBeforeDestruct = bWillNotSaveDataThisTime; }
   void saveToSettings();
 

@@ -155,8 +155,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(mockcpp)
 
-set(READ_TR_FROM_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/PublicToolTest.cpp
+set(READ_TRANSLATION_FROM_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/FileToolTest.cpp
 )
 
 list(LENGTH HEADERS header_cpp_count)
@@ -288,6 +288,6 @@ endif()
 set(LUPDATE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate")
 set(LRELEASE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease")
 message(STATUS "Run following command in terminal if translation need update")
-message("${LUPDATE_EXECUTABLE} ${READ_TR_FROM_SOURCE} -ts ${TS_FILES}")
+message("${LUPDATE_EXECUTABLE} ${READ_TRANSLATION_FROM_SOURCE} -ts ${TS_FILES}")
 message("${LRELEASE_EXECUTABLE} ${TS_FILES} -qm ${QM_FILE_IN_QRC}")
 message(STATUS "The End")

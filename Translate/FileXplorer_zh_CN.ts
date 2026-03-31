@@ -217,7 +217,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+40"/>
+        <location filename="../View/CustomListView.cpp" line="+41"/>
         <source>Icon size</source>
         <translation>图片大小</translation>
     </message>
@@ -362,7 +362,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+26"/>
+        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+546"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -390,6 +390,51 @@
         <translation>允许动画</translation>
     </message>
     <message>
+        <location line="+9"/>
+        <source>Hide Header</source>
+        <translation>隐藏标题</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Root Decoration</source>
+        <translation>根节点装饰</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Sort</source>
+        <translation>排序</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Is Group</source>
+        <translation>按分组</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Full Path</source>
+        <translation>按全路径</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last Access Time</source>
+        <translation>按上次访问时间</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Access Count</source>
+        <translation>按访问次数</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Sort Reverse</source>
+        <translation>降序</translation>
+    </message>
+    <message>
         <location line="+10"/>
         <source>Rename</source>
         <translation>重命名</translation>
@@ -406,6 +451,11 @@
     </message>
     <message>
         <location line="+6"/>
+        <source>Add Initial Examples</source>
+        <translation>加入初始样例组</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Skip Saving</source>
         <translation>本轮不保存</translation>
     </message>
@@ -682,6 +732,23 @@
         <location line="+4"/>
         <source>Rename rule statistics</source>
         <translation>名称标准化规则统计数据</translation>
+    </message>
+</context>
+<context>
+    <name>FileToolTest</name>
+    <message>
+        <location filename="../TestCase/publicTest/FileToolTest.cpp" line="+128"/>
+        <location line="+18"/>
+        <location line="+7"/>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location line="-24"/>
+        <location line="+18"/>
+        <location line="+7"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -1398,23 +1465,6 @@
     </message>
 </context>
 <context>
-    <name>PublicToolTest</name>
-    <message>
-        <location filename="../TestCase/publicTest/PublicToolTest.cpp" line="+128"/>
-        <location line="+18"/>
-        <location line="+7"/>
-        <source>Apply</source>
-        <translation>应用</translation>
-    </message>
-    <message>
-        <location line="-24"/>
-        <location line="+18"/>
-        <location line="+7"/>
-        <source>Cancel</source>
-        <translation>取消</translation>
-    </message>
-</context>
-<context>
     <name>PwdTableEditActions</name>
     <message>
         <location filename="../Actions/PwdTableEditActions.cpp" line="+5"/>
@@ -1796,35 +1846,60 @@
         <translation>更新场景</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Performance mode(disable image)</source>
         <translation>性能模式(禁用图片)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>Clear scn</source>
         <translation>清除场景</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+7"/>
+        <source>Movie Name</source>
+        <translation>按名称</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Movie Path</source>
+        <translation>按全路径</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Movie Size</source>
+        <translation>按文件大小</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Movie Rate</source>
+        <translation>按评分</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Created Time</source>
+        <translation>按创建时间</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Reverse result</source>
         <translation>倒序</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Sort Per Page</source>
-        <translation>页内排序</translation>
+        <location line="+7"/>
+        <source>Sort Page by Page</source>
+        <translation>逐页排序</translation>
     </message>
     <message>
-        <location line="+61"/>
-        <source>Sort Dimension</source>
-        <translation>排序维度</translation>
+        <location line="+52"/>
+        <source>Sort Role</source>
+        <translation>按角色排序</translation>
     </message>
 </context>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+42"/>
+        <location filename="../View/SceneListView.cpp" line="+39"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>

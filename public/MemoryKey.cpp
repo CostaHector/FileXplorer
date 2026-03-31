@@ -106,10 +106,10 @@ const KV MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE{"RETURN_ERRORCODE_UPON_ANY
 
 const KV MemoryKey::RATE_MOVIE_DEFAULT_VALUE{"RATE_MOVIE_DEFAULT_VALUE", 10, ValueChecker{0, 11}};
 
-const KV SceneKey::SCENE_SORT_ORDER{"SCENE_SORT_ORDER", false, ValueChecker{PLAIN_BOOL}}; // true: reverse, false: not reverse
-const KV SceneKey::SCENE_SORT_BY_DIMENSION{"SCENE_SORT_BY_DIMENSION", 0, ValueChecker{0, 4}};
-const KV SceneKey::SCENE_DISABLE_IMAGE_DECORATION{"SCENE_DISABLE_IMAGE_DECORATION", false, ValueChecker{PLAIN_BOOL}};
-const KV SceneKey::SCENES_COUNT_EACH_PAGE{"SCENES_COUNT_EACH_PAGE", 40, ValueChecker{1, 9999}};
+const KV SceneKey::SORT_ORDER_REVERSE{"SceneKey/SORT_ORDER_REVERSE", false, ValueChecker{PLAIN_BOOL}}; // true: reverse, false: not reverse
+const KV SceneKey::SORT_BY_ROLE{"SceneKey/SORT_BY_ROLE", 0, ValueChecker{0, 4}};
+const KV SceneKey::DISABLE_IMAGE_DECORATION{"SceneKey/DISABLE_IMAGE_DECORATION", false, ValueChecker{PLAIN_BOOL}};
+const KV SceneKey::CNT_EACH_PAGE{"SceneKey/CNT_EACH_PAGE", 40, ValueChecker{1, 9999}};
 
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES{"Cast/PreviewBrowser/ShowRelatedImages", true, ValueChecker{PLAIN_BOOL}};
 const KV BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS{"Cast/PreviewBrowser/ShowImagesImages", true, ValueChecker{PLAIN_BOOL}};
@@ -123,6 +123,8 @@ const KV BrowserKey::FLOATING_MEDIA_TYPE_SEQ{"FLOATING_MEDIA_TYPE_SEQ", "012", V
 const KV RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE{"RedunImgFinderKey/ALSO_RECYCLE_EMPTY_IMAGE", true, ValueChecker{PLAIN_BOOL}};
 const KV RedunImgFinderKey::RUND_IMG_PATH("RUND_IMG_PATH", ".", ValueChecker{FOLDER_PATH}, true);
 
+const KV FavoritesNavigationKey::SORT_BY_ROLE{"FavoritesNavigationKey/SORT_BY_ROLE", 0, ValueChecker{0, 1000}};
+const KV FavoritesNavigationKey::SORT_ORDER_REVERSE{"FavoritesNavigationKey/SORT_ORDER_REVERSE", false, ValueChecker{PLAIN_BOOL}};
 
 namespace JsonOpMemoryKey {
 const KV& STUDIO_OPERATION() {

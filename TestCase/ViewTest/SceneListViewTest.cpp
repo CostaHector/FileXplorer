@@ -8,6 +8,7 @@
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "SceneListView.h"
+#include "ScenesListModel.h"
 #include "EndToExposePrivateMember.h"
 
 #include "TDir.h"
@@ -378,9 +379,9 @@ class SceneListViewTest : public PlainTestSuite {
 
     auto checkNameAndRate = [&](const QString& expect0Name, int expect0Rate, const QString& expect1Name, int expect1Rate) -> void {
       QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), expect0Name);
-      QCOMPARE(firstIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect0Rate);
+      QCOMPARE(firstIndex.data(SceneInfo::Role::RATE_ROLE).toInt(), expect0Rate);
       QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), expect1Name);
-      QCOMPARE(secondIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect1Rate);
+      QCOMPARE(secondIndex.data(SceneInfo::Role::RATE_ROLE).toInt(), expect1Rate);
     };
 
     auto checkJsonScnRate = [&](const int expectChrisRate, const int expectHenryRate) {

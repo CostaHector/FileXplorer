@@ -7,8 +7,10 @@
 #include "BytesRangeTool.h"
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
-#include "ScenePageNaviHelper.h"
 #include "VideoPlayTool.h"
+#include "FavoriteItemData.h"
+#include "SceneInfo.h"
+#include "ScenePageNaviHelper.h"
 #include <QHeaderView>
 #include <QCryptographicHash>
 #include <QMediaPlaylist>
@@ -23,9 +25,10 @@ template struct EnumIntAction<QCryptographicHash::Algorithm>;
 template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
-template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
 template struct EnumIntAction<Qt::TextElideMode>;
 template struct EnumIntAction<QHeaderView::ResizeMode>;
 template struct EnumIntAction<Qt::ScrollBarPolicy>;
 template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
 template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;
+template struct EnumIntAction<FavoriteItemData::Role>;
+template struct EnumIntAction<SceneInfo::Role>;

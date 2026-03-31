@@ -1,11 +1,16 @@
 #include "SceneInfo.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "MemoryKey.h"
+#include "PublicMacro.h"
 #include <QFileInfo>
 #include <QFile>
 #include <QDirIterator>
 #include <QSaveFile>
 #include <QVariantHash>
+
+constexpr int SceneInfo::SORT_COLUMN;
+constexpr SceneInfo::Role SceneInfo::DEF_SORT_ROLE;
 
 constexpr quint32 SceneInfo::MAGIC_NUMBER;  // "LMSC" = "Local Media Scene Cache"
 constexpr quint16 SceneInfo::CURRENT_VERSION;
@@ -79,19 +84,18 @@ QString SceneInfo::GetJsonAbsPath(const QString& rootPath) const {
   return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + ".json");
 }
 
-SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneSortOrderHelper::SortDimE dim) {
-  using namespace SceneSortOrderHelper;
+SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneInfo::Role dim) {
   switch (dim) {
-    case SortDimE::MOVIE_PATH:
+    case SceneInfo::Role::REL_PATH_ROLE:
       return &SceneInfo::less;
-    case SortDimE::MOVIE_SIZE:
+    case SceneInfo::Role::VID_SIZE_ROLE:
       return &SceneInfo::lessThanVidSize;
-    case SortDimE::RATE:
+    case SceneInfo::Role::RATE_ROLE:
       return &SceneInfo::lessThanRate;
-    case SortDimE::UPLOADED_TIME:
+    case SceneInfo::Role::UPLOADED_ROLE:
       return &SceneInfo::lessThanUploaded;
     default:
-      LOG_D("Sort Dimension[%s] not support", c_str(dim));
+      LOG_D("Sort Role[%d] not support", dim);
       return &SceneInfo::lessThanName;
   }
 }
@@ -137,6 +141,34 @@ bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, 
   }
   stream << newRate;
   return stream.status() == QDataStream::Ok;
+}
+
+SceneInfo::Role SceneInfo::GetInitialSortRole() {
+  const int role{Configuration().value(SceneKey::SORT_BY_ROLE.name, SceneKey::SORT_BY_ROLE.v).toInt()};
+  if (role < DEF_BEGIN_ROLE || role > INVALID_BUTT_ROLE) {
+    return DEF_BEGIN_ROLE;
+  }
+  return static_cast<SceneInfo::Role>(role);
+}
+
+void SceneInfo::SaveInitialSortRole(Role sortRole) {
+  Configuration().setValue(SceneKey::SORT_BY_ROLE.name, (int)sortRole);
+}
+
+bool SceneInfo::GetInitialSortOrderReverse() {
+  return Configuration().value(SceneKey::SORT_ORDER_REVERSE.name, SceneKey::SORT_ORDER_REVERSE.v).toBool();
+}
+
+void SceneInfo::SaveSortOrderReverse(bool bReverse) {
+  Configuration().setValue(SceneKey::SORT_ORDER_REVERSE.name, bReverse);
+}
+
+bool SceneInfo::GetInitialDisableImageDecoration() {
+  return Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.v).toBool();
+}
+
+void SceneInfo::SaveDisableImageDecoration(bool bDisable) {
+  Configuration().setValue(SceneKey::DISABLE_IMAGE_DECORATION.name, bDisable);
 }
 
 namespace SceneHelper {

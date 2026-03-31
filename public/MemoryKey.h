@@ -110,10 +110,10 @@ struct MemoryKey {
 };
 
 struct SceneKey {
-  static const KV SCENE_SORT_ORDER;
-  static const KV SCENE_SORT_BY_DIMENSION;
-  static const KV SCENE_DISABLE_IMAGE_DECORATION;
-  static const KV SCENES_COUNT_EACH_PAGE;
+  static const KV SORT_ORDER_REVERSE;
+  static const KV SORT_BY_ROLE;
+  static const KV DISABLE_IMAGE_DECORATION;
+  static const KV CNT_EACH_PAGE;
 };
 
 struct BrowserKey {
@@ -129,6 +129,11 @@ struct BrowserKey {
 struct RedunImgFinderKey {
   static const KV ALSO_RECYCLE_EMPTY_IMAGE;
   static const KV RUND_IMG_PATH;
+};
+
+struct FavoritesNavigationKey {
+  static const KV SORT_BY_ROLE;
+  static const KV SORT_ORDER_REVERSE;
 };
 
 namespace JsonOpMemoryKey {

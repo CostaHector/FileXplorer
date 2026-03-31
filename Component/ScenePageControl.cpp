@@ -38,7 +38,7 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
         QActionGroup::ExclusionPolicy::None); //
   }
 
-  const int sceneCnt1Page = Configuration().value(SceneKey::SCENES_COUNT_EACH_PAGE.name, SceneKey::SCENES_COUNT_EACH_PAGE.v).toInt();
+  const int sceneCnt1Page = Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.v).toInt();
   mPageDimensionLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page), this);
   CHECK_NULLPTR_RETURN_VOID(mPageDimensionLE);
   mPageDimensionLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
@@ -89,7 +89,7 @@ bool ScenePageControl::SetScenesCountPerPage() {
     LOG_D("Page scenes count str[%s] invalid", qPrintable(scenesCnt1PageStr));
     return false;
   }
-  Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, scenesCnt1Page);
+  Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, scenesCnt1Page);
   LOG_D("Scene count each page: %d", scenesCnt1Page);
   emit maxScenesCountPerPageChanged(scenesCnt1Page);
   return true;

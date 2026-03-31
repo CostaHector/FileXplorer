@@ -243,18 +243,9 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
-  QToolBar* compressToolBar = new (std::nothrow) QToolBar{"Compress/Decompress", leafHomeWid};
+  QToolBar* compressToolBar = g_AchiveFilesActions().GetArchiveTooBar(leafHomeWid);
   CHECK_NULLPTR_RETURN_NULLPTR(compressToolBar);
-  {
-    compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_HERE);
-    compressToolBar->addAction(g_AchiveFilesActions().COMPRESSED_IMAGES);
-    compressToolBar->addAction(g_AchiveFilesActions().DECOMPRESSED_HERE);
-    compressToolBar->setOrientation(Qt::Orientation::Vertical);
-    compressToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    compressToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-    compressToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
-    SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
-  }
+  SetLayoutAlightment(compressToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
 
   auto* renameItemsTB = new MenuToolButton(g_renameAg().RENAME_RIBBONS->actions(),
                                            QToolButton::MenuButtonPopup,

@@ -15,6 +15,7 @@
 #include "CastPsonFileHelper.h"
 #include "Logger.h"
 #include "TableFields.h"
+#include "ScenesListModel.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -109,7 +110,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
     ScenePageControl m_scenePageControl{"Pagination display", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &wid};  // view/searchToolBar switcher
+        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
@@ -205,7 +207,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
     ScenePageControl m_scenePageControl{"Pagination display", &wid};
     CustomStatusBar m_statusBar{&wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &wid};  // view/searchToolBar switcher
+        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
@@ -313,7 +316,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     ScenePageControl m_scenePageControl{"Pagination display", &wid};
     CustomStatusBar m_statusBar{&wid};
     ViewSwitchToolBar m_viewSwitcher{"View Switcher", &m_statusBar};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &wid};  // view/searchToolBar switcher
+        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
     m_statusBar.addPermanentWidget(&m_viewSwitcher);
 
     lo.addWidget(&m_previewFolder);
@@ -497,7 +501,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     ScenePageControl m_scenePageControl{"Pagination display", &wid};
     CustomStatusBar m_statusBar{&wid};
     ViewSwitchToolBar m_viewSwitcher{"View Switcher", &m_statusBar};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &wid};  // view/searchToolBar switcher
+        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
     m_statusBar.addPermanentWidget(&m_viewSwitcher);
 
     lo.addWidget(&m_previewFolder);
@@ -901,7 +906,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::SCENE);
       QCOMPARE(m_fsPanel.m_scenesModel->rowCount(), 1);
       QCOMPARE(m_fsPanel.m_sceneProxyModel->rowCount(), 1);
-      m_fsPanel.m_sceneProxyModel->sort((int)SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
+      m_fsPanel.m_sceneProxyModel->sort((int)SceneInfo::Role::REL_PATH_ROLE, Qt::AscendingOrder);
 
       QCOMPARE(m_fsPanel.getRootPath(), lvl1Path);
       QVERIFY(!m_fsPanel.hasSelection());

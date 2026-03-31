@@ -6,6 +6,7 @@
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
 #include "PublicMacro.h"
+#include "Bool2QtEnum.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
@@ -158,13 +159,13 @@ void CustomListView::AddItselfAction2Menu() {
 }
 
 void CustomListView::onFlowOrientationChanged(const bool bLeft2Right) {
-  setFlow(bLeft2Right ? QListView::Flow::LeftToRight : QListView::Flow::TopToBottom);
+  setFlow(Bool2QtEnum::toFlow(bLeft2Right));
 }
 void CustomListView::onViewModeListIconToggled(const bool bIconMode) {
-  setViewMode(bIconMode ? QListView::ViewMode::IconMode : QListView::ViewMode::ListMode);
+  setViewMode(Bool2QtEnum::toViewMode(bIconMode));
 }
 void CustomListView::onResizeModeToggled(const bool bAdjust) {
-  setResizeMode(bAdjust ? QListView::ResizeMode::Adjust : QListView::ResizeMode::Fixed);
+  setResizeMode(Bool2QtEnum::toResizeMode(bAdjust));
 }
 void CustomListView::onWrapingToggled(const bool bWapping) {
   setWrapping(bWapping);
