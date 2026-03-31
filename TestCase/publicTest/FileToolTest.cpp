@@ -8,10 +8,10 @@
 #include "MemoryKey.h"
 #include <QPushButton>
 
-class PublicToolTest : public PlainTestSuite {
+class FileToolTest : public PlainTestSuite {
   Q_OBJECT
-public:
-private slots:
+ public:
+ private slots:
   void test_mvToANewPath() {
     QString mvToANewPath = "5";
     QAction act1{"1", this};
@@ -66,22 +66,22 @@ private slots:
     QByteArray last5ba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 5);
     QCOMPARE(last5ba, "5\n6\n7\n8\n9");
 
-    QCOMPARE(QFile::exists(textFileAbsPath), true); // file already exist. not override with OpenModeFlag::NewOnly
+    QCOMPARE(QFile::exists(textFileAbsPath), true);  // file already exist. not override with OpenModeFlag::NewOnly
     QCOMPARE(FileTool::TextWriter(textFileAbsPath,
-                                  "Cannot override", //
+                                  "Cannot override",  //
                                   QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
              false);
     QByteArray lastAllba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 100);
     QCOMPARE(lastAllba, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 
     QCOMPARE(FileTool::TextWriter(textFileAbsPath,
-                                  "Can only override", //
+                                  "Can only override",  //
                                   QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
              true);
     QCOMPARE(FileTool::TextReader(textFileAbsPath), "Can only override");
   }
 
-  void CreateUserPath_ok() { // UserPath is Service Running Precondition
+  void CreateUserPath_ok() {  // UserPath is Service Running Precondition
     QCOMPARE(CreateUserPath(), true);
 
     const QString homePath = SystemPath::HOME_PATH();
@@ -91,7 +91,7 @@ private slots:
     QCOMPARE(QFileInfo{workPath}.isDir(), true);
 
     // cross-compile unit protection test: should not crash down
-    auto IsPathStringValid = [homePath](const QString& path) { // we do not assume path existence here
+    auto IsPathStringValid = [homePath](const QString& path) {  // we do not assume path existence here
       return path.startsWith(homePath) && path.size() > homePath.size();
     };
     QVERIFY(IsPathStringValid(SystemPath::STARRED_PATH()));
@@ -157,5 +157,5 @@ private slots:
   }
 };
 
-#include "PublicToolTest.moc"
-REGISTER_TEST(PublicToolTest, false)
+#include "FileToolTest.moc"
+REGISTER_TEST(FileToolTest, false)

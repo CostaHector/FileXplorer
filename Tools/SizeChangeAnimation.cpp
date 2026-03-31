@@ -68,7 +68,13 @@ void SizeChangeAnimation::operator()(QWidget *pWid, int currentVal, bool bExpand
   myAnimation->setStartValue(currentVal);
   myAnimation->setEndValue(bExpand ? mExpandVal : mNoExpandValue);
   if (mFuncWhenFinished) {
-    QObject::connect(myAnimation, &QPropertyAnimation::finished, this, &SizeChangeAnimation::doPostOperation);
+    // 不能连接到this, this是栈对象, 会先于QPropertyAnimation堆对象释放, qt机制保证this释放时断开连接, 因此不会调用槽函数
+    // WRONG: QObject::connect(myAnimation, &QPropertyAnimation::finished, this, &SizeChangeAnimation::doPostOperation);
+    // 捕获一个拷贝对象, qt保证pWid存活时, 才会调用槽函数安全的设定pWid属性
+    auto tempCallback = mFuncWhenFinished;
+    QObject::connect(myAnimation, &QPropertyAnimation::finished, pWid, [tempCallback]() {
+      tempCallback();
+    });
   }
   myAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }

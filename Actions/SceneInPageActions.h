@@ -6,9 +6,9 @@
 #include <QObject>
 #include <QToolBar>
 #include "EnumIntAction.h"
-#include "ScenePageNaviHelper.h"
+#include "SceneInfo.h"
 
-extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
+extern template struct EnumIntAction<SceneInfo::Role>;
 
 class SceneInPageActions : public QObject {
   Q_OBJECT
@@ -23,6 +23,7 @@ class SceneInPageActions : public QObject {
   QAction* _DISABLE_IMAGE_DECORATION{nullptr};
   QAction* _CLEAR_SCN_FILE{nullptr};
 
+  QAction* _BY_NAME{nullptr};
   QAction* _BY_MOVIE_PATH{nullptr};
   QAction* _BY_MOVIE_SIZE{nullptr};
   QAction* _BY_RATE{nullptr};
@@ -32,7 +33,7 @@ class SceneInPageActions : public QObject {
 
   QAction* _SORT_RANGE_PAGE_BY_PAGE{nullptr};
 
-  SceneSortOrderHelper::SortDimE GetSortDimension() const {
+  SceneInfo::Role GetSortRole() const {
     return mSortOrderIntAction.curVal();
   }
   bool GetSortOrderReverse() const {
@@ -45,18 +46,18 @@ class SceneInPageActions : public QObject {
  signals:
   void disableImageDecorationChanged(bool bDisable);
 
-  void sceneSortDimensionChanged(SceneSortOrderHelper::SortDimE newSortDimension);
+  void sceneSortDimensionChanged(SceneInfo::Role newSortDimension);
   void sceneSortReverseOrderChanged(bool bReverse);
 
-  // used in proxy model only
-  void scenesSortPolicyChanged(SceneSortOrderHelper::SortDimE sortDimension, Qt::SortOrder order);
+  void sortImplementerChanged(bool pageByPage);
 
  private:
   void onDisableImageDecorationToggled(bool bDisabled);
   void onReverseSortOrderToggled(bool bReverseDescend);
-  void onSortDimensionTriggered(QAction* triggeredAct);
+  void onSortDimensionTriggered(const QAction* triggeredAct);
+
   void subscribe();
-  EnumIntAction<SceneSortOrderHelper::SortDimE> mSortOrderIntAction;
+  EnumIntAction<SceneInfo::Role> mSortOrderIntAction;
 };
 
 SceneInPageActions& g_SceneInPageActions();

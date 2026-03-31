@@ -24,6 +24,12 @@ class ActionsRecorder {
     }
     return keys;
   }
+  void clear() {
+    mTextToActionMap.clear();
+    keys.clear();
+    isDirty = false;
+  }
+
   int FromToolButton(QToolButton* toolButton, const QString postPath = "");
   int FromToolbar(QToolBar* tb);
   int FromMenu(QMenu* menu, const QString postPath = "");

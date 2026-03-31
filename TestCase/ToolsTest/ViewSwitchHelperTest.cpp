@@ -18,7 +18,8 @@ class ViewSwitchHelperTest : public PlainTestSuite {
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
     ScenePageControl m_scenePageControl{"Pagination display", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &wid};  // view/searchToolBar switcher
+    NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);

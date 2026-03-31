@@ -1,13 +1,14 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "Logger.h"
 #include "MemoryKey.h"
 #include "BeginToExposePrivateMember.h"
 #include "SceneListView.h"
+#include "ScenesListModel.h"
 #include "EndToExposePrivateMember.h"
 
 #include "TDir.h"
@@ -189,6 +190,38 @@ class SceneListViewTest : public PlainTestSuite {
       QVERIFY(sceneView.onUpdateScnFiles() > 0);
       QVERIFY(QFile::exists(scnAbsPath));
     }
+  }
+
+  void toggle_connection_and_init_ok() {
+    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInfo::SaveInitialSortRole(SceneInfo::Role::RATE_ROLE);
+    SceneInfo::SaveSortOrderReverse(true);
+    QCOMPARE(sceneAct.GetSortRangeCurrentPageOnly(), false);  // global
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), false);
+
+    QWidget wid;
+    ScenesListModel sceneModel{"ScenesListView", &wid};
+    SceneSortProxyModel sceneProxyModel{&wid};
+    ScenePageControl pageControlToolbar{"Pagination display", &wid};
+    QCOMPARE(sceneModel.isSortProxyInited(), false);
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
+
+    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar, &wid};
+    QCOMPARE(sceneModel.isSortProxyInited(), true);  // first init
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
+    QVERIFY(sceneView.mSortRoleConn);  // connection ok
+    QVERIFY(sceneView.mSortOrderReverseConn);
+
+    sceneAct._SORT_RANGE_PAGE_BY_PAGE->toggle();
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), true);
+    QCOMPARE(sceneModel.isSortProxyInited(), true);       // first init
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), true);  // not it is inited
+    QVERIFY(sceneView.mSortRoleConn);                     // connection ok
+    QVERIFY(sceneView.mSortOrderReverseConn);
+
+    // 不加下一行, 则会崩溃, 先暂时改到全局排序
+    sceneAct._SORT_RANGE_PAGE_BY_PAGE->toggle();
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), false);
   }
 
   void select_scene_slot_interact_with_sort_ok() {
@@ -378,9 +411,9 @@ class SceneListViewTest : public PlainTestSuite {
 
     auto checkNameAndRate = [&](const QString& expect0Name, int expect0Rate, const QString& expect1Name, int expect1Rate) -> void {
       QCOMPARE(firstIndex.data(Qt::DisplayRole).toString(), expect0Name);
-      QCOMPARE(firstIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect0Rate);
+      QCOMPARE(firstIndex.data(SceneInfo::Role::RATE_ROLE).toInt(), expect0Rate);
       QCOMPARE(secondIndex.data(Qt::DisplayRole).toString(), expect1Name);
-      QCOMPARE(secondIndex.data(ScenesListModel::CustomRole::RatingRole).toInt(), expect1Rate);
+      QCOMPARE(secondIndex.data(SceneInfo::Role::RATE_ROLE).toInt(), expect1Rate);
     };
 
     auto checkJsonScnRate = [&](const int expectChrisRate, const int expectHenryRate) {

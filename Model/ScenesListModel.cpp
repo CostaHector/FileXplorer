@@ -12,9 +12,9 @@
 
 ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  //
     : QAbstractListModelPub{listViewName, object} {
-  m_bDisableImage = Configuration().value(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name, SceneKey::SCENE_DISABLE_IMAGE_DECORATION.v).toBool();
+  m_bDisableImage = Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.v).toBool();
 
-  const int perPageCnt{Configuration().value(SceneKey::SCENES_COUNT_EACH_PAGE.name, SceneKey::SCENES_COUNT_EACH_PAGE.v).toInt()};
+  const int perPageCnt{Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.v).toInt()};
   mPagedData.initPerPageCnt(perPageCnt);
   mPagedData.registerCallback(                                                         //
       std::bind(&ScenesListModel::beginResetModel, this),                              //
@@ -23,12 +23,15 @@ ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  
   );
 }
 
-void ScenesListModel::initSortSetting(SceneSortOrderHelper::SortDimE newSortDimension, bool bResultReverse) {
-  auto comparator = SceneInfo::getCompareFunc(newSortDimension);
-  mPagedData.initSortSetting(comparator, bResultReverse);
+void ScenesListModel::initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse) {
+  if (!isSortProxyInited()) {
+    auto comparator = SceneInfo::getCompareFunc(newSortDimension);
+    mPagedData.initSortSetting(comparator, bResultReverse);
+    m_bSortProxyInited = true;
+  }
 }
 
-bool ScenesListModel::setSortDimension(SceneSortOrderHelper::SortDimE newSortDimension) {
+bool ScenesListModel::setSortDimension(SceneInfo::Role newSortDimension) {
   auto comparator = SceneInfo::getCompareFunc(newSortDimension);
   return mPagedData.setSorter(comparator);
 }
@@ -60,8 +63,17 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       }
       break;
     }
-    case CustomRole::RatingRole: {
+    case SceneInfo::Role::REL_PATH_ROLE: {
+      return item.rel2scn + '/' + item.name;
+    }
+    case SceneInfo::Role::VID_SIZE_ROLE: {
+      return item.vidSize;
+    }
+    case SceneInfo::Role::RATE_ROLE: {
       return item.rate;
+    }
+    case SceneInfo::Role::UPLOADED_ROLE: {
+      return item.uploaded;
     }
     default:
       break;
@@ -70,7 +82,7 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
 }
 
 bool ScenesListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (index.isValid() && role == CustomRole::RatingRole) {
+  if (index.isValid() && role == SceneInfo::Role::RATE_ROLE) {
     return ModifySceneInfoRateValue(index, value.toInt());
   }
   return QAbstractListModel::setData(index, value, role);
@@ -88,7 +100,7 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
     return true;
   }
   item.rate = newRate;
-  emit dataChanged(index, index, {CustomRole::RatingRole});
+  emit dataChanged(index, index, {SceneInfo::Role::RATE_ROLE});
 
   const QString scnAbsFilePath = GetScn(index);
   const QString eleRel2Scn = item.rel2scn;

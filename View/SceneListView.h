@@ -22,6 +22,7 @@ class SceneListView : public CustomListView {
                          SceneSortProxyModel* sceneSortProxyModel,
                          ScenePageControl* scenePageControl,
                          QWidget* parent = nullptr);
+  ~SceneListView();
   void setRootPath(const QString& rootPath);
   int onUpdateJsonFiles();
   int onUpdateScnFiles();
@@ -40,6 +41,7 @@ class SceneListView : public CustomListView {
   int onRenameSceneAndRelatedInsert();
   int onRenameSceneAndRelatedNumerize();
   int onRecycleSceneAndRelated();
+  void toggleSortRequestImplementer(bool bPageByPage);
 
  protected:
   void mousePressEvent(QMouseEvent* event) override;
@@ -60,6 +62,9 @@ class SceneListView : public CustomListView {
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   SceneStyleDelegate* mAlignDelegate{nullptr};
   ScenePageControl* _scenePageControl{nullptr};
+
+  QMetaObject::Connection mSortRoleConn;
+  QMetaObject::Connection mSortOrderReverseConn;
 
   mutable QModelIndex mLastClickedIndex;
 };

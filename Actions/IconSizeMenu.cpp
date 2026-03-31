@@ -40,6 +40,8 @@ IconSizeMenu::~IconSizeMenu() {
 }
 
 bool IconSizeMenu::EmitIconScaledIndexChanged(const QAction* pAct) {
+  CHECK_NULLPTR_RETURN_FALSE(pAct);
+
   bool bOk = false;
   int newScaledSize = pAct->data().toInt(&bOk);
   if (!bOk) {

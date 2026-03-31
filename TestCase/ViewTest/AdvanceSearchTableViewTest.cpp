@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "TDir.h"

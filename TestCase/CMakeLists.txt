@@ -37,10 +37,11 @@ file(GLOB SOURCES
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
-    ${PARENT_DIR}/Component/RenameWidgets/*.cpp
-    ${PARENT_DIR}/Component/Pwd/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
+    ${PARENT_DIR}/Component/Navigation/*.cpp
+    ${PARENT_DIR}/Component/Pwd/*.cpp
+    ${PARENT_DIR}/Component/RenameWidgets/*.cpp
     ${PARENT_DIR}/Component/VideoPlayer/*.cpp
     ${PARENT_DIR}/FileOperation/*.cpp
     ${PARENT_DIR}/Model/*.cpp
@@ -58,9 +59,10 @@ file(GLOB SOURCES
     ActionsTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
-    ComponentTest/PwdTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
+    ComponentTest/NavigationTest/*.cpp
+    ComponentTest/PwdTest/*.cpp
     ComponentTest/RenameTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
     DbManagerTest/*.cpp
@@ -88,10 +90,11 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
     ${PARENT_DIR}/Component/FolderPreview
-    ${PARENT_DIR}/Component/RenameWidgets
-    ${PARENT_DIR}/Component/Pwd
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
+    ${PARENT_DIR}/Component/Navigation
+    ${PARENT_DIR}/Component/Pwd
+    ${PARENT_DIR}/Component/RenameWidgets
     ${PARENT_DIR}/Component/VideoPlayer
     ${PARENT_DIR}/FileOperation
     ${PARENT_DIR}/lib
@@ -116,10 +119,11 @@ file(GLOB HEADERS
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
-    ${PARENT_DIR}/Component/RenameWidgets/*.h
-    ${PARENT_DIR}/Component/Pwd/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
+    ${PARENT_DIR}/Component/Navigation/*.h
+    ${PARENT_DIR}/Component/Pwd/*.h
+    ${PARENT_DIR}/Component/RenameWidgets/*.h
     ${PARENT_DIR}/Component/VideoPlayer/*.h
     ${PARENT_DIR}/FileOperation/*.h
     ${PARENT_DIR}/lib/*.h
@@ -151,8 +155,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(mockcpp)
 
-set(READ_TR_FROM_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/PublicToolTest.cpp
+set(READ_TRANSLATION_FROM_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/publicTest/FileToolTest.cpp
 )
 
 list(LENGTH HEADERS header_cpp_count)
@@ -284,6 +288,6 @@ endif()
 set(LUPDATE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate")
 set(LRELEASE_EXECUTABLE "/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease")
 message(STATUS "Run following command in terminal if translation need update")
-message("${LUPDATE_EXECUTABLE} ${READ_TR_FROM_SOURCE} -ts ${TS_FILES}")
+message("${LUPDATE_EXECUTABLE} ${READ_TRANSLATION_FROM_SOURCE} -ts ${TS_FILES}")
 message("${LRELEASE_EXECUTABLE} ${TS_FILES} -qm ${QM_FILE_IN_QRC}")
 message(STATUS "The End")

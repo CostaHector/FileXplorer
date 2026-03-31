@@ -3,4 +3,8 @@
   <qresource prefix="stylesheet">
       <file>default.qss</file>
   </qresource>
+  <qresource prefix="/icon">
+      <file alias="FAVORITES_GROUP">../FAVORITES_GROUP.svg</file>
+      <file alias="FAVORITES_GROUP_EXPAND">../FAVORITES_GROUP_EXPAND.svg</file>
+  </qresource>
 </RCC>

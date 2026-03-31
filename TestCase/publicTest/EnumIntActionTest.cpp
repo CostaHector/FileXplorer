@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "Logger.h"
@@ -19,6 +19,7 @@
 #include "BytesRangeTool.h"
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
+#include "SceneInfo.h"
 #include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
 #include <QMediaPlaylist>
@@ -34,7 +35,7 @@ extern template struct EnumIntAction<QCryptographicHash::Algorithm>;
 extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
 extern template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
-extern template struct EnumIntAction<SceneSortOrderHelper::SortDimE>;
+extern template struct EnumIntAction<SceneInfo::Role>;
 extern template struct EnumIntAction<Qt::TextElideMode>;
 extern template struct EnumIntAction<QHeaderView::ResizeMode>;
 extern template struct EnumIntAction<Qt::ScrollBarPolicy>;
@@ -140,10 +141,10 @@ class EnumIntActionTest : public PlainTestSuite {
         FileStructurePolicy::FileStuctureModeE::QUERY,             //
         QActionGroup::ExclusionPolicy::Exclusive);
 
-    EnumIntActionChecker<SceneSortOrderHelper::SortDimE>(  //
-        SceneSortOrderHelper::SortDimE::MOVIE_PATH,        //
-        SceneSortOrderHelper::SortDimE::MOVIE_SIZE,        //
-        SceneSortOrderHelper::DEFAULT_SCENE_SORT_ORDER,    //
+    EnumIntActionChecker<SceneInfo::Role>(  //
+        SceneInfo::Role::REL_PATH_ROLE,        //
+        SceneInfo::Role::VID_SIZE_ROLE,        //
+        SceneInfo::DEF_SORT_ROLE,    //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<Qt::TextElideMode>(  //

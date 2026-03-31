@@ -1,68 +1,31 @@
 #include "SceneSortProxyModel.h"
-#include "PublicMacro.h"
+#include "Bool2QtEnum.h"
 
-void SceneSortProxyModel::setSourceModel(QAbstractItemModel* sourceModel) {
-  if (m_sourceModel != nullptr) {
-    LOG_W("Don't reset source Model");
-    return;
+void SceneSortProxyModel::initSortProxy(SceneInfo::Role initRole, bool bReverseOrder) {
+  if (!isSortProxyInited()) {
+    setSortRole(initRole);
+    mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
+    sort(SceneInfo::SORT_COLUMN, mSortOrder);
+    m_bSortProxyInited = true;
   }
-  CHECK_NULLPTR_RETURN_VOID(sourceModel);
-  QSortFilterProxyModel::setSourceModel(sourceModel);
-  auto* pTmp = qobject_cast<ScenesListModel*>(sourceModel);
-  CHECK_NULLPTR_RETURN_VOID(pTmp);
-  m_sourceModel = pTmp;
 }
 
-void SceneSortProxyModel::sort(int newColumn, Qt::SortOrder newOrder) {
-  if (sourceModel() == nullptr) {
-    return;
-  }
-  bool dimChanged = false, orderChanged = false;
-  if (newColumn != (int)m_sortDimension) {  // need update mComparator when dimension changed
-    m_sortDimension = SceneSortOrderHelper::toEnum(newColumn);
-    mComparator = SceneInfo::getCompareFunc(m_sortDimension);
-    dimChanged = true;
-  }
-  if (newOrder != sortOrder()) {
-    orderChanged = true;
-  }
-  if (!dimChanged && !orderChanged) {
-    LOG_D("Sort policy unchange at all remains[dimension:%s, order:%d]", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
-    return;
-  }
-  LOG_D("Sort dimension[%s] or order[%d] changed succeed", SceneSortOrderHelper::c_str(m_sortDimension), (int)newOrder);
-  const bool bNeedResetModel{!orderChanged};
-  static constexpr int ONLY_1_COLUMN_INDEX = 0;
-  if (bNeedResetModel) beginResetModel();
-  QSortFilterProxyModel::sort(ONLY_1_COLUMN_INDEX, newOrder);
-  if (bNeedResetModel) endResetModel();
-#ifdef RUNNING_UNIT_TESTS
-  ForceCompleteSort();
-#endif
-}
-
-void SceneSortProxyModel::sortByFieldDimension(SceneSortOrderHelper::SortDimE newSortDimension, Qt::SortOrder newOrder) {
-  SceneSortProxyModel::sort((int)newSortDimension, newOrder);
-}
-
-bool SceneSortProxyModel::lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const {
-  if (m_sourceModel == nullptr || mComparator == nullptr) {
+bool SceneSortProxyModel::setSortOrder(bool bReverseOrder) {
+  const Qt::SortOrder newSortOrder{Bool2QtEnum::toSortOrder(bReverseOrder)};
+  if (newSortOrder == mSortOrder) {
     return false;
   }
-  int leftRow = 0, rightRow = 0;
-  if (!m_sourceModel->isLocalIndexValid(source_left, leftRow)) {
-    return false;
-  }
-  if (!m_sourceModel->isLocalIndexValid(source_right, rightRow)) {
-    return false;
-  }
-  const SceneInfoList::const_iterator iter = m_sourceModel->constBeginCurPage();
-  return mComparator(iter[leftRow], iter[rightRow]);
+  mSortOrder = newSortOrder;
+  sort(SceneInfo::SORT_COLUMN, mSortOrder);
+  return true;
 }
 
 #ifdef RUNNING_UNIT_TESTS
 void SceneSortProxyModel::ForceCompleteSort() {
-  LOG_D("Force complete sort rows");
+  const bool bNeedResetModel{true};
+  if (bNeedResetModel) beginResetModel();
+  QSortFilterProxyModel::sort(SceneInfo::SORT_COLUMN, sortOrder());
+  if (bNeedResetModel) endResetModel();
   invalidate();
 }
 #endif

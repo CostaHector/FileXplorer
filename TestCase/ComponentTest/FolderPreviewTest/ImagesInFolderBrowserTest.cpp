@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "PlainTestSuite.h"
@@ -37,7 +37,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     Configuration().clear();
 
     Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, 12);
-    Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_ICON_SIZE_INDEX.name, IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
+    IMAGE_SIZE::SaveInitialScaledSize("ClickableTextBrowser", IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
 
     QList<FsNodeEntry> nodes;
     nodes.reserve(SVG_IMG_COUNT);

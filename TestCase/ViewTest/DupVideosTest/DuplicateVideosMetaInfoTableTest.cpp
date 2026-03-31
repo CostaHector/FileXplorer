@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "BeginToExposePrivateMember.h"

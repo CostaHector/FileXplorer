@@ -10,14 +10,18 @@ using namespace ViewTypeTool;
 ViewSwitchHelper::ViewSwitchHelper(StackedAddressAndSearchToolBar* navigation,
                                    ViewsStackedWidget* view,
                                    ScenePageControl* scenePageControl,
+                                   NavigationToolBar* navigationToolBar,
                                    QObject* parent)  //
     : QObject{parent},                               //
       _navigation{navigation},                       //
       _view{view},                                   //
-      _scenePageControl{scenePageControl} {          //
+      _scenePageControl{scenePageControl},           //
+      _navigationToolBar{navigationToolBar}          //
+{                                                    //
   CHECK_NULLPTR_RETURN_VOID(_navigation)
   CHECK_NULLPTR_RETURN_VOID(_view)
   CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
+  CHECK_NULLPTR_RETURN_VOID(_navigationToolBar)
 }
 
 void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
@@ -34,23 +38,23 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _navigation->AddToolBar(ViewType::TABLE, _navigation->m_addressBar);
         _view->BindNavigationAddressBar(_navigation->m_addressBar);
 
-        T_IntoNewPath fIntoNewPath {
+        T_IntoNewPath fIntoNewPath{
             [this](QString newPath, bool isNewPath) -> bool {             //
               return _view->onActionAndViewNavigate(newPath, isNewPath);  //
             }                                                             //
         };
-        T_on_searchTextChanged fSearchTextChanged {
+        T_on_searchTextChanged fSearchTextChanged{
             [this](const QString& targetStr) -> bool {        //
               return _view->on_searchTextChanged(targetStr);  //
             }                                                 //
         };
-        T_on_searchEnterKey fSearchEnterKey {
+        T_on_searchEnterKey fSearchEnterKey{
             [this](const QString& targetStr) -> bool {     //
               return _view->on_searchEnterKey(targetStr);  //
             }                                              //
         };
         _navigation->m_addressBar->BindFileSystemViewCallback(fIntoNewPath, fSearchTextChanged, fSearchEnterKey, _view->m_fsModel);
-        NavigationExToolBar::BindIntoNewPathNavi(fIntoNewPath);
+        _navigationToolBar->BindIntoNewPathNavi(fIntoNewPath);
       }
       naviIndex = _navigation->m_name2StackIndex[ViewType::TABLE];
       break;

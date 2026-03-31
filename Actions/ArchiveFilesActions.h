@@ -21,8 +21,9 @@ class ArchiveFilesActions : public QObject {
   QAction* COMPRESSED_IMAGES{nullptr};
 
   QAction* ARCHIVE_PREVIEW{nullptr};
-};
 
+  QToolBar* GetArchiveTooBar(QWidget* parent);
+};
 ArchiveFilesActions& g_AchiveFilesActions();
 
 #endif  // ARCHIVEFILESACTIONS_H

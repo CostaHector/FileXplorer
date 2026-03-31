@@ -163,6 +163,9 @@
         <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
         <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
         <file alias="EXPAND_SIDEBAR">LeftSideToolBarIcons/EXPAND_SIDEBAR.svg</file>
+        <file alias="EXPAND_ALL">LeftSideToolBarIcons/EXPAND_ALL.svg</file>
+        <file alias="COLLAPSE_ALL">LeftSideToolBarIcons/COLLAPSE_ALL.svg</file>
+        <file alias="FAVORITES_LINK">LeftSideToolBarIcons/FAVORITES_LINK.svg</file>
 
         <!--RightClickIcon here-->
         <file alias="REFRESH_THIS_PATH">RightClickIcon/REFRESH_THIS_PATH.svg</file>
@@ -404,6 +407,7 @@
         <file alias="REGISTER">pwd/REGISTER.svg</file>
         <file alias="OPEN_DIRECTORY">pwd/OPEN_DIRECTORY.svg</file>
     </qresource>
+
     <qresource prefix="/bankcard">
         <file alias="AMEX">pwd/amex.png</file>
         <file alias="MASTERCARD">pwd/mastercard.png</file>
@@ -413,6 +417,7 @@
         <file alias="UNION_CARD_TEMPLATE">pwd/UNION_CARD_TEMPLATE.svg</file>
         <file alias="VISA_CARD_TEMPLATE">pwd/VISA_CARD_TEMPLATE.svg</file>
     </qresource>
+
     <qresource prefix="/type">
         <file alias="BANK">pwd/credit_card_cvc_hint.png</file>
         <file alias="GAME">pwd/games.svg</file>

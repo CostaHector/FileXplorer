@@ -2,7 +2,7 @@
 #include "PlainTestSuite.h"
 #include "ClipboardGuard.h"
 #include "TDir.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "Logger.h"

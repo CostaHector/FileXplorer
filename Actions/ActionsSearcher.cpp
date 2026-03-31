@@ -39,7 +39,7 @@ void ActionsSearcher::subscribe() {
   connect(this, &QComboBox::currentTextChanged, this, &ActionsSearcher::onActionSearchTextEdit);
 }
 
-void ActionsSearcher::onActionSearchTextEdit(const QString& text) {
+bool ActionsSearcher::onActionSearchTextEdit(const QString& text) {
   static const auto& inst = ActionsRecorder::GetInst();
   if (mLastValidAct != nullptr) {
     actionKeyLineEdit->removeAction(mLastValidAct);
@@ -48,8 +48,9 @@ void ActionsSearcher::onActionSearchTextEdit(const QString& text) {
   const auto it = inst.mTextToActionMap.constFind(text);
   if (it == inst.mTextToActionMap.constEnd()) {
     LOG_D("QAction[%s] not exist in map", qPrintable(text));
-    return;
+    return false;
   }
   mLastValidAct = it.value();
   actionKeyLineEdit->addAction(mLastValidAct, QLineEdit::ActionPosition::TrailingPosition);
+  return true;
 }

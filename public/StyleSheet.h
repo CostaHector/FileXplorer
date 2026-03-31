@@ -29,7 +29,7 @@ constexpr char SUBMIT_BTN_STYLE[] =
     "}";
 }  // namespace StyleSheet
 
-constexpr QRect DEFAULT_GEOMETRY{0, 0, 1024, 768};
+constexpr QRect DEFAULT_GEOMETRY{100, 100, 1024, 768};
 constexpr QSize DOCKER_DEFAULT_SIZE{DEFAULT_GEOMETRY.width() / 2, DEFAULT_GEOMETRY.height()};
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align);

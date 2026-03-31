@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include <QTestEventList>
+
 #include <QSignalSpy>
 
 #include "Logger.h"
@@ -36,7 +36,7 @@ bool checkIndexMatch(const QAbstractListModel& srcModel, int srcR, const QSortFi
   return true;
 }
 
-bool GetSceneInfoList(int count, SceneSortOrderHelper::SortDimE sortDim, bool isReverse, SceneInfoList& ansList) {
+bool GetSceneInfoList(int count, SceneInfo::Role sortDim, bool isReverse, SceneInfoList& ansList) {
   ansList.clear();
   ansList.reserve(count);
 
@@ -54,24 +54,24 @@ bool GetSceneInfoList(int count, SceneSortOrderHelper::SortDimE sortDim, bool is
     // 只有入参指定一个dimension有序
     const int valueForDistinguish = isReverse ? count - i - 1 : i;
     switch (sortDim) {
-      case SceneSortOrderHelper::SortDimE::MOVIE_PATH: {
+      case SceneInfo::Role::REL_PATH_ROLE: {
         siBasic.name = QString::asprintf("Name %03d", valueForDistinguish);
         break;
       }
-      case SceneSortOrderHelper::SortDimE::MOVIE_SIZE: {
+      case SceneInfo::Role::VID_SIZE_ROLE: {
         siBasic.vidSize = valueForDistinguish;
         break;
       }
-      case SceneSortOrderHelper::SortDimE::RATE: {
+      case SceneInfo::Role::RATE_ROLE: {
         siBasic.rate = valueForDistinguish;
         break;
       }
-      case SceneSortOrderHelper::SortDimE::UPLOADED_TIME: {
+      case SceneInfo::Role::UPLOADED_ROLE: {
         siBasic.uploaded = QString::asprintf("2010-06-16 00:00:00.%03d", valueForDistinguish);
         break;
       }
       default:
-        LOG_E("unsupport: %s", SceneSortOrderHelper::c_str(sortDim));
+        LOG_E("unsupport: %d", sortDim);
         return false;
     }
     ansList.push_back(siBasic);
@@ -92,8 +92,8 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void init() {
     GlobalMockObject::reset();
-    Configuration().remove(SceneKey::SCENES_COUNT_EACH_PAGE.name);
-    Configuration().remove(SceneKey::SCENE_DISABLE_IMAGE_DECORATION.name);
+    Configuration().remove(SceneKey::CNT_EACH_PAGE.name);
+    Configuration().remove(SceneKey::DISABLE_IMAGE_DECORATION.name);
   }
 
   void cleanup() {  //
@@ -132,7 +132,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(defModel.rel2fileNames({}).isEmpty());
 
     // 测试分页功能
-    QCOMPARE(defModel.mPagedData.GetPerPageEleCnt(), SceneKey::SCENES_COUNT_EACH_PAGE.v);
+    QCOMPARE(defModel.mPagedData.GetPerPageEleCnt(), SceneKey::CNT_EACH_PAGE.v);
     QVERIFY(defModel.onScenesCountsPerPageChanged(10));
     QCOMPARE(defModel.rowCount(), 0);
     QVERIFY(defModel.onPageIndexChanged(1));
@@ -159,16 +159,16 @@ class ScenesListModelTest : public PlainTestSuite {
         .will(returnValue(scenesLstInPath1))  //
         .id("1");
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelSetRootPath"};
     QCOMPARE(slm.rootPath(), "");
-    QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 1000);
+    QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 40);
     QSignalSpy pgCntSpy{&slm, &ScenesListModel::pagesCountChanged};
 
     QCOMPARE(slm.setRootPath("inexist/path0"), true);  // GetScnsLstFromPath: 1, emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                       // 1 item
     QCOMPARE(pgCntSpy.count(), 1);
-    QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/1000)
+    QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/40)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
     QCOMPARE(slm.rel2fileNames({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
 
@@ -206,7 +206,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
@@ -228,8 +228,8 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.data(slm.index(0), Qt::BackgroundRole).isValid(), true);   // 0 video, specify solid pattern
     QCOMPARE(slm.data(slm.index(1), Qt::BackgroundRole).isValid(), false);  // 1 video, no pattern
 
-    QCOMPARE(slm.data(slm.index(0), ScenesListModel::CustomRole::RatingRole).toInt(), 9);
-    QCOMPARE(slm.data(slm.index(1), ScenesListModel::CustomRole::RatingRole).toInt(), 10);
+    QCOMPARE(slm.data(slm.index(0), SceneInfo::Role::RATE_ROLE).toInt(), 9);
+    QCOMPARE(slm.data(slm.index(1), SceneInfo::Role::RATE_ROLE).toInt(), 10);
 
     QCOMPARE(slm.data(slm.index(0), Qt::ForegroundRole).isValid(), false);
     QCOMPARE(slm.data(slm.index(1), Qt::ForegroundRole).isValid(), false);
@@ -273,7 +273,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 1000);
+    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
@@ -281,10 +281,10 @@ class ScenesListModelTest : public PlainTestSuite {
     QModelIndex kakaInd = slm.index(0);
     QCOMPARE(slm.GetRate(kakaInd), 9);
 
-    QCOMPARE(slm.setData(kakaInd, 6, Qt::EditRole), false);                            // role unmatch
-    QCOMPARE(slm.setData({}, 6, Qt::EditRole), false);                                 // index invalid unmatch
-    QCOMPARE(slm.setData(kakaInd, 6, ScenesListModel::CustomRole::RatingRole), true);  // 1st
-    QCOMPARE(slm.setData(kakaInd, 8, ScenesListModel::CustomRole::RatingRole), true);  // 1st
+    QCOMPARE(slm.setData(kakaInd, 6, Qt::EditRole), false);               // role unmatch
+    QCOMPARE(slm.setData({}, 6, Qt::EditRole), false);                    // index invalid unmatch
+    QCOMPARE(slm.setData(kakaInd, 6, SceneInfo::Role::RATE_ROLE), true);  // 1st
+    QCOMPARE(slm.setData(kakaInd, 8, SceneInfo::Role::RATE_ROLE), true);  // 1st
 
     QCOMPARE(slm.ModifySceneInfoRateValue({}, 8), false);
     QCOMPARE(slm.ModifySceneInfoRateValue(kakaInd, 8), true);  // 2nd
@@ -293,13 +293,13 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void local_sort_by_proxyModel_given_only_one_dimension_sorted_data_ok() {
     SceneInfoList mockMoviePathAscendingList;  // asc
-    QVERIFY(GetSceneInfoList(10, SceneSortOrderHelper::SortDimE::MOVIE_PATH, false, mockMoviePathAscendingList));
+    QVERIFY(GetSceneInfoList(10, SceneInfo::Role::REL_PATH_ROLE, false, mockMoviePathAscendingList));
     SceneInfoList mockMovieSizeDescendingList;  // desc
-    QVERIFY(GetSceneInfoList(10, SceneSortOrderHelper::SortDimE::MOVIE_SIZE, true, mockMovieSizeDescendingList));
+    QVERIFY(GetSceneInfoList(10, SceneInfo::Role::VID_SIZE_ROLE, true, mockMovieSizeDescendingList));
     SceneInfoList mockRateAscendingList;  // asc
-    QVERIFY(GetSceneInfoList(10, SceneSortOrderHelper::SortDimE::RATE, false, mockRateAscendingList));
+    QVERIFY(GetSceneInfoList(10, SceneInfo::Role::RATE_ROLE, false, mockRateAscendingList));
     SceneInfoList mockUploadedDescendingList;  // desc
-    QVERIFY(GetSceneInfoList(11, SceneSortOrderHelper::SortDimE::UPLOADED_TIME, true, mockUploadedDescendingList));
+    QVERIFY(GetSceneInfoList(11, SceneInfo::Role::UPLOADED_ROLE, true, mockUploadedDescendingList));
 
     MOCKER(SceneHelper::GetScnsLstFromPath)              //
         .expects(exactly(4))                             //
@@ -311,24 +311,26 @@ class ScenesListModelTest : public PlainTestSuite {
     ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     sspm.setSourceModel(&slm);
-    {  // MOVIE_PATH
+    {  // REL_PATH_ROLE
       QCOMPARE(slm.setRootPath("any/inexists/path1"), true);
       QCOMPARE(slm.rowCount(), 10);
       // 升
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
+      sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
       // 降
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
+      // sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 0));
 
       // 强化用例: 只更改维度, 不改变降序(aka 在Rate+降序情况下), 预期按照Rate降序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
+      sspm.setSortRole(SceneInfo::Role::RATE_ROLE);
       QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(0, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(1, 0))));
       QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(1, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(2, 0))));
       QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(2, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(3, 0))));
@@ -341,14 +343,14 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.rowCount(), 10);
 
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
+      sspm.setSortRole(SceneInfo::Role::VID_SIZE_ROLE);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
@@ -359,14 +361,14 @@ class ScenesListModelTest : public PlainTestSuite {
     {
       QCOMPARE(slm.setRootPath("any/inexists/path3"), true);
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::AscendingOrder);
+      sspm.setSortRole(SceneInfo::Role::RATE_ROLE);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
@@ -378,14 +380,14 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(slm.setRootPath("any/inexists/path4"), true);
       QCOMPARE(slm.rowCount(), 11);
       // 降序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::DescendingOrder);
+      sspm.setSortRole(SceneInfo::Role::UPLOADED_ROLE);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
 
       // 升序排序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::AscendingOrder);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 10));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 9));
       QVERIFY(checkIndexMatch(slm, 8, sspm, 2));
@@ -409,15 +411,12 @@ class ScenesListModelTest : public PlainTestSuite {
     ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // nothing happend
-      sspm.setSourceModel(nullptr);                                                               // ignored
+      sspm.initSortProxy(SceneInfo::Role::REL_PATH_ROLE, false);  // nothing happend
+      sspm.setSourceModel(nullptr);                               // ignored
       sspm.setSourceModel(&slm);
       sspm.setSourceModel(&slm);  // rebind, ignored
 
       QCOMPARE(sspm.sortOrder(), Qt::SortOrder::AscendingOrder);
-      QCOMPARE(sspm.m_sortDimension, SceneSortOrderHelper::SortDimE::END_INVALID);
-      QVERIFY(sspm.mComparator == nullptr);
-      QVERIFY(sspm.m_sourceModel != nullptr);
     }
 
     // Precondition: there are 6 items in source model, and MoviePath(ascending), MovieSize(Desc), Rate(Asce), Uploaded(Desc)
@@ -428,55 +427,60 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(pagesCntChanged.count(), 1);
       QCOMPARE(pagesCntChanged.takeLast(), (QVariantList{1}));  // floor(6 / 1024)
     }
-    // only one page sort(MOVIE_PATH)
+    // only one page sort(REL_PATH_ROLE)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
     QCOMPARE(slm.rowCount(), 6);
 
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);
+      // ascending
+      sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
+      sspm.setSortOrder(false);
       QCOMPARE(sspm.sortOrder(), Qt::SortOrder::AscendingOrder);  // by default ascending in MoviePath
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));                  // 0<->0
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));                  // 1<->1
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - 1));          // 5<->5
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 6 - 0 - 1));            // 0<->5
       QVERIFY(checkIndexMatch(slm, 1, sspm, 6 - 1 - 1));            // 1<->4
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));  // 5<->0
     }
-    // only one page sort(MOVIE_SIZE)
+    // only one page sort(VID_SIZE_ROLE)
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);
+      sspm.setSortRole(SceneInfo::Role::VID_SIZE_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 6 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 6 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - 1));
     }
-    // only one page sort(RATE)
+    // only one page sort(RATE_ROLE)
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::AscendingOrder);
+      sspm.setSortRole(SceneInfo::Role::RATE_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::RATE, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 6 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 6 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));
     }
 
-    // only one page sort(UPLOADED_TIME)
+    // only one page sort(UPLOADED_ROLE)
     {
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::AscendingOrder);
+      sspm.setSortRole(SceneInfo::Role::UPLOADED_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 6 - 0 - 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 6 - 1 - 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::UPLOADED_TIME, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - 1));
@@ -496,23 +500,32 @@ class ScenesListModelTest : public PlainTestSuite {
     // two pages, sort on second page
     {
       // 本就是MOVIE_PATH 升序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::AscendingOrder);  // ascending
+      sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_PATH, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 0));
     }
     {
       // 本就是MOVIE_SIZE 降序
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::AscendingOrder);  // ascending
+      sspm.setSortRole(SceneInfo::Role::VID_SIZE_ROLE);
+      sspm.setSortOrder(false);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 0));
 
-      sspm.sortByFieldDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE, Qt::DescendingOrder);
+      sspm.setSortOrder(true);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
       QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
+    }
+
+    {
+      // 仅仅修改排序角色, 不修改反转
+      sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
+      QVERIFY(checkIndexMatch(slm, 0, sspm, 1));
+      QVERIFY(checkIndexMatch(slm, 1, sspm, 0));
     }
   }
 
@@ -529,10 +542,10 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(scenesLst.size(), 6);
     MOCKER(SceneHelper::GetScnsLstFromPath).expects(exactly(1)).with(eq(QString{"inexist/GlobalSortPath"})).will(returnValue(scenesLst));
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 4);
+    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 4);
     // global rate descending
     ScenesListModel slm{"ScenesListViewGlobalSort"};
-    slm.initSortSetting(SceneSortOrderHelper::SortDimE::RATE, true);
+    slm.initSortSetting(SceneInfo::Role::RATE_ROLE, true);
     QCOMPARE(slm.setRootPath("inexist/GlobalSortPath"), true);
     QCOMPARE(slm.rowCount(), 4);
 
@@ -543,7 +556,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.baseName(slm.index(3)), "Chris Evans");
 
     // global size descending
-    QCOMPARE(slm.setSortDimension(SceneSortOrderHelper::SortDimE::MOVIE_SIZE), true);
+    QCOMPARE(slm.setSortDimension(SceneInfo::Role::VID_SIZE_ROLE), true);
     QCOMPARE(slm.baseName(slm.index(0)), "Ben Affleck");
     QCOMPARE(slm.baseName(slm.index(1)), "Brad Pitt");
     QCOMPARE(slm.baseName(slm.index(2)), "Chris Evans");
@@ -576,7 +589,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(scenesLst.size(), 6);
     MOCKER(SceneHelper::GetScnsLstFromPath).expects(exactly(1)).with(eq(QString{"inexist/RowRemovePath"})).will(returnValue(scenesLst));
 
-    Configuration().setValue(SceneKey::SCENES_COUNT_EACH_PAGE.name, 4);
+    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 4);
     ScenesListModel slm{"RowRemovedTest"};
     QSignalSpy pagesCntChanged(&slm, &ScenesListModel::pagesCountChanged);
     QCOMPARE(slm.setRootPath("inexist/RowRemovePath"), true);

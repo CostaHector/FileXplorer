@@ -7,10 +7,28 @@
 
 #include "MemoryKey.h"
 
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
+
+bool IntoNewPathMock(QString path, bool isNew) {
+  return true;
+}
+
 class NavigationToolBarTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void init() {  //
+    GlobalMockObject::reset();
+  }
+
+  void cleanup() {  //
+    GlobalMockObject::verify();
+  }
+
   void D2Ev_D0Ev_ok() {
     Configuration().remove(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name);
     QCOMPARE(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool(), false);
@@ -33,8 +51,9 @@ class NavigationToolBarTest : public PlainTestSuite {
       std::unique_ptr<NavigationToolBar> d0ev{new NavigationToolBar};
     }
   }
-  void user_path_exist() {          //
-    NavigationToolBar naviToolbar;  //
+
+  void fixed_link_all_under_user_path_ok() {  //
+    NavigationToolBar naviToolbar;            //
     const QList<QAction*> actions = naviToolbar.actions();
     QVERIFY(actions.size() > 0);
     QStringList pathsFromTooltip;
@@ -43,13 +62,14 @@ class NavigationToolBarTest : public PlainTestSuite {
       if (pAct->isSeparator()) {  // seperator
         continue;
       }
-      QString path = pAct->toolTip();
-      if (path.isEmpty()) {
+      QVariant pathVar = pAct->data();
+      if (!pathVar.canConvert<QString>()) {
         continue;
       }
+      QString path = pathVar.toString();
       pathsFromTooltip.push_back(path);
     }
-
+    // 固定的链接都是SystemPath::HOME_PATH()路径下的
     const QString prepath = SystemPath::HOME_PATH();
     QCOMPARE(QFileInfo(prepath).isDir(), true);
     QVERIFY(pathsFromTooltip.size() > 0);
@@ -60,7 +80,7 @@ class NavigationToolBarTest : public PlainTestSuite {
     }
   }
 
-  void uers_fixed_folder_actions_into_new_path_correct() {
+  void mDevDriveTV_ok() {
     NavigationToolBar naviTooBar{"Navi toolbar"};
     QList<QAction*> plainActLsts = naviTooBar.actions();
     QVERIFY(!plainActLsts.isEmpty());
@@ -97,6 +117,39 @@ class NavigationToolBarTest : public PlainTestSuite {
         continue;
       }
     }
+  }
+
+  void onPathActionTriggeredNavi_ok() {
+    NavigationToolBar naviTooBar{"Navi toolbar"};
+    QVERIFY(naviTooBar.m_pathActionGroups != nullptr);
+    QList<QAction*> fixedPathActs = naviTooBar.m_pathActionGroups->actions();
+    QVERIFY(fixedPathActs.size() > 0);
+    QAction* frontAct = fixedPathActs.front();
+    QVERIFY(frontAct != nullptr);
+    QVERIFY(frontAct->text() != "");
+    QVariant pathVar = frontAct->data();
+    QVERIFY(pathVar.canConvert<QString>());
+    QString path = pathVar.toString();
+
+    MOCKER(::IntoNewPathMock)
+        .expects(exactly(3))       //
+        .with(eq(path), eq(true))  //
+        .will(returnValue(true))   //
+        .then(returnValue(true));
+
+    // will not crash down
+    QCOMPARE(naviTooBar.onPathActionTriggeredNavi(nullptr), false);
+
+    QVERIFY(!naviTooBar.m_IntoNewPathNavi);
+    emit naviTooBar.m_pathActionGroups->triggered(frontAct);
+    QCOMPARE(naviTooBar.onPathActionTriggeredNavi(frontAct), false);
+    QCOMPARE(naviTooBar.onAccessNewPathRequest(path, true), false);
+
+    naviTooBar.BindIntoNewPathNavi(::IntoNewPathMock);
+    QVERIFY(naviTooBar.m_IntoNewPathNavi);
+    emit naviTooBar.m_pathActionGroups->triggered(frontAct);
+    QCOMPARE(naviTooBar.onPathActionTriggeredNavi(frontAct), true);
+    QCOMPARE(naviTooBar.onAccessNewPathRequest(path, true), true);
   }
 };
 

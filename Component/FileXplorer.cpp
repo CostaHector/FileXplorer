@@ -28,7 +28,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
   m_fsPanel->BindLogger(m_statusBar);
   m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
 
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, this};  // view/searchToolBar switcher
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, m_navigationToolBar, this};  // view/searchToolBar switcher
   m_viewSwitchHelper->onSwitchByViewType(initialViewType);
 
   const QString& defaultPath = GetInitialPathFromArgs(args);

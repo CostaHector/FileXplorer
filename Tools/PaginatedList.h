@@ -79,7 +79,7 @@ class PaginatedList {
   int GetCurPageEnd() const { return mCurPageEnd; }
 
   SceneElementTypeList mDataList;
-  int mPerPageEleCnt{1000};
+  int mPerPageEleCnt{40};
   int mCurPageIndex{0};
   int mCurPageStart{0}, mCurPageEnd{0};
   TBeforeDataResetCallable mBeforeDataResetFunc;

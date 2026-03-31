@@ -3,6 +3,7 @@
 #include "ScenesListModel.h"
 #include "SceneInfo.h"
 #include "Logger.h"
+#include "PublicMacro.h"
 
 RatingStateMachine::RatingStateMachine() {
   mTransitionTable[(int)RatingState::IDLE][(int)RatingAction::CLICK_SAME_ONE_RATE_BAR_AGAIN] = &RatingStateMachine::PlaceHolderTransit;
@@ -62,7 +63,7 @@ void RatingStateMachine::ClickOtherRateBarWhenIdle(SceneStyleDelegate& delegate,
                                                    const QModelIndex& nowInd,
                                                    const QRect& visualRect,
                                                    const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
 
   mRateData.curIndex = nowInd;
   mRateData.mState = RatingState::SELECTED_SHOW;
@@ -76,7 +77,7 @@ void RatingStateMachine::ClickOtherNotRateBarWhenIdle(SceneStyleDelegate& delega
                                                       const QModelIndex& nowInd,
                                                       const QRect& visualRect,
                                                       const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
 
   mRateData.curIndex = nowInd;
   mRateData.mState = RatingState::SELECTED_HIDE;
@@ -92,7 +93,7 @@ void RatingStateMachine::ClickSameOneRateBarWhenShow(SceneStyleDelegate& delegat
   if (mRateData.newRateValue != mRateData.oldRateValue) {  // 评分真实改变了
     // 去修改json/scn 二进制
     if (QAbstractItemModel* model = const_cast<QAbstractItemModel*>(nowInd.model())) {
-      bool bResult = model->setData(nowInd, mRateData.newRateValue, ScenesListModel::RatingRole);
+      bool bResult = model->setData(nowInd, mRateData.newRateValue, SceneInfo::Role::RATE_ROLE);
     }
   }
   emit delegate.cellVisualUpdateRequested(nowInd);
@@ -101,7 +102,7 @@ void RatingStateMachine::ClickSameOneNotRateBarWhenShow(SceneStyleDelegate& dele
                                                         const QModelIndex& nowInd,
                                                         const QRect& visualRect,
                                                         const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
   mRateData.oldRateValue = oldRateValue;
   mRateData.newRateValue = oldRateValue;
 
@@ -113,7 +114,7 @@ void RatingStateMachine::ClickOtherOneRateBarWhenShow(SceneStyleDelegate& delega
                                                       const QModelIndex& nowInd,
                                                       const QRect& visualRect,
                                                       const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
 
   mRateData.oldRateValue = oldRateValue;
   mRateData.newRateValue = oldRateValue;
@@ -129,7 +130,7 @@ void RatingStateMachine::ClickOtherOneNotRateBarWhenShow(SceneStyleDelegate& del
                                                          const QModelIndex& nowInd,
                                                          const QRect& visualRect,
                                                          const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
 
   mRateData.oldRateValue = oldRateValue;
   mRateData.newRateValue = oldRateValue;
@@ -158,7 +159,7 @@ void RatingStateMachine::ClickOtherOneRateBarWhenHide(SceneStyleDelegate& delega
                                                       const QModelIndex& nowInd,
                                                       const QRect& visualRect,
                                                       const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
 
   mRateData.oldRateValue = oldRateValue;
   mRateData.newRateValue = oldRateValue;
@@ -171,7 +172,7 @@ void RatingStateMachine::ClickOtherOneNotRateBarWhenHide(SceneStyleDelegate& del
                                                          const QModelIndex& nowInd,
                                                          const QRect& visualRect,
                                                          const QPoint& clickedPnt) {
-  const int oldRateValue = nowInd.data(ScenesListModel::RatingRole).toInt();
+  const int oldRateValue = nowInd.data(SceneInfo::Role::RATE_ROLE).toInt();
   mRateData.oldRateValue = oldRateValue;
   mRateData.newRateValue = oldRateValue;
   mRateData.curIndex = nowInd;

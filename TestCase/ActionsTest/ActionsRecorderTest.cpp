@@ -4,6 +4,7 @@
 #include "PlainTestSuite.h"
 #include "BeginToExposePrivateMember.h"
 #include "ActionsRecorder.h"
+#include "ActionsSearcher.h"
 #include "EndToExposePrivateMember.h"
 
 class ActionsRecorderTest : public PlainTestSuite {
@@ -224,7 +225,7 @@ class ActionsRecorderTest : public PlainTestSuite {
     QCOMPARE(expectsLst, actualList);
   }
 
-  void test_from_actionGrp_ok() {
+  void from_actionGrp_ok() {
     QAction* flatten = new QAction{"flatten"};
     QAction* remain = new QAction{"remain"};
     QActionGroup* actGrp = new QActionGroup{this};
@@ -240,6 +241,11 @@ class ActionsRecorderTest : public PlainTestSuite {
     QStringList actualList = actRecorder.GetKeys();
     actualList.sort();
     QCOMPARE(expectsLst, actualList);
+
+    ActionsRecorder::GetInst().clear();
+
+    ActionsSearcher actSearcher;
+    QCOMPARE(actSearcher.onActionSearchTextEdit("definitely not exist key"), false);
   }
 };
 
