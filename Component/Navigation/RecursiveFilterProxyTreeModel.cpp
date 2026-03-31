@@ -7,18 +7,22 @@ RecursiveFilterProxyTreeModel::RecursiveFilterProxyTreeModel(QObject* parent) : 
 }
 
 void RecursiveFilterProxyTreeModel::initSortProxy(FavoriteItemData::Role initRole, bool bReverseOrder) {
-  setSortRole(initRole);
-  mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
-  sort(FavoriteItemData::SORT_COLUMN, mSortOrder);
+  if (!isSortProxyInited()) {
+    setSortRole(initRole);
+    mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
+    sort(FavoriteItemData::SORT_COLUMN, mSortOrder);
+    m_bSortProxyInited = true;
+  }
 }
 
-void RecursiveFilterProxyTreeModel::setSortOrder(bool bReverseOrder) {
+bool RecursiveFilterProxyTreeModel::setSortOrder(bool bReverseOrder) {
   const Qt::SortOrder newSortOrder{Bool2QtEnum::toSortOrder(bReverseOrder)};
   if (newSortOrder == mSortOrder) {
-    return;
+    return false;
   }
   mSortOrder = newSortOrder;
   sort(FavoriteItemData::SORT_COLUMN, mSortOrder);
+  return true;
 }
 
 void RecursiveFilterProxyTreeModel::setFilterString(const QString& filter) {

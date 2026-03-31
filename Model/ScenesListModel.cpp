@@ -24,9 +24,11 @@ ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  
 }
 
 void ScenesListModel::initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse) {
-  auto comparator = SceneInfo::getCompareFunc(newSortDimension);
-  mPagedData.initSortSetting(comparator, bResultReverse);
-  m_bSortProxyInited = true;
+  if (!isSortProxyInited()) {
+    auto comparator = SceneInfo::getCompareFunc(newSortDimension);
+    mPagedData.initSortSetting(comparator, bResultReverse);
+    m_bSortProxyInited = true;
+  }
 }
 
 bool ScenesListModel::setSortDimension(SceneInfo::Role newSortDimension) {

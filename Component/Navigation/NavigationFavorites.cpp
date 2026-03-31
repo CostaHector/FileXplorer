@@ -22,14 +22,3 @@ NavigationFavorites::NavigationFavorites(QWidget* parent) : QWidget{parent} {
 void NavigationFavorites::onStartFilter() {
   m_favView->setFilter(m_searchLineEdit->text());
 }
-
-// #ifndef RUNNING_UNIT_TESTS
-// #include <QApplication>
-// int main(int argc, char* argv[]) {
-//   QApplication app{argc, argv};
-//   NavigationFavorites navi;
-//   navi.show();
-//   const int exitCode = app.exec();
-//   return exitCode;
-// }
-// #endif

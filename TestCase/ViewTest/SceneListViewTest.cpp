@@ -192,6 +192,38 @@ class SceneListViewTest : public PlainTestSuite {
     }
   }
 
+  void toggle_connection_and_init_ok() {
+    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInfo::SaveInitialSortRole(SceneInfo::Role::RATE_ROLE);
+    SceneInfo::SaveSortOrderReverse(true);
+    QCOMPARE(sceneAct.GetSortRangeCurrentPageOnly(), false);  // global
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), false);
+
+    QWidget wid;
+    ScenesListModel sceneModel{"ScenesListView", &wid};
+    SceneSortProxyModel sceneProxyModel{&wid};
+    ScenePageControl pageControlToolbar{"Pagination display", &wid};
+    QCOMPARE(sceneModel.isSortProxyInited(), false);
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
+
+    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar, &wid};
+    QCOMPARE(sceneModel.isSortProxyInited(), true);  // first init
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
+    QVERIFY(sceneView.mSortRoleConn);  // connection ok
+    QVERIFY(sceneView.mSortOrderReverseConn);
+
+    sceneAct._SORT_RANGE_PAGE_BY_PAGE->toggle();
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), true);
+    QCOMPARE(sceneModel.isSortProxyInited(), true);       // first init
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), true);  // not it is inited
+    QVERIFY(sceneView.mSortRoleConn);                     // connection ok
+    QVERIFY(sceneView.mSortOrderReverseConn);
+
+    // 不加下一行, 则会崩溃, 先暂时改到全局排序
+    sceneAct._SORT_RANGE_PAGE_BY_PAGE->toggle();
+    QCOMPARE(sceneAct._SORT_RANGE_PAGE_BY_PAGE->isChecked(), false);
+  }
+
   void select_scene_slot_interact_with_sort_ok() {
     SceneInPageActions& sceneAct = g_SceneInPageActions();
 

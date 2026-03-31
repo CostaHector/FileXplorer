@@ -13,12 +13,12 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
 
   mFavProxyModel = new RecursiveFilterProxyTreeModel{this};
   mFavProxyModel->setSourceModel(mFavModel);
-
   setModel(mFavProxyModel);
 
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setDragDropMode(QAbstractItemView::DragDrop);
+  setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
@@ -271,8 +271,11 @@ bool FavoritesTreeView::isNoSelectionOrExactlyOneGroup(QModelIndex* grpOrRootSrc
 
 void FavoritesTreeView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
+  CHECK_NULLPTR_RETURN_VOID(mMenu);
   if (mMenu != nullptr) {
+#ifndef RUNNING_UNIT_TESTS
     mMenu->popup(event->globalPos());
+#endif
   }
   event->accept();
 }
@@ -306,6 +309,7 @@ void FavoritesTreeView::dragMoveEvent(QDragMoveEvent* event) {
 }
 
 void FavoritesTreeView::dropEvent(QDropEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QTreeView::dropEvent(event);
   if (event->isAccepted()) {
     QModelIndex proxyIndex = indexAt(event->pos());

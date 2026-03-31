@@ -58,6 +58,7 @@ class FavoritesTreeModel : public QStandardItemModel {
   QString GetDataKeyInQSetting() const { return GetBelongToName() + "_DATAS"; }
   const QString m_belongToName;
   bool mNotSaveDatasThisTimeBeforeDestruct{false};
+  mutable bool m_bIsDirty = false;
   static constexpr quint16 VERSION = 1;
 };
 

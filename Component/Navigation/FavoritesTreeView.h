@@ -34,7 +34,7 @@ class FavoritesTreeView : public QTreeView {
   void onSortRoleActionTriggered(const QAction* newSortRoleAction);
 
   bool isExactlyOneGroupSelected(QModelIndex* grpSrcIndex = nullptr) const;
-  bool isNoSelectionOrExactlyOneGroup(QModelIndex* grpOrRootSrcIndex) const;
+  bool isNoSelectionOrExactlyOneGroup(QModelIndex* grpOrRootSrcIndex = nullptr) const;
 
   FavoritesTreeModel* mFavModel{nullptr};
   RecursiveFilterProxyTreeModel* mFavProxyModel{nullptr};

@@ -135,15 +135,15 @@ void NavigationToolBar::updateToolbarButtonStyle(bool bExpand, bool bAnimationEn
   ani(this, width(), bExpand);
 }
 
-void NavigationToolBar::onAccessNewPathRequest(const QString& newPath, bool isNew) {
+bool NavigationToolBar::onAccessNewPathRequest(const QString& newPath, bool isNew) {
   if (m_IntoNewPathNavi) {
-    m_IntoNewPathNavi(newPath, isNew);
+    return m_IntoNewPathNavi(newPath, isNew);
   }
+  return false;
 }
 
 bool NavigationToolBar::onPathActionTriggeredNavi(const QAction* pAct) {
   CHECK_NULLPTR_RETURN_FALSE(pAct);
   const QVariant& pathVar{pAct->data()};
-  onAccessNewPathRequest(pathVar.toString(), true);
-  return true;
+  return onAccessNewPathRequest(pathVar.toString(), true);
 }

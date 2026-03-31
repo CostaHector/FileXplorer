@@ -18,7 +18,7 @@ class NavigationToolBar : public QToolBar {
   void subscribe();
   void onExpandSidebar(bool bExpand);
   void updateToolbarButtonStyle(bool bExpand, bool bAnimation);
-  void onAccessNewPathRequest(const QString& newPath, bool isNew);
+  bool onAccessNewPathRequest(const QString& newPath, bool isNew);
   bool onPathActionTriggeredNavi(const QAction* pAct);
 
   T_IntoNewPath m_IntoNewPathNavi{nullptr};

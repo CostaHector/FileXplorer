@@ -2,19 +2,22 @@
 #include "Bool2QtEnum.h"
 
 void SceneSortProxyModel::initSortProxy(SceneInfo::Role initRole, bool bReverseOrder) {
-  setSortRole(initRole);
-  mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
-  sort(SceneInfo::SORT_COLUMN, mSortOrder);
-  m_bSortProxyInited = true;
+  if (!isSortProxyInited()) {
+    setSortRole(initRole);
+    mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
+    sort(SceneInfo::SORT_COLUMN, mSortOrder);
+    m_bSortProxyInited = true;
+  }
 }
 
-void SceneSortProxyModel::setSortOrder(bool bReverseOrder) {
+bool SceneSortProxyModel::setSortOrder(bool bReverseOrder) {
   const Qt::SortOrder newSortOrder{Bool2QtEnum::toSortOrder(bReverseOrder)};
   if (newSortOrder == mSortOrder) {
-    return;
+    return false;
   }
   mSortOrder = newSortOrder;
   sort(SceneInfo::SORT_COLUMN, mSortOrder);
+  return true;
 }
 
 #ifdef RUNNING_UNIT_TESTS

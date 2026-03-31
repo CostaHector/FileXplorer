@@ -10,7 +10,7 @@ class SceneSortProxyModel : public QSortFilterProxyModel {
   using QSortFilterProxyModel::QSortFilterProxyModel;
   bool isSortProxyInited() const { return m_bSortProxyInited; }
   void initSortProxy(SceneInfo::Role initRole, bool bReverseOrder);
-  void setSortOrder(bool bReverseOrder);
+  bool setSortOrder(bool bReverseOrder);
 
  private:
   Qt::SortOrder mSortOrder{Qt::SortOrder::AscendingOrder};

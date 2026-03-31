@@ -17,19 +17,23 @@ FavoritesTreeModel::FavoritesTreeModel(const QString& belongToName, QObject* par
   const QByteArray& datas = Configuration().value(GetDataKeyInQSetting(), QByteArray{}).toByteArray();
   if (!datas.isEmpty() && setDatas(datas)) {
     // Key exist and ByteArray not empty and valid(may contains 0 elements)
+    m_bIsDirty = false;
     return;
   }
   if (!bInitialCollectionsWhenEmpty) {
     return;
   }
   addInitialFavoritesGroup();
+  m_bIsDirty = false; // 初始化阶段全程视为未修改
 }
 
 FavoritesTreeModel::~FavoritesTreeModel() {
   if (mNotSaveDatasThisTimeBeforeDestruct) {
     return;
   }
-  saveToSettings();
+  if (m_bIsDirty) {
+    saveToSettings();
+  }
 }
 
 bool FavoritesTreeModel::setDatas(const QVector<FavoriteItemData>& topLevelItems) {
@@ -42,6 +46,7 @@ bool FavoritesTreeModel::setDatas(const QVector<FavoriteItemData>& topLevelItems
     }
   }
   endResetModel();
+  m_bIsDirty = true;
   return true;
 }
 
@@ -54,7 +59,8 @@ bool FavoritesTreeModel::setDatas(const QByteArray& dataByteArray) {
 }
 
 Qt::ItemFlags FavoritesTreeModel::flags(const QModelIndex& index) const {
-  static const Qt::ItemFlags defaultFlags{QStandardItemModel::flags(index) & ~(Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled)};
+  // cannot use static here
+  const Qt::ItemFlags defaultFlags{QStandardItemModel::flags(index) & ~(Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled)};
 
   // root: drop only
   if (!index.isValid()) {
@@ -345,6 +351,7 @@ QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, QStandardIte
   item->setEditable(true);
   parentItem->appendRow(item);
   LOG_D("Group[%s] added successfully", qPrintable(grpName));
+  m_bIsDirty = true;
   return item;
 }
 
@@ -375,6 +382,7 @@ QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& p
   item->setEditable(true);  // 允许重命名
   item->setToolTip(QString("<b>%1</b><br>%2").arg(name, path));
   parentItem->appendRow(item);
+  m_bIsDirty = true;
   return item;
 }
 
@@ -500,6 +508,7 @@ int FavoritesTreeModel::moveParentIndexesTo(const QModelIndexList& parentIndexes
     destItem->appendRow(parent->takeRow(row));
     succeedCnt++;
   }
+  m_bIsDirty = true;
   return succeedCnt;
 }
 
@@ -532,13 +541,17 @@ int FavoritesTreeModel::removeParentIndexes(const QModelIndexList& parentIndexes
     parent->removeRow(row);
     succeedCnt++;
   }
-
+  m_bIsDirty = true;
   LOG_D("Removed %d items successfully", succeedCnt);
   return succeedCnt;
 }
 
 bool FavoritesTreeModel::onRename(const QModelIndex& parentIndex, const QString& newName) {
-  return setData(parentIndex, newName);
+  bool bSucceed = setData(parentIndex, newName);
+  if (bSucceed) {
+    m_bIsDirty = true;
+  }
+  return bSucceed;
 }
 
 void FavoritesTreeModel::addInitialFavoritesGroup() {
@@ -557,6 +570,7 @@ void FavoritesTreeModel::addInitialFavoritesGroup() {
 void FavoritesTreeModel::saveToSettings() {
   Configuration().setValue(GetDataKeyInQSetting(), toByteArray());
   LOG_D("All favorites saved");
+  m_bIsDirty = false;
 }
 
 int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) {
@@ -578,6 +592,7 @@ int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction
       addedCount++;
     }
   }
+  m_bIsDirty = true;
   return addedCount;
 }
 
@@ -628,8 +643,6 @@ int FavoritesTreeModel::handleInternalDrop(const QMimeData* data, Qt::DropAction
       return false;
     }
   }
-
+  m_bIsDirty = true;
   return moveParentIndexesTo(draggedIndexes, dstParent);
 }
-
-// todo: add a mutable sign to tell if need save changes

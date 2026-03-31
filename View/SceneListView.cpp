@@ -82,6 +82,15 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   // viewport()->setMouseTracking(true);
 }
 
+SceneListView::~SceneListView() {
+  if (mSortRoleConn) {
+    SceneInPageActions::disconnect(mSortRoleConn);
+  }
+  if (mSortOrderReverseConn) {
+    SceneInPageActions::disconnect(mSortOrderReverseConn);
+  }
+}
+
 bool SceneListView::onOpenCorrespondingFolder() {
   const QModelIndex& curInd = currentIndex();
   if (!curInd.isValid()) {
@@ -122,10 +131,10 @@ void SceneListView::subscribe() {
 
 void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
   if (mSortRoleConn) {
-    SceneListView::disconnect(mSortRoleConn);
+    SceneInPageActions::disconnect(mSortRoleConn);
   }
   if (mSortOrderReverseConn) {
-    SceneListView::disconnect(mSortOrderReverseConn);
+    SceneInPageActions::disconnect(mSortOrderReverseConn);
   }
 
   const SceneInPageActions& sceneActInst = g_SceneInPageActions();
