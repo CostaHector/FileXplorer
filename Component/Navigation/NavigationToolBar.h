@@ -27,7 +27,7 @@ class NavigationToolBar : public QToolBar {
   QActionGroup* m_pathActionGroups{nullptr};
   NavigationFavorites* m_favorites{nullptr};
   PopupWidgetManager<DevicesDrivesTV>* mDevDriveTV{nullptr};
-  static constexpr int MAXIMUM_WIDTH_WHEN_NOT_EXPAND = 32, MAXIMUM_WIDTH_WHEN_EXPAND = 200;
+  static constexpr int MAXIMUM_WIDTH_WHEN_NOT_EXPAND = 32, MAXIMUM_WIDTH_WHEN_EXPAND = 600;
 };
 
 #endif  // NAVIGATIONTOOLBAR_H
