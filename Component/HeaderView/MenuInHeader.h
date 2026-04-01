@@ -6,27 +6,6 @@
 #include <QMenu>
 #include "EnumIntAction.h"
 
-#ifdef RUNNING_UNIT_TESTS
-namespace UserSpecifiedIntValueMock {
-inline bool& mockBoolOk() {
-  static bool bOk = false;
-  return bOk;
-}
-inline int& mockIntValue() {
-  static int intValue = 0;
-  return intValue;
-}
-inline void MockQInputDialogGetInt(bool bOk, int iValue) {
-  mockBoolOk() = bOk;
-  mockIntValue() = iValue;
-}
-inline QString& mockColumnsShowSwitch() {
-  static QString columnsShowSwitch01Chars = ""; // e.g. "010101" means even column hide. odd columns is show
-  return columnsShowSwitch01Chars;
-}
-} // namespace UserSpecifiedIntValueMock
-#endif
-
 extern template struct EnumIntAction<QHeaderView::ResizeMode>;
 
 class MenuInHeader : public QHeaderView {
@@ -48,7 +27,7 @@ protected:
 private:
   void setClickedSection(int newClickedSection) const { m_clickedColumn = newClickedSection; }
 
-  void onSetSectionResizeMode(const QAction* pResizeToContent);
+  bool onSetSectionResizeMode(const QAction* pResizeToContent);
 
   bool onSetDefaultSectionSize();
 
@@ -76,11 +55,6 @@ private:
   const QString m_headerStateKey;
 
   mutable int m_clickedColumn{INVALID_CLICKED_COLUMN};
-
-  static constexpr int TABLE_DEFAULT_ROW_SECTION_SIZE = 30;
-  static constexpr int TABLE_DEFAULT_COLUMN_SECTION_SIZE = 200;
-  static constexpr int TABLE_MAX_ROW_SECTION_SIZE = 9999;
-  static constexpr int TABLE_MAX_COLUMN_SECTION_SIZE = 9999;
 
   static constexpr int INVALID_CLICKED_COLUMN = -1;
 };

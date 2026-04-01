@@ -9,19 +9,19 @@
 
 class CustomListView : public QListView {
   Q_OBJECT
-public:
-  explicit CustomListView(const QString& name, QWidget* parent = nullptr);
+ public:
+  explicit CustomListView(const QString& instName, QWidget* parent = nullptr);
   ~CustomListView();
+  const QString& GetName() const { return m_name; }
 
   void PushFrontExclusiveActions(const QList<QAction*>& acts);
-  void AddItselfAction2Menu();
   void PushBackExclusiveActions(const QList<QAction*>& acts);
 
   void InitListView();
 
-protected:
+ protected:
   void contextMenuEvent(QContextMenuEvent* event) override;
-  void wheelEvent(QWheelEvent *event) override;
+  void wheelEvent(QWheelEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
 
@@ -36,9 +36,9 @@ protected:
   QAction* _WRAPPING_ACTIONS{nullptr};
   QAction* _UNIFORM_ITEM_SIZES{nullptr};
 
-  AddableMenu* m_menu {nullptr};
-private:
+ private:
   void SubscribePublicActions();
+  void AddItselfAction2Menu();
 
   void onFlowOrientationChanged(const bool bLeft2Right);
   void onViewModeListIconToggled(const bool bIconMode);
@@ -48,8 +48,10 @@ private:
 
   void onIconScaledIndexChanged(int newScaledIndex);
 
-  inline bool isNameExists(const QString& name) const { return LISTS_SET.contains(name); }
-  static QSet<QString> LISTS_SET;
+  AddableMenu* m_menu{nullptr};
+
+  inline bool isNameExists(const QString& name) const { return mListInstSet.contains(name); }
+  static QSet<QString> mListInstSet;
 };
 
 #endif  // CUSTOMLISTVIEW_H

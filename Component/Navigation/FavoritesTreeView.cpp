@@ -6,7 +6,8 @@
 #include <QInputDialog>
 #include <QMimeData>
 
-FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTreeView{parent}, m_name{name} {
+FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
+    : CustomTreeView{"FavoritesTreeView", parent} {
   setObjectName("FavoritesTreeView");
   setIndentation(12);
   mFavModel = new FavoritesTreeModel{GetName(), this};
@@ -17,32 +18,30 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
 
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setDragDropMode(QAbstractItemView::DragDrop);
-  setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-  setSelectionMode(QAbstractItemView::ExtendedSelection);
+
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
   setExpandsOnDoubleClick(true);
   setSortingEnabled(true);
 
-  const int fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(font());
-  defaultFont.setPointSize(fontSize);
-  setFont(defaultFont);
-
-  mMenu = new QMenu{"Favorites Menu", this};
+  QList<QAction*> exclusiveActs;
+  exclusiveActs.reserve(20);
 
   // Expand all
-  mExpandAll = mMenu->addAction(QIcon{":img/EXPAND_ALL"}, tr("Expand All"));
+  mExpandAll = new QAction(QIcon{":img/EXPAND_ALL"}, tr("Expand All"), this);
   mExpandAll->setToolTip("Expand all groups to show their contents");
+  exclusiveActs.push_back(mExpandAll);
 
   // Collapse all
-  mCollapseAll = mMenu->addAction(QIcon{":img/COLLAPSE_ALL"}, tr("Collapse All"));
+  mCollapseAll = new QAction(QIcon{":img/COLLAPSE_ALL"}, tr("Collapse All"), this);
   mCollapseAll->setToolTip("Collapse all groups to hide their contents");
+  exclusiveActs.push_back(mCollapseAll);
 
   // Animated
-  mAnimatedEnableAct = mMenu->addAction(tr("Enable Animation"));
+  mAnimatedEnableAct = new QAction(tr("Enable Animation"), this);
   mAnimatedEnableAct->setToolTip("Enable or disable smooth expand/collapse animations");
+  exclusiveActs.push_back(mAnimatedEnableAct);
   {
     const bool bDefAnimated{false};
     mAnimatedEnableAct->setCheckable(true);
@@ -50,15 +49,8 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
     setAnimated(bDefAnimated);
   }
 
-  mHeaderHidden = mMenu->addAction(tr("Hide Header"));
-  {
-    const bool bHiddenHeader{false};
-    mHeaderHidden->setCheckable(true);
-    mHeaderHidden->setChecked(bHiddenHeader);
-    setHeaderHidden(bHiddenHeader);
-  }
-
-  mRootDecorationEnabled = mMenu->addAction(tr("Root Decoration"));
+  mRootDecorationEnabled = new QAction(tr("Root Decoration"), this);
+  exclusiveActs.push_back(mRootDecorationEnabled);
   {
     const bool bShowRootDecoration{true};
     mRootDecorationEnabled->setCheckable(true);
@@ -66,10 +58,8 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
     setRootIsDecorated(bShowRootDecoration);
   }
 
-  mMenu->addSeparator();
-
   {
-    mSortRoleMenu = mMenu->addMenu(tr("Sort"));
+    QMenu* mSortRoleMenu = new QMenu(tr("Sort"), this);
     mSortByName = mSortRoleMenu->addAction(tr("Name"));
     mSortByIsGroup = mSortRoleMenu->addAction(tr("Is Group"));
     mSortByFullPathRole = mSortRoleMenu->addAction(tr("Full Path"));
@@ -93,48 +83,61 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
     mSortRoleIntAction.setCheckedIfActionExist(initMemoryRole);
 
     const bool isSortReverse{FavoriteItemData::GetInitialSortOrderReverse()};
-    mSortReverse = mMenu->addAction(tr("Sort Reverse"));
+    mSortReverse = new QAction(tr("Sort Reverse"), this);
     mSortReverse->setCheckable(true);
     mSortReverse->setChecked(isSortReverse);
 
     mFavProxyModel->initSortProxy(initMemoryRole, isSortReverse);
+
+    exclusiveActs.push_back(mSortRoleMenu->menuAction());
   }
 
-  mMenu->addSeparator();
-
   // Rename
-  mRenameDisplayRole = mMenu->addAction(QIcon{":img/RENAME"}, tr("Rename"));
+  mRenameDisplayRole = new QAction(QIcon{":img/RENAME"}, tr("Rename"), this);
   mRenameDisplayRole->setToolTip("Rename the selected item");
+  exclusiveActs.push_back(mRenameDisplayRole);
 
   // Add group
-  mAddAGroup = mMenu->addAction(QIcon{":img/WHERE_CLAUSE_HISTORY_ADD"}, tr("Add Group"));
+  mAddAGroup = new QAction(QIcon{":img/WHERE_CLAUSE_HISTORY_ADD"}, tr("Add Group"), this);
   mAddAGroup->setToolTip("Add a new group to organize favorites");
+  exclusiveActs.push_back(mAddAGroup);
 
   // Remove selection
-  mRemoveSelection = mMenu->addAction(QIcon{":img/WHERE_CLAUSE_HISTORY_REMOVED"}, tr("Delete Selected"));
+  mRemoveSelection = new QAction(QIcon{":img/WHERE_CLAUSE_HISTORY_REMOVED"}, tr("Delete Selected"), this);
   mRemoveSelection->setToolTip("Remove the selected items");
-
-  mMenu->addSeparator();
+  exclusiveActs.push_back(mRemoveSelection);
 
   // Add initial examples
-  mAddInitialExamples = mMenu->addAction(tr("Add Initial Examples"));
+  mAddInitialExamples = new QAction(tr("Add Initial Examples"), this);
+  exclusiveActs.push_back(mAddInitialExamples);
 
   // Skip saving
-  mNotSavedDatasThisTime = mMenu->addAction(tr("Skip Saving"));
+  mNotSavedDatasThisTime = new QAction(tr("Skip Saving"), this);
   mNotSavedDatasThisTime->setCheckable(true);
   mNotSavedDatasThisTime->setChecked(false);
   mNotSavedDatasThisTime->setToolTip("Skip saving changes on exit (temporary mode). by default not skip");
+  exclusiveActs.push_back(mNotSavedDatasThisTime);
 
   // Save immediately
-  mSaveRightNow = mMenu->addAction(QIcon{":/JsonEditor/SAVE_CHANGES"}, tr("Save Now"));
+  mSaveRightNow = new QAction(QIcon{":/JsonEditor/SAVE_CHANGES"}, tr("Save Now"), this);
   mSaveRightNow->setToolTip("Save all changes immediately");
+  exclusiveActs.push_back(mSaveRightNow);
 
+  PushFrontExclusiveActions(exclusiveActs);
+  subscribe();
+}
+
+FavoritesTreeView::~FavoritesTreeView() {
+  FavoriteItemData::SaveInitialSortRole(mSortRoleIntAction.curVal());
+  FavoriteItemData::SaveSortOrderReverse(mSortReverse->isChecked());
+}
+
+void FavoritesTreeView::subscribe() {
   connect(this, &QTreeView::clicked, this, &FavoritesTreeView::onItemClicked);
   connect(mExpandAll, &QAction::triggered, this, &FavoritesTreeView::expandAll);
   connect(mCollapseAll, &QAction::triggered, this, &FavoritesTreeView::collapseAll);
 
   connect(mAnimatedEnableAct, &QAction::toggled, this, &FavoritesTreeView::setAnimated);
-  connect(mHeaderHidden, &QAction::toggled, this, &FavoritesTreeView::setHeaderHidden);
   connect(mRootDecorationEnabled, &QAction::toggled, this, &FavoritesTreeView::setRootIsDecorated);
 
   connect(mSortRoleIntAction.getActionGroup(), &QActionGroup::triggered, this, &FavoritesTreeView::onSortRoleActionTriggered);
@@ -147,11 +150,6 @@ FavoritesTreeView::FavoritesTreeView(const QString& name, QWidget* parent) : QTr
   connect(mAddInitialExamples, &QAction::triggered, mFavModel, &FavoritesTreeModel::addInitialFavoritesGroup);
   connect(mNotSavedDatasThisTime, &QAction::toggled, mFavModel, &FavoritesTreeModel::setThisTimeNotSave);
   connect(mSaveRightNow, &QAction::triggered, mFavModel, &FavoritesTreeModel::saveToSettings);
-}
-
-FavoritesTreeView::~FavoritesTreeView() {
-  FavoriteItemData::SaveInitialSortRole(mSortRoleIntAction.curVal());
-  FavoriteItemData::SaveSortOrderReverse(mSortReverse->isChecked());
 }
 
 void FavoritesTreeView::setFilter(const QString& filter) {
@@ -267,17 +265,6 @@ bool FavoritesTreeView::isNoSelectionOrExactlyOneGroup(QModelIndex* grpOrRootSrc
     return true;
   }
   return isExactlyOneGroupSelected(grpOrRootSrcIndex);
-}
-
-void FavoritesTreeView::contextMenuEvent(QContextMenuEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  CHECK_NULLPTR_RETURN_VOID(mMenu);
-  if (mMenu != nullptr) {
-#ifndef RUNNING_UNIT_TESTS
-    mMenu->popup(event->globalPos());
-#endif
-  }
-  event->accept();
 }
 
 void FavoritesTreeView::dragEnterEvent(QDragEnterEvent* event) {

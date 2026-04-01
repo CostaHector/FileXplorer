@@ -12,7 +12,7 @@ constexpr const char* FavoritesTreeModel::MIME_TYPE;
 
 FavoritesTreeModel::FavoritesTreeModel(const QString& belongToName, QObject* parent, bool bInitialCollectionsWhenEmpty)  //
     : QStandardItemModel{0, 1, parent}, m_belongToName{belongToName} {
-  setHorizontalHeaderLabels({"Favorites"});
+  setHorizontalHeaderLabels({tr("Favorites")});
 
   const QByteArray& datas = Configuration().value(GetDataKeyInQSetting(), QByteArray{}).toByteArray();
   if (!datas.isEmpty() && setDatas(datas)) {

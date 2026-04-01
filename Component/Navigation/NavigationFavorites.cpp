@@ -7,7 +7,7 @@ NavigationFavorites::NavigationFavorites(QWidget* parent) : QWidget{parent} {
   m_startSearchAct = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_searchLineEdit->setClearButtonEnabled(true);
 
-  m_favView = new FavoritesTreeView{"FavoritesTreeView", this};
+  m_favView = new FavoritesTreeView{this};
 
   m_layout = new QVBoxLayout{this};
   m_layout->addWidget(m_searchLineEdit);

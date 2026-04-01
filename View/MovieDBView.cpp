@@ -28,14 +28,16 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
   CHECK_NULLPTR_RETURN_VOID(model_);
   CHECK_NULLPTR_RETURN_VOID(dbSearchBar_);
 
-  m_menu->addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
-  m_menu->addActions(FileOpActs::GetInst().OPEN_AG->actions());
-  m_menu->addSeparator();
-  m_menu->addActions(FileOpActs::GetInst().COPY_PATH_AG->actions());
-  AddItselfAction2Menu();
+  {
+    QList<QAction*> exclusiveActs;
+    exclusiveActs.reserve(15);
+    exclusiveActs.push_back(g_viewActions()._SYS_VIDEO_PLAYERS);
+    exclusiveActs += FileOpActs::GetInst().OPEN_AG->actions();
+    exclusiveActs += FileOpActs::GetInst().COPY_PATH_AG->actions();
+    PushFrontExclusiveActions(exclusiveActs);
+  }
 
   setModel(_dbModel);
-
   setEditTriggers(QAbstractItemView::EditKeyPressed);  // only F2 works.
 
   InitMoviesTables();
@@ -114,7 +116,6 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   _dbModel->setTable(movieTableName);
   _dbModel->select();
-  ShowOrHideColumnCore();
   return true;
 }
 

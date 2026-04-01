@@ -215,9 +215,10 @@ QTableView::item:hover {
 }
 
 QTreeView {
-    show-decoration-selected: 1;
+    show-decoration-selected: 0;
     alternate-background-color: #2a2a2a;  /* 交替行颜色 */
-    background-color: #1e1e1e;  /* 基础背景色 */
+    background-color: #323232;  /* 基础背景色 */
+    gridline-color: #3c3c3c;  /* 网格线颜色 */
 }
 QTreeView::item:alternate {
 }

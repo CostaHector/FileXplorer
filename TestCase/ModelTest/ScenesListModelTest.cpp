@@ -411,7 +411,7 @@ class ScenesListModelTest : public PlainTestSuite {
     ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
     {
-      sspm.initSortProxy(SceneInfo::Role::REL_PATH_ROLE, false);  // nothing happend
+      sspm.initSortSetting(SceneInfo::Role::REL_PATH_ROLE, false);  // nothing happend
       sspm.setSourceModel(nullptr);                               // ignored
       sspm.setSourceModel(&slm);
       sspm.setSourceModel(&slm);  // rebind, ignored

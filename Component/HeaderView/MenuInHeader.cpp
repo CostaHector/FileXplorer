@@ -2,16 +2,14 @@
 #include "MemoryKey.h"
 #include "Logger.h"
 #include "PublicMacro.h"
+#include "MockFriendlyTool.h"
+#include "SizeTool.h"
 #include <QContextMenuEvent>
-#include <QInputDialog>
-
-constexpr int MenuInHeader::TABLE_DEFAULT_ROW_SECTION_SIZE;
-constexpr int MenuInHeader::TABLE_DEFAULT_COLUMN_SECTION_SIZE;
-constexpr int MenuInHeader::TABLE_MAX_ROW_SECTION_SIZE;
-constexpr int MenuInHeader::TABLE_MAX_COLUMN_SECTION_SIZE;
+#include <utility>
 
 constexpr int MenuInHeader::INVALID_CLICKED_COLUMN;
 
+using namespace SizeTool;
 int MenuInHeader::GetDefaultSectionSizeFirstTime() const {
   const int defValue{orientation() == Qt::Orientation::Horizontal ? TABLE_DEFAULT_COLUMN_SECTION_SIZE : TABLE_DEFAULT_ROW_SECTION_SIZE};
   return Configuration().value(m_defaultSectionSizeKey, defValue).toInt();
@@ -22,14 +20,18 @@ int MenuInHeader::GetMaxSectionSizeFirstTime() const {
   return Configuration().value(m_maxSectionSizeKey, defValue).toInt();
 }
 
-MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget *parent)
-  : QHeaderView{ori, parent}
-  , m_name{proName}
-  , m_defaultSectionSizeKey{GetName() + "_DEFAULT_SECTION_SIZE"}
-  , m_maxSectionSizeKey{GetName() + "_MAX_SECTION_SIZE"}
-  , m_stretchLastSectionKey{GetName() + "_STRETCH_LAST_SECTION"}
-  , m_resizeModeKey{GetName() + "_RESIZE_MODE"}
-  , m_headerStateKey{GetName() + "_HEADER_GEOMETRY"} {
+MenuInHeader::MenuInHeader(const QString& proName, Qt::Orientation ori, QWidget* parent)
+    : QHeaderView{ori, parent},
+      m_name{proName},
+      m_defaultSectionSizeKey{GetName() + "_DEFAULT_SECTION_SIZE"},
+      m_maxSectionSizeKey{GetName() + "_MAX_SECTION_SIZE"},
+      m_stretchLastSectionKey{GetName() + "_STRETCH_LAST_SECTION"},
+      m_resizeModeKey{GetName() + "_RESIZE_MODE"},
+      m_headerStateKey{GetName() + "_HEADER_GEOMETRY"} {
+  m_menu = new (std::nothrow) QMenu{m_name + " Header Menu", this};
+  CHECK_NULLPTR_RETURN_VOID(m_menu);
+  m_menu->setToolTipsVisible(true);
+
   const QString sectionSizeIconPath{orientation() == Qt::Orientation::Horizontal ? ":img/DEFAULT_COLUMN_WIDTH" : ":img/DEFAULT_ROW_HEIGHT"};
   _SET_DEFAULT_SECTION_SIZE = new (std::nothrow) QAction(QIcon(sectionSizeIconPath), tr("Set default section size"), this);
   CHECK_NULLPTR_RETURN_VOID(_SET_DEFAULT_SECTION_SIZE);
@@ -60,24 +62,20 @@ MenuInHeader::MenuInHeader(const QString &proName, Qt::Orientation ori, QWidget 
 
     mResizeModeIntAction.init(
         {
-            {_RESIZE_MODE_INTERACTIVE, QHeaderView::ResizeMode::Interactive}, //
-            {_RESIZE_MODE_STRETCH, QHeaderView::ResizeMode::Stretch},         //
-            {_RESIZE_MODE_FIXED, QHeaderView::ResizeMode::Fixed},             //
+            {_RESIZE_MODE_INTERACTIVE, QHeaderView::ResizeMode::Interactive},  //
+            {_RESIZE_MODE_STRETCH, QHeaderView::ResizeMode::Stretch},          //
+            {_RESIZE_MODE_FIXED, QHeaderView::ResizeMode::Fixed},              //
             {_RESIZE_MODE_RESIZE_TO_CONTENTS, QHeaderView::ResizeMode::ResizeToContents},
-        }, //
-        QHeaderView::ResizeMode::Interactive,
-        QActionGroup::ExclusionPolicy::Exclusive);
+        },  //
+        QHeaderView::ResizeMode::Interactive, QActionGroup::ExclusionPolicy::Exclusive);
 
     int defResizeMode = Configuration().value(m_resizeModeKey, QHeaderView::ResizeMode::Interactive).toInt();
-    QAction *checkedResizeModeAct = mResizeModeIntAction.setCheckedIfActionExist(defResizeMode);
+    QAction* checkedResizeModeAct = mResizeModeIntAction.setCheckedIfActionExist(defResizeMode);
 
-    m_menu = new (std::nothrow) QMenu{m_name + " Header Menu", this};
-    CHECK_NULLPTR_RETURN_VOID(m_menu);
-    m_menu->setToolTipsVisible(true);
-    m_menu->addAction(_SET_DEFAULT_SECTION_SIZE);
-    m_menu->addAction(_SET_MAX_SECTION_SIZE);
-    m_menu->addAction(_STRETCH_DETAIL_SECTION);
-    QMenu *sectionResizeModeMenu = m_menu->addMenu(QIcon{":img/RESIZE_MODE"}, tr("Section resize mode"));
+    AddActionToMenu(_SET_DEFAULT_SECTION_SIZE);
+    AddActionToMenu(_SET_MAX_SECTION_SIZE);
+    AddActionToMenu(_STRETCH_DETAIL_SECTION);
+    QMenu* sectionResizeModeMenu = m_menu->addMenu(QIcon{":img/RESIZE_MODE"}, tr("Section resize mode"));
     CHECK_NULLPTR_RETURN_VOID(sectionResizeModeMenu);
     sectionResizeModeMenu->addActions(mResizeModeIntAction.getActionEnumAscendingList());
 
@@ -102,7 +100,7 @@ MenuInHeader::~MenuInHeader() {
   Configuration().setValue(m_headerStateKey, saveState());
 }
 
-void MenuInHeader::AddActionToMenu(QAction *act) {
+void MenuInHeader::AddActionToMenu(QAction* act) {
   if (act == nullptr) {
     m_menu->addSeparator();
     return;
@@ -114,79 +112,70 @@ void MenuInHeader::RestoreHeaderState() {
   restoreState(Configuration().value(m_headerStateKey, QByteArray{}).toByteArray());
 }
 
-void MenuInHeader::contextMenuEvent(QContextMenuEvent *e) {
+void MenuInHeader::contextMenuEvent(QContextMenuEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
   CHECK_NULLPTR_RETURN_VOID(m_menu);
-  if (m_menu != nullptr) {
-    QPoint pnt = e->globalPos();
+  QPoint pnt = e->globalPos();
 #ifndef RUNNING_UNIT_TESTS
-    m_menu->popup(pnt);
+  m_menu->popup(pnt);
 #endif
-  }
   setClickedSection(logicalIndexAt(e->pos()));
   e->accept();
 }
 
-void MenuInHeader::onSetSectionResizeMode(const QAction *pResizeToContent) {
-  CHECK_NULLPTR_RETURN_VOID(pResizeToContent);
+bool MenuInHeader::onSetSectionResizeMode(const QAction* pResizeToContent) {
+  CHECK_NULLPTR_RETURN_FALSE(pResizeToContent);
   QHeaderView::ResizeMode lastMode = sectionResizeMode(0);
   const QHeaderView::ResizeMode newMode = mResizeModeIntAction.act2Enum(pResizeToContent);
   if (newMode == lastMode) {
-    return;
+    return false;
   }
   if (lastMode == QHeaderView::ResizeMode::ResizeToContents) {
     RestoreHeaderState();
   }
   setSectionResizeMode(newMode);
+  return true;
 }
 
 bool MenuInHeader::onSetDefaultSectionSize() {
-  bool setOk{false};
   const int beforeDefSize = defaultSectionSize();
   int afterDefSize{beforeDefSize};
   const int minSize = minimumSectionSize(), maxSize = maximumSectionSize();
   constexpr int sizeStep = 10;
   const QString titleMsg{"Set Default Section Size"};
   const QString labelMsg{QString::asprintf("Current: %d px | Range: %d-%d px", beforeDefSize, minSize, maxSize)};
-#ifdef RUNNING_UNIT_TESTS
-  setOk = UserSpecifiedIntValueMock::mockBoolOk();
-  afterDefSize = UserSpecifiedIntValueMock::mockIntValue();
-#else
-  afterDefSize = QInputDialog::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep, &setOk);
-#endif
+
+  bool setOk{false};
+  std::tie(afterDefSize, setOk) = MockFriendlyTool::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
   if (!setOk) {
     LOG_W("User canceled default section size setting");
     return false;
   }
   if (afterDefSize == beforeDefSize) {
     LOG_D("Default section size unchanged: %d px", beforeDefSize);
-    return true;
+    return false;
   }
   setDefaultSectionSize(afterDefSize);
   return true;
 }
 
 bool MenuInHeader::onSetMaxSectionSize() {
-  bool setOk{false};
   const int beforeDefSize = maximumSectionSize();
   int afterDefSize{beforeDefSize};
   const int minSize = minimumSectionSize(), maxSize = 9999;
   constexpr int sizeStep = 10;
   const QString titleMsg{"Set Maximum Section Size"};
   const QString labelMsg{QString::asprintf("Current: %d px | Range: %d-%d px", beforeDefSize, minSize, maxSize)};
-#ifdef RUNNING_UNIT_TESTS
-  setOk = UserSpecifiedIntValueMock::mockBoolOk();
-  afterDefSize = UserSpecifiedIntValueMock::mockIntValue();
-#else
-  afterDefSize = QInputDialog::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep, &setOk);
-#endif
+
+  bool setOk{false};
+  std::tie(afterDefSize, setOk) = MockFriendlyTool::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
   if (!setOk) {
     LOG_W("User canceled maximum section size setting");
     return false;
   }
   if (afterDefSize == beforeDefSize) {
     LOG_D("Maximum section size unchanged: %d px", beforeDefSize);
-    return true;
+    return false;
   }
   setMaximumSectionSize(afterDefSize);
   return true;

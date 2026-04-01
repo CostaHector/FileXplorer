@@ -9,7 +9,7 @@ class SceneSortProxyModel : public QSortFilterProxyModel {
  public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
   bool isSortProxyInited() const { return m_bSortProxyInited; }
-  void initSortProxy(SceneInfo::Role initRole, bool bReverseOrder);
+  bool initSortSetting(SceneInfo::Role initRole, bool bReverseOrder);
   bool setSortOrder(bool bReverseOrder);
 
  private:

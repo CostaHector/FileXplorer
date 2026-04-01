@@ -70,7 +70,7 @@ bool QAbstractTableModelPub::ColumnsCountEndChange() {  // must call me after Co
   return true;
 }
 
-int QAbstractTableModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback) {
+int QAbstractTableModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeRemoveCallback fCallback) {
   if (indexes.isEmpty()) {
     LOG_D("Indexes list empty. skip");
     return 0;

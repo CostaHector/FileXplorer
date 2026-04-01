@@ -103,10 +103,10 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   SET_STUDIO = new (std::nothrow) QAction(QIcon(":img/STUDIOS_LIST_FILE"), tr("Set Studio"), this);
 
   SET_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_LIST_FILE"), tr("Set Cast"), this);
-  APPEND_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_APPEND_INPUT"), tr("Add Cast"), this);
-  REMOVE_CAST = new (std::nothrow) QAction(QIcon(":img/CAST_REMOVE"), tr("Rmv Cast"), this);
+  APPEND_CAST = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST_APPEND_INPUT"), tr("Add Cast"), this);
+  REMOVE_CAST = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST_REMOVE"), tr("Rmv Cast"), this);
 
-  SET_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_SET"), tr("Set Tags"), this);
-  APPEND_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_APPEND"), tr("Add Tags"), this);
-  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":img/TAGS_REMOVE"), tr("Rmv Tag"), this);
+  SET_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_SET"), tr("Set Tags"), this);
+  APPEND_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_APPEND"), tr("Add Tags"), this);
+  REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_REMOVE"), tr("Rmv Tag"), this);
 }

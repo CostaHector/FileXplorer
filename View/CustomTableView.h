@@ -2,44 +2,49 @@
 #define CUSTOMTABLEVIEW_H
 
 #include <QTableView>
-#include "VerMenuInHeader.h"
-#include "DoubleRowHeader.h"
-#include "ScrollBarPolicyMenu.h"
 #include "AddableMenu.h"
+
+class VerMenuInHeader;
+class DoubleRowHeader;
+class ScrollBarPolicyMenu;
 
 class CustomTableView : public QTableView {
   Q_OBJECT
-public:
-  explicit CustomTableView(const QString& name, QWidget* parent = nullptr);
+ public:
+  explicit CustomTableView(const QString& instName, QWidget* parent = nullptr);
   ~CustomTableView();
 
-  virtual void contextMenuEvent(QContextMenuEvent* event) override;
+  const QString& GetName() const { return m_name; }
 
   void PushFrontExclusiveActions(const QList<QAction*>& acts);
 
-  bool ShowOrHideColumnCore();
-
   void InitTableView();
-  void SubscribeHeaderActions();
 
   void mousePressEvent(QMouseEvent* event) override;
 
-signals:
+ signals:
   void searchSqlStatementChanged(const QString& sqlStatement);
 
-protected:
+ protected:
   void scrollContentsBy(int dx, int dy) override;
-  void AddItselfAction2Menu();
-  AddableMenu* m_menu{nullptr};
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  virtual void initExclusivePreferenceSetting() {}
+  bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true};
 
-private:
+ private:
+  void AddItselfAction2Menu();
+  void SubscribeHeaderActions();
+  bool ShowOrHideColumnCore();
+
   const QString m_name;
+
   const QString m_showHorizontalHeaderKey;
   const QString m_showVerticalHeaderKey;
   const QString m_autoScrollKey;
   const QString m_alternatingRowColorsKey;
   const QString m_showGridKey;
 
+  QAction* _SHOW_ALL_HORIZONTAL_COLUMNS{nullptr};
   QAction *_SHOW_HORIZONTAL_HEADER{nullptr}, *_SHOW_VERTICAL_HEADER{nullptr};
   QAction *_RESIZE_ROW_TO_CONTENTS{nullptr}, *_RESIZE_COLUMN_TO_CONTENTS{nullptr};
   QAction* _AUTO_SCROLL{nullptr};
@@ -49,9 +54,10 @@ private:
 
   DoubleRowHeader* m_horHeader{nullptr};
   VerMenuInHeader* m_verHeader{nullptr};
+  AddableMenu* m_menu{nullptr};
 
-  inline bool isNameExists(const QString& name) const { return TABLES_SET.contains(name); }
-  static QSet<QString> TABLES_SET;
+  inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }
+  static QSet<QString> mTableInstSet;
 };
 
-#endif // CUSTOMTABLEVIEW_H
+#endif  // CUSTOMTABLEVIEW_H

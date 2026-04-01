@@ -27,7 +27,8 @@ class QAbstractListModelPub : public QAbstractListModel {
  public slots:
   bool onIconSizeChange(const QSize& newSize);
   bool onPixmapSmoothTransformationToggled(bool bSmooth);
-  int onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback);
+  int onRowsRangeListRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeListRemoveCallback fCallback);
+  int onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeRemoveCallback fCallback);
 
  private:
   void subscribe();

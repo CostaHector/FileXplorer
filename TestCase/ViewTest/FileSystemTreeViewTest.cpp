@@ -111,14 +111,9 @@ class FileSystemTreeViewTest : public PlainTestSuite {
     FileSystemModel fsModel;
     FileSystemTreeView treeView(&fsModel);
 
-    treeView.InitViewSettings();
-
     QVERIFY(treeView.alternatingRowColors());
     QVERIFY(treeView.isSortingEnabled());
     QCOMPARE(treeView.selectionBehavior(), QAbstractItemView::SelectRows);
-
-    int originalSize = treeView.font().pointSize();
-    treeView.UpdateItemViewFontSize();
   }
 };
 

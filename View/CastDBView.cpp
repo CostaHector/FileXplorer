@@ -27,12 +27,11 @@ void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
-  : CustomTableView{"ACTORS_TABLE", parent}
-  , //
-  _castDbSearchBar{castDbSearchBar_}
-  , _castModel{castDbModel_}
-  , _castDb{castDb_}
-  , mImageHost{castDbModel_->rootPath()} {
+    : CustomTableView{"ACTORS_TABLE", parent},  //
+      _castDbSearchBar{castDbSearchBar_},
+      _castModel{castDbModel_},
+      _castDb{castDb_},
+      mImageHost{castDbModel_->rootPath()} {
   if (!QFileInfo{mImageHost}.isDir()) {
     LOG_WARN_P("ImageHostPath not exist", "Fix it[%s] in .ini file", qPrintable(mImageHost));
     return;
@@ -41,10 +40,12 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
   CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
   CHECK_NULLPTR_RETURN_VOID(_castModel);
 
-  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
-  m_menu->addAction(g_castAct().SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
-  m_menu->addAction(g_castAct().DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  AddItselfAction2Menu();
+  {
+    auto& inst = g_castAct();
+    QList<QAction*> exclusiveActs{inst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, inst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK,
+                                  inst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE};
+    PushFrontExclusiveActions(exclusiveActs);
+  }
 
   setModel(_castModel);
   InitTableView();
@@ -152,15 +153,14 @@ int CastDBView::onDeleteRecords() {
 bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDelete) {
   QMessageBox::StandardButton stdCfmDeleteBtn = QMessageBox::StandardButton::No;
   const QString cfmTitleText{QString::asprintf("Confirm %s?", DbManagerHelper::c_str(dropOrDelete))};
-  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable", //
-                                           DbManagerHelper::c_str(dropOrDelete),
-                                           qPrintable(DB_TABLE::PERFORMERS))};
+  const QString hintText{QString::asprintf("Operation[%s] on Table[%s] is not recoverable",  //
+                                           DbManagerHelper::c_str(dropOrDelete), qPrintable(DB_TABLE::PERFORMERS))};
 #ifdef RUNNING_UNIT_TESTS
   stdCfmDeleteBtn = CastDbViewMocker::MockDropDeleteTable() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
 #else
-  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                         //
-                                         cfmTitleText,                                                                 //
-                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable", //
+  stdCfmDeleteBtn = QMessageBox::warning(this,                                                                          //
+                                         cfmTitleText,                                                                  //
+                                         "Drop(0)/Delete(1) [" + DB_TABLE::PERFORMERS + "] operation not recoverable",  //
                                          QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
 #endif
   if (stdCfmDeleteBtn != QMessageBox::StandardButton::Yes) {
@@ -168,11 +168,7 @@ bool CastDBView::onDropDeleteTable(const DbManagerHelper::DropOrDeleteE dropOrDe
     return true;
   }
   int rmvedTableCnt = _castDb.RmvTable(DB_TABLE::PERFORMERS, dropOrDelete);
-  LOG_OE_P(rmvedTableCnt >= 0,
-           "Drop/Delete",
-           "Table[%s] %s count:%d",
-           qPrintable(DB_TABLE::PERFORMERS),
-           DbManagerHelper::c_str(dropOrDelete),
+  LOG_OE_P(rmvedTableCnt >= 0, "Drop/Delete", "Table[%s] %s count:%d", qPrintable(DB_TABLE::PERFORMERS), DbManagerHelper::c_str(dropOrDelete),
            rmvedTableCnt);
   if (dropOrDelete == DbManagerHelper::DropOrDeleteE::DELETE) {
     onModelRepopulate();
@@ -351,12 +347,12 @@ void IndexRecoverHelper::stashPop(QAbstractItemView& itemView, const QModelIndex
   if (currentIndex == mOldIndex) {
     return;
   }
-  if (mOldIndex.isValid()) { // old still valid
+  if (mOldIndex.isValid()) {  // old still valid
     itemView.setCurrentIndex(mOldIndex);
     return;
   }
   const int beforeRow = mOldIndex.row();
-  if (const QAbstractItemModel* pModel = mOldIndex.model()) { // may get deleted
+  if (const QAbstractItemModel* pModel = mOldIndex.model()) {  // may get deleted
     const int rowCnt = pModel->rowCount();
     if (rowCnt == 0) {
       return;

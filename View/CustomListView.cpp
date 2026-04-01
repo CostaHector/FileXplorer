@@ -11,18 +11,14 @@
 #include <QActionGroup>
 #include <QContextMenuEvent>
 
-QSet<QString> CustomListView::LISTS_SET;
+QSet<QString> CustomListView::mListInstSet;
 
-CustomListView::CustomListView(const QString& name, QWidget* parent)  //
-    : QListView{parent}, m_name{name} {
-  if (isNameExists(m_name)) {
-#ifdef RUNNING_UNIT_TESTS
-    LOG_D("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
-#else
-    LOG_W("Instance list name[%s] already exist, memory key will override", qPrintable(m_name));
-#endif
+CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
+    : QListView{parent}, m_name{instName} {
+  if (isNameExists(GetName())) {
+    LOG_W("Instance list name[%s] already exist, memory key will override", qPrintable(GetName()));
   }
-  LISTS_SET.insert(m_name);
+  mListInstSet.insert(GetName());
 
   setAlternatingRowColors(true);
 
@@ -32,17 +28,12 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  const auto fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(font());
-  defaultFont.setPointSize(fontSize);
-  setFont(defaultFont);
-
   {
-    const QString iconSizeMenuName{m_name + " " + tr("Icon size")};
-    _ICON_SIZE_MENU = new (std::nothrow) IconSizeMenu{iconSizeMenuName, m_name, this};
+    const QString iconSizeMenuName{GetName() + " " + tr("Icon size")};
+    _ICON_SIZE_MENU = new (std::nothrow) IconSizeMenu{iconSizeMenuName, GetName(), this};
 
-    const QString textElideModeMenuName{m_name + " " + tr("Text elide mode")};
-    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, m_name, this};
+    const QString textElideModeMenuName{GetName() + " " + tr("Text elide mode")};
+    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, GetName(), this};
   }
 
   {
@@ -59,7 +50,7 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Resize Mode: Adjust"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
     _RESIZED_MODE_ADJUST->setCheckable(true);
-    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", true).toBool());
+    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(GetName() + "_RESIZED_MODE_FIXED_OR_ADJUST", true).toBool());
     _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed. by default: adjust");
 
     _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, tr("Wrapping"), this};
@@ -70,11 +61,11 @@ CustomListView::CustomListView(const QString& name, QWidget* parent)  //
     _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, tr("Uniform items sizes"), this};
     CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
     _UNIFORM_ITEM_SIZES->setCheckable(true);
-    _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(m_name + "_UNIFORM_ITEM_SIZES", false).toBool());
+    _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "_UNIFORM_ITEM_SIZES", false).toBool());
     _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
   }
 
-  m_menu = new (std::nothrow) AddableMenu{name + "_menu", this};
+  m_menu = new (std::nothrow) AddableMenu{GetName() + "_menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu);
   m_menu->setToolTipsVisible(true);
   AddItselfAction2Menu();
@@ -94,11 +85,11 @@ void CustomListView::SubscribePublicActions() {
 }
 
 CustomListView::~CustomListView() {
-  Configuration().setValue(m_name + "_FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
-  Configuration().setValue(m_name + "_VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
-  Configuration().setValue(m_name + "_RESIZED_MODE_FIXED_OR_ADJUST", (resizeMode() == QListView::ResizeMode::Adjust));
-  Configuration().setValue(m_name + "_WRAPPING_ACTIONS", isWrapping());
-  Configuration().setValue(m_name + "_UNIFORM_ITEM_SIZES", uniformItemSizes());
+  Configuration().setValue(GetName() + "_FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
+  Configuration().setValue(GetName() + "_VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
+  Configuration().setValue(GetName() + "_RESIZED_MODE_FIXED_OR_ADJUST", (resizeMode() == QListView::ResizeMode::Adjust));
+  Configuration().setValue(GetName() + "_WRAPPING_ACTIONS", isWrapping());
+  Configuration().setValue(GetName() + "_UNIFORM_ITEM_SIZES", uniformItemSizes());
 }
 
 void CustomListView::contextMenuEvent(QContextMenuEvent* event) {
@@ -176,10 +167,12 @@ void CustomListView::onUniformItemSizedToggled(const bool bUniform) {
 
 void CustomListView::InitListView() {
   initExclusivePreferenceSetting();
+  View::UpdateItemViewFontSizeCore(this);
+
   // top2bottom, list
-  _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(m_name + "_FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());
-  _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(m_name + "_VIEW_MODE_LIST_ICON", m_defaultViewModeIcon).toBool());
-  _WRAPPING_ACTIONS->setChecked(Configuration().value(m_name + "_WRAPPING_ACTIONS", m_defaultWrapping).toBool());
+  _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(GetName() + "_FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());
+  _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(GetName() + "_VIEW_MODE_LIST_ICON", m_defaultViewModeIcon).toBool());
+  _WRAPPING_ACTIONS->setChecked(Configuration().value(GetName() + "_WRAPPING_ACTIONS", m_defaultWrapping).toBool());
 
   const int sizeScaledIndex = _ICON_SIZE_MENU->GetScaledIndex();
   setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[sizeScaledIndex]);

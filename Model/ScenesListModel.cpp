@@ -23,12 +23,14 @@ ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  
   );
 }
 
-void ScenesListModel::initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse) {
-  if (!isSortProxyInited()) {
-    auto comparator = SceneInfo::getCompareFunc(newSortDimension);
-    mPagedData.initSortSetting(comparator, bResultReverse);
-    m_bSortProxyInited = true;
+bool ScenesListModel::initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse) {
+  if (isSortProxyInited()) {
+    return false;
   }
+  auto comparator = SceneInfo::getCompareFunc(newSortDimension);
+  mPagedData.initSortSetting(comparator, bResultReverse);
+  m_bSortProxyInited = true;
+  return true;
 }
 
 bool ScenesListModel::setSortDimension(SceneInfo::Role newSortDimension) {
@@ -41,6 +43,10 @@ bool ScenesListModel::setSortResultReverse(bool bResultReverse) {
 }
 
 QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) {
+    return {};
+  }
+  int rc = rowCount();
   int i = -1;
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
@@ -246,15 +252,11 @@ bool ScenesListModel::onDisableImageDecorationChanged(bool bDisabled) {
   return true;
 }
 
-extern template class PaginatedListRangeEraseGuard<SceneInfo>;
-using PaginatedSceneListRangeEraseGuard = PaginatedListRangeEraseGuard<SceneInfo>;
-
 int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
   if (indexes.isEmpty()) {
     return 0;
   }
-  PaginatedSceneListRangeEraseGuard guard(&mPagedData);
-  const auto rowElementsRmv = mPagedData.GetRangeEraser();
-  const int rowRmvedCnt{onRowsRemoved(indexes, rowElementsRmv)};
+  const auto rowElementsRmv = mPagedData.GetRangeListEraser();
+  const int rowRmvedCnt{onRowsRangeListRemoved(indexes, rowElementsRmv)};
   return rowRmvedCnt;
 }

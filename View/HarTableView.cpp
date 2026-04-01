@@ -29,9 +29,7 @@ HarTableView::HarTableView(QWidget* parent)
   mQUICK_PREVIEW->setCheckable(true);
   mQUICK_PREVIEW->setChecked(mShowImagePreview);
 
-  m_menu->addAction(mEXPORT_TO);
-  m_menu->addAction(mQUICK_PREVIEW);
-  AddItselfAction2Menu();
+  PushFrontExclusiveActions({mEXPORT_TO, mQUICK_PREVIEW});
 
   subscribe();
   updateWindowsSize();

@@ -17,7 +17,7 @@ class ItemView : public CustomListView {
 
  private:
   void subscribe();
-  void initExclusivePreferenceSetting();
+  void initExclusivePreferenceSetting() override;
 
   FloatingModels* mModels{nullptr};
   QAction* _PLAY_ITEM{nullptr};

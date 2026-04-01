@@ -18,7 +18,6 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
   InitTableView();
-  verticalHeader()->setVisible(false);
 
   const auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
   {
@@ -284,4 +283,9 @@ int VideoTableView::onRecycleVideoAndRelated() {
   const int removeRowCnt = mVideoModel->AfterVideoFilesNameRenamed(indexes);
   LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
   return relatedFilesCnt;
+}
+
+void VideoTableView::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultShowHorizontalHeader = true;
+  CustomTableView::m_defaultShowVerticalHeader = false;
 }

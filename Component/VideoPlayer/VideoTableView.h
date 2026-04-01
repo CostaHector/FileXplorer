@@ -26,6 +26,8 @@ signals:
   void reqPlayMedia(QString mediaUrl, bool bPlayInstantly);
 
 private:
+  void initExclusivePreferenceSetting() override;
+
   QModelIndexList selectedRowsSource() const;
 
   QModelIndex previousIndex() const;

@@ -73,6 +73,7 @@ void DoubleRowHeader::onToggleEnableOrDisableFilter(bool bEnableFilter) {
 }
 
 void DoubleRowHeader::resizeEvent(QResizeEvent *event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QHeaderView::resizeEvent(event);
   updateFilterEditorsGeometry();
 }

@@ -12,12 +12,12 @@ public:
   ScrollBarPolicyMenu(const QString& menuName, const QString& belongToName, QWidget* parent = nullptr);
   ~ScrollBarPolicyMenu();
   Qt::ScrollBarPolicy GetScrollBarPolicy() const;
+  QString GetName() const { return m_memoryName; }
 
 signals:
   void reqScrollBarPolicyChanged(Qt::ScrollBarPolicy newScrollBarPolicy);
 
 private:
-  QString GetName() const { return m_memoryName; }
   void onActionInMenuTriggered(const QAction* pScrollBarPolicyAct);
 
   QAction *_AS_NEEDED{nullptr}, *_ALWAYS_ON{nullptr}, *_ALWAYS_OFF{nullptr};

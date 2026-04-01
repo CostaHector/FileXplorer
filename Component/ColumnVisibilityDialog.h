@@ -9,26 +9,29 @@
 #include <QAction>
 
 class ColumnVisibilityDialog : public QDialog {
-public:
-  explicit ColumnVisibilityDialog(const QStringList& headers,
-                                  const QString& initSwitches,
-                                  const QString& name = "",
-                                  QWidget* parent = nullptr);
+ public:
+  static std::pair<QString, bool> GetSwitches(const QStringList& headers,
+                                              const QString& initSwitches,
+                                              const QString& name = "",
+                                              QWidget* parent = nullptr);
+
+  explicit ColumnVisibilityDialog(const QStringList& headers, const QString& initSwitches, const QString& name = "", QWidget* parent = nullptr);
+
   void setAllCheckboxes(bool checked);
   void toggleAllCheckboxes();
   void revertCheckboxes(const QString& initSwitches);
   QString getSwitches() const;
   void showEvent(QShowEvent* event) override;
 
-private:
+ private:
   QToolButton* mSelectToolButton{nullptr};
-  QFormLayout *m_layout{nullptr};
+  QFormLayout* m_layout{nullptr};
   QDialogButtonBox* buttons{nullptr};
   QList<QCheckBox*> m_checkboxes;
-  QAction *mSelectAll{nullptr};
-  QAction *mDeselectAll{nullptr};
-  QAction *mInvertSelect{nullptr};
-  QAction *mRevertChange{nullptr};
+  QAction* mSelectAll{nullptr};
+  QAction* mDeselectAll{nullptr};
+  QAction* mInvertSelect{nullptr};
+  QAction* mRevertChange{nullptr};
 };
 
-#endif // COLUMNVISIBILITYDIALOG_H
+#endif  // COLUMNVISIBILITYDIALOG_H
