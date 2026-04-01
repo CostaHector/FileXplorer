@@ -2,17 +2,23 @@
 #include "FileOpActs.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
+#include "RightClickMenu.h"
+
 #include "ViewActions.h"
 #include "ViewHelper.h"
 #include "RateHelper.h"
 #include "NotificatorMacro.h"
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QHeaderView>
 #include <QMouseEvent>
 
 FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* parent) //
   : CustomTableView{"FILE_SYSTEM", parent}
   , _fsModel{fsmModel} { //
-  CHECK_NULLPTR_RETURN_VOID(_fsModel)
+  CHECK_NULLPTR_RETURN_VOID(_fsModel);
   PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(_fsModel);
 
@@ -22,9 +28,6 @@ FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* par
   setDropIndicatorShown(true);
 
   subscribe();
-
-  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   InitTableView();
 }

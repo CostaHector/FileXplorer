@@ -10,6 +10,7 @@
 #include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
 
+#include <QHeaderView>
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>

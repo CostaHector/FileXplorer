@@ -113,7 +113,7 @@ QTableView::item:hover {
 }
 
 QTreeView {
-    show-decoration-selected: 1;
+    show-decoration-selected: 0;
 }
 QTreeView::item:alternate {
 }

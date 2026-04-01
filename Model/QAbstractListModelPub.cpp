@@ -69,14 +69,32 @@ bool QAbstractListModelPub::RowsCountEndChange() {
   return true;
 }
 
-int QAbstractListModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback) {
+int QAbstractListModelPub::onRowsRangeListRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeListRemoveCallback fCallback) {
   if (indexes.isEmpty()) {
     LOG_D("Indexes list empty. skip");
     return 0;
   }
-  // 获取有效行
+  // 获取有效行(按照行号升序, 且无重复元素)
   QList<int> validRows = ModelTools::GetIndexesRows(indexes);
-  // 合并行号到区间
+  // 合并行号到区间(保持升序, 例如输入{0,1,3,4,5} -> 输出{{0,1}, {3,5}})
+  QList<std::pair<int, int>> ranges = ModelTools::MergeList2SectionsRange(validRows);
+  // 倒序删行区间
+  if (fCallback) {
+    beginResetModel();
+    fCallback(ranges);
+    endResetModel();
+  }
+  return validRows.size();
+}
+
+int QAbstractListModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeRemoveCallback fCallback) {
+  if (indexes.isEmpty()) {
+    LOG_D("Indexes list empty. skip");
+    return 0;
+  }
+  // 获取有效行(按照行号升序, 且无重复元素)
+  QList<int> validRows = ModelTools::GetIndexesRows(indexes);
+  // 合并行号到区间(保持升序, 例如输入{0,1,3,4,5} -> 输出{{0,1}, {3,5}})
   QList<std::pair<int, int>> ranges = ModelTools::MergeList2SectionsRange(validRows);
   // 倒序删行区间
   {
@@ -85,7 +103,9 @@ int QAbstractListModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelTo
       int frontRow = it->first;
       int backRow = it->second;
       if (fCallback) {
+        // beginRemoveRows({}, frontRow, backRow);
         fCallback(frontRow, backRow + 1);
+        // endRemoveRows();
       }
     }
     endResetModel();

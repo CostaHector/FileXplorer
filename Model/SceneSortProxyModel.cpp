@@ -1,13 +1,15 @@
 #include "SceneSortProxyModel.h"
 #include "Bool2QtEnum.h"
 
-void SceneSortProxyModel::initSortProxy(SceneInfo::Role initRole, bool bReverseOrder) {
-  if (!isSortProxyInited()) {
-    setSortRole(initRole);
-    mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
-    sort(SceneInfo::SORT_COLUMN, mSortOrder);
-    m_bSortProxyInited = true;
+bool SceneSortProxyModel::initSortSetting(SceneInfo::Role initRole, bool bReverseOrder) {
+  if (isSortProxyInited()) {
+    return false;
   }
+  setSortRole(initRole);
+  mSortOrder = Bool2QtEnum::toSortOrder(bReverseOrder);
+  sort(SceneInfo::SORT_COLUMN, mSortOrder);
+  m_bSortProxyInited = true;
+  return true;
 }
 
 bool SceneSortProxyModel::setSortOrder(bool bReverseOrder) {

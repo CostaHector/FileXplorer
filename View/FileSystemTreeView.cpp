@@ -4,42 +4,37 @@
 #include "MemoryKey.h"
 
 #include "RightClickMenuActions.h"
+#include "RightClickMenu.h"
 #include "FileOpActs.h"
 #include "RenameActions.h"
 #include "ViewActions.h"
 #include <QHeaderView>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
 #include <QMouseEvent>
 
 FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* parent)  //
-    : QTreeView{parent}, _fsModel{fsmModel}                                         //
+    : CustomTreeView{"FILE_SYSTEM_TREE", parent}, _fsModel{fsmModel}                                         //
 {
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
-  m_menu = new (std::nothrow) QMenu{"Tree right click menu", this};
-  CHECK_NULLPTR_RETURN_VOID(m_menu);
-  m_menu->setToolTipsVisible(true);
-  m_menu->addActions(GetRightClickMenuActions(this));
-
+  PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(fsmModel);
-  InitViewSettings();
 
+  setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
+
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
 
-  const int fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(font());
-  defaultFont.setPointSize(fontSize);
-  setFont(defaultFont);
-
+  InitTreeView();
   FileSystemTreeView::subscribe();
 }
 
 void FileSystemTreeView::subscribe() {
-  connect(header(), &QHeaderView::sectionResized, this, [this]() { Configuration().setValue("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW", header()->saveState()); });
-
   addAction(g_rightClickActions()._CALC_MD5_ACT);
   addAction(g_rightClickActions()._PROPERTIES);
 
@@ -57,23 +52,6 @@ void FileSystemTreeView::subscribe() {
   addActions(FileOpActs::GetInst().SELECTION_RIBBONS->actions());
   addActions(FileOpActs::GetInst().DELETE_ACTIONS->actions());
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
-}
-
-auto FileSystemTreeView::InitViewSettings() -> void {
-  //  setShowGrid(false);
-  setAlternatingRowColors(true);
-  setSortingEnabled(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  if (Configuration().contains("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW")) {
-    header()->restoreState(Configuration().value("FILE_EXPLORER_HEADER_GEOMETRY_TREE_VIEW").toByteArray());
-  }
-  sizeHintForRow(StyleSheet::ROW_SECTION_HEIGHT);
-  FileSystemTreeView::UpdateItemViewFontSize();
-}
-
-auto FileSystemTreeView::UpdateItemViewFontSize() -> void {
-  View::UpdateItemViewFontSizeCore(this);
 }
 
 void FileSystemTreeView::dropEvent(QDropEvent* event) {
@@ -98,14 +76,6 @@ void FileSystemTreeView::keyPressEvent(QKeyEvent* e) {
     return;
   }
   QTreeView::keyPressEvent(e);
-}
-
-void FileSystemTreeView::contextMenuEvent(QContextMenuEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  CHECK_NULLPTR_RETURN_VOID(m_menu);
-#ifndef RUNNING_UNIT_TESTS
-  m_menu->popup(viewport()->mapToGlobal(event->pos()));  // or QCursor::pos()
-#endif
 }
 
 void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {

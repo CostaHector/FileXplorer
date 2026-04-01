@@ -21,6 +21,7 @@ signals:
 public slots:
   bool onHideThisColumnTriggered();
   bool onColumnVisibilityAdjust();
+  void onShowAllColumns();
 
 protected:
   void InitHorHeaderTitles(QStringList& newTitles) const;

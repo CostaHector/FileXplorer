@@ -12,11 +12,11 @@ const QString& HorMenuInHeader::DEFAULT_SWITCHES() {
   return defSwitches;
 }
 
-HorMenuInHeader::HorMenuInHeader(const QString &proName, QWidget *parent)
-  : MenuInHeader{proName, Qt::Orientation::Horizontal, parent}
-  , m_columnVisibiltyKey{GetName() + "_COLUMN_VISIBILITY"}
-  , m_sortByColumnSwitchKey{GetName() + "_SORT_BY_COLUMN_SWITCH"}
-  , m_columnsShowSwitch{Configuration().value(m_columnVisibiltyKey, DEFAULT_SWITCHES()).toString()} {
+HorMenuInHeader::HorMenuInHeader(const QString& proName, QWidget* parent)
+    : MenuInHeader{proName, Qt::Orientation::Horizontal, parent},
+      m_columnVisibiltyKey{GetName() + "_COLUMN_VISIBILITY"},
+      m_sortByColumnSwitchKey{GetName() + "_SORT_BY_COLUMN_SWITCH"},
+      m_columnsShowSwitch{Configuration().value(m_columnVisibiltyKey, DEFAULT_SWITCHES()).toString()} {
   _COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, tr("Column visibility"), this);
   _HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, tr("Hide this column"), this);
 
@@ -24,7 +24,7 @@ HorMenuInHeader::HorMenuInHeader(const QString &proName, QWidget *parent)
   _ENABLE_COLUMN_SORT->setCheckable(true);
   _ENABLE_COLUMN_SORT->setChecked(Configuration().value(m_sortByColumnSwitchKey, true).toBool());
   _ENABLE_COLUMN_SORT->setToolTip(QString("<b>%1 (%2)</b><br/> Enable/Disable sort by click on horizontal header")
-                                     .arg(_ENABLE_COLUMN_SORT->text(), _ENABLE_COLUMN_SORT->shortcut().toString()));
+                                      .arg(_ENABLE_COLUMN_SORT->text(), _ENABLE_COLUMN_SORT->shortcut().toString()));
 
   AddActionToMenu(nullptr);
   AddActionToMenu(_COLUMNS_VISIBILITY);
@@ -51,15 +51,15 @@ bool HorMenuInHeader::onHideThisColumnTriggered() {
   }
   if (isColumnHidden(clickedSection)) {
     LOG_INFO_P("[Skip] Column already hide", "Select another column[not col %d] to hide", clickedSection);
-    return true;
+    return false;
   }
   m_columnsShowSwitch[clickedSection] = SW_OFF;
-  emit reqHideAColumn(clickedSection, true); // tableview call setColumnHidden(clickedSection, true);
+  emit reqHideAColumn(clickedSection, true);  // tableview call setColumnHidden(clickedSection, true);
   return true;
 }
 
 bool HorMenuInHeader::onColumnVisibilityAdjust() {
-  auto *model_ = this->model();
+  auto* model_ = this->model();
   CHECK_NULLPTR_RETURN_FALSE(model_)
 
   const int tableColumnsCount{count()};
@@ -76,28 +76,30 @@ bool HorMenuInHeader::onColumnVisibilityAdjust() {
   }
 
   // get column title(s)
-#ifdef RUNNING_UNIT_TESTS
-  m_columnsShowSwitch = UserSpecifiedIntValueMock::mockColumnsShowSwitch();
-#else
-  ColumnVisibilityDialog dialog{getTitles(), tempSwitches, GetName(), this};
-  if (dialog.exec() != QDialog::Accepted) {
-    LOG_I("User canceled column visibility change");
+  bool bAccepted{false};
+  QString newSwitches;
+  std::tie(newSwitches, bAccepted) = ColumnVisibilityDialog::GetSwitches(getTitles(), tempSwitches, GetName(), this);
+  if (!bAccepted) {
     return false;
   }
-  m_columnsShowSwitch = dialog.getSwitches();
-#endif
+  m_columnsShowSwitch.swap(newSwitches);
 
   emit reqUpdateColumnVisibilty();
   return true;
 }
 
-const QStringList &HorMenuInHeader::getTitles() const { //
+void HorMenuInHeader::onShowAllColumns() {
+  m_columnsShowSwitch.replace(SW_OFF, SW_ON);
+  emit reqUpdateColumnVisibilty();
+}
+
+const QStringList& HorMenuInHeader::getTitles() const {  //
   if (m_horHeaderTitles.isEmpty()) {
-    if (const QAbstractItemModel *pModel = model()) {
+    if (const QAbstractItemModel* pModel = model()) {
       QStringList titlesTempList;
       const int columnCount = pModel->columnCount();
       for (int col = 0; col < columnCount; ++col) {
-        const QString &headTitle = pModel->headerData(col, Qt::Orientation::Horizontal, Qt::DisplayRole).toString();
+        const QString& headTitle = pModel->headerData(col, Qt::Orientation::Horizontal, Qt::DisplayRole).toString();
         titlesTempList.push_back(headTitle);
       }
       InitHorHeaderTitles(titlesTempList);
@@ -106,6 +108,6 @@ const QStringList &HorMenuInHeader::getTitles() const { //
   return m_horHeaderTitles;
 }
 
-void HorMenuInHeader::InitHorHeaderTitles(QStringList &newTitles) const {
+void HorMenuInHeader::InitHorHeaderTitles(QStringList& newTitles) const {
   m_horHeaderTitles.swap(newTitles);
 }

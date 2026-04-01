@@ -4,17 +4,13 @@
 
 template <typename SceneElementType>
 void PaginatedList<SceneElementType>::setData(SceneElementTypeList newEntryList) {
-  int startIndex{-1}, endIndex{-1};
-  std::tie(startIndex, endIndex) = GetEntryIndexBE(mPerPageEleCnt, GetCurPageIndex(), newEntryList.size());
-
   const int beforePageCnt{GetPageCnt()};
   if (mBeforeDataResetFunc) {
     mBeforeDataResetFunc();
   }
   mDataList.swap(newEntryList);
   sort();
-  mCurPageStart = startIndex;
-  mCurPageEnd = endIndex;
+  UpdatePageStartAndEndIndex();
   if (mAfterDataResetFunc) {
     mAfterDataResetFunc();
   }
@@ -33,7 +29,8 @@ bool PaginatedList<SceneElementType>::sort() {
   }
   if (m_sortResultReverse) {
     auto localSorter = m_sorter;
-    std::sort(mDataList.begin(), mDataList.end(), [localSorter](const SceneElementType& lhs, const SceneElementType& rhs) -> bool { return localSorter(rhs, lhs); });
+    std::sort(mDataList.begin(), mDataList.end(),
+              [localSorter](const SceneElementType& lhs, const SceneElementType& rhs) -> bool { return localSorter(rhs, lhs); });
   } else {
     std::sort(mDataList.begin(), mDataList.end(), m_sorter);
   }
@@ -48,19 +45,13 @@ bool PaginatedList<SceneElementType>::setPerPageEleCnt(int newPerPage) {
     LOG_D("scenes count per page remains: %d", befPerPage);
     return false;
   }
-  int startIndex{-1}, endIndex{-1};
   if (newPerPage == 0) {
     LOG_W("none in one page");
-    startIndex = 0;
-    endIndex = 0;
   } else if (newPerPage < 0) {
     LOG_D("all items in one page");
-    startIndex = 0;
-    endIndex = GetGlbEleCnt();
     newPerPage = GetGlbEleCnt();
   } else {
     LOG_D("%d items in one page", newPerPage);
-    std::tie(startIndex, endIndex) = GetEntryIndexBE(newPerPage, GetCurPageIndex(), GetGlbEleCnt());
   }
 
   const int beforePageCnt{GetPageCnt()};
@@ -68,8 +59,7 @@ bool PaginatedList<SceneElementType>::setPerPageEleCnt(int newPerPage) {
     mBeforeDataResetFunc();
   }
   mPerPageEleCnt = newPerPage;
-  mCurPageStart = startIndex;
-  mCurPageEnd = endIndex;
+  UpdatePageStartAndEndIndex();
   if (mAfterDataResetFunc) {
     mAfterDataResetFunc();
   }
@@ -93,16 +83,12 @@ bool PaginatedList<SceneElementType>::setCurPageIndex(int newPageIndex) {
     return false;
   }
 
-  int startIndex{-1}, endIndex{-1};
-  std::tie(startIndex, endIndex) = GetEntryIndexBE(GetPerPageEleCnt(), newPageIndex, GetGlbEleCnt());
-
   // Don't use RowsCountBeginChange, RowsCountEndChange(); here. QPixmap Image varies here
   if (mBeforeDataResetFunc) {
     mBeforeDataResetFunc();
   }
   mCurPageIndex = newPageIndex;
-  mCurPageStart = startIndex;
-  mCurPageEnd = endIndex;
+  UpdatePageStartAndEndIndex();
   if (mAfterDataResetFunc) {
     mAfterDataResetFunc();
   }
@@ -144,29 +130,51 @@ bool PaginatedList<SceneElementType>::setSortResultReverse(bool bResultReverse) 
   return true;
 }
 
-// ----------
-
 template <typename SceneElementType>
-PaginatedListRangeEraseGuard<SceneElementType>::PaginatedListRangeEraseGuard(PaginatedList<SceneElementType>* spyList)  //
-    : mSpyList{spyList}, mBeforePageCnt{spyList == nullptr ? 0 : spyList->GetPageCnt()} {
-  CHECK_NULLPTR_RETURN_VOID(spyList);
+typename PaginatedList<SceneElementType>::TRangeEraserCallback PaginatedList<SceneElementType>::GetRangeEraser() {
+  return std::bind(&PaginatedList<SceneElementType>::EraseRange, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 template <typename SceneElementType>
-PaginatedListRangeEraseGuard<SceneElementType>::~PaginatedListRangeEraseGuard() {
-  CHECK_NULLPTR_RETURN_VOID(mSpyList);
-  const int afterPageCnt{mSpyList->GetPageCnt()};
-  if (afterPageCnt != mBeforePageCnt) {
-    if (mSpyList->mEmitPageCntChangedFunc) {
-      mSpyList->mEmitPageCntChangedFunc(afterPageCnt);
+typename PaginatedList<SceneElementType>::TRangeListEraserCallback PaginatedList<SceneElementType>::GetRangeListEraser() {
+  return std::bind(&PaginatedList<SceneElementType>::EraseRangeList, this, std::placeholders::_1);
+}
+
+template <typename SceneElementType>
+void PaginatedList<SceneElementType>::EraseRange(int beg, int end) {
+  if (beg >= end) {
+    return;
+  }
+  int frontRow = beg;
+  int backRow = end - 1;
+  QList<std::pair<int, int>> rangeLst{{frontRow, backRow}};
+  EraseRangeList(rangeLst);
+}
+
+template <typename SceneElementType>
+void PaginatedList<SceneElementType>::EraseRangeList(const QList<std::pair<int, int>>& rangeLst) {
+  // rangeLst: {{front0, back0}, {front1, back1}}, 升序
+  // 删除元素后, 需要刷新当前页的索引端点, 同时页数也可能变化, 页码保持不变
+  if (rangeLst.isEmpty()) {
+    return;
+  }
+  const int mBeforePageCnt{GetPageCnt()};
+  for (auto it = rangeLst.rbegin(); it != rangeLst.rend(); ++it) {
+    int beginRow = it->first;
+    int endRow = it->second + 1;
+    if (beginRow < endRow) {
+      mDataList.erase(mDataList.begin() + mCurPageStart + beginRow, mDataList.begin() + mCurPageStart + endRow);
     }
   }
-  mSpyList->UpdatePageStartAndEndIndex();
-  mSpyList = nullptr;
+  UpdatePageStartAndEndIndex();
+  const int afterPageCnt{GetPageCnt()};
+  if (afterPageCnt != mBeforePageCnt) {
+    if (mEmitPageCntChangedFunc) {
+      mEmitPageCntChangedFunc(afterPageCnt);
+    }
+  }
 }
 
 #include "SceneInfo.h"
 template class PaginatedList<SceneInfo>;
 template class PaginatedList<int>;
-template class PaginatedListRangeEraseGuard<SceneInfo>;
-template class PaginatedListRangeEraseGuard<int>;

@@ -22,7 +22,7 @@ class QAbstractTableModelPub : public QAbstractTableModel {
   template <typename Swappable2DimContainerDataType>
   void DimensionCountChange(Swappable2DimContainerDataType& lhs, Swappable2DimContainerDataType& rhs, const DataChangeRangeE changeRangeE=DataChangeRangeE::ROW);
 
-  int onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRemoveElementsCallback fCallback);
+  int onRowsRemoved(const QModelIndexList& indexes, ModelTools::FuncRangeRemoveCallback fCallback);
 
  private:
   struct DimensionRange {

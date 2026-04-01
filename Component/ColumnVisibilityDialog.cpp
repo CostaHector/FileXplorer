@@ -5,6 +5,18 @@
 #include <QAction>
 #include <QMenu>
 
+std::pair<QString, bool> ColumnVisibilityDialog::GetSwitches(const QStringList& headers,
+                                                             const QString& initSwitches,
+                                                             const QString& name,
+                                                             QWidget* parent) {  //
+  ColumnVisibilityDialog dialog{headers, initSwitches, name, parent};
+  if (dialog.exec() != QDialog::Accepted) {
+    LOG_I("User canceled column visibility change");
+    return {"", false};
+  }
+  return {dialog.getSwitches(), true};
+}
+
 ColumnVisibilityDialog::ColumnVisibilityDialog(const QStringList& headers, const QString& initSwitches, const QString& name, QWidget* parent)
     : QDialog{parent} {
   if (initSwitches.size() < headers.size()) {

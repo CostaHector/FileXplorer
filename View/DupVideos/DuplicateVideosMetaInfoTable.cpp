@@ -15,20 +15,15 @@
 #include <QMimeData>
 #include <QUrl>
 
-DuplicateVideosMetaInfoTable::DuplicateVideosMetaInfoTable(QWidget* parent)
-  : CustomTableView{"AiMediaDupTableView", parent} {
-
-  auto& agInst = g_dupVidFinderAg();
-  m_menu->addAction(agInst.ANALYSE_THESE_TABLES);
-  m_menu->addSeparator();
-  m_menu->addAction(agInst.SCAN_A_PATH);
-  m_menu->addAction(agInst.FORCE_RELOAD_TABLES);
-  m_menu->addAction(agInst.AUDIT_THESE_TABLES);
-  m_menu->addSeparator();
-  m_menu->addAction(agInst.DROP_THESE_TABLES);
-  m_menu->addSeparator();
-  m_menu->addAction(agInst.CLEAR_ANALYSIS_LIST);
-  AddItselfAction2Menu();
+DuplicateVideosMetaInfoTable::DuplicateVideosMetaInfoTable(QWidget* parent) : CustomTableView{"AiMediaDupTableView", parent} {
+  {
+    auto& agInst = g_dupVidFinderAg();
+    QList<QAction*> exclusiveActs{
+        agInst.ANALYSE_THESE_TABLES, agInst.SCAN_A_PATH,       agInst.FORCE_RELOAD_TABLES,
+        agInst.AUDIT_THESE_TABLES,   agInst.DROP_THESE_TABLES, agInst.CLEAR_ANALYSIS_LIST,
+    };
+    PushFrontExclusiveActions(exclusiveActs);
+  }
 
   m_aiMediaTblModel = new (std::nothrow) DuplicateVideosMetaInfoModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_aiMediaTblModel);
@@ -57,10 +52,10 @@ QStringList DuplicateVideosMetaInfoTable::GetSelectedAiTables() const {
 
 QString DuplicateVideosMetaInfoTable::GetCurrentDupVideoMetaInfo() const {
   const int actualTablesCount = m_aiMediaTblModel->rowCount();
-  return QString("Analysed %1 videos in %2 tables") //
-      .arg(mVideosListNeedAnalyse.size())           //
-      .arg(actualTablesCount)                       //
-      ;                                             //
+  return QString("Analysed %1 videos in %2 tables")  //
+      .arg(mVideosListNeedAnalyse.size())            //
+      .arg(actualTablesCount)                        //
+      ;                                              //
 }
 
 int DuplicateVideosMetaInfoTable::onAnalyzeTheseSelectedTables() {
@@ -88,10 +83,10 @@ int DuplicateVideosMetaInfoTable::startAnalyzeNewTables(const QStringList& table
 
 bool DuplicateVideosMetaInfoTable::onScanAPath(const QString& specifiedPath) {
   QString loadFromPath;
-  if (specifiedPath.isEmpty()) { // ask user to select
+  if (specifiedPath.isEmpty()) {  // ask user to select
     const QString& defaultOpenDir = Configuration().value("DUPLICATE_VIDEOS_SELECT_FROM", ".").toString();
     loadFromPath = QFileDialog::getExistingDirectory(this, "Learn From", defaultOpenDir);
-  } else { // from input directly
+  } else {  // from input directly
     loadFromPath = specifiedPath;
   }
   QFileInfo loadFromFi(loadFromPath);
@@ -183,10 +178,7 @@ bool DuplicateVideosMetaInfoTable::onDropSelectedTables() {
   }
   QMessageBox::StandardButton ret = QMessageBox::StandardButton::Yes;
 #ifndef RUNNING_UNIT_TESTS
-  ret = QMessageBox::warning(this,
-                             "Drop selected tables?",
-                             "Cannot recover",
-                             QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
+  ret = QMessageBox::warning(this, "Drop selected tables?", "Cannot recover", QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
                              QMessageBox::StandardButton::No);
 #endif
   if (ret != QMessageBox::StandardButton::Yes) {
@@ -219,11 +211,8 @@ bool DuplicateVideosMetaInfoTable::onForceReloadTables() {
   }
   QMessageBox::StandardButton ret = QMessageBox::StandardButton::Yes;
 #ifndef RUNNING_UNIT_TESTS
-  ret = QMessageBox::warning(this,
-                             "Drop & Rebuild selected tables?",
-                             "If disk is offline, skip it",
-                             QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
-                             QMessageBox::StandardButton::No);
+  ret = QMessageBox::warning(this, "Drop & Rebuild selected tables?", "If disk is offline, skip it",
+                             QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No, QMessageBox::StandardButton::No);
 #endif
   if (ret != QMessageBox::StandardButton::Yes) {
     LOG_OK_NP("Skip", "User has cancel drop&rebuild table");

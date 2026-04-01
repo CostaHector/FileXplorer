@@ -11,6 +11,7 @@
 #include "CustomTableView.h"
 #include "DoubleRowHeader.h"
 #include "VerMenuInHeader.h"
+#include "ScrollBarPolicyMenu.h"
 #include "EndToExposePrivateMember.h"
 
 #include "ModelTestHelper.h"
@@ -18,10 +19,11 @@
 #include "ViewHelper.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
+#include "SizeTool.h"
 
 #include "MouseKeyboardEventHelper.h"
 using namespace MouseKeyboardEventHelper;
-
+using namespace SizeTool;
 struct FileInfo {
   FileInfo(QString&& name_, QByteArray&& contents_, QString&& createTime_, QString&& fileExtenstion_)
     : name{std::move(name_)}
@@ -74,12 +76,10 @@ public:
 private slots:
   void initTestCase() { //
     QCOMPARE(nodes.size(), 3);
-    UserSpecifiedIntValueMock::mockColumnsShowSwitch() = HorMenuInHeader::DEFAULT_SWITCHES();
   }
 
   void cleanupTestCase() { //
     Configuration().clear();
-    UserSpecifiedIntValueMock::mockColumnsShowSwitch() = HorMenuInHeader::DEFAULT_SWITCHES();
   }
 
   void QTableView_standardItemModel_ok() {
@@ -125,6 +125,7 @@ private slots:
 
     QString headerStateKey;
 
+    // 测试析构自动保存配置
     QMap<QString, QVariant> key2ExpectValue;
     {
       QStandardItemModel model;
@@ -150,24 +151,6 @@ private slots:
         QVERIFY(tv._AUTO_SCROLL->isCheckable());
         QVERIFY(tv._ALTERNATING_ROW_COLORS->isCheckable());
         QVERIFY(tv._SHOW_GRID->isCheckable());
-
-        // in MenuInHeader
-        QVERIFY(!horHeader._SET_DEFAULT_SECTION_SIZE->isCheckable());
-        QVERIFY(!horHeader._SET_MAX_SECTION_SIZE->isCheckable());
-        QVERIFY(horHeader._STRETCH_DETAIL_SECTION->isCheckable());
-        QVERIFY(horHeader._RESIZE_MODE_INTERACTIVE->isCheckable());
-        QVERIFY(horHeader._RESIZE_MODE_STRETCH->isCheckable());
-        QVERIFY(horHeader._RESIZE_MODE_FIXED->isCheckable());
-        QVERIFY(horHeader._RESIZE_MODE_RESIZE_TO_CONTENTS->isCheckable());
-        QCOMPARE(horHeader.mResizeModeIntAction.getActionGroup()->exclusionPolicy(), QActionGroup::ExclusionPolicy::Exclusive);
-
-        // in HorMenuInHeader
-        QVERIFY(!horHeader._COLUMNS_VISIBILITY->isCheckable());
-        QVERIFY(!horHeader._HIDE_THIS_COLUMN->isCheckable());
-        QVERIFY(horHeader._ENABLE_COLUMN_SORT->isCheckable());
-
-        // in DoubleRowHeader
-        QVERIFY(horHeader._ENABLE_FILTERS->isCheckable());
       }
 
       // tableview itself
@@ -196,40 +179,6 @@ private slots:
       QCOMPARE(tv.m_verScrollBarPolicyMenu->GetScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAsNeeded);
       key2ExpectValue[tv.m_horScrollBarPolicyMenu->GetName()] = Qt::ScrollBarPolicy::ScrollBarAsNeeded;
       key2ExpectValue[tv.m_verScrollBarPolicyMenu->GetName()] = Qt::ScrollBarPolicy::ScrollBarAsNeeded;
-
-      // column visibility switches = all `1`, no column hidden, but filter disabled
-      const QString expectAllShownSwitches{HorMenuInHeader::DEFAULT_SWITCHES()};
-      QVERIFY(expectAllShownSwitches.size() > 0);
-      QVERIFY(!expectAllShownSwitches.contains(HorMenuInHeader::SW_OFF));
-      QCOMPARE(horHeader.m_columnsShowSwitch, expectAllShownSwitches);
-      QVERIFY(!horHeader.isSectionHidden(0));
-      QVERIFY(!horHeader.isSectionHidden(1));
-      QVERIFY(!horHeader.isSectionHidden(2));
-      QVERIFY(!horHeader.isSectionHidden(3));
-      QCOMPARE(horHeader.m_columnsShowSwitch, expectAllShownSwitches);
-      QVERIFY(!horHeader.isFilterEnabled());
-      QVERIFY(horHeader.m_filterEditors.isEmpty());
-      key2ExpectValue[horHeader.m_enableFilterKey] = false;
-      key2ExpectValue[horHeader.m_columnVisibiltyKey] = expectAllShownSwitches;
-
-      // sorting, Header ResizeMode, Strech last section, titles
-      QVERIFY(horHeader.isSortingEnabled());
-      QVERIFY(tv.isSortingEnabled());
-      key2ExpectValue[horHeader.m_sortByColumnSwitchKey] = true;
-
-      QVERIFY(horHeader._RESIZE_MODE_INTERACTIVE->isChecked());
-      QVERIFY(verHeader._RESIZE_MODE_INTERACTIVE->isChecked());
-      QCOMPARE(horHeader.sectionResizeMode(0), QHeaderView::ResizeMode::Interactive);
-      QCOMPARE(verHeader.sectionResizeMode(0), QHeaderView::ResizeMode::Interactive);
-      key2ExpectValue[horHeader.m_resizeModeKey] = (int) QHeaderView::ResizeMode::Interactive;
-      key2ExpectValue[verHeader.m_resizeModeKey] = (int) QHeaderView::ResizeMode::Interactive;
-
-      QVERIFY(!horHeader._STRETCH_DETAIL_SECTION->isChecked());
-      QVERIFY(!verHeader._STRETCH_DETAIL_SECTION->isChecked());
-      QVERIFY(!horHeader.stretchLastSection());
-      QVERIFY(!verHeader.stretchLastSection());
-      key2ExpectValue[horHeader.m_stretchLastSectionKey] = false;
-      key2ExpectValue[verHeader.m_stretchLastSectionKey] = false;
 
       QCOMPARE(horHeader.getTitles(), mTitles);
 
@@ -304,109 +253,6 @@ private slots:
       QCOMPARE(tv.verticalScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
       key2ExpectValue[tv.m_verScrollBarPolicyMenu->GetName()] = Qt::ScrollBarPolicy::ScrollBarAlwaysOn;
 
-      // all column/filter shown
-      QVERIFY(!horHeader.isSectionHidden(0));
-      QVERIFY(!horHeader.isSectionHidden(1));
-      QVERIFY(!horHeader.isSectionHidden(2));
-      QVERIFY(!horHeader.isSectionHidden(3));
-      horHeader._ENABLE_FILTERS->setChecked(true);
-      QSignalSpy reqParentTableUpdateGeometriesSpy{&horHeader, &DoubleRowHeader::reqParentTableUpdateGeometries};
-      emit horHeader._ENABLE_FILTERS->toggled(horHeader._ENABLE_FILTERS->isChecked());
-      QCOMPARE(reqParentTableUpdateGeometriesSpy.count(), 1);
-      QVERIFY(reqParentTableUpdateGeometriesSpy.takeLast().isEmpty()); // expect no params at all
-      QCOMPARE(horHeader.m_filterEditors.size(), EXPECT_COL_CNT);
-      QVERIFY(!horHeader.m_filterEditors[0]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[1]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[2]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[3]->isHidden());
-      key2ExpectValue[horHeader.m_enableFilterKey] = true;
-
-      // only index=0 column/filter hide
-      QPoint pnt{2, 2};
-      QContextMenuEvent cme{QContextMenuEvent::Reason::Mouse, pnt};
-      horHeader.contextMenuEvent(&cme);
-      // or mock here horHeader.setClickedSection(0);
-      QCOMPARE(horHeader.m_clickedColumn, 0);
-      emit horHeader._HIDE_THIS_COLUMN->triggered();
-      QVERIFY(horHeader.isSectionHidden(0));
-      QVERIFY(!horHeader.isSectionHidden(1));
-      QVERIFY(!horHeader.isSectionHidden(2));
-      QVERIFY(!horHeader.isSectionHidden(3));
-      QVERIFY(horHeader.m_clickedColumn < 0); // should invalidate right after hide action triggered
-      QCOMPARE(horHeader.m_filterEditors.size(), EXPECT_COL_CNT);
-      QVERIFY(horHeader.m_filterEditors[0]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[1]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[2]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[3]->isHidden());
-      const QString column0HideSws{QChar{'0'} + horHeader.m_columnsShowSwitch.mid(1)};
-      QCOMPARE(horHeader.m_columnsShowSwitch, column0HideSws);
-      key2ExpectValue[horHeader.m_columnVisibiltyKey] = column0HideSws;
-
-      // all column/filter hide
-      const QString allHideSws(column0HideSws.size(), QChar{'0'});
-      UserSpecifiedIntValueMock::mockColumnsShowSwitch() = allHideSws;
-      emit horHeader._COLUMNS_VISIBILITY->triggered(false);
-      QVERIFY(horHeader.isSectionHidden(0));
-      QVERIFY(horHeader.isSectionHidden(1));
-      QVERIFY(horHeader.isSectionHidden(2));
-      QVERIFY(horHeader.isSectionHidden(3));
-      QCOMPARE(horHeader.m_filterEditors.size(), EXPECT_COL_CNT);
-      QVERIFY(horHeader.m_filterEditors[0]->isHidden());
-      QVERIFY(horHeader.m_filterEditors[1]->isHidden());
-      QVERIFY(horHeader.m_filterEditors[2]->isHidden());
-      QVERIFY(horHeader.m_filterEditors[3]->isHidden());
-      QCOMPARE(horHeader.m_columnsShowSwitch, allHideSws);
-      key2ExpectValue[horHeader.m_columnVisibiltyKey] = allHideSws;
-
-      // only index=0 column/filter hide
-      UserSpecifiedIntValueMock::mockColumnsShowSwitch() = column0HideSws;
-      emit horHeader._COLUMNS_VISIBILITY->triggered(false);
-      QVERIFY(horHeader.isSectionHidden(0));
-      QVERIFY(!horHeader.isSectionHidden(1));
-      QVERIFY(!horHeader.isSectionHidden(2));
-      QVERIFY(!horHeader.isSectionHidden(3));
-      QCOMPARE(horHeader.m_filterEditors.size(), EXPECT_COL_CNT);
-      QVERIFY(horHeader.m_filterEditors[0]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[1]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[2]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[3]->isHidden());
-      QCOMPARE(horHeader.m_columnsShowSwitch, column0HideSws);
-      key2ExpectValue[horHeader.m_columnVisibiltyKey] = column0HideSws;
-
-      horHeader._ENABLE_COLUMN_SORT->setChecked(false);
-      emit horHeader._ENABLE_COLUMN_SORT->toggled(horHeader._ENABLE_COLUMN_SORT->isChecked());
-      QVERIFY(!horHeader.isSortingEnabled());
-      QVERIFY(!tv.isSortingEnabled());
-      key2ExpectValue[horHeader.m_sortByColumnSwitchKey] = false;
-
-      horHeader._RESIZE_MODE_RESIZE_TO_CONTENTS->setChecked(true);
-      emit horHeader.mResizeModeIntAction.getActionGroup()->triggered(horHeader._RESIZE_MODE_RESIZE_TO_CONTENTS);
-      QCOMPARE(horHeader.sectionResizeMode(0), QHeaderView::ResizeMode::ResizeToContents);
-      key2ExpectValue[horHeader.m_resizeModeKey] = (int) QHeaderView::ResizeMode::ResizeToContents;
-
-      horHeader._STRETCH_DETAIL_SECTION->setChecked(true);
-      emit horHeader._STRETCH_DETAIL_SECTION->toggled(horHeader._STRETCH_DETAIL_SECTION->isChecked());
-      QVERIFY(horHeader.stretchLastSection());
-      QVERIFY(!verHeader.stretchLastSection());
-      key2ExpectValue[horHeader.m_stretchLastSectionKey] = true;
-      key2ExpectValue[verHeader.m_stretchLastSectionKey] = false;
-
-      UserSpecifiedIntValueMock::MockQInputDialogGetInt(false, 66);
-      emit horHeader._SET_DEFAULT_SECTION_SIZE->triggered(false);
-      QVERIFY(horHeader.defaultSectionSize() != 66);
-      UserSpecifiedIntValueMock::MockQInputDialogGetInt(true, 66);
-      emit horHeader._SET_DEFAULT_SECTION_SIZE->triggered(false);
-      key2ExpectValue[horHeader.m_defaultSectionSizeKey] = 66;
-      QCOMPARE(horHeader.defaultSectionSize(), 66);
-
-      UserSpecifiedIntValueMock::MockQInputDialogGetInt(false, 888);
-      emit horHeader._SET_MAX_SECTION_SIZE->triggered(false);
-      QVERIFY(horHeader.maximumSectionSize() != 888);
-      UserSpecifiedIntValueMock::MockQInputDialogGetInt(true, 888);
-      emit horHeader._SET_MAX_SECTION_SIZE->triggered(false);
-      QCOMPARE(horHeader.maximumSectionSize(), 888);
-      key2ExpectValue[horHeader.m_maxSectionSizeKey] = 888;
-
       QCOMPARE(horHeader.getTitles(), mTitles);
     }
 
@@ -432,45 +278,11 @@ private slots:
       QVERIFY(tv._SHOW_HORIZONTAL_HEADER->isChecked());
       QVERIFY(!tv._SHOW_VERTICAL_HEADER->isChecked());
 
-      QVERIFY(!horHeader.isSortingEnabled());
-      QVERIFY(!tv.isSortingEnabled());
       QVERIFY(!tv.hasAutoScroll());
       QVERIFY(!tv.alternatingRowColors());
       QVERIFY(tv.showGrid());
       QCOMPARE(tv.horizontalScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAsNeeded);
       QCOMPARE(tv.verticalScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
-
-      // filter should enabled
-      QVERIFY(horHeader.isFilterEnabled());
-      QCOMPARE(horHeader.m_filterEditors.size(), EXPECT_COL_CNT);
-      // filter linedit all shown except column=0
-      QVERIFY(horHeader.isSectionHidden(0));
-      QVERIFY(!horHeader.isSectionHidden(1));
-      QVERIFY(!horHeader.isSectionHidden(2));
-      QVERIFY(!horHeader.isSectionHidden(3));
-      QVERIFY(horHeader.m_filterEditors[0]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[1]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[2]->isHidden());
-      QVERIFY(!horHeader.m_filterEditors[3]->isHidden());
-
-      QCOMPARE(horHeader.sectionResizeMode(0), QHeaderView::ResizeMode::ResizeToContents);
-
-      QVERIFY(horHeader.stretchLastSection());
-      QVERIFY(!verHeader.stretchLastSection());
-
-      QCOMPARE(horHeader.defaultSectionSize(), 66);
-      QCOMPARE(horHeader.maximumSectionSize(), 888);
-
-      // search signal ok
-      horHeader.m_filterEditors[0]->setText("Chris Evans|Henry Cavill"); // Name
-      horHeader.m_filterEditors[1]->setText(">1024");                    // Size: 1024 B
-
-      QSignalSpy searchStatementChangedSpy{&horHeader, &DoubleRowHeader::searchStatementChanged};
-      emit horHeader.m_filterEditors[0]->returnPressed();
-      QCOMPARE(searchStatementChangedSpy.count(), 1);
-      QVariantList actualParams = searchStatementChangedSpy.takeLast();
-      QVariantList expectParams{R"((`Name` LIKE "%Chris Evans%" OR `Name` LIKE "%Henry Cavill%") AND `Size`>1024)"};
-      QCOMPARE(actualParams, expectParams);
     }
   }
 

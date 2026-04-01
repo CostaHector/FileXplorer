@@ -2,15 +2,7 @@
 #define FILESYSTEMTABLEVIEW_H
 
 #include "CustomTableView.h"
-#include "RightClickMenu.h"
 #include "FileSystemModel.h"
-
-#include <QDragEnterEvent>
-#include <QDragLeaveEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QMenu>
-#include <QMouseEvent>
 
 class FileSystemTableView : public CustomTableView {
  public:
@@ -18,22 +10,17 @@ class FileSystemTableView : public CustomTableView {
 
   void subscribe();
 
+ protected:
   void dropEvent(QDropEvent* event) override;
-
   void dragEnterEvent(QDragEnterEvent* event) override;
-
   void dragMoveEvent(QDragMoveEvent* event) override;
-
   void dragLeaveEvent(QDragLeaveEvent* event) override;
-
   void mousePressEvent(QMouseEvent* event) override;
-
   void mouseMoveEvent(QMouseEvent* event) override;
-
   void keyPressEvent(QKeyEvent* event) override;
 
  private:
-  FileSystemModel* _fsModel {nullptr};
+  FileSystemModel* _fsModel{nullptr};
   QPoint mDragStartPosition;
 };
 

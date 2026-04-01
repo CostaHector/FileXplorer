@@ -3,13 +3,19 @@
 #include "FileOpActs.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
+#include "RightClickMenu.h"
 #include "ViewActions.h"
 
 #include "FileSystemListView.h"
 #include "ViewHelper.h"
 
-#include <QHeaderView>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QListView>
 #include <QMouseEvent>
+#include <QHeaderView>
 
 FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* parent)  //
     : CustomListView{"FILE_SYSTEM_LIST", parent}, _fsModel{fsmModel}                                       //

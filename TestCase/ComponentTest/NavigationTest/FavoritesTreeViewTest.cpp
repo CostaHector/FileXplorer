@@ -33,7 +33,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void selection_info_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
@@ -101,7 +101,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void reqIntoAPath_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
@@ -140,7 +140,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void onRenameDisplayRole_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
@@ -179,7 +179,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void onAddAGroup_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
     QCOMPARE(view.selectionModel()->hasSelection(), false);
@@ -227,7 +227,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void onRemoveSelection_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
@@ -245,7 +245,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void contextMenuEvent_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     view.contextMenuEvent(nullptr);  // will not crash down
 
@@ -256,7 +256,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void setFilter_filter_proxy_ok() {
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
     QVERIFY(view.mFavProxyModel->m_sourceModel != nullptr);
@@ -295,7 +295,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     FavoriteItemData::SaveInitialSortRole(FavoriteItemData::Role::ACCESS_COUNT_ROLE);
     FavoriteItemData::SaveSortOrderReverse(true);  // reverse
 
-    FavoritesTreeView view{"FavoritesTreeView"};
+    FavoritesTreeView view;
     QCOMPARE(view.mSortReverse->isChecked(), true);
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavProxyModel->isSortProxyInited(), true);
@@ -346,7 +346,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
   }
 
   void D0EV_and_drag_enter_move_drop_ok() {  //
-    std::unique_ptr<FavoritesTreeView> pView{new FavoritesTreeView{"FavoritesTreeView"}};
+    std::unique_ptr<FavoritesTreeView> pView{new FavoritesTreeView};
     QVERIFY(pView);
     pView->mFavModel->setDatas(QByteArray{});
     QCOMPARE(pView->mFavModel->rowCount(), 0);

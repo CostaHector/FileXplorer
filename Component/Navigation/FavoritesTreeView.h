@@ -1,32 +1,31 @@
 #ifndef FAVORITESTREEVIEW_H
 #define FAVORITESTREEVIEW_H
 
-#include <QTreeView>
-#include <QMenu>
-#include "EnumIntAction.h"
+#include "CustomTreeView.h"
 #include "FavoritesTreeModel.h"
 #include "RecursiveFilterProxyTreeModel.h"
+#include "EnumIntAction.h"
 
 extern template struct EnumIntAction<FavoriteItemData::Role>;
 
-class FavoritesTreeView : public QTreeView {
+class FavoritesTreeView : public CustomTreeView {
   Q_OBJECT
  public:
-  explicit FavoritesTreeView(const QString& name = "FavoritesTreeView", QWidget* parent = nullptr);
+  explicit FavoritesTreeView(QWidget* parent = nullptr);
   ~FavoritesTreeView();
   void setFilter(const QString& filter);
-  QString GetName() const { return m_name; }
 
  signals:
   bool reqIntoAPath(QString fullPath, bool isNew);
 
  protected:
-  void contextMenuEvent(QContextMenuEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;
   void dropEvent(QDropEvent* event) override;
 
  private:
+  void subscribe();
+
   bool onRenameDisplayRole();
   bool onAddAGroup();
   int onRemoveSelection();
@@ -39,14 +38,11 @@ class FavoritesTreeView : public QTreeView {
   FavoritesTreeModel* mFavModel{nullptr};
   RecursiveFilterProxyTreeModel* mFavProxyModel{nullptr};
 
-  QMenu* mMenu{nullptr};
   QAction *mExpandAll{nullptr}, *mCollapseAll{nullptr};
 
   QAction* mAnimatedEnableAct{nullptr};
-  QAction* mHeaderHidden{nullptr};
   QAction* mRootDecorationEnabled{nullptr};
 
-  QMenu* mSortRoleMenu{nullptr};
   QAction* mSortByName{nullptr};
   QAction* mSortByIsGroup{nullptr};
   QAction* mSortByFullPathRole{nullptr};
@@ -62,8 +58,6 @@ class FavoritesTreeView : public QTreeView {
   QAction* mAddInitialExamples{nullptr};
   QAction* mNotSavedDatasThisTime{nullptr};
   QAction* mSaveRightNow{nullptr};
-
-  const QString m_name;
 };
 
 #endif  // FAVORITESTREEVIEW_H

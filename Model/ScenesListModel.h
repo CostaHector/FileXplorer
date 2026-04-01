@@ -16,7 +16,7 @@ class ScenesListModel : public QAbstractListModelPub {
  public:
   explicit ScenesListModel(const QString& listViewName, QObject* object = nullptr);
   bool isSortProxyInited() const { return m_bSortProxyInited; }
-  void initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse);
+  bool initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse);
   bool setSortDimension(SceneInfo::Role newSortDimension);
   bool setSortResultReverse(bool bResultReverse);
 

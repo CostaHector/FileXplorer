@@ -5,16 +5,13 @@
 #include <QModelIndex>
 
 template <typename SceneElementType>
-struct PaginatedListRangeEraseGuard;
-
-template <typename SceneElementType>
 class PaginatedList {
  public:
   using TBeforeDataResetCallable = std::function<void()>;
   using TAfterDataResetCallable = std::function<void()>;
   using TEmitPageCntChangedCallable = std::function<void(int)>;
   using TRangeEraserCallback = std::function<void(int, int)>;
-  friend class PaginatedListRangeEraseGuard<SceneElementType>;
+  using TRangeListEraserCallback = std::function<void(const QList<std::pair<int, int>>&)>;
   using SceneElementTypeList = QList<SceneElementType>;
   using SceneElementSorter = bool(*)(const SceneElementType&, const SceneElementType&);
 
@@ -47,23 +44,21 @@ class PaginatedList {
   int toGlobalIndex(int localInd) const { return mCurPageStart + localInd; }
   int GetLocalEleCnt() const { return mCurPageEnd - mCurPageStart; }
   void UpdatePageStartAndEndIndex() { std::tie(mCurPageStart, mCurPageEnd) = GetEntryIndexBE(GetPerPageEleCnt(), GetCurPageIndex(), GetGlbEleCnt()); }
-  TRangeEraserCallback GetRangeEraser() {
-    return [this](int beg, int end) {  //
-      mDataList.erase(mDataList.begin() + mCurPageStart + beg, mDataList.begin() + mCurPageStart + end);
-    };
-  }
   bool setSorter(SceneElementSorter sorter);
   bool setSortResultReverse(bool bResultReverse);
 
   bool sort();
   typename SceneElementTypeList::const_iterator constBeginCurPage() const { return mDataList.cbegin() + mCurPageStart; } // used in SceneSortProxyModel
 
+  TRangeEraserCallback GetRangeEraser();
+  TRangeListEraserCallback GetRangeListEraser();
+
  private:
   typename SceneElementTypeList::const_iterator constEndCurPage() const { return mDataList.cbegin() + mCurPageEnd; }
 
   int GetGlbEleCnt() const { return mDataList.size(); }
   static std::pair<int, int> GetEntryIndexBE(const int perPage, const int pageIndex, const int elesCnt) {
-    if (perPage < 0) {
+    if (perPage <= 0) {
       return std::make_pair(0, elesCnt);
     }
     const int begin = perPage * pageIndex;
@@ -77,6 +72,8 @@ class PaginatedList {
   int GetCurPageIndex() const { return mCurPageIndex; }
   int GetCurPageStart() const { return mCurPageStart; }
   int GetCurPageEnd() const { return mCurPageEnd; }
+  void EraseRange(int beg, int end); // {begin, end}
+  void EraseRangeList(const QList<std::pair<int, int>>& rangeLst); // {front, back}
 
   SceneElementTypeList mDataList;
   int mPerPageEleCnt{40};
@@ -88,17 +85,6 @@ class PaginatedList {
 
   SceneElementSorter m_sorter{nullptr};
   bool m_sortResultReverse{false}; // aka reverse order
-};
-
-template <typename SceneElementType>
-struct PaginatedListRangeEraseGuard {
- public:
-  explicit PaginatedListRangeEraseGuard(PaginatedList<SceneElementType>* spyList);
-  ~PaginatedListRangeEraseGuard();
-
- private:
-  PaginatedList<SceneElementType>* mSpyList{nullptr};
-  const int mBeforePageCnt{0};
 };
 
 #endif  // PAGINATEDLIST_H
