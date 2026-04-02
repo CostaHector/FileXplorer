@@ -197,7 +197,7 @@ bool FavoritesTreeView::onAddAGroup() {
     LOG_INFO_NP("Skip", "User cancel");
     return false;
   }
-  QStandardItem* grpItem = mFavModel->addGroup(grpName, grpOrRootSrcIndex);
+  MyTreeNode* grpItem = mFavModel->addGroup(grpName, grpOrRootSrcIndex);
   bool addResult{grpItem != nullptr};
   LOG_OE_NP(addResult, "Add a group", grpName);
   return addResult;
@@ -298,10 +298,4 @@ void FavoritesTreeView::dragMoveEvent(QDragMoveEvent* event) {
 void FavoritesTreeView::dropEvent(QDropEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   QTreeView::dropEvent(event);
-  if (event->isAccepted()) {
-    QModelIndex proxyIndex = indexAt(event->pos());
-    if (proxyIndex.isValid()) {
-      expand(proxyIndex);
-    }
-  }
 }

@@ -2,30 +2,29 @@
 #include "FavoriteItemData.h"
 #include "MemoryKey.h"
 
+constexpr int FavoriteItemData::COLUMN_COUNT;
+constexpr const char* FavoriteItemData::HOR_HEADER_TITLES[];
 constexpr int FavoriteItemData::SORT_COLUMN;
 constexpr FavoriteItemData::Role FavoriteItemData::DEF_SORT_ROLE;
 
 FavoriteItemData::FavoriteItemData(const QString& _name) : name{_name}, isGroup{true} {}
-
 FavoriteItemData::FavoriteItemData(const QString& _name, const QString& path) : name{_name}, isGroup{false}, fullPath{path} {}
 
 QDataStream& operator<<(QDataStream& out, const FavoriteItemData& item) {
   out << item.name;
-  out << item.isGroup;
   out << item.fullPath;
+  out << item.isGroup;
   out << item.lastAccess;
   out << item.accessCount;
-  out << item.children;
   return out;
 }
 
 QDataStream& operator>>(QDataStream& in, FavoriteItemData& item) {
   in >> item.name;
-  in >> item.isGroup;
   in >> item.fullPath;
+  in >> item.isGroup;
   in >> item.lastAccess;
   in >> item.accessCount;
-  in >> item.children;
   return in;
 }
 

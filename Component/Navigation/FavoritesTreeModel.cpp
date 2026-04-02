@@ -7,71 +7,113 @@
 #include <QUrl>
 #include <QFileInfo>
 
-constexpr quint16 FavoritesTreeModel::VERSION;
 constexpr const char* FavoritesTreeModel::MIME_TYPE;
 
 FavoritesTreeModel::FavoritesTreeModel(const QString& belongToName, QObject* parent, bool bInitialCollectionsWhenEmpty)  //
-    : QStandardItemModel{0, 1, parent}, m_belongToName{belongToName} {
-  setHorizontalHeaderLabels({tr("Favorites")});
-
+    : QAbstractTreeModelPub{parent}, m_belongToName{belongToName} {
   const QByteArray& datas = Configuration().value(GetDataKeyInQSetting(), QByteArray{}).toByteArray();
   if (!datas.isEmpty() && setDatas(datas)) {
     // Key exist and ByteArray not empty and valid(may contains 0 elements)
-    m_bIsDirty = false;
+    clearDirty();
     return;
   }
+  setDatas(QByteArray{});  // 初始化
   if (!bInitialCollectionsWhenEmpty) {
     return;
   }
   addInitialFavoritesGroup();
-  m_bIsDirty = false; // 初始化阶段全程视为未修改
+  clearDirty();  // 初始化阶段全程视为未修改
 }
 
 FavoritesTreeModel::~FavoritesTreeModel() {
   if (mNotSaveDatasThisTimeBeforeDestruct) {
     return;
   }
-  if (m_bIsDirty) {
+  if (isDirty()) {
     saveToSettings();
   }
 }
 
-bool FavoritesTreeModel::setDatas(const QVector<FavoriteItemData>& topLevelItems) {
-  beginResetModel();
-  setRowCount(0);
-  for (const FavoriteItemData& itemData : topLevelItems) {
-    QStandardItem* item = convertDataToItem(itemData);
-    if (item) {
-      invisibleRootItem()->appendRow(item);
+QVariant FavoritesTreeModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) {
+    return {};
+  }
+
+  MyTreeNode* node = static_cast<MyTreeNode*>(index.internalPointer());
+  if (!node) {
+    return {};
+  }
+
+  const FavoriteItemData& item = node->val;
+  int column = index.column();
+
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    switch (column) {
+      case FavoriteItemData::DEF_NAME_TEXT_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
+        return item.name;
+      case FavoriteItemData::FULL_PATH_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
+        return item.fullPath;
+      case FavoriteItemData::IS_GROUP_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
+        return item.isGroup;
+      case FavoriteItemData::LAST_ACCESS_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
+        return item.lastAccess;
+      case FavoriteItemData::ACCESS_COUNT_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
+        return item.accessCount;
+      default:
+        return {};
+    }
+  } else {
+    switch (role) {
+      case FavoriteItemData::DEF_NAME_TEXT_ROLE:
+        return item.name;
+      case FavoriteItemData::FULL_PATH_ROLE:
+        return item.fullPath;
+      case FavoriteItemData::IS_GROUP_ROLE:
+        return item.isGroup;
+      case FavoriteItemData::LAST_ACCESS_ROLE:
+        return item.lastAccess;
+      case FavoriteItemData::ACCESS_COUNT_ROLE:
+        return item.accessCount;
+      default:
+        return {};
     }
   }
-  endResetModel();
-  m_bIsDirty = true;
-  return true;
+
+  return {};
 }
 
-bool FavoritesTreeModel::setDatas(const QByteArray& dataByteArray) {
-  QVector<FavoriteItemData> topLevelItems;
-  if (!fromByteArray(dataByteArray, topLevelItems)) {
+bool FavoritesTreeModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (!index.isValid()) {
     return false;
   }
-  return setDatas(topLevelItems);
+
+  if (role == Qt::EditRole) {
+    MyTreeNode* node = static_cast<MyTreeNode*>(index.internalPointer());
+    if (!node) {
+      return {};
+    }
+    QString newName = value.toString();
+    if (node->val.name == newName) {
+      return true;  // unchange
+    }
+    node->val.name.swap(newName);
+    emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+    return true;
+  }
+  return QAbstractTreeModelPub::setData(index, value, role);
 }
 
 Qt::ItemFlags FavoritesTreeModel::flags(const QModelIndex& index) const {
-  // cannot use static here
-  const Qt::ItemFlags defaultFlags{QStandardItemModel::flags(index) & ~(Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled)};
-
   // root: drop only
   if (!index.isValid()) {
-    return defaultFlags | Qt::ItemIsDropEnabled;
+    return Qt::ItemIsDropEnabled;
   }
   // group: drag and drop
   if (isGroup(index)) {
-    return defaultFlags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
   }
   // nongroup, drag only
-  return defaultFlags | Qt::ItemIsDragEnabled;
+  return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 }
 
 Qt::DropActions FavoritesTreeModel::supportedDropActions() const {
@@ -126,7 +168,7 @@ QMimeData* FavoritesTreeModel::mimeData(const QModelIndexList& indexes) const {
   // 序列化选中的项
   QByteArray data;
   QDataStream stream(&data, QIODevice::WriteOnly);
-  stream << static_cast<quint16>(VERSION);
+  stream << GetVersion();
 
   // 存储每个选中项 从该项到根的索引
   for (const QModelIndex& index : firstColumnIndexes) {
@@ -194,138 +236,41 @@ bool FavoritesTreeModel::dropMimeData(const QMimeData* data, Qt::DropAction acti
   return false;
 }
 
-QByteArray FavoritesTreeModel::toByteArray() const {
-  QByteArray data;
-  QDataStream stream(&data, QIODevice::WriteOnly);
-  stream.setVersion(QDataStream::Qt_5_15);
-  stream << VERSION;
-
-  // 转换所有顶级项
-  QVector<FavoriteItemData> topLevelItems;
-  QStandardItem* root = invisibleRootItem();
-
-  for (int i = 0; i < root->rowCount(); ++i) {
-    QStandardItem* item = root->child(i);
-    if (item) {
-      topLevelItems.append(convertItemToData(item));
-    }
-  }
-
-  stream << topLevelItems;
-  return data;
-}
-
-bool FavoritesTreeModel::fromByteArray(const QByteArray& data, QVector<FavoriteItemData>& topLevelItems) {
-  topLevelItems.clear();
-  if (data.isEmpty()) {  // used in clear all rows
-    return true;
-  }
-
-  QDataStream stream(data);
-  stream.setVersion(QDataStream::Qt_5_15);
-
-  quint16 version{0};
-  stream >> version;
-  if (version != VERSION) {
-    LOG_D("Version dismatch. expect:%u, actual:%d", VERSION, version);
-    return false;
-  }
-  stream >> topLevelItems;
-  if (stream.status() != QDataStream::Ok) {
-    LOG_W("read stream failed");
-    return false;
-  }
-
-  return true;
-}
-
 QString FavoritesTreeModel::filePath(const QModelIndex& parentIndex) const {
   if (!parentIndex.isValid()) {
     return "";
   }
-  QStandardItem* item = itemFromIndex(parentIndex);
+  MyTreeNode* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return "";
   }
-  if (item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
+  if (item->val.isGroup) {
     return "";
   }
-  return item->data(FavoriteItemData::Role::FULL_PATH_ROLE).toString();
+  return item->val.fullPath;
 }
 
 bool FavoritesTreeModel::isGroup(const QModelIndex& parentIndex) const {
   if (isRoot(parentIndex)) {
     return false;
   }
-  QStandardItem* item = itemFromIndex(parentIndex);
+  MyTreeNode* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return false;  // failed
   }
-  return item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool();
+  return item->val.isGroup;
 }
 
 QString FavoritesTreeModel::groupName(const QModelIndex& parentIndex) const {
-  QStandardItem* item = itemFromIndex(parentIndex);
+  MyTreeNode* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return "";  // failed
   }
-  return item->text();
+  return item->val.name;
 }
 
-FavoriteItemData FavoritesTreeModel::convertItemToData(QStandardItem* item) {
-  if (!item) {
-    return {};
-  }
-
-  FavoriteItemData data;
-  data.name = item->text();
-  data.isGroup = item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool();
-  data.fullPath = item->data(FavoriteItemData::Role::FULL_PATH_ROLE).toString();
-  data.lastAccess = item->data(FavoriteItemData::Role::LAST_ACCESS_ROLE).toInt();
-  data.accessCount = item->data(FavoriteItemData::Role::ACCESS_COUNT_ROLE).toInt();
-
-  // 递归处理子项
-  for (int i = 0; i < item->rowCount(); ++i) {
-    QStandardItem* child = item->child(i);
-    if (child) {
-      data.children.append(convertItemToData(child));
-    }
-  }
-
-  return data;
-}
-
-QStandardItem* FavoritesTreeModel::convertDataToItem(const FavoriteItemData& data) {
-  if (!data.isValid()) {
-    return nullptr;
-  }
-
-  QStandardItem* item = nullptr;
-  if (data.isGroup) {
-    item = new QStandardItem(data.name);
-  } else {
-    item = new QStandardItem(QIcon(":img/FAVORITES_LINK"), data.name);
-    item->setToolTip(QString("<b>%1</b><br>%2").arg(data.name, data.fullPath));
-  }
-  item->setEditable(true);  // 允许重命名
-  item->setData(data.isGroup, FavoriteItemData::Role::IS_GROUP_ROLE);
-  item->setData(data.fullPath, FavoriteItemData::Role::FULL_PATH_ROLE);
-  item->setData(data.lastAccess, FavoriteItemData::Role::LAST_ACCESS_ROLE);
-  item->setData(data.accessCount, FavoriteItemData::Role::ACCESS_COUNT_ROLE);
-
-  // 递归创建子项
-  for (const FavoriteItemData& childData : data.children) {
-    QStandardItem* child = convertDataToItem(childData);
-    if (child) {
-      item->appendRow(child);
-    }
-  }
-
-  return item;
-}
-
-QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, const QModelIndex& parentIndex) {
-  QStandardItem* parentItem = nullptr;
+MyTreeNode* FavoritesTreeModel::addGroup(const QString& grpName, const QModelIndex& parentIndex) {
+  MyTreeNode* parentItem = nullptr;
   if (parentIndex.isValid()) {
     parentItem = itemFromIndex(parentIndex);
     if (parentItem == nullptr) {
@@ -336,27 +281,26 @@ QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, const QModel
   return addGroup(grpName, parentItem);
 }
 
-QStandardItem* FavoritesTreeModel::addGroup(const QString& grpName, QStandardItem* parentItem) {
+MyTreeNode* FavoritesTreeModel::addGroup(const QString& grpName, MyTreeNode* parentItem) {
   if (parentItem) {
-    if (!parentItem->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
+    if (!parentItem->val.isGroup) {
       LOG_D("Cannot insert under non-group item");
       return nullptr;
     }
   } else {
     parentItem = invisibleRootItem();
   }
-  QStandardItem* item = new QStandardItem(grpName);
-  item->setData(true, FavoriteItemData::Role::IS_GROUP_ROLE);
-  item->setData("", FavoriteItemData::Role::FULL_PATH_ROLE);
-  item->setEditable(true);
-  parentItem->appendRow(item);
-  LOG_D("Group[%s] added successfully", qPrintable(grpName));
-  m_bIsDirty = true;
-  return item;
+
+  QModelIndex parentIndex = indexFromItem(parentItem);
+  beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
+  auto childNode = parentItem->appendRow(new MyTreeNode{TDataType{grpName}});
+  endInsertRows();
+  setDirty();
+  return childNode;
 }
 
-QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex) {
-  QStandardItem* parentItem = nullptr;
+MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex) {
+  MyTreeNode* parentItem = nullptr;
   if (parentIndex.isValid()) {
     parentItem = itemFromIndex(parentIndex);
     if (parentItem == nullptr) {
@@ -367,41 +311,39 @@ QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& p
   return addPath(name, path, parentItem);
 }
 
-QStandardItem* FavoritesTreeModel::addPath(const QString& name, const QString& path, QStandardItem* parentItem) {
+MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, MyTreeNode* parentItem) {
   if (parentItem) {
-    if (!parentItem->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
+    if (!parentItem->val.isGroup) {
       LOG_D("Cannot insert under non-group item");
       return nullptr;
     }
   } else {
     parentItem = invisibleRootItem();
   }
-  QStandardItem* item = new QStandardItem(QIcon(":img/FAVORITES_LINK"), name);
-  item->setData(false, FavoriteItemData::Role::IS_GROUP_ROLE);
-  item->setData(path, FavoriteItemData::Role::FULL_PATH_ROLE);
-  item->setEditable(true);  // 允许重命名
-  item->setToolTip(QString("<b>%1</b><br>%2").arg(name, path));
-  parentItem->appendRow(item);
-  m_bIsDirty = true;
-  return item;
+  QModelIndex parentIndex = indexFromItem(parentItem);
+  beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
+  auto childNode = parentItem->appendRow(new MyTreeNode{TDataType{name, path}});
+  endInsertRows();
+  setDirty();
+  return childNode;
 }
 
 // 去除冗余, 先按照父索引排序, 在按照行号降序列
-QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexList& parentIndexes, QStandardItem* destItem) const {
-  const QStandardItem* rootItem = invisibleRootItem();
+QList<MyTreeNode*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexList& parentIndexes, MyTreeNode* destItem) const {
+  const MyTreeNode* rootItem = invisibleRootItem();
 
-  QList<QStandardItem*> allItems;
+  QList<MyTreeNode*> allItems;
   {
     // 收集要移动的项，去重
-    QSet<QStandardItem*> uniqueItems;
+    QSet<MyTreeNode*> uniqueItems;
 
-    QList<QStandardItem*> itemsToDelete;
-    QSet<QStandardItem*> groupsToDelete;
+    QList<MyTreeNode*> itemsToDelete;
+    QSet<MyTreeNode*> groupsToDelete;
     for (const QModelIndex& idx : parentIndexes) {
       if (!idx.isValid()) {
         continue;
       }
-      QStandardItem* item = itemFromIndex(idx);
+      MyTreeNode* item = itemFromIndex(idx);
       if (item == nullptr || item == rootItem || uniqueItems.contains(item)) {
         continue;
       }
@@ -411,7 +353,7 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
       }
       uniqueItems.insert(item);
 
-      if (item->data(FavoriteItemData::Role::IS_GROUP_ROLE).toBool()) {
+      if (item->val.isGroup) {
         groupsToDelete.insert(item);
       } else {
         itemsToDelete.append(item);
@@ -419,9 +361,9 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
     }
 
     // 非分组在要移动的分组中时, 不需要单独移动它, 避免重复移动
-    for (QStandardItem* item : itemsToDelete) {
+    for (MyTreeNode* item : itemsToDelete) {
       bool bExistInGroup = false;
-      QStandardItem* ancestor = item->parent();
+      MyTreeNode* ancestor = item->parent();
       while (ancestor != nullptr && ancestor != rootItem) {
         if (groupsToDelete.contains(ancestor)) {
           bExistInGroup = true;
@@ -435,9 +377,9 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
     }
 
     // 分组在要移动的分组中时, 不需要单独移动它, 避免重复移动
-    for (QStandardItem* item : groupsToDelete) {
+    for (MyTreeNode* item : groupsToDelete) {
       bool bExistInGroup = false;
-      QStandardItem* ancestor = item->parent();
+      MyTreeNode* ancestor = item->parent();
       while (ancestor != nullptr && ancestor != rootItem) {
         if (groupsToDelete.contains(ancestor)) {
           bExistInGroup = true;
@@ -455,12 +397,12 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
   }
 
   // 按父项和行号排序, 让相同父项的项在一起, 按行号从大到小排序
-  std::sort(allItems.begin(), allItems.end(), [rootItem](QStandardItem* a, QStandardItem* b) {
-    const QStandardItem* parentA = a->parent();
+  std::sort(allItems.begin(), allItems.end(), [rootItem](MyTreeNode* a, MyTreeNode* b) {
+    const MyTreeNode* parentA = a->parent();
     if (parentA == nullptr) {
       parentA = rootItem;
     }
-    const QStandardItem* parentB = b->parent();
+    const MyTreeNode* parentB = b->parent();
     if (parentB == nullptr) {
       parentB = rootItem;
     }
@@ -470,45 +412,52 @@ QList<QStandardItem*> FavoritesTreeModel::GetItemsNeedProcess(const QModelIndexL
   return allItems;
 }
 
-int FavoritesTreeModel::moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& dest) {
+int FavoritesTreeModel::moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& destInd) {
   if (parentIndexes.isEmpty()) {
     return 0;
   }
-  QStandardItem* destItem = nullptr;
-  if (dest.isValid()) {
-    if (!isGroup(dest)) {
+  MyTreeNode* destNode = nullptr;
+  if (destInd.isValid()) {
+    if (!isGroup(destInd)) {
       LOG_D("Can only move to group or root");
       return -1;
     }
-    destItem = itemFromIndex(dest);
+    destNode = itemFromIndex(destInd);
   } else {
-    destItem = invisibleRootItem();
+    destNode = invisibleRootItem();
   }
 
-  QList<QStandardItem*> allItems = GetItemsNeedProcess(parentIndexes, destItem);
+  QList<MyTreeNode*> allItems = GetItemsNeedProcess(parentIndexes, destNode);
   if (allItems.isEmpty()) {
     return -1;
   }
+
   // 开始移动
   int succeedCnt{0};
-  QStandardItem* notConstRootItem = invisibleRootItem();
-  for (QStandardItem* item : allItems) {
-    QStandardItem* parent = item->parent();
-    if (parent == nullptr) {
-      parent = notConstRootItem;
+  MyTreeNode* notConstRootItem = invisibleRootItem();
+  for (MyTreeNode* item : allItems) {
+    MyTreeNode* srcNode = item->parent();
+    if (srcNode == nullptr) {
+      srcNode = notConstRootItem;
     }
     int row = item->row();
-    if (row < 0 || row >= parent->rowCount()) {
+    if (row < 0 || row >= srcNode->rowCount()) {
       continue;
     }
-#ifdef RUNNING_UNIT_TESTS
-    // 只在测试环境中记录日志
-    LOG_D("Append row:%d [%s]", row, qPrintable(item->text()));
-#endif
-    destItem->appendRow(parent->takeRow(row));
+
+    const QModelIndex srcInd{indexFromItem(srcNode)};
+
+    beginRemoveRows(srcInd, row, row);
+    MyTreeNode* pNode = srcNode->takeRow(row);
+    endRemoveRows();
+
+    beginInsertRows(destInd, destNode->rowCount(), destNode->rowCount());
+    destNode->appendRow(pNode);
+    endInsertRows();
+
     succeedCnt++;
   }
-  m_bIsDirty = true;
+  setDirty();
   return succeedCnt;
 }
 
@@ -517,16 +466,16 @@ int FavoritesTreeModel::removeParentIndexes(const QModelIndexList& parentIndexes
     return 0;
   }
 
-  QList<QStandardItem*> allItems = GetItemsNeedProcess(parentIndexes, nullptr);
+  QList<MyTreeNode*> allItems = GetItemsNeedProcess(parentIndexes, nullptr);
   if (allItems.isEmpty()) {
     return -1;
   }
 
-  QStandardItem* notConstRootItem = invisibleRootItem();
+  MyTreeNode* notConstRootItem = invisibleRootItem();
 
   int succeedCnt{0};
-  for (QStandardItem* item : allItems) {
-    QStandardItem* parent = item->parent();
+  for (MyTreeNode* item : allItems) {
+    MyTreeNode* parent = item->parent();
     if (parent == nullptr) {
       parent = notConstRootItem;
     }
@@ -534,14 +483,13 @@ int FavoritesTreeModel::removeParentIndexes(const QModelIndexList& parentIndexes
     if (row < 0 || row >= parent->rowCount()) {
       continue;
     }
-#ifdef RUNNING_UNIT_TESTS
-    // 只在测试环境中记录日志
-    LOG_D("Removing row: %d[%s]", row, qPrintable(item->text()));
-#endif
+    QModelIndex parentIndex = indexFromItem(parent);
+    beginRemoveRows(parentIndex, row, row);
     parent->removeRow(row);
+    endRemoveRows();
     succeedCnt++;
   }
-  m_bIsDirty = true;
+  setDirty();
   LOG_D("Removed %d items successfully", succeedCnt);
   return succeedCnt;
 }
@@ -549,18 +497,18 @@ int FavoritesTreeModel::removeParentIndexes(const QModelIndexList& parentIndexes
 bool FavoritesTreeModel::onRename(const QModelIndex& parentIndex, const QString& newName) {
   bool bSucceed = setData(parentIndex, newName);
   if (bSucceed) {
-    m_bIsDirty = true;
+    setDirty();
   }
   return bSucceed;
 }
 
 void FavoritesTreeModel::addInitialFavoritesGroup() {
   // initial configs
-  QStandardItem* workGroup = addGroup(tr("Work"), nullptr);
+  MyTreeNode* workGroup = addGroup(tr("Work"), nullptr);
   addPath("Documents", SystemPath::HOME_PATH() + "/Documents", workGroup);
   addPath("Project Configurations", SystemPath::HOME_PATH(), workGroup);
 
-  QStandardItem* lifeGroup = addGroup(tr("Life"), nullptr);
+  MyTreeNode* lifeGroup = addGroup(tr("Life"), nullptr);
   addPath("Pictures", SystemPath::HOME_PATH() + "/Pictures", lifeGroup);
   addPath("Videos", SystemPath::HOME_PATH() + "/Videos", lifeGroup);
 
@@ -569,8 +517,7 @@ void FavoritesTreeModel::addInitialFavoritesGroup() {
 
 void FavoritesTreeModel::saveToSettings() {
   Configuration().setValue(GetDataKeyInQSetting(), toByteArray());
-  LOG_D("All favorites saved");
-  m_bIsDirty = false;
+  clearDirty();
 }
 
 int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) {
@@ -587,12 +534,12 @@ int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction
       fullPath = fi.absolutePath();
     }
     const QString nameTextShown{PathTool::GetBaseName(fullPath)};
-    QStandardItem* addedItem = addPath(nameTextShown, fullPath, dstParent);
+    MyTreeNode* addedItem = addPath(nameTextShown, fullPath, dstParent);
     if (addedItem != nullptr) {
       addedCount++;
     }
   }
-  m_bIsDirty = true;
+  setDirty();
   return addedCount;
 }
 
@@ -602,7 +549,7 @@ int FavoritesTreeModel::handleInternalDrop(const QMimeData* data, Qt::DropAction
 
   quint16 version;
   stream >> version;
-  if (version != VERSION) {
+  if (version != GetVersion()) {
     return false;
   }
 
@@ -643,6 +590,6 @@ int FavoritesTreeModel::handleInternalDrop(const QMimeData* data, Qt::DropAction
       return false;
     }
   }
-  m_bIsDirty = true;
+  setDirty();
   return moveParentIndexesTo(draggedIndexes, dstParent);
 }

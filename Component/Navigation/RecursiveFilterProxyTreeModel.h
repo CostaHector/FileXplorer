@@ -20,8 +20,8 @@ class RecursiveFilterProxyTreeModel : public QSortFilterProxyModel {
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
  private:
-  bool itemMatches(const QStandardItem* item, const QString& filter) const;
-  bool hasMatchingChild(const QStandardItem* item, const QString& filter) const;
+  bool itemMatches(const MyTreeNode* item, const QString& filter) const;
+  bool hasMatchingChild(const MyTreeNode* item, const QString& filter) const;
   bool hasMatchingParent(const QModelIndex& index, const QString& filter) const;
 
   bool m_bSortProxyInited{false};

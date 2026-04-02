@@ -6,42 +6,37 @@ class FavoriteItemDataTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-
   void read_write_ok() {
-    FavoriteItemData defData;
-    QCOMPARE(defData.isValid(), false);
+    auto r0 = new MyTreeNode{TDataType{"group"}, {}, nullptr};
 
-    FavoriteItemData grpData{"group"};
-    QCOMPARE(grpData.isValid(), true);
+    auto r0_0 = new MyTreeNode{TDataType{"group/child0_g"}, {}, r0};
+    auto r0_1 = new MyTreeNode{TDataType{"group/child1_g"}, {}, r0};
+    auto r0_2 = new MyTreeNode{TDataType{"group/child2_l", "path/group/child2_l"}, {}, r0};
+    auto r0_3 = new MyTreeNode{TDataType{"group/child3_l", "path/group/child3_l"}, {}, r0};
 
-    FavoriteItemData nonGrpData{"non_group", "path/to/folder"};
-    QCOMPARE(nonGrpData.isValid(), true);
+    auto r0_1_0 = new MyTreeNode{TDataType{"group/child1_g/group0"}, {}, r0_1};
+    auto r0_1_1 = new MyTreeNode{TDataType{"group/child1_g/node1"}, {}, r0_1};
+    r0_1->childs.push_back(r0_1_0);
+    r0_1->childs.push_back(r0_1_1);
 
-    FavoriteItemData grpDataWithChild{"group_with_child"};
-    grpDataWithChild.children.push_back(FavoriteItemData{"child_group_item"});
-    grpDataWithChild.children.push_back(FavoriteItemData{"child_non_group_item", "child_path/to/folder"});
+    r0->childs.push_back(r0_0);
+    r0->childs.push_back(r0_1);
+    r0->childs.push_back(r0_2);
+    r0->childs.push_back(r0_3);
+    std::unique_ptr<MyTreeNode> rootNode{r0};
 
-    QByteArray data;
+    QByteArray ba;
+    QDataStream writeDs(&ba, QIODevice::WriteOnly);
+    writeDs << *rootNode;
+    QCOMPARE(writeDs.status(), QDataStream::Status::Ok);
+    QVERIFY(ba.size() > 0);
 
-    QDataStream dsWrite{&data, QIODevice::WriteOnly};
-    dsWrite << defData << grpData << nonGrpData << grpDataWithChild;
-    QCOMPARE(dsWrite.status(), QDataStream::Status::Ok);
-    QCOMPARE(data.isEmpty(), false);
+    std::unique_ptr<MyTreeNode> recoverRootNode{new MyTreeNode};
+    QDataStream readDs(ba);
+    readDs >> *recoverRootNode;
+    QCOMPARE(readDs.status(), QDataStream::Status::Ok);
 
-    FavoriteItemData defDataActual;
-    FavoriteItemData grpDataActual;
-    FavoriteItemData nonGrpDataActual;
-    FavoriteItemData grpDataWithChildActual;
-
-    QDataStream dsRead{data};
-    dsRead >> defDataActual >> grpDataActual >> nonGrpDataActual >> grpDataWithChildActual;
-    QCOMPARE(dsRead.status(), QDataStream::Status::Ok);
-    QCOMPARE(data.isEmpty(), false);
-
-    QCOMPARE(defDataActual, defData);
-    QCOMPARE(grpDataActual, grpData);
-    QCOMPARE(nonGrpDataActual, nonGrpData);
-    QCOMPARE(grpDataWithChildActual, grpDataWithChild);
+    QCOMPARE(*rootNode, *recoverRootNode);
   }
 };
 
