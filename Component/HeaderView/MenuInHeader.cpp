@@ -23,11 +23,11 @@ int MenuInHeader::GetMaxSectionSizeFirstTime() const {
 MenuInHeader::MenuInHeader(const QString& proName, Qt::Orientation ori, QWidget* parent)
     : QHeaderView{ori, parent},
       m_name{proName},
-      m_defaultSectionSizeKey{GetName() + "_DEFAULT_SECTION_SIZE"},
-      m_maxSectionSizeKey{GetName() + "_MAX_SECTION_SIZE"},
-      m_stretchLastSectionKey{GetName() + "_STRETCH_LAST_SECTION"},
-      m_resizeModeKey{GetName() + "_RESIZE_MODE"},
-      m_headerStateKey{GetName() + "_HEADER_GEOMETRY"} {
+      m_defaultSectionSizeKey{GetName() + "/DEFAULT_SECTION_SIZE"},
+      m_maxSectionSizeKey{GetName() + "/MAX_SECTION_SIZE"},
+      m_stretchLastSectionKey{GetName() + "/STRETCH_LAST_SECTION"},
+      m_resizeModeKey{GetName() + "/RESIZE_MODE"},
+      m_headerStateKey{GetName() + "/HEADER_GEOMETRY"} {
   m_menu = new (std::nothrow) QMenu{m_name + " Header Menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu);
   m_menu->setToolTipsVisible(true);

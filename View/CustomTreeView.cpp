@@ -12,9 +12,9 @@ QSet<QString> CustomTreeView::mTreeInstSet;
 CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
     : QTreeView{parent},                                                  //
       m_name{instName},                                                   //
-      m_showHorizontalHeaderKey{instName + "_SHOW_HORIZONTAL_HEADER"},    //
-      m_autoScrollKey{instName + "_AUTO_SCROLL"},                         //
-      m_alternatingRowColorsKey{instName + "_ALTERNATING_ROW_COLORS"}     //
+      m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"},    //
+      m_autoScrollKey{instName + "/AUTO_SCROLL"},                         //
+      m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"}     //
 {
   if (isNameExists(GetName())) {  // not in sharing list, but name already find
     LOG_D("Instance tree name[%s] already exist, QSetting may conflict", qPrintable(GetName()));
@@ -43,7 +43,7 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   _SHOW_HORIZONTAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the horizontal header")
                                           .arg(_SHOW_HORIZONTAL_HEADER->text(), _SHOW_HORIZONTAL_HEADER->shortcut().toString()));
 
-  m_horHeader = new DoubleRowHeader{GetName() + "_HorHeader", this};
+  m_horHeader = new DoubleRowHeader{GetName() + "/HorHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_horHeader);
   if (!_SHOW_HORIZONTAL_HEADER->isChecked()) {
     m_horHeader->setVisible(false);
@@ -67,12 +67,12 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
 
   // 6.
   const QString horMenuName{GetName() + " " + tr("Horizontal scroll bar policy")};
-  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "_Horizontal", this};
+  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
 
   const QString verMenuName{GetName() + " " + tr("Vertical scroll bar policy")};
-  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "_Vertical", this};
+  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "/Vertical", this};
   CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
 

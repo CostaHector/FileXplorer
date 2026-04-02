@@ -56,7 +56,7 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   addWidget(mTypeToDisplayTB);
 
   setContentsMargins(0, 0, 0, 0);
-  restoreState(Configuration().value(GetMemoryName() + "_STATE").toByteArray());
+  restoreState(Configuration().value(GetMemoryName() + "/STATE").toByteArray());
   subscribe();
 }
 
@@ -167,9 +167,9 @@ void ImgVidOthInFolderPreviewer::subscribe() {
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   m_bImgVisible = checked;
   if (mImgTv == nullptr) {
-    mImgModel = new (std::nothrow) ImgsModel{GetMemoryName() + "_IMAGE", this};
+    mImgModel = new (std::nothrow) ImgsModel{GetMemoryName() + "/IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgModel)
-    mImgTv = new (std::nothrow) ItemView{GetMemoryName() + "_IMAGE", this};
+    mImgTv = new (std::nothrow) ItemView{GetMemoryName() + "/IMAGE", this};
     CHECK_NULLPTR_RETURN_VOID(mImgTv)
     mImgTv->InitListView();
     mImgTv->SetCurrentModel(mImgModel);
@@ -202,9 +202,9 @@ void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
 void ImgVidOthInFolderPreviewer::onOthBtnClicked(bool checked) {
   m_bOthVisible = checked;
   if (mOthTv == nullptr) {
-    mOthModel = new (std::nothrow) OthersModel{GetMemoryName() + "_OTHER", this};
+    mOthModel = new (std::nothrow) OthersModel{GetMemoryName() + "/OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthModel)
-    mOthTv = new (std::nothrow) ItemView{GetMemoryName() + "_OTHER", this};
+    mOthTv = new (std::nothrow) ItemView{GetMemoryName() + "/OTHER", this};
     CHECK_NULLPTR_RETURN_VOID(mOthTv);
     mOthTv->InitListView();
     mOthTv->SetCurrentModel(mOthModel);

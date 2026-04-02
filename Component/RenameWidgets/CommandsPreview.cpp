@@ -37,13 +37,13 @@ void CommandsPreview::showEvent(QShowEvent* event) {
 }
 
 void CommandsPreview::closeEvent(QCloseEvent* event) {
-  Configuration().setValue(mName + "_GEOMETRY", saveGeometry());
+  Configuration().setValue(mName + "/GEOMETRY", saveGeometry());
   QTextBrowser::closeEvent(event);
 }
 
 void CommandsPreview::ReadSettings() {
-  if (Configuration().contains(mName + "_GEOMETRY")) {
-    restoreGeometry(Configuration().value(mName + "_GEOMETRY").toByteArray());
+  if (Configuration().contains(mName + "/GEOMETRY")) {
+    restoreGeometry(Configuration().value(mName + "/GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

@@ -44,12 +44,10 @@ class DoubleRowHeaderTest : public PlainTestSuite {
       QCOMPARE(header->sizeHint().height(), beforeHeight * 2);
     }
 
-    QCOMPARE(Configuration().contains("SettingSavedOk"
-                                      "_ENABLE_FILTERS"),
+    QCOMPARE(Configuration().contains("SettingSavedOk/ENABLE_FILTERS"),
              true);
     QCOMPARE(Configuration()
-                 .value("SettingSavedOk"
-                        "_ENABLE_FILTERS")
+                 .value("SettingSavedOk/ENABLE_FILTERS")
                  .toBool(),
              true);
   }

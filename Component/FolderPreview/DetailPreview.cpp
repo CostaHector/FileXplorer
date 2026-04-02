@@ -17,7 +17,7 @@ DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_P
   addWidget(mBasicVideoView);
 
   mBasicVideoView->registerFullScreenToggleCallback(std::bind(&DetailPreview::onReqFullscreenModeChange, this, std::placeholders::_1));
-  restoreState(Configuration().value(GetMemoryName() + "_STATE").toByteArray());
+  restoreState(Configuration().value(GetMemoryName() + "/STATE").toByteArray());
 }
 
 DetailPreview::~DetailPreview() {  //

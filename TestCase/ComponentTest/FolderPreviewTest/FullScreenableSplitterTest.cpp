@@ -27,7 +27,7 @@ class FullScreenableSplitterDerived : public FullScreenableSplitter {
     setFixedSize(20, 30);
     setContentsMargins(0, 0, 0, 0);
 
-    restoreState(Configuration().value(GetMemoryName() + "_STATE").toByteArray());
+    restoreState(Configuration().value(GetMemoryName() + "/STATE").toByteArray());
 
     connect(btn1, &QPushButton::toggled, this, &FullScreenableSplitterDerived::onReqFullscreenModeChange);
   }
@@ -46,7 +46,7 @@ class FullScreenableSplitterTest : public PlainTestSuite {
   const QString mMemoryName{"FullScreenableSplitterDerived"};
  private slots:
   void fullScreen_not_save_state_ok() {
-    Configuration().setValue(mMemoryName + "_STATE", QByteArray{});
+    Configuration().setValue(mMemoryName + "/STATE", QByteArray{});
     QByteArray beforeState;
     {
       // 非全屏, 可以保存状态->保存状态, 全屏, 不可以保存状态->非全屏, 恢复状态, 可以保存状态
@@ -75,7 +75,7 @@ class FullScreenableSplitterTest : public PlainTestSuite {
       QCOMPARE(wid.indexOf(wid.btn1), -1);
       QCOMPARE(wid.mBeforeFullScreenState.isEmpty(), false);
       QCOMPARE(wid.mBeforeFullScreenState,  //
-               Configuration().value(mMemoryName + "_STATE").toByteArray());
+               Configuration().value(mMemoryName + "/STATE").toByteArray());
       QCOMPARE(wid.needSaveStateWhenClose(), false);
       beforeState = wid.mBeforeFullScreenState;
 
@@ -87,11 +87,11 @@ class FullScreenableSplitterTest : public PlainTestSuite {
       wid.move(0, 0);
     }
     // 析构中无需保存
-    QCOMPARE(Configuration().value(mMemoryName + "_STATE").toByteArray(), beforeState);
+    QCOMPARE(Configuration().value(mMemoryName + "/STATE").toByteArray(), beforeState);
   }
 
   void fullScreen_save_state_ok() {
-    Configuration().setValue(mMemoryName + "_STATE", QByteArray{});
+    Configuration().setValue(mMemoryName + "/STATE", QByteArray{});
     QByteArray beforeState;
     {
       // 非全屏, 可以保存状态->保存状态, 全屏, 不可以保存状态->非全屏, 恢复状态, 可以保存状态
@@ -119,7 +119,7 @@ class FullScreenableSplitterTest : public PlainTestSuite {
       QCOMPARE(wid.indexOf(wid.btn1), -1);
       QCOMPARE(wid.mBeforeFullScreenState.isEmpty(), false);
       QCOMPARE(wid.mBeforeFullScreenState,  //
-               Configuration().value(mMemoryName + "_STATE").toByteArray());
+               Configuration().value(mMemoryName + "/STATE").toByteArray());
       QCOMPARE(wid.needSaveStateWhenClose(), false);
 
       wid.btn1->toggle();
@@ -145,7 +145,7 @@ class FullScreenableSplitterTest : public PlainTestSuite {
       wid.move(0, 0);
     }
     // 析构中应当保存
-    QVERIFY(Configuration().value(mMemoryName + "_STATE").toByteArray() != beforeState);
+    QVERIFY(Configuration().value(mMemoryName + "/STATE").toByteArray() != beforeState);
   }
 };
 

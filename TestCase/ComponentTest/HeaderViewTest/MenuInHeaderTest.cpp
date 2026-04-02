@@ -145,8 +145,7 @@ class MenuInHeaderTest : public PlainTestSuite {
       QCOMPARE(horHeader.defaultSectionSize(), afterValue);
     }
     QCOMPARE(Configuration()
-                 .value("SetDefaultSectionSizeOk"
-                        "_DEFAULT_SECTION_SIZE")
+                 .value("SetDefaultSectionSizeOk/DEFAULT_SECTION_SIZE")
                  .toInt(),
              99);
   }
@@ -183,8 +182,7 @@ class MenuInHeaderTest : public PlainTestSuite {
       QCOMPARE(horHeader.maximumSectionSize(), afterValue);
     }
     QCOMPARE(Configuration()
-                 .value("SetMaxSectionSizeOk"
-                        "_MAX_SECTION_SIZE")
+                 .value("SetMaxSectionSizeOk/MAX_SECTION_SIZE")
                  .toInt(),
              999);
   }

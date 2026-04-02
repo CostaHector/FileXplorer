@@ -3,7 +3,7 @@
 #include "PublicMacro.h"
 
 TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
-    : QMenu{menuName, parent}, m_memoryName{belongToName + "_TextElideMode"} {
+    : QMenu{menuName, parent}, m_memoryName{belongToName + "/TextElideMode"} {
   CHECK_NULLPTR_RETURN_VOID(parent);
   CHECK_FALSE_RETURN_VOID(!belongToName.isEmpty());
 

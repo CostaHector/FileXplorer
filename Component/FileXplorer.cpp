@@ -55,7 +55,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "_Geometry", saveGeometry());
+  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "/Geometry", saveGeometry());
   Configuration().setValue("SELECTION_PREVIEWER_WIDTH", m_previewFolder->width());
   Configuration().setValue("SELECTION_PREVIEWER_HEIGHT", m_previewFolder->height());
   Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
@@ -95,8 +95,8 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
 }
 
 void FileXplorer::RestoreWindowStateAndSetupUI() {
-  if (Configuration().contains(PROJECT_NAME "_Geometry")) {
-    restoreGeometry(Configuration().value(PROJECT_NAME "_Geometry").toByteArray());
+  if (Configuration().contains(PROJECT_NAME "/Geometry")) {
+    restoreGeometry(Configuration().value(PROJECT_NAME "/Geometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

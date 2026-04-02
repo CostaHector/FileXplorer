@@ -12,7 +12,7 @@ QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObjec
   setPixmapWidth(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].width());
   setPixmapHeight(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].height());
 
-  m_isSmooth = Configuration().value(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
+  m_isSmooth = Configuration().value(GetName() + "/PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
   _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{":img/IMAGE_TRANSFORMATION_SMOOTH"}, tr("smooth transformation"), this};
   _PIXMAP_TRANSFORMATION_SMOOTH->setCheckable(true);
   _PIXMAP_TRANSFORMATION_SMOOTH->setChecked(m_isSmooth);
@@ -23,7 +23,7 @@ QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObjec
 }
 
 QAbstractListModelPub::~QAbstractListModelPub() {
-  Configuration().setValue(GetName() + "_PIXMAP_TRANSFORMATION_SMOOTH", _PIXMAP_TRANSFORMATION_SMOOTH->isChecked());
+  Configuration().setValue(GetName() + "/PIXMAP_TRANSFORMATION_SMOOTH", _PIXMAP_TRANSFORMATION_SMOOTH->isChecked());
 }
 
 void QAbstractListModelPub::subscribe() {
