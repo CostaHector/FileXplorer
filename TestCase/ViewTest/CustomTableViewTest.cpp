@@ -185,17 +185,17 @@ private slots:
       // Default Section size
       LOG_D("horizontalHeader [%d, %d]", tv.horizontalHeader()->minimumSectionSize(), tv.horizontalHeader()->maximumSectionSize());
       LOG_D("verticalHeader [%d, %d]", tv.verticalHeader()->minimumSectionSize(), tv.verticalHeader()->maximumSectionSize());
-      QCOMPARE(tv.horizontalHeader()->defaultSectionSize(), MenuInHeader::TABLE_DEFAULT_COLUMN_SECTION_SIZE);
-      // QCOMPARE(tv.verticalHeader()->defaultSectionSize(), MenuInHeader::TABLE_DEFAULT_ROW_SECTION_SIZE);  //
+      QCOMPARE(tv.horizontalHeader()->defaultSectionSize(), TABLE_DEFAULT_COLUMN_SECTION_SIZE);
+      // QCOMPARE(tv.verticalHeader()->defaultSectionSize(), TABLE_DEFAULT_ROW_SECTION_SIZE);  //
       // don't check ver
-      key2ExpectValue[horHeader.m_defaultSectionSizeKey] = MenuInHeader::TABLE_DEFAULT_COLUMN_SECTION_SIZE;
-      // key2ExpectValue[verHeader.m_defaultSectionSizeKey] = MenuInHeader::TABLE_DEFAULT_ROW_SECTION_SIZE;
+      key2ExpectValue[horHeader.m_defaultSectionSizeKey] = TABLE_DEFAULT_COLUMN_SECTION_SIZE;
+      // key2ExpectValue[verHeader.m_defaultSectionSizeKey] = TABLE_DEFAULT_ROW_SECTION_SIZE;
       // don't check ver
 
-      QCOMPARE(tv.horizontalHeader()->maximumSectionSize(), MenuInHeader::TABLE_MAX_COLUMN_SECTION_SIZE);
-      QCOMPARE(tv.verticalHeader()->maximumSectionSize(), MenuInHeader::TABLE_MAX_ROW_SECTION_SIZE);
-      key2ExpectValue[horHeader.m_maxSectionSizeKey] = MenuInHeader::TABLE_MAX_COLUMN_SECTION_SIZE;
-      key2ExpectValue[verHeader.m_maxSectionSizeKey] = MenuInHeader::TABLE_MAX_ROW_SECTION_SIZE;
+      QCOMPARE(tv.horizontalHeader()->maximumSectionSize(), TABLE_MAX_COLUMN_SECTION_SIZE);
+      QCOMPARE(tv.verticalHeader()->maximumSectionSize(), TABLE_MAX_ROW_SECTION_SIZE);
+      key2ExpectValue[horHeader.m_maxSectionSizeKey] = TABLE_MAX_COLUMN_SECTION_SIZE;
+      key2ExpectValue[verHeader.m_maxSectionSizeKey] = TABLE_MAX_ROW_SECTION_SIZE;
     }
 
     for (auto it = key2ExpectValue.cbegin(); it != key2ExpectValue.cend(); ++it) {

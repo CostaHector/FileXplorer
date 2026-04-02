@@ -10,6 +10,24 @@
 
 #include <QMimeData>
 
+std::unique_ptr<MyTreeNode> GetRemoveOrMoveRootNode() {
+  auto p0 = MyTreeNode::NewTreeNodeRoot();
+  auto p00 = p0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
+  auto p01 = p0->appendRow(new MyTreeNode{TDataType{"group0Child"}});
+  auto p02 = p0->appendRow(new MyTreeNode{TDataType{"group2Child"}});
+  auto p03 = p0->appendRow(new MyTreeNode{TDataType{"group3Child"}});
+  auto p04 = p0->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
+
+  p02->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+  p02->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
+
+  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
+  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
+  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
+
+  return p0;
+}
+
 class FavoritesTreeModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -42,7 +60,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
       QVERIFY(model.addPath("random name", "path/to/random name", nullptr) != nullptr);
       QCOMPARE(model.rowCount({}), 4);  // count(root)=3+1
-      QCOMPARE(model.itemFromIndex(model.index(3, 0, {}))->text(), "random name");
+      QCOMPARE(model.itemFromIndex(model.index(3, 0, {}))->val.name, "random name");
       QCOMPARE(model.isGroup(model.index(3, 0, {})), false);
       QCOMPARE(model.filePath(model.index(3, 0, {})), "path/to/random name");
       // will call save to in destruction automatically
@@ -52,7 +70,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     {  // no initialCollections, vector<FavoriteItemData>.size() == 4
       FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
       QCOMPARE(model.rowCount({}), 4);  // count(root)=3+1
-      QCOMPARE(model.itemFromIndex(model.index(3, 0, {}))->text(), "random name");
+      QCOMPARE(model.itemFromIndex(model.index(3, 0, {}))->val.name, "random name");
       QCOMPARE(model.isGroup(model.index(3, 0, {})), false);
       QCOMPARE(model.filePath(model.index(3, 0, {})), "path/to/random name");
 
@@ -115,48 +133,28 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.setDatas(QByteArray{}), true);  // failed
     QCOMPARE(model.rowCount({}), 0);
 
-    QVector<FavoriteItemData> elements;
-    elements.push_back(FavoriteItemData{});                                         // invalid element 0
-    elements.push_back(FavoriteItemData{"group"});                                  // valid element 1
-    elements.push_back(FavoriteItemData{"non_group", "path/to/non_group_folder"});  // valid element 2
-    QCOMPARE(model.setDatas(elements), true);
+    auto r0 = MyTreeNode::NewTreeNodeRoot();
+    r0->appendRow(new MyTreeNode{TDataType{"group"}});                                  // valid element 1
+    r0->appendRow(new MyTreeNode{TDataType{"non_group", "path/to/non_group_folder"}});  // valid element 2
+
+    QCOMPARE(model.setDatas(std::move(r0)), true);
     QCOMPARE(model.rowCount({}), 2);
 
-    auto r00 = model.index(0, 0, {});
-    auto r10 = model.index(1, 0, {});
+    auto ind00 = model.index(0, 0, {});
+    auto ind10 = model.index(1, 0, {});
 
-    QCOMPARE(model.data(r00, Qt::DisplayRole).toString(), "group");
-    QCOMPARE(model.data(r00, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "");
-    QCOMPARE(model.data(r10, Qt::DisplayRole).toString(), "non_group");
-    QCOMPARE(model.data(r10, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "path/to/non_group_folder");
-
-    QCOMPARE(model.convertDataToItem(FavoriteItemData{}), nullptr);
-    QCOMPARE(model.convertItemToData(nullptr), (FavoriteItemData{}));
+    QCOMPARE(model.data(ind00, Qt::DisplayRole).toString(), "group");
+    QCOMPARE(model.data(ind00, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "");
+    QCOMPARE(model.data(ind10, Qt::DisplayRole).toString(), "non_group");
+    QCOMPARE(model.data(ind10, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "path/to/non_group_folder");
   }
 
   void removeParentIndexes_ok() {
-    FavoriteItemData nonGroup0{"nonGroup0", "path/to/nonGroup0"};
-    FavoriteItemData noChildGroup{"group0Child"};
-    FavoriteItemData twoChildGroup{"group2Child"};
-    twoChildGroup.children.push_back(FavoriteItemData{"group2Child/non_group_0", "path/to/group2Child/non_group_0"});
-    twoChildGroup.children.push_back(FavoriteItemData{"group2Child/group_1"});
-    FavoriteItemData threeChildGroup{"group3Child"};
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child0", "path/to/group3Child/child0"});
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child1"});
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child2"});
-    FavoriteItemData nonGroup1{"nonGroup1", "path/to/nonGroup1"};
-
-    QVector<FavoriteItemData> elements;
-    elements.push_back(nonGroup0);
-    elements.push_back(noChildGroup);
-    elements.push_back(twoChildGroup);
-    elements.push_back(threeChildGroup);
-    elements.push_back(nonGroup1);
-    QCOMPARE(elements.size(), 5);
-
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    QCOMPARE(model.setDatas(elements), true);
+    auto p0 = GetRemoveOrMoveRootNode();
+    QCOMPARE(model.setDatas(std::move(p0)), true);
     QCOMPARE(model.rowCount({}), 5);
+    const QByteArray elements{model.toByteArray()};
 
     QCOMPARE(model.removeParentIndexes({}), 0);
 
@@ -194,28 +192,11 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void moveParentIndexesTo_ok() {
-    FavoriteItemData nonGroup0{"nonGroup0", "path/to/nonGroup0"};
-    FavoriteItemData noChildGroup{"group0Child"};
-    FavoriteItemData twoChildGroup{"group2Child"};
-    twoChildGroup.children.push_back(FavoriteItemData{"group2Child/non_group_0", "path/to/group2Child/non_group_0"});
-    twoChildGroup.children.push_back(FavoriteItemData{"group2Child/group_1"});
-    FavoriteItemData threeChildGroup{"group3Child"};
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child0", "path/to/group3Child/child0"});
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child1"});
-    threeChildGroup.children.push_back(FavoriteItemData{"group3Child/child2"});
-    FavoriteItemData nonGroup1{"nonGroup1", "path/to/nonGroup1"};
-
-    QVector<FavoriteItemData> elements;
-    elements.push_back(nonGroup0);
-    elements.push_back(noChildGroup);
-    elements.push_back(twoChildGroup);
-    elements.push_back(threeChildGroup);
-    elements.push_back(nonGroup1);
-    QCOMPARE(elements.size(), 5);
-
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    QCOMPARE(model.setDatas(elements), true);
+    auto p0 = GetRemoveOrMoveRootNode();
+    QCOMPARE(model.setDatas(std::move(p0)), true);
     QCOMPARE(model.rowCount({}), 5);
+    const QByteArray elements{model.toByteArray()};
 
     {
       QModelIndex rootIndex;                                  // will ignored
@@ -239,11 +220,11 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
       // nonGroup0 group0Child group2Child group3Child nonGroup1
       // r0, r1, r4同根, 行号r4大; 排序后, r4, r1, r0按照顺序Append到尾部
-      QCOMPARE(model.itemFromIndex(model.index(0, 0, rootIndex))->text(), "group2Child");
-      QCOMPARE(model.itemFromIndex(model.index(1, 0, rootIndex))->text(), "group3Child");
-      QCOMPARE(model.itemFromIndex(model.index(2, 0, rootIndex))->text(), "nonGroup1");
-      QCOMPARE(model.itemFromIndex(model.index(3, 0, rootIndex))->text(), "group0Child");
-      QCOMPARE(model.itemFromIndex(model.index(4, 0, rootIndex))->text(), "nonGroup0");
+      QCOMPARE(model.itemFromIndex(model.index(0, 0, rootIndex))->val.name, "group2Child");
+      QCOMPARE(model.itemFromIndex(model.index(1, 0, rootIndex))->val.name, "group3Child");
+      QCOMPARE(model.itemFromIndex(model.index(2, 0, rootIndex))->val.name, "nonGroup1");
+      QCOMPARE(model.itemFromIndex(model.index(3, 0, rootIndex))->val.name, "group0Child");
+      QCOMPARE(model.itemFromIndex(model.index(4, 0, rootIndex))->val.name, "nonGroup0");
     }
 
     // 包含冗余, move to group ok
@@ -259,9 +240,9 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QModelIndex r3_0 = model.index(0, 0, r3);
       QModelIndex r3_2 = model.index(2, 0, r3);
 
-      QStandardItem* r0ParentAddress{model.invisibleRootItem()};
-      QStandardItem* r2ParentAddress{model.invisibleRootItem()};
-      QStandardItem* r3ParentAddress{model.itemFromIndex(r3)};
+      MyTreeNode* r0ParentAddress{model.invisibleRootItem()};
+      MyTreeNode* r2ParentAddress{model.invisibleRootItem()};
+      MyTreeNode* r3ParentAddress{model.itemFromIndex(r3)};
       QCOMPARE(r0ParentAddress, r2ParentAddress);
 
       // r0, r1, r2, r2_0, r2_1, r3, r3_0, r3_2
@@ -274,8 +255,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(model.rowCount(), 3);
 
       const QModelIndex newR1Index{model.index(0, 0, {})};
-      QCOMPARE(model.itemFromIndex(newR1Index)->text(), "group0Child");
-      const QStandardItem* newR1Item{model.itemFromIndex(newR1Index)};
+      QCOMPARE(model.itemFromIndex(newR1Index)->val.name, "group0Child");
+      const MyTreeNode* newR1Item{model.itemFromIndex(newR1Index)};
       QVERIFY(newR1Item != nullptr);
       QCOMPARE(newR1Item->rowCount(), 4);
 
@@ -292,37 +273,34 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       }
 
       const QModelIndex newR3Index{model.index(1, 0, {})};
-      const QStandardItem* newR3Item{model.itemFromIndex(newR3Index)};
+      const MyTreeNode* newR3Item{model.itemFromIndex(newR3Index)};
       QVERIFY(newR3Item != nullptr);
-      QCOMPARE(newR3Item->text(), "group3Child");
+      QCOMPARE(newR3Item->val.name, "group3Child");
       QCOMPARE(newR3Item->rowCount(), 1);
 
       const QModelIndex newR3_1Index{model.index(0, 0, newR3Index)};
-      const QStandardItem* newR3_1Item{model.itemFromIndex(newR3_1Index)};
+      const MyTreeNode* newR3_1Item{model.itemFromIndex(newR3_1Index)};
       QVERIFY(newR3_1Item != nullptr);
-      QCOMPARE(newR3_1Item->text(), "group3Child/child1");
+      QCOMPARE(newR3_1Item->val.name, "group3Child/child1");
 
-      QCOMPARE(model.itemFromIndex(model.index(2, 0, {}))->text(), "nonGroup1");
+      QCOMPARE(model.itemFromIndex(model.index(2, 0, {}))->val.name, "nonGroup1");
     }
   }
 
   void onRenameGroupName_ok() {
-    FavoriteItemData nonGroup0{"nonGroup0", "path/to/nonGroup0"};
-    FavoriteItemData noChildGroup{"group0Child"};
-    QVector<FavoriteItemData> elements;
-    elements.push_back(nonGroup0);
-    elements.push_back(noChildGroup);
-    QCOMPARE(elements.size(), 2);
+    auto r0 = MyTreeNode::NewTreeNodeRoot();
+    r0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
+    r0->appendRow(new MyTreeNode{TDataType{"group0Child"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    QCOMPARE(model.setDatas(elements), true);
+    QCOMPARE(model.setDatas(std::move(r0)), true);
     QCOMPARE(model.rowCount({}), 2);
 
     QCOMPARE(model.onRename({}, "Hallo"), false);                              // cannot rename root
     QCOMPARE(model.onRename(model.index(0, 0, {}), "nonGroup0"), true);        // name no change(here we don't check)
     QCOMPARE(model.onRename(model.index(0, 0, {}), "hallo nonGroup0"), true);  // can rename nongroup
     QCOMPARE(model.index(0, 0, {}).data().toString(), "hallo nonGroup0");
-    QCOMPARE(model.itemFromIndex(model.index(0, 0, {}))->text(), "hallo nonGroup0");
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, {}))->val.name, "hallo nonGroup0");
 
     QCOMPARE(model.onRename(model.index(1, 0, {}), "group0Child"), true);        // name no change(here we don't check)
     QCOMPARE(model.onRename(model.index(1, 0, {}), "hallo group0Child"), true);  // can rename nongroup
@@ -330,17 +308,14 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void drag_drop_internal_ok() {
-    FavoriteItemData nonGroup0{"nonGroup0", "path/to/nonGroup0"};
-    FavoriteItemData childGroup1{"groupChild1"};
-    childGroup1.children.push_back(FavoriteItemData{"groupChild1_group0"});
-    childGroup1.children.push_back(FavoriteItemData{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"});
-    QVector<FavoriteItemData> elements;
-    elements.push_back(nonGroup0);
-    elements.push_back(childGroup1);
-    QCOMPARE(elements.size(), 2);
+    auto r0 = MyTreeNode::NewTreeNodeRoot();
+    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});  // non-group
+    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"groupChild1"}});                     // group
+    auto r010 = r01->appendRow(new MyTreeNode{TDataType{"groupChild1_group0"}});
+    auto r011 = r01->appendRow(new MyTreeNode{TDataType{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeViewInternalDragDrop", nullptr, false};
-    QCOMPARE(model.setDatas(elements), true);
+    QCOMPARE(model.setDatas(std::move(r0)), true);
     QCOMPARE(model.rowCount({}), 2);
 
     // flags & canDropOn & isIndexValidAndDescendantOfValidAncestor
@@ -447,9 +422,10 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QByteArray rawNodeToRootPathData = mimeData->data(FavoritesTreeModel::MIME_TYPE);
       QCOMPARE(rawNodeToRootPathData.isEmpty(), false);
       QDataStream readStream(rawNodeToRootPathData);
-      auto version = FavoritesTreeModel::VERSION;
+      auto version = FavoritesTreeModel::GetVersion();
+      version = 0;
       readStream >> version;
-      QCOMPARE(version, FavoritesTreeModel::VERSION);
+      QCOMPARE(version, FavoritesTreeModel::GetVersion());
 
       QList<int> nonGroup0IndexNode2Root;
       QList<int> groupChild1_group0IndexNode2Root;
@@ -466,8 +442,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       // sort:
       // if address(r0 parent) < address(r10 parent): [r0, r11, r10] => r1 (r0, r11, r10)
       // else: [r11, r10, r0] => r1 (r11, r10, r0)
-      const QStandardItem* r0ParentAddress = model.invisibleRootItem();
-      const QStandardItem* r10ParentAddress = model.itemFromIndex(childGroup1Index);
+      const MyTreeNode* r0ParentAddress = model.invisibleRootItem();
+      const MyTreeNode* r10ParentAddress = model.itemFromIndex(childGroup1Index);
       QCOMPARE(nonGroup0Index.data().toString(), "nonGroup0");
       QCOMPARE(childGroup1Index.data().toString(), "groupChild1");
       QCOMPARE(model.rowCount(), 2);
@@ -506,9 +482,9 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QVERIFY(model.canDropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
     QVERIFY(model.dropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
 
-    QCOMPARE(model.index(0, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), SystemPath::HOME_PATH());
-    QCOMPARE(model.index(1, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), SystemPath::STARRED_PATH());
-    QCOMPARE(model.index(2, 0, rootIndex).data(FavoriteItemData::FULL_PATH_ROLE).toString(), expectParentPath);
+    QCOMPARE(model.index(0, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::HOME_PATH());
+    QCOMPARE(model.index(1, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::STARRED_PATH());
+    QCOMPARE(model.index(2, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), expectParentPath);
 
     QCOMPARE(model.rowCount(), 3);
   }
