@@ -119,11 +119,11 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   title += (isFolder ? "Folders" : "Files");
   const QString folderDefName{
       Configuration()
-          .value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.v)
+          .value(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name, BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.v)
           .toString()};
   const QString fileDefName{
       Configuration()
-          .value(MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name, MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.v)
+          .value(BehaviorKey::BATCH_FILES_NAME_PATTERN.name, BehaviorKey::BATCH_FILES_NAME_PATTERN.v)
           .toString()};
   const QString defNamePattern{isFolder ? folderDefName : fileDefName};
   const QString userInputRule = QInputDialog::getText(_contentPane,
@@ -142,8 +142,8 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   const QString& namePattern = userInputLst[0];
   const int startIndex = userInputLst[1].toInt();
   const int endIndex = userInputLst[2].toInt();
-  Configuration().setValue(isFolder ? MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FOLDERS.name //
-                                    : MemoryKey::NAME_PATTERN_USED_CREATE_BATCH_FILES.name,  //
+  Configuration().setValue(isFolder ? BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name //
+                                    : BehaviorKey::BATCH_FILES_NAME_PATTERN.name,  //
                            userInputRule);
   const QString createIn{_fileSysModel->rootPath()};
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
@@ -333,7 +333,7 @@ void FileXplorerEvent::subsribeCompress() {
   connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileXplorerEvent::on_compressImgsByGroup);
 
   m_archivePreview = new (std::nothrow)
-      PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane, "AchiveViewerGeometry"};
+      PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane, "Geometry/AchiveViewer"};
   connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::toggled, this, &FileXplorerEvent::on_archivePreview);
 }
 
@@ -457,10 +457,10 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
 
     m_duplicateVideosFinder = new (std::nothrow)
-        PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "DuplicateVideosFinderGeometry"};
+        PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
     m_redundantImageFinder = new (std::nothrow)
-        PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "RedundantImageFinderGeometry"};
+        PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
     connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
 
@@ -1268,10 +1268,10 @@ bool FileXplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, Q
 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (dropAct == Qt::DropAction::MoveAction) {
-    Configuration().setValue(MemoryKey::MOVE_TO_PATH_HISTORY.name, //
+    Configuration().setValue(BehaviorKey::MOVE_TO_HISTORY.name, //
                              MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().MOVE_TO_PATH_HISTORY));
   } else if (dropAct == Qt::DropAction::CopyAction) {
-    Configuration().setValue(MemoryKey::COPY_TO_PATH_HISTORY.name, //
+    Configuration().setValue(BehaviorKey::COPY_TO_HISTORY.name, //
                              MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().COPY_TO_PATH_HISTORY));
   } else {
     LOG_D("DropAction[%d] is invalid", static_cast<int>(dropAct));

@@ -131,5 +131,5 @@ void Logger::SetPrintLevel(LOG_LVL_E newLevel) {
 
 void Logger::SetAutoFlushAllLevel(bool allLevelChecked) {
   m_autoFflushLevel = allLevelChecked ? LOG_LVL_E::D : LOG_LVL_E::W;
-  Configuration().setValue(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, allLevelChecked);
+  Configuration().setValue(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, allLevelChecked);
 }

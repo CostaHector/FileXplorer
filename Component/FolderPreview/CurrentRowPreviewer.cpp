@@ -53,9 +53,15 @@ void CurrentRowPreviewer::UpdatePreview() {
 }
 
 QSize CurrentRowPreviewer::sizeHint() const {
-  static const int w = Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.width()).toInt();
-  static const int h = Configuration().value("SELECTION_PREVIEWER_WIDTH", DOCKER_DEFAULT_SIZE.height()).toInt();
-  return {w, h};
+  static const int w = Configuration().value("CurrentRowPreviewer/width", DOCKER_DEFAULT_SIZE.width()).toInt();
+  static const int h = Configuration().value("CurrentRowPreviewer/height", DOCKER_DEFAULT_SIZE.height()).toInt();
+  static const QSize defHint{w, h};
+  return defHint;
+}
+
+void CurrentRowPreviewer::saveSizeHint() const {
+  Configuration().setValue("CurrentRowPreviewer/width", width());
+  Configuration().setValue("CurrentRowPreviewer/height", height());
 }
 
 bool CurrentRowPreviewer::NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const {

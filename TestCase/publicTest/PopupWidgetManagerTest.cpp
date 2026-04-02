@@ -29,7 +29,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
       }
     }
 
-    const QString widgetGeometryKey = configsBaseName + "Geometry";
+    const QString widgetGeometryKey = "Geometry/" + configsBaseName;
     QVERIFY(!Configuration().contains(widgetGeometryKey));
     {
       {  // invalid input. shoud not crash down

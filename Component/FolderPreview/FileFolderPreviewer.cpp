@@ -29,15 +29,15 @@ FileFolderPreviewer::~FileFolderPreviewer() {
 }
 
 void FileFolderPreviewer::ReadSettings() {
-  if (Configuration().contains("FLOATING_PREVIEW_GEOMETRY")) {
-    restoreGeometry(Configuration().value("FLOATING_PREVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("Geometry/FLOATING_PREVIEW")) {
+    restoreGeometry(Configuration().value("Geometry/FLOATING_PREVIEW").toByteArray());
   } else {
     setGeometry(QRect(0, 0, 480, 1080));
   }
 }
 
 void FileFolderPreviewer::SaveSettings() {
-  Configuration().setValue("FLOATING_PREVIEW_GEOMETRY", saveGeometry());
+  Configuration().setValue("Geometry/FLOATING_PREVIEW", saveGeometry());
 }
 
 void FileFolderPreviewer::StopVideoPlay() {

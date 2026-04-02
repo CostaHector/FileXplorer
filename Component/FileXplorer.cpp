@@ -55,10 +55,9 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  Configuration().setValue(CLASSNAME_2_STR(FileXplorer) "/Geometry", saveGeometry());
-  Configuration().setValue("SELECTION_PREVIEWER_WIDTH", m_previewFolder->width());
-  Configuration().setValue("SELECTION_PREVIEWER_HEIGHT", m_previewFolder->height());
-  Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, m_fsPanel->m_fsModel->rootPath());
+  Configuration().setValue("Geometry/" CLASSNAME_2_STR(FileXplorer), saveGeometry());
+  Configuration().setValue(PathKey::STARTUP_PATH.name, m_fsPanel->m_fsModel->rootPath());
+  m_previewFolder->saveSizeHint();
   QMainWindow::closeEvent(event);
 }
 
@@ -80,7 +79,7 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
 #endif
   // when not specified or specied path is invalid, use last time path in preference setting
   if (!bIsSpecifiedPath || (!path.isEmpty() && !QFile::exists(path))) {
-    QString lastTimePath = Configuration().value(MemoryKey::DEFAULT_OPEN_PATH.name, MemoryKey::DEFAULT_OPEN_PATH.v).toString();
+    QString lastTimePath = Configuration().value(PathKey::STARTUP_PATH.name, PathKey::STARTUP_PATH.v).toString();
     LOG_D("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
@@ -105,12 +104,12 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 }
 
 void FileXplorer::InitComponentVisibility() {
-  const bool showNavi{Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
+  const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool()};
   if (!showNavi) {
     m_navigationToolBar->hide();
   }
 
-  const bool showFolderPreview = Configuration().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool();
+  const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool();
   if (!showFolderPreview) {
     m_previewHtmlDock->setVisible(false);
   }

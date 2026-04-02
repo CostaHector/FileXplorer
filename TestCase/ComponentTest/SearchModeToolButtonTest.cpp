@@ -28,7 +28,7 @@ private slots:
 
   void test_initialState() {
     // precondition
-    QCOMPARE(MemoryKey::ADVANCE_SEARCH_MODE.v.toInt(), ((int)SearchTools::SearchModeE::NORMAL));
+    QCOMPARE(SearchKey::ADVANCE_MODE.v.toInt(), ((int)SearchTools::SearchModeE::NORMAL));
 
     SearchModeToolButton btn;
     QCOMPARE(btn.curSearchMode(), SearchTools::SearchModeE::NORMAL);
@@ -63,8 +63,8 @@ private slots:
       btn.EmitSearchModeChanged(pContentAct);
     } // cofigure saved to local file when destruct called
 
-    QVERIFY(Configuration().contains(MemoryKey::ADVANCE_SEARCH_MODE.name));
-    QCOMPARE(Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name).toInt(),
+    QVERIFY(Configuration().contains(SearchKey::ADVANCE_MODE.name));
+    QCOMPARE(Configuration().value(SearchKey::ADVANCE_MODE.name).toInt(),
              ((int)SearchTools::SearchModeE::FILE_CONTENTS));
 
     SearchModeToolButton newBtn;

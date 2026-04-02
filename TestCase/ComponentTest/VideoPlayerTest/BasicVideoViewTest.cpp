@@ -79,7 +79,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void playAVideo_trigger_disabled_ok() {
-    Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
     const QString existVideoPath{__FILE__};
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
@@ -110,7 +110,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void onStopPlaying_release_file_ok() {
-    Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
 
     BasicVideoView basicVideoView{true, nullptr};
     QCOMPARE(basicVideoView.mIsMediaCleared, false);
@@ -132,7 +132,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void playAVideo_trigger_manual_ok() {
-    Configuration().setValue(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::MANUAL);
+    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::MANUAL);
 
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(2)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(2)).will(returnValue(true));
@@ -184,7 +184,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void not_crash_ok() {
-    Configuration().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, 99);
+    Configuration().setValue(VideoPlayerKey::VOLUME.name, 99);
     BasicVideoView basicVideoView{false, nullptr};
     QCOMPARE(BasicVideoView::SetPositionCore(nullptr, 77), false);
     QCOMPARE(BasicVideoView::SetPositionCore(basicVideoView.mPlayer, 77), true);

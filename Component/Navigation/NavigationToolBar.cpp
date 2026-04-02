@@ -18,7 +18,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
   setObjectName(title);
 
   const bool bExpandSideBar{
-      Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool()};
+      Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.v).toBool()};
   setOrientation(Qt::Vertical);
   setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
   setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
@@ -106,11 +106,11 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
 }
 
 NavigationToolBar::~NavigationToolBar() {  //
-  Configuration().setValue(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, EXPAND_SIDEBAR->isChecked());
+  Configuration().setValue(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, EXPAND_SIDEBAR->isChecked());
 }
 
 void NavigationToolBar::subscribe() {
-  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{DEVICES_AND_DRIVES, this, "DevicesDrivesTVGeometry"};
+  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{DEVICES_AND_DRIVES, this, "Geometry/DevicesDrivesTV"};
   CHECK_NULLPTR_RETURN_VOID(mDevDriveTV);
 
   connect(m_pathActionGroups, &QActionGroup::triggered, this, &NavigationToolBar::onPathActionTriggeredNavi);

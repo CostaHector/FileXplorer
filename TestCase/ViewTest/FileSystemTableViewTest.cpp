@@ -119,7 +119,7 @@ private slots:
     pClip->clear();
 
     // precondition
-    const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
     QString currentPath = QFileInfo(__FILE__).absolutePath();
     QDir currentDir{currentPath, "", QDir::SortFlag::NoSort, defaultFilters};
     QStringList itemsInCurrentDir = currentDir.entryList();
@@ -151,7 +151,7 @@ private slots:
 
   void dragMove_and_drop_and_dragLeave_protection_ok() {
     // precondition
-    const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
 
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);  // need call manually
@@ -260,7 +260,7 @@ private slots:
 
   void drag_enter_and_drop_event_function_ok() {
     // precondition
-    const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
 
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);  // need call manually
@@ -386,7 +386,7 @@ private slots:
 
 
   void event_ok() {
-    const QDir::Filters defaultFilters{MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);
     FileSystemTableView fsView{&fsModel};

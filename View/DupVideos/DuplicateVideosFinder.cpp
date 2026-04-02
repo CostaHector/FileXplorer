@@ -21,12 +21,12 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
   tableNameFilterLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   tableNameFilterLE->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 
-  int szDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
+  int szDev = Configuration().value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v).toInt();
   sizeDevLE = new (std::nothrow) QLineEdit{QString::number(szDev), parent};
   CHECK_NULLPTR_RETURN_VOID(sizeDevLE);
   sizeDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
-  int durDev = Configuration().value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
+  int durDev = Configuration().value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.v).toInt();
   durationDevLE = new (std::nothrow) QLineEdit{QString::number(durDev), parent};
   CHECK_NULLPTR_RETURN_VOID(durationDevLE);
   durationDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
@@ -70,8 +70,8 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
 }
 
 void DuplicateVideosFinder::updateWindowsSize() {
-  if (Configuration().contains("DuplicateVideosFinderGeometry")) {
-    restoreGeometry(Configuration().value("DuplicateVideosFinderGeometry").toByteArray());
+  if (Configuration().contains("Geometry/DuplicateVideosFinder")) {
+    restoreGeometry(Configuration().value("Geometry/DuplicateVideosFinder").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -84,7 +84,7 @@ void DuplicateVideosFinder::showEvent(QShowEvent* event) {
 }
 
 void DuplicateVideosFinder::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("DuplicateVideosFinderGeometry", saveGeometry());
+  Configuration().setValue("Geometry/DuplicateVideosFinder", saveGeometry());
   Configuration().setValue("DuplicateVideosFinderSplitterState", m_tbl_detail_ver->saveState());
   QMainWindow::closeEvent(event);
 }

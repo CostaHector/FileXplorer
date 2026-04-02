@@ -17,7 +17,7 @@ SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent
                              {MATCH_REGEX, SearchModeE::REGEX},
                              {SEARCH_SCOPE_CONTENT, SearchModeE::FILE_CONTENTS}},//
                             SearchTools::DEFAULT_SEARCH_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  int searchModeInt = Configuration().value(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)SearchTools::DEFAULT_SEARCH_MODE).toInt();
+  int searchModeInt = Configuration().value(SearchKey::ADVANCE_MODE.name, (int)SearchTools::DEFAULT_SEARCH_MODE).toInt();
   QAction* defaultModeAct = mSearchModeIntAction.setCheckedIfActionExist(searchModeInt);
   if (defaultModeAct != nullptr) {
     setDefaultAction(defaultModeAct); //
@@ -42,7 +42,7 @@ SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent
 }
 
 SearchModeToolButton::~SearchModeToolButton() {
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)curSearchMode());
+  Configuration().setValue(SearchKey::ADVANCE_MODE.name, (int)curSearchMode());
 }
 
 void SearchModeToolButton::EmitSearchModeChanged(QAction* checkedAction) {

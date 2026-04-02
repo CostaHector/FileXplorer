@@ -166,7 +166,7 @@ void MovieDBSearchToolBar::InitTables(const QStringList& tbls) {
 }
 
 void MovieDBSearchToolBar::InitCurrentIndex() {
-  const QString defaultTableName{Configuration().value(MemoryKey::VIDS_LAST_TABLE_NAME.name, MemoryKey::VIDS_LAST_TABLE_NAME.v).toString()};
+  const QString defaultTableName{Configuration().value(BehaviorKey::VIDS_LAST_TABLE_NAME.name, BehaviorKey::VIDS_LAST_TABLE_NAME.v).toString()};
   const int defaultDisplayIndex = m_tablesCB->findText(defaultTableName, Qt::MatchStartsWith);
   if (defaultDisplayIndex != -1) {
     m_tablesCB->setCurrentIndex(defaultDisplayIndex);

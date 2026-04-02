@@ -22,8 +22,8 @@ class TypeFilterButtonTest : public PlainTestSuite {
   TypeFilterButtonTest() : PlainTestSuite{} { LOG_D("TypeFilterButtonTest object created\n"); }
 
   bool isInitialStateMatchConfigurationFile(const ModelFilterActions& filterHelper) {
-    const QString dirFilterKey = filterHelper.GetMemoryKeyName(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name);
-    const int expectInitialFilters = Configuration().value(dirFilterKey, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt();
+    const QString dirFilterKey = filterHelper.GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name);
+    const int expectInitialFilters = Configuration().value(dirFilterKey, BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt();
     QDir::Filters actualDirFilters = filterHelper.getCurDirFilters();
     const int actualDirFiltersValue = actualDirFilters.operator Int();
     if (actualDirFiltersValue != expectInitialFilters) {
@@ -31,16 +31,16 @@ class TypeFilterButtonTest : public PlainTestSuite {
       return false;
     }
 
-    const QString grayOrHideKey = filterHelper.GetMemoryKeyName(MemoryKey::GRAY_ENTRIES_DONT_PASS_FILTER.name);
-    const bool expectGrayOrHideKey = Configuration().value(grayOrHideKey, MemoryKey::GRAY_ENTRIES_DONT_PASS_FILTER.v).toBool();
+    const QString grayOrHideKey = filterHelper.GetMemoryKeyName(SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.name);
+    const bool expectGrayOrHideKey = Configuration().value(grayOrHideKey, SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.v).toBool();
     const bool actualGrayOrHide = filterHelper.getCurGrayOrHideUpassItem();
     if (actualGrayOrHide != expectGrayOrHideKey) {
       LOG_W("GrayOrHide dismatch. actual: %d, expect: %d", actualGrayOrHide, expectGrayOrHideKey);
       return false;
     }
 
-    const QString includeSubKey = filterHelper.GetMemoryKeyName(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name);
-    const bool expectIncludeSub = Configuration().value(includeSubKey, MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool();
+    const QString includeSubKey = filterHelper.GetMemoryKeyName(SearchKey::INCLUDING_SUBDIRECTORIES.name);
+    const bool expectIncludeSub = Configuration().value(includeSubKey, SearchKey::INCLUDING_SUBDIRECTORIES.v).toBool();
     const bool actualIncludeSub = filterHelper.getCurIteratorFlag() == QDirIterator::Subdirectories;
     if (actualIncludeSub != expectIncludeSub) {
       LOG_W("IncludeSub dismatch. actual: %d, expect: %d", actualIncludeSub, expectIncludeSub);
@@ -135,10 +135,10 @@ class TypeFilterButtonTest : public PlainTestSuite {
     }  // force call destructor
 
     const QStringList onlyFskeys = Configuration().allKeys();
-    QCOMPARE(onlyFskeys.size(), 2);  // only 2 key, and not contains SEARCH_INCLUDING_SUBDIRECTORIES
+    QCOMPARE(onlyFskeys.size(), 2);  // only 2 key, and not contains INCLUDING_SUBDIRECTORIES
     for (const QString& key : onlyFskeys) {
       QVERIFY(key.endsWith(keyEndWith));
-      QVERIFY(!key.contains(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name));
+      QVERIFY(!key.contains(SearchKey::INCLUDING_SUBDIRECTORIES.name));
     }
 
     {

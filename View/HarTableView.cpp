@@ -23,7 +23,7 @@ HarTableView::HarTableView(QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(mEXPORT_TO)
   mEXPORT_TO->setToolTip(QString("<b>%1</b><br/> Export the selection items to local path.").arg(mEXPORT_TO->text()));
 
-  mShowImagePreview = Configuration().value(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, MemoryKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
+  mShowImagePreview = Configuration().value(CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.name, CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
   mQUICK_PREVIEW = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Enable Images Preview", this};
   CHECK_NULLPTR_RETURN_VOID(mQUICK_PREVIEW)
   mQUICK_PREVIEW->setCheckable(true);
@@ -121,8 +121,8 @@ bool HarTableView::PreviewImage(const QModelIndex &current, const QModelIndex &/
 }
 
 void HarTableView::updateWindowsSize() {
-  if (Configuration().contains("HAR_TABLEVIEW_GEOMETRY")) {
-    restoreGeometry(Configuration().value("HAR_TABLEVIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("Geometry/HAR_TABLEVIEW")) {
+    restoreGeometry(Configuration().value("Geometry/HAR_TABLEVIEW").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -136,7 +136,7 @@ void HarTableView::showEvent(QShowEvent *event) {
 
 void HarTableView::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  Configuration().setValue("HAR_TABLEVIEW_GEOMETRY", saveGeometry());
-  Configuration().setValue(MemoryKey::SHOW_HAR_IMAGE_PREVIEW.name, mShowImagePreview);
+  Configuration().setValue("Geometry/HAR_TABLEVIEW", saveGeometry());
+  Configuration().setValue(CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.name, mShowImagePreview);
   CustomTableView::closeEvent(event);
 }

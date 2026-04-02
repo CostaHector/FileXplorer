@@ -180,9 +180,8 @@ class PasswordBookTest : public PlainTestSuite {
     pwdMgr.closeEvent(nullptr);
     QCloseEvent closeEve;
     pwdMgr.closeEvent(&closeEve);
-    Configuration().contains("PASSWORD_TABLEVIEW_GEOMETRY");
     Configuration().contains("PASSWORD_TABLEVIEW_STATE");
-    Configuration().contains("ACCOUNT_DETAIL_VIEW_GEOMETRY");
+    Configuration().contains("Geometry/ACCOUNT_DETAIL_VIEW");
   }
 
   void secondTime_FromExistsEncrypedFile_directly() {

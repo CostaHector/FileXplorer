@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   } else {
     LOG_I("argc[%d].", argc);
   }
-  Logger::SetAutoFlushAllLevel(Configuration().value(MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, MemoryKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
+  Logger::SetAutoFlushAllLevel(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
 
   const QStringList& args = app.arguments();
   QTranslator translator;  // cannot define in local. will be release.

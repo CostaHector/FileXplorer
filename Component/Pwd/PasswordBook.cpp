@@ -87,7 +87,7 @@ PasswordBook::PasswordBook(QWidget* parent)
 void PasswordBook::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event)
   Configuration().setValue("PASSWORD_TABLEVIEW_STATE", saveState());
-  Configuration().setValue("ACCOUNT_DETAIL_VIEW_GEOMETRY", mAccountDetailView->saveGeometry());
+  Configuration().setValue("Geometry/ACCOUNT_DETAIL_VIEW", mAccountDetailView->saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
@@ -95,8 +95,8 @@ void PasswordBook::ReadSettings() {
   if (Configuration().contains("PASSWORD_TABLEVIEW_STATE")) {
     restoreState(Configuration().value("PASSWORD_TABLEVIEW_STATE").toByteArray());
   }
-  if (Configuration().contains("ACCOUNT_DETAIL_VIEW_GEOMETRY")) {
-    mAccountDetailView->restoreGeometry(Configuration().value("ACCOUNT_DETAIL_VIEW_GEOMETRY").toByteArray());
+  if (Configuration().contains("Geometry/ACCOUNT_DETAIL_VIEW")) {
+    mAccountDetailView->restoreGeometry(Configuration().value("Geometry/ACCOUNT_DETAIL_VIEW").toByteArray());
   }
 }
 

@@ -23,13 +23,13 @@ void RenameWidget_Insert::extraSubscribe() {
 void RenameWidget_Insert::InitExtraMemberWidget() {
   insertStrCB->setEditable(true);
   insertStrCB->setCompleter(nullptr);
-  insertStrCB->addItems(Configuration().value(MemoryKey::RENAMER_OLD_STR_LIST.name, MemoryKey::RENAMER_OLD_STR_LIST.v).toStringList());
+  insertStrCB->addItems(Configuration().value(RenamerKey::OLD_STR_LIST.name, RenamerKey::OLD_STR_LIST.v).toStringList());
   insertStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   insertStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   insertAtCB->setEditable(true);
   insertAtCB->setCompleter(nullptr);
-  insertAtCB->addItems(Configuration().value(MemoryKey::RENAMER_INSERT_INDEXES_LIST.name, MemoryKey::RENAMER_INSERT_INDEXES_LIST.v).toStringList());
+  insertAtCB->addItems(Configuration().value(RenamerKey::INSERT_INDEXES_LIST.name, RenamerKey::INSERT_INDEXES_LIST.v).toStringList());
   insertAtCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   insertAtCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 }

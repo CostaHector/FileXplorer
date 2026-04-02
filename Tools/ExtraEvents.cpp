@@ -29,15 +29,15 @@ void ExtraEvents::subscribe() {
       PopupWidgetManager<TorrentsManagerWidget>{
           torrInst.SHOW_TORRENTS_MANAGER, //
           pParentWidget,                  //
-          "TorrentsManagerWidgetGeometry" //
+          "Geometry/TorrentsManagerWidget" //
       };
   CHECK_NULLPTR_RETURN_VOID(mTorrentsManager);
 
   auto& leafInst = g_fileLeafActions();
-  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsTable>{leafInst._SETTINGS, pParentWidget, "ConfigsTableGeometry"};
+  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsTable>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
 
-  mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "PasswordBookGeometry"};
+  mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "Geometry/PasswordBook"};
   CHECK_NULLPTR_RETURN_VOID(mPwdBook);
   mPwdBook->setWidgetCreator(PasswordBook::Creater);
 
@@ -49,7 +49,7 @@ void ExtraEvents::subscribe() {
                        "Platform-supported: Linux and Win");
   });
   m_resMonitor = new (std::nothrow)
-      PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget, "ResMonitorGeometry"};
+      PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget, "Geometry/ResMonitor"};
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {

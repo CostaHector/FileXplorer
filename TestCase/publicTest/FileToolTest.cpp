@@ -111,16 +111,16 @@ class FileToolTest : public PlainTestSuite {
     const QString fileParentParentFolder{QFileInfo(fileParentFolder).absolutePath()};
     QCOMPARE(QFileInfo{fileParentParentFolder}.isDir(), true);
 
-    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, fileParentParentFolder);
 
     // user specified
     QCOMPARE(ChooseCopyDestination(fileParentFolder, nullptr), fileParentFolder);
-    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
+    QCOMPARE(Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
 
     // from Configs file
-    Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, fileParentParentFolder);
     QCOMPARE(ChooseCopyDestination("", nullptr), fileParentParentFolder);
-    QCOMPARE(Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString(), fileParentParentFolder);
+    QCOMPARE(Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString(), fileParentParentFolder);
   }
 
   void load_and_remove_language_pack_ok() {

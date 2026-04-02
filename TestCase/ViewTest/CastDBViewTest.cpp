@@ -31,7 +31,7 @@ class CastDBViewTest : public PlainTestSuite {
   void default_construct() {
     TDir tDir;
     QVERIFY(tDir.IsValid());
-    Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
+    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
 
     const QString dbName{tDir.itemPath("CaseViewTest.db")};
     const QString connName{"CaseViewTestConn"};

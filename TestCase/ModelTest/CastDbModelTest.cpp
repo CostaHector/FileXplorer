@@ -25,7 +25,7 @@ class CastDbModelTest : public PlainTestSuite {
 public:
 private slots:
   void default_initialized_ok() {
-    Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, "Path/to/inexists/path");
+    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, "Path/to/inexists/path");
     CastDbModel castModel;
     { // precondition
       QVERIFY(!QFileInfo("Path/to/inexists/path").isDir());
@@ -108,7 +108,7 @@ private slots:
     QVERIFY(castDb.IsTableExist(tableName));
     QVERIFY(castDb.IsTableEmpty(tableName));
 
-    Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
+    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
     CastDbModel castModel(nullptr, castDb.GetDb());
     QVERIFY(castModel.database().isValid());
     QVERIFY(castModel.database().isOpen());

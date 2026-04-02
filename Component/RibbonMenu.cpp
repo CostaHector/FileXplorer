@@ -62,7 +62,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
                                   .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
   _EXPAND_RIBBONS->setCheckable(true);
   _EXPAND_RIBBONS->setChecked(
-      Configuration().value(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
+      Configuration().value(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
   m_corner = GetMenuRibbonCornerWid();
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -168,7 +168,7 @@ QToolBar* RibbonMenu::LeafHome() const {
                                       Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
                                       IMAGE_SIZE::TABS_ICON_IN_MENU_16,
                                       propertiesTB);
-    copyTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_COPY_CHOICE, true);
+    copyTB->InitDefaultActionFromQSetting(BehaviorKey::COPY_CHOICE, true);
     propertiesTB->addWidget(copyTB);
     propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
     propertiesTB->addAction(g_rightClickActions()._PROPERTIES);
@@ -184,7 +184,7 @@ QToolBar* RibbonMenu::LeafHome() const {
                                                        Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
                                                        IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                                                        leafHomeWid);
-  newItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_NEW_CHOICE, true);
+  newItemsTB->InitDefaultActionFromQSetting(BehaviorKey::NEW_CHOICE, true);
 
   QToolBar* moveCopyItemsToTB = new (std::nothrow) QToolBar{"Move/Copy item(s) To ToolBar", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(moveCopyItemsToTB);
@@ -252,7 +252,7 @@ QToolBar* RibbonMenu::LeafHome() const {
                                            Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
                                            IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                                            leafHomeWid);
-  renameItemsTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_RENAME_CHOICE, true);
+  renameItemsTB->InitDefaultActionFromQSetting(BehaviorKey::RENAME_CHOICE, true);
 
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
   CHECK_NULLPTR_RETURN_NULLPTR(advanceSearchToolBar);
@@ -408,7 +408,7 @@ void RibbonMenu::Subscribe() {
 }
 
 void RibbonMenu::AfterSubscribeInitialSettings() {
-  setCurrentIndex(Configuration().value(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
+  setCurrentIndex(Configuration().value(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
   QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
 }
 
@@ -421,7 +421,7 @@ bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
 }
 
 void RibbonMenu::on_expandStackedWidget(bool bExpand) {
-  Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, bExpand);
+  Configuration().setValue(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, bExpand);
   updateStackedWidgetHeight(bExpand, true);
 }
 
@@ -436,7 +436,7 @@ void RibbonMenu::updateStackedWidgetHeight(bool bExpand, bool bAnimationEnabled)
 }
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
-  Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
+  Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
 }
 
 void RibbonMenu::on_ViewTypeChanged(ViewTypeTool::ViewType vt) {

@@ -84,7 +84,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QCloseEvent closeEvent;
     devicesDrivesTV.closeEvent(&closeEvent);
 
-    Configuration().contains("DevicesDriveTableViewGeometry");
+    Configuration().contains("Geometry/DevicesDriveTableView");
   }
 
   void data_retrieve_ok() {
@@ -110,7 +110,7 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QCloseEvent closeEvent;
     devicesDrivesTV.closeEvent(&closeEvent);
 
-    QByteArray savedGeometry = Configuration().value("DevicesDriveTableViewGeometry").toByteArray();
+    QByteArray savedGeometry = Configuration().value("Geometry/DevicesDriveTableView").toByteArray();
     QCOMPARE(savedGeometry, originalGeometry);
   }
 };

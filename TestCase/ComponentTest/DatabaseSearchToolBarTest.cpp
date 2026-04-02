@@ -40,7 +40,7 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
   }
 
   void MovieDBSearchToolBar_emitsignal_ok() {
-    Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, "InexistTableName");
+    Configuration().setValue(BehaviorKey::VIDS_LAST_TABLE_NAME.name, "InexistTableName");
 
     QWidget parent;
     MovieDBSearchToolBar mdbSearchBar{"MovieSearchToolBarTest", &parent};
@@ -89,7 +89,7 @@ class DatabaseSearchToolBarTest : public PlainTestSuite {
     mdbSearchBar.m_tablesCB->setCurrentText("C__home_DISKS_DD2");
     QCOMPARE(mdbSearchBar.GetMovieTableMountPath(), "C:/home/DISKS/DD2");
 
-    Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, "_mnt_DISKS_DD2");
+    Configuration().setValue(BehaviorKey::VIDS_LAST_TABLE_NAME.name, "_mnt_DISKS_DD2");
     mdbSearchBar.InitCurrentIndex();
     QCOMPARE(mdbSearchBar.GetCurrentTableName(), "_mnt_DISKS_DD2");
   }

@@ -20,7 +20,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
-  m_nameFilterCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.v).toString());
+  m_nameFilterCB->addItem(Configuration().value(SearchKey::ADVANCE_LINEEDIT_VALUE.name, SearchKey::ADVANCE_LINEEDIT_VALUE.v).toString());
   m_nameFilterCB->addItem("\\.xltd$");
   m_nameFilterCB->addItem("\\.torrent$");
   m_nameFilterCB->addItem("\\.!ut$");
@@ -52,7 +52,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_contentCB->lineEdit()->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_contentCB->lineEdit()->setClearButtonEnabled(true);
   m_contentCB->addItem("nonporn");
-  m_contentCB->addItem(Configuration().value(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.v).toString());
+  m_contentCB->addItem(Configuration().value(SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE.name, SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE.v).toString());
   m_contentCB->addItem(QString{50, QChar{' '}});
   m_contentCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_contentCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
@@ -77,8 +77,8 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
 }
 
 AdvanceSearchToolBar::~AdvanceSearchToolBar() {
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
-  Configuration().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
+  Configuration().setValue(SearchKey::ADVANCE_LINEEDIT_VALUE.name, m_nameFilterCB->currentText());
+  Configuration().setValue(SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE.name, m_contentCB->currentText());
 }
 
 void AdvanceSearchToolBar::BindSearchAllModel(SearchProxyModel* searchProxyModel, AdvanceSearchModel* searchSourceModel) {

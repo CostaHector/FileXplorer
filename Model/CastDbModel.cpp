@@ -23,8 +23,8 @@ constexpr int CastDbModel::MAX_RATE;
 CastDbModel::CastDbModel(QObject* parent, QSqlDatabase db)
   : SqlTableModelPub{parent, db}
   , m_imageHostPath{Configuration()                                             //
-                        .value(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, //
-                               MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.v)    //
+                        .value(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, //
+                               PathKey::PERFORMER_IMAGEHOST_LOCATE.v)    //
                         .toString()} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 

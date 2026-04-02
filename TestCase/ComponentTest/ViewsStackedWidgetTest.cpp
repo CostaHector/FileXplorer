@@ -442,7 +442,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.m_fsModel->rootPath(), lvl0Path);
 
       const QString imageHostPath = mTDir.path();
-      Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, imageHostPath);
+      Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, imageHostPath);
       const QString dbName{mTDir.itemPath("DoubleClickOnCastViewTest.db")};
       const QString connName{"DoubleClickOnCastViewTestConn"};
       MOCKER(SystemPath::PEFORMERS_DATABASE).expects(exactly(1)).will(returnValue(dbName));
@@ -778,7 +778,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     // onSwitchByViewType(CAST)后移到准备好库后
     {
       const QString imageHostPath = mTDir.path();
-      Configuration().setValue(MemoryKey::PATH_PERFORMER_IMAGEHOST_LOCATE.name, imageHostPath);
+      Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, imageHostPath);
       const QString dbName{mTDir.itemPath("SelectionOnCastViewTest.db")};
       const QString connName{"SelectionOnCastViewTestConn"};
       MOCKER(SystemPath::PEFORMERS_DATABASE).expects(exactly(1)).will(returnValue(dbName));

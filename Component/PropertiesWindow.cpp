@@ -141,8 +141,8 @@ bool PropertiesWindow::operator()(const QList<qint64>& fileSizes, const QList<in
 }
 
 void PropertiesWindow::ReadSetting() {
-  if (Configuration().contains("PropertiesWindowGeometry")) {
-    restoreGeometry(Configuration().value("PropertiesWindowGeometry").toByteArray());
+  if (Configuration().contains("Geometry/PropertiesWindow")) {
+    restoreGeometry(Configuration().value("Geometry/PropertiesWindow").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
@@ -156,7 +156,7 @@ void PropertiesWindow::showEvent(QShowEvent* event) {
 }
 
 void PropertiesWindow::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("PropertiesWindowGeometry", saveGeometry());
+  Configuration().setValue("Geometry/PropertiesWindow", saveGeometry());
   QDialog::closeEvent(event);
 }
 

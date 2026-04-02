@@ -69,9 +69,9 @@ public:
 
   QString GetCurPath() const { return m_curPath; }
   QSize sizeHint() const override;
+  void saveSizeHint() const;
 
   bool NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const;
-
 signals:
   void reqWindowsTitleChange(const QString& newTitle);
 

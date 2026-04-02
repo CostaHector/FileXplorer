@@ -12,8 +12,8 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
  private slots:
   void default_construct_ok() {
     // with configs
-    Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1 * 1000);  // 1 s
-    Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 1 * 1024);  // 1 kB
+    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1 * 1000);  // 1 s
+    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 1 * 1024);  // 1 kB
     {
       LeftVideoGroupsModel model;
       QCOMPARE(model.rowCount(), 0);
@@ -83,7 +83,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   }
 
   void deviationDurationChange_only_ok() {
-    Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1050);  // 1050ms
+    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1050);  // 1050ms
 
     LeftVideoGroupsModel model;
     QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0);
@@ -110,7 +110,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   }
 
   void dataUpdate_increase_decrease_row_count_ok() {
-    Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2 kB
+    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2 kB
 
     LeftVideoGroupsModel model;
     QCOMPARE(model.rowCount(), 0);
