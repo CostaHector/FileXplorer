@@ -66,6 +66,7 @@ QVariant FavoritesTreeModel::data(const QModelIndex& index, int role) const {
     switch (role) {
       case FavoriteItemData::DEF_NAME_TEXT_ROLE:
         return item.name;
+      case Qt::ToolTipRole:
       case FavoriteItemData::FULL_PATH_ROLE:
         return item.fullPath;
       case FavoriteItemData::IS_GROUP_ROLE:
