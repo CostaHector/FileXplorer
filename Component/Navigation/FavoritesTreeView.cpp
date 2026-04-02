@@ -125,6 +125,7 @@ FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
 
   PushFrontExclusiveActions(exclusiveActs);
   subscribe();
+  InitTreeView();
 }
 
 FavoritesTreeView::~FavoritesTreeView() {
