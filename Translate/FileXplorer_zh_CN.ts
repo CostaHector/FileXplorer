@@ -400,12 +400,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+15"/>
-        <source>Favorites</source>
-        <translation>收藏夹</translation>
-    </message>
-    <message>
-        <location line="+544"/>
+        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+508"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
