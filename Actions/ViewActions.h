@@ -34,6 +34,7 @@ public:
   QAction* _HAR_VIEW{nullptr};
 
   QAction* _FONT_TYPE_AND_SIZE{nullptr};
+  QAction* _ROW_HEIGHT{nullptr};
 
 private:
   explicit ViewActions(QObject* parent = nullptr);

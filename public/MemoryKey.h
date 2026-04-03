@@ -33,8 +33,7 @@ class KV {
 
 struct MemoryKey {
   static const KV LANGUAGE_ZH_CN;
-  static const KV ITEM_VIEW_FONT_FAMILY;
-  static const KV ITEM_VIEW_FONT_SIZE;
+  static const KV ROW_HEIGHT;
 };
 
 struct FontKey {

@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QLayout>
 #include <QStyle>
+#include <unordered_set>
 
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {
@@ -65,17 +66,6 @@ void InitFontFamilyAndSize(QWidget* pWid) {
   }
   QFont font = ReadFontFamilyAndSize();
   pWid->setFont(font);
-}
-
-bool UpdateFontFamilyAndSize(QWidget* pWid, QFont newFont) {
-  if (pWid == nullptr) {
-    return false;
-  }
-  if (pWid->font() == newFont) {
-    return false;
-  }
-  pWid->setFont(newFont);
-  return true;
 }
 
 void SaveFontFamilyAndSize(QFont font) {

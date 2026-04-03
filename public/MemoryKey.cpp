@@ -1,4 +1,5 @@
 ﻿#include "MemoryKey.h"
+#include "SizeTool.h"
 #include <QDir>
 
 QList<const KV*> KV::mEditableKVs;
@@ -21,6 +22,7 @@ QString KV::valueToString(const QVariant& v_) const {
 using namespace VALUE_CHECKER_TYPE;
 
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
+const KV MemoryKey::ROW_HEIGHT{"ROW_HEIGHT", SizeTool::TABLE_DEFAULT_ROW_SECTION_SIZE, ValueChecker{0, 9999}};
 
 const KV FontKey::FAMILY("FontKey/FAMILY",
 #ifdef _WIN32

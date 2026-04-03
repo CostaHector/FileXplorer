@@ -112,6 +112,16 @@ void MenuInHeader::RestoreHeaderState() {
   restoreState(Configuration().value(m_headerStateKey, QByteArray{}).toByteArray());
 }
 
+bool MenuInHeader::checkAndSetDefaultSectionSize(int newSectionSize) {
+  const int beforeDefSize{defaultSectionSize()};
+  if (newSectionSize == beforeDefSize) {
+    LOG_D("Default section size unchanged: %d px", beforeDefSize);
+    return false;
+  }
+  setDefaultSectionSize(newSectionSize);
+  return true;
+}
+
 void MenuInHeader::contextMenuEvent(QContextMenuEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
   CHECK_NULLPTR_RETURN_VOID(m_menu);
@@ -151,12 +161,7 @@ bool MenuInHeader::onSetDefaultSectionSize() {
     LOG_W("User canceled default section size setting");
     return false;
   }
-  if (afterDefSize == beforeDefSize) {
-    LOG_D("Default section size unchanged: %d px", beforeDefSize);
-    return false;
-  }
-  setDefaultSectionSize(afterDefSize);
-  return true;
+  return checkAndSetDefaultSectionSize(afterDefSize);
 }
 
 bool MenuInHeader::onSetMaxSectionSize() {

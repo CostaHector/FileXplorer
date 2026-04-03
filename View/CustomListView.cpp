@@ -7,9 +7,11 @@
 #include "ViewHelper.h"
 #include "PublicMacro.h"
 #include "Bool2QtEnum.h"
+#include "FontRegistry.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
+extern template struct FontRegistry<QWidget>;
 
 QSet<QString> CustomListView::mListInstSet;
 
@@ -71,6 +73,7 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
   AddItselfAction2Menu();
 
   SubscribePublicActions();
+  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
 }
 
 void CustomListView::SubscribePublicActions() {
