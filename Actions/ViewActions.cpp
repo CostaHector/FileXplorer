@@ -100,6 +100,11 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _HAR_VIEW->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                 "Double click to open an har file")
                             .arg(_HAR_VIEW->text(), _HAR_VIEW->shortcut().toString()));
+
+  _FONT_TYPE_AND_SIZE = new (std::nothrow) QAction{QIcon{":img/FONT_SIZE"}, tr("Font"), this};
+  _FONT_TYPE_AND_SIZE->setToolTip(QString("<b>%1 (%2)<br/>"
+                                          "Configure text font settings")
+                                      .arg(_FONT_TYPE_AND_SIZE->text(), _FONT_TYPE_AND_SIZE->shortcut().toString()));
 }
 
 ViewActions::~ViewActions() {

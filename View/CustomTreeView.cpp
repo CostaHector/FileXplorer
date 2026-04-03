@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "ViewItemDelegate.h"
+#include "StyleSheet.h"
 
 QSet<QString> CustomTreeView::mTreeInstSet;
 
@@ -154,7 +155,7 @@ bool CustomTreeView::ShowOrHideColumnCore() {
 }
 
 void CustomTreeView::InitTreeView() {  //
-  View::UpdateItemViewFontSizeCore(this);
+  StyleSheet::InitFontFamilyAndSize(this);
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();

@@ -105,7 +105,7 @@ CSVInputDialog::CSVInputDialog(QWidget* parent)  //
   connect(buttonBox, &QDialogButtonBox::helpRequested, this, &CSVInputDialog::onHelpRequest);
   connect(textEdit->document(), &QTextDocument::contentsChanged, this, &CSVInputDialog::onContentsChanged);
 
-  setFont(StyleSheet::TEXT_EDIT_FONT);
+  setFont(StyleSheet::CODE_EDITOR_FONT());
   setWindowIcon(QIcon(":/edit/LOAD_FROM_INPUT"));
   setWindowTitle("Get record(s) from CSV input");
 }

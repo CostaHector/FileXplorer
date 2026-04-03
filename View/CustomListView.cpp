@@ -167,7 +167,7 @@ void CustomListView::onUniformItemSizedToggled(const bool bUniform) {
 
 void CustomListView::InitListView() {
   initExclusivePreferenceSetting();
-  View::UpdateItemViewFontSizeCore(this);
+  StyleSheet::InitFontFamilyAndSize(this);
 
   // top2bottom, list
   _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(GetName() + "/FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());

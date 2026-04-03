@@ -1,12 +1,13 @@
 #include "AccountTableView.h"
+#include "PwdPublicVariable.h"
+#include "PwdTableEditActions.h"
+#include "NotificatorMacro.h"
+#include "StyleSheet.h"
 #include <QHeaderView>
 #include <QDateTime>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
-#include "PwdPublicVariable.h"
-#include "PwdTableEditActions.h"
-#include "NotificatorMacro.h"
 
 AccountTableView::AccountTableView(QWidget* parent)
     : CustomTableView{"PASSWORD_TABLEVIEW", parent}  //
@@ -23,7 +24,7 @@ AccountTableView::AccountTableView(QWidget* parent)
   setModel(mSortProxyModel);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
   InitTableView();
-  setFont(PwdPublicVariable::TEXT_EDIT_FONT);
+  setFont(StyleSheet::CODE_EDITOR_FONT());
   Subscribe();
 }
 

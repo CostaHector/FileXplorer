@@ -71,7 +71,7 @@ PasswordBook::PasswordBook(QWidget* parent)
   mToolBar->addAction(tblEditInst.OPEN_DIRECTORY);
   mToolBar->addAction(tblEditInst.SAVE_CHANGES);
   addToolBar(Qt::ToolBarArea::TopToolBarArea, mToolBar);
-  mToolBar->setFont(StyleSheet::TEXT_EDIT_FONT);
+  mToolBar->setFont(StyleSheet::CODE_EDITOR_FONT());
 
   mStatusBar = new (std::nothrow) QStatusBar{this};
   CHECK_NULLPTR_RETURN_VOID(mStatusBar);

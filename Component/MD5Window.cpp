@@ -195,7 +195,7 @@ void MD5Window::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_md5TextEdit->setFont(StyleSheet::TEXT_EDIT_FONT);
+  m_md5TextEdit->setFont(StyleSheet::CODE_EDITOR_FONT());
 }
 
 void MD5Window::showEvent(QShowEvent* event) {

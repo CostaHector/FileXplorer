@@ -302,6 +302,8 @@ QToolBar* RibbonMenu::LeafView() const {
   leafViewWid->addAction(viewInst._PREVIEW_PANEL);
   leafViewWid->addSeparator();
   leafViewWid->addAction(viewInst._HAR_VIEW);
+  leafViewWid->addSeparator();
+  leafViewWid->addAction(viewInst._FONT_TYPE_AND_SIZE);
   leafViewWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafViewWid;
 }

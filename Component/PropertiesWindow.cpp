@@ -146,7 +146,7 @@ void PropertiesWindow::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_propertiesInfoTextEdit->setFont(StyleSheet::TEXT_EDIT_FONT);
+  m_propertiesInfoTextEdit->setFont(StyleSheet::CODE_EDITOR_FONT());
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {

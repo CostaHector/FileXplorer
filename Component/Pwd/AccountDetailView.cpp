@@ -38,7 +38,7 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
 
   mFormWid->setLayout(mForm);
   setWidget(mFormWid);
-  setFont(StyleSheet::TEXT_EDIT_FONT);
+  setFont(StyleSheet::CODE_EDITOR_FONT());
   Subscribe();
   editNotHappen();
   setWindowTitle(tr("Detail View"));

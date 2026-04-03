@@ -33,6 +33,8 @@ public:
   QAction* _SYS_VIDEO_PLAYERS{nullptr};
   QAction* _HAR_VIEW{nullptr};
 
+  QAction* _FONT_TYPE_AND_SIZE{nullptr};
+
 private:
   explicit ViewActions(QObject* parent = nullptr);
 };

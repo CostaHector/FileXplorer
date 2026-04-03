@@ -6,6 +6,7 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
+#include "StyleSheet.h"
 #include <QContextMenuEvent>
 
 QSet<QString> CustomTableView::mTableInstSet;
@@ -192,7 +193,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
 
 void CustomTableView::InitTableView() {
   initExclusivePreferenceSetting();
-  View::UpdateItemViewFontSizeCore(this);
+  StyleSheet::InitFontFamilyAndSize(this);
 
   _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool());
   _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool());

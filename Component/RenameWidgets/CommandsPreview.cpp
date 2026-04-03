@@ -47,7 +47,7 @@ void CommandsPreview::ReadSettings() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  setFont(StyleSheet::TEXT_EDIT_FONT);
+  setFont(StyleSheet::CODE_EDITOR_FONT());
   setWindowIcon(QIcon(":img/COMMAND_PREVIEW"));
 }
 

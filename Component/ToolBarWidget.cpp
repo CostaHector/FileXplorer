@@ -94,6 +94,12 @@ QToolButton* ToolBarWidget::createToolButton(QAction* act, Qt::ToolButtonStyle t
   return btn;
 }
 
+QAction* ToolBarWidget::addAction(const QIcon& icon, const QString& text) {
+  QAction* act = new QAction{icon, text, this};
+  addAction(act);
+  return act;
+}
+
 bool ToolBarWidget::addAction(QAction* act) {
   CHECK_NULLPTR_RETURN_FALSE(act);
   QToolButton* btn = createToolButton(act);

@@ -13,7 +13,7 @@
 #include <QFile>
 
 ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
-  setFont(StyleSheet::TEXT_EDIT_FONT);
+  setFont(StyleSheet::CODE_EDITOR_FONT());
 
   m_failItemCnt = new (std::nothrow) QLabel{"Configs status here", this};
   CHECK_NULLPTR_RETURN_VOID(m_failItemCnt);

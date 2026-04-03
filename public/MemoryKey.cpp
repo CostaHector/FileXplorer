@@ -21,7 +21,15 @@ QString KV::valueToString(const QVariant& v_) const {
 using namespace VALUE_CHECKER_TYPE;
 
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
-const KV MemoryKey::ITEM_VIEW_FONT_SIZE("ITEM_VIEW_FONT_SIZE", 12, ValueChecker{8, 25 + 1});
+
+const KV FontKey::FAMILY("FontKey/FAMILY",
+#ifdef _WIN32
+                         "Microsoft YaHei",
+#else
+                         "Noto Sans",
+#endif
+                         ValueChecker{PLAIN_STR});
+const KV FontKey::POINT("FontKey/POINT", 12, ValueChecker{8, 25 + 1});
 
 const KV PathKey::STARTUP_PATH{"PathKey/STARTUP_PATH", "./", ValueChecker{FOLDER_PATH}};
 const KV PathKey::LAST_TIME_COPY_TO("PathKey/LAST_TIME_COPY_TO", "", ValueChecker{FOLDER_PATH});

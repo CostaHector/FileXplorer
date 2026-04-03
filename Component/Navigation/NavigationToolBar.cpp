@@ -82,7 +82,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
     // 3. all volumes
     foreach (const QFileInfo& fi, QDir::drives()) {
       const QString diskAbsPath{fi.absoluteFilePath()};
-      auto* pVolume = addAction(diskAbsPath);
+      auto* pVolume = addAction({}, diskAbsPath);
       CHECK_NULLPTR_RETURN_VOID(pVolume)
       pVolume->setData(diskAbsPath);
       pVolume->setToolTip(QString{"<b>Disk: %1</b>"}.arg(diskAbsPath));

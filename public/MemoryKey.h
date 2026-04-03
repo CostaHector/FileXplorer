@@ -33,7 +33,13 @@ class KV {
 
 struct MemoryKey {
   static const KV LANGUAGE_ZH_CN;
+  static const KV ITEM_VIEW_FONT_FAMILY;
   static const KV ITEM_VIEW_FONT_SIZE;
+};
+
+struct FontKey {
+  static const KV FAMILY;
+  static const KV POINT;
 };
 
 struct PathKey {
