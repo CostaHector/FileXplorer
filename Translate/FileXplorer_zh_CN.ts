@@ -215,130 +215,6 @@
     </message>
 </context>
 <context>
-    <name>CustomListView</name>
-    <message>
-        <location filename="../View/CustomListView.cpp" line="+32"/>
-        <source>Icon size</source>
-        <translation>图片大小</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Text elide mode</source>
-        <translation>文本省略模式</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Flow Orientation: Left2Right</source>
-        <translation>布局:从左往右</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>View Mode: Icon</source>
-        <translation>视图模式:图标</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Resize Mode: Adjust</source>
-        <translation>大小调整:自适应</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Wrapping</source>
-        <translation>卷绕显示</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Uniform items sizes</source>
-        <translation>项大小统一</translation>
-    </message>
-</context>
-<context>
-    <name>CustomTableView</name>
-    <message>
-        <location filename="../View/CustomTableView.cpp" line="+35"/>
-        <source>Show All Columns</source>
-        <translation>显示所有列</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Show Horizontal Header</source>
-        <translation>显示水平表头</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Show Vertical Header</source>
-        <translation>显示垂直表头</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Resize Rows to Contents</source>
-        <translation>调正行高适应内容</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Resize Columns to Contents</source>
-        <translation>调整列宽适应内容</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Auto Scroll</source>
-        <translation>自动滚动</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Alternating row colors</source>
-        <translation>交替行颜色</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Show grid</source>
-        <translation>显示网格</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Horizontal scroll bar policy</source>
-        <translation>水平滚动条显示策略</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Vertical scroll bar policy</source>
-        <translation>竖直滚动条显示策略</translation>
-    </message>
-</context>
-<context>
-    <name>CustomTreeView</name>
-    <message>
-        <location filename="../View/CustomTreeView.cpp" line="+35"/>
-        <source>Show All Columns</source>
-        <translation>显示所有列</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Show Horizontal Header</source>
-        <translation>显示水平表头</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Auto Scroll</source>
-        <translation>自动滚动</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Alternating row colors</source>
-        <translation>交替行颜色</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Horizontal scroll bar policy</source>
-        <translation>水平滚动条显示策略</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Vertical scroll bar policy</source>
-        <translation>竖直滚动条显示策略</translation>
-    </message>
-</context>
-<context>
     <name>DoubleRowHeader</name>
     <message>
         <location filename="../Component/HeaderView/DoubleRowHeader.cpp" line="+9"/>
@@ -400,7 +276,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+508"/>
+        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+514"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -2187,7 +2063,12 @@
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.cpp" line="+14"/>
+        <location filename="../Actions/ViewActions.cpp" line="+8"/>
+        <source>Navigation Pane</source>
+        <translation>导航面板</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>LIST</source>
         <translation>单列文件视图</translation>
     </message>
@@ -2228,31 +2109,36 @@
     </message>
     <message>
         <location line="+50"/>
-        <source>View back</source>
+        <source>View Back</source>
         <translation>上一个视图</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>View forward</source>
+        <source>View Forward</source>
         <translation>下一个视图</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>play in system application</source>
-        <translation>在系统应用中打开</translation>
-    </message>
-    <message>
-        <location line="-84"/>
-        <source>Navigation Pane</source>
-        <translation>导航面板</translation>
-    </message>
-    <message>
-        <location line="+78"/>
+        <location line="+6"/>
         <source>Preview Panel</source>
         <translation>预览面板</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+6"/>
+        <source>Play in System Application</source>
+        <translation>在系统应用中打开</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Row Height</source>
+        <translation>行高</translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Font</source>
+        <translation>字体</translation>
+    </message>
+    <message>
+        <location line="-5"/>
         <source>Har View</source>
         <translation>Har视图</translation>
     </message>
