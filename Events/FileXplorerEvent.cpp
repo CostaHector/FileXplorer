@@ -50,6 +50,8 @@
 #include "RateActions.h"
 #include "RateHelper.h"
 #include "RecycleCfmDlg.h"
+#include "FontRegistry.h"
+#include "RowHeightRegistry.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -520,6 +522,7 @@ void FileXplorerEvent::subscribe() {
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileXplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileXplorerEvent::on_PlayVideo);
     connect(viewInst._FONT_TYPE_AND_SIZE, &QAction::triggered, this, &FileXplorerEvent::on_FontChanged);
+    connect(viewInst._ROW_HEIGHT, &QAction::triggered, this, &FileXplorerEvent::on_RowHeightChanged);
   }
 
   {
@@ -906,31 +909,48 @@ bool FileXplorerEvent::on_PlayVideo() const {
   return true;
 }
 
+extern template struct FontRegistry<QWidget>;
+extern template struct FontRegistry<QAction>;
 void FileXplorerEvent::on_FontChanged() {
   bool bOk{false};
 
-  QFont beforeFont = StyleSheet::ReadFontFamilyAndSize();
-  QFont newFont = QFontDialog::getFont(&bOk, beforeFont, nullptr);
+  const QFont& beforeFont = StyleSheet::ReadFontFamilyAndSize();
+  const QFont& newFont = QFontDialog::getFont(&bOk, beforeFont, nullptr);
   if (!bOk) {
     LOG_INFO_NP("[Cancel]", "User cancelled font setting");
     return;
   }
   if (newFont == beforeFont) {
-    LOG_INFO_NP("[Skip]", "font setting unchaned");
+    LOG_INFO_P("[Skip]", "font setting unchaned remains font: %s, size: %d, weight:%d, Italic: %d",  //
+               qPrintable(beforeFont.family()), beforeFont.pointSize(), beforeFont.weight(), beforeFont.italic());
     return;
   }
   LOG_OK_P("Font changed", "Selected font: %s, size: %d, weight:%d, Italic: %d",  //
            qPrintable(newFont.family()), newFont.pointSize(), newFont.weight(), newFont.italic());
-
   StyleSheet::SaveFontFamilyAndSize(newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_fsListView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_fsTableView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_fsTreeView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_movieView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_advanceSearchView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_sceneTableView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_castTableView, newFont);
-  StyleSheet::UpdateFontFamilyAndSize(_contentPane->m_jsonTableView, newFont);
+  FontRegistry<QWidget>::updateRegisteredWidgetsFont(newFont, false);
+  FontRegistry<QAction>::updateRegisteredWidgetsFont(newFont, false);  // definitely false for action
+}
+
+extern template struct RowHeightRegistry<CustomTableView>;
+extern template struct RowHeightRegistry<CustomTreeView>;
+void FileXplorerEvent::on_RowHeightChanged() {
+  int beforeRowHeight = Configuration().value(MemoryKey::ROW_HEIGHT.name, MemoryKey::ROW_HEIGHT.v).toInt();
+  QString msg{QString{"will be used in tableview/treeview.\nIt is recommend that %1"}.arg(MemoryKey::ROW_HEIGHT.v.toInt())};
+  bool bOk{false};
+  int newRowHeight = QInputDialog::getInt(nullptr, "Row height setting", msg, beforeRowHeight, 0, 9999, 1, &bOk);
+  if (!bOk) {
+    LOG_INFO_NP("[Cancel]", "User cancelled rowHeight setting");
+    return;
+  }
+  if (newRowHeight == beforeRowHeight) {
+    LOG_INFO_P("[Skip]", "rowHeight setting unchaned remains[%d]", beforeRowHeight);
+    return;
+  }
+  LOG_OK_P("Row height changed", "value[%d]", newRowHeight);
+  Configuration().setValue(MemoryKey::ROW_HEIGHT.name, newRowHeight);
+  RowHeightRegistry<CustomTableView>::updateRegisteredWidgetsForAdjust(newRowHeight);
+  RowHeightRegistry<CustomTreeView>::updateRegisteredWidgetsForAdjust(newRowHeight);
 }
 
 bool FileXplorerEvent::on_Merge(const bool isReverse) {

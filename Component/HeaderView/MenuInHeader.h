@@ -17,6 +17,7 @@ public:
   const QString& GetName() const { return m_name; }
   void AddActionToMenu(QAction* act);
   void RestoreHeaderState();
+  bool checkAndSetDefaultSectionSize(int newSectionSize);
 
 protected:
   void contextMenuEvent(QContextMenuEvent* e) override;

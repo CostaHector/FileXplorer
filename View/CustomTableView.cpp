@@ -7,7 +7,13 @@
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
 #include "StyleSheet.h"
+#include "FontRegistry.h"
+#include "RowHeightRegistry.h"
+
 #include <QContextMenuEvent>
+
+extern template struct FontRegistry<QWidget>;
+extern template struct RowHeightRegistry<CustomTableView>;
 
 QSet<QString> CustomTableView::mTableInstSet;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
@@ -30,7 +36,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
-
 
   // 0.
   _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, tr("Show All Columns"), this);
@@ -109,6 +114,8 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   AddItselfAction2Menu();
 
   SubscribeHeaderActions();
+  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
+  RowHeightRegistry<CustomTableView>::registerWidgetForAdjust(this, true);
 }
 
 CustomTableView::~CustomTableView() {
@@ -201,6 +208,16 @@ void CustomTableView::InitTableView() {
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
+}
+
+int CustomTableView::rowHeight() const {
+  CHECK_NULLPTR_RETURN_INT(m_verHeader, -1);
+  return m_verHeader->defaultSectionSize();
+}
+
+bool CustomTableView::setRowHeight(int newRowHeight) {
+  CHECK_NULLPTR_RETURN_FALSE(m_verHeader);
+  return m_verHeader->checkAndSetDefaultSectionSize(newRowHeight);
 }
 
 void CustomTableView::mousePressEvent(QMouseEvent* event) {

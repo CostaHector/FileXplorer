@@ -20,12 +20,14 @@ class CustomTableView : public QTableView {
 
   void InitTableView();
 
-  void mousePressEvent(QMouseEvent* event) override;
+  int rowHeight() const;
+  bool setRowHeight(int newRowHeight);
 
  signals:
   void searchSqlStatementChanged(const QString& sqlStatement);
 
  protected:
+  void mousePressEvent(QMouseEvent* event) override;
   void scrollContentsBy(int dx, int dy) override;
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}

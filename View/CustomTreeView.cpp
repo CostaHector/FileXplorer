@@ -7,6 +7,10 @@
 #include "PublicMacro.h"
 #include "ViewItemDelegate.h"
 #include "StyleSheet.h"
+#include "FontRegistry.h"
+#include "RowHeightRegistry.h"
+extern template struct FontRegistry<QWidget>;
+extern template struct RowHeightRegistry<CustomTreeView>;
 
 QSet<QString> CustomTreeView::mTreeInstSet;
 
@@ -28,8 +32,8 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  ViewItemDelegate* pDelegate = new ViewItemDelegate{this};
-  setItemDelegate(pDelegate);
+  m_itemDelegate = new ViewItemDelegate{this};
+  setItemDelegate(m_itemDelegate);
   setUniformRowHeights(true);
 
   // 0.
@@ -83,6 +87,8 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
 
   AddItselfAction2Menu();
   SubscribeHeaderActions();
+  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
+  RowHeightRegistry<CustomTreeView>::registerWidgetForAdjust(this, true);
 }
 
 CustomTreeView::~CustomTreeView() {
@@ -159,4 +165,18 @@ void CustomTreeView::InitTreeView() {  //
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
+}
+
+int CustomTreeView::rowHeight() const {
+  if (m_itemDelegate) {
+    return m_itemDelegate->rowHeight();
+  }
+  return -1;
+}
+
+bool CustomTreeView::setRowHeight(int newRowHeight) {
+  if (m_itemDelegate) {
+    return m_itemDelegate->setRowHeight(newRowHeight);
+  }
+  return false;
 }

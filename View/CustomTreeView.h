@@ -6,6 +6,7 @@
 
 class DoubleRowHeader;
 class ScrollBarPolicyMenu;
+class ViewItemDelegate;
 
 class CustomTreeView : public QTreeView {
   Q_OBJECT
@@ -17,6 +18,9 @@ class CustomTreeView : public QTreeView {
 
   void PushFrontExclusiveActions(const QList<QAction*>& acts);
   void InitTreeView();
+
+  int rowHeight() const;
+  bool setRowHeight(int newRowHeight);
 
  signals:
   void searchSqlStatementChanged(const QString& sqlStatement);
@@ -42,6 +46,7 @@ class CustomTreeView : public QTreeView {
 
   DoubleRowHeader* m_horHeader{nullptr};
   AddableMenu* m_menu{nullptr};
+  ViewItemDelegate* m_itemDelegate{nullptr};
 
   inline bool isNameExists(const QString& name) const { return mTreeInstSet.contains(name); }
   static QSet<QString> mTreeInstSet;

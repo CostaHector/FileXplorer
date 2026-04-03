@@ -2,9 +2,9 @@
 #include "BeginToExposePrivateMember.h"
 #include "ThumbnailImageViewer.h"
 #include "CustomListView.h"
+#include "CustomTableView.h"
 #include "EndToExposePrivateMember.h"
 #include "ClickableTextBrowser.h"
-#include "CustomTableView.h"
 #include <QWheelEvent>
 
 namespace MouseKeyboardEventHelper {

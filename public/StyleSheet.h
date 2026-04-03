@@ -28,7 +28,6 @@ constexpr char SUBMIT_BTN_STYLE[] =
 const QFont& CODE_EDITOR_FONT();
 QFont ReadFontFamilyAndSize();
 void InitFontFamilyAndSize(QWidget* pWid);
-bool UpdateFontFamilyAndSize(QWidget* pWid, QFont newFont);
 void SaveFontFamilyAndSize(QFont font);
 
 QIcon GetSystemDirOpenIcon();

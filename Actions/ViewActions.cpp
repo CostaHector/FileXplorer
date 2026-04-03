@@ -105,6 +105,11 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _FONT_TYPE_AND_SIZE->setToolTip(QString("<b>%1 (%2)<br/>"
                                           "Configure text font settings")
                                       .arg(_FONT_TYPE_AND_SIZE->text(), _FONT_TYPE_AND_SIZE->shortcut().toString()));
+
+  _ROW_HEIGHT = new (std::nothrow) QAction{QIcon{":img/DEFAULT_ROW_HEIGHT"}, tr("Row height"), this};
+  _ROW_HEIGHT->setToolTip(QString("<b>%1 (%2)<br/>"
+                                  "Configure tableview/treeview row height settings")
+                              .arg(_ROW_HEIGHT->text(), _ROW_HEIGHT->shortcut().toString()));
 }
 
 ViewActions::~ViewActions() {
