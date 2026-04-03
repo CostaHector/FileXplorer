@@ -168,15 +168,15 @@ void CustomTreeView::InitTreeView() {  //
 }
 
 int CustomTreeView::rowHeight() const {
-  if (m_itemDelegate) {
-    return m_itemDelegate->rowHeight();
-  }
-  return -1;
+  CHECK_NULLPTR_RETURN_INT(m_itemDelegate, -1);
+  return m_itemDelegate->rowHeight();
 }
 
 bool CustomTreeView::setRowHeight(int newRowHeight) {
-  if (m_itemDelegate) {
-    return m_itemDelegate->setRowHeight(newRowHeight);
+  CHECK_NULLPTR_RETURN_INT(m_itemDelegate, false);
+  bool setResult = m_itemDelegate->setRowHeight(newRowHeight);
+  if (setResult) {
+    doItemsLayout();
   }
-  return false;
+  return setResult;
 }
