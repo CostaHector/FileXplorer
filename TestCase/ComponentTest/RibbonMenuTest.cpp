@@ -14,8 +14,8 @@ class RibbonMenuTest : public PlainTestSuite {
  private slots:
   void test_ribbon_menu_basic_behavior_ok() {
     // precondition: default table widget=0, expand=true
-    Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, 0);
-    Configuration().setValue(MemoryKey::EXPAND_OFFICE_STYLE_MENUBAR.name, true);
+    Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, 0);
+    Configuration().setValue(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, true);
 
     RibbonMenu rm;
     QVERIFY(rm.count() > 0);
@@ -29,7 +29,7 @@ class RibbonMenuTest : public PlainTestSuite {
     const int movieIndexInTabBar = rm.currentIndex();
     emit rm.currentChanged(movieIndexInTabBar);
     // memory updated
-    Configuration().setValue(MemoryKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, movieIndexInTabBar);
+    Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, movieIndexInTabBar);
     // tab widget toggled
     auto* pTabBar = rm.tabBar();
     QVERIFY(pTabBar != nullptr);

@@ -141,12 +141,12 @@ bool PropertiesWindow::operator()(const QList<qint64>& fileSizes, const QList<in
 }
 
 void PropertiesWindow::ReadSetting() {
-  if (Configuration().contains("PropertiesWindowGeometry")) {
-    restoreGeometry(Configuration().value("PropertiesWindowGeometry").toByteArray());
+  if (Configuration().contains("Geometry/PropertiesWindow")) {
+    restoreGeometry(Configuration().value("Geometry/PropertiesWindow").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_propertiesInfoTextEdit->setFont(StyleSheet::TEXT_EDIT_FONT);
+  m_propertiesInfoTextEdit->setFont(StyleSheet::CODE_EDITOR_FONT());
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {
@@ -156,7 +156,7 @@ void PropertiesWindow::showEvent(QShowEvent* event) {
 }
 
 void PropertiesWindow::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("PropertiesWindowGeometry", saveGeometry());
+  Configuration().setValue("Geometry/PropertiesWindow", saveGeometry());
   QDialog::closeEvent(event);
 }
 

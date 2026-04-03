@@ -30,8 +30,8 @@ class NavigationToolBarTest : public PlainTestSuite {
   }
 
   void D2Ev_D0Ev_ok() {
-    Configuration().remove(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name);
-    QCOMPARE(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.v).toBool(), false);
+    Configuration().remove(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name);
+    QCOMPARE(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.v).toBool(), false);
     {  // 普通析构函数
       NavigationToolBar naviTooBar{"NaviToolbarOnExpandSidebar"};
       QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), false);
@@ -44,8 +44,8 @@ class NavigationToolBarTest : public PlainTestSuite {
       QCOMPARE(naviTooBar.toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
       QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND);
     }
-    QVERIFY(Configuration().contains(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name));
-    QVERIFY(Configuration().value(MemoryKey::EXPAND_QUICK_NAVIGATION_TOOL_BAR.name).toBool());
+    QVERIFY(Configuration().contains(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name));
+    QVERIFY(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name).toBool());
 
     {  // 删除析构函数
       std::unique_ptr<NavigationToolBar> d0ev{new NavigationToolBar};

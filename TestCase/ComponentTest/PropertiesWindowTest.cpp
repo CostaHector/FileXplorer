@@ -166,7 +166,7 @@ class PropertiesWindowTest : public PlainTestSuite {
     QCloseEvent closeEvent;
     propWindow.closeEvent(&closeEvent);
 
-    QByteArray savedGeometry = Configuration().value("PropertiesWindowGeometry").toByteArray();
+    QByteArray savedGeometry = Configuration().value("Geometry/PropertiesWindow").toByteArray();
     QCOMPARE(savedGeometry, originalGeometry);
     propWindow.setGeometry(100, 100, 800, 600);
   }

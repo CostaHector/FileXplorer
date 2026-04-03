@@ -256,6 +256,15 @@ C:/Qt/5.15.2/mingw81_64/bin/lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Tran
 /home/ariel/Qt/5.15.2/gcc_64/bin/lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
 ```
 
+## Font type and size
+Copy file "msyh.ttc" "msyhbd.ttc" from `C:\Windows\Fonts`.
+
+```bash
+sudo mkdir -p /usr/share/fonts/microsoft
+sudo cp msyh.ttc msyhbd.ttc /usr/share/fonts/microsoft/
+sudo fc-cache -fv
+```
+
 ## sqlite db browser recommend
 sudo apt update
 sudo apt install sqlitebrowser

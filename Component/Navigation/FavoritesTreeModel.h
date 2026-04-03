@@ -52,7 +52,7 @@ class FavoritesTreeModel : public QAbstractTreeModelPub {
   // "NFLF" = "Navigation Favorites Links File"
 
   QString GetBelongToName() const { return m_belongToName; }
-  QString GetDataKeyInQSetting() const { return GetBelongToName() + "_DATAS"; }
+  QString GetDataKeyInQSetting() const { return GetBelongToName() + "/DATAS"; }
   const QString m_belongToName;
   bool mNotSaveDatasThisTimeBeforeDestruct{false};
 };

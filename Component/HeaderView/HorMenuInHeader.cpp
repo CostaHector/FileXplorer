@@ -14,8 +14,8 @@ const QString& HorMenuInHeader::DEFAULT_SWITCHES() {
 
 HorMenuInHeader::HorMenuInHeader(const QString& proName, QWidget* parent)
     : MenuInHeader{proName, Qt::Orientation::Horizontal, parent},
-      m_columnVisibiltyKey{GetName() + "_COLUMN_VISIBILITY"},
-      m_sortByColumnSwitchKey{GetName() + "_SORT_BY_COLUMN_SWITCH"},
+      m_columnVisibiltyKey{GetName() + "/COLUMN_VISIBILITY"},
+      m_sortByColumnSwitchKey{GetName() + "/SORT_BY_COLUMN_SWITCH"},
       m_columnsShowSwitch{Configuration().value(m_columnVisibiltyKey, DEFAULT_SWITCHES()).toString()} {
   _COLUMNS_VISIBILITY = new (std::nothrow) QAction(QIcon{":img/COLUMN_VISIBILITY"}, tr("Column visibility"), this);
   _HIDE_THIS_COLUMN = new (std::nothrow) QAction(QIcon{":img/HIDE_THIS_COLUMN"}, tr("Hide this column"), this);

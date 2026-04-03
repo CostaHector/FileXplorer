@@ -77,13 +77,13 @@ ThumbnailImageViewer::~ThumbnailImageViewer() {
   if (mPMovie) {
     mPMovie->stop();
   }
-  Configuration().setValue(m_memoryKeyName + "_GEOMETRY", saveGeometry());
+  Configuration().setValue(m_memoryKeyName + "/GEOMETRY", saveGeometry());
   IMAGE_SIZE::SaveInitialScaledSize(m_memoryKeyName, mCurIconScaledSizeIndex);
 }
 
 void ThumbnailImageViewer::ReadSetting() {
-  if (Configuration().contains(m_memoryKeyName + "_GEOMETRY")) {
-    restoreGeometry(Configuration().value(m_memoryKeyName + "_GEOMETRY").toByteArray());
+  if (Configuration().contains(m_memoryKeyName + "/GEOMETRY")) {
+    restoreGeometry(Configuration().value(m_memoryKeyName + "/GEOMETRY").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

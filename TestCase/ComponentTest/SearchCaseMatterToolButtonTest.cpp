@@ -28,8 +28,8 @@ private slots:
 
   void test_initialState() {
     SearchCaseMatterToolButton btn;
-    QCOMPARE(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.v, false);
-    QCOMPARE(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.v, false);
+    QCOMPARE(SearchKey::NAME_CASE_SENSITIVE.v, false);
+    QCOMPARE(SearchKey::CONTENTS_CASE_SENSITIVE.v, false);
     QCOMPARE(btn.curNameCaseSensitive(), Qt::CaseInsensitive);
     QCOMPARE(btn.curContentCaseSensitive(), Qt::CaseInsensitive);
   }
@@ -65,11 +65,11 @@ private slots:
       btn.SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(true);
     } // btn destructor called. configure saved to local file
 
-    QVERIFY(Configuration().contains(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name));
-    QVERIFY(Configuration().contains(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name));
+    QVERIFY(Configuration().contains(SearchKey::NAME_CASE_SENSITIVE.name));
+    QVERIFY(Configuration().contains(SearchKey::CONTENTS_CASE_SENSITIVE.name));
 
-    QCOMPARE(Configuration().value(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name).toBool(), true);
-    QCOMPARE(Configuration().value(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name).toBool(), true);
+    QCOMPARE(Configuration().value(SearchKey::NAME_CASE_SENSITIVE.name).toBool(), true);
+    QCOMPARE(Configuration().value(SearchKey::CONTENTS_CASE_SENSITIVE.name).toBool(), true);
 
     // when initialize always use config from local file
     SearchCaseMatterToolButton newBtn;

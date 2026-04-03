@@ -239,7 +239,7 @@ bool OpenLocalTorrentFile(const QString& localFilePath) {
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
-    defaultPath = Configuration().value(MemoryKey::PATH_LAST_TIME_COPY_TO.name).toString();
+    defaultPath = Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString();
   }
   QString selectPath = defaultPath;
 #ifndef RUNNING_UNIT_TESTS
@@ -250,7 +250,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";
   }
-  Configuration().setValue(MemoryKey::PATH_LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
+  Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
   return dstFi.absoluteFilePath();
 }
 

@@ -4,7 +4,7 @@
 
 DoubleRowHeader::DoubleRowHeader(const QString &parentTableName, QWidget *parent)
   : HorMenuInHeader{parentTableName, parent}
-  , m_enableFilterKey{GetName() + "_ENABLE_FILTERS"} //
+  , m_enableFilterKey{GetName() + "/ENABLE_FILTERS"} //
 {
   _ENABLE_FILTERS = new (std::nothrow) QAction(QIcon(":img/QUICK_WHERE_FILTERS"), tr("Enable filters for each column"), this);
   _ENABLE_FILTERS->setCheckable(true);

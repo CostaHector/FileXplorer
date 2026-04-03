@@ -54,13 +54,13 @@ short nextLevelInLinearScale(short target) {
 constexpr int VolumeWidget::MIN_VOLUME, VolumeWidget::MAX_VOLUME;
 
 VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
-  const bool bMuteVolume = Configuration().value(MemoryKey::VIDEO_PLAYER_MUTE.name, MemoryKey::VIDEO_PLAYER_MUTE.v).toBool();
+  const bool bMuteVolume = Configuration().value(VideoPlayerKey::MUTE.name, VideoPlayerKey::MUTE.v).toBool();
   mMuteAct = DualIconCheckableAction::CreateMuteAction(this, bMuteVolume);
 
   mMuteBtn = new QToolButton{this};
   mMuteBtn->setDefaultAction(mMuteAct);
 
-  const int sliderValue = Configuration().value(MemoryKey::VIDEO_PLAYER_VOLUME.name, MemoryKey::VIDEO_PLAYER_VOLUME.v).toInt();
+  const int sliderValue = Configuration().value(VideoPlayerKey::VOLUME.name, VideoPlayerKey::VOLUME.v).toInt();
   mVolumeSlider = new ClickableSlider{Qt::Orientation::Horizontal, this};
   mVolumeSlider->setRange(MIN_VOLUME, MAX_VOLUME);
   mVolumeSlider->setValue(sliderValue);
@@ -80,8 +80,8 @@ VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : Q
 }
 
 VolumeWidget::~VolumeWidget() {
-  Configuration().setValue(MemoryKey::VIDEO_PLAYER_MUTE.name, isMuted());
-  Configuration().setValue(MemoryKey::VIDEO_PLAYER_VOLUME.name, volumeVal());
+  Configuration().setValue(VideoPlayerKey::MUTE.name, isMuted());
+  Configuration().setValue(VideoPlayerKey::VOLUME.name, volumeVal());
 }
 
 void VolumeWidget::onMouseEventProcessor(const int sliderValue) {

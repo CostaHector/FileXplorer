@@ -39,8 +39,8 @@ FileOpActs::FileOpActs(QObject* parent)
   _COPY_TO = new (std::nothrow) QAction(QIcon(":img/CP_TO_COMMAND_PATH"), tr("Copy to"), this);
   MOVE_COPY_TO = GetMOVE_COPY_TOActions();
 
-  MOVE_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::MOVE_TO_PATH_HISTORY);
-  COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(MemoryKey::COPY_TO_PATH_HISTORY);
+  MOVE_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(BehaviorKey::MOVE_TO_HISTORY);
+  COPY_TO_PATH_HISTORY = GetMOVE_COPY_TO_PATH_HistoryActions(BehaviorKey::COPY_TO_HISTORY);
 
   InitFileStructureActions();
 
@@ -373,7 +373,7 @@ void FileOpActs::InitFileStructureActions() {
                                 {FILE_STRUCTURE_PRESERVE, FileStuctureModeE::PRESERVE},       //
                                 {FILE_STRUCTURE_FLATTEN, FileStuctureModeE::FLATTEN}},
                                DEFAULT_FILE_STRUCTURE_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  const int fileStructureModeInt = Configuration().value(MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.name, MemoryKey::FILE_SYSTEM_STRUCTURE_WAY.v).toInt();
+  const int fileStructureModeInt = Configuration().value(BehaviorKey::FILESYSTEM_STRUCTURE.name, BehaviorKey::FILESYSTEM_STRUCTURE.v).toInt();
   FileStuctureModeE fileStructureMode = mFileStructureIntAction.intVal2Enum(fileStructureModeInt);
   mFileStructureIntAction.setCheckedIfActionExist(fileStructureMode);
 }

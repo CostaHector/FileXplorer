@@ -37,7 +37,7 @@ ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
 }
 
 ImgReorderDialog::~ImgReorderDialog() {
-  Configuration().setValue("IMG_REORDER_DIALOG_GEOMETRY", saveGeometry());
+  Configuration().setValue("Geometry/IMG_REORDER_DIALOG", saveGeometry());
 }
 
 void ImgReorderDialog::showEvent(QShowEvent* event) {
@@ -47,8 +47,8 @@ void ImgReorderDialog::showEvent(QShowEvent* event) {
 }
 
 void ImgReorderDialog::ReadSettings() {
-  if (Configuration().contains("IMG_REORDER_DIALOG_GEOMETRY")) {
-    restoreGeometry(Configuration().value("IMG_REORDER_DIALOG_GEOMETRY").toByteArray());
+  if (Configuration().contains("Geometry/IMG_REORDER_DIALOG")) {
+    restoreGeometry(Configuration().value("Geometry/IMG_REORDER_DIALOG").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

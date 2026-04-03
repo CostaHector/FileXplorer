@@ -71,7 +71,7 @@ private slots:
   }
 
   void test_configuration_saved() {
-    QVERIFY(Configuration().contains("FLOATING_PREVIEW_GEOMETRY"));
+    QVERIFY(Configuration().contains("Geometry/FLOATING_PREVIEW"));
     FileFolderPreviewer previewer{"TestFileFolderPreviewer secondtime"};
 
     QVERIFY(previewer.mImgVidOtherPane != nullptr);

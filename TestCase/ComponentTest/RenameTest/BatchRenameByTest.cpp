@@ -153,10 +153,10 @@ class BatchRenameByTest : public PlainTestSuite {
   }
 
   void NumerizerQueryAndConfirm_ok() {
-    Configuration().setValue(MemoryKey::RENAMER_NAME_EXT_INDEPENDENT.name, true);
-    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_UNIQUE_EXT_COUNTER.name, false);
-    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT.name, " %1");
-    Configuration().setValue(MemoryKey::RENAMER_NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, 0);
+    Configuration().setValue(RenamerKey::NAME_EXT_INDEPENDENT.name, true);
+    Configuration().setValue(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, false);
+    Configuration().setValue(RenamerKey::NUMERIAZER_NO_FORMAT.name, " %1");
+    Configuration().setValue(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, 0);
 
     using namespace AdvanceRenamerTestTool;
     set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted});

@@ -5,6 +5,7 @@
 #include "ImgReorderListView.h"
 #include "EndToExposePrivateMember.h"
 #include "FileTool.h"
+#include "MemoryKey.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -20,6 +21,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
   void cleanupTestCase() { GlobalMockObject::verify(); }
 
   void default_ok() {
+    Configuration().clear();
     ImgReorderListView reorderList;
     reorderList.InitListView();
     QVERIFY(reorderList.mImgReorderListModel != nullptr);

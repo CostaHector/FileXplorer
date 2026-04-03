@@ -33,7 +33,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
  public:
  private slots:
   void init() {  //
-    Configuration().remove("BelongToFavoritesTreeView_DATAS");
+    Configuration().remove("BelongToFavoritesTreeView/DATAS");
   }
 
   void default_construct_ok() {
@@ -41,7 +41,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, true};
       QCOMPARE(model.rowCount({}), 3);  // count(root)=3
       model.saveToSettings();
-      QCOMPARE(Configuration().contains("BelongToFavoritesTreeView_DATAS"), true);
+      QCOMPARE(Configuration().contains("BelongToFavoritesTreeView/DATAS"), true);
 
       QCOMPARE(model.rowCount(model.index(0, 0, {})), 2);
       QCOMPARE(model.rowCount(model.index(1, 0, {})), 2);
@@ -65,7 +65,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(model.filePath(model.index(3, 0, {})), "path/to/random name");
       // will call save to in destruction automatically
     }
-    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView_DATAS"), true);
+    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView/DATAS"), true);
 
     {  // no initialCollections, vector<FavoriteItemData>.size() == 4
       FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
@@ -78,15 +78,15 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(model.rowCount({}), 0);  // cleared
       // will call save to in destruction automatically
     }
-    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView_DATAS"), true);
+    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView/DATAS"), true);
 
     {  // no initialCollections, vector<FavoriteItemData>.size() == 0
       FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
       QCOMPARE(model.rowCount({}), 0);  // count(root)=0
       model.setThisTimeNotSave(true);
-      Configuration().remove("BelongToFavoritesTreeView_DATAS");
+      Configuration().remove("BelongToFavoritesTreeView/DATAS");
     }
-    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView_DATAS"), false);
+    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView/DATAS"), false);
 
     {  // no initialCollections, no key exist
       FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
@@ -94,11 +94,11 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(model.rowCount({}), 0);  // count(root)=0
       model.setThisTimeNotSave(true);
     }
-    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView_DATAS"), false);
+    QCOMPARE(Configuration().contains("BelongToFavoritesTreeView/DATAS"), false);
   }
 
   void addGroup_ok() {
-    Configuration().remove("BelongToFavoritesTreeView_DATAS");
+    Configuration().remove("BelongToFavoritesTreeView/DATAS");
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.mNotSaveDatasThisTimeBeforeDestruct, false);
     QCOMPARE(model.rowCount({}), 0);  // count(root)=0

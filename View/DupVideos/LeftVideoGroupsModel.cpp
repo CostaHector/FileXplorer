@@ -8,12 +8,12 @@ const QStringList LeftVideoGroupsModel::DUPLICATE_LIST_HEADER{"Count", "Value"};
 LeftVideoGroupsModel::LeftVideoGroupsModel(QObject* parent)  //
     : QAbstractTableModelPub{parent} {
   m_deviationSz = Configuration()
-                      .value(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name,  //
-                             MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v)
+                      .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name,  //
+                             VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v)
                       .toInt();
   m_deviationDur = Configuration()
-                       .value(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name,  //
-                              MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.v)
+                       .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name,  //
+                              VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.v)
                        .toInt();
 }
 
@@ -125,7 +125,7 @@ int LeftVideoGroupsModel::setDeviationDuration(int newDuration) {
     LOG_D("no need to update DeviationDuration, already [%d]ms", (int)newDuration);
     return 0;
   }
-  Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, newDuration);
+  Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, newDuration);
 
   const int oldDuration{newDuration};
   const int beforeRowCnt = rowCount();
@@ -149,7 +149,7 @@ int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
     LOG_D("no need to update DeviationSize, already [%d]bytes", (int)newSize);
     return 0;
   }
-  Configuration().setValue(MemoryKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
+  Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
 
   const qint64 oldSize{newSize};
   const int beforeRowCnt = rowCount();

@@ -30,8 +30,8 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
 
   void test_initial_State() {
     // precondition
-    Configuration().setValue(MemoryKey::ADVANCE_SEARCH_LINEEDIT_VALUE.name, "Name: hello word");
-    Configuration().setValue(MemoryKey::ADVANCE_SEARCH_CONTENTS_LINEEDIT_VALUE.name, "Contents: henry");
+    Configuration().setValue(SearchKey::ADVANCE_LINEEDIT_VALUE.name, "Name: hello word");
+    Configuration().setValue(SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE.name, "Contents: henry");
 
     ModelFilterActions& inst = ModelFilterActions::GetInst(ModelFilterE::ADVANCE_SEARCH);
     inst.clearAllDirFilterFlags();
@@ -39,9 +39,9 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
     inst.GRAY_ENTRIES_DONT_PASS_FILTER->setChecked(true);
     inst.INCLUDING_SUBDIRECTORIES->setChecked(true);
 
-    Configuration().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)SearchTools::SearchModeE::FILE_CONTENTS);
-    Configuration().setValue(MemoryKey::SEARCH_NAME_CASE_SENSITIVE.name, true);
-    Configuration().setValue(MemoryKey::SEARCH_CONTENTS_CASE_SENSITIVE.name, true);
+    Configuration().setValue(SearchKey::ADVANCE_MODE.name, (int)SearchTools::SearchModeE::FILE_CONTENTS);
+    Configuration().setValue(SearchKey::NAME_CASE_SENSITIVE.name, true);
+    Configuration().setValue(SearchKey::CONTENTS_CASE_SENSITIVE.name, true);
 
     QWidget parent;
     AdvanceSearchToolBar advanceSearchToolbar{"advance search toolbar", &parent};
@@ -84,7 +84,7 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
   }
 
   void comboBoxCompleter_case_sensitive() {
-    Configuration().setValue(MemoryKey::ADVANCE_SEARCH_MODE.name, (int)SearchTools::SearchModeE::FILE_CONTENTS);
+    Configuration().setValue(SearchKey::ADVANCE_MODE.name, (int)SearchTools::SearchModeE::FILE_CONTENTS);
 
     QWidget parent;
     AdvanceSearchToolBar advanceSearchToolbar{"advance search toolbar", &parent};

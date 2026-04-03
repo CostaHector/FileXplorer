@@ -9,23 +9,35 @@
 #include <unordered_set>
 
 class ToolBarWidget : public QWidget {
-public:
-  explicit ToolBarWidget(QBoxLayout::Direction direction = QBoxLayout::Direction::LeftToRight, QWidget *parent = nullptr);
+ public:
+  explicit ToolBarWidget(QBoxLayout::Direction direction = QBoxLayout::Direction::LeftToRight, QWidget* parent = nullptr);
   bool setDirection(QBoxLayout::Direction direction);
+  Qt::Orientation orientation() const {
+    switch (mLayout->direction()) {
+      case QBoxLayout::Direction::LeftToRight:
+      case QBoxLayout::Direction::RightToLeft:
+        return Qt::Orientation::Horizontal;
+      case QBoxLayout::Direction::TopToBottom:
+      case QBoxLayout::Direction::BottomToTop:
+      default:
+        return Qt::Orientation::Vertical;
+    }
+  }
   int setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool bRecursive = false);
-  void addWidget(QWidget *parent, int stretch = 0);
+  void addWidget(QWidget* parent, int stretch = 0);
+  QAction* addAction(const QIcon& icon, const QString& text);
   bool addAction(QAction* act);
   void addSpacing(int size = 1);
   void addStretch(int stretch = 0);
-  QLabel* addString(const QString &sep = "|");
+  QLabel* addString(const QString& sep = "|");
   QFrame* addSeparator();
 
-  QToolButton *createToolButton(QAction *act,
+  QToolButton* createToolButton(QAction* act,
                                 Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonStyle::ToolButtonIconOnly,
                                 bool bToolButtonStyleFixed = false);
 
-private:
-  QBoxLayout *mLayout{nullptr};
+ private:
+  QBoxLayout* mLayout{nullptr};
   std::unordered_set<QString> mToolButtonStyleFixedObjNameSet;
 };
-#endif // TOOLBARWIDGET_H
+#endif  // TOOLBARWIDGET_H

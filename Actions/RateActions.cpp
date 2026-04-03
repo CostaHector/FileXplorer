@@ -113,7 +113,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
   message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";
 
-  const int defaultRate = Configuration().value(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, MemoryKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
+  const int defaultRate = Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
 
   bool bOk = false;
   const int newRate = QInputDialog::getInt(parent, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1, &bOk);
@@ -122,7 +122,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
     return 0;
   }
   if (newRate != defaultRate) {
-    Configuration().setValue(MemoryKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
+    Configuration().setValue(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
   }
   const int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate, bOverrideForce);
   LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);

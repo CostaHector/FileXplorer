@@ -74,6 +74,7 @@ private:
   bool on_HarView();
 
   bool on_PlayVideo() const;
+  void on_FontChanged();
 
   bool on_Merge(const bool reverse = false);
   void on_TsFilesMerge();

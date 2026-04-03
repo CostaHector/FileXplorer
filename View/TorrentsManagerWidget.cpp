@@ -107,7 +107,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   }
 
   const QString& defaultOpenDir =
-      Configuration().value(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.v).toString();
+      Configuration().value(PathKey::DB_INSERT_TORRENTS_FROM.name, PathKey::DB_INSERT_TORRENTS_FROM.v).toString();
   QString loadFromPath;
 #ifdef RUNNING_UNIT_TESTS
   loadFromPath = defaultOpenDir;
@@ -119,7 +119,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
     LOG_ERR_NP("[Failed] not a folder", loadFromPath);
     return false;
   }
-  Configuration().setValue(MemoryKey::PATH_DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
+  Configuration().setValue(PathKey::DB_INSERT_TORRENTS_FROM.name, loadFromFi.absoluteFilePath());
 
   QSqlQuery query{con};
   if (!query.prepare(TorrDb::REPLACE_INTO_TABLE_TEMPLATE.arg(DB_TABLE::TORRENTS))) {
@@ -255,13 +255,13 @@ void TorrentsManagerWidget::showEvent(QShowEvent* event) {
 
 void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {
   g_torrActions().SHOW_TORRENTS_MANAGER->setChecked(false);
-  Configuration().setValue("TorrentsManagerWidgetGeometry", saveGeometry());
+  Configuration().setValue("Geometry/TorrentsManagerWidget", saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
 void TorrentsManagerWidget::updateWindowsSize() {
-  if (Configuration().contains("TorrentsManagerWidgetGeometry")) {
-    restoreGeometry(Configuration().value("TorrentsManagerWidgetGeometry").toByteArray());
+  if (Configuration().contains("Geometry/TorrentsManagerWidget")) {
+    restoreGeometry(Configuration().value("Geometry/TorrentsManagerWidget").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }

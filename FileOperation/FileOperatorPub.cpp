@@ -8,7 +8,7 @@ BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_T
 
 bool g_bReturnErrorCodeUponAnyFailure = true;
 void InitReturnErrorCodeUponAnyFailureSw() {
-  g_bReturnErrorCodeUponAnyFailure = Configuration().value(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.v).toBool();
+  g_bReturnErrorCodeUponAnyFailure = Configuration().value(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.v).toBool();
 }
 
 bool IsReturnErrorCodeUponAnyFailureSw() {
@@ -17,7 +17,7 @@ bool IsReturnErrorCodeUponAnyFailureSw() {
 
 void SetReturnErrorCodeUponAnyFailureSw(bool sw) {
   g_bReturnErrorCodeUponAnyFailure = sw;
-  Configuration().setValue(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, sw);
+  Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, sw);
 }
 
 }  // namespace FileOperatorType

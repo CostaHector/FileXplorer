@@ -59,11 +59,11 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     }
 
     {
-      QVERIFY(Configuration().contains(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name));
-      QCOMPARE(Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_MODE.name).toInt(), (int)QMediaPlaylist::PlaybackMode::Loop);
+      QVERIFY(Configuration().contains(VideoPlayerKey::PLAYBACK_MODE.name));
+      QCOMPARE(Configuration().value(VideoPlayerKey::PLAYBACK_MODE.name).toInt(), (int)QMediaPlaylist::PlaybackMode::Loop);
 
-      QVERIFY(Configuration().contains(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name));
-      QCOMPARE(Configuration().value(MemoryKey::VIDEO_PLAYER_PLAYBACK_TRIGGER_MODE.name).toInt(), (int)VideoPlayTool::PlaybackTriggerMode::AUTO);
+      QVERIFY(Configuration().contains(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name));
+      QCOMPARE(Configuration().value(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name).toInt(), (int)VideoPlayTool::PlaybackTriggerMode::AUTO);
     }
 
     {
@@ -293,7 +293,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
   }
 
   void selectAFile_ok() {
-    Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "invalid path");
+    Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, "invalid path");
     const QString openPath{SystemPath::HOME_PATH()};
 
     InteractiveVideoWidget videoWid;
@@ -316,11 +316,11 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     QCOMPARE(selectAFileSpy.count(), 1);
     QCOMPARE(selectAFileSpy.takeLast(), (QVariantList{"path/to/MediaFile.mp4", true}));
 
-    Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "path/to");
+    Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, "path/to");
   }
 
   void selectAFolder_ok() {
-    Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "invalid path");
+    Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, "invalid path");
     const QString openPath{SystemPath::HOME_PATH()};
 
     InteractiveVideoWidget videoWid;
@@ -343,7 +343,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     QCOMPARE(selectAFolderSpy.count(), 1);
     QCOMPARE(selectAFolderSpy.takeLast(), (QVariantList{"path/to/MediaFolder", true}));
 
-    Configuration().setValue(MemoryKey::PATH_VIDEO_PLAYER_OPEN_PATH.name, "path/to");
+    Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, "path/to");
   }
 };
 

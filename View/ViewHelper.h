@@ -12,8 +12,6 @@ class FileSystemModel;
 namespace View {
 bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
 
-void UpdateItemViewFontSizeCore(QAbstractItemView* view);
-
 bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
 
 void changeDropAction(QDropEvent* event);

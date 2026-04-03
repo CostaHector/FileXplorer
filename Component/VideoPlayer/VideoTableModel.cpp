@@ -41,7 +41,7 @@ QVariant VideoTableModel::data(const QModelIndex& index, int role) const {
 bool VideoTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole && flags(index).testFlag(Qt::ItemFlag::ItemIsEditable)) {
     bool bIsInt{false};
-    const short newRate{value.toInt(&bIsInt)};
+    const short newRate{(short)value.toInt(&bIsInt)};
     if (!bIsInt) {
       return false;
     }

@@ -46,7 +46,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   m_swap2Index->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_swap2Index->setToolTip("Section at two indexes will be swapped");
   m_swap2Index->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  const QString& defaultUserInput = Configuration().value(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.v).toString();
+  const QString& defaultUserInput = Configuration().value(RenamerKey::ARRANGE_SECTION_INDEX.name, RenamerKey::ARRANGE_SECTION_INDEX.v).toString();
   m_swap2Index->addItem(defaultUserInput);
   m_swap2Index->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
 
@@ -83,7 +83,7 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
       return {};
     }
 #ifndef RUNNING_UNIT_TESTS
-    Configuration().setValue(MemoryKey::RENAMER_ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
+    Configuration().setValue(RenamerKey::ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
 #endif
     nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {

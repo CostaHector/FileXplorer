@@ -54,20 +54,20 @@ ModelFilterActions::ModelFilterActions(ModelFilterE modelE, QObject* parent) //
           {CASE_SENSITIVE, QDir::CaseSensitive}
       };
   mFilterAct2FilterFlag.swap(tempFilterAct2FilterFlag);
-  const QString dirFilterKeyName = GetMemoryKeyName(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name);
-  const QDir::Filters initialDirFlag{Configuration().value(dirFilterKeyName, MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
+  const QString dirFilterKeyName = GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name);
+  const QDir::Filters initialDirFlag{Configuration().value(dirFilterKeyName, BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt()};
   LOG_D("%s filter flags: %d", qPrintable(dirFilterKeyName), (int)initialDirFlag);
   // restore Checkable / checked / Enabled;
   setActionCheckedOrNot(initialDirFlag);
 
-  const bool bGrayOrHide{Configuration().value(GetMemoryKeyName(MemoryKey::GRAY_ENTRIES_DONT_PASS_FILTER.name), MemoryKey::GRAY_ENTRIES_DONT_PASS_FILTER.v).toBool()};
+  const bool bGrayOrHide{Configuration().value(GetMemoryKeyName(SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.name), SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.v).toBool()};
   GRAY_ENTRIES_DONT_PASS_FILTER = new (std::nothrow) QAction{"Gray the entries if don't pass name filter", this};
   GRAY_ENTRIES_DONT_PASS_FILTER->setCheckable(true);
   GRAY_ENTRIES_DONT_PASS_FILTER->setChecked(bGrayOrHide);
   GRAY_ENTRIES_DONT_PASS_FILTER->setToolTip("This property holds whether files that don't pass the name filter are disable gray(true) or hide(false). (true by default)");
 
   if (modelE == ModelFilterE::ADVANCE_SEARCH) {
-    const bool isIncludingSubdirectory{Configuration().value(GetMemoryKeyName(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name), MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.v).toBool()};
+    const bool isIncludingSubdirectory{Configuration().value(GetMemoryKeyName(SearchKey::INCLUDING_SUBDIRECTORIES.name), SearchKey::INCLUDING_SUBDIRECTORIES.v).toBool()};
     INCLUDING_SUBDIRECTORIES         = new (std::nothrow) QAction{"Including Subdirs", this};
     INCLUDING_SUBDIRECTORIES->setCheckable(true);
     INCLUDING_SUBDIRECTORIES->setChecked(isIncludingSubdirectory);
@@ -85,7 +85,7 @@ void ModelFilterActions::setActionCheckedOrNot(int flagsInt) {
 }
 
 void ModelFilterActions::resetFiltersToInitial() {
-  setActionCheckedOrNot(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt());
+  setActionCheckedOrNot(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt());
 }
 
 QString ModelFilterActions::GetMemoryKeyName(const QString& keyBaseName) const {return keyBaseName + "/" + c_str();}

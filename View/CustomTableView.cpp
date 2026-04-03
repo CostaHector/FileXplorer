@@ -6,6 +6,7 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
+#include "StyleSheet.h"
 #include <QContextMenuEvent>
 
 QSet<QString> CustomTableView::mTableInstSet;
@@ -14,11 +15,11 @@ QSet<QString> CustomTableView::mTableInstSet;
 CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
     : QTableView(parent),
       m_name{instName},
-      m_showHorizontalHeaderKey{instName + "_SHOW_HORIZONTAL_HEADER"},
-      m_showVerticalHeaderKey{instName + "_SHOW_VERTICAL_HEADER"},
-      m_autoScrollKey{instName + "_AUTO_SCROLL"},
-      m_alternatingRowColorsKey{instName + "_ALTERNATING_ROW_COLORS"},
-      m_showGridKey{instName + "_SHOW_GRID"} {
+      m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"},
+      m_showVerticalHeaderKey{instName + "/SHOW_VERTICAL_HEADER"},
+      m_autoScrollKey{instName + "/AUTO_SCROLL"},
+      m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"},
+      m_showGridKey{instName + "/SHOW_GRID"} {
   if (isNameExists(GetName())) {  // not in sharing list, but name already find
     LOG_D("Instance table name[%s] already exist, QSetting may conflict", qPrintable(GetName()));
   }
@@ -41,7 +42,7 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   _SHOW_HORIZONTAL_HEADER->setCheckable(true);
   _SHOW_HORIZONTAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the horizontal header")
                                           .arg(_SHOW_HORIZONTAL_HEADER->text(), _SHOW_HORIZONTAL_HEADER->shortcut().toString()));
-  m_horHeader = new DoubleRowHeader{GetName() + "_HorHeader", this};
+  m_horHeader = new DoubleRowHeader{GetName() + "/HorHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_horHeader);
   if (!_SHOW_HORIZONTAL_HEADER->isChecked()) {
     m_horHeader->setVisible(false);
@@ -55,7 +56,7 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   _SHOW_VERTICAL_HEADER->setCheckable(true);
   _SHOW_VERTICAL_HEADER->setToolTip(
       QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header").arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
-  m_verHeader = new (std::nothrow) VerMenuInHeader{GetName() + "_VerHeader", this};
+  m_verHeader = new (std::nothrow) VerMenuInHeader{GetName() + "/VerHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_verHeader);
   if (!_SHOW_VERTICAL_HEADER->isChecked()) {
     m_verHeader->setVisible(false);
@@ -93,12 +94,12 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   // 6.
   const QString horMenuName{GetName() + " " + tr("Horizontal scroll bar policy")};
-  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "_Horizontal", this};
+  m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
 
   const QString verMenuName{GetName() + " " + tr("Vertical scroll bar policy")};
-  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "_Vertical", this};
+  m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "/Vertical", this};
   CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
 
@@ -192,7 +193,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
 
 void CustomTableView::InitTableView() {
   initExclusivePreferenceSetting();
-  View::UpdateItemViewFontSizeCore(this);
+  StyleSheet::InitFontFamilyAndSize(this);
 
   _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool());
   _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool());

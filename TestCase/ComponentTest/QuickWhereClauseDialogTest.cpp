@@ -122,16 +122,16 @@ private slots:
   }
 
   void test_WriteUniqueHistoryToQSetting() {
-    const QString beforeCfg = Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString();
+    const QString beforeCfg = Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.v).toString();
     ON_SCOPE_EXIT {
-      Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
+      Configuration().setValue(BehaviorKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
     };
     QuickWhereClauseDialogMock::mockWhereHistsList() = QStringList{"\t  \n", "", " A", "C ", "A \t", "\t B", "A"};
     dialog->onEditHistory();
     QCOMPARE(dialog->WriteUniqueHistoryToQSetting(), 3);
 
     const QString expectNewHistStr{"A\nC\nB"};
-    QCOMPARE(Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name).toString(), expectNewHistStr);
+    QCOMPARE(Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name).toString(), expectNewHistStr);
   }
 
   void test_enter_will_not_close_the_dialog_and_f10_will() {

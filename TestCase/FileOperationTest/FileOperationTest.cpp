@@ -847,11 +847,11 @@ class FileOperationTest : public PlainTestSuite {
       SetReturnErrorCodeUponAnyFailureSw(bkpUp);
     };
 
-    Configuration().setValue(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, false);
+    Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, false);
     InitReturnErrorCodeUponAnyFailureSw();
     QVERIFY(!IsReturnErrorCodeUponAnyFailureSw());
 
-    Configuration().setValue(MemoryKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, true);
+    Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, true);
     InitReturnErrorCodeUponAnyFailureSw();
     QVERIFY(IsReturnErrorCodeUponAnyFailureSw());
 

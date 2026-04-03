@@ -113,7 +113,7 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
     InitTableView();
     m_isHeaderStateAlreadyInited = true;
   }
-  Configuration().setValue(MemoryKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
+  Configuration().setValue(BehaviorKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
   _dbModel->setTable(movieTableName);
   _dbModel->select();
   return true;
@@ -123,7 +123,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
 
   const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
-  QString lastPath = Configuration().value(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, MemoryKey::PATH_DB_INSERT_VIDS_FROM.v).toString();
+  QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.v).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = tblPeerPath;
   }
@@ -139,7 +139,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
     return false;
   }
 
-  Configuration().setValue(MemoryKey::PATH_DB_INSERT_VIDS_FROM.name, selectPath);
+  Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, selectPath);
   userSelected.swap(selectPath);
   LOG_D("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
   return true;

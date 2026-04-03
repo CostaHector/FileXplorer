@@ -3,7 +3,7 @@
 #include "PublicMacro.h"
 
 ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
-    : QMenu{menuName, parent}, m_memoryName{belongToName + "_ScrollBarPolicy"} {
+    : QMenu{menuName, parent}, m_memoryName{belongToName + "/ScrollBarPolicy"} {
   CHECK_NULLPTR_RETURN_VOID(parent);
   CHECK_FALSE_RETURN_VOID(!belongToName.isEmpty());
 

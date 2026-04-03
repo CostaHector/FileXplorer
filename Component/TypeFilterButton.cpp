@@ -41,10 +41,10 @@ TypeFilterButton::TypeFilterButton(ModelFilterE modelE, QWidget* parent)
 }
 
 TypeFilterButton::~TypeFilterButton() {
-  Configuration().setValue(mFilterHelper.GetMemoryKeyName(MemoryKey::DIR_FILTER_ON_SWITCH_ENABLE.name), (int) curDirFilters());
-  Configuration().setValue(mFilterHelper.GetMemoryKeyName(MemoryKey::GRAY_ENTRIES_DONT_PASS_FILTER.name), curGrayOrHideUnpassItem());
+  Configuration().setValue(mFilterHelper.GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name), (int) curDirFilters());
+  Configuration().setValue(mFilterHelper.GetMemoryKeyName(SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.name), curGrayOrHideUnpassItem());
   if (mFilterHelper.GetModelE() == ModelFilterE::ADVANCE_SEARCH) {
-    Configuration().setValue(mFilterHelper.GetMemoryKeyName(MemoryKey::SEARCH_INCLUDING_SUBDIRECTORIES.name),
+    Configuration().setValue(mFilterHelper.GetMemoryKeyName(SearchKey::INCLUDING_SUBDIRECTORIES.name),
                              curIteratorFlag() == QDirIterator::IteratorFlag::Subdirectories);
   }
 }

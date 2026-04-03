@@ -32,18 +32,18 @@ class FileXplorerTest : public PlainTestSuite {
     }
 
     {  // basic expectation
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, "");
+      Configuration().setValue(PathKey::STARTUP_PATH.name, "");
       QStringList specifiedValidPath{"a.exe", validPath};
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(specifiedValidPath), validPath);
     }
 
     {  // special path:
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, inValidPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, inValidPath);
       QStringList emptyPath{"a.exe", ""};
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(emptyPath), "");
 
 #ifdef __linux__
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, inValidPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, inValidPath);
       QStringList slashPath{"a.exe", "/"};
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(slashPath), "/");
 #endif
@@ -52,20 +52,20 @@ class FileXplorerTest : public PlainTestSuite {
     {  // path specified but invalid
       QStringList specifiedInvalidPath{"a.exe", "invalid/path/to/folder"};
       // when last time path still valid
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, validPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, validPath);
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(specifiedInvalidPath), validPath);
       //  when last time path invalid ->parent
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, inValidPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, inValidPath);
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(specifiedInvalidPath), validPath);
     }
 
     {  // no path specified
       const QStringList noPathSpecified{"a.exe"};
       // when last time path is still valid
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, validPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, validPath);
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(noPathSpecified), validPath);
       // when last time path invalid->parent
-      Configuration().setValue(MemoryKey::DEFAULT_OPEN_PATH.name, inValidPath);
+      Configuration().setValue(PathKey::STARTUP_PATH.name, inValidPath);
       QCOMPARE(FileXplorer::GetInitialPathFromArgs(noPathSpecified), validPath);
     }
   }
@@ -76,9 +76,9 @@ class FileXplorerTest : public PlainTestSuite {
     const QString existPath{QFileInfo{__FILE__}.absolutePath()};
     QStringList args{"a.exe", existPath};
 
-    QCOMPARE(Configuration().value(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.v).toBool(), true);
-    QCOMPARE(Configuration().value(MemoryKey::SHOW_FLOATING_PREVIEW.name, MemoryKey::SHOW_FLOATING_PREVIEW.v).toBool(), true);
-    QCOMPARE(Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toInt(),
+    QCOMPARE(Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool(), true);
+    QCOMPARE(Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool(), true);
+    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.v).toInt(),
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
 
     auto& viewActInst = g_viewActions();
@@ -147,10 +147,10 @@ class FileXplorerTest : public PlainTestSuite {
 
     // show navi/preview action checked configuration will saved when static global variable ViewActions get destructed
     // here we change it manually only to see if it work for the new window
-    Configuration().setValue(MemoryKey::SHOW_QUICK_NAVIGATION_TOOL_BAR.name, false);
-    Configuration().setValue(MemoryKey::SHOW_FLOATING_PREVIEW.name, false);
+    Configuration().setValue(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, false);
+    Configuration().setValue(CompoVisKey::SHOW_PREVIEW_DOCKER.name, false);
 
-    QCOMPARE(Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.v).toInt(),
+    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.v).toInt(),
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
     // configuration read and used
     viewActInst._TABLE_VIEW->setChecked(true);

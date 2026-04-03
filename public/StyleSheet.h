@@ -9,9 +9,6 @@ class QWidget;
 class QLayout;
 
 namespace StyleSheet {
-constexpr int ROW_SECTION_HEIGHT = 10;
-static const QFont TEXT_EDIT_FONT{"Consolas", 15};
-
 void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
@@ -27,6 +24,14 @@ constexpr char SUBMIT_BTN_STYLE[] =
     "    background-color: rgb(36, 118, 199);"
     "    border-color: rgb(36, 118, 199);"
     "}";
+
+const QFont& CODE_EDITOR_FONT();
+QFont ReadFontFamilyAndSize();
+void InitFontFamilyAndSize(QWidget* pWid);
+bool UpdateFontFamilyAndSize(QWidget* pWid, QFont newFont);
+void SaveFontFamilyAndSize(QFont font);
+
+QIcon GetSystemDirOpenIcon();
 }  // namespace StyleSheet
 
 constexpr QRect DEFAULT_GEOMETRY{100, 100, 1024, 768};

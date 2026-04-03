@@ -1,9 +1,11 @@
 ﻿#include "StyleSheet.h"
 #include "PreferenceActions.h"
 #include "PublicMacro.h"
+#include "MemoryKey.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLayout>
+#include <QStyle>
 
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {
@@ -45,6 +47,46 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
   }
 }
 #endif
+
+const QFont& CODE_EDITOR_FONT() {
+  static QFont UNIVERSAL_MONOSPACE_FONT{"Consolas", 15};
+  return UNIVERSAL_MONOSPACE_FONT;
+}
+
+QFont ReadFontFamilyAndSize() {
+  const QString fontFamily = Configuration().value(FontKey::FAMILY.name, FontKey::FAMILY.v).toString();
+  const int fontSize = Configuration().value(FontKey::POINT.name, FontKey::POINT.v).toInt();
+  return QFont(fontFamily, fontSize);
+}
+
+void InitFontFamilyAndSize(QWidget* pWid) {
+  if (pWid == nullptr) {
+    return;
+  }
+  QFont font = ReadFontFamilyAndSize();
+  pWid->setFont(font);
+}
+
+bool UpdateFontFamilyAndSize(QWidget* pWid, QFont newFont) {
+  if (pWid == nullptr) {
+    return false;
+  }
+  if (pWid->font() == newFont) {
+    return false;
+  }
+  pWid->setFont(newFont);
+  return true;
+}
+
+void SaveFontFamilyAndSize(QFont font) {
+  Configuration().setValue(FontKey::FAMILY.name, font.family());
+  Configuration().setValue(FontKey::POINT.name, font.pointSize());
+}
+
+QIcon GetSystemDirOpenIcon() {
+  return QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon);
+}
+
 }  // namespace StyleSheet
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {

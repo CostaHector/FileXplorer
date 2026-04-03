@@ -59,7 +59,7 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
                                                      IMAGE_SIZE::TABS_ICON_IN_MENU_16,              //
                                                      parent};                                       //
   CHECK_NULLPTR_RETURN_NULLPTR(createTB);
-  createTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_THUMBNAILS_DIMENSION, true);
+  createTB->InitDefaultActionFromQSetting(BehaviorKey::THUMBNAILS_DIMENSION, true);
 
   QList<QAction*> extractThumbnailActions;
   extractThumbnailActions += _EXTRACT_THUMBNAIL_AG->actions();
@@ -73,7 +73,7 @@ QToolBar* ThumbnailProcessActions::GetThumbnailToolbar(QWidget* parent) {
                                                       IMAGE_SIZE::TABS_ICON_IN_MENU_16,              //
                                                       parent};                                       //
   CHECK_NULLPTR_RETURN_NULLPTR(extractTB);
-  extractTB->InitDefaultActionFromQSetting(MemoryKey::DEFAULT_EXTRACT_CHOICE, true);
+  extractTB->InitDefaultActionFromQSetting(BehaviorKey::EXTRACT_CHOICE, true);
 
   QToolBar* thumbnailTB = new (std::nothrow) QToolBar{"Thumbnail", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(thumbnailTB);

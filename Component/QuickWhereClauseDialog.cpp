@@ -41,7 +41,7 @@ void QuickWhereClauseDialog::Init() {
   m_whereHistComboBox->setEditable(false);
   m_whereHistComboBox->setInsertPolicy(QComboBox::InsertAtTop);
 
-  QString hists{Configuration().value(MemoryKey::WHERE_CLAUSE_HISTORY.name, MemoryKey::WHERE_CLAUSE_HISTORY.v).toString()};
+  QString hists{Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.v).toString()};
   if (hists.isEmpty()) {
     hists += R"(`NAME` LIKE "%%")";
     hists += WHERE_HIST_SPLIT_CHAR;
@@ -100,7 +100,7 @@ QuickWhereClauseDialog::~QuickWhereClauseDialog() {
 int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   QStringList hists = mStrListModel->stringList();
   StringTool::SearchHistoryListProc(hists);
-  Configuration().setValue(MemoryKey::WHERE_CLAUSE_HISTORY.name, hists.join(WHERE_HIST_SPLIT_CHAR));
+  Configuration().setValue(BehaviorKey::WHERE_CLAUSE_HISTORY.name, hists.join(WHERE_HIST_SPLIT_CHAR));
   return hists.size();
 }
 

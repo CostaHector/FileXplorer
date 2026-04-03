@@ -29,7 +29,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
                               {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD},         //
                               {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},                        //
                              DEFULT_PREVIEW_TYPE_E, QActionGroup::ExclusionPolicy::Exclusive);  //
-  int curPreviewType = Configuration().value(MemoryKey::FOLDER_PREVIEW_TYPE.name, MemoryKey::FOLDER_PREVIEW_TYPE.name).toInt();
+  int curPreviewType = Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.name).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
   m_floatingPanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarNormalButton), "float", this};
@@ -62,7 +62,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
 }
 
 PreviewDockWidget::~PreviewDockWidget() {
-  Configuration().setValue(MemoryKey::FOLDER_PREVIEW_TYPE.name, (int)GetCurrentPreviewType());
+  Configuration().setValue(CompoVisKey::FOLDER_PREVIEW_TYPE.name, (int)GetCurrentPreviewType());
 }
 
 void PreviewDockWidget::showEvent(QShowEvent* event) {

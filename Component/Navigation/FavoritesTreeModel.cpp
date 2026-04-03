@@ -62,6 +62,12 @@ QVariant FavoritesTreeModel::data(const QModelIndex& index, int role) const {
       default:
         return {};
     }
+  } else if (role == Qt::DecorationRole) {
+    if (column == 0 && !item.isGroup) {
+      static const QIcon favNonGroupIcon{":img/FAVORITES_LINK"};
+      return favNonGroupIcon;
+    }
+    return {};
   } else {
     switch (role) {
       case FavoriteItemData::DEF_NAME_TEXT_ROLE:

@@ -129,10 +129,10 @@ int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
       || name.contains("browser", Qt::CaseSensitivity::CaseInsensitive) //
   }; //
   const int defaultScaledSize{isImageRelated ? DEFAULT_IMAGE_SCALED_SIZE : DEFAULT_NON_IMAGE_SCALED_SIZE};
-  int iconSizeIndexHint = Configuration().value(name + "_ICON_SIZE_INDEX", defaultScaledSize).toInt();
+  int iconSizeIndexHint = Configuration().value(name + "/ICON_SIZE_INDEX", defaultScaledSize).toInt();
   return clampScaledIndex(iconSizeIndexHint); // [0, WHEEL_CANDIDATES_N)
 }
 
 void IMAGE_SIZE::SaveInitialScaledSize(const QString& name, int scaledIndex) {
-  Configuration().setValue(name + "_ICON_SIZE_INDEX", scaledIndex);
+  Configuration().setValue(name + "/ICON_SIZE_INDEX", scaledIndex);
 }

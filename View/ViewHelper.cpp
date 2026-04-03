@@ -41,17 +41,6 @@ bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton m
   return false;
 }
 
-void UpdateItemViewFontSizeCore(QAbstractItemView* view) {
-  if (view == nullptr) {
-    LOG_D("UpdateItemViewFontSizeCore view* pointer is nullptr");
-    return;
-  }
-  const auto fontSize = Configuration().value(MemoryKey::ITEM_VIEW_FONT_SIZE.name, MemoryKey::ITEM_VIEW_FONT_SIZE.v).toInt();
-  QFont defaultFont(view->font());
-  defaultFont.setPointSize(fontSize);
-  view->setFont(defaultFont);
-}
-
 bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
   if (!data->hasUrls()) {
     return true;
