@@ -19,4 +19,19 @@ inline QListView::ResizeMode toResizeMode(bool bAdjust) {
 }
 }  // namespace Bool2QtEnum
 
+namespace QtEnum2Bool {
+inline bool fromSortOrder(Qt::SortOrder bReverseOrder) {
+  return bReverseOrder == Qt::SortOrder::DescendingOrder;
+}
+inline bool fromFlow(QListView::Flow bLeft2Right) {
+  return bLeft2Right == QListView::Flow::LeftToRight;
+}
+inline bool fromViewMode(QListView::ViewMode bIconMode) {
+  return bIconMode == QListView::ViewMode::IconMode;
+}
+inline bool fromResizeMode(QListView::ResizeMode bAdjust) {
+  return bAdjust == QListView::ResizeMode::Adjust;
+}
+}  // namespace Bool2QtEnum
+
 #endif  // BOOL2QTENUM_H

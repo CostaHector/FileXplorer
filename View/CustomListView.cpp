@@ -88,9 +88,9 @@ void CustomListView::SubscribePublicActions() {
 }
 
 CustomListView::~CustomListView() {
-  Configuration().setValue(GetName() + "/FLOW_ORIENTATION", (flow() == QListView::Flow::TopToBottom));
-  Configuration().setValue(GetName() + "/VIEW_MODE_LIST_ICON", (viewMode() == QListView::ViewMode::IconMode));
-  Configuration().setValue(GetName() + "/RESIZED_MODE_FIXED_OR_ADJUST", (resizeMode() == QListView::ResizeMode::Adjust));
+  Configuration().setValue(GetName() + "/FLOW_ORIENTATION", QtEnum2Bool::fromFlow(flow()));
+  Configuration().setValue(GetName() + "/VIEW_MODE_LIST_ICON", QtEnum2Bool::fromViewMode(viewMode()));
+  Configuration().setValue(GetName() + "/RESIZED_MODE_FIXED_OR_ADJUST", QtEnum2Bool::fromResizeMode(resizeMode()));
   Configuration().setValue(GetName() + "/WRAPPING_ACTIONS", isWrapping());
   Configuration().setValue(GetName() + "/UNIFORM_ITEM_SIZES", uniformItemSizes());
 }
