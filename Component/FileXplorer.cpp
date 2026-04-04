@@ -17,7 +17,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this}; // previewer in docker
 
   m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};       // previewer switcher
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this}; // searchToolBar
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"AddressToolbar", this}; // searchToolBar
   m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};     // left navigation bar
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                        // ribbon menu
 
