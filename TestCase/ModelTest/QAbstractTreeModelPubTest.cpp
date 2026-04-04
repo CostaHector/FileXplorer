@@ -29,6 +29,9 @@ class QAbstractTreeModelPubTest : public PlainTestSuite {
     r0_1->appendRow(new MyTreeNode{TDataType{"group/child1_g/group0"}});
     r0_1->appendRow(new MyTreeNode{TDataType{"group/child1_g/node1"}});
 
+    QCOMPARE(*r0_0, *r0_0);
+    QVERIFY(*r0_0 != *r0_1);
+
     QCOMPARE(rootNode->childsCount(), 4);
     model.setDatas(std::move(rootNode));
     QCOMPARE(model.rowCount({}), 4);

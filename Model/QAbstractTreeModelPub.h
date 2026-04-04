@@ -30,10 +30,22 @@ class QAbstractTreeModelPub : public QAbstractItemModel {
   void clearDirty() const { m_bIsDirty = false; }
   bool isDirty() const { return m_bIsDirty; }
 
+  bool isRoot(const QModelIndex& parentIndex) const { return !parentIndex.isValid(); }
+  bool isGroup(const QModelIndex& parentIndex) const;
+  QString groupName(const QModelIndex& parentIndex) const;
+  bool onRename(const QModelIndex& parentIndex, const QString& newName);
+
+  static bool isIndexValidAndDescendantOfValidAncestor(const QModelIndex& descendant, const QModelIndex& ancestor);
+  int moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& dest);
+  int removeParentIndexes(const QModelIndexList& parentIndexes);
+
+  MyTreeNode* canDropIntoIndex(const QModelIndex& destParentIndex) const;
+
  protected:
   QByteArray toByteArray() const;
 
  private:
+  QList<MyTreeNode*> GetItemsNeedProcess(const QModelIndexList& parentIndexes, MyTreeNode* destItem) const;
   std::unique_ptr<MyTreeNode> m_pRoot{nullptr};
   mutable bool m_bIsDirty = false;
 };

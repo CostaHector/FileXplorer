@@ -30,13 +30,6 @@ class FavoritesTreeModel : public QAbstractTreeModelPub {
 
   QString filePath(const QModelIndex& parentIndex) const;
 
-  bool isRoot(const QModelIndex& parentIndex) const { return !parentIndex.isValid(); }
-  bool isGroup(const QModelIndex& parentIndex) const;
-  QString groupName(const QModelIndex& parentIndex) const;
-
-  int moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& dest);
-  int removeParentIndexes(const QModelIndexList& parentIndexes);
-  bool onRename(const QModelIndex& parentIndex, const QString& newName);
   void addInitialFavoritesGroup();
   void setThisTimeNotSave(bool bWillNotSaveDataThisTime) { mNotSaveDatasThisTimeBeforeDestruct = bWillNotSaveDataThisTime; }
   void saveToSettings();
@@ -44,8 +37,6 @@ class FavoritesTreeModel : public QAbstractTreeModelPub {
   static constexpr const char* MIME_TYPE = "application/x-favoritetreeitemdata";
 
  private:
-  QList<MyTreeNode*> GetItemsNeedProcess(const QModelIndexList& parentIndexes, MyTreeNode* destItem) const;
-  static bool isIndexValidAndDescendantOfValidAncestor(const QModelIndex& descendant, const QModelIndex& ancestor);
   int handleExternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent);
   int handleInternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent);
 
