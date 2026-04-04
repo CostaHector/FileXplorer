@@ -10,24 +10,6 @@
 
 #include <QMimeData>
 
-std::unique_ptr<MyTreeNode> GetRemoveOrMoveRootNode() {
-  auto p0 = MyTreeNode::NewTreeNodeRoot();
-  auto p00 = p0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
-  auto p01 = p0->appendRow(new MyTreeNode{TDataType{"group0Child"}});
-  auto p02 = p0->appendRow(new MyTreeNode{TDataType{"group2Child"}});
-  auto p03 = p0->appendRow(new MyTreeNode{TDataType{"group3Child"}});
-  auto p04 = p0->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
-
-  p02->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
-  p02->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
-
-  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
-  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
-  p03->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
-
-  return p0;
-}
-
 class FavoritesTreeModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -149,14 +131,131 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.data(ind10, FavoriteItemData::Role::FULL_PATH_ROLE).toString(), "path/to/non_group_folder");
   }
 
+  void moveParentIndexesTo_sameParent_ok() {
+    auto r = MyTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
+    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+
+    QVERIFY(r0->isDescendantOf(r.get()));
+    QVERIFY(r0->isAncestorOf(r02));
+    QVERIFY(r02->isDescendantOf(r0));
+    QVERIFY(r0->isAncestorOf(r00));
+    QVERIFY(!r00->isAncestorOf(r0));
+
+    FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
+    QCOMPARE(model.setDatas(std::move(r)), true);  // failed
+    QModelIndex rIndex;
+    QCOMPARE(model.rowCount(rIndex), 3);
+
+    QModelIndex r0Index = model.index(0, 0, rIndex);
+    QModelIndex r1Index = model.index(1, 0, rIndex);
+    QModelIndex r2Index = model.index(2, 0, rIndex);
+    QModelIndex r00Index = model.index(0, 0, r0Index);
+    QModelIndex r01Index = model.index(1, 0, r0Index);
+    QModelIndex r02Index = model.index(2, 0, r0Index);
+    QCOMPARE(model.rowCount(r0Index), 3);
+
+    // 0. nothing selected
+    QCOMPARE(model.moveParentIndexesTo({}, r0Index), 0);
+
+    // 1. cannot move to itself
+    QCOMPARE(model.moveParentIndexesTo({r0Index}, r0Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r1Index}, r1Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r2Index}, r2Index), -1);
+
+    // 2. cannot move to non-group
+    QCOMPARE(model.moveParentIndexesTo({r0Index}, r2Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r02Index}, r00Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r02Index}, r01Index), -1);
+
+    // 3. cannot move ancestor to its descendant
+    QVERIFY(!r0->isDescendantOf(r02));
+    QCOMPARE(model.moveParentIndexesTo({r0Index}, r02Index), -1);
+
+    // can move r00 its r0
+    QVERIFY(r00->isDescendantOf(r0));
+    QCOMPARE(model.moveParentIndexesTo({r00Index}, r0Index), 1);
+    QCOMPARE(model.rowCount(r0Index), 3);
+
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, r0Index)), r01);
+    QCOMPARE(model.itemFromIndex(model.index(1, 0, r0Index)), r02);
+    QCOMPARE(model.itemFromIndex(model.index(2, 0, r0Index)), r00);
+
+    // can move r0 its r
+    QCOMPARE(model.moveParentIndexesTo({r0Index}, rIndex), 1);
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, rIndex)), r1);
+    QCOMPARE(model.itemFromIndex(model.index(1, 0, rIndex)), r2);
+    QCOMPARE(model.itemFromIndex(model.index(2, 0, rIndex)), r0);
+  }
+
+  void moveParentIndexesTo_crossParent_ok() {
+    auto r = MyTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
+    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+
+    FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
+    QCOMPARE(model.setDatas(std::move(r)), true);  // failed
+    QModelIndex rIndex;
+    QCOMPARE(model.rowCount(rIndex), 3);
+
+    QModelIndex r0Index = model.index(0, 0, rIndex);
+    QModelIndex r1Index = model.index(1, 0, rIndex);
+    QModelIndex r2Index = model.index(2, 0, rIndex);
+    QModelIndex r00Index = model.index(0, 0, r0Index);
+    QModelIndex r01Index = model.index(1, 0, r0Index);
+    QModelIndex r02Index = model.index(2, 0, r0Index);
+    QCOMPARE(model.rowCount(r0Index), 3);
+
+    // cannot move to non-group
+    QCOMPARE(model.moveParentIndexesTo({r00Index}, r2Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r01Index}, r2Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r02Index}, r2Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r1Index}, r00Index), -1);
+    QCOMPARE(model.moveParentIndexesTo({r2Index}, r00Index), -1);
+
+    QCOMPARE(model.rowCount(rIndex), 3);
+    QCOMPARE(model.rowCount(r0Index), 3);
+    QCOMPARE(model.rowCount(r1Index), 0);
+    QCOMPARE(model.rowCount(r2Index), 0);
+    QCOMPARE(model.moveParentIndexesTo({r00Index}, r1Index), 1);
+    QCOMPARE(model.rowCount(rIndex), 3);
+    QCOMPARE(model.rowCount(r0Index), 2);
+    QCOMPARE(model.rowCount(r1Index), 1);
+    QCOMPARE(model.rowCount(r2Index), 0);
+
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, r0Index)), r01);
+    QCOMPARE(model.itemFromIndex(model.index(1, 0, r0Index)), r02);
+
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, r1Index)), r00);
+  }
+
   void removeParentIndexes_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    auto p0 = GetRemoveOrMoveRootNode();
-    QCOMPARE(model.setDatas(std::move(p0)), true);
+    auto p = MyTreeNode::NewTreeNodeRoot();
+    auto p0 = p->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new MyTreeNode{TDataType{"group0Child"}});
+    auto p2 = p->appendRow(new MyTreeNode{TDataType{"group2Child"}});
+    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new MyTreeNode{TDataType{"group3Child"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
+    auto p4 = p->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
+    QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
     const QByteArray elements{model.toByteArray()};
 
     QCOMPARE(model.removeParentIndexes({}), 0);
+    QCOMPARE(model.removeParentIndexes({QModelIndex{}}), -1); // 根节点, 不会被删除
 
     // remove all root groups and root non group (duplicate index exists. not crash)
     {
@@ -193,38 +292,46 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void moveParentIndexesTo_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    auto p0 = GetRemoveOrMoveRootNode();
-    QCOMPARE(model.setDatas(std::move(p0)), true);
+    auto p = MyTreeNode::NewTreeNodeRoot();
+    auto p0 = p->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new MyTreeNode{TDataType{"group0Child"}});
+    auto p2 = p->appendRow(new MyTreeNode{TDataType{"group2Child"}});
+    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new MyTreeNode{TDataType{"group3Child"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
+    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
+    auto p4 = p->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
+
+    QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
     const QByteArray elements{model.toByteArray()};
 
-    {
-      QModelIndex rootIndex;                                  // will ignored
-      QCOMPARE(model.moveParentIndexesTo({}, rootIndex), 0);  // no need
-
-      QModelIndex nonGroup0RootIndex{model.index(0, 0, {})};  // cannot move to non-group
-      QCOMPARE(model.moveParentIndexesTo({QModelIndex{}}, nonGroup0RootIndex), -1);
-
-      QModelIndex twoChildGroupIndex{model.index(2, 0, {})};  // cannot move to itself
-      QCOMPARE(model.moveParentIndexesTo({rootIndex, nonGroup0RootIndex, twoChildGroupIndex}, twoChildGroupIndex), -1);
-    }
-
     // 根升序, 行号降序, move to root ok
     {
-      QModelIndex rootIndex;
-      QModelIndex r0{model.index(0, 0, rootIndex)};
-      QModelIndex r1{model.index(1, 0, rootIndex)};
-      QModelIndex r4{model.index(4, 0, rootIndex)};
-      QCOMPARE(model.moveParentIndexesTo({r4, r0, r1, r0, r4}, rootIndex), 3);
+      QModelIndex r0{model.index(0, 0, {})};
+      QModelIndex r1{model.index(1, 0, {})};
+      QModelIndex r4{model.index(4, 0, {})};
+      QCOMPARE(model.moveParentIndexesTo({r4, r0, r1, r0, r4}, {}), 3);
       QCOMPARE(model.rowCount(), 5);
 
       // nonGroup0 group0Child group2Child group3Child nonGroup1
       // r0, r1, r4同根, 行号r4大; 排序后, r4, r1, r0按照顺序Append到尾部
-      QCOMPARE(model.itemFromIndex(model.index(0, 0, rootIndex))->val.name, "group2Child");
-      QCOMPARE(model.itemFromIndex(model.index(1, 0, rootIndex))->val.name, "group3Child");
-      QCOMPARE(model.itemFromIndex(model.index(2, 0, rootIndex))->val.name, "nonGroup1");
-      QCOMPARE(model.itemFromIndex(model.index(3, 0, rootIndex))->val.name, "group0Child");
-      QCOMPARE(model.itemFromIndex(model.index(4, 0, rootIndex))->val.name, "nonGroup0");
+      QCOMPARE(model.itemFromIndex(model.index(0, 0, {}))->val.name, "group2Child");
+      QCOMPARE(model.itemFromIndex(model.index(1, 0, {}))->val.name, "group3Child");
+      QCOMPARE(model.itemFromIndex(model.index(2, 0, {}))->val.name, "nonGroup1");
+      QCOMPARE(model.itemFromIndex(model.index(3, 0, {}))->val.name, "group0Child");
+      QCOMPARE(model.itemFromIndex(model.index(4, 0, {}))->val.name, "nonGroup0");
+    }
+
+    {
+      QModelIndex rootIndex;                                         // will ignored
+      QModelIndex nonGroup0RootIndex{model.index(0, 0, rootIndex)};  // cannot move to non-group
+      QCOMPARE(model.moveParentIndexesTo({QModelIndex{}}, nonGroup0RootIndex), -1);
+
+      QModelIndex twoChildGroupIndex{model.index(2, 0, rootIndex)};  // cannot move to itself
+      QCOMPARE(model.moveParentIndexesTo({rootIndex, nonGroup0RootIndex, twoChildGroupIndex}, twoChildGroupIndex), -1);
     }
 
     // 包含冗余, move to group ok
@@ -297,12 +404,12 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.rowCount({}), 2);
 
     QCOMPARE(model.onRename({}, "Hallo"), false);                              // cannot rename root
-    QCOMPARE(model.onRename(model.index(0, 0, {}), "nonGroup0"), true);        // name no change(here we don't check)
+    QCOMPARE(model.onRename(model.index(0, 0, {}), "nonGroup0"), false);       // name no change
     QCOMPARE(model.onRename(model.index(0, 0, {}), "hallo nonGroup0"), true);  // can rename nongroup
     QCOMPARE(model.index(0, 0, {}).data().toString(), "hallo nonGroup0");
     QCOMPARE(model.itemFromIndex(model.index(0, 0, {}))->val.name, "hallo nonGroup0");
 
-    QCOMPARE(model.onRename(model.index(1, 0, {}), "group0Child"), true);        // name no change(here we don't check)
+    QCOMPARE(model.onRename(model.index(1, 0, {}), "group0Child"), false);       // name no change
     QCOMPARE(model.onRename(model.index(1, 0, {}), "hallo group0Child"), true);  // can rename nongroup
     QCOMPARE(model.groupName(model.index(1, 0, {})), "hallo group0Child");
   }

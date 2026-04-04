@@ -2,7 +2,11 @@
 #include "PublicMacro.h"
 #include <QLabel>
 
-ToolBarWidget::ToolBarWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
+constexpr Qt::ToolButtonStyle ToolBarWidget::DEF_TOOL_BUTTON_STYLE;
+constexpr bool ToolBarWidget::DEF_TOOL_BUTTON_STYLE_FIXED;
+
+ToolBarWidget::ToolBarWidget(QBoxLayout::Direction direction, QWidget* parent)
+  : QWidget{parent} {
   mLayout = new (std::nothrow) QBoxLayout{direction, this};
   CHECK_NULLPTR_RETURN_VOID(mLayout);
   mLayout->setContentsMargins(0, 0, 0, 0);
@@ -42,12 +46,12 @@ QFrame* ToolBarWidget::addSeparator() {
   QFrame* separator = new (std::nothrow) QFrame{this};
   CHECK_NULLPTR_RETURN_NULLPTR(separator);
 
-  if (mLayout->direction() == QBoxLayout::LeftToRight || mLayout->direction() == QBoxLayout::RightToLeft) {  // 水平布局使用垂直分隔线
+  if (mLayout->direction() == QBoxLayout::LeftToRight || mLayout->direction() == QBoxLayout::RightToLeft) { // 水平布局使用垂直分隔线
     separator->setFrameShape(QFrame::VLine);
     separator->setFrameShadow(QFrame::Sunken);
     separator->setFixedWidth(1);
     separator->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-  } else {  // 垂直布局使用水平分隔线
+  } else { // 垂直布局使用水平分隔线
     separator->setFrameShape(QFrame::HLine);
     separator->setFrameShadow(QFrame::Sunken);
     separator->setFixedHeight(1);
@@ -58,8 +62,48 @@ QFrame* ToolBarWidget::addSeparator() {
   return separator;
 }
 
+int ToolBarWidget::setToolButtonSizePolicy(const QSizePolicy& newSizePolicy, bool bRecursive) {
+  CHECK_NULLPTR_RETURN_INT(mLayout, -1);
+  mToolButtonSizePolicy = newSizePolicy;
+  int affectedWid{0};
+  QList<QToolButton*> toolButtons = this->findChildren<QToolButton*>();
+  for (QToolButton* toolBtn : toolButtons) {
+    if (!bRecursive && toolBtn->parentWidget() != this) {
+      // 嵌套的QToolButton跳过, i.e., mLayout中的QWidget中的QToolButton控件
+      continue;
+    }
+    if (toolBtn->sizePolicy() == newSizePolicy) {
+      continue;
+    }
+    toolBtn->setSizePolicy(newSizePolicy);
+    ++affectedWid;
+  }
+  return affectedWid;
+}
+
+int ToolBarWidget::setIconSize(const QSize& newIconSize, bool bRecursive) {
+  CHECK_NULLPTR_RETURN_INT(mLayout, -1);
+  mIconSize = newIconSize;
+  int affectedWid{0};
+  QList<QToolButton*> toolButtons = this->findChildren<QToolButton*>();
+  for (QToolButton* toolBtn : toolButtons) {
+    if (!bRecursive && toolBtn->parentWidget() != this) {
+      // 嵌套的QToolButton跳过, i.e., mLayout中的QWidget中的QToolButton控件
+      continue;
+    }
+    if (toolBtn->iconSize() == newIconSize) {
+      continue;
+    }
+    toolBtn->setIconSize(newIconSize);
+    ++affectedWid;
+  }
+  return affectedWid;
+}
+
 int ToolBarWidget::setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool bRecursive) {
   CHECK_NULLPTR_RETURN_INT(mLayout, -1);
+  mToolButtonStyle = toolButtonStyle;
+
   int affectedWid{0};
   QList<QToolButton*> toolButtons = this->findChildren<QToolButton*>();
   for (QToolButton* toolBtn : toolButtons) {
@@ -80,13 +124,17 @@ int ToolBarWidget::setToolButtonStyle(Qt::ToolButtonStyle toolButtonStyle, bool 
   return affectedWid;
 }
 
-QToolButton* ToolBarWidget::createToolButton(QAction* act, Qt::ToolButtonStyle toolButtonStyle, bool bToolButtonStyleFixed) {
+QToolButton* ToolBarWidget::createToolButton(QAction* act, bool bToolButtonStyleFixed) {
   CHECK_NULLPTR_RETURN_NULLPTR(act);
   QToolButton* btn = new (std::nothrow) QToolButton{this};
   CHECK_NULLPTR_RETURN_NULLPTR(btn);
   btn->setObjectName(act->objectName().isEmpty() ? act->text() : act->objectName());
   btn->setDefaultAction(act);
-  btn->setToolButtonStyle(toolButtonStyle);
+  if (mIconSize.isValid()) {
+    btn->setIconSize(mIconSize);
+  }
+  btn->setToolButtonStyle(mToolButtonStyle);
+  btn->setSizePolicy(mToolButtonSizePolicy);
   btn->setAutoRaise(true);
   if (bToolButtonStyleFixed) {
     mToolButtonStyleFixedObjNameSet.insert(btn->objectName());
@@ -102,7 +150,8 @@ QAction* ToolBarWidget::addAction(const QIcon& icon, const QString& text) {
 
 bool ToolBarWidget::addAction(QAction* act) {
   CHECK_NULLPTR_RETURN_FALSE(act);
-  QToolButton* btn = createToolButton(act);
+  mActions.push_back(act);
+  QToolButton* btn = createToolButton(act, DEF_TOOL_BUTTON_STYLE_FIXED);
   CHECK_NULLPTR_RETURN_FALSE(btn);
   addWidget(btn);
   return true;

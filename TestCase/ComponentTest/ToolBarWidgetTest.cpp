@@ -44,7 +44,7 @@ class ToolBarWidgetTest : public PlainTestSuite {
 
     // 已固定的不受setToolButtonStyle影响
     QAction helpAction{"help", tb.get()};
-    QToolButton* fixedStyleBtn = tb->createToolButton(&helpAction, Qt::ToolButtonStyle::ToolButtonIconOnly, true);
+    QToolButton* fixedStyleBtn = tb->createToolButton(&helpAction, true);
     QCOMPARE(fixedStyleBtn->toolButtonStyle(), Qt::ToolButtonStyle::ToolButtonIconOnly);
     tb->addWidget(fixedStyleBtn);
 

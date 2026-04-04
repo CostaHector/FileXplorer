@@ -47,3 +47,24 @@ bool FavoriteItemData::GetInitialSortOrderReverse() {
 void FavoriteItemData::SaveSortOrderReverse(bool bReverse) {
   Configuration().setValue(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, bReverse);
 }
+
+bool MyTreeNode::isAncestorOf(const MyTreeNode* descendant) const {
+  if (descendant == nullptr) {
+    return false;
+  }
+  return descendant->isDescendantOf(this);
+}
+
+bool MyTreeNode::isDescendantOf(const MyTreeNode* ancestor) const {
+  if (ancestor == nullptr) {
+    return false;
+  }
+
+  for (const MyTreeNode* parentNode = parent(); parentNode != nullptr; parentNode = parentNode->parent()) {
+    if (parentNode == ancestor) {
+      return true;
+    }
+  }
+
+  return false;
+}

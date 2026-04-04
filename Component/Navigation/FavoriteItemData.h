@@ -63,6 +63,17 @@ struct MyTreeNode final {
       : val{_val}, childs{_childs}, pParent{_parent} {}
   ~MyTreeNode() { releaseAndClearChilds(); }
   MyTreeNode* parent() const { return pParent; }
+  bool isGroup() const { return val.isGroup; }
+  QString name() const { return val.name; }
+  bool setName(const QString& newName) {
+    if (val.name == newName) {
+      return false;  // unchanged
+    }
+    val.name = newName;
+    return true;
+  }
+  bool isAncestorOf(const MyTreeNode* descendant) const;
+  bool isDescendantOf(const MyTreeNode* ancestor) const;
 
   bool operator==(const MyTreeNode& rhs) const;
   bool operator!=(const MyTreeNode& rhs) const { return !(*this == rhs); }

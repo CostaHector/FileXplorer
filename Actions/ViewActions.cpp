@@ -75,9 +75,9 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
   _JSON_VIEW->setCheckable(true);
 
-  _VIEW_BACK_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_BACK_TO"}, tr("View back"), this);
+  _VIEW_BACK_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_BACK_TO"}, tr("View Back"), this);
   _VIEW_BACK_TO->setToolTip(QString("<b>%1 (Ctrl+Mouse BackButton)</b><br/> back to last view type.").arg(_VIEW_BACK_TO->text()));
-  _VIEW_FORWARD_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_FORWARD_TO"}, tr("View forward"), this);
+  _VIEW_FORWARD_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_FORWARD_TO"}, tr("View Forward"), this);
   _VIEW_FORWARD_TO->setToolTip(QString("<b>%1 (Ctrl+Mouse ForwardButton)</b><br/> forward to next view type.").arg(_VIEW_FORWARD_TO->text()));
   _VIEWS_NAVIGATE += _VIEW_BACK_TO;
   _VIEWS_NAVIGATE += _VIEW_FORWARD_TO;
@@ -89,7 +89,7 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _PREVIEW_PANEL->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(_PREVIEW_PANEL->text(), _PREVIEW_PANEL->shortcut().toString()));
 
-  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/SYSTEM_APPLICATION_VIDEO"), tr("play in system application"), this);
+  _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/SYSTEM_APPLICATION_VIDEO"), tr("Play in System Application"), this);
   _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
   _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);
   _SYS_VIDEO_PLAYERS->setToolTip(QString("<b>%1 (%2)</b><br/>"
@@ -102,13 +102,13 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
                             .arg(_HAR_VIEW->text(), _HAR_VIEW->shortcut().toString()));
 
   _FONT_TYPE_AND_SIZE = new (std::nothrow) QAction{QIcon{":img/FONT_SIZE"}, tr("Font"), this};
-  _FONT_TYPE_AND_SIZE->setToolTip(QString("<b>%1 (%2)<br/>"
+  _FONT_TYPE_AND_SIZE->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                           "Configure text font settings")
                                       .arg(_FONT_TYPE_AND_SIZE->text(), _FONT_TYPE_AND_SIZE->shortcut().toString()));
 
-  _ROW_HEIGHT = new (std::nothrow) QAction{QIcon{":img/DEFAULT_ROW_HEIGHT"}, tr("Row height"), this};
-  _ROW_HEIGHT->setToolTip(QString("<b>%1 (%2)<br/>"
-                                  "Configure tableview/treeview row height settings")
+  _ROW_HEIGHT = new (std::nothrow) QAction{QIcon{":img/DEFAULT_ROW_HEIGHT"}, tr("Row Height"), this};
+  _ROW_HEIGHT->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                  "Configure tableview/treeview row height")
                               .arg(_ROW_HEIGHT->text(), _ROW_HEIGHT->shortcut().toString()));
 }
 

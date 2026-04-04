@@ -2,7 +2,6 @@
 #include "PopupWidgetManager.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
-#include "StyleSheet.h"
 #include "SizeChangeAnimation.h"
 #include "ImageTool.h"
 #include <QApplication>
@@ -12,16 +11,13 @@
 
 constexpr int NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND, NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND;
 
-NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
-    : QToolBar{title, parent}                                                //
+NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
+  : ToolBarWidget{QBoxLayout::Direction::Down, parent}               //
 {
   setObjectName(title);
 
   const bool bExpandSideBar{
       Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.v).toBool()};
-  setOrientation(Qt::Vertical);
-  setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
-  setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
 
   // 0. expand and minimum
   {
@@ -80,9 +76,10 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
     m_pathActionGroups->addAction(pFavorite);
 
     // 3. all volumes
+    const QIcon diskIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon);
     foreach (const QFileInfo& fi, QDir::drives()) {
       const QString diskAbsPath{fi.absoluteFilePath()};
-      auto* pVolume = addAction({}, diskAbsPath);
+      auto* pVolume = addAction(diskIcon, diskAbsPath);
       CHECK_NULLPTR_RETURN_VOID(pVolume)
       pVolume->setData(diskAbsPath);
       pVolume->setToolTip(QString{"<b>Disk: %1</b>"}.arg(diskAbsPath));
@@ -91,21 +88,23 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent)  //
     addSeparator();
   }
 
+  setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
+  setToolButtonSizePolicy(QSizePolicy{QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum});
+
   // 4. all collections
   m_favorites = new (std::nothrow) NavigationFavorites{this};
   CHECK_NULLPTR_RETURN_VOID(m_favorites);
   addWidget(m_favorites);
 
-  SetLayoutAlightment(layout(), Qt::AlignmentFlag::AlignLeft);
-#ifdef RUNNING_UNIT_TESTS
-  updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
-#else
-  QTimer::singleShot(0, this, [this]() { updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false); });
-#endif
+  #ifdef RUNNING_UNIT_TESTS
+    updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
+  #else
+    QTimer::singleShot(0, this, [this]() { updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false); });
+  #endif
   subscribe();
 }
 
-NavigationToolBar::~NavigationToolBar() {  //
+NavigationToolBar::~NavigationToolBar() { //
   Configuration().setValue(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, EXPAND_SIDEBAR->isChecked());
 }
 
@@ -123,13 +122,13 @@ void NavigationToolBar::onExpandSidebar(bool bExpand) {
 }
 
 void NavigationToolBar::updateToolbarButtonStyle(bool bExpand, bool bAnimationEnabled) {
-#ifdef RUNNING_UNIT_TESTS  // no need animation in testcase
+#ifdef RUNNING_UNIT_TESTS // no need animation in testcase
   bAnimationEnabled = false;
 #endif
   SizeChangeAnimation ani{orientation(), MAXIMUM_WIDTH_WHEN_EXPAND, MAXIMUM_WIDTH_WHEN_NOT_EXPAND, bAnimationEnabled};
-  if (bExpand) {  // 扩展场景, 需要事先设置Icon旁文字, 这样计算的宽度是最终宽度
+  if (bExpand) { // 扩展场景, 需要事先设置Icon旁文字, 这样计算的宽度是最终宽度
     ani.registerCallbackBeforeStart([this] { setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon); });
-  } else {  // 收缩场景, 先收缩到一个很小值, 再设置仅文字
+  } else { // 收缩场景, 先收缩到一个很小值, 再设置仅文字
     ani.registerCallbackWhenFinished([this] { setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly); });
   }
   ani(this, width(), bExpand);
