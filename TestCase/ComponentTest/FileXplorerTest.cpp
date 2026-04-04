@@ -96,6 +96,7 @@ class FileXplorerTest : public PlainTestSuite {
       QVERIFY(fe.m_stackedBar != nullptr);
       QVERIFY(fe.m_viewSwitchHelper != nullptr);
       QVERIFY(fe.m_navigationToolBar != nullptr);
+      QVERIFY(fe.m_naviSideBarDock != nullptr);
       QVERIFY(fe.m_ribbonMenu != nullptr);
       QVERIFY(fe.m_statusBar != nullptr);
 
@@ -107,7 +108,7 @@ class FileXplorerTest : public PlainTestSuite {
       fe.keyPressEvent(nullptr);
       {
         QCOMPARE(viewActInst._NAVIGATION_PANE->isChecked(), true);
-        QCOMPARE(fe.m_navigationToolBar->isHidden(), false);
+        QCOMPARE(fe.m_naviSideBarDock->isHidden(), false);
 
         QCOMPARE(viewActInst._PREVIEW_PANEL->isChecked(), true);
         QCOMPARE(fe.m_previewHtmlDock->isHidden(), false);
@@ -123,7 +124,7 @@ class FileXplorerTest : public PlainTestSuite {
 
       // change status
       viewActInst._NAVIGATION_PANE->toggle();
-      QCOMPARE(fe.m_navigationToolBar->isHidden(), true);
+      QCOMPARE(fe.m_naviSideBarDock->isHidden(), true);
 
       viewActInst._PREVIEW_PANEL->toggle();
       QCOMPARE(fe.m_previewHtmlDock->isHidden(), true);
@@ -156,7 +157,7 @@ class FileXplorerTest : public PlainTestSuite {
     viewActInst._TABLE_VIEW->setChecked(true);
     {
       FileXplorer fe{args, nullptr};
-      QCOMPARE(fe.m_navigationToolBar->isHidden(), true);
+      QCOMPARE(fe.m_naviSideBarDock->isHidden(), true);
       QCOMPARE(fe.m_previewHtmlDock->isHidden(), true);
       QCOMPARE(fe.m_previewFolder->isHidden(), true);
       QCOMPARE(fe.m_fsPanel->GetVt(), ViewTypeTool::ViewType::TABLE);

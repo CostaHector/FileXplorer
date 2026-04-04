@@ -99,24 +99,6 @@ class NavigationToolBarTest : public PlainTestSuite {
     QVERIFY(naviTooBar.mDevDriveTV != nullptr);
     QCOMPARE(naviTooBar.mDevDriveTV->isVisible(), false);
     QCOMPARE(naviTooBar.DEVICES_AND_DRIVES->isChecked(), false);
-
-    QList<QAction*> otherActLst = plainActLsts.mid(1);
-    for (QAction* action : otherActLst) {
-      if (action->isSeparator()) {
-        continue;
-      }
-
-      // built-in: QWidgetAction
-      if (QWidget* widget = naviTooBar.widgetForAction(action)) {
-        if (qobject_cast<QToolBar*>(widget)) {
-          // built-in toolbar skip
-          continue;
-        }
-      }
-      if (!action->isEnabled() || !action->isVisible()) {
-        continue;
-      }
-    }
   }
 
   void onPathActionTriggeredNavi_ok() {

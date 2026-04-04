@@ -22,6 +22,7 @@ public:
   ViewSwitchToolBar* m_viewSwitcher{nullptr};
   ScenePageControl* m_scenePageControl{nullptr};
 
+  QDockWidget* m_naviSideBarDock{nullptr};
   PreviewDockWidget* m_previewHtmlDock{nullptr};
 
   CurrentRowPreviewer* m_previewFolder{nullptr};

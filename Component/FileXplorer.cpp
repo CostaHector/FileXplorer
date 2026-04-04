@@ -7,28 +7,28 @@
 #include "StyleSheet.h"
 #include <QFileInfo>
 
-FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
-    : QMainWindow(parent)                                           //
+FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
+  : QMainWindow(parent)                                            //
 {
   m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
-  m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this};  // docker
   m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
   const ViewTypeTool::ViewType initialViewType{m_viewSwitcher->GetCurViewType()};
 
-  m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this};  // previewer in docker
+  m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this}; // previewer in docker
 
-  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};        // previewer switcher
-  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this};  // searchToolBar
-  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};      // left navigation bar
-  m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                         // ribbon menu
+  m_previewSwitcher = new (std::nothrow) FolderPreviewSwitcher{m_previewFolder, this};       // previewer switcher
+  m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"Stacked Toolbar", this}; // searchToolBar
+  m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};     // left navigation bar
+  m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                        // ribbon menu
 
-  m_statusBar = new (std::nothrow) CustomStatusBar{this};  // status bar
+  m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
 
-  m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this};  // main widget
+  m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
   m_fsPanel->BindLogger(m_statusBar);
   m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
 
-  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, m_navigationToolBar, this};  // view/searchToolBar switcher
+  m_viewSwitchHelper = new (std::nothrow)
+      ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, m_navigationToolBar, this}; // view/searchToolBar switcher
   m_viewSwitchHelper->onSwitchByViewType(initialViewType);
 
   const QString& defaultPath = GetInitialPathFromArgs(args);
@@ -38,12 +38,20 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent)  //
 
   m_ribbonMenu->AddScenePageControlWidget(m_scenePageControl);
 
+  m_naviSideBarDock = new (std::nothrow) QDockWidget{"Navigation Sidebar", this};
+  auto title = new QLabel{"Navi", this};
+  title->setFixedHeight(12);
+  m_naviSideBarDock->setTitleBarWidget(title);
+  m_naviSideBarDock->setWidget(m_navigationToolBar);
+  m_naviSideBarDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
+  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, m_naviSideBarDock);
+
+  m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this}; // docker
   m_previewHtmlDock->setWidget(m_previewFolder);
   m_previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
 
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
-  addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
   setMenuWidget(m_ribbonMenu);
   setStatusBar(m_statusBar);
 
@@ -73,7 +81,7 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
   const bool bIsSpecifiedPath{args.size() > 1};
   QString path{bIsSpecifiedPath ? args[1] : ""};
 #ifdef _WIN32
-  if (path.endsWith(":\"")) {  // e.g. "E:\"" => "E:/"
+  if (path.endsWith(":\"")) { // e.g. "E:\"" => "E:/"
     path.back() = '/';
   }
 #endif
@@ -106,7 +114,7 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 void FileXplorer::InitComponentVisibility() {
   const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool()};
   if (!showNavi) {
-    m_navigationToolBar->hide();
+    m_naviSideBarDock->hide();
   }
 
   const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool();
@@ -120,7 +128,7 @@ void FileXplorer::InitComponentVisibility() {
 
 void FileXplorer::subscribe() {
   auto& vA = g_viewActions();
-  connect(vA._NAVIGATION_PANE, &QAction::toggled, m_navigationToolBar, &QWidget::setVisible);
+  connect(vA._NAVIGATION_PANE, &QAction::toggled, m_naviSideBarDock, &QWidget::setVisible);
   connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
 
   connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
@@ -133,7 +141,7 @@ void FileXplorer::subscribe() {
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
   CHECK_NULLPTR_RETURN_VOID(ev);
   switch (ev->key()) {
-    case Qt::Key_F3: {  // F3 Search
+    case Qt::Key_F3: { // F3 Search
       const auto viewType = m_fsPanel->GetVt();
       switch (viewType) {
         case ViewTypeTool::ViewType::LIST:

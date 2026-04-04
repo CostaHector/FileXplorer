@@ -12,6 +12,9 @@ class NavigationFavorites : public QWidget {
   const FavoritesTreeView* view() const { return m_favView; }
 
  private:
+  QSize sizeHint() const override {
+     return {QWidget::sizeHint().width(), 400};
+  }
   void onStartFilter();
 
   QLineEdit* m_searchLineEdit{nullptr};
