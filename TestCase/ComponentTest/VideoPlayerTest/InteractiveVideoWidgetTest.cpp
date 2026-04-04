@@ -246,25 +246,26 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
     QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
     layoutVisibilityChangedSpy.takeLast();
 
-    // 右键点击事件, 显示工具栏和视频文件列表, a.全屏模式下还会重新启动定时器
+    // 右键点击事件, 强制显示工具栏, 不修改视频文件列表可见性, a.全屏模式下还会重新启动定时器
     {
       QMouseEvent rightClickEvent{QEvent::MouseButtonPress, videoWid.geometry().center(), Qt::RightButton, Qt::RightButton, Qt::NoModifier};
       videoWid.mousePressEvent(&rightClickEvent);
       QCOMPARE(rightClickEvent.isAccepted(), true);
 
       QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
-      QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
+      QCOMPARE(videoWid.mShowVideoList->isChecked(), false);
       QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
       layoutVisibilityChangedSpy.takeLast();
       QVERIFY(videoWid.mLongTimeNoClickTimer.isActive());  // 重新启动定时器
     }
 
-    // 退出全屏模式将显示工具栏和视频文件列表
+    // 退出全屏模式将强制显示工具栏和视频文件列表
     {
       QCOMPARE(videoWid.mFullScreenAct->isChecked(), true);
       videoWid.mFullScreenAct->toggle();
       QCOMPARE(videoWid.mFullScreenAct->isChecked(), false);
-
+      QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
+      layoutVisibilityChangedSpy.takeLast();
       QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
       QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
       QVERIFY(!videoWid.mLongTimeNoClickTimer.isActive());  // 停用定时器
@@ -278,14 +279,14 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
       QCOMPARE(videoWid.mShowVideoList->isChecked(), false);
     }
 
-    // 右键点击事件, 显示工具栏和视频文件列表, b.非全屏模式下不会重新启动定时器
+    // 右键点击事件, 强制显示工具栏, 不修改视频文件列表, b.非全屏模式下不会重新启动定时器
     {
       QMouseEvent rightClickEvent{QEvent::MouseButtonPress, videoWid.geometry().center(), Qt::RightButton, Qt::RightButton, Qt::NoModifier};
       videoWid.mousePressEvent(&rightClickEvent);
       QCOMPARE(rightClickEvent.isAccepted(), true);
 
       QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
-      QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
+      QCOMPARE(videoWid.mShowVideoList->isChecked(), false);
       QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
       layoutVisibilityChangedSpy.takeLast();
       QVERIFY(!videoWid.mLongTimeNoClickTimer.isActive());  // 不会重新启动定时器

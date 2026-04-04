@@ -370,8 +370,11 @@ void InteractiveVideoWidget::onPlaybackTriggerModeTriggered(const QAction* newPl
 }
 
 void InteractiveVideoWidget::onMouseRightClickEventHappend() {
-  // show everything
-  changeAllToolbarVisibility(true);
+  // 只修改进度条所在的toolbar的可见性, 不修改列表的可见性
+  if (mHideToolBarAct->isChecked()) {
+    mHideToolBarAct->toggle();
+    emit layoutVisibilityChanged();
+  }
   if (isVideoFullScreen()) {
     // 全屏模式下, 重新开始计时
     tryStartAutoHideTimer();
