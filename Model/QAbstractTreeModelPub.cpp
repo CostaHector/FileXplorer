@@ -338,40 +338,36 @@ int QAbstractTreeModelPub::moveParentIndexesTo(const QModelIndexList& parentInde
 
     const QModelIndex srcInd{indexFromItem(srcNode)};
     {
-      int destRow = destNode->rowCount();
-      if (srcNode == destNode) {
-        // 1. 同父, 向后移动时, 要--目的行, 若源和目的相等, 则跳过;
-        if (row < destRow) {
-          --destRow;
-        }
-        if (destRow == row) {
-          succeedCnt++;  // no need move
-          continue;
-        }
+      const int destRowCount{destNode->rowCount()};
+      const int destRow{destRowCount};
+      const bool bSameParent{srcNode == destNode};
+      if (bSameParent && (row <= destRow && destRow <= row + 1)) {
+        // 1. 同父, 向后移动时, 若 destRow in [row, row+1] 直接跳过, 顺序已符合预期, 无需调整
+        succeedCnt++;
+        continue;
       }
       // 2. 差异: 此处允许子结点往父节点上移动, 但不允许父节点往子结点上移动(避免环),
       // 原生beginMoveRows不允许任何有父子关系的移动, 否则false;
-      // 原生beginMoveRows不允许destRow, 在[row1, row2]区间内, 否则false
-      const bool begSucceed{beginMoveRows(srcInd, row, row, destInd, destRow)};
-      MyTreeNode* pNode = srcNode->takeRow(row);
-      destNode->appendRow(pNode);
-      if (begSucceed) {
+      // 原生beginMoveRows 在同父间移动时不允许destRow在[rowFront, rowBack+1]区间内(无需多余移动), 否则false
+      if (beginMoveRows(srcInd, row, row, destInd, destRow)) {
+        MyTreeNode* pNode = srcNode->takeRow(row);
+        destNode->appendRow(pNode);
         endMoveRows();
+      } else {
+        LOG_W("beginMoveRows return false[sameParent:%d, row:%d, destRow:%d, destRowCnt:%d]", bSameParent, row, destRow, destRowCount);
+        /* or do remove and append seperately
+         {
+          beginRemoveRows(srcInd, row, row);
+          MyTreeNode* pNode = srcNode->takeRow(row);
+          endRemoveRows();
+          beginInsertRows(destInd, destRowCount, destRowCount);
+          destNode->appendRow(pNode);
+          endInsertRows();
+         }
+         */
+        return -2;
       }
     }
-
-    /* or do remove and append seperately
-     {
-      beginRemoveRows(srcInd, row, row);
-      MyTreeNode* pNode = srcNode->takeRow(row);
-      endRemoveRows();
-      int destRow = destNode->rowCount();
-      beginInsertRows(destInd, destRow, destRow);
-      destNode->appendRow(pNode);
-      endInsertRows();
-     }
-     */
-
     succeedCnt++;
   }
   setDirty();

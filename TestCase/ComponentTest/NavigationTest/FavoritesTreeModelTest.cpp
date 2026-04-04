@@ -237,6 +237,46 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.itemFromIndex(model.index(0, 0, r1Index)), r00);
   }
 
+  void moveParentIndexesTo_Ancestor_ok() {
+    auto r = MyTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
+    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+
+    FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
+    QCOMPARE(model.setDatas(std::move(r)), true);  // failed
+    QModelIndex rIndex;
+    QModelIndex r0Index = model.index(0, 0, rIndex);
+    QModelIndex r1Index = model.index(1, 0, rIndex);
+    QModelIndex r2Index = model.index(2, 0, rIndex);
+    QModelIndex r00Index = model.index(0, 0, r0Index);
+    QModelIndex r01Index = model.index(1, 0, r0Index);
+    QModelIndex r02Index = model.index(2, 0, r0Index);
+
+    QCOMPARE(model.rowCount(rIndex), 3);
+    QCOMPARE(model.rowCount(r0Index), 3);
+    QCOMPARE(model.rowCount(r1Index), 0);
+    QCOMPARE(model.rowCount(r2Index), 0);
+
+    QCOMPARE(model.moveParentIndexesTo({r00Index}, rIndex), 1);
+
+    QCOMPARE(model.rowCount(rIndex), 4);
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, rIndex)), r0);
+    QCOMPARE(model.itemFromIndex(model.index(1, 0, rIndex)), r1);
+    QCOMPARE(model.itemFromIndex(model.index(2, 0, rIndex)), r2);
+    QCOMPARE(model.itemFromIndex(model.index(3, 0, rIndex)), r00);
+
+    QCOMPARE(model.rowCount(r0Index), 2);
+    QCOMPARE(model.itemFromIndex(model.index(0, 0, r0Index)), r01);
+    QCOMPARE(model.itemFromIndex(model.index(1, 0, r0Index)), r02);
+
+    QCOMPARE(model.rowCount(r1Index), 0);
+    QCOMPARE(model.rowCount(r2Index), 0);
+  }
+
   void removeParentIndexes_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     auto p = MyTreeNode::NewTreeNodeRoot();
