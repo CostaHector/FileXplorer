@@ -161,7 +161,6 @@
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
         <file alias="PIN">LeftSideToolBarIcons/PIN.svg</file>
         <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
-        <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
         <file alias="EXPAND_SIDEBAR">LeftSideToolBarIcons/EXPAND_SIDEBAR.svg</file>
         <file alias="EXPAND_ALL">LeftSideToolBarIcons/EXPAND_ALL.svg</file>
         <file alias="COLLAPSE_ALL">LeftSideToolBarIcons/COLLAPSE_ALL.svg</file>

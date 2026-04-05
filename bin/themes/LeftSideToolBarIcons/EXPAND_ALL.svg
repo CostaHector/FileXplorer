@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 11H10v-1h12zm0-8H9v1h13zM8 20H6v2h2zM6 6H2V2h4zM5 3H3v2h2zm3 7H6v2h2zm0 5H6v2h2zm14 0H10v1h12zm-12 6h12v-1H10z"/><path fill="none" d="M0 0h24v24H0z"/></svg>
+<svg fill="#000000" width="800px" height="800px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
+<defs><style>.cls-1{fill:none;}</style></defs>
+<title>expand-categories</title>
+  <g opacity="0.1">
+    <rect x="0" y="0" width="32" height="32" fill="#FFFFFF"/>
+  </g>
+<rect x="20" y="26" width="6" height="2"/>
+<rect x="20" y="18" width="8" height="2"/>
+<rect x="20" y="10" width="10" height="2"/>
+<rect x="15" y="4" width="2" height="24"/>
+<polygon points="10.586 3.959 7 7.249 3.412 3.958 2 5.373 7 10 12 5.373 10.586 3.959"/>
+<rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
+</svg>

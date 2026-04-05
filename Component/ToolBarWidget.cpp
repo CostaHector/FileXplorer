@@ -7,6 +7,7 @@ constexpr bool ToolBarWidget::DEF_TOOL_BUTTON_STYLE_FIXED;
 
 ToolBarWidget::ToolBarWidget(QBoxLayout::Direction direction, QWidget* parent)
   : QWidget{parent} {
+  setProperty("isToolBar", true);
   mLayout = new (std::nothrow) QBoxLayout{direction, this};
   CHECK_NULLPTR_RETURN_VOID(mLayout);
   mLayout->setContentsMargins(0, 0, 0, 0);

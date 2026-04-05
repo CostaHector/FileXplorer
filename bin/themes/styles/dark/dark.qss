@@ -5,9 +5,14 @@ QWidget {
     selection-background-color: #264f78;
 }
 
+QWidget[isToolBar="true"] {
+    background-color: #3F3B39;
+    color: #FFFFFF;
+}
+
 /* 主窗口 */
 QMainWindow {
-    background-color: #252525;
+    background-color: #3F3B39;
 }
 
 /* 文本编辑区 */
@@ -281,7 +286,6 @@ QToolBar {
     border: 1px solid #000000;
 }
 
-
 QToolBar QToolBar {
     margin: 0px;
     border: 0px;
@@ -423,6 +427,10 @@ QToolButton::menu-arrow {
 
 }
 
+#VideoPlayerPauseShieldButton {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+}
 QComboBox {
     padding: 0px;
     background-color: #3F3B39;
