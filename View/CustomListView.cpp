@@ -31,36 +31,36 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   {
-    const QString iconSizeMenuName{GetName() + " " + tr("Icon size")};
+    const QString iconSizeMenuName{GetName() + " " + CustomListView::tr("Icon size")};
     _ICON_SIZE_MENU = new (std::nothrow) IconSizeMenu{iconSizeMenuName, GetName(), this};
 
-    const QString textElideModeMenuName{GetName() + " " + tr("Text elide mode")};
+    const QString textElideModeMenuName{GetName() + " " + CustomListView::tr("Text elide mode")};
     _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, GetName(), this};
   }
 
   {
-    _FLOW_ORIENTATION_LTR = new (std::nothrow) QAction{QIcon{":img/ALIGN_HORIZONTAL_LEFT"}, tr("Flow Orientation: Left2Right"), this};
+    _FLOW_ORIENTATION_LTR = new (std::nothrow) QAction{QIcon{":img/ALIGN_HORIZONTAL_LEFT"}, CustomListView::tr("Flow Orientation: Left2Right"), this};
     CHECK_FALSE_RETURN_VOID(_FLOW_ORIENTATION_LTR);
     _FLOW_ORIENTATION_LTR->setCheckable(true);
     _FLOW_ORIENTATION_LTR->setToolTip("The items layout should flow LeftToRight if enabled, other Top2Bottom(by default)");
 
-    _VIEW_MODE_LIST_ICON = new (std::nothrow) QAction{QIcon{":img/VIEW_MODE_ICON"}, tr("View Mode: Icon"), this};
+    _VIEW_MODE_LIST_ICON = new (std::nothrow) QAction{QIcon{":img/VIEW_MODE_ICON"}, CustomListView::tr("View Mode: Icon"), this};
     CHECK_NULLPTR_RETURN_VOID(_VIEW_MODE_LIST_ICON);
     _VIEW_MODE_LIST_ICON->setCheckable(true);
     _VIEW_MODE_LIST_ICON->setToolTip("Icon if enabled, other List(by default)");
 
-    _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, tr("Resize Mode: Adjust"), this};
+    _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, CustomListView::tr("Resize Mode: Adjust"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
     _RESIZED_MODE_ADJUST->setCheckable(true);
     _RESIZED_MODE_ADJUST->setChecked(Configuration().value(GetName() + "/RESIZED_MODE_FIXED_OR_ADJUST", true).toBool());
     _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed. by default: adjust");
 
-    _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, tr("Wrapping"), this};
+    _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, CustomListView::tr("Wrapping"), this};
     CHECK_NULLPTR_RETURN_VOID(_WRAPPING_ACTIONS);
     _WRAPPING_ACTIONS->setCheckable(true);
     _WRAPPING_ACTIONS->setToolTip("The layout should wrap when there is no more space in the visible area if enabled, by default: no wrap false");
 
-    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, tr("Uniform items sizes"), this};
+    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, CustomListView::tr("Uniform items sizes"), this};
     CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
     _UNIFORM_ITEM_SIZES->setCheckable(true);
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "/UNIFORM_ITEM_SIZES", false).toBool());

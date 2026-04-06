@@ -22,7 +22,7 @@ class RateHelper {
   static inline int clampRate(int rate) { return std::max(std::min(rate, (int)MAX_V), (int)MIN_V); }
 
   static bool isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& vRect);
-  static QRect getRatingRect(QRect visualRect);
+  static QRect getRatingRect(const QRect& visualRect);
   static int ratingAtPosition(const QPoint& pos, const QRect& visualRect);
 
  private:

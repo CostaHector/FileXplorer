@@ -13,7 +13,7 @@ class SceneStyleDelegate : public QStyledItemDelegate {
   QString displayText(const QVariant& value, const QLocale& loc) const override;
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-  QRect GetRealImageVisualRect(const QModelIndex& index, QRect gridVisualRect) const;
+  static QRect GetRealImageVisualRect(const QRect& gridVisualRect);
   void onSceneClicked(const QModelIndex& nowInd, const QRect& vRect, const QPoint& clickedPnt);
 
  signals:

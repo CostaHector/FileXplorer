@@ -37,11 +37,11 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   setUniformRowHeights(true);
 
   // 0.
-  _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, tr("Show All Columns"), this);
+  _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, CustomTreeView::tr("Show All Columns"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_ALL_HORIZONTAL_COLUMNS);
 
   // 1.
-  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, tr("Show Horizontal Header"), this);
+  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, CustomTreeView::tr("Show Horizontal Header"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_HORIZONTAL_HEADER);
   _SHOW_HORIZONTAL_HEADER->setCheckable(true);
   _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, true).toBool());
@@ -57,26 +57,26 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   setSortingEnabled(m_horHeader->isSortingEnabled());
 
   // 3.
-  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, tr("Auto Scroll"), this);
+  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, CustomTreeView::tr("Auto Scroll"), this);
   CHECK_NULLPTR_RETURN_VOID(_AUTO_SCROLL);
   _AUTO_SCROLL->setCheckable(true);
   _AUTO_SCROLL->setChecked(Configuration().value(m_autoScrollKey, true).toBool());
   setAutoScroll(_AUTO_SCROLL->isChecked());
 
   // 4.
-  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, tr("Alternating row colors"), this);
+  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, CustomTreeView::tr("Alternating row colors"), this);
   CHECK_NULLPTR_RETURN_VOID(_ALTERNATING_ROW_COLORS);
   _ALTERNATING_ROW_COLORS->setCheckable(true);
   _ALTERNATING_ROW_COLORS->setChecked(Configuration().value(m_alternatingRowColorsKey, true).toBool());
   setAlternatingRowColors(_ALTERNATING_ROW_COLORS->isChecked());
 
   // 6.
-  const QString horMenuName{GetName() + " " + tr("Horizontal scroll bar policy")};
+  const QString horMenuName{GetName() + " " + CustomTreeView::tr("Horizontal scroll bar policy")};
   m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
 
-  const QString verMenuName{GetName() + " " + tr("Vertical scroll bar policy")};
+  const QString verMenuName{GetName() + " " + CustomTreeView::tr("Vertical scroll bar policy")};
   m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "/Vertical", this};
   CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());

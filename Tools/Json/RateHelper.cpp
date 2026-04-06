@@ -131,9 +131,7 @@ bool RateHelper::getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPa
     return false;
   }
   const QString dirPath{fileAbsPath.chopped(choppedSize)};
-  const auto JoinDirAndBasename = [dirPath](const QString& baseName) -> QString {
-    return PathTool::JoinJsonAbsFilePath(dirPath, baseName);
-  };
+  const auto JoinDirAndBasename = [dirPath](const QString& baseName) -> QString { return PathTool::JoinJsonAbsFilePath(dirPath, baseName); };
 
   using namespace ItemsPileCategory;
   static const T_DOT_EXT_2_TYPE& dotExt2TypeHash = GetTypeFromDotExtension();
@@ -253,10 +251,13 @@ bool RateHelper::isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect
   return getRatingRect(visualRect).contains(clickPnt);
 }
 
-QRect RateHelper::getRatingRect(QRect visualRect) {
-  visualRect.setTop(visualRect.bottom() + 1 - RATING_BAR_HEIGHT);
-  visualRect.setHeight(RATING_BAR_HEIGHT);
-  return visualRect;
+QRect RateHelper::getRatingRect(const QRect& visualRect) {
+  return {
+      visualRect.x(),                          // 左边界不变
+      visualRect.bottom() + 1 - RATING_BAR_HEIGHT, // 上边界计算
+      visualRect.width(),                      // 宽度不变
+      RATING_BAR_HEIGHT                        // 固定高度
+  };
 }
 
 int RateHelper::ratingAtPosition(const QPoint& pos, const QRect& visualRect) {

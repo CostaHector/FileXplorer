@@ -55,7 +55,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/View/DupVideos/*.cpp
     # test only module sources
-    *.cpp
+    main_ut.cpp
     ActionsTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
@@ -108,7 +108,6 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/PasswordTable
     ${PARENT_DIR}/View
     ${PARENT_DIR}/View/DupVideos
-    ./
     pubTestTool
     MockTool
 )

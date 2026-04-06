@@ -268,7 +268,7 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
       onClickEvent(proIndex);
     }
     mLastClickedIndex = proIndex;
-    const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(proIndex, visualRect(proIndex))};
+    const QRect imageRect{mAlignDelegate->GetRealImageVisualRect(visualRect(proIndex))};
     emit sceneGridClicked(proIndex, imageRect, pos);
   }
   QListView::mousePressEvent(event);

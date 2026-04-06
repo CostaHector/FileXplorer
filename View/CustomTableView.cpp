@@ -19,13 +19,14 @@ QSet<QString> CustomTableView::mTableInstSet;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
 
 CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
-    : QTableView(parent),
-      m_name{instName},
-      m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"},
-      m_showVerticalHeaderKey{instName + "/SHOW_VERTICAL_HEADER"},
-      m_autoScrollKey{instName + "/AUTO_SCROLL"},
-      m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"},
-      m_showGridKey{instName + "/SHOW_GRID"} {
+    : QTableView{parent}, //
+      m_name{instName}, //
+      m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"}, //
+      m_showVerticalHeaderKey{instName + "/SHOW_VERTICAL_HEADER"}, //
+      m_autoScrollKey{instName + "/AUTO_SCROLL"}, //
+      m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"}, //
+      m_showGridKey{instName + "/SHOW_GRID"} //
+{
   if (isNameExists(GetName())) {  // not in sharing list, but name already find
     LOG_D("Instance table name[%s] already exist, QSetting may conflict", qPrintable(GetName()));
   }
@@ -38,11 +39,11 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   // 0.
-  _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, tr("Show All Columns"), this);
+  _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, CustomTableView::tr("Show All Columns"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_ALL_HORIZONTAL_COLUMNS);
 
   // 1.
-  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, tr("Show Horizontal Header"), this);
+  _SHOW_HORIZONTAL_HEADER = new (std::nothrow) QAction(QIcon{":img/HORIZONTAL_HEADER"}, CustomTableView::tr("Show Horizontal Header"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_HORIZONTAL_HEADER);
   _SHOW_HORIZONTAL_HEADER->setCheckable(true);
   _SHOW_HORIZONTAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the horizontal header")
@@ -56,7 +57,7 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   setSortingEnabled(m_horHeader->isSortingEnabled());
 
   // 2.
-  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction(QIcon{":img/VERTICAL_HEADER"}, tr("Show Vertical Header"), this);
+  _SHOW_VERTICAL_HEADER = new (std::nothrow) QAction(QIcon{":img/VERTICAL_HEADER"}, CustomTableView::tr("Show Vertical Header"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_VERTICAL_HEADER);
   _SHOW_VERTICAL_HEADER->setCheckable(true);
   _SHOW_VERTICAL_HEADER->setToolTip(
@@ -68,42 +69,42 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   }
   setVerticalHeader(m_verHeader);
 
-  _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), tr("Resize Rows to Contents"), this);
+  _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), CustomTableView::tr("Resize Rows to Contents"), this);
   _RESIZE_ROW_TO_CONTENTS->setToolTip(
       QString("<b>%1</b><br/>Adjust row heights to fit content (one-time operation)").arg(_RESIZE_ROW_TO_CONTENTS->text()));
 
-  _RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), tr("Resize Columns to Contents"), this);
+  _RESIZE_COLUMN_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_COLUMN_TO_CONTENTS"), CustomTableView::tr("Resize Columns to Contents"), this);
   _RESIZE_COLUMN_TO_CONTENTS->setToolTip(
       QString("<b>%1</b><br/>Adjust column widths to fit content (one-time operation)").arg(_RESIZE_COLUMN_TO_CONTENTS->text()));
 
   // 3.
-  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, tr("Auto Scroll"), this);
+  _AUTO_SCROLL = new (std::nothrow) QAction(QIcon{":img/AUTO_SCROLL"}, CustomTableView::tr("Auto Scroll"), this);
   CHECK_NULLPTR_RETURN_VOID(_AUTO_SCROLL);
   _AUTO_SCROLL->setCheckable(true);
   _AUTO_SCROLL->setChecked(Configuration().value(m_autoScrollKey, true).toBool());
   setAutoScroll(_AUTO_SCROLL->isChecked());
 
   // 4.
-  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, tr("Alternating row colors"), this);
+  _ALTERNATING_ROW_COLORS = new (std::nothrow) QAction(QIcon{":img/ALTERNATING_ROW_COLORS"}, CustomTableView::tr("Alternating row colors"), this);
   CHECK_NULLPTR_RETURN_VOID(_ALTERNATING_ROW_COLORS);
   _ALTERNATING_ROW_COLORS->setCheckable(true);
   _ALTERNATING_ROW_COLORS->setChecked(Configuration().value(m_alternatingRowColorsKey, true).toBool());
   setAlternatingRowColors(_ALTERNATING_ROW_COLORS->isChecked());
 
   // 5.
-  _SHOW_GRID = new (std::nothrow) QAction(QIcon{":img/VIEW_GRID_ON"}, tr("Show grid"), this);
+  _SHOW_GRID = new (std::nothrow) QAction(QIcon{":img/VIEW_GRID_ON"}, CustomTableView::tr("Show grid"), this);
   CHECK_NULLPTR_RETURN_VOID(_SHOW_GRID);
   _SHOW_GRID->setCheckable(true);
   _SHOW_GRID->setChecked(Configuration().value(m_showGridKey, false).toBool());
   setShowGrid(_SHOW_GRID->isChecked());
 
   // 6.
-  const QString horMenuName{GetName() + " " + tr("Horizontal scroll bar policy")};
+  const QString horMenuName{GetName() + " " + CustomTableView::tr("Horizontal scroll bar policy")};
   m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
   setHorizontalScrollBarPolicy(m_horScrollBarPolicyMenu->GetScrollBarPolicy());
 
-  const QString verMenuName{GetName() + " " + tr("Vertical scroll bar policy")};
+  const QString verMenuName{GetName() + " " + CustomTableView::tr("Vertical scroll bar policy")};
   m_verScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{verMenuName, GetName() + "/Vertical", this};
   CHECK_NULLPTR_RETURN_VOID(m_verScrollBarPolicyMenu);
   setVerticalScrollBarPolicy(m_verScrollBarPolicyMenu->GetScrollBarPolicy());
