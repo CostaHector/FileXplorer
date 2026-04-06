@@ -17,15 +17,14 @@ public:
   explicit PreferenceActions(QObject *parent = nullptr);
   ~PreferenceActions();
 
-  void Subscribe();
+  void subscribe();
   bool onSetAppStyle(const QAction* pStyleAct);
   bool onSetStylesheet(const QAction* pStyleSheetAct);
 
   // style: "windows", "windowsvista", "fusion", or "macos"
   QAction *STYLE_WINDOWS_VISTA{nullptr}, *STYLE_WINDOWS{nullptr}, *STYLE_FUSION{nullptr}, *STYLE_MACOS{nullptr};
 
-  QAction *STYLESHEET_DEFAULT_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
-  QActionGroup *STYLESHEET{nullptr};
+  QAction *STYLESHEET_NONE{nullptr}, *STYLESHEET_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
 
   QToolBar* GetStyleAndStyleSheetToolbar(QWidget* parent);
 

@@ -1441,17 +1441,22 @@
 <context>
     <name>PreferenceActions</name>
     <message>
-        <location filename="../Actions/PreferenceActions.cpp" line="+44"/>
+        <location filename="../Actions/PreferenceActions.cpp" line="+46"/>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Light</source>
         <translation>明亮主题</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Dark</source>
         <translation>深色主题</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+84"/>
         <source>App UI Style</source>
         <translation>应用风格</translation>
     </message>

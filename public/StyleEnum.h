@@ -10,10 +10,12 @@ enum class StyleE : int {
 };
 
 enum class StyleSheetE : int {
-  STYLESHEET_DEFAULT_LIGHT = 0,
+  STYLESHEET_DEFAULT_NONE = 0,
+  STYLESHEET_LIGHT,
   STYLESHEET_DARK_THEME_MOON_FOG,
   BUTT,
 };
+constexpr StyleSheetE DEFAULT_STYLE_SHEET = StyleSheetE::STYLESHEET_LIGHT;
 }
 
 #endif // STYLEENUM_H
