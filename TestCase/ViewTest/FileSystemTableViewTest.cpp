@@ -14,17 +14,16 @@
 #include "EndToExposePrivateMember.h"
 #include "FileOpActs.h"
 #include "MimeDataHelper.h"
-#include "AddressBarActions.h"
-#include "ViewActions.h"
+
 #include "ViewHelper.h"
 #include <QDir>
 #include <QDirIterator>
 
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   static bool checkAfterCopyMimeData(FileSystemModel& fsModel, FileSystemTableView& fsView, QClipboard* pClip, const int expectItemCnt) {
-    pClip->clear(); // prevent COM error 0x800401D in windows platform error message
+    pClip->clear();  // prevent COM error 0x800401D in windows platform error message
 
     // select all
     auto& fileOpActsInst = FileOpActs::GetInst();
@@ -32,7 +31,7 @@ public:
     auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<FileSystemModel>(fsModel,  //
                                                                                             fsView.selectionModel()->selectedRows());
     const QString expectPaths = mimeDataMember.texts.join('\n');
-    { // here would modify fsModel header decoration role return value
+    {  // here would modify fsModel header decoration role return value
       if (!MimeDataHelper::FillCutCopySomething<FileSystemModel>(fsModel, mimeDataMember.srcIndexes, Qt::DropAction::MoveAction)) {
         return false;
       }
@@ -109,7 +108,7 @@ public:
     return true;
   }
 
-private slots:
+ private slots:
   void cut_copy_in_view_mimedata_correct() {
     // auto clean clipboard
     ClipboardGuard clipboardGuard;
@@ -130,10 +129,10 @@ private slots:
     fsModel.setFilter(currentDir.filter());  // need call manually
     FileSystemTableView fsView{&fsModel};
 
-    QObject::connect(&fsModel, &QFileSystemModel::directoryLoaded, this, [&](const QString& path){
+    QObject::connect(&fsModel, &QFileSystemModel::directoryLoaded, this, [&](const QString& path) {
       bool checkResult = checkAfterCopyMimeData(fsModel, fsView, pClip, expectItemCnt);
 #ifndef _WIN32
-      QVERIFY2(checkResult, qPrintable(path)); // clipboard is extremely unreliable in windows
+      QVERIFY2(checkResult, qPrintable(path));  // clipboard is extremely unreliable in windows
 #endif
     });
 
@@ -161,8 +160,8 @@ private slots:
     // prepare environment for cut or copy
     TDir tDir;
     QList<FsNodeEntry> nodes{
-      {"folder", true, ""},
-      {"file.txt", false, "hello"},
+        {"folder", true, ""},
+        {"file.txt", false, "hello"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
     const QString rootPath = tDir.path();
@@ -270,8 +269,8 @@ private slots:
     // prepare environment for cut or copy
     TDir tDir;
     QList<FsNodeEntry> nodes{
-      {"subfolder/folder", true, ""},
-      {"subfolder/file.txt", false, "hello"},
+        {"subfolder/folder", true, ""},
+        {"subfolder/file.txt", false, "hello"},
     };
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
     const QString rootPath = tDir.path();
@@ -384,14 +383,12 @@ private slots:
     QVERIFY(tDir.exists("file.txt.lnk"));
   }
 
-
-  void event_ok() {
+  void keyPressEvent_ok() {
     const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);
     FileSystemTableView fsView{&fsModel};
 
-    /******************** 测试 keyPressEvent ********************/
     QSignalSpy moveToTrashSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN, &QAction::triggered);
 
     // 测试 Delete 键触发
@@ -410,43 +407,21 @@ private slots:
     QKeyEvent enterEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
     fsView.keyPressEvent(&enterEvent);
     QCOMPARE(moveToTrashSpy.count(), 0);
+  }
 
-    /******************** 测试 mousePressEvent ********************/
-    // 测试左键按下设置拖拽起始位置
-    const QPoint testPos(50, 60);
-    QMouseEvent leftPressEvent(QEvent::MouseButtonPress, testPos,
-                               Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-    fsView.mousePressEvent(&leftPressEvent);
-    QCOMPARE(fsView.mDragStartPosition, testPos);
+  void mouseKeyEvents_ok() {
+    FileSystemModel fsModel;
+    FileSystemTableView tabView(&fsModel);
+    tabView.InitTableView();
 
-    // 测试其他按钮不设置拖拽起始位置
-    const QPoint originalPos = fsView.mDragStartPosition;
-    QMouseEvent rightPressEvent(QEvent::MouseButtonPress, QPoint(100, 120),
-                                Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    fsView.mousePressEvent(&rightPressEvent);
-    QCOMPARE(fsView.mDragStartPosition, originalPos);
+    tabView.mousePressEvent(nullptr);
 
-    /******************** 测试 mouseMoveEvent ********************/
-    // 设置起始位置
-    const QPoint startPos(50, 50);
-    fsView.mDragStartPosition = startPos;
+    QMouseEvent randomEvent(QEvent::MouseButtonPress, QPoint(50, 60), Qt::BackButton, Qt::BackButton, Qt::NoModifier);
+    tabView.mousePressEvent(&randomEvent);
+    QVERIFY(randomEvent.isAccepted());
 
-    // 测试未达到拖拽阈值 - 不触发拖拽
-    QMouseEvent smallMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST_MIN-1, 0),
-                               Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
-    fsView.mouseMoveEvent(&smallMoveEvent);
-    QVERIFY(!smallMoveEvent.isAccepted());
-
-    // 测试达到拖拽阈值 - 触发拖拽
-    QMouseEvent largeMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0),
-                               Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
-    fsView.mouseMoveEvent(&largeMoveEvent);
-    QVERIFY(largeMoveEvent.isAccepted());
-
-    // 测试非左键移动不触发拖拽
-    QMouseEvent rightMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0),
-                               Qt::NoButton, Qt::RightButton, Qt::NoModifier);
-    fsView.mouseMoveEvent(&rightMoveEvent);
+    QMouseEvent ignoredEvent(QEvent::MouseButtonPress, QPoint(50, 60), Qt::BackButton, Qt::BackButton, Qt::AltModifier);
+    tabView.mousePressEvent(&ignoredEvent);
   }
 };
 

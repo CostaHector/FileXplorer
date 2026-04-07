@@ -30,7 +30,7 @@ class CustomListView : public QListView {
 
   IconSizeMenu* _ICON_SIZE_MENU{nullptr};
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
-  QAction* _FLOW_ORIENTATION_LTR;
+  QAction* _FLOW_ORIENTATION_LTR{nullptr};
   QAction* _VIEW_MODE_LIST_ICON{nullptr};
   QAction* _RESIZED_MODE_ADJUST{nullptr};
   QAction* _WRAPPING_ACTIONS{nullptr};

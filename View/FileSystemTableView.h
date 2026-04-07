@@ -15,13 +15,10 @@ class FileSystemTableView : public CustomTableView {
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;
   void dragLeaveEvent(QDragLeaveEvent* event) override;
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseMoveEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
 
  private:
   FileSystemModel* _fsModel{nullptr};
-  QPoint mDragStartPosition;
 };
 
 #endif  // FILESYSTEMTABLEVIEW_H

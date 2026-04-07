@@ -42,8 +42,8 @@ void ItemView::subscribe() {
 }
 
 void ItemView::initExclusivePreferenceSetting() {
-  if (CustomListView::m_name.contains("img", Qt::CaseSensitivity::CaseInsensitive) ||
-      CustomListView::m_name.contains("image", Qt::CaseSensitivity::CaseInsensitive)) {
+  if (GetName().contains("img", Qt::CaseSensitivity::CaseInsensitive) ||
+      GetName().contains("image", Qt::CaseSensitivity::CaseInsensitive)) {
     CustomListView::m_defaultFlowLeft2Right = true;
     CustomListView::m_defaultViewModeIcon = true;
   } else {

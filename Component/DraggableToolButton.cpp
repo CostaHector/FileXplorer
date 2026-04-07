@@ -6,6 +6,8 @@
 #include <QDrag>
 #include <QPainter>
 
+constexpr int DraggableToolButton::START_DRAG_DIST_MIN;
+
 DraggableToolButton::DraggableToolButton(QWidget* parent)  //
     : QToolButton{parent}  //
 {
@@ -24,7 +26,7 @@ void DraggableToolButton::mouseMoveEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (!(event->buttons().testFlag(Qt::LeftButton)))
     return;
-  if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST_MIN) {
+  if ((event->pos() - mDragStartPosition).manhattanLength() < START_DRAG_DIST_MIN) {
     return;
   }
   setEnabled(false);

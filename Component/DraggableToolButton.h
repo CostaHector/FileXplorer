@@ -13,6 +13,7 @@ class DraggableToolButton : public QToolButton {
   void mouseMoveEvent(QMouseEvent* event) override;
 
  private:
+  static constexpr int START_DRAG_DIST_MIN = 30;
   QPoint mDragStartPosition;
 };
 

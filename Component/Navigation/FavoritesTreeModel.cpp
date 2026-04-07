@@ -144,7 +144,7 @@ QMimeData* FavoritesTreeModel::mimeData(const QModelIndexList& indexes) const {
     return nullptr;
   }
 
-  // 只处理第一列
+  // 只处理首列
   QModelIndexList firstColumnIndexes;
   for (const QModelIndex& index : indexes) {
     if (index.column() == 0) {

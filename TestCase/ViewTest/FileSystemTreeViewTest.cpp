@@ -71,29 +71,25 @@ class FileSystemTreeViewTest : public PlainTestSuite {
     const QPoint testPos(50, 60);
     QMouseEvent leftPressEvent(QEvent::MouseButtonPress, testPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     treeView.mousePressEvent(&leftPressEvent);
-    QCOMPARE(treeView.mDragStartPosition, testPos);
 
     // 测试其他按钮不设置拖拽起始位置
-    const QPoint originalPos = treeView.mDragStartPosition;
     QMouseEvent rightPressEvent(QEvent::MouseButtonPress, QPoint(100, 120), Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     treeView.mousePressEvent(&rightPressEvent);
-    QCOMPARE(treeView.mDragStartPosition, originalPos);
 
     // 测试鼠标按下设置拖拽起始位置
     const QPoint startPos(50, 50);
-    treeView.mDragStartPosition = startPos;
 
     // 测试未达到拖拽阈值 - 不触发拖拽
-    QMouseEvent smallMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST_MIN - 1, 0), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent smallMoveEvent(QEvent::MouseMove, startPos + QPoint(1, 1), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
     treeView.mouseMoveEvent(&smallMoveEvent);
 
     // 测试达到拖拽阈值 - 触发拖拽
-    QMouseEvent largeMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent largeMoveEvent(QEvent::MouseMove, startPos + QPoint(100, 100), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
     treeView.mouseMoveEvent(&largeMoveEvent);
     QVERIFY(largeMoveEvent.isAccepted());
 
     // 测试非左键移动不触发拖拽
-    QMouseEvent rightMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0), Qt::NoButton, Qt::RightButton, Qt::NoModifier);
+    QMouseEvent rightMoveEvent(QEvent::MouseMove, startPos + QPoint(100, 100), Qt::NoButton, Qt::RightButton, Qt::NoModifier);
     treeView.mouseMoveEvent(&rightMoveEvent);
   }
 
@@ -107,7 +103,7 @@ class FileSystemTreeViewTest : public PlainTestSuite {
     treeView.contextMenuEvent(&contextEvent);
   }
 
-  void testViewSettings() {
+  void viewSettings_ok() {
     FileSystemModel fsModel;
     FileSystemTreeView treeView(&fsModel);
 

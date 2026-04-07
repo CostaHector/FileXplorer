@@ -49,7 +49,7 @@ file(GLOB SOURCES
     Tools/PasswordTable/*.cpp
     View/*.cpp
     View/DupVideos/*.cpp
-    *.cpp
+    main.cpp
 )
 list(LENGTH SOURCES src_cpp_count)
 message("\n> ${src_cpp_count} file(s) in SOURCES, there are:")
@@ -110,7 +110,6 @@ file(GLOB HEADERS
     Tools/PasswordTable/*.h
     View/*.h
     View/DupVideos/*.h
-    *.h
 )
 
 list(LENGTH HEADERS header_cpp_count)
@@ -140,16 +139,10 @@ qt_add_translation(QM_FILES ${TS_FILES})
 
 if(WIN32)
     # Windows-specific platform: Use the WIN32 option to hide the console
-    find_package(Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt5 REQUIRED COMPONENTS Core)
-
     add_executable(${PROJECT_NAME} WIN32
         ${SOURCES}
         ${RESOURCES}
     )
-
-target_link_libraries(FileXplorer PRIVATE Qt5::Core)
-target_link_libraries(FileXplorer PRIVATE Qt5::Core)
 else()
     # Linux Platform: Directly generate a GUI application (no terminal displayed by default). No extra flags needed for GUI apps
     add_executable(${PROJECT_NAME}

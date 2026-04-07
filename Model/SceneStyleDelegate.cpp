@@ -32,7 +32,7 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   // 2. only when index = curIndex and display = true. plot rating bar is needed
   painter->save();
   if (mRateMachine.status() == RatingState::SELECTED_SHOW && index == mRateMachine.curIndex()) {
-    QRect imageRect{GetRealImageVisualRect(index, option.rect)};
+    QRect imageRect{GetRealImageVisualRect(option.rect)};
     drawRatingGrid(painter, RateHelper::getRatingRect(imageRect), mRateMachine.oldRate(), mRateMachine.newRate());
   }
   const int rating = index.data(SceneInfo::Role::RATE_ROLE).toInt();
@@ -90,9 +90,6 @@ void SceneStyleDelegate::onSceneClicked(const QModelIndex& nowInd, const QRect& 
   mRateMachine.DoStateTransition(*this, nowInd, visualRect, clickedPnt);
 }
 
-QRect SceneStyleDelegate::GetRealImageVisualRect(const QModelIndex& index, QRect gridVisualRect) const {
-  static QStyleOptionViewItem optionBkp;
-  QStyledItemDelegate::initStyleOption(&optionBkp, index);
-  gridVisualRect.setHeight(optionBkp.decorationSize.height());
-  return gridVisualRect;
+QRect SceneStyleDelegate::GetRealImageVisualRect(const QRect& gridVisualRect) {
+  return gridVisualRect.adjusted(2, 0, -2, 0);
 }

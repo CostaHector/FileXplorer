@@ -106,9 +106,9 @@ class EnumIntActionTest : public PlainTestSuite {
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<Style::StyleSheetE>(                //
-        Style::StyleSheetE::STYLESHEET_DEFAULT_LIGHT,        //
+        Style::StyleSheetE::STYLESHEET_LIGHT,        //
         Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG,  //
-        Style::StyleSheetE::STYLESHEET_DEFAULT_LIGHT,        //
+        Style::StyleSheetE::STYLESHEET_LIGHT,        //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<SearchTools::SearchModeE>(  //

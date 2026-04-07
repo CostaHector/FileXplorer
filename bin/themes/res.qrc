@@ -161,7 +161,6 @@
         <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
         <file alias="PIN">LeftSideToolBarIcons/PIN.svg</file>
         <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
-        <file alias="UNPIN_ALL">LeftSideToolBarIcons/UNPIN_ALL.svg</file>
         <file alias="EXPAND_SIDEBAR">LeftSideToolBarIcons/EXPAND_SIDEBAR.svg</file>
         <file alias="EXPAND_ALL">LeftSideToolBarIcons/EXPAND_ALL.svg</file>
         <file alias="COLLAPSE_ALL">LeftSideToolBarIcons/COLLAPSE_ALL.svg</file>
@@ -234,16 +233,6 @@
         <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
         <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.svg</file>
         <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
-
-        <!--Style icon here-->
-        <file alias="STYLE_SETTING">styles/STYLE_SETTING.svg</file>
-        <file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
-        <file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
-        <file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
-        <file alias="STYLE_MACOS">styles/STYLE_MACOS.svg</file>
-        <file alias="STYLESHEET_SETTING">styles/STYLESHEET_SETTING.svg</file>
-        <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
-        <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
 
         <!--View icon here-->
         <file alias="UNDO">View/UNDO.svg</file>
@@ -397,6 +386,19 @@
         <file alias="PLAY_TRIGGER_AUTO">VideoPlayer/PLAY_TRIGGER_AUTO.svg</file>
         <file alias="PLAY_TRIGGER_DISABLED">VideoPlayer/PLAY_TRIGGER_DISABLED.svg</file>
         <file alias="DISABLE_AUTO_HIDE">VideoPlayer/DISABLE_AUTO_HIDE.svg</file>
+    </qresource>
+
+    <qresource prefix="/styles">
+        <!--Style icon here-->
+        <file alias="STYLE_SETTING">styles/STYLE_SETTING.svg</file>
+        <file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
+        <file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
+        <file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
+        <file alias="STYLE_MACOS">styles/STYLE_MACOS.svg</file>
+        <file alias="STYLESHEET_SETTING">styles/STYLESHEET_SETTING.svg</file>
+        <file alias="STYLESHEET_NONE">styles/STYLESHEET_NONE.svg</file>
+        <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
+        <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
     </qresource>
 
     <qresource prefix="/">

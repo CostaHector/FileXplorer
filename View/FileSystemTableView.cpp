@@ -81,27 +81,3 @@ void FileSystemTableView::keyPressEvent(QKeyEvent* e) {
   }
   QTableView::keyPressEvent(e);
 }
-
-void FileSystemTableView::mousePressEvent(QMouseEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  if (event->button() == Qt::LeftButton) {
-    mDragStartPosition = event->pos();
-  }
-  CustomTableView::mousePressEvent(event);
-}
-
-void FileSystemTableView::mouseMoveEvent(QMouseEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  if (event->buttons() == Qt::MouseButton::LeftButton) {
-    // ‌To prevent accidental drag operations that move files/folders, a drag threshold is added.
-    // The drag event triggers only when the drag distance exceeds [specified number] pixels.
-    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
-      event->ignore();
-      return;
-    }
-    View::mouseMoveEventCore(this, event);
-    event->accept();
-    return;
-  }
-  return QTableView::mouseMoveEvent(event);
-}

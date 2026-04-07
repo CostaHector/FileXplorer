@@ -20,16 +20,65 @@ class CustomListViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() {
-    QVERIFY(QMetaType::type("QSize") != 0);
+  void initTestCase() { QVERIFY(QMetaType::type("QSize") != 0); }
+
+  void cleanupTestCase() {  //
     Configuration().clear();
   }
 
-  void cleanupTestCase() { //
-    Configuration().clear();
+  void init() { Configuration().clear(); }
+
+  void save_settings_in_destructor_ok() {
+    const QString listInstanceName{"saveSettingTest_ok"};
+    {
+      CustomListView view{listInstanceName};
+      QVERIFY(!view.m_defaultFlowLeft2Right);
+      QVERIFY(!view.m_defaultViewModeIcon);
+      QVERIFY(!view.m_defaultWrapping);
+      QVERIFY(!view._FLOW_ORIENTATION_LTR->isChecked());
+      QVERIFY(!view._VIEW_MODE_LIST_ICON->isChecked());
+      QVERIFY(!view._WRAPPING_ACTIONS->isChecked());
+      QCOMPARE(view.flow(), QListView::Flow::TopToBottom);
+      QCOMPARE(view.viewMode(), QListView::ViewMode::ListMode);
+      QCOMPARE(view.isWrapping(), false);
+
+      // 默认行为不会修改缺省值
+      view.initExclusivePreferenceSetting();
+      QVERIFY(!view.m_defaultFlowLeft2Right);
+      QVERIFY(!view.m_defaultViewModeIcon);
+      QVERIFY(!view.m_defaultWrapping);
+      QVERIFY(!view._FLOW_ORIENTATION_LTR->isChecked());
+      QVERIFY(!view._VIEW_MODE_LIST_ICON->isChecked());
+      QVERIFY(!view._WRAPPING_ACTIONS->isChecked());
+      QCOMPARE(view.flow(), QListView::Flow::TopToBottom);
+      QCOMPARE(view.viewMode(), QListView::ViewMode::ListMode);
+      QCOMPARE(view.isWrapping(), false);
+
+      // 模拟子类override initExclusivePreferenceSetting body如下
+      view.m_defaultFlowLeft2Right = true;
+      view.m_defaultViewModeIcon = true;
+      view.m_defaultWrapping = false;
+
+      view.InitListView();
+      QVERIFY(view._FLOW_ORIENTATION_LTR->isChecked());
+      QVERIFY(view._VIEW_MODE_LIST_ICON->isChecked());
+      QVERIFY(!view._WRAPPING_ACTIONS->isChecked());
+      QCOMPARE(view.flow(), QListView::Flow::LeftToRight);
+      QCOMPARE(view.viewMode(), QListView::ViewMode::IconMode);
+      QCOMPARE(view.isWrapping(), false);
+    }
+    QVERIFY(Configuration().contains(listInstanceName + "/FLOW_ORIENTATION"));
+    QVERIFY(Configuration().contains(listInstanceName + "/VIEW_MODE_LIST_ICON"));
+    QVERIFY(Configuration().contains(listInstanceName + "/RESIZED_MODE_FIXED_OR_ADJUST"));
+    QVERIFY(Configuration().contains(listInstanceName + "/WRAPPING_ACTIONS"));
+    QVERIFY(Configuration().contains(listInstanceName + "/UNIFORM_ITEM_SIZES"));
+
+    QCOMPARE(Configuration().value(listInstanceName + "/FLOW_ORIENTATION").toBool(), true);
+    QCOMPARE(Configuration().value(listInstanceName + "/VIEW_MODE_LIST_ICON").toInt(), true);
+    QCOMPARE(Configuration().value(listInstanceName + "/WRAPPING_ACTIONS").toBool(), false);
   }
 
-  void test_contextMenuEvent() {
+  void contextMenuEvent_ok() {
     const QString keyMemoryName = "CustomListViewTest";
     IMAGE_SIZE::SaveInitialScaledSize(keyMemoryName, 5);
     CustomListView view(keyMemoryName);
@@ -93,7 +142,7 @@ class CustomListViewTest : public PlainTestSuite {
     }
   }
 
-  void test_wheelEvent_zoom() {
+  void wheelEvent_zoom_ok() {
     const QString keyMemoryName = "CustomListViewTest";
     IMAGE_SIZE::SaveInitialScaledSize(keyMemoryName, 5);
     CustomListView viewer(keyMemoryName);
@@ -164,15 +213,15 @@ class CustomListViewTest : public PlainTestSuite {
     QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(nullptr), false);
 
     QAction pAct;
-    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false); // no value in data
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false);  // no value in data
     QCOMPARE(iconScaledIndexChangedSpy.count(), 0);
 
     pAct.setData(index1);
-    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false); // unchange
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), false);  // unchange
     QCOMPARE(iconScaledIndexChangedSpy.count(), 0);
 
     pAct.setData(index0);
-    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), true); // changed
+    QCOMPARE(sceneMenu.EmitIconScaledIndexChanged(&pAct), true);  // changed
     QCOMPARE(iconScaledIndexChangedSpy.count(), 1);
     QCOMPARE(iconScaledIndexChangedSpy.takeLast(), (QVariantList{index0}));
   }

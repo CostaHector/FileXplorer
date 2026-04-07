@@ -22,11 +22,6 @@ void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* 
 void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event);
 
 void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
-
-QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt);
-constexpr int START_DRAG_DIST{32};  // QApplication::startDragDistance()
-constexpr int START_DRAG_DIST_MIN{10};
-constexpr Qt::MouseButtons MOUSE_NAVI_BTN = Qt::BackButton | Qt::ForwardButton;
 }  // namespace View
 
 #endif  // VIEWHELPER_H
