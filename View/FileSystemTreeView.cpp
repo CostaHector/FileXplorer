@@ -71,31 +71,10 @@ void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
 }
 
 void FileSystemTreeView::keyPressEvent(QKeyEvent* e) {
+  CHECK_NULLPTR_RETURN_VOID(e);
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
     emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
     return;
   }
   QTreeView::keyPressEvent(e);
-}
-
-void FileSystemTreeView::mousePressEvent(QMouseEvent* event) {
-  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
-    event->accept();
-    return;
-  }
-  if (event->button() == Qt::LeftButton) {
-    mDragStartPosition = event->pos();
-  }
-  return QTreeView::mousePressEvent(event);
-}
-
-void FileSystemTreeView::mouseMoveEvent(QMouseEvent* event) {
-  if (event->buttons() == Qt::MouseButton::LeftButton) {
-    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
-      return;
-    }
-    View::mouseMoveEventCore(this, event);
-    return;
-  }
-  return QTreeView::mouseMoveEvent(event);
 }

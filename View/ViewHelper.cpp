@@ -42,6 +42,7 @@ bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton m
 }
 
 bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
+  CHECK_NULLPTR_RETURN_FALSE(data);
   if (!data->hasUrls()) {
     return true;
   }
@@ -55,25 +56,6 @@ bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QS
   }
   LOG_OK_NP("[Ok] Drop into all", dest);
   return true;
-}
-
-QPixmap PaintDraggedFilesFolders(const QString& firstSelectedAbsPath, const int selectedCnt) {
-  const QIcon& ico {ImageTool::GetIconFromCachedByFullPath(firstSelectedAbsPath)};
-  constexpr int DRGA_PIXMAP_SIDE_LEN = 128;
-  QPixmap pixmap = ico.pixmap(DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN);
-  if (selectedCnt > 1) {
-    QPainter painter(&pixmap);
-    static QFont font("arial", 18, QFont::Weight::ExtraBold, true);
-    painter.setFont(font);
-#ifdef _WIN32
-    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN * 2, DRGA_PIXMAP_SIDE_LEN * 2), Qt::AlignRight | Qt::AlignBottom,
-                     QString("x%1").arg(selectedCnt));
-#else
-    painter.drawText(QRect(0, 0, DRGA_PIXMAP_SIDE_LEN, DRGA_PIXMAP_SIDE_LEN), Qt::AlignRight | Qt::AlignBottom, QString("x%1").arg(selectedCnt));
-#endif
-    painter.end();
-  }
-  return pixmap;
 }
 
 void changeDropAction(QDropEvent* event) {
@@ -156,30 +138,6 @@ void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* 
 void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event) {
   m_fsm->DragRelease();
   event->accept();
-}
-
-void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event) {
-  event->accept();
-  const QModelIndexList rows{view->selectionModel()->selectedRows()};
-  if (rows.isEmpty()) {
-    return;
-  }
-  const FileSystemModel* m_fsm = dynamic_cast<FileSystemModel*>(view->model());
-  CHECK_NULLPTR_RETURN_VOID(m_fsm)
-  QList<QUrl> urls;
-  urls.reserve(rows.size());
-  for (const QModelIndex& ind : rows) {
-    urls.append(QUrl::fromLocalFile(m_fsm->filePath(ind)));
-  }
-  LOG_D("drags %d rows", urls.size());
-  QMimeData* mime = new (std::nothrow) QMimeData;
-  mime->setUrls(urls);
-
-  QDrag drag(view);
-  drag.setMimeData(mime);
-  const QPixmap dragPixmap = PaintDraggedFilesFolders(urls[0].toLocalFile(), urls.size());
-  drag.setPixmap(dragPixmap);
-  drag.exec(Qt::DropAction::LinkAction | Qt::DropAction::CopyAction | Qt::DropAction::MoveAction);
 }
 
 }  // namespace View

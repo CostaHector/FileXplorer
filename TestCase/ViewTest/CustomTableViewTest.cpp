@@ -26,11 +26,11 @@ using namespace MouseKeyboardEventHelper;
 using namespace SizeTool;
 struct FileInfo {
   FileInfo(QString&& name_, QByteArray&& contents_, QString&& createTime_, QString&& fileExtenstion_)
-    : name{std::move(name_)}
-    , fileSize{contents_.size()}
-    , contents{contents_}
-    , createTime{std::move(createTime_)}
-    , fileExtenstion{std::move(fileExtenstion_)} {}
+      : name{std::move(name_)},
+        fileSize{contents_.size()},
+        contents{contents_},
+        createTime{std::move(createTime_)},
+        fileExtenstion{std::move(fileExtenstion_)} {}
   QString name;
   qint64 fileSize;
   QString createTime;
@@ -40,23 +40,22 @@ struct FileInfo {
 
 #define SIMPLE_TABLE_VIEW "SIMPLE_TABLE_VIEW"
 class SimpleCustomTableView : public CustomTableView {
-public:
-  explicit SimpleCustomTableView(QStandardItemModel* pModel, QWidget* parent = nullptr)
-    : CustomTableView{SIMPLE_TABLE_VIEW, parent} {
+ public:
+  explicit SimpleCustomTableView(QStandardItemModel* pModel, QWidget* parent = nullptr) : CustomTableView{SIMPLE_TABLE_VIEW, parent} {
     setModel(pModel);
     InitTableView();
   }
 
-private:
+ private:
 };
 
 class CustomTableViewTest : public PlainTestSuite {
   Q_OBJECT
-public:
+ public:
   const QList<FileInfo> nodes{
-      {"1.txt", "contents 333", "2025/11/20 00:00:00.001", "txt"}, //
-      {"2.zip", "contents 22", "2025/11/20 00:00:00.000", "zip"},  //
-      {"3.txt", "contents 1", "2025/11/20 00:00:00.003", "txt"},   //
+      {"1.txt", "contents 333", "2025/11/20 00:00:00.001", "txt"},  //
+      {"2.zip", "contents 22", "2025/11/20 00:00:00.000", "zip"},   //
+      {"3.txt", "contents 1", "2025/11/20 00:00:00.003", "txt"},    //
   };
   //
   const QStringList mTitles{"Name", "Size", "Create Time", "File Extenstion"};
@@ -65,20 +64,20 @@ public:
     model.setColumnCount(EXPECT_COL_CNT);
     for (const FileInfo& fi : nodes) {
       model.appendRow(QList<QStandardItem*>{
-          {new QStandardItem{fi.name},                      //
-           new QStandardItem{QString::number(fi.fileSize)}, //
-           new QStandardItem{fi.createTime},                //
-           new QStandardItem{fi.fileExtenstion}},           //
+          {new QStandardItem{fi.name},                       //
+           new QStandardItem{QString::number(fi.fileSize)},  //
+           new QStandardItem{fi.createTime},                 //
+           new QStandardItem{fi.fileExtenstion}},            //
       });
     }
     model.setHorizontalHeaderLabels(mTitles);
   }
-private slots:
-  void initTestCase() { //
+ private slots:
+  void initTestCase() {  //
     QCOMPARE(nodes.size(), 3);
   }
 
-  void cleanupTestCase() { //
+  void cleanupTestCase() {  //
     Configuration().clear();
   }
 
@@ -108,7 +107,7 @@ private slots:
     QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "2.zip");
     QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "1.txt");
 
-    tv.sortByColumn(2, Qt::SortOrder::AscendingOrder); // sort by size
+    tv.sortByColumn(2, Qt::SortOrder::AscendingOrder);  // sort by size
     QCOMPARE(model.index(0, 0).data(Qt::DisplayRole).toString(), "2.zip");
     QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "1.txt");
     QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "3.txt");
@@ -269,21 +268,53 @@ private slots:
       SimpleCustomTableView tv{&model};
       tv.setModel(&model);
       tv.InitTableView();
-      DoubleRowHeader& horHeader = *tv.m_horHeader;
-      VerMenuInHeader& verHeader = *tv.m_verHeader;
 
       // hor header: shown, ver header: hidden
-      QVERIFY(!horHeader.isHidden());
-      QVERIFY(verHeader.isHidden());
-      QVERIFY(tv._SHOW_HORIZONTAL_HEADER->isChecked());
-      QVERIFY(!tv._SHOW_VERTICAL_HEADER->isChecked());
-
       QVERIFY(!tv.hasAutoScroll());
       QVERIFY(!tv.alternatingRowColors());
       QVERIFY(tv.showGrid());
       QCOMPARE(tv.horizontalScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAsNeeded);
       QCOMPARE(tv.verticalScrollBarPolicy(), Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     }
+  }
+
+  void saveSettings_ok() {
+    const QString tableInstanceName{"saveSettingTest_ok"};
+    {
+      CustomTableView view{tableInstanceName};
+      QVERIFY(view.m_defaultShowHorizontalHeader);
+      QVERIFY(view.m_defaultShowVerticalHeader);
+      QVERIFY(!view._SHOW_HORIZONTAL_HEADER->isChecked());
+      QVERIFY(!view._SHOW_VERTICAL_HEADER->isChecked());
+      QCOMPARE(view.m_horHeader->isHidden(), false);
+      QCOMPARE(view.m_verHeader->isHidden(), false);
+
+      // 默认行为不会修改缺省值
+      view.initExclusivePreferenceSetting();
+      QVERIFY(view.m_defaultShowHorizontalHeader);
+      QVERIFY(view.m_defaultShowVerticalHeader);
+
+      // 模拟子类override initExclusivePreferenceSetting body如下
+      view.m_defaultShowHorizontalHeader = false;
+      view.m_defaultShowVerticalHeader = false;
+
+      view.InitTableView();
+      QVERIFY(!view.m_defaultShowHorizontalHeader);
+      QVERIFY(!view.m_defaultShowVerticalHeader);
+      QVERIFY(!view._SHOW_HORIZONTAL_HEADER->isChecked());
+      QVERIFY(!view._SHOW_VERTICAL_HEADER->isChecked());
+
+      QCOMPARE(view.m_horHeader->isHidden(), true);
+      QCOMPARE(view.m_verHeader->isHidden(), true);
+    }
+    QVERIFY(Configuration().contains(tableInstanceName + "/SHOW_HORIZONTAL_HEADER"));
+    QVERIFY(Configuration().contains(tableInstanceName + "/SHOW_VERTICAL_HEADER"));
+    QVERIFY(Configuration().contains(tableInstanceName + "/AUTO_SCROLL"));
+    QVERIFY(Configuration().contains(tableInstanceName + "/ALTERNATING_ROW_COLORS"));
+    QVERIFY(Configuration().contains(tableInstanceName + "/SHOW_GRID"));
+
+    QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_HORIZONTAL_HEADER").toBool(), false);
+    QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_VERTICAL_HEADER").toBool(), false);
   }
 
   void mouseSideClick_NavigationSignals() {
@@ -297,7 +328,7 @@ private slots:
     QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
     QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
 
-    { // accepted events
+    {  // accepted events
       QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::NoModifier));
       QCOMPARE(backAddressSpy.count(), 1);
 

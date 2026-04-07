@@ -38,6 +38,39 @@ Qt::ItemFlags FileSystemModel::flags(const QModelIndex& index) const {
   return defaultFlags;
 }
 
+QMimeData* FileSystemModel::mimeData(const QModelIndexList& indexes) const {
+  if (indexes.isEmpty()) {
+    return nullptr;
+  }
+
+  // 只处理首列
+  QModelIndexList firstColumnIndexes;
+  firstColumnIndexes.reserve(indexes.size());
+  for (const QModelIndex& index : indexes) {
+    if (index.column() == 0) {
+      firstColumnIndexes.append(index);
+    }
+  }
+  if (firstColumnIndexes.isEmpty()) {
+    return nullptr;
+  }
+
+  QList<QUrl> urls;
+  urls.reserve(firstColumnIndexes.size());
+  for (const QModelIndex& index : firstColumnIndexes) {
+    if (index.isValid()) {
+      urls.append(QUrl::fromLocalFile(filePath(index)));
+    }
+  }
+  if (urls.isEmpty()) {
+    return nullptr;
+  }
+
+  QMimeData* mimeData = new QMimeData;
+  mimeData->setUrls(urls);
+  return mimeData;
+}
+
 bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const {
   if (!supportedDropActions().testFlag(action)) {
     return false;

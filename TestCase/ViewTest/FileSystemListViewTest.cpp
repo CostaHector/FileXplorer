@@ -4,14 +4,25 @@
 #include "BeginToExposePrivateMember.h"
 #include "FileSystemListView.h"
 #include "EndToExposePrivateMember.h"
+
 #include "FileOpActs.h"
 #include "ViewHelper.h"
+#include <QSignalSpy>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class FileSystemListViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void testConstructor() {
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
+  void default_constructor_ok() {
     FileSystemModel fsModel;
 
     FileSystemListView listView(&fsModel);
@@ -22,6 +33,7 @@ class FileSystemListViewTest : public PlainTestSuite {
     QVERIFY(listView.acceptDrops());
     QVERIFY(listView.dragEnabled());
   }
+
   void testDragEvents() {
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
@@ -40,7 +52,7 @@ class FileSystemListViewTest : public PlainTestSuite {
     listView.dropEvent(&dropEvent);
   }
 
-  void testKeyEvents() {
+  void keyPressEvent_ok() {
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
     listView.InitListView();
@@ -58,41 +70,26 @@ class FileSystemListViewTest : public PlainTestSuite {
     QCOMPARE(moveToTrashSpy.count(), 0);
   }
 
-  void testMouseEvents() {
+  void mouseKeyEvents_ok() {
     FileSystemModel fsModel;
     FileSystemListView listView(&fsModel);
     listView.InitListView();
 
-    // 测试左键按下设置拖拽起始位置
-    const QPoint testPos(50, 60);
-    QMouseEvent leftPressEvent(QEvent::MouseButtonPress, testPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-    listView.mousePressEvent(&leftPressEvent);
-    QCOMPARE(listView.mDragStartPosition, testPos);
+    listView.mousePressEvent(nullptr);
 
-    // 测试其他按钮不设置拖拽起始位置
-    const QPoint originalPos = listView.mDragStartPosition;
-    QMouseEvent rightPressEvent(QEvent::MouseButtonPress, QPoint(100, 120), Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    listView.mousePressEvent(&rightPressEvent);
-    QCOMPARE(listView.mDragStartPosition, originalPos);
+    MOCKER(View::onMouseSidekeyBackwardForward)  //
+        .expects(exactly(2))                     //
+        .will(returnValue(true))                 //
+        .then(returnValue(false));               //
+    QMouseEvent randomEvent(QEvent::MouseButtonPress, QPoint(50, 60), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    listView.mousePressEvent(&randomEvent);
+    QVERIFY(randomEvent.isAccepted());
 
-    // 测试鼠标按下设置拖拽起始位置
-    const QPoint startPos(50, 50);
-    listView.mDragStartPosition = startPos;
-
-    // 测试未达到拖拽阈值 - 不触发拖拽
-    QMouseEvent smallMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST_MIN - 1, 0), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
-    listView.mouseMoveEvent(&smallMoveEvent);
-    QVERIFY(!smallMoveEvent.isAccepted());
-
-    // 测试达到拖拽阈值 - 触发拖拽
-    QMouseEvent largeMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
-    listView.mouseMoveEvent(&largeMoveEvent);
-    QVERIFY(largeMoveEvent.isAccepted());
-
-    // 测试非左键移动不触发拖拽
-    QMouseEvent rightMoveEvent(QEvent::MouseMove, startPos + QPoint(View::START_DRAG_DIST, 0), Qt::NoButton, Qt::RightButton, Qt::NoModifier);
-    listView.mouseMoveEvent(&rightMoveEvent);
+    randomEvent.setAccepted(false);
+    listView.mousePressEvent(&randomEvent);
+    QVERIFY(!randomEvent.isAccepted());
   }
 };
+
 #include "FileSystemListViewTest.moc"
 REGISTER_TEST(FileSystemListViewTest, false)

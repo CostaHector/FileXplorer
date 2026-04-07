@@ -50,9 +50,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
                                           .arg(_SHOW_HORIZONTAL_HEADER->text(), _SHOW_HORIZONTAL_HEADER->shortcut().toString()));
   m_horHeader = new DoubleRowHeader{GetName() + "/HorHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_horHeader);
-  if (!_SHOW_HORIZONTAL_HEADER->isChecked()) {
-    m_horHeader->setVisible(false);
-  }
   setHorizontalHeader(m_horHeader);
   setSortingEnabled(m_horHeader->isSortingEnabled());
 
@@ -64,9 +61,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
       QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header").arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
   m_verHeader = new (std::nothrow) VerMenuInHeader{GetName() + "/VerHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_verHeader);
-  if (!_SHOW_VERTICAL_HEADER->isChecked()) {
-    m_verHeader->setVisible(false);
-  }
   setVerticalHeader(m_verHeader);
 
   _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), CustomTableView::tr("Resize Rows to Contents"), this);
@@ -161,8 +155,6 @@ void CustomTableView::AddItselfAction2Menu() {
 
 void CustomTableView::SubscribeHeaderActions() {
   connect(_SHOW_ALL_HORIZONTAL_COLUMNS, &QAction::triggered, m_horHeader, &HorMenuInHeader::onShowAllColumns);
-  connect(_SHOW_HORIZONTAL_HEADER, &QAction::toggled, m_horHeader, &QHeaderView::setVisible);
-  connect(_SHOW_VERTICAL_HEADER, &QAction::toggled, m_verHeader, &QHeaderView::setVisible);
   connect(_AUTO_SCROLL, &QAction::toggled, this, &QTableView::setAutoScroll);
   connect(_ALTERNATING_ROW_COLORS, &QAction::toggled, this, &QTableView::setAlternatingRowColors);
   connect(_SHOW_GRID, &QAction::toggled, this, &QTableView::setShowGrid);
@@ -203,8 +195,14 @@ void CustomTableView::InitTableView() {
   initExclusivePreferenceSetting();
   StyleSheet::InitFontFamilyAndSize(this);
 
-  _SHOW_HORIZONTAL_HEADER->setChecked(Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool());
-  _SHOW_VERTICAL_HEADER->setChecked(Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool());
+  const bool showHorHeader = Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool();
+  const bool showVertHeader = Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool();
+  _SHOW_HORIZONTAL_HEADER->setChecked(showHorHeader);
+  _SHOW_VERTICAL_HEADER->setChecked(showVertHeader);
+  m_horHeader->setVisible(showHorHeader);
+  m_verHeader->setVisible(showVertHeader);
+  connect(_SHOW_HORIZONTAL_HEADER, &QAction::toggled, m_horHeader, &QHeaderView::setVisible);
+  connect(_SHOW_VERTICAL_HEADER, &QAction::toggled, m_verHeader, &QHeaderView::setVisible);
 
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
@@ -222,6 +220,7 @@ bool CustomTableView::setRowHeight(int newRowHeight) {
 }
 
 void CustomTableView::mousePressEvent(QMouseEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
     event->accept();
     return;

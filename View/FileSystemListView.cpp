@@ -77,27 +77,6 @@ void FileSystemListView::keyPressEvent(QKeyEvent* e) {
   QListView::keyPressEvent(e);
 }
 
-void FileSystemListView::mousePressEvent(QMouseEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  if (event->button() == Qt::LeftButton) {
-    mDragStartPosition = event->pos();
-  }
-  CustomListView::mousePressEvent(event);
-}
-
-void FileSystemListView::mouseMoveEvent(QMouseEvent* event) {
-  if (event->buttons() == Qt::MouseButton::LeftButton) {
-    if ((event->pos() - mDragStartPosition).manhattanLength() < View::START_DRAG_DIST) {
-      event->ignore();
-      return;
-    }
-    View::mouseMoveEventCore(this, event);
-    event->accept();
-    return;
-  }
-  return QListView::mouseMoveEvent(event);
-}
-
 void FileSystemListView::initExclusivePreferenceSetting() {
   CustomListView::m_defaultFlowLeft2Right = false;
   CustomListView::m_defaultViewModeIcon = false;
