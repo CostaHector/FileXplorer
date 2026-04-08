@@ -230,7 +230,7 @@ if(WIN32)
         message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack ffmpeg-7.1.1-full_build-shared.7z to [${ffmpegpath}].")
     endif()
     target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
-    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 Qt5::Core
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         "${ffmpegpath}/lib/avformat.lib"
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
@@ -241,7 +241,7 @@ if(WIN32)
     # Copy OpenSSL DLLs to: The OpenSSL binaries (/bin) directory
     set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
     if(NOT EXISTS ${OPENSSL_ROOT_DIR})
-        message(FATAL_ERROR "OpenSSL not found at: ${OPENSSL_ROOT_DIR}\n. Please install OpenSSL or set the correct path.")
+        message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
     endif()
     include_directories("${OPENSSL_ROOT_DIR}/include")
     link_directories("${OPENSSL_ROOT_DIR}/lib")

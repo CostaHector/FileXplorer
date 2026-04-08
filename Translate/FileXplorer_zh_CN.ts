@@ -2003,7 +2003,7 @@
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../Component/ScenePageControl.cpp" line="+10"/>
+        <location filename="../Component/ScenePageControl.cpp" line="+11"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>
@@ -2021,6 +2021,11 @@
         <location line="+5"/>
         <source>Last Page</source>
         <translation>尾页</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Scenes per page:</source>
+        <translation>每页项数量:</translation>
     </message>
 </context>
 <context>

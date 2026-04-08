@@ -175,9 +175,12 @@ if(WIN32)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi mediaInfo)
     set(ffmpegpath "C:/home/ffmpeg")
+    if(NOT EXISTS ${ffmpegpath})
+        message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack `ffmpeg-7.1.1-full_build-shared.7z` to [${ffmpegpath}].")
+    endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
-    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 Qt5::Core
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         "${ffmpegpath}/lib/avformat.lib"
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
@@ -186,6 +189,9 @@ if(WIN32)
     # OpenSSL configuration for Windows
     # Set OpenSSL paths
     set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+    if(NOT EXISTS ${OPENSSL_ROOT_DIR})
+        message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
+    endif()
 
     # Include directories
     include_directories("${OPENSSL_ROOT_DIR}/include")
