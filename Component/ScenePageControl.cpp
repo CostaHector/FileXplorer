@@ -47,7 +47,6 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   mPagesSelectTB = new (std::nothrow) QToolBar{"Page Navigation", this};
   CHECK_NULLPTR_RETURN_VOID(mPagesSelectTB);
   mPagesSelectTB->addActions({_THE_FRONT_PAGE, _PREVIOUS_PAGE});
-  mPagesSelectTB->addSeparator();
   {
     mPageIndexInputLE = new (std::nothrow) QLineEdit{"0", this};
     CHECK_NULLPTR_RETURN_VOID(mPageIndexInputLE);
@@ -56,7 +55,6 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
     mPageIndexInputLE->setToolTip("Enter page number and press Enter to jump");
   }
   mPagesSelectTB->addWidget(mPageIndexInputLE);
-  mPagesSelectTB->addSeparator();
   mPagesSelectTB->addActions({_NEXT_PAGE, _THE_BACK_PAGE});
   mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
 
