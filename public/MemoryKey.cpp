@@ -113,7 +113,7 @@ const KV VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE("VideoPlayer/DUPLIC
                                                              ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB
 const KV VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE{"VideoPlayer/RATE_MOVIE_DEFAULT_VALUE", 10, ValueChecker{0, 11}};
 
-const KV RenamerKey::NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", false, ValueChecker{PLAIN_BOOL}};
+const KV RenamerKey::NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", true, ValueChecker{PLAIN_BOOL}};
 const KV RenamerKey::INCLUDING_DIR{"RenamerKey/INCLUDING_DIR", false, ValueChecker{PLAIN_BOOL}};
 const KV RenamerKey::OLD_STR_LIST{"RenamerKey/OLD_STR_LIST",                                                                        //
                                   QStringList{"", "^(.*?)$", " BB ", " BB",                                                         //

@@ -28,11 +28,13 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_nameExtIndependent->setToolTip(
       "Show file base name and extension respectively.\n"
       "So rename rules will work/or not work on extension");
+
   m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
   m_recursiveCB->setToolTip(
       "Recursive rename.\n"
       "Rules will also work on itself and its subdirectories");
+
   regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
   regexValidLabel->setVisible(false);
