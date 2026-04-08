@@ -114,12 +114,12 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 void FileXplorer::InitComponentVisibility() {
   const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool()};
   if (!showNavi) {
-    m_naviSideBarDock->hide();
+    m_naviSideBarDock->setHidden(true);
   }
 
   const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool();
   if (!showFolderPreview) {
-    m_previewHtmlDock->setVisible(false);
+    m_previewHtmlDock->setHidden(true);
   }
 
   const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};

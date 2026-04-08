@@ -32,10 +32,10 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   int curPreviewType = Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.name).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
-  m_floatingPanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarNormalButton), "float", this};
+  m_floatingPanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarNormalButton), tr("Float"), this};
   m_floatingPanel->setCheckable(true);
 
-  m_minimizePanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarMinButton), "minimize", this};
+  m_minimizePanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarMinButton), tr("Minimize"), this};
 
   QAction* originalCloseAction = toggleViewAction();
   originalCloseAction->setCheckable(false);
@@ -43,6 +43,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   originalCloseAction->setIcon(QApplication::style()->standardIcon(QStyle::SP_DockWidgetCloseButton));
 
   m_titleBar = new ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
+  m_titleBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   m_windowsTitleLabel = m_titleBar->addString("Preview");
   m_titleBar->addStretch(1);
   m_titleBar->addSeparator();
@@ -55,7 +56,6 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   m_titleBar->addAction(m_floatingPanel);
   m_titleBar->addAction(m_minimizePanel);
   m_titleBar->addAction(originalCloseAction);
-  m_titleBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
   setTitleBarWidget(m_titleBar);
   subscribe();

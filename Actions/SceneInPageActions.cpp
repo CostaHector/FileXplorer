@@ -27,7 +27,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
-  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance mode(disable image)"), this);
+  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance Mode(disable image)"), this);
   CHECK_NULLPTR_RETURN_VOID(_DISABLE_IMAGE_DECORATION);
   _DISABLE_IMAGE_DECORATION->setCheckable(true);
   const bool disableImage{SceneInfo::GetInitialDisableImageDecoration()};

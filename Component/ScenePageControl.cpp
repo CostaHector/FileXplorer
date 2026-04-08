@@ -43,14 +43,14 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(mPageDimensionLE);
   mPageDimensionLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageDimensionLE->setToolTip("Scenes count each page");
-  mPageDimensionLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  mPageDimensionLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_16);
 
   mPageIndexInputLE = new (std::nothrow) QLineEdit("0", this);
   CHECK_NULLPTR_RETURN_VOID(mPageIndexInputLE);
   mPageIndexInputLE->setValidator(new (std::nothrow) QIntValidator{-1, 10000});
   mPageIndexInputLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   mPageIndexInputLE->setToolTip("Jump to the nth page");
-  mPageIndexInputLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_24);
+  mPageIndexInputLE->setMinimumHeight(IMAGE_SIZE::TABS_ICON_IN_MENU_36);
 
   mPagesSelectTB = new (std::nothrow) QToolBar("Page Select", this);
   CHECK_NULLPTR_RETURN_VOID(mPagesSelectTB);
@@ -60,13 +60,8 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   mPagesSelectTB->addSeparator();
   mPagesSelectTB->addActions({_NEXT_PAGE, _THE_BACK_PAGE});
   mPagesSelectTB->setStyleSheet("QToolBar { max-width: 512px; }");
-  mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_36, IMAGE_SIZE::TABS_ICON_IN_MENU_36));
 
-  QLabel* pPageNavi = new (std::nothrow) QLabel{tr("Page Navigation"), this};
-  CHECK_NULLPTR_RETURN_VOID(pPageNavi);
-  pPageNavi->setAlignment(Qt::AlignmentFlag::AlignHCenter);
-
-  addWidget(pPageNavi);
   addWidget(mPageDimensionLE);
   addWidget(mPagesSelectTB);
   setOrientation(Qt::Orientation::Vertical);

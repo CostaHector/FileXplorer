@@ -7,7 +7,6 @@
 #include <QApplication>
 #include <QDir>
 #include <QStyle>
-#include <QTimer>
 
 constexpr int NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND, NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND;
 
@@ -96,11 +95,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
   CHECK_NULLPTR_RETURN_VOID(m_favorites);
   addWidget(m_favorites);
 
-  #ifdef RUNNING_UNIT_TESTS
-    updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
-  #else
-    QTimer::singleShot(0, this, [this]() { updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false); });
-  #endif
+  updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
   subscribe();
 }
 

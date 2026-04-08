@@ -237,8 +237,8 @@ LoginQryWidget::LoginQryWidget(QWidget* parent)
   }
   mLoginRegisterTab = new (std::nothrow) QTabBar{this};
   CHECK_NULLPTR_RETURN_VOID(mLoginRegisterTab);
-  mLoginRegisterTab->addTab(QIcon(":/LOGIN"), ENUM_2_STR(LOGIN));
-  mLoginRegisterTab->addTab(QIcon(":/REGISTER"), ENUM_2_STR(REGISTER));
+  mLoginRegisterTab->addTab(QIcon(":/LOGIN"), tr("Login"));
+  mLoginRegisterTab->addTab(QIcon(":/REGISTER"), tr("Register"));
   mLoginRegisterTab->setShape(QTabBar::RoundedNorth);
 
   mLoginWid = new (std::nothrow) LoginWid{this};

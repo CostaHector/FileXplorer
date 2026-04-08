@@ -20,6 +20,7 @@ QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase);
 struct IMAGE_SIZE {
   static constexpr int TABS_ICON_IN_MENU_16 = 16;
   static constexpr int TABS_ICON_IN_MENU_24 = 24;
+  static constexpr int TABS_ICON_IN_MENU_36 = 36;
   static constexpr int TABS_ICON_IN_MENU_48 = 48;
   static constexpr QSize ICON_SIZE_CANDIDATES[]//
       {

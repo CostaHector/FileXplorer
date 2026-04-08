@@ -265,12 +265,12 @@
         <translation>显示水平表头</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+11"/>
         <source>Show Vertical Header</source>
         <translation>显示垂直表头</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Resize Rows to Contents</source>
         <translation>调整行高适应内容</translation>
     </message>
@@ -506,17 +506,17 @@
         <translation>设置</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+6"/>
+        <source>Password Book</source>
+        <translation>密码本</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <source>Password book</source>
-        <translation>密码本</translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+10"/>
         <source>Usage Monitor</source>
         <translation>性能监控</translation>
     </message>
@@ -540,47 +540,47 @@
     <name>FileOpActs</name>
     <message>
         <location filename="../Actions/FileOpActs.cpp" line="+19"/>
-        <source>Reveal in explorer</source>
+        <source>Reveal in Explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Open in terminal</source>
+        <source>Open in Terminal</source>
         <translation>在终端打开</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Copy fullpath</source>
+        <source>Copy Fullpath</source>
         <translation>复制完整路径</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Copy path</source>
+        <source>Copy Path</source>
         <translation>复制所在路径</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Copy name</source>
+        <source>Copy Name</source>
         <translation>复制文件名</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Copy records</source>
+        <source>Copy Records</source>
         <translation>复制全记录</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>New folder</source>
+        <source>New Folder</source>
         <translation>新建文件夹</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>New text</source>
+        <source>New Text</source>
         <translation>新建文本文档</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>New json</source>
+        <source>New Json</source>
         <translation>新建json文件</translation>
     </message>
     <message>
@@ -610,11 +610,71 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete permanently</source>
+        <source>Delete Permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
+        <location line="+12"/>
+        <source>Merged to Front</source>
+        <translation>合并到前一个</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Merge to Back</source>
+        <translation>合并到后一个</translation>
+    </message>
+    <message>
         <location line="+3"/>
+        <source>Merged TS Files</source>
+        <translation>合并ts文件</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Select All</source>
+        <translation>全选</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select None</source>
+        <translation>空选</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Invert Selection</source>
+        <translation>反选</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Fail Fast</source>
+        <translation>快速失败</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Long Path Finder</source>
+        <translation>长路径查找</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Low Resolution Imgs Rmv</source>
+        <translation>删除低分辨率图片</translation>
+    </message>
+    <message>
+        <location line="+278"/>
+        <source>Query</source>
+        <translation>询问</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Preserve</source>
+        <translation>保留</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Flatten</source>
+        <translation>拉平</translation>
+    </message>
+    <message>
+        <location line="-317"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -639,37 +699,7 @@
         <translation>粘贴</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Merged to front</source>
-        <translation>合并到前一个</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Merge to back</source>
-        <translation>合并到后一个</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Merged ts files</source>
-        <translation>合并ts文件</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Select all</source>
-        <translation>全选</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Select none</source>
-        <translation>空选</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Invert selection</source>
-        <translation>反选</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+17"/>
         <source>Packer</source>
         <translation>分类打包</translation>
     </message>
@@ -679,17 +709,7 @@
         <translation>解包</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Fail fast</source>
-        <translation>快速失败</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Long path finder</source>
-        <translation>长路径查找</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Rmv empty folders</source>
         <translation>删除空文件夹</translation>
     </message>
@@ -709,12 +729,7 @@
         <translation>重复图片查找</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Low resolution imgs Rmv</source>
-        <translation>删除低分辨率图片</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Duplicate Videos Finder</source>
         <translation>重复视频文件查找</translation>
     </message>
@@ -1181,9 +1196,22 @@
     </message>
 </context>
 <context>
+    <name>LoginQryWidget</name>
+    <message>
+        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+240"/>
+        <source>Login</source>
+        <translation>登录</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Register</source>
+        <translation>注册</translation>
+    </message>
+</context>
+<context>
     <name>LoginWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+43"/>
+        <location line="-198"/>
         <source>Remember key</source>
         <translation>记住密码</translation>
     </message>
@@ -1343,7 +1371,7 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>&amp;Open with local app</source>
+        <source>&amp;Open with Sys App</source>
         <translation>用系统应用打开(&amp;O)</translation>
     </message>
     <message>
@@ -1398,7 +1426,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../Component/Navigation/NavigationToolBar.cpp" line="+24"/>
+        <location filename="../Component/Navigation/NavigationToolBar.cpp" line="+23"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1461,7 +1489,7 @@
         <translation>应用风格</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+9"/>
         <source>Color Theme</source>
         <translation>色彩主题</translation>
     </message>
@@ -1482,6 +1510,16 @@
         <location line="+5"/>
         <source>Carousel Preview</source>
         <translation>幻灯片预览</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Float</source>
+        <translation>浮动</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minimize</source>
+        <translation>最小化</translation>
     </message>
 </context>
 <context>
@@ -1516,43 +1554,43 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Append rows</source>
+        <source>Append Rows</source>
         <translation>尾后添加多行</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Delete rows</source>
+        <source>Delete Rows</source>
         <translation>删除多行</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Load from input</source>
+        <source>Load from Input</source>
         <translation>从输入框导入</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Open directory</source>
+        <source>Open Directory</source>
         <translation>打开存储路径</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Show CSV contents</source>
+        <source>Show CSV Contents</source>
         <translation>展示CSV内容</translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Export to plain CSV</source>
+        <source>Export to Plain File</source>
         <translation>导出到明文CSV</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Search by</source>
-        <translation>查找</translation>
+        <location line="+6"/>
+        <source>Save Changes</source>
+        <translation>写入变更</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Save changes</source>
-        <translation>写入变更</translation>
+        <location line="-2"/>
+        <source>Search by</source>
+        <translation>查找</translation>
     </message>
 </context>
 <context>
@@ -1885,7 +1923,7 @@
     </message>
     <message>
         <location line="+9"/>
-        <source>Performance mode(disable image)</source>
+        <source>Performance Mode(disable image)</source>
         <translation>性能模式(禁用图片)</translation>
     </message>
     <message>
@@ -1983,11 +2021,6 @@
         <location line="+5"/>
         <source>Last Page</source>
         <translation>尾页</translation>
-    </message>
-    <message>
-        <location line="+39"/>
-        <source>Page Navigation</source>
-        <translation>页导航</translation>
     </message>
 </context>
 <context>
@@ -2119,7 +2152,7 @@
     <name>TorrDBAction</name>
     <message>
         <location filename="../Actions/TorrDBAction.cpp" line="+7"/>
-        <source>&amp;Open with local app</source>
+        <source>&amp;Open with Sys App</source>
         <translation>用系统应用打开(&amp;O)</translation>
     </message>
     <message>
@@ -2202,42 +2235,42 @@
         <translation>单列文件视图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>TABLE</source>
         <translation>表格文件视图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>TREE</source>
         <translation>树形文件视图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>SEARCH</source>
         <translation>搜索视图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>MOVIE</source>
         <translation>电影库</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>SCENE</source>
         <translation>场景库</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>CAST</source>
         <translation>偶像库</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>JSON</source>
         <translation>JSON视图</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+49"/>
         <source>View Back</source>
         <translation>上一个视图</translation>
     </message>
