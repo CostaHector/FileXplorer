@@ -58,7 +58,7 @@ const KV BehaviorKey::BATCH_FILES_NAME_PATTERN("BehaviorKey/BATCH_FILES_NAME_PAT
 const KV BehaviorKey::BATCH_FOLDERS_NAME_PATTERN("BehaviorKey/BATCH_FOLDERS_NAME_PATTERN", "Page %03d%1$1$11", ValueChecker{PLAIN_STR});
 
 const KV BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE("BehaviorKey/DIR_FILTER_ON_SWITCH_ENABLE",
-                                                  int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot),
+                                                  int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::Hidden | QDir::Filter::NoDotAndDotDot),
                                                   ValueChecker{0});
 
 // only work after call SetAutoFlushAllLevel manually
