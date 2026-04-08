@@ -13,16 +13,10 @@ AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, 
   _searchProxyModel->setSourceModel(_sourceModel);
   setModel(_searchProxyModel);
 
-  setDragDropMode(QAbstractItemView::DragDrop);
-  setAcceptDrops(true);
-  setDragEnabled(true);
-  setDropIndicatorShown(true);
+  setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);
 
   subscribe();
-
-  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   InitTableView();
 }

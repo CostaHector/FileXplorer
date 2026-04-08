@@ -117,7 +117,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
     if (index.column() == PropColumnE::Size) {
       return Qt::AlignRight;
     }
-    return int(Qt::AlignLeft | Qt::AlignTop);
+    return int(Qt::AlignLeft | Qt::AlignVCenter); // AlignTop:换行
   } else if (role == Qt::ForegroundRole) {
     if (m_disableList.contains(index)) {
       static const QColor DISABLE_COLOR{Qt::GlobalColor::lightGray};

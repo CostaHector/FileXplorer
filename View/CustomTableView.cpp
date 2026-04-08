@@ -1,4 +1,5 @@
 #include "CustomTableView.h"
+#include "TextElideModeMenu.h"
 #include "VerMenuInHeader.h"
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
@@ -37,6 +38,11 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
+
+  {
+    const QString textElideModeMenuName{GetName() + " " + CustomTableView::tr("Text elide mode")};
+    _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, GetName(), this};
+  }
 
   // 0.
   _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, CustomTableView::tr("Show All Columns"), this);
@@ -148,12 +154,15 @@ void CustomTableView::AddItselfAction2Menu() {
   m_menu->addAction(_RESIZE_ROW_TO_CONTENTS);
   m_menu->addMenu(m_verScrollBarPolicyMenu);
   m_menu->addSeparator();
+  m_menu->addMenu(_TEXT_ELIDE_MODE_MENU);
   m_menu->addAction(_AUTO_SCROLL);
   m_menu->addAction(_ALTERNATING_ROW_COLORS);
   m_menu->addAction(_SHOW_GRID);
 }
 
 void CustomTableView::SubscribeHeaderActions() {
+  connect(_TEXT_ELIDE_MODE_MENU, &TextElideModeMenu::reqTextElideModeChanged, this, &QTableView::setTextElideMode);
+
   connect(_SHOW_ALL_HORIZONTAL_COLUMNS, &QAction::triggered, m_horHeader, &HorMenuInHeader::onShowAllColumns);
   connect(_AUTO_SCROLL, &QAction::toggled, this, &QTableView::setAutoScroll);
   connect(_ALTERNATING_ROW_COLORS, &QAction::toggled, this, &QTableView::setAlternatingRowColors);
@@ -203,6 +212,8 @@ void CustomTableView::InitTableView() {
   m_verHeader->setVisible(showVertHeader);
   connect(_SHOW_HORIZONTAL_HEADER, &QAction::toggled, m_horHeader, &QHeaderView::setVisible);
   connect(_SHOW_VERTICAL_HEADER, &QAction::toggled, m_verHeader, &QHeaderView::setVisible);
+
+  setTextElideMode(_TEXT_ELIDE_MODE_MENU->GetTextElideMode());
 
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();

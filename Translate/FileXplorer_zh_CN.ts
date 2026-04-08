@@ -255,7 +255,12 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.cpp" line="+42"/>
+        <location filename="../View/CustomTableView.cpp" line="+43"/>
+        <source>Text elide mode</source>
+        <translation>文本省略模式</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Show All Columns</source>
         <translation>显示所有列</translation>
     </message>
@@ -2023,7 +2028,7 @@
         <translation>尾页</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+34"/>
         <source>Scenes per page:</source>
         <translation>每页项数量:</translation>
     </message>
