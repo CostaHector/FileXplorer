@@ -86,6 +86,10 @@ FileOpActs::FileOpActs(QObject* parent)
   _FORCE_RESEARCH = new (std::nothrow) QAction{QIcon{":img/FORCE_RESEARCH"}, tr("Force Research"), this};
 }
 
+FileOpActs::~FileOpActs() {
+  Configuration().setValue(BehaviorKey::FILESYSTEM_STRUCTURE.name, (int)GetCurFileStructurePolicy());
+}
+
 QActionGroup* FileOpActs::GetDeleteActions() {
   MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
   MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
