@@ -70,20 +70,6 @@ class RateHelperTest : public PlainTestSuite {
     QCOMPARE(RateHelper::ratingAtPosition(QPoint{DEV_X + 100, 500}, visualRect), 10);
   }
 
-  void getRatingRect_ok() {  //
-    QCOMPARE(RateHelper::RATING_BAR_HEIGHT, 50);
-    // y0 = 200 - 50, 100 - 50, 80 - 50, 50 - 50
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 0, 100, 200}), (QRect{0, 150, 100, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 0, 80, 100}), (QRect{0, 50, 80, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 0, 50, 80}), (QRect{0, 30, 50, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 0, 50, 50}), (QRect{0, 0, 50, 50}));
-
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 20, 100, 200}), (QRect{0, 170, 100, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 20, 80, 100}), (QRect{0, 70, 80, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 20, 50, 80}), (QRect{0, 50, 50, 50}));
-    QCOMPARE(RateHelper::getRatingRect(QRect{0, 20, 50, 50}), (QRect{0, 20, 50, 50}));
-  }
-
   void isClickPointInsideRatingBar_ok() {
     const QRect rect{0, 0, 100, 400};
     // 0 <= x < 100

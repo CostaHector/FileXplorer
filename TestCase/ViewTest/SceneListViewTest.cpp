@@ -397,12 +397,12 @@ class SceneListViewTest : public PlainTestSuite {
       secondIndex = sceneProxyModel.index(1, 0);
 
       const QRect vRect0 = sceneView.visualRect(firstIndex);
-      imgRect0 = SceneStyleDelegate::GetRealImageVisualRect(vRect0);
+      imgRect0 = SceneStyleDelegate::GetRatingAreaRect(vRect0);
       pnt0Out = QPoint{imgRect0.left() + 2, imgRect0.top() + 5};  // rate 1 postion
       pnt0In = QPoint{imgRect0.left() + 2, imgRect0.bottom() - 5};
 
       const QRect vRect1 = sceneView.visualRect(secondIndex);
-      imgRect1 = SceneStyleDelegate::GetRealImageVisualRect(vRect1);
+      imgRect1 = SceneStyleDelegate::GetRatingAreaRect(vRect1);
       pnt1Out = QPoint{imgRect1.right() - 2, imgRect1.top() + 5};  // rate 10 postion
       pnt1In = QPoint{imgRect1.right() - 2, imgRect1.bottom() - 5};
     };
