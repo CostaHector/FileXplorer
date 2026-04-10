@@ -78,12 +78,12 @@
         <translation>名/扩展名独立</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Recursive</source>
         <translation>穿透</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Regex expression state</source>
         <translation>正则表达式状态</translation>
     </message>
@@ -664,7 +664,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+278"/>
+        <location line="+282"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -679,7 +679,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-317"/>
+        <location line="-321"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -2026,11 +2026,6 @@
         <location line="+5"/>
         <source>Last Page</source>
         <translation>尾页</translation>
-    </message>
-    <message>
-        <location line="+34"/>
-        <source>Scenes per page:</source>
-        <translation>每页项数量:</translation>
     </message>
 </context>
 <context>

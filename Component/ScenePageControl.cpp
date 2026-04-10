@@ -53,12 +53,14 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
     mPageIndexInputLE->setValidator(new (std::nothrow) QIntValidator{-1, 10000});
     mPageIndexInputLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);
     mPageIndexInputLE->setToolTip("Enter page number and press Enter to jump");
+    mPageInfoLabel = new QLabel{"/0", this};
   }
   mPagesSelectTB->addWidget(mPageIndexInputLE);
+  mPagesSelectTB->addWidget(mPageInfoLabel);
   mPagesSelectTB->addActions({_NEXT_PAGE, _THE_BACK_PAGE});
   mPagesSelectTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
 
-  addWidget(new QLabel{tr("Scenes per page:"), this});
+  addWidget(new QLabel{"Scenes per page:", this});
   addWidget(mScenesPerPageLE);
   addSeparator();
   addWidget(mPagesSelectTB);
@@ -152,4 +154,9 @@ bool ScenePageControl::PageIndexIncDec(const QAction* pageAct) {
   mPageIndexInputLE->setText(QString::number(afterPageInd));
   emit currentPageIndexChanged(afterPageInd);
   return true;
+}
+
+void ScenePageControl::onPagesCountChanged(int newPagesCount) {
+  mPagesCount = newPagesCount;
+  mPageInfoLabel->setText(QString::asprintf("/%d", mPagesCount));
 }
