@@ -41,9 +41,10 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
 
   mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("open in system application"), this};
 
+  const bool bShowVideoList{Configuration().value("VideoView/ShowVideoList", true).toBool()};
   mShowVideoList = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_LIST"}, tr("show list"), this};
   mShowVideoList->setCheckable(true);
-  mShowVideoList->setChecked(true);
+  mShowVideoList->setChecked(bShowVideoList);
 
   mPlaybackMode_CurrentItemOnce = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAYBACK_MODE_CURRENT_ITEM_ONCE"}, tr("current item once"), this};
   mPlaybackMode_CurrentItemOnce->setCheckable(true);
