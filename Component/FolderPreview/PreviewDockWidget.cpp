@@ -74,7 +74,7 @@ PreviewTypeTool::PREVIEW_TYPE_E PreviewDockWidget::GetCurrentPreviewType() const
   return mPreviewTypeIntAction.curVal();
 }
 
-void PreviewDockWidget::onWindowsTitleChanged(const QString newWindowsTitle) {
+void PreviewDockWidget::onWindowsTitleChanged(const QString& newWindowsTitle) {
   CHECK_NULLPTR_RETURN_VOID(m_windowsTitleLabel);
   m_windowsTitleLabel->setText(newWindowsTitle);
 }

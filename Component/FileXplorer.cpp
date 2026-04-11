@@ -135,7 +135,7 @@ void FileXplorer::subscribe() {
 
   connect(m_previewHtmlDock, &PreviewDockWidget::previewTypeChanged, m_previewSwitcher, &FolderPreviewSwitcher::onSwitchByPreviewType);
 
-  connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
+  // connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {
