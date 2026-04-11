@@ -11,37 +11,61 @@ static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d
 
 QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames) {
   QStringList filesNeedRename;
-  QDir sameLevelDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  QString relPath;
+  QString jsonFileName;
   QString jsonBaseName, jsonExt;
-  for (const QString& jsonFileName : jsonNames) {
+
+  QString fileBaseName, fileExt;
+
+  QString jsonLevelPath;
+  jsonLevelPath.reserve(256);
+
+  QHash<QString, QStringList> dirToJsonNames;
+
+  QDir sameLevelDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  for (const QString& rel2Json : jsonNames) {
+    jsonFileName = PathTool::GetPrepathAndFileName(rel2Json, relPath);
+    const bool isRel{!relPath.isEmpty()};
+    jsonLevelPath = path;
+    if (isRel) {
+      jsonLevelPath += '/';
+      jsonLevelPath += relPath;
+    }
+    auto relIt = dirToJsonNames.find(jsonLevelPath);
+    if (relIt == dirToJsonNames.end()) {
+      if (sameLevelDir.path() != jsonLevelPath) {
+        sameLevelDir.setPath(jsonLevelPath);
+      }
+      relIt = dirToJsonNames.insert(jsonLevelPath, sameLevelDir.entryList());
+    }
+
     std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
-    sameLevelDir.setNameFilters({jsonBaseName + "*"});
-    QString fileBaseName, fileExt;
-    for (const QString& fileName : sameLevelDir.entryList()) {
-      std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
-      // fileBaseName == (jsonBaseName + extraContent) + fileExt
-      if (!fileBaseName.startsWith(jsonBaseName)) {
+    foreach (const QString& fileName, relIt.value()) {
+      if (!fileName.startsWith(jsonBaseName)) {
         continue;
       }
+      std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
+      // fileBaseName == (jsonBaseName + extraContent) + fileExt
       // extraContent can be
       // 1. "": (fileBaseName == jsonBaseName)
       // 2. " - number": len(fileBaseName) > len(jsonBaseName)
       // 3. " number": len(fileBaseName) > len(jsonBaseName)
       QString extraContent = fileBaseName.mid(jsonBaseName.size());
       if (!extraContent.isEmpty() && !JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
-        continue;  // Todo: llt cover this line
+        continue; // Todo: llt cover this line
       }
-      filesNeedRename.push_back(fileName);
+      filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
     }
   }
-  filesNeedRename.sort();
-  filesNeedRename.removeDuplicates();
+  std::sort(filesNeedRename.begin(), filesNeedRename.end());
+  auto dupStartIt = std::unique(filesNeedRename.begin(), filesNeedRename.end());
+  filesNeedRename.erase(dupStartIt, filesNeedRename.end());
   return filesNeedRename;
 }
 
-RnmResult InsertQueryAndConfirm(const QString& workPath,           //
-                                const QStringList& selectedNames,  //
-                                const QString& defStrInsert,       //
+RnmResult InsertQueryAndConfirm(const QString& workPath,          //
+                                const QStringList& selectedNames, //
+                                const QString& defStrInsert,      //
                                 const int insertAtIndex) {
   if (selectedNames.isEmpty()) {
     return RnmResult::SKIP;
@@ -58,10 +82,10 @@ RnmResult InsertQueryAndConfirm(const QString& workPath,           //
   return pInserter.GetApplyResult() ? RnmResult::ALL_SUCCEED : RnmResult::PARTIAL_FAILED;
 }
 
-RnmResult ReplaceQueryAndConfirm(const QString& workPath,           //
-                                 const QStringList& selectedNames,  //
-                                 const QString& defOldName,         //
-                                 const QString& defNewName,         //
+RnmResult ReplaceQueryAndConfirm(const QString& workPath,          //
+                                 const QStringList& selectedNames, //
+                                 const QString& defOldName,        //
+                                 const QString& defNewName,        //
                                  bool disableOldNameEdit) {
   if (selectedNames.isEmpty()) {
     return RnmResult::SKIP;
@@ -80,7 +104,7 @@ RnmResult ReplaceQueryAndConfirm(const QString& workPath,           //
   return pReplacer.GetApplyResult() ? RnmResult::ALL_SUCCEED : RnmResult::PARTIAL_FAILED;
 }
 
-RnmResult NumerizerQueryAndConfirm(const QString& workPath,  //
+RnmResult NumerizerQueryAndConfirm(const QString& workPath, //
                                    const QStringList& selectedNames) {
   if (selectedNames.isEmpty()) {
     return RnmResult::SKIP;
@@ -107,8 +131,11 @@ int InsertBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
     LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
     return 0;
   }
-  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Insert) json/video related",  //
-           "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED,
+           "Rename(Insert) json/video related", //
+           "%d item(s) specified by %d pattern renamed",
+           filesNeedRename.size(),
+           jsonNames.size());
   return filesNeedRename.size();
 }
 
@@ -135,8 +162,11 @@ int ReplaceBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
     LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
     return 0;
   }
-  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Replace) json/video related",  //
-           "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED,
+           "Rename(Replace) json/video related", //
+           "%d item(s) specified by %d pattern renamed",
+           filesNeedRename.size(),
+           jsonNames.size());
   return filesNeedRename.size();
 }
 
@@ -150,9 +180,12 @@ int NumerizerBySpecifiedJson(const QString& path, const QStringList& jsonNames) 
     LOG_INFO_P("[Skip] rename", "User cancel rename %d item(s)", filesNeedRename.size());
     return 0;
   }
-  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED, "Rename(Numerize) json/video related",  //
-           "%d item(s) specified by %d pattern renamed", filesNeedRename.size(), jsonNames.size());
+  LOG_OE_P(rnmResult == RnmResult::ALL_SUCCEED,
+           "Rename(Numerize) json/video related", //
+           "%d item(s) specified by %d pattern renamed",
+           filesNeedRename.size(),
+           jsonNames.size());
   return filesNeedRename.size();
 }
 
-}  // namespace BatchRenameBy
+} // namespace BatchRenameBy

@@ -217,7 +217,11 @@ QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName) {
 
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
-  prepath = fullpath.left(lastIndexOfSlash);
+  if (lastIndexOfSlash == -1) {
+    prepath = "";
+  } else {
+    prepath = fullpath.left(lastIndexOfSlash);
+  }
   return fullpath.mid(lastIndexOfSlash + 1);
 }
 
