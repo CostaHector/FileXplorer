@@ -22,6 +22,15 @@ QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames
 
   QHash<QString, QStringList> dirToJsonNames;
 
+  const auto prefixLessThan = [](const QStringList::ConstIterator& nameIt, const QString& prefix)->bool {
+    const QString& fileName = (*nameIt);
+    const int cmpLength{qMin(prefix.size(), fileName.size())};
+    if (const int cmp = QString::compare(fileName.left(cmpLength), prefix.left(cmpLength))) { // !=0
+      return cmp < 0;
+    }
+    return fileName.size() < prefix.size();
+  };
+
   QDir sameLevelDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   for (const QString& rel2Json : jsonNames) {
     jsonFileName = PathTool::GetPrepathAndFileName(rel2Json, relPath);
@@ -40,9 +49,13 @@ QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames
     }
 
     std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
-    foreach (const QString& fileName, relIt.value()) {
+
+    const QStringList& files{relIt.value()};
+    auto firstFileIt = std::__lower_bound(files.cbegin(), files.cend(), jsonBaseName, prefixLessThan);
+    for (auto it = firstFileIt; it != files.end(); ++it) {
+      const QString& fileName = *it;
       if (!fileName.startsWith(jsonBaseName)) {
-        continue;
+        break;
       }
       std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
       // fileBaseName == (jsonBaseName + extraContent) + fileExt

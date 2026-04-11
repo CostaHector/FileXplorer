@@ -64,6 +64,19 @@ class BatchRenameByTest : public PlainTestSuite {
     QCOMPARE(beforeSelectedNames, filesNeedRename);
   }
 
+  void GetFilesNeedRename_subdirectory_ok() {
+    QString workPath = mTDir.itemPath("replace");
+    QStringList patterns{"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"};
+    const QStringList filesNeedRename{GetFilesNeedRename(workPath, patterns)};
+    const QStringList beforeSelectedNames{
+        "pattern/Chris Evans.jpg",          //
+        "pattern/Chris Evans.json",         //
+        "pattern/Jensen Ackles.mp4",        //
+        "pattern/Jensen Ackles.pson",       //
+    };
+    QCOMPARE(beforeSelectedNames, filesNeedRename);
+  }
+
   void ReplaceQueryAndConfirm_ok() {
     using namespace AdvanceRenamerTestTool;
     set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted, QDialog::DialogCode::Accepted});
