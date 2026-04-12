@@ -2,7 +2,6 @@
 #include "PathTool.h"
 #include "DataFormatter.h"
 #include <QFile>
-#include <QPixmap>
 
 using namespace DuplicateImageMetaInfo;
 
@@ -20,15 +19,6 @@ QVariant RedundantImageModel::data(const QModelIndex& index, int role) const {
         DUP_IMAGE_META_INFO_KEY_MAPPING //
 #undef DUP_IMAGE_META_INFO_KEY_ITEM     //
             default : return {};
-      }
-      break;
-    }
-    case Qt::DecorationRole: {
-      if (index.column() == DI_TABLE_HEADERS_COUNT - 1) {
-        if (!QFile::exists(item.m_AbsPath)) {
-          return {}; // not exist
-        }
-        return QPixmap{item.m_AbsPath}.scaledToWidth(128);
       }
       break;
     }
