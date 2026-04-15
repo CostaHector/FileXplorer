@@ -21,7 +21,7 @@ QHeaderView#Vertical::section {
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QHeaderView::section {
-    background-color: #252525;
+    background-color: #3F3B39;
     color: #FFFFFF;
 }
 QHeaderView#Horizontal::section {

@@ -124,7 +124,7 @@ QDockWidget::separator {
 }
 
 QPlainTextEdit, QTextEdit {
-    background-color: #3C3C3C;
+    background-color: #3F3B39;
     color: #FFFFFF;
     selection-background-color: #264f78;
 }
