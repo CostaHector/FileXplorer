@@ -21,7 +21,7 @@ QDockWidget::separator {
 }
 
 QPushButton {
-    border: 1px solid #3c3c3c;
+    border: 1px solid #3C3C3C;
     min-width: 80px;
 }
 
@@ -50,12 +50,12 @@ QToolBar QToolBar {
 QToolBar QComboBox {
     margin: 0px;
     border: 0px;
-    border: 1px solid #000000;
+    border: 1px solid #3C3C3C;
 }
 
 QToolBar QLineEdit {
     margin: 0px;
-    border: 1px solid #000000;
+    border: 1px solid #3C3C3C;
 }
 
 QComboBox QLineEdit {
@@ -88,14 +88,14 @@ QProgressBar:indeterminate::chunk {
 
 QComboBox QAbstractItemView {
     selection-background-color: #CCEBFF;
-    selection-color: #000000;
+    selection-color: #3C3C3C;
 }
 )";
       break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QWidget {
-    background-color: #000000;
+    background-color: #3C3C3C;
     color: #FFFFFF;
     selection-background-color: #264f78;
 }
@@ -124,19 +124,19 @@ QDockWidget::separator {
 }
 
 QPlainTextEdit, QTextEdit {
-    background-color: #252525;
+    background-color: #3C3C3C;
     color: #FFFFFF;
     selection-background-color: #264f78;
 }
 
 QPushButton {
     background-color: #333333;
-    border: 1px solid #3c3c3c;
+    border: 1px solid #3C3C3C;
     min-width: 80px;
 }
 
 QPushButton:hover {
-    background-color: #3c3c3c;
+    background-color: #3C3C3C;
 }
 
 QLineEdit {

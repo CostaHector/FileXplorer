@@ -31,6 +31,7 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   InitTreeView();
   subscribe();
   setWindowTitle("StyleSheet Manager");
+  setWindowIcon(QIcon{":styles/STYLESHEET_MGR"});
 }
 
 void StyleSheetTreeView::showEvent(QShowEvent* event) {

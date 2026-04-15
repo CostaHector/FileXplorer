@@ -119,7 +119,24 @@ QString GetColorBackgroundSelectedActive(Style::StyleSheetE styleE) {
   }
   return Configuration().value("StyleSheet/LightColor/Background/SelectedActive", ColorBackgroundSelectedActiveDef(styleE)).toString();
 }
-
+QString GetColorBackgroundMenu(Style::StyleSheetE styleE) {
+  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+    return Configuration().value("StyleSheet/DarkColor/Background/Menu", ColorBackgroundMenuDef(styleE)).toString();
+  }
+  return Configuration().value("StyleSheet/LightColor/Background/Menu", ColorBackgroundMenuDef(styleE)).toString();
+}
+QString GetColorBackgroundMenuChecked(Style::StyleSheetE styleE) {
+  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+    return Configuration().value("StyleSheet/DarkColor/Background/MenuChecked", ColorBackgroundMenuCheckedDef(styleE)).toString();
+  }
+  return Configuration().value("StyleSheet/LightColor/Background/MenuChecked", ColorBackgroundMenuCheckedDef(styleE)).toString();
+}
+QString GetColorBackgroundMenuSelected(Style::StyleSheetE styleE) {
+  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+    return Configuration().value("StyleSheet/DarkColor/Background/MenuSelected", ColorBackgroundMenuSelectedDef(styleE)).toString();
+  }
+  return Configuration().value("StyleSheet/LightColor/Background/MenuSelected", ColorBackgroundMenuSelectedDef(styleE)).toString();
+}
 QString GetColorGridLine(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
     return Configuration().value("StyleSheet/DarkColor/GridLine", ColorGridLineDef(styleE)).toString();
@@ -169,6 +186,18 @@ QString ColorBackgroundSelectedInactiveDef(Style::StyleSheetE styleE) {
 }
 QString ColorBackgroundSelectedActiveDef(Style::StyleSheetE styleE) {
   return "#99D1FF";
+}
+QString ColorBackgroundMenuDef(Style::StyleSheetE styleE) {
+  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+    return "#313131";
+  }
+  return "#FBFCFD";
+}
+QString ColorBackgroundMenuCheckedDef(Style::StyleSheetE styleE) {
+  return "#99D1FF";
+}
+QString ColorBackgroundMenuSelectedDef(Style::StyleSheetE styleE) {
+  return "#CCEBFF";
 }
 QString ColorGridLineDef(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {

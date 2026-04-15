@@ -63,7 +63,7 @@ PreferenceActions::PreferenceActions(QObject* parent) //
   const int stylesheetInt = Configuration().value("STYLESHEET_NAME", (int) Style::DEFAULT_STYLE_SHEET).toInt();
   mStyleSheetIntAction.setCheckedIfActionExist(stylesheetInt);
 
-  STYLESHEET_MGR = new (std::nothrow) QAction{tr("Stylesheet"), this};
+  STYLESHEET_MGR = new (std::nothrow) QAction{QIcon{":styles/STYLESHEET_MGR"}, tr("Stylesheet"), this};
   STYLESHEET_MGR->setCheckable(true);
   STYLESHEET_MGR->setChecked(false);
 
@@ -133,6 +133,7 @@ QToolBar* PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget* parent) {
   styleAndStylesheetToolbar->addAction(STYLESHEET_MGR);
   styleAndStylesheetToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   styleAndStylesheetToolbar->setOrientation(Qt::Orientation::Vertical);
+  styleAndStylesheetToolbar->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});
   return styleAndStylesheetToolbar;
 }
 

@@ -41,7 +41,7 @@ QTabBar::tab:selected {
     border-top: 1px solid #FFA0A0A0;
     border-right: 1px solid #FFA0A0A0;
     border-left: 1px solid #FFA0A0A0;
-    font-weight: bold; /* 选中状态加粗 */
+    font-weight: bold;
 }
 QTabBar::tab:hover {
     background-color: #FFCDE8FF;
@@ -54,14 +54,13 @@ QTabBar::tab:selected:hover {
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QTabWidget {
-    background-color: #252525;  /* 右侧空白区域背景色 */
+    background-color: #3C3C3C;
     border: none;
 }
-
 QTabWidget::tab {
-    background: #252525;
+    background: #3C3C3C;
     color: #FFFFFF;
-    border: 1px solid #3c3c3c;
+    border: 1px solid #3C3C3C;
     border-bottom: none;
 }
 QTabWidget::pane {
@@ -73,12 +72,11 @@ QTabWidget::pane {
 }
 
 QTabBar {
-    background-color: #252525;  /* 右侧空白区域背景色 */
+    background-color: #3C3C3C;
     %1
 }
-
 QTabBar::tab {
-    background-color: #252525;
+    background-color: #3C3C3C;
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 15px;
@@ -88,18 +86,19 @@ QTabBar::tab {
     font-size: %2px;
 }
 QTabBar::tab:!selected {
+    background-color: #3C3C3C;
     border-bottom: 1px solid #FFA0A0A0;
 }
 QTabBar::tab:selected {
-    background-color: #3F3B39;
+    background-color: #3C3C3C;
     border-top: 1px solid #FFA0A0A0;
     border-right: 1px solid #FFA0A0A0;
     border-left: 1px solid #FFA0A0A0;
-    font-weight: bold; /* 选中状态加粗 */
+    font-weight: bold;
 }
 QTabBar::tab:hover {
     background-color: #FF3E3E40;
-    border: 1px solid #5e5e60;
+    border: 1px solid #5E5E60;
 }
 QTabBar::tab:selected:hover {
     background-color: #CC1E1E1E;

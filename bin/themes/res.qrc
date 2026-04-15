@@ -399,6 +399,7 @@
         <file alias="STYLESHEET_NONE">styles/STYLESHEET_NONE.svg</file>
         <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
         <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
+        <file alias="STYLESHEET_MGR">styles/STYLESHEET_MGR.svg</file>
     </qresource>
 
     <qresource prefix="/">

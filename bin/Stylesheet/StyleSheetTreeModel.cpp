@@ -59,6 +59,13 @@ bool StyleSheetTreeModel::initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot
                                                                                            ColorBackgroundSelectedInactiveDef(styleE),
                                                                                            GetColorBackgroundSelectedInactive(styleE),
                                                                                            StyleItemData::COLOR}));
+  auto* pColorBgMenu = pColorBg->appendRow(
+      StyleTreeNode::create(StyleItemData{"Menu", ColorBackgroundMenuDef(styleE), GetColorBackgroundMenu(styleE), StyleItemData::COLOR}));
+  auto* pColorBgMenuChecked = pColorBg->appendRow(
+      StyleTreeNode::create(StyleItemData{"MenuChecked", ColorBackgroundMenuCheckedDef(styleE), GetColorBackgroundMenuChecked(styleE), StyleItemData::COLOR}));
+  auto* pColorBgMenuSelected = pColorBg->appendRow(
+      StyleTreeNode::create(StyleItemData{"MenuSelected", ColorBackgroundMenuSelectedDef(styleE), GetColorBackgroundMenuSelected(styleE), StyleItemData::COLOR}));
+
 
   auto* pColorGridLine = pColor->appendRow(
       StyleTreeNode::create(StyleItemData{"Gridline", ColorGridLineDef(styleE), GetColorGridLine(styleE), StyleItemData::COLOR}));
@@ -94,29 +101,43 @@ QVariant StyleSheetTreeModel::data(const QModelIndex& index, int role) const {
         return item.defValue;
       case StyleItemData::CURRENT_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
         return item.curValue;
-      case StyleItemData::NEW_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
+      case StyleItemData::EDITABLE_COLUMN:
         return item.modifiedToValue;
       default:
         return {};
     }
   } else if (role == StyleItemData::DATA_TYPE_ROLE) {
     return item.dataType;
-  } else if (role == Qt::DecorationRole && column == StyleItemData::EDITABLE_COLUMN && mEditFailedCells.contains(index)) {
+  } else if (role == Qt::DecorationRole) {
     static QIcon failedIcon{":img/NOT_SAVED"};
-    return failedIcon;
-  } else if (role == Qt::BackgroundRole && item.dataType == StyleItemData::DataTypeE::COLOR) {
-    switch (column) {
-      case StyleItemData::DEFAULT_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
-        return QColor{item.defValue.toString()};
-      case StyleItemData::CURRENT_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
-        return QColor{item.curValue.toString()};
-      case StyleItemData::NEW_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
-        if (item.isModifiedToValueValid()) {
-          return QColor{item.modifiedToValue.toString()};
-        }
+    if (column == StyleItemData::EDITABLE_COLUMN && mEditFailedCells.contains(index)) {
+      return failedIcon;
+    }
+    if (item.dataType == StyleItemData::DataTypeE::COLOR) {
+      QString colorStr;
+      switch (column) {
+        case StyleItemData::DEFAULT_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
+          colorStr = item.defValue.toString();
+          break;
+        case StyleItemData::CURRENT_DATA_ROLE - StyleItemData::DEF_BEGIN_ROLE:
+          colorStr = item.curValue.toString();
+          break;
+        case StyleItemData::EDITABLE_COLUMN:
+          colorStr = item.modifiedToValue.toString();
+          break;
+        default:
+          return {};
+      }
+      if (colorStr.isEmpty()) {
         return {};
-      default:
+      }
+      QColor color(colorStr);
+      if (!color.isValid()) {
         return {};
+      }
+      QPixmap pixmap(16, 16);
+      pixmap.fill(color);
+      return pixmap;
     }
   }
   return {};
