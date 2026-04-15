@@ -17,20 +17,23 @@ public:
   explicit PreferenceActions(QObject *parent = nullptr);
   ~PreferenceActions();
 
-  void subscribe();
-  bool onSetAppStyle(const QAction* pStyleAct);
-  bool onSetStylesheet(const QAction* pStyleSheetAct);
-
-  // style: "windows", "windowsvista", "fusion", or "macos"
-  QAction *STYLE_WINDOWS_VISTA{nullptr}, *STYLE_WINDOWS{nullptr}, *STYLE_FUSION{nullptr}, *STYLE_MACOS{nullptr};
-
-  QAction *STYLESHEET_NONE{nullptr}, *STYLESHEET_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
-
   QToolBar* GetStyleAndStyleSheetToolbar(QWidget* parent);
+  void initAppStyle() const;
+  void initStyleSheet(bool bThemeChanged) const;
 
   Style::StyleE CurStyle() const;
   Style::StyleSheetE CurStyleSheet() const;
+  QAction *STYLESHEET_MGR{nullptr};
+
 private:
+  void subscribe();
+  bool onAppStyleChanged(const QAction* pStyleAct) const;
+  bool onStylesheetChanged(const QAction* pStyleSheetAct) const;
+
+  // style: "windows", "windowsvista", "fusion", or "macos"
+  QAction *STYLE_WINDOWS_VISTA{nullptr}, *STYLE_WINDOWS{nullptr}, *STYLE_FUSION{nullptr}, *STYLE_MACOS{nullptr};
+  QAction *STYLESHEET_NONE{nullptr}, *STYLESHEET_LIGHT{nullptr}, *STYLESHEET_DARK_THEME_MOON_FOG{nullptr};
+
   EnumIntAction<Style::StyleE> mStyleIntAction;
   EnumIntAction<Style::StyleSheetE> mStyleSheetIntAction;
 };

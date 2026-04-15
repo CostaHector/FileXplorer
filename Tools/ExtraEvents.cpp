@@ -10,6 +10,9 @@
 #include "SimpleAES.h"
 #include "PasswordBook.h"
 
+#include "PreferenceActions.h"
+#include "StyleSheetTreeView.h"
+
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -51,6 +54,10 @@ void ExtraEvents::subscribe() {
   m_resMonitor = new (std::nothrow)
       PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget, "Geometry/ResMonitor"};
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);
+
+  auto& prefInst = g_PreferenceActions();
+  mStyleSheetManager = new (std::nothrow) PopupWidgetManager<StyleSheetTreeView>{prefInst.STYLESHEET_MGR, pParentWidget, "Geometry/StyleSheetMgr"};
+  CHECK_NULLPTR_RETURN_VOID(mStyleSheetManager);
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);

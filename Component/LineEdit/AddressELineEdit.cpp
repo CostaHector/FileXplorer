@@ -75,10 +75,8 @@ AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
   {
     auto* le = m_pathComboBox->lineEdit();
     le->addAction(StyleSheet::GetSystemDirOpenIcon(), QLineEdit::ActionPosition::LeadingPosition);
-    StyleSheet::InitFontFamilyAndSize(le);
   }
   m_pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  StyleSheet::InitFontFamilyAndSize(m_pathComboBox);
 
   QCompleter* pCompleter = new QCompleter{this};
   CHECK_NULLPTR_RETURN_VOID(pCompleter);

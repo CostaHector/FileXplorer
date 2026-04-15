@@ -2,16 +2,13 @@
 
 #include "MemoryKey.h"
 #include "ImageTool.h"
-#include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
 #include "PublicMacro.h"
 #include "Bool2QtEnum.h"
-#include "FontRegistry.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
-extern template struct FontRegistry<QWidget>;
 
 QSet<QString> CustomListView::mListInstSet;
 
@@ -73,7 +70,6 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
   AddItselfAction2Menu();
 
   SubscribePublicActions();
-  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
 }
 
 void CustomListView::SubscribePublicActions() {
@@ -170,7 +166,6 @@ void CustomListView::onUniformItemSizedToggled(const bool bUniform) {
 
 void CustomListView::InitListView() {
   initExclusivePreferenceSetting();
-  StyleSheet::InitFontFamilyAndSize(this);
 
   // top2bottom, list
   _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(GetName() + "/FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());

@@ -58,7 +58,7 @@ bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int 
     // for direct edit, using EditRole
     const KV* record = KV::mEditableKVs[index.row()];
     if (!record->checker(value)) {
-      LOG_D("Edit %s[newValue] not pass the checker", qPrintable(record->name));
+      LOG_D("Edit %s[modifiedToValue] not pass the checker", qPrintable(record->name));
       return false;
     }
     QSettings& curCfg = Configuration();

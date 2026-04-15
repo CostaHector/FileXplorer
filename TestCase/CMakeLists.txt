@@ -33,6 +33,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets
 file(GLOB SOURCES
     # service module sources
     ${PARENT_DIR}/Actions/*.cpp
+    ${PARENT_DIR}/bin/Stylesheet/*.cpp
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
@@ -86,6 +87,7 @@ endforeach()
 
 set(SRV_HEADER_PATH
     ${PARENT_DIR}/Actions
+    ${PARENT_DIR}/bin/Stylesheet
     ${PARENT_DIR}/Model
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
@@ -114,6 +116,7 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     ${PARENT_DIR}/Actions/*.h
+    ${PARENT_DIR}/bin/Stylesheet/*.h
     ${PARENT_DIR}/Model/*.h
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h

@@ -24,15 +24,6 @@ using namespace VALUE_CHECKER_TYPE;
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
 const KV MemoryKey::ROW_HEIGHT{"ROW_HEIGHT", SizeTool::TABLE_DEFAULT_ROW_SECTION_SIZE, ValueChecker{0, 9999}};
 
-const KV FontKey::FAMILY("FontKey/FAMILY",
-#ifdef _WIN32
-                         "Microsoft YaHei",
-#else
-                         "Noto Sans",
-#endif
-                         ValueChecker{PLAIN_STR});
-const KV FontKey::POINT("FontKey/POINT", 12, ValueChecker{8, 25 + 1});
-
 const KV PathKey::STARTUP_PATH{"PathKey/STARTUP_PATH", "./", ValueChecker{FOLDER_PATH}};
 const KV PathKey::LAST_TIME_COPY_TO("PathKey/LAST_TIME_COPY_TO", "", ValueChecker{FOLDER_PATH});
 const KV PathKey::JSON_EDITOR_LOAD_FROM("PathKey/JSON_EDITOR_LOAD_FROM", "", ValueChecker{FOLDER_PATH});

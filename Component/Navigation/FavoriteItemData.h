@@ -1,8 +1,9 @@
 #ifndef FAVORITEITEMDATA_H
 #define FAVORITEITEMDATA_H
 
+#include "TreeNodeBase.h"
+
 #include <QString>
-#include <QVector>
 #include <QDataStream>
 #include <memory>
 
@@ -14,7 +15,7 @@ struct FavoriteItemData final {
   explicit FavoriteItemData(const QString& _name);
   FavoriteItemData(const QString& _name, const QString& path);
 
-  enum Role {  // -DEF_BEGIN_ROLE represent column
+  enum Role { // -DEF_BEGIN_ROLE represent column
     DEF_BEGIN_ROLE = Qt::UserRole + 1,
     DEF_NAME_TEXT_ROLE = DEF_BEGIN_ROLE,
     FULL_PATH_ROLE,
@@ -24,7 +25,7 @@ struct FavoriteItemData final {
     INVALID_BUTT_ROLE,
   };
 
-  bool operator==(const FavoriteItemData& other) const {  //
+  bool operator==(const FavoriteItemData& other) const { //
     return name == other.name && isGroup == other.isGroup && fullPath == other.fullPath;
   }
 
@@ -32,11 +33,11 @@ struct FavoriteItemData final {
 
   bool isValid() const { return !name.isEmpty() && (isGroup || !fullPath.isEmpty()); }
 
-  QString name;        // 显示名称
-  QString fullPath;    // 完整路径（如果不是分组）
-  bool isGroup{true};  // 是否为分组
-  int lastAccess{0};   // 最后访问时间
-  int accessCount{0};  // 访问次数
+  QString name;       // 显示名称
+  QString fullPath;   // 完整路径（如果不是分组）
+  bool isGroup{true}; // 是否为分组
+  int lastAccess{0};  // 最后访问时间
+  int accessCount{0}; // 访问次数
 
   static Role GetInitialSortRole();
   static void SaveInitialSortRole(Role sortRole);
@@ -52,83 +53,14 @@ struct FavoriteItemData final {
 QDataStream& operator<<(QDataStream& out, const FavoriteItemData& item);
 QDataStream& operator>>(QDataStream& in, FavoriteItemData& item);
 
-using TDataType = FavoriteItemData;
-struct MyTreeNode final {
-  friend QDataStream& operator<<(QDataStream& out, const MyTreeNode& item);
-  friend QDataStream& operator>>(QDataStream& in, MyTreeNode& item);
-  static std::unique_ptr<MyTreeNode> NewTreeNodeRoot() { return std::unique_ptr<MyTreeNode>{new MyTreeNode}; }
-
-  MyTreeNode() = default;
-  MyTreeNode(const TDataType& _val, const QList<MyTreeNode*>& _childs = {}, MyTreeNode* _parent = nullptr)
-      : val{_val}, childs{_childs}, pParent{_parent} {}
-  ~MyTreeNode() { releaseAndClearChilds(); }
-  MyTreeNode* parent() const { return pParent; }
-  bool isGroup() const { return val.isGroup; }
-  QString name() const { return val.name; }
-  bool setName(const QString& newName) {
-    if (val.name == newName) {
-      return false;  // unchanged
-    }
-    val.name = newName;
-    return true;
-  }
-  bool isAncestorOf(const MyTreeNode* descendant) const;
-  bool isDescendantOf(const MyTreeNode* ancestor) const;
-
-  bool operator==(const MyTreeNode& rhs) const;
-  bool operator!=(const MyTreeNode& rhs) const { return !(*this == rhs); }
-
-  void releaseAndClearChilds() {
-    qDeleteAll(childs);
-    childs.clear();
-  }
-
-  TDataType val;
-  QList<MyTreeNode*> childs;
-  MyTreeNode* pParent{nullptr};
-
-  int childsCount() const { return childs.size(); }
-  int rowCount() const { return childsCount(); }
-
-  MyTreeNode* child(int row, int column = 0) const {
-    if (0 <= row && row < childsCount()) {
-      return childs[row];
-    }
-    return nullptr;
-  }
-
-  MyTreeNode* appendRow(MyTreeNode* child) {
-    if (child) {
-      childs.append(child);
-      child->pParent = this;
-    }
-    return child;
-  }
-  MyTreeNode* takeRow(int row) {
-    if (0 <= row && row < childsCount()) {
-      return childs.takeAt(row);
-    }
-    return nullptr;
-  }
-
-  void removeRow(int row) {
-    if (0 <= row && row < childsCount()) {
-      if (childs[row] != nullptr) {
-        delete childs[row];
-      }
-      childs.erase(childs.begin() + row);
-    }
-  }
-
-  int row() const {
-    if (pParent) {
-      return pParent->childs.indexOf(const_cast<MyTreeNode*>(this));
-    }
-    return 0;
-  }
+using TFavDataType = FavoriteItemData;
+struct FavTreeNode final : public TreeNodeBase<FavTreeNode, TFavDataType> {
+  friend QDataStream& operator<<(QDataStream& out, const FavTreeNode& item);
+  friend QDataStream& operator>>(QDataStream& in, FavTreeNode& item);
+  using TreeNodeBase<FavTreeNode, TFavDataType>::TreeNodeBase;
 };
 
-QDataStream& operator<<(QDataStream& out, const MyTreeNode& item);
-QDataStream& operator>>(QDataStream& in, MyTreeNode& item);
+QDataStream& operator<<(QDataStream& out, const FavTreeNode& item);
+QDataStream& operator>>(QDataStream& in, FavTreeNode& item);
 
-#endif  // FAVORITEITEMDATA_H
+#endif // FAVORITEITEMDATA_H

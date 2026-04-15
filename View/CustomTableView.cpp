@@ -7,13 +7,10 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
-#include "StyleSheet.h"
-#include "FontRegistry.h"
 #include "RowHeightRegistry.h"
 
 #include <QContextMenuEvent>
 
-extern template struct FontRegistry<QWidget>;
 extern template struct RowHeightRegistry<CustomTableView>;
 
 QSet<QString> CustomTableView::mTableInstSet;
@@ -115,7 +112,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   AddItselfAction2Menu();
 
   SubscribeHeaderActions();
-  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
   RowHeightRegistry<CustomTableView>::registerWidgetForAdjust(this, true);
 }
 
@@ -202,7 +198,6 @@ bool CustomTableView::ShowOrHideColumnCore() {
 
 void CustomTableView::InitTableView() {
   initExclusivePreferenceSetting();
-  StyleSheet::InitFontFamilyAndSize(this);
 
   const bool showHorHeader = Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool();
   const bool showVertHeader = Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool();

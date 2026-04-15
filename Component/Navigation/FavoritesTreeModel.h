@@ -1,11 +1,12 @@
 #ifndef FAVORITESTREEMODEL_H
 #define FAVORITESTREEMODEL_H
 
-#include <QStandardItemModel>
 #include "FavoriteItemData.h"
 #include "QAbstractTreeModelPub.h"
 
-class FavoritesTreeModel : public QAbstractTreeModelPub {
+extern template class QAbstractTreeModelPub<FavTreeNode>;
+
+class FavoritesTreeModel : public QAbstractTreeModelPub<FavTreeNode> {
   Q_OBJECT
  public:
   explicit FavoritesTreeModel(const QString& belongToName, QObject* parent = nullptr, bool bInitialCollectionsWhenEmpty = true);
@@ -23,10 +24,8 @@ class FavoritesTreeModel : public QAbstractTreeModelPub {
   bool canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) const override;
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) override;
 
-  MyTreeNode* addGroup(const QString& grpName, const QModelIndex& parentIndex = {});
-  MyTreeNode* addGroup(const QString& grpName, MyTreeNode* parentItem = nullptr);
-  MyTreeNode* addPath(const QString& name, const QString& path, const QModelIndex& parentIndex = {});
-  MyTreeNode* addPath(const QString& name, const QString& path, MyTreeNode* parent = nullptr);
+  FavTreeNode* addPath(const QString& name, const QString& path, const QModelIndex& parentIndex = {});
+  FavTreeNode* addPath(const QString& name, const QString& path, FavTreeNode* parent = nullptr);
 
   QString filePath(const QModelIndex& parentIndex) const;
 

@@ -90,7 +90,7 @@ class CastDBView : public CustomTableView {
 
   void EmitCurrentCastRecordChanged(const QModelIndex& current, const QModelIndex& /*previous*/);
 
-  static void setQueryConfirmIfRowSelectedCountAbove(int newValue);
+  static void setQueryConfirmIfRowSelectedCountAbove(int modifiedToValue);
  private:
   void RefreshCurrentRowHtmlContents();
 

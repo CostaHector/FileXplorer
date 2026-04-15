@@ -50,7 +50,7 @@
 #include "RateActions.h"
 #include "RateHelper.h"
 #include "RecycleCfmDlg.h"
-#include "FontRegistry.h"
+#include "StyleSheetGetter.h"
 #include "RowHeightRegistry.h"
 
 #include <QApplication>
@@ -909,12 +909,10 @@ bool FileXplorerEvent::on_PlayVideo() const {
   return true;
 }
 
-extern template struct FontRegistry<QWidget>;
-extern template struct FontRegistry<QAction>;
 void FileXplorerEvent::on_FontChanged() {
   bool bOk{false};
 
-  const QFont& beforeFont = StyleSheet::ReadFontFamilyAndSize();
+  const QFont& beforeFont = FontCfg::ReadFont();
   const QFont& newFont = QFontDialog::getFont(&bOk, beforeFont, nullptr);
   if (!bOk) {
     LOG_INFO_NP("[Cancel]", "User cancelled font setting");
@@ -927,9 +925,7 @@ void FileXplorerEvent::on_FontChanged() {
   }
   LOG_OK_P("Font changed", "Selected font: %s, size: %d, weight:%d, Italic: %d",  //
            qPrintable(newFont.family()), newFont.pointSize(), newFont.weight(), newFont.italic());
-  StyleSheet::SaveFontFamilyAndSize(newFont);
-  FontRegistry<QWidget>::updateRegisteredWidgetsFont(newFont, false);
-  FontRegistry<QAction>::updateRegisteredWidgetsFont(newFont, false);  // definitely false for action
+  FontCfg::updateFont(newFont);
 }
 
 extern template struct RowHeightRegistry<CustomTableView>;
@@ -1334,7 +1330,6 @@ bool FileXplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctur
 
   msgBox->button(QMessageBox::StandardButton::Apply)->setText("Keep");
   msgBox->button(QMessageBox::StandardButton::Apply)->setIcon(QIcon(":img/FILE_STRUCTURE_PRESERVE"));
-  msgBox->button(QMessageBox::StandardButton::Apply)->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 
   msgBox->button(QMessageBox::StandardButton::Yes)->setText("Flatten");
   msgBox->button(QMessageBox::StandardButton::Yes)->setIcon(QIcon(":img/FILE_STRUCTURE_FLATTEN"));

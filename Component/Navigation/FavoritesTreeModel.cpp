@@ -11,19 +11,19 @@
 constexpr const char* FavoritesTreeModel::MIME_TYPE;
 
 FavoritesTreeModel::FavoritesTreeModel(const QString& belongToName, QObject* parent, bool bInitialCollectionsWhenEmpty)  //
-    : QAbstractTreeModelPub{parent}, m_belongToName{belongToName} {
+    : QAbstractTreeModelPub<FavTreeNode>{parent}, m_belongToName{belongToName} {
   const QByteArray& datas = Configuration().value(GetDataKeyInQSetting(), QByteArray{}).toByteArray();
   if (!datas.isEmpty() && setDatas(datas)) {
     // Key exist and ByteArray not empty and valid(may contains 0 elements)
     clearDirty();
     return;
   }
-  setDatas(QByteArray{});  // 初始化
+  setDatas(QByteArray{});
   if (!bInitialCollectionsWhenEmpty) {
     return;
   }
   addInitialFavoritesGroup();
-  clearDirty();  // 初始化阶段全程视为未修改
+  clearDirty();
 }
 
 FavoritesTreeModel::~FavoritesTreeModel() {
@@ -40,14 +40,13 @@ QVariant FavoritesTreeModel::data(const QModelIndex& index, int role) const {
     return {};
   }
 
-  MyTreeNode* node = static_cast<MyTreeNode*>(index.internalPointer());
+  FavTreeNode* node = static_cast<FavTreeNode*>(index.internalPointer());
   if (!node) {
     return {};
   }
 
-  const FavoriteItemData& item = node->val;
-  int column = index.column();
-
+  const FavoriteItemData& item = node->value();
+  const int column = index.column();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (column) {
       case FavoriteItemData::DEF_NAME_TEXT_ROLE - FavoriteItemData::DEF_BEGIN_ROLE:
@@ -96,7 +95,7 @@ bool FavoritesTreeModel::setData(const QModelIndex& index, const QVariant& value
   }
 
   if (role == Qt::EditRole) {
-    MyTreeNode* node = static_cast<MyTreeNode*>(index.internalPointer());
+    FavTreeNode* node = static_cast<FavTreeNode*>(index.internalPointer());
     if (node == nullptr) {
       return false;
     }
@@ -231,48 +230,18 @@ QString FavoritesTreeModel::filePath(const QModelIndex& parentIndex) const {
   if (!parentIndex.isValid()) {
     return "";
   }
-  MyTreeNode* item = itemFromIndex(parentIndex);
+  FavTreeNode* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return "";
   }
-  if (item->val.isGroup) {
+  if (item->value().isGroup) {
     return "";
   }
-  return item->val.fullPath;
+  return item->value().fullPath;
 }
 
-MyTreeNode* FavoritesTreeModel::addGroup(const QString& grpName, const QModelIndex& parentIndex) {
-  MyTreeNode* parentItem = nullptr;
-  if (parentIndex.isValid()) {
-    parentItem = itemFromIndex(parentIndex);
-    if (parentItem == nullptr) {
-      LOG_W("Cannot get parent item from index");
-      return nullptr;
-    }
-  }
-  return addGroup(grpName, parentItem);
-}
-
-MyTreeNode* FavoritesTreeModel::addGroup(const QString& grpName, MyTreeNode* parentItem) {
-  if (parentItem) {
-    if (!parentItem->val.isGroup) {
-      LOG_D("Cannot insert under non-group item");
-      return nullptr;
-    }
-  } else {
-    parentItem = invisibleRootItem();
-  }
-
-  QModelIndex parentIndex = indexFromItem(parentItem);
-  beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
-  auto childNode = parentItem->appendRow(new MyTreeNode{TDataType{grpName}});
-  endInsertRows();
-  setDirty();
-  return childNode;
-}
-
-MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex) {
-  MyTreeNode* parentItem = nullptr;
+FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex) {
+  FavTreeNode* parentItem = nullptr;
   if (parentIndex.isValid()) {
     parentItem = itemFromIndex(parentIndex);
     if (parentItem == nullptr) {
@@ -283,9 +252,9 @@ MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path
   return addPath(name, path, parentItem);
 }
 
-MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, MyTreeNode* parentItem) {
+FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, FavTreeNode* parentItem) {
   if (parentItem) {
-    if (!parentItem->val.isGroup) {
+    if (!parentItem->value().isGroup) {
       LOG_D("Cannot insert under non-group item");
       return nullptr;
     }
@@ -294,7 +263,8 @@ MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path
   }
   QModelIndex parentIndex = indexFromItem(parentItem);
   beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
-  auto childNode = parentItem->appendRow(new MyTreeNode{TDataType{name, path}});
+
+  auto childNode = parentItem->appendRow(FavTreeNode::create(TFavDataType{name, path}));
   endInsertRows();
   setDirty();
   return childNode;
@@ -302,11 +272,11 @@ MyTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path
 
 void FavoritesTreeModel::addInitialFavoritesGroup() {
   // initial configs
-  MyTreeNode* workGroup = addGroup(tr("Work"), nullptr);
+  FavTreeNode* workGroup = addGroup(tr("Work"), nullptr);
   addPath("Documents", SystemPath::HOME_PATH() + "/Documents", workGroup);
   addPath("Project Configurations", SystemPath::HOME_PATH(), workGroup);
 
-  MyTreeNode* lifeGroup = addGroup(tr("Life"), nullptr);
+  FavTreeNode* lifeGroup = addGroup(tr("Life"), nullptr);
   addPath("Pictures", SystemPath::HOME_PATH() + "/Pictures", lifeGroup);
   addPath("Videos", SystemPath::HOME_PATH() + "/Videos", lifeGroup);
 
@@ -332,7 +302,7 @@ int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction
       fullPath = fi.absolutePath();
     }
     const QString nameTextShown{PathTool::GetBaseName(fullPath)};
-    MyTreeNode* addedItem = addPath(nameTextShown, fullPath, dstParent);
+    FavTreeNode* addedItem = addPath(nameTextShown, fullPath, dstParent);
     if (addedItem != nullptr) {
       addedCount++;
     }

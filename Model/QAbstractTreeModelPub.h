@@ -1,27 +1,28 @@
 #ifndef QABSTRACTTREEMODELPUB_H
 #define QABSTRACTTREEMODELPUB_H
 
-#include "FavoriteItemData.h"
 #include <QAbstractItemModel>
 #include <memory>
 
+template<typename TDataType>
 class QAbstractTreeModelPub : public QAbstractItemModel {
  public:
   using QAbstractItemModel::QAbstractItemModel;
 
-  bool setDatas(std::unique_ptr<MyTreeNode> newDatas);
+  bool setDatas(std::unique_ptr<TDataType> newDatas);
   bool setDatas(const QByteArray& dataByteArray);
 
   QModelIndex index(int row, int column, const QModelIndex& parent = {}) const override;
+  QModelIndex siblingAtColumn(const QModelIndex &childIndex, int siblingColumn) const;
   QModelIndex parent(const QModelIndex& child) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override { return FavoriteItemData::COLUMN_COUNT; }
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override { return TDataType::columnCount(); }
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-  MyTreeNode* invisibleRootItem() const;
+  TDataType* invisibleRootItem() const;
 
-  MyTreeNode* itemFromIndex(const QModelIndex& index) const;
+  TDataType* itemFromIndex(const QModelIndex& index) const;
 
-  QModelIndex indexFromItem(const MyTreeNode* item) const;
+  QModelIndex indexFromItem(const TDataType* item) const;
   static quint16 GetVersion() {
     static constexpr quint16 VERSION = 1;
     return VERSION;
@@ -39,14 +40,20 @@ class QAbstractTreeModelPub : public QAbstractItemModel {
   int moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& dest);
   int removeParentIndexes(const QModelIndexList& parentIndexes);
 
-  MyTreeNode* canDropIntoIndex(const QModelIndex& destParentIndex) const;
+  TDataType* canDropIntoIndex(const QModelIndex& destParentIndex) const;
+
+  TDataType* addGroup(const QString& grpName, const QModelIndex& parentIndex = {});
+  TDataType* addGroup(const QString& grpName, TDataType* parentItem = nullptr);
 
  protected:
   QByteArray toByteArray() const;
 
  private:
-  QList<MyTreeNode*> GetItemsNeedProcess(const QModelIndexList& parentIndexes, MyTreeNode* destItem) const;
-  std::unique_ptr<MyTreeNode> m_pRoot{nullptr};
+  static bool hasAncestorInSet(const TDataType* node, const QSet<TDataType*>& ancestorSet);
+  static QList<TDataType*> filterWithoutAncestor(const QList<TDataType*>& items, const QSet<TDataType*>& ancestorSet);
+
+  QList<TDataType*> GetItemsNeedProcess(const QModelIndexList& parentIndexes, TDataType* destItem) const;
+  std::unique_ptr<TDataType> m_pRoot{nullptr};
   mutable bool m_bIsDirty = false;
 };
 

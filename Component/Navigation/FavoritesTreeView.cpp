@@ -8,13 +8,13 @@
 
 FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
     : CustomTreeView{"FavoritesTreeView", parent} {
-  setObjectName("FavoritesTreeView");
   setIndentation(12);
   mFavModel = new FavoritesTreeModel{GetName(), this};
 
   mFavProxyModel = new RecursiveFilterProxyTreeModel{this};
   mFavProxyModel->setSourceModel(mFavModel);
   setModel(mFavProxyModel);
+  registerProxyModel(mFavProxyModel);
 
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setDragDropMode(QAbstractItemView::DragDrop);
@@ -27,36 +27,6 @@ FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
 
   QList<QAction*> exclusiveActs;
   exclusiveActs.reserve(20);
-
-  // Expand all
-  mExpandAll = new QAction(QIcon{":img/EXPAND_ALL"}, tr("Expand All"), this);
-  mExpandAll->setToolTip("Expand all groups to show their contents");
-  exclusiveActs.push_back(mExpandAll);
-
-  // Collapse all
-  mCollapseAll = new QAction(QIcon{":img/COLLAPSE_ALL"}, tr("Collapse All"), this);
-  mCollapseAll->setToolTip("Collapse all groups to hide their contents");
-  exclusiveActs.push_back(mCollapseAll);
-
-  // Animated
-  mAnimatedEnableAct = new QAction(tr("Enable Animation"), this);
-  mAnimatedEnableAct->setToolTip("Enable or disable smooth expand/collapse animations");
-  exclusiveActs.push_back(mAnimatedEnableAct);
-  {
-    const bool bDefAnimated{false};
-    mAnimatedEnableAct->setCheckable(true);
-    mAnimatedEnableAct->setChecked(bDefAnimated);
-    setAnimated(bDefAnimated);
-  }
-
-  mRootDecorationEnabled = new QAction(tr("Root Decoration"), this);
-  exclusiveActs.push_back(mRootDecorationEnabled);
-  {
-    const bool bShowRootDecoration{true};
-    mRootDecorationEnabled->setCheckable(true);
-    mRootDecorationEnabled->setChecked(bShowRootDecoration);
-    setRootIsDecorated(bShowRootDecoration);
-  }
 
   {
     QMenu* mSortRoleMenu = new QMenu(tr("Sort"), this);
@@ -135,11 +105,6 @@ FavoritesTreeView::~FavoritesTreeView() {
 
 void FavoritesTreeView::subscribe() {
   connect(this, &QTreeView::clicked, this, &FavoritesTreeView::onItemClicked);
-  connect(mExpandAll, &QAction::triggered, this, &FavoritesTreeView::expandAll);
-  connect(mCollapseAll, &QAction::triggered, this, &FavoritesTreeView::collapseAll);
-
-  connect(mAnimatedEnableAct, &QAction::toggled, this, &FavoritesTreeView::setAnimated);
-  connect(mRootDecorationEnabled, &QAction::toggled, this, &FavoritesTreeView::setRootIsDecorated);
 
   connect(mSortRoleIntAction.getActionGroup(), &QActionGroup::triggered, this, &FavoritesTreeView::onSortRoleActionTriggered);
   connect(mSortReverse, &QAction::toggled, mFavProxyModel, &RecursiveFilterProxyTreeModel::setSortOrder);
@@ -198,7 +163,7 @@ bool FavoritesTreeView::onAddAGroup() {
     LOG_INFO_NP("Skip", "User cancel");
     return false;
   }
-  MyTreeNode* grpItem = mFavModel->addGroup(grpName, grpOrRootSrcIndex);
+  FavTreeNode* grpItem = mFavModel->addGroup(grpName, grpOrRootSrcIndex);
   bool addResult{grpItem != nullptr};
   LOG_OE_NP(addResult, "Add a group", grpName);
   return addResult;

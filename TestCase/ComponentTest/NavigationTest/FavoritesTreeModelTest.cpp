@@ -115,9 +115,9 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.setDatas(QByteArray{}), true);  // failed
     QCOMPARE(model.rowCount({}), 0);
 
-    auto r0 = MyTreeNode::NewTreeNodeRoot();
-    r0->appendRow(new MyTreeNode{TDataType{"group"}});                                  // valid element 1
-    r0->appendRow(new MyTreeNode{TDataType{"non_group", "path/to/non_group_folder"}});  // valid element 2
+    auto r0 = FavTreeNode::NewTreeNodeRoot();
+    r0->appendRow(new FavTreeNode{TFavDataType{"group"}});                                  // valid element 1
+    r0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});  // valid element 2
 
     QCOMPARE(model.setDatas(std::move(r0)), true);
     QCOMPARE(model.rowCount({}), 2);
@@ -132,13 +132,13 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void moveParentIndexesTo_sameParent_ok() {
-    auto r = MyTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
-    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+    auto r = FavTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
 
     QVERIFY(r0->isDescendantOf(r.get()));
     QVERIFY(r0->isAncestorOf(r02));
@@ -193,13 +193,13 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void moveParentIndexesTo_crossParent_ok() {
-    auto r = MyTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
-    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+    auto r = FavTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r)), true);  // failed
@@ -238,13 +238,13 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void moveParentIndexesTo_Ancestor_ok() {
-    auto r = MyTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new MyTreeNode{TDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new MyTreeNode{TDataType{"g1"}});
-    auto r2 = r->appendRow(new MyTreeNode{TDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new MyTreeNode{TDataType{"g0/g2"}});                // Descendant
+    auto r = FavTreeNode::NewTreeNodeRoot();
+    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r)), true);  // failed
@@ -279,17 +279,17 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void removeParentIndexes_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    auto p = MyTreeNode::NewTreeNodeRoot();
-    auto p0 = p->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
-    auto p1 = p->appendRow(new MyTreeNode{TDataType{"group0Child"}});
-    auto p2 = p->appendRow(new MyTreeNode{TDataType{"group2Child"}});
-    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
-    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
-    auto p3 = p->appendRow(new MyTreeNode{TDataType{"group3Child"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
-    auto p4 = p->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
+    auto p = FavTreeNode::NewTreeNodeRoot();
+    auto p0 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
+    auto p2 = p->appendRow(new FavTreeNode{TFavDataType{"group2Child"}});
+    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new FavTreeNode{TFavDataType{"group3Child"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child1"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child2"}});
+    auto p4 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup1", "path/to/nonGroup1"}});
     QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
     const QByteArray elements{model.toByteArray()};
@@ -332,17 +332,17 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void moveParentIndexesTo_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
-    auto p = MyTreeNode::NewTreeNodeRoot();
-    auto p0 = p->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
-    auto p1 = p->appendRow(new MyTreeNode{TDataType{"group0Child"}});
-    auto p2 = p->appendRow(new MyTreeNode{TDataType{"group2Child"}});
-    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
-    /*     */ p2->appendRow(new MyTreeNode{TDataType{"group2Child/group_1"}});
-    auto p3 = p->appendRow(new MyTreeNode{TDataType{"group3Child"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child0", "path/to/group3Child/child0"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child1"}});
-    /*     */ p3->appendRow(new MyTreeNode{TDataType{"group3Child/child2"}});
-    auto p4 = p->appendRow(new MyTreeNode{TDataType{"nonGroup1", "path/to/nonGroup1"}});
+    auto p = FavTreeNode::NewTreeNodeRoot();
+    auto p0 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
+    auto p2 = p->appendRow(new FavTreeNode{TFavDataType{"group2Child"}});
+    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new FavTreeNode{TFavDataType{"group3Child"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child1"}});
+    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child2"}});
+    auto p4 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup1", "path/to/nonGroup1"}});
 
     QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
@@ -387,9 +387,9 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QModelIndex r3_0 = model.index(0, 0, r3);
       QModelIndex r3_2 = model.index(2, 0, r3);
 
-      MyTreeNode* r0ParentAddress{model.invisibleRootItem()};
-      MyTreeNode* r2ParentAddress{model.invisibleRootItem()};
-      MyTreeNode* r3ParentAddress{model.itemFromIndex(r3)};
+      FavTreeNode* r0ParentAddress{model.invisibleRootItem()};
+      FavTreeNode* r2ParentAddress{model.invisibleRootItem()};
+      FavTreeNode* r3ParentAddress{model.itemFromIndex(r3)};
       QCOMPARE(r0ParentAddress, r2ParentAddress);
 
       // r0, r1, r2, r2_0, r2_1, r3, r3_0, r3_2
@@ -403,7 +403,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
       const QModelIndex newR1Index{model.index(0, 0, {})};
       QCOMPARE(model.itemFromIndex(newR1Index)->val.name, "group0Child");
-      const MyTreeNode* newR1Item{model.itemFromIndex(newR1Index)};
+      const FavTreeNode* newR1Item{model.itemFromIndex(newR1Index)};
       QVERIFY(newR1Item != nullptr);
       QCOMPARE(newR1Item->rowCount(), 4);
 
@@ -420,13 +420,13 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       }
 
       const QModelIndex newR3Index{model.index(1, 0, {})};
-      const MyTreeNode* newR3Item{model.itemFromIndex(newR3Index)};
+      const FavTreeNode* newR3Item{model.itemFromIndex(newR3Index)};
       QVERIFY(newR3Item != nullptr);
       QCOMPARE(newR3Item->val.name, "group3Child");
       QCOMPARE(newR3Item->rowCount(), 1);
 
       const QModelIndex newR3_1Index{model.index(0, 0, newR3Index)};
-      const MyTreeNode* newR3_1Item{model.itemFromIndex(newR3_1Index)};
+      const FavTreeNode* newR3_1Item{model.itemFromIndex(newR3_1Index)};
       QVERIFY(newR3_1Item != nullptr);
       QCOMPARE(newR3_1Item->val.name, "group3Child/child1");
 
@@ -435,9 +435,9 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void onRenameGroupName_ok() {
-    auto r0 = MyTreeNode::NewTreeNodeRoot();
-    r0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});
-    r0->appendRow(new MyTreeNode{TDataType{"group0Child"}});
+    auto r0 = FavTreeNode::NewTreeNodeRoot();
+    r0->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
+    r0->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r0)), true);
@@ -455,11 +455,11 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   }
 
   void drag_drop_internal_ok() {
-    auto r0 = MyTreeNode::NewTreeNodeRoot();
-    auto r00 = r0->appendRow(new MyTreeNode{TDataType{"nonGroup0", "path/to/nonGroup0"}});  // non-group
-    auto r01 = r0->appendRow(new MyTreeNode{TDataType{"groupChild1"}});                     // group
-    auto r010 = r01->appendRow(new MyTreeNode{TDataType{"groupChild1_group0"}});
-    auto r011 = r01->appendRow(new MyTreeNode{TDataType{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"}});
+    auto r0 = FavTreeNode::NewTreeNodeRoot();
+    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});  // non-group
+    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"groupChild1"}});                     // group
+    auto r010 = r01->appendRow(new FavTreeNode{TFavDataType{"groupChild1_group0"}});
+    auto r011 = r01->appendRow(new FavTreeNode{TFavDataType{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeViewInternalDragDrop", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r0)), true);
@@ -589,8 +589,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       // sort:
       // if address(r0 parent) < address(r10 parent): [r0, r11, r10] => r1 (r0, r11, r10)
       // else: [r11, r10, r0] => r1 (r11, r10, r0)
-      const MyTreeNode* r0ParentAddress = model.invisibleRootItem();
-      const MyTreeNode* r10ParentAddress = model.itemFromIndex(childGroup1Index);
+      const FavTreeNode* r0ParentAddress = model.invisibleRootItem();
+      const FavTreeNode* r10ParentAddress = model.itemFromIndex(childGroup1Index);
       QCOMPARE(nonGroup0Index.data().toString(), "nonGroup0");
       QCOMPARE(childGroup1Index.data().toString(), "groupChild1");
       QCOMPARE(model.rowCount(), 2);

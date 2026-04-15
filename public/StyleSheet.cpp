@@ -2,6 +2,7 @@
 #include "PreferenceActions.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "StyleEnum.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLayout>
@@ -50,27 +51,8 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
 #endif
 
 const QFont& CODE_EDITOR_FONT() {
-  static QFont UNIVERSAL_MONOSPACE_FONT{"Consolas", 15};
+  static QFont UNIVERSAL_MONOSPACE_FONT{Style::DEFAULT_FONT_FAMILY_CODE, 15};
   return UNIVERSAL_MONOSPACE_FONT;
-}
-
-QFont ReadFontFamilyAndSize() {
-  const QString fontFamily = Configuration().value(FontKey::FAMILY.name, FontKey::FAMILY.v).toString();
-  const int fontSize = Configuration().value(FontKey::POINT.name, FontKey::POINT.v).toInt();
-  return QFont(fontFamily, fontSize);
-}
-
-void InitFontFamilyAndSize(QWidget* pWid) {
-  if (pWid == nullptr) {
-    return;
-  }
-  QFont font = ReadFontFamilyAndSize();
-  pWid->setFont(font);
-}
-
-void SaveFontFamilyAndSize(QFont font) {
-  Configuration().setValue(FontKey::FAMILY.name, font.family());
-  Configuration().setValue(FontKey::POINT.name, font.pointSize());
 }
 
 QIcon GetSystemDirOpenIcon() {

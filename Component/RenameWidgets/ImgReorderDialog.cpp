@@ -24,7 +24,6 @@ ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
     pOkBtn->setShortcut(Qt::Key_F10);
     pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Finish numerize")  //
                            .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-    pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
   }
 
   connect(m_buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);

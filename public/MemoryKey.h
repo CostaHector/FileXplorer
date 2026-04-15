@@ -36,11 +36,6 @@ struct MemoryKey {
   static const KV ROW_HEIGHT;
 };
 
-struct FontKey {
-  static const KV FAMILY;
-  static const KV POINT;
-};
-
 struct PathKey {
   static const KV STARTUP_PATH;
   static const KV LAST_TIME_COPY_TO;

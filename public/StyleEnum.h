@@ -16,6 +16,21 @@ enum class StyleSheetE : int {
   BUTT,
 };
 constexpr StyleSheetE DEFAULT_STYLE_SHEET = StyleSheetE::STYLESHEET_LIGHT;
+
+constexpr const char* DEFAULT_FONT_FAMILY {
+#ifdef _WIN32
+    "Microsoft YaHei",
+#else
+    "Noto Sans",
+#endif
+};
+constexpr const char* DEFAULT_FONT_FAMILY_CODE {
+#ifdef _WIN32
+    "Consolas",
+#else
+    "Monospace",
+#endif
+};
 }
 
 #endif // STYLEENUM_H

@@ -28,6 +28,12 @@ MenuInHeader::MenuInHeader(const QString& proName, Qt::Orientation ori, QWidget*
       m_stretchLastSectionKey{GetName() + "/STRETCH_LAST_SECTION"},
       m_resizeModeKey{GetName() + "/RESIZE_MODE"},
       m_headerStateKey{GetName() + "/HEADER_GEOMETRY"} {
+  if (ori == Qt::Orientation::Horizontal) {
+    setObjectName("Horizontal");
+  } else {
+    setObjectName("Vertical");
+  }
+
   m_menu = new (std::nothrow) QMenu{m_name + " Header Menu", this};
   CHECK_NULLPTR_RETURN_VOID(m_menu);
   m_menu->setToolTipsVisible(true);

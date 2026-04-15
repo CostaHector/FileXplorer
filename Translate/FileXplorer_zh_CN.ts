@@ -217,7 +217,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+34"/>
+        <location filename="../View/CustomListView.cpp" line="+31"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -255,7 +255,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.cpp" line="+43"/>
+        <location filename="../View/CustomTableView.cpp" line="+40"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -313,7 +313,27 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../View/CustomTreeView.cpp" line="+40"/>
+        <location filename="../View/CustomTreeView.cpp" line="+39"/>
+        <source>Expand All</source>
+        <translation>展开所有节点</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Collapse All</source>
+        <translation>收起所有节点</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Enable Animation</source>
+        <translation>允许动画</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Root Decoration</source>
+        <translation>根节点装饰</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Show All Columns</source>
         <translation>显示所有列</translation>
     </message>
@@ -405,7 +425,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+305"/>
+        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+275"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -419,26 +439,6 @@
     <name>FavoritesTreeView</name>
     <message>
         <location filename="../Component/Navigation/FavoritesTreeView.cpp" line="+32"/>
-        <source>Expand All</source>
-        <translation>展开所有项</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Collapse All</source>
-        <translation>收拢所有项</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Enable Animation</source>
-        <translation>允许动画</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Root Decoration</source>
-        <translation>根节点装饰</translation>
-    </message>
-    <message>
-        <location line="+10"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -913,17 +913,17 @@
         <translation>帧图组</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>show list</source>
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="-3"/>
         <source>open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>current item once</source>
         <translation>单播</translation>
     </message>
@@ -1257,7 +1257,7 @@
 <context>
     <name>MenuInHeader</name>
     <message>
-        <location filename="../Component/HeaderView/MenuInHeader.cpp" line="+36"/>
+        <location filename="../Component/HeaderView/MenuInHeader.cpp" line="+42"/>
         <source>Set default section size</source>
         <translation>设置默认尺寸</translation>
     </message>
@@ -1489,7 +1489,12 @@
         <translation>深色主题</translation>
     </message>
     <message>
-        <location line="+84"/>
+        <location line="+12"/>
+        <source>Stylesheet</source>
+        <translation>样式配置</translation>
+    </message>
+    <message>
+        <location line="+52"/>
         <source>App UI Style</source>
         <translation>应用风格</translation>
     </message>
@@ -2044,6 +2049,29 @@
         <location line="+4"/>
         <source>Always On</source>
         <translation>总是显示</translation>
+    </message>
+</context>
+<context>
+    <name>StyleSheetTreeView</name>
+    <message>
+        <location filename="../bin/Stylesheet/StyleSheetTreeView.cpp" line="+21"/>
+        <source>Clear Modified Values</source>
+        <translation>清除修改后的值</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore from Backup</source>
+        <translation>恢复修改后的值</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Apply Changes</source>
+        <translation>应用修改后的值</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Instant Apply</source>
+        <translation>修改立即生效</translation>
     </message>
 </context>
 <context>

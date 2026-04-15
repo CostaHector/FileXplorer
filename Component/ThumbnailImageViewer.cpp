@@ -377,8 +377,8 @@ void ThumbnailImageViewer::keyPressEvent(QKeyEvent* event) {
     static constexpr int pixel = 30;  // each up/down/left/right key pixels count
     const int delta{event->key() == Qt::Key_Left || event->key() == Qt::Key_Up ? -pixel : pixel};
     // clamp
-    const int newValue{qMax(scrollBar->minimum(), qMin(scrollBar->value() + delta, scrollBar->maximum()))};
-    scrollBar->setValue(newValue);
+    const int modifiedToValue{qMax(scrollBar->minimum(), qMin(scrollBar->value() + delta, scrollBar->maximum()))};
+    scrollBar->setValue(modifiedToValue);
     event->accept();
     return;
   }

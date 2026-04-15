@@ -38,11 +38,6 @@ class FavoritesTreeView : public CustomTreeView {
   FavoritesTreeModel* mFavModel{nullptr};
   RecursiveFilterProxyTreeModel* mFavProxyModel{nullptr};
 
-  QAction *mExpandAll{nullptr}, *mCollapseAll{nullptr};
-
-  QAction* mAnimatedEnableAct{nullptr};
-  QAction* mRootDecorationEnabled{nullptr};
-
   QAction* mSortByName{nullptr};
   QAction* mSortByIsGroup{nullptr};
   QAction* mSortByFullPathRole{nullptr};

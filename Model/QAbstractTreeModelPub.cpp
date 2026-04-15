@@ -1,70 +1,22 @@
 #include "QAbstractTreeModelPub.h"
+#include "FavoriteItemData.h"
+#include "StyleItemData.h"
+
 #include "Logger.h"
 #include <QSet>
 
-bool MyTreeNode::operator==(const MyTreeNode& rhs) const {
-  if (val != rhs.val) {
-    return false;
-  }
-  if (childsCount() != rhs.childsCount()) {
-    return false;
-  }
-  for (int i = 0; i < childsCount(); ++i) {
-    const MyTreeNode* leftChild = child(i);
-    const MyTreeNode* rightChild = rhs.child(i);
-    if (leftChild == nullptr && rightChild == nullptr) {
-      continue;
-    }
-    if (leftChild != nullptr && rightChild != nullptr) {
-      if (*leftChild != *rightChild) {
-        return false;
-      }
-      continue;
-    }
-    return false;
-  }
-  return true;
-}
-
-QDataStream& operator<<(QDataStream& out, const MyTreeNode& item) {
-  out << item.val;
-  int n = item.childsCount();
-  out << n;
-  for (MyTreeNode* pChild : item.childs) {
-    out << *pChild;
-  }
-  return out;
-}
-
-QDataStream& operator>>(QDataStream& in, MyTreeNode& item) {
-  item.releaseAndClearChilds();
-
-  in >> item.val;
-
-  int n{0};
-  in >> n;
-
-  item.childs.reserve(n);
-  for (int i = 0; i < n; ++i) {
-    MyTreeNode* node = new MyTreeNode;
-    in >> *node;
-    node->pParent = &item;
-    item.childs.push_back(node);
-  }
-  return in;
-}
-
 // newDatas必须是new 出来的
-bool QAbstractTreeModelPub::setDatas(std::unique_ptr<MyTreeNode> newDatas) {
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::setDatas(std::unique_ptr<TDataType> newDatas) {
   beginResetModel();
   m_pRoot.swap(newDatas);
   endResetModel();
   m_bIsDirty = true;
   return true;
 }
-
-bool QAbstractTreeModelPub::setDatas(const QByteArray& dataByteArray) {
-  std::unique_ptr<MyTreeNode> rootNodeFromByteArray{new MyTreeNode};
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::setDatas(const QByteArray& dataByteArray) {
+  std::unique_ptr<TDataType> rootNodeFromByteArray{TDataType::NewTreeNodeRoot()};
   if (!dataByteArray.isEmpty()) {
     QDataStream readDs{dataByteArray};
     readDs.setVersion(QDataStream::Qt_5_15);
@@ -80,81 +32,99 @@ bool QAbstractTreeModelPub::setDatas(const QByteArray& dataByteArray) {
   }
   return setDatas(std::move(rootNodeFromByteArray));
 }
-
-QModelIndex QAbstractTreeModelPub::index(int row, int column, const QModelIndex& parent) const {
+template<typename TDataType>
+QModelIndex QAbstractTreeModelPub<TDataType>::index(int row, int column, const QModelIndex& parent) const {
   if (!hasIndex(row, column, parent)) {
     return {};
   }
-  MyTreeNode* parentNode = itemFromIndex(parent);
+  TDataType* parentNode = itemFromIndex(parent);
   if (!parentNode) {
     return {};
   }
-  if (MyTreeNode* childNode = parentNode->child(row)) {
+  if (TDataType* childNode = parentNode->child(row)) {
     return createIndex(row, column, childNode);
   }
   return {};
 }
-
-QModelIndex QAbstractTreeModelPub::parent(const QModelIndex& child) const {
+template<typename TDataType>
+QModelIndex QAbstractTreeModelPub<TDataType>::siblingAtColumn(const QModelIndex &childIndex, int siblingColumn) const {
+  if (!childIndex.isValid()) {
+    return {};
+  }
+  if (siblingColumn == childIndex.column()) {
+    return childIndex;
+  }
+  if (siblingColumn < 0 || siblingColumn >= columnCount(childIndex.parent())) {
+    return {};
+  }
+  TDataType* currentNode = static_cast<TDataType*>(childIndex.internalPointer());
+  if (!currentNode) {
+    return {};
+  }
+  return createIndex(childIndex.row(), siblingColumn, currentNode);
+}
+template<typename TDataType>
+QModelIndex QAbstractTreeModelPub<TDataType>::parent(const QModelIndex& child) const {
   if (!child.isValid()) {
     return {};
   }
 
-  MyTreeNode* childNode = static_cast<MyTreeNode*>(child.internalPointer());
+  TDataType* childNode = static_cast<TDataType*>(child.internalPointer());
   if (!childNode) {
     return {};
   }
 
-  MyTreeNode* parentNode = childNode->parent();
+  TDataType* parentNode = childNode->parent();
   if (!parentNode || parentNode == invisibleRootItem()) {
     return {};
   }
 
   return createIndex(parentNode->row(), 0, parentNode);
 }
-
-int QAbstractTreeModelPub::rowCount(const QModelIndex& parent) const {
-  if (MyTreeNode* parentNode = itemFromIndex(parent)) {
+template<typename TDataType>
+int QAbstractTreeModelPub<TDataType>::rowCount(const QModelIndex& parent) const {
+  if (TDataType* parentNode = itemFromIndex(parent)) {
     return parentNode->childsCount();
   }
   return 0;
 }
-
-QVariant QAbstractTreeModelPub::headerData(int section, Qt::Orientation orientation, int role) const {
+template<typename TDataType>
+QVariant QAbstractTreeModelPub<TDataType>::headerData(int section, Qt::Orientation orientation, int role) const {
   if (role == Qt::DisplayRole && orientation == Qt::Orientation::Horizontal) {
-    if (0 <= section && section < FavoriteItemData::COLUMN_COUNT) {
-      return FavoriteItemData::HOR_HEADER_TITLES[section];
+    if (0 <= section && section < columnCount()) {
+      static const auto& headers = TDataType::horizontalHeaderTitles();
+      return headers[section];
     }
   }
   return QAbstractItemModel::headerData(section, orientation, role);
 }
-
-MyTreeNode* QAbstractTreeModelPub::invisibleRootItem() const {
+template<typename TDataType>
+TDataType* QAbstractTreeModelPub<TDataType>::invisibleRootItem() const {
   return m_pRoot ? m_pRoot.get() : nullptr;
 }
-
-MyTreeNode* QAbstractTreeModelPub::itemFromIndex(const QModelIndex& index) const {
+template<typename TDataType>
+TDataType* QAbstractTreeModelPub<TDataType>::itemFromIndex(const QModelIndex& index) const {
   if (!index.isValid()) {
     return invisibleRootItem();
   }
-  return static_cast<MyTreeNode*>(index.internalPointer());
+  return static_cast<TDataType*>(index.internalPointer());
 }
-
-QModelIndex QAbstractTreeModelPub::indexFromItem(const MyTreeNode* item) const {
+template<typename TDataType>
+QModelIndex QAbstractTreeModelPub<TDataType>::indexFromItem(const TDataType* item) const {
   if (!item || item == invisibleRootItem() || !item->parent()) {
     return {};
   }
 
   int row = item->row();
   if (row >= 0) {
-    return createIndex(row, 0, const_cast<MyTreeNode*>(item));
+    return createIndex(row, 0, const_cast<TDataType*>(item));
   }
 
   return {};
 }
-
-QByteArray QAbstractTreeModelPub::toByteArray() const {
-  const MyTreeNode* pRoot = invisibleRootItem();
+template<typename TDataType>
+QByteArray QAbstractTreeModelPub<TDataType>::toByteArray() const {
+  const TDataType* pRoot = invisibleRootItem();
   if (!pRoot) {
     return {};
   }
@@ -168,35 +138,35 @@ QByteArray QAbstractTreeModelPub::toByteArray() const {
   }
   return data;
 }
-
-bool QAbstractTreeModelPub::isGroup(const QModelIndex& parentIndex) const {
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::isGroup(const QModelIndex& parentIndex) const {
   if (isRoot(parentIndex)) {
     return false;
   }
-  MyTreeNode* item = itemFromIndex(parentIndex);
+  TDataType* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return false;  // failed
   }
   return item->isGroup();
 }
-
-QString QAbstractTreeModelPub::groupName(const QModelIndex& parentIndex) const {
-  MyTreeNode* item = itemFromIndex(parentIndex);
+template<typename TDataType>
+QString QAbstractTreeModelPub<TDataType>::groupName(const QModelIndex& parentIndex) const {
+  TDataType* item = itemFromIndex(parentIndex);
   if (item == nullptr) {
     return "";  // failed
   }
   return item->name();
 }
-
-bool QAbstractTreeModelPub::onRename(const QModelIndex& parentIndex, const QString& newName) {
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::onRename(const QModelIndex& parentIndex, const QString& newName) {
   if (!setData(parentIndex, newName)) {
     return false;
   }
   setDirty();
   return true;
 }
-
-bool QAbstractTreeModelPub::isIndexValidAndDescendantOfValidAncestor(const QModelIndex& descendant, const QModelIndex& father) {
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::isIndexValidAndDescendantOfValidAncestor(const QModelIndex& descendant, const QModelIndex& father) {
   if (!descendant.isValid() || !father.isValid()) {
     return false;
   }
@@ -210,8 +180,8 @@ bool QAbstractTreeModelPub::isIndexValidAndDescendantOfValidAncestor(const QMode
   }
   return false;
 }
-
-MyTreeNode* QAbstractTreeModelPub::canDropIntoIndex(const QModelIndex& destParentIndex) const {
+template<typename TDataType>
+TDataType* QAbstractTreeModelPub<TDataType>::canDropIntoIndex(const QModelIndex& destParentIndex) const {
   if (!destParentIndex.isValid()) {
     return invisibleRootItem();
   }
@@ -223,10 +193,42 @@ MyTreeNode* QAbstractTreeModelPub::canDropIntoIndex(const QModelIndex& destParen
   return itemFromIndex(destParentIndex);
 }
 
+template<typename TDataType>
+TDataType* QAbstractTreeModelPub<TDataType>::addGroup(const QString& grpName, const QModelIndex& parentIndex) {
+  TDataType* parentItem = nullptr;
+  if (parentIndex.isValid()) {
+    parentItem = itemFromIndex(parentIndex);
+    if (parentItem == nullptr) {
+      LOG_W("Cannot get parent item from index");
+      return nullptr;
+    }
+  }
+  return addGroup(grpName, parentItem);
+}
+template<typename TDataType>
+TDataType* QAbstractTreeModelPub<TDataType>::addGroup(const QString& grpName, TDataType* parentItem) {
+  if (parentItem) {
+    if (!parentItem->value().isGroup) {
+      LOG_D("Cannot insert under non-group item");
+      return nullptr;
+    }
+  } else {
+    parentItem = invisibleRootItem();
+  }
+
+  QModelIndex parentIndex = indexFromItem(parentItem);
+  beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
+  auto childNode = parentItem->appendRow(TDataType::create(typename TDataType::DataType{grpName}));
+  endInsertRows();
+  setDirty();
+  return childNode;
+}
+
 // 检查节点是否有祖先在集合中
-bool hasAncestorInSet(const MyTreeNode* node, const QSet<MyTreeNode*>& ancestorSet) {
+template<typename TDataType>
+bool QAbstractTreeModelPub<TDataType>::hasAncestorInSet(const TDataType* node, const QSet<TDataType*>& ancestorSet) {
   // 若 ancestorSet 中包含了根, 将跳过所有移动/删除操作, 避免错删整个树
-  for (MyTreeNode* ancestor = node->parent(); ancestor != nullptr; ancestor = ancestor->parent()) {
+  for (TDataType* ancestor = node->parent(); ancestor != nullptr; ancestor = ancestor->parent()) {
     if (ancestorSet.contains(ancestor)) {
       return true;
     }
@@ -235,9 +237,10 @@ bool hasAncestorInSet(const MyTreeNode* node, const QSet<MyTreeNode*>& ancestorS
 }
 
 // 过滤不包含祖先的节点
-QList<MyTreeNode*> filterWithoutAncestor(const QList<MyTreeNode*>& items, const QSet<MyTreeNode*>& ancestorSet) {
-  QList<MyTreeNode*> result;
-  for (MyTreeNode* item : items) {
+template<typename TDataType>
+QList<TDataType*> QAbstractTreeModelPub<TDataType>::filterWithoutAncestor(const QList<TDataType*>& items, const QSet<TDataType*>& ancestorSet) {
+  QList<TDataType*> result;
+  for (TDataType* item : items) {
     if (!hasAncestorInSet(item, ancestorSet)) {
       result.append(item);
     }
@@ -246,21 +249,22 @@ QList<MyTreeNode*> filterWithoutAncestor(const QList<MyTreeNode*>& items, const 
 }
 
 // 去除冗余, 先按照父索引排序, 在按照行号降序列
-QList<MyTreeNode*> QAbstractTreeModelPub::GetItemsNeedProcess(const QModelIndexList& parentIndexes, MyTreeNode* destItem) const {
+template<typename TDataType>
+QList<TDataType*> QAbstractTreeModelPub<TDataType>::GetItemsNeedProcess(const QModelIndexList& parentIndexes, TDataType* destItem) const {
   const bool bMoveMode{destItem != nullptr};
-  const MyTreeNode* rootItem = invisibleRootItem();
-  QList<MyTreeNode*> allItems;
+  const TDataType* rootItem = invisibleRootItem();
+  QList<TDataType*> allItems;
   {
     // 收集要移动的项，去重
-    QSet<MyTreeNode*> uniqueItems;
+    QSet<TDataType*> uniqueItems;
 
-    QList<MyTreeNode*> itemsToDelete;
-    QSet<MyTreeNode*> groupsToDelete;
+    QList<TDataType*> itemsToDelete;
+    QSet<TDataType*> groupsToDelete;
     for (const QModelIndex& idx : parentIndexes) {
       if (!idx.isValid()) {
         continue;
       }
-      MyTreeNode* item = itemFromIndex(idx);
+      TDataType* item = itemFromIndex(idx);
       if (item == nullptr || item == rootItem || uniqueItems.contains(item)) {
         continue;
       }
@@ -287,19 +291,19 @@ QList<MyTreeNode*> QAbstractTreeModelPub::GetItemsNeedProcess(const QModelIndexL
     // 非分组在要移动/删除的分组中时, 不需要单独移动/删除它, 避免重复移动/删除
     allItems += filterWithoutAncestor(itemsToDelete, groupsToDelete);
     // 分组在要移动/删除的分组中时, 不需要单独移动/删除它, 避免重复移动/删除
-    allItems += filterWithoutAncestor(QList<MyTreeNode*>{groupsToDelete.begin(), groupsToDelete.end()}, groupsToDelete);
+    allItems += filterWithoutAncestor(QList<TDataType*>{groupsToDelete.begin(), groupsToDelete.end()}, groupsToDelete);
   }
   if (allItems.isEmpty()) {
     return {};
   }
 
   // 按父项和行号排序, 让相同父项的项在一起, 按行号从大到小排序
-  std::sort(allItems.begin(), allItems.end(), [rootItem](MyTreeNode* a, MyTreeNode* b) {
-    const MyTreeNode* parentA = a->parent();
+  std::sort(allItems.begin(), allItems.end(), [rootItem](TDataType* a, TDataType* b) {
+    const TDataType* parentA = a->parent();
     if (parentA == nullptr) {
       parentA = rootItem;
     }
-    const MyTreeNode* parentB = b->parent();
+    const TDataType* parentB = b->parent();
     if (parentB == nullptr) {
       parentB = rootItem;
     }
@@ -308,26 +312,26 @@ QList<MyTreeNode*> QAbstractTreeModelPub::GetItemsNeedProcess(const QModelIndexL
 
   return allItems;
 }
-
-int QAbstractTreeModelPub::moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& destInd) {
+template<typename TDataType>
+int QAbstractTreeModelPub<TDataType>::moveParentIndexesTo(const QModelIndexList& parentIndexes, const QModelIndex& destInd) {
   if (parentIndexes.isEmpty()) {
     return 0;
   }
-  MyTreeNode* destNode = canDropIntoIndex(destInd);
+  TDataType* destNode = canDropIntoIndex(destInd);
   if (destNode == nullptr) {
     return -1;
   }
 
-  QList<MyTreeNode*> allItems = GetItemsNeedProcess(parentIndexes, destNode);
+  QList<TDataType*> allItems = GetItemsNeedProcess(parentIndexes, destNode);
   if (allItems.isEmpty()) {
     return -1;
   }
 
   // 开始移动
   int succeedCnt{0};
-  MyTreeNode* notConstRootItem = invisibleRootItem();
-  for (MyTreeNode* item : allItems) {
-    MyTreeNode* srcNode = item->parent();
+  TDataType* notConstRootItem = invisibleRootItem();
+  for (TDataType* item : allItems) {
+    TDataType* srcNode = item->parent();
     if (srcNode == nullptr) {
       srcNode = notConstRootItem;
     }
@@ -350,7 +354,7 @@ int QAbstractTreeModelPub::moveParentIndexesTo(const QModelIndexList& parentInde
       // 原生beginMoveRows不允许任何有父子关系的移动, 否则false;
       // 原生beginMoveRows 在同父间移动时不允许destRow在[rowFront, rowBack+1]区间内(无需多余移动), 否则false
       if (beginMoveRows(srcInd, row, row, destInd, destRow)) {
-        MyTreeNode* pNode = srcNode->takeRow(row);
+        TDataType* pNode = srcNode->takeRow(row);
         destNode->appendRow(pNode);
         endMoveRows();
       } else {
@@ -358,7 +362,7 @@ int QAbstractTreeModelPub::moveParentIndexesTo(const QModelIndexList& parentInde
         /* or do remove and append seperately
          {
           beginRemoveRows(srcInd, row, row);
-          MyTreeNode* pNode = srcNode->takeRow(row);
+          TDataType* pNode = srcNode->takeRow(row);
           endRemoveRows();
           beginInsertRows(destInd, destRowCount, destRowCount);
           destNode->appendRow(pNode);
@@ -373,22 +377,22 @@ int QAbstractTreeModelPub::moveParentIndexesTo(const QModelIndexList& parentInde
   setDirty();
   return succeedCnt;
 }
-
-int QAbstractTreeModelPub::removeParentIndexes(const QModelIndexList& parentIndexes) {
+template<typename TDataType>
+int QAbstractTreeModelPub<TDataType>::removeParentIndexes(const QModelIndexList& parentIndexes) {
   if (parentIndexes.isEmpty()) {
     return 0;
   }
 
-  QList<MyTreeNode*> allItems = GetItemsNeedProcess(parentIndexes, nullptr);
+  QList<TDataType*> allItems = GetItemsNeedProcess(parentIndexes, nullptr);
   if (allItems.isEmpty()) {
     return -1;
   }
 
-  MyTreeNode* notConstRootItem = invisibleRootItem();
+  TDataType* notConstRootItem = invisibleRootItem();
 
   int succeedCnt{0};
-  for (MyTreeNode* item : allItems) {
-    MyTreeNode* parent = item->parent();
+  for (TDataType* item : allItems) {
+    TDataType* parent = item->parent();
     if (parent == nullptr) {
       parent = notConstRootItem;
     }
@@ -406,3 +410,6 @@ int QAbstractTreeModelPub::removeParentIndexes(const QModelIndexList& parentInde
   LOG_D("Removed %d items successfully", succeedCnt);
   return succeedCnt;
 }
+
+template class QAbstractTreeModelPub<FavTreeNode>;
+template class QAbstractTreeModelPub<StyleTreeNode>;

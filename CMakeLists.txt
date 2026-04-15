@@ -27,6 +27,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Char
 
 file(GLOB SOURCES
     Actions/*.cpp
+    bin/Stylesheet/*.cpp
     Events/*.cpp
     Model/*.cpp
     View/*.cpp
@@ -60,6 +61,7 @@ endforeach()
 
 set(SRV_HEADER_PATH
     Actions
+    bin/Stylesheet
     Events
     Model
     View
@@ -88,6 +90,7 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     Actions/*.h
+    bin/Stylesheet/*.h
     Events/*.h
     Model/*.h
     View/*.h
@@ -121,8 +124,6 @@ endforeach()
 
 set(RESOURCES
     "bin/themes/res.qrc"
-    "bin/themes/styles/dark/darkstyle.qrc"
-    "bin/themes/styles/default/defaultstyle.qrc"
 )
 
 file(GLOB TS_FILES

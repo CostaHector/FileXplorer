@@ -70,7 +70,6 @@ void QuickWhereClauseDialog::Init() {
   pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply where clause right now.") //
                          .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 
   m_Layout = new (std::nothrow) QFormLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_Layout);

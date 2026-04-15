@@ -4,6 +4,7 @@
 #include "StyleSheet.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "StyleSheetGetter.h"
 #include <QApplication>
 #include <QFile>
 #include <QIODevice>
@@ -40,8 +41,7 @@ PreferenceActions::PreferenceActions(QObject* parent) //
                        StyleE::STYLE_WINDOWS_VISTA,
                        QActionGroup::ExclusionPolicy::Exclusive);
   int styleInt = Configuration().value("STYLE_NAME", (int) mStyleIntAction.defVal()).toInt();
-  auto* checkedStyleAct = mStyleIntAction.setCheckedIfActionExist(styleInt);
-  onSetAppStyle(checkedStyleAct);
+  mStyleIntAction.setCheckedIfActionExist(styleInt);
 
   STYLESHEET_NONE = new (std::nothrow) QAction{QIcon(":/styles/STYLESHEET_NONE"), tr("None"), this};
   STYLESHEET_NONE->setCheckable(true);
@@ -61,8 +61,11 @@ PreferenceActions::PreferenceActions(QObject* parent) //
                             Style::DEFAULT_STYLE_SHEET,
                             QActionGroup::ExclusionPolicy::Exclusive);
   const int stylesheetInt = Configuration().value("STYLESHEET_NAME", (int) Style::DEFAULT_STYLE_SHEET).toInt();
-  auto* checkedStyleSheetAct = mStyleSheetIntAction.setCheckedIfActionExist(stylesheetInt);
-  onSetStylesheet(checkedStyleSheetAct);
+  mStyleSheetIntAction.setCheckedIfActionExist(stylesheetInt);
+
+  STYLESHEET_MGR = new (std::nothrow) QAction{tr("Stylesheet"), this};
+  STYLESHEET_MGR->setCheckable(true);
+  STYLESHEET_MGR->setChecked(false);
 
   subscribe();
 }
@@ -72,57 +75,34 @@ PreferenceActions::~PreferenceActions() {
   Configuration().setValue("STYLESHEET_NAME", (int) CurStyleSheet());
 }
 
-bool PreferenceActions::onSetAppStyle(const QAction* pStyleAct) {
+void PreferenceActions::initAppStyle() const {
+  if (auto* checkedStyleAct = mStyleIntAction.getActionGroup()->checkedAction()) {
+    const QString& styleName{checkedStyleAct->text().toLower()};
+    qApp->setStyle(styleName);
+  }
+}
+
+void PreferenceActions::initStyleSheet(bool bThemeChanged) const {
+  const Style::StyleSheetE stylesheetEnum{CurStyleSheet()};
+  if (bThemeChanged) {
+    StyleSheet::setGlobalDarkMode(stylesheetEnum == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
+  }
+  const QString qssContents = StyleSheetGetter::GetInst()(stylesheetEnum);
+  qApp->setStyleSheet(qssContents);
+}
+
+bool PreferenceActions::onAppStyleChanged(const QAction* pStyleAct) const {
   CHECK_NULLPTR_RETURN_FALSE(pStyleAct);
-  const QString& styleName = pStyleAct->text().toLower();
-  qApp->setStyle(styleName);
-  LOG_D("setStyle to %s", qPrintable(styleName));
+  const QString& styleName{pStyleAct->text().toLower()};
+  LOG_D("setStyle[%s]", qPrintable(styleName));
+  initAppStyle();
   return true;
 }
 
-const QString& GetQssFileContents(const Style::StyleSheetE stylesheetEnum) {
-  using namespace Style;
-  static QString theme2QssContent[(int) StyleSheetE::BUTT]{};
-  if (!theme2QssContent[(int) stylesheetEnum].isEmpty()) {
-    return theme2QssContent[(int) stylesheetEnum];
-  }
-
-  static const QString EMPTY_QSS_CONTENTS;
-  QString qssFileName;
-  switch (stylesheetEnum) {
-    case StyleSheetE::STYLESHEET_LIGHT:
-      qssFileName = ":stylesheet/default.qss";
-      break;
-    case StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
-      qssFileName = ":stylesheet/dark.qss";
-      break;
-    case StyleSheetE::STYLESHEET_DEFAULT_NONE: {
-      return EMPTY_QSS_CONTENTS;
-    }
-    default: {
-      LOG_W("invalid stylesheetEnum[%d]", (int) stylesheetEnum);
-      return EMPTY_QSS_CONTENTS;
-    }
-  }
-
-  QFile qssFile{qssFileName};
-  if (!qssFile.open(QFile::ReadOnly)) {
-    LOG_ERR_NP("Unable to set stylesheet, file[%s] not found", qPrintable(qssFile.fileName()));
-    return EMPTY_QSS_CONTENTS;
-  }
-  theme2QssContent[(int) stylesheetEnum] = QString::fromUtf8(qssFile.readAll());
-  qssFile.close();
-  return theme2QssContent[(int) stylesheetEnum];
-}
-
-bool PreferenceActions::onSetStylesheet(const QAction* pStyleSheetAct) {
+bool PreferenceActions::onStylesheetChanged(const QAction* pStyleSheetAct) const {
   CHECK_NULLPTR_RETURN_FALSE(pStyleSheetAct);
-  using namespace Style;
-  const StyleSheetE stylesheetEnum{mStyleSheetIntAction.act2Enum(pStyleSheetAct)};
-  const QString& qssContents{GetQssFileContents(stylesheetEnum)};
-  qApp->setStyleSheet(qssContents);
-  StyleSheet::setGlobalDarkMode(stylesheetEnum == StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
-  LOG_D("Style Changed to %s", qPrintable(pStyleSheetAct->text()));
+  LOG_D("StyleSheet[%s]", qPrintable(pStyleSheetAct->text()));
+  initStyleSheet(true);
   return true;
 }
 
@@ -131,7 +111,7 @@ QToolBar* PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget* parent) {
   MenuToolButton* uiStyleToolButton = new (std::nothrow) MenuToolButton(mStyleIntAction.getActionEnumAscendingList(),
                                                                         QToolButton::InstantPopup,
                                                                         Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
-                                                                        IMAGE_SIZE::TABS_ICON_IN_MENU_24,
+                                                                        IMAGE_SIZE::TABS_ICON_IN_MENU_16,
                                                                         parent);
   CHECK_NULLPTR_RETURN_NULLPTR(uiStyleToolButton);
   uiStyleToolButton->SetCaption(QIcon{":/styles/STYLE_SETTING"},
@@ -141,7 +121,7 @@ QToolBar* PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget* parent) {
   MenuToolButton* colorThemeToolButton = new (std::nothrow) MenuToolButton(mStyleSheetIntAction.getActionEnumAscendingList(),
                                                                            QToolButton::InstantPopup,
                                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,
-                                                                           IMAGE_SIZE::TABS_ICON_IN_MENU_24,
+                                                                           IMAGE_SIZE::TABS_ICON_IN_MENU_16,
                                                                            parent);
   CHECK_NULLPTR_RETURN_NULLPTR(colorThemeToolButton);
   colorThemeToolButton->SetCaption(QIcon{":/styles/STYLESHEET_SETTING"}, tr("Color Theme"), "Toggle between Light and Dark color schemes");
@@ -150,15 +130,15 @@ QToolBar* PreferenceActions::GetStyleAndStyleSheetToolbar(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(styleAndStylesheetToolbar);
   styleAndStylesheetToolbar->addWidget(uiStyleToolButton);
   styleAndStylesheetToolbar->addWidget(colorThemeToolButton);
+  styleAndStylesheetToolbar->addAction(STYLESHEET_MGR);
   styleAndStylesheetToolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   styleAndStylesheetToolbar->setOrientation(Qt::Orientation::Vertical);
-  styleAndStylesheetToolbar->setStyleSheet("QToolBar { min-width: 128px;max-width: 128px; }");
   return styleAndStylesheetToolbar;
 }
 
 void PreferenceActions::subscribe() {
-  connect(mStyleIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetAppStyle);
-  connect(mStyleSheetIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onSetStylesheet);
+  connect(mStyleIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onAppStyleChanged);
+  connect(mStyleSheetIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreferenceActions::onStylesheetChanged);
 }
 
 Style::StyleE PreferenceActions::CurStyle() const {
