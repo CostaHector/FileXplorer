@@ -21,7 +21,7 @@ class PreviewDockWidget : public QDockWidget {
   void previewTypeChanged(PreviewTypeTool::PREVIEW_TYPE_E previewType);
 
  public slots:
-  void onWindowsTitleChanged(const QString newWindowsTitle);
+  void onWindowsTitleChanged(const QString& newWindowsTitle);
   void setVisible(bool visible) override;
 
  protected:

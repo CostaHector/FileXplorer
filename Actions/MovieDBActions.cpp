@@ -94,7 +94,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(_SUM);
   _SUM->setToolTip("SELECT SUM(COLUMN) FROM TABLE WHERE 1;");
 
-  _OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("&Open with local app"), this};
+  _OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("&Open with Sys App"), this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_DB_WITH_LOCAL_APP);
   _OPEN_DB_WITH_LOCAL_APP->setToolTip(
       QString("<b>%1 (%2)</b><br/> Open *.db file in local app.<br/>DB Browser(sqlite) and set it open db by default required.")

@@ -22,8 +22,8 @@
 #include <QFileDialog>
 
 int CastDBView::QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = 100;
-void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int newValue) {
-  QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = newValue;
+void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int modifiedToValue) {
+  QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = modifiedToValue;
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)

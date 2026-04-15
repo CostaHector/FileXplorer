@@ -63,7 +63,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
 
 void FileXplorer::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  Configuration().setValue("Geometry/" CLASSNAME_2_STR(FileXplorer), saveGeometry());
+  Configuration().setValue("FileXplorer/Geometry", saveGeometry());
   Configuration().setValue(PathKey::STARTUP_PATH.name, m_fsPanel->m_fsModel->rootPath());
   m_previewFolder->saveSizeHint();
   QMainWindow::closeEvent(event);
@@ -76,7 +76,7 @@ void FileXplorer::showEvent(QShowEvent* event) {
 }
 
 QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
-  LOG_I("Program:[" PROJECT_NAME R"(] running with given args["%s"])", qPrintable(args.join(R"(",")")));
+  LOG_I(R"(Program:[FileXplorer] running with given args["%s"])", qPrintable(args.join(R"(",")")));
   // executing the program with or without command-line arguments
   const bool bIsSpecifiedPath{args.size() > 1};
   QString path{bIsSpecifiedPath ? args[1] : ""};
@@ -102,24 +102,24 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
 }
 
 void FileXplorer::RestoreWindowStateAndSetupUI() {
-  if (Configuration().contains(PROJECT_NAME "/Geometry")) {
-    restoreGeometry(Configuration().value(PROJECT_NAME "/Geometry").toByteArray());
+  if (Configuration().contains("FileXplorer/Geometry")) {
+    restoreGeometry(Configuration().value("FileXplorer/Geometry").toByteArray());
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  setWindowTitle(PROJECT_NAME);
+  setWindowTitle("FileXplorer");
   setWindowIcon(QIcon(":img/APP_ICON_PATH"));
 }
 
 void FileXplorer::InitComponentVisibility() {
   const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool()};
   if (!showNavi) {
-    m_naviSideBarDock->hide();
+    m_naviSideBarDock->setHidden(true);
   }
 
   const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool();
   if (!showFolderPreview) {
-    m_previewHtmlDock->setVisible(false);
+    m_previewHtmlDock->setHidden(true);
   }
 
   const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};
@@ -135,7 +135,7 @@ void FileXplorer::subscribe() {
 
   connect(m_previewHtmlDock, &PreviewDockWidget::previewTypeChanged, m_previewSwitcher, &FolderPreviewSwitcher::onSwitchByPreviewType);
 
-  connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
+  // connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
 }
 
 void FileXplorer::keyPressEvent(QKeyEvent* ev) {

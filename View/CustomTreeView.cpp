@@ -6,10 +6,9 @@
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "ViewItemDelegate.h"
-#include "StyleSheet.h"
-#include "FontRegistry.h"
+#include <QSortFilterProxyModel>
+
 #include "RowHeightRegistry.h"
-extern template struct FontRegistry<QWidget>;
 extern template struct RowHeightRegistry<CustomTreeView>;
 
 QSet<QString> CustomTreeView::mTreeInstSet;
@@ -35,6 +34,32 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   m_itemDelegate = new ViewItemDelegate{this};
   setItemDelegate(m_itemDelegate);
   setUniformRowHeights(true);
+
+  // Expand all
+  mExpandAll = new QAction(QIcon{":img/EXPAND_ALL"}, CustomTreeView::tr("Expand All"), this);
+  mExpandAll->setToolTip("Expand all groups to show their contents");
+
+  // Collapse all
+  mCollapseAll = new QAction(QIcon{":img/COLLAPSE_ALL"}, CustomTreeView::tr("Collapse All"), this);
+  mCollapseAll->setToolTip("Collapse all groups to hide their contents");
+
+  // Animated
+  mAnimatedEnableAct = new QAction(CustomTreeView::tr("Enable Animation"), this);
+  mAnimatedEnableAct->setToolTip("Enable or disable smooth expand/collapse animations");
+  {
+    const bool bDefAnimated{false};
+    mAnimatedEnableAct->setCheckable(true);
+    mAnimatedEnableAct->setChecked(bDefAnimated);
+    setAnimated(bDefAnimated);
+  }
+
+  mRootDecorationEnabled = new QAction(CustomTreeView::tr("Root Decoration"), this);
+  {
+    const bool bShowRootDecoration{true};
+    mRootDecorationEnabled->setCheckable(true);
+    mRootDecorationEnabled->setChecked(bShowRootDecoration);
+    setRootIsDecorated(bShowRootDecoration);
+  }
 
   // 0.
   _SHOW_ALL_HORIZONTAL_COLUMNS = new (std::nothrow) QAction(QIcon{":img/SHOW_ALL_COLUMNS"}, CustomTreeView::tr("Show All Columns"), this);
@@ -87,7 +112,6 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
 
   AddItselfAction2Menu();
   SubscribeHeaderActions();
-  FontRegistry<QWidget>::registerWidgetForFont(this, false, true);
   RowHeightRegistry<CustomTreeView>::registerWidgetForAdjust(this, true);
 }
 
@@ -113,7 +137,31 @@ void CustomTreeView::contextMenuEvent(QContextMenuEvent* event) {
   return;
 }
 
+void CustomTreeView::registerProxyModel(QSortFilterProxyModel* proxyModelInDerived) {
+  CHECK_NULLPTR_RETURN_VOID(proxyModelInDerived);
+  _proxyModel = proxyModelInDerived;
+}
+
+QModelIndexList CustomTreeView::selectedRowsSource() const {
+  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
+  if (_proxyModel == nullptr) {
+    return proxyIndexes;
+  }
+
+  QModelIndexList srcIndexes;
+  srcIndexes.reserve(proxyIndexes.size());
+  for (const QModelIndex& proxyIndex : proxyIndexes) {
+    srcIndexes.push_back(_proxyModel->mapToSource(proxyIndex));
+  }
+  return srcIndexes;
+}
+
 void CustomTreeView::AddItselfAction2Menu() {
+  m_menu->addSeparator();
+  m_menu->addAction(mExpandAll);
+  m_menu->addAction(mCollapseAll);
+  m_menu->addAction(mAnimatedEnableAct);
+  m_menu->addAction(mRootDecorationEnabled);
   m_menu->addSeparator();
   m_menu->addAction(_SHOW_ALL_HORIZONTAL_COLUMNS);
   m_menu->addAction(_SHOW_HORIZONTAL_HEADER);
@@ -126,6 +174,11 @@ void CustomTreeView::AddItselfAction2Menu() {
 }
 
 void CustomTreeView::SubscribeHeaderActions() {
+  connect(mExpandAll, &QAction::triggered, this, &CustomTreeView::expandAll);
+  connect(mCollapseAll, &QAction::triggered, this, &CustomTreeView::collapseAll);
+  connect(mAnimatedEnableAct, &QAction::toggled, this, &CustomTreeView::setAnimated);
+  connect(mRootDecorationEnabled, &QAction::toggled, this, &CustomTreeView::setRootIsDecorated);
+
   connect(_SHOW_ALL_HORIZONTAL_COLUMNS, &QAction::triggered, m_horHeader, &HorMenuInHeader::onShowAllColumns);
   connect(_SHOW_HORIZONTAL_HEADER, &QAction::toggled, m_horHeader, &QHeaderView::setVisible);
   connect(_AUTO_SCROLL, &QAction::toggled, this, &QTreeView::setAutoScroll);
@@ -161,7 +214,11 @@ bool CustomTreeView::ShowOrHideColumnCore() {
 }
 
 void CustomTreeView::InitTreeView() {  //
-  StyleSheet::InitFontFamilyAndSize(this);
+  initExclusivePreferenceSetting();
+  if (m_defaultExpandAll) {
+    expandAll();
+  }
+
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();

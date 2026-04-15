@@ -32,14 +32,14 @@ ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
 
   auto* pOk = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok);
   pOk->setShortcut(QKeySequence(Qt::Key::Key_F10));
-  pOk->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
+  pOk->setIcon(QIcon(":img/SAVED"));
   auto* pOpen = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Open);
   pOpen->setText("Edit");
   pOpen->setIcon(QIcon(":img/CONFIGURE"));
   pOpen->setToolTip("Edit in config file directly");
   auto* pRetry = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Retry);
   pRetry->setText("Recheck");
-  pRetry->setIcon(QIcon(":img/RELOAD_FROM_DISK"));
+  pRetry->setIcon(QIcon(":JsonEditor/RELOAD_FROM_DISK"));
 
   auto* lo = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(lo)

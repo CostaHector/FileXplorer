@@ -40,16 +40,16 @@ void ClickableSlider::mousePressEvent(QMouseEvent* ev) {
 
 void ClickableSlider::keyPressEvent(QKeyEvent* ev) {
   CHECK_NULLPTR_RETURN_VOID(ev);
-  int newValue = value();
+  int modifiedToValue = value();
   if (ev->key() == Qt::Key_Left) {
-    newValue -= singleStep();
+    modifiedToValue -= singleStep();
   } else if (ev->key() == Qt::Key_Right) {
-    newValue += singleStep();
+    modifiedToValue += singleStep();
   } else {
     QSlider::keyPressEvent(ev);
     return;
   }
-  mousePressEventCore(newValue);  // 调用核心处理函数
+  mousePressEventCore(modifiedToValue);  // 调用核心处理函数
   ev->accept();  // 接受键盘事件
 }
 

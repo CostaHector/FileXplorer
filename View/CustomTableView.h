@@ -7,6 +7,7 @@
 class VerMenuInHeader;
 class DoubleRowHeader;
 class ScrollBarPolicyMenu;
+class TextElideModeMenu;
 
 class CustomTableView : public QTableView {
   Q_OBJECT
@@ -56,6 +57,7 @@ class CustomTableView : public QTableView {
 
   DoubleRowHeader* m_horHeader{nullptr};
   VerMenuInHeader* m_verHeader{nullptr};
+  TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }

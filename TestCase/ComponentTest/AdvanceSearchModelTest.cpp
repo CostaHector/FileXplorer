@@ -280,7 +280,7 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     sourceModel.CopiedSomething({firstInd});
     sourceModel.data(firstInd, Qt::ItemDataRole::DecorationRole);
     QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Size), Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
-    QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Name), Qt::ItemDataRole::TextAlignmentRole).toInt(), int(Qt::AlignLeft | Qt::AlignTop));
+    QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Name), Qt::ItemDataRole::TextAlignmentRole).toInt(), int(Qt::AlignLeft | Qt::AlignVCenter));
 
     QVERIFY(sourceModel.m_disableList.isEmpty());
     QVERIFY(sourceModel.m_recycleSet.isEmpty());

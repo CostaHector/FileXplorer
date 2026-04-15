@@ -13,22 +13,7 @@ void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
 
-constexpr char SUBMIT_BTN_STYLE[] =
-    "QPushButton{"
-    "    color: #fff;"
-    "    background-color: DodgerBlue;"
-    "    border-color: DodgerBlue;"
-    "}"
-    "QPushButton:hover {"
-    "    color: #fff;"
-    "    background-color: rgb(36, 118, 199);"
-    "    border-color: rgb(36, 118, 199);"
-    "}";
-
 const QFont& CODE_EDITOR_FONT();
-QFont ReadFontFamilyAndSize();
-void InitFontFamilyAndSize(QWidget* pWid);
-void SaveFontFamilyAndSize(QFont font);
 
 QIcon GetSystemDirOpenIcon();
 }  // namespace StyleSheet

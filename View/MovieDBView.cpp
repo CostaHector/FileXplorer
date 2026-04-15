@@ -259,17 +259,26 @@ bool MovieDBView::onDropATable() {
   if (deleteTbl.isEmpty()) {
     return false;
   }
-  QSqlDatabase con = _fdBasedDb.GetDb();
-  if (!_fdBasedDb.CheckValidAndOpen(con)) {
-    LOG_ERR_NP("[Failed] Open db ", con.lastError().text());
+  const QString beforeTableName = _dbModel->tableName();
+  if (beforeTableName != deleteTbl) {
+    LOG_WARN_P("Table deletion rejected", "Cannot drop table[%s] - it is not the active table[%s].", qPrintable(deleteTbl), qPrintable(beforeTableName));
     return false;
   }
-  if (!_fdBasedDb.DropTable(deleteTbl)) {
-    LOG_ERR_NP("[Failed] Table drop", con.lastError().text());
+  _dbModel->setTable("");
+  _dbModel->clear();
+
+  QSqlDatabase con = _fdBasedDb.GetDb();
+  if (!_fdBasedDb.CheckValidAndOpen(con)) {
+    LOG_ERR_NP("[Failed] Open db", con.lastError().text());
+    return false;
+  }
+  const int dropRetCode = _fdBasedDb.DropTable(deleteTbl);
+  if (dropRetCode != 1) {
+    LOG_ERR_P("Table drop failed", "Failed to drop table[%s]: %s (return code: %d)", qPrintable(deleteTbl), qPrintable(con.lastError().text()), dropRetCode);
     return false;
   }
   InitMoviesTables();
-  LOG_OK_NP("[OK] Table has been dropped", deleteTbl);
+  LOG_OK_P("Table dropped successfully", "Table[%s] has been successfully dropped", qPrintable(deleteTbl));
   return true;
 }
 

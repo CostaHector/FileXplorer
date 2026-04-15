@@ -24,15 +24,6 @@ using namespace VALUE_CHECKER_TYPE;
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
 const KV MemoryKey::ROW_HEIGHT{"ROW_HEIGHT", SizeTool::TABLE_DEFAULT_ROW_SECTION_SIZE, ValueChecker{0, 9999}};
 
-const KV FontKey::FAMILY("FontKey/FAMILY",
-#ifdef _WIN32
-                         "Microsoft YaHei",
-#else
-                         "Noto Sans",
-#endif
-                         ValueChecker{PLAIN_STR});
-const KV FontKey::POINT("FontKey/POINT", 12, ValueChecker{8, 25 + 1});
-
 const KV PathKey::STARTUP_PATH{"PathKey/STARTUP_PATH", "./", ValueChecker{FOLDER_PATH}};
 const KV PathKey::LAST_TIME_COPY_TO("PathKey/LAST_TIME_COPY_TO", "", ValueChecker{FOLDER_PATH});
 const KV PathKey::JSON_EDITOR_LOAD_FROM("PathKey/JSON_EDITOR_LOAD_FROM", "", ValueChecker{FOLDER_PATH});
@@ -58,7 +49,7 @@ const KV BehaviorKey::BATCH_FILES_NAME_PATTERN("BehaviorKey/BATCH_FILES_NAME_PAT
 const KV BehaviorKey::BATCH_FOLDERS_NAME_PATTERN("BehaviorKey/BATCH_FOLDERS_NAME_PATTERN", "Page %03d%1$1$11", ValueChecker{PLAIN_STR});
 
 const KV BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE("BehaviorKey/DIR_FILTER_ON_SWITCH_ENABLE",
-                                                  int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::NoDotAndDotDot),
+                                                  int(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::Hidden | QDir::Filter::NoDotAndDotDot),
                                                   ValueChecker{0});
 
 // only work after call SetAutoFlushAllLevel manually
@@ -113,7 +104,7 @@ const KV VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE("VideoPlayer/DUPLIC
                                                              ValueChecker{0, 30 * 1024 * 1024});  // 2kB ~ 30MB
 const KV VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE{"VideoPlayer/RATE_MOVIE_DEFAULT_VALUE", 10, ValueChecker{0, 11}};
 
-const KV RenamerKey::NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", false, ValueChecker{PLAIN_BOOL}};
+const KV RenamerKey::NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", true, ValueChecker{PLAIN_BOOL}};
 const KV RenamerKey::INCLUDING_DIR{"RenamerKey/INCLUDING_DIR", false, ValueChecker{PLAIN_BOOL}};
 const KV RenamerKey::OLD_STR_LIST{"RenamerKey/OLD_STR_LIST",                                                                        //
                                   QStringList{"", "^(.*?)$", " BB ", " BB",                                                         //

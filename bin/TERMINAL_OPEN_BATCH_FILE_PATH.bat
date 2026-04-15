@@ -1,1 +1,0 @@
-cmd.exe /K "C: && cd C:\home\aria\code\FileXplorer\bin\themes"

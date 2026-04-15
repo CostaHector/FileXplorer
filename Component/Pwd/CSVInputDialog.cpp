@@ -152,5 +152,4 @@ void CSVInputDialog::onContentsChanged() {
 void CSVInputDialog::onCheckPassed() {
   pOkBtn->setEnabled(true);
   pOkBtn->setToolTip("");
-  pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
 }

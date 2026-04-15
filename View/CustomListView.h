@@ -24,17 +24,7 @@ class CustomListView : public QListView {
   void wheelEvent(QWheelEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
-
-  const QString m_name;
   bool m_defaultFlowLeft2Right{false}, m_defaultViewModeIcon{false}, m_defaultWrapping{false};
-
-  IconSizeMenu* _ICON_SIZE_MENU{nullptr};
-  TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
-  QAction* _FLOW_ORIENTATION_LTR{nullptr};
-  QAction* _VIEW_MODE_LIST_ICON{nullptr};
-  QAction* _RESIZED_MODE_ADJUST{nullptr};
-  QAction* _WRAPPING_ACTIONS{nullptr};
-  QAction* _UNIFORM_ITEM_SIZES{nullptr};
 
  private:
   void SubscribePublicActions();
@@ -48,6 +38,16 @@ class CustomListView : public QListView {
 
   void onIconScaledIndexChanged(int newScaledIndex);
 
+  const QString m_name;
+
+  QAction* _FLOW_ORIENTATION_LTR{nullptr};
+  QAction* _VIEW_MODE_LIST_ICON{nullptr};
+  QAction* _RESIZED_MODE_ADJUST{nullptr};
+  QAction* _WRAPPING_ACTIONS{nullptr};
+  QAction* _UNIFORM_ITEM_SIZES{nullptr};
+
+  IconSizeMenu* _ICON_SIZE_MENU{nullptr};
+  TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
 
   inline bool isNameExists(const QString& name) const { return mListInstSet.contains(name); }

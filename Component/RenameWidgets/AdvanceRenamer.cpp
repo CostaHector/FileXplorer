@@ -28,11 +28,13 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
   m_nameExtIndependent->setToolTip(
       "Show file base name and extension respectively.\n"
       "So rename rules will work/or not work on extension");
+
   m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
   m_recursiveCB->setToolTip(
       "Recursive rename.\n"
       "Rules will also work on itself and its subdirectories");
+
   regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
   regexValidLabel->setVisible(false);
@@ -120,14 +122,13 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
   buttonBox->setOrientation(Qt::Orientation::Horizontal);
 
   if (QPushButton* pOkBtn = buttonBox->button(QDialogButtonBox::Ok)) {
+    pOkBtn->setIcon(QIcon(":img/SAVED"));
     pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
     pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
                            .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
-    pOkBtn->setStyleSheet(StyleSheet::SUBMIT_BTN_STYLE);
   }
 
   if (QPushButton* pHelpBtn = buttonBox->button(QDialogButtonBox::Help)) {
-    pHelpBtn->setIcon(QIcon(":img/COMMAND_PREVIEW"));
     pHelpBtn->setText(tr("See commands..."));
     pHelpBtn->setCheckable(true);
     pHelpBtn->setChecked(false);

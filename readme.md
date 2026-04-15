@@ -7,6 +7,89 @@ FileXplorer is a cross-platform professional file management system engineered f
 ![FileXplorer dark windows](bin/FileXplorer_Dark.png)
 ![FileXplorer dark ubuntu](bin/FileXplorer_Dark_ubuntu.png)
 
+## Prerequisites:
+
+### 1. FFmpeg/libav (Required for Video Duration Retrieval)
+FFmpeg/libav is required to retrieve video duration information in the application. Below are the installation and configuration steps for Windows and Ubuntu systems:
+
+#### Windows
+Step 1: Download and Extract FFmpeg
+
+1. Download the FFmpeg dynamic library package:
+   - Visit the official FFmpeg download page: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+   - Under "Windows EXE Files", select `Windows builds from gyan.dev`
+   - Download the package named `ffmpeg-7.1.1-full_build-shared.7z` (approx. 44.4 MiB; newer compatible versions are also acceptable)
+2. Extract the downloaded `.7z` file to a custom directory (e.g., `C:/home/ffmpeg`)
+
+Step 2: Verify FFmpeg Path Configuration
+
+Ensure the path containing `ffmpeg.exe` (e.g., `C:/home/ffmpeg/bin`) is added to the system `PATH` variable.  
+One can add it and verify it via the Command Prompt(Run as administrator):
+```cmd
+setx PATH "C:/home/ffmpeg/bin;%PATH%" /M
+echo %PATH%|findstr -i "ffmpeg"
+```
+
+Step 3: Quit Command Prompt
+
+#### Ubuntu
+
+Install FFmpeg Dependencies
+
+Install the required FFmpeg development libraries and binaries via apt:
+
+```sh
+sudo apt install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+sudo apt install ffmpeg
+ffmpeg -version
+```
+
+#### Verify FFmpeg Integration
+Run the following C++ code to confirm FFmpeg is properly configured. The output should show FFmpeg version: 3999588 (version number may vary by build):
+```cpp
+#include <QDebug>
+extern "C" {
+#include <libavformat/avformat.h>
+}
+
+void testFFmpeg() {
+    avformat_network_init();
+    qDebug() << "FFmpeg version:" << avformat_version();
+}
+```
+
+### 2. OpenSSL (Required for Password Book Encryption/Decryption)
+OpenSSL is required to support encryption and decryption functionality for the password book feature. Below are the installation steps for Windows and Ubuntu systems:
+
+#### Windows
+1. **Download OpenSSL Installer**
+   Visit the official Win32/Win64 OpenSSL download page:  
+   https://slproweb.com/products/Win32OpenSSL.html
+   
+   - Select the `Win64 OpenSSL v3.5.1` package (**non-Light version**)
+   - Download the installer file: `Win64OpenSSL-3_5_1.msi` (approx. 281 MiB)
+
+2. **Install OpenSSL**
+   - Run the downloaded `.msi` installer
+   - Use the default installation path: `C:\Program Files\OpenSSL-Win64` (recommended for easy management)
+   - During installation, select the option:  
+     `Copy OpenSSL DLLs to → The OpenSSL binaries (/bin) directory`
+   - Complete the installation wizard with default settings
+
+3. **Verify Installation**
+   Open Command Prompt (CMD) and execute the following commands to confirm successful installation:
+   ```cmd
+   cd "C:\Program Files\OpenSSL-Win64\bin"
+   openssl version
+   ```
+
+#### Ubuntu
+Install OpenSSL via the terminal with the following commands:
+```sh
+sudo apt install -y openssl libssl-dev
+openssl version
+```
+
 ## Core Features
 
 1. File/Folder Preview & ‌Sidebar Navigation‌
@@ -75,7 +158,6 @@ we suggest you to do following setting in git bash
 git update-index --assume-unchange FileXplorer.pro.user
 git update-index --assume-unchange FileXplorerTest.pro.user
 git update-index --assume-unchange bin/logs_info.log
-git update-index --assume-unchange bin/TERMINAL_OPEN_BATCH_FILE_PATH.bat
 
 git update-index --no-assume-unchange FileXplorer.pro.user
 git update-index --no-assume-unchange FileXplorerTest.pro.user
@@ -109,62 +191,6 @@ Interactive function:
 
 a log line example:
 > `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
-
-## get video duration using FFmpeg/libav
-### in windows:
-
-step1: Download dynamic library `ffmpeg-7.1.1-full_build-shared.7z` and extract to a ${path}. then add this "${path}/bin" to system environment path.
-
-step2: Add path that contains file `[ffmpeg.exe]` says "C:/home/ffmpeg/bin" to system variable, i.e. SET(path "C:/home/ffmpeg")
-
-step3: add following snippet in .pro file
-```pro
-win32 {
-    # FFmpeg headers path
-    INCLUDEPATH += "C:/home/ffmpeg/include"
-    # FFmpeg libs path
-    LIBS += -L"C:/home/ffmpeg/lib" -lavformat -lavcodec  -lavutil -lswscale -lws2_32 -lsecur32
-}
-```
-
-step3: add following snippet in .pro file for CMakelists.txt
-```cmake
-set(ffmpegpath "C:/home/ffmpeg")
-target_include_directories(ThumbnailsGetterFFmpeg PRIVATE "${ffmpegpath}/include")
-target_link_libraries(ThumbnailsGetterFFmpeg PRIVATE ws2_32 Qt5::Core
-	"${ffmpegpath}/lib/avformat.lib"
-	"${ffmpegpath}/lib/avcodec.lib"
-	"${ffmpegpath}/lib/avutil.lib"
-	"${ffmpegpath}/lib/swscale.lib")
-```
-
-step4: run the following code snippet. It should says "FFmpeg version: 3999588"
-```cpp
-#include <QDebug>
-extern "C"{
-#include <libavformat/avformat.h>
-}
-void testFFmpeg() {
-    avformat_network_init();
-    qDebug() << "FFmpeg version:" << avformat_version();
-}
-```
-
-### in ubuntu
-
-step1: install following items. and test if it was intalled succeed
-```sh
-sudo apt install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
-sudo apt install ffmpeg
-ffmpeg
-```
-
-step3: add following snippet in .pro file
-```
-linux {
-    LIBS += -lavformat -lavcodec -lavutil -lswscale
-}
-```
 
 ## Add this application to file system context menu
 

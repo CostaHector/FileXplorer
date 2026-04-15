@@ -27,6 +27,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Char
 
 file(GLOB SOURCES
     Actions/*.cpp
+    bin/Stylesheet/*.cpp
     Events/*.cpp
     Model/*.cpp
     View/*.cpp
@@ -60,6 +61,7 @@ endforeach()
 
 set(SRV_HEADER_PATH
     Actions
+    bin/Stylesheet
     Events
     Model
     View
@@ -88,6 +90,7 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     Actions/*.h
+    bin/Stylesheet/*.h
     Events/*.h
     Model/*.h
     View/*.h
@@ -121,8 +124,6 @@ endforeach()
 
 set(RESOURCES
     "bin/themes/res.qrc"
-    "bin/themes/styles/dark/darkstyle.qrc"
-    "bin/themes/styles/default/defaultstyle.qrc"
 )
 
 file(GLOB TS_FILES
@@ -175,9 +176,12 @@ if(WIN32)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi mediaInfo)
     set(ffmpegpath "C:/home/ffmpeg")
+    if(NOT EXISTS ${ffmpegpath})
+        message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack `ffmpeg-7.1.1-full_build-shared.7z` to [${ffmpegpath}].")
+    endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
-    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 Qt5::Core
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         "${ffmpegpath}/lib/avformat.lib"
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
@@ -186,6 +190,9 @@ if(WIN32)
     # OpenSSL configuration for Windows
     # Set OpenSSL paths
     set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+    if(NOT EXISTS ${OPENSSL_ROOT_DIR})
+        message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
+    endif()
 
     # Include directories
     include_directories("${OPENSSL_ROOT_DIR}/include")

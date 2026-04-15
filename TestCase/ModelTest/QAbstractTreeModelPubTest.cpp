@@ -15,19 +15,19 @@ class QAbstractTreeModelPubTest : public PlainTestSuite {
     Configuration().clear();
     FavoritesTreeModel model{"FavoritesDataRetrieveOk", nullptr, false};
     QCOMPARE(model.rowCount({}), 0);
-    QCOMPARE(model.columnCount({}), TDataType::COLUMN_COUNT);
+    QCOMPARE(model.columnCount({}), TFavDataType::COLUMN_COUNT);
 
-    auto emptyRootNode = MyTreeNode::NewTreeNodeRoot();
+    auto emptyRootNode = FavTreeNode::NewTreeNodeRoot();
     model.setDatas(std::move(emptyRootNode));
     QCOMPARE(model.rowCount({}), 0);
 
-    auto rootNode = MyTreeNode::NewTreeNodeRoot();
-    auto r0_0 = rootNode->appendRow(new MyTreeNode{TDataType{"group/child0_g"}});
-    auto r0_1 = rootNode->appendRow(new MyTreeNode{TDataType{"group/child1_g"}});
-    auto r0_2 = rootNode->appendRow(new MyTreeNode{TDataType{"group/child2_l", "path/group/child2_l"}});
-    auto r0_3 = rootNode->appendRow(new MyTreeNode{TDataType{"group/child3_l", "path/group/child3_l"}});
-    r0_1->appendRow(new MyTreeNode{TDataType{"group/child1_g/group0"}});
-    r0_1->appendRow(new MyTreeNode{TDataType{"group/child1_g/node1"}});
+    auto rootNode = FavTreeNode::NewTreeNodeRoot();
+    auto r0_0 = rootNode->appendRow(new FavTreeNode{TFavDataType{"group/child0_g"}});
+    auto r0_1 = rootNode->appendRow(new FavTreeNode{TFavDataType{"group/child1_g"}});
+    auto r0_2 = rootNode->appendRow(new FavTreeNode{TFavDataType{"group/child2_l", "path/group/child2_l"}});
+    auto r0_3 = rootNode->appendRow(new FavTreeNode{TFavDataType{"group/child3_l", "path/group/child3_l"}});
+    r0_1->appendRow(new FavTreeNode{TFavDataType{"group/child1_g/group0"}});
+    r0_1->appendRow(new FavTreeNode{TFavDataType{"group/child1_g/node1"}});
 
     QCOMPARE(*r0_0, *r0_0);
     QVERIFY(*r0_0 != *r0_1);
@@ -36,7 +36,7 @@ class QAbstractTreeModelPubTest : public PlainTestSuite {
     model.setDatas(std::move(rootNode));
     QCOMPARE(model.rowCount({}), 4);
 
-    MyTreeNode* rootItem = model.invisibleRootItem();
+    FavTreeNode* rootItem = model.invisibleRootItem();
 
     QModelIndex rootIndex;
     QModelIndex index0 = model.index(0, 0, rootIndex);
@@ -44,10 +44,10 @@ class QAbstractTreeModelPubTest : public PlainTestSuite {
     QModelIndex index2 = model.index(2, 0, rootIndex);
     QModelIndex index3 = model.index(3, 0, rootIndex);
 
-    MyTreeNode* item0 = model.itemFromIndex(index0);
-    MyTreeNode* item1 = model.itemFromIndex(index1);
-    MyTreeNode* item2 = model.itemFromIndex(index2);
-    MyTreeNode* item3 = model.itemFromIndex(index3);
+    FavTreeNode* item0 = model.itemFromIndex(index0);
+    FavTreeNode* item1 = model.itemFromIndex(index1);
+    FavTreeNode* item2 = model.itemFromIndex(index2);
+    FavTreeNode* item3 = model.itemFromIndex(index3);
 
     QCOMPARE(model.indexFromItem(item0), index0);
     QCOMPARE(model.indexFromItem(item1), index1);

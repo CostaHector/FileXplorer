@@ -2,6 +2,7 @@
 #include "FileXplorer.h"
 #include "ExtraEvents.h"
 #include "FileTool.h"
+#include "PreferenceActions.h"
 #include "MemoryKey.h"
 #include "Logger.h"
 #include <QApplication>
@@ -13,13 +14,13 @@ int main(int argc, char* argv[]) {
   if (!CreateUserPath()) {
     return -1;
   }
-
-  QApplication app{argc, argv};
   if (argc > 1) {
     LOG_I("argc[%d]. argv[1]=%s.", argc, argv[1]);
   } else {
     LOG_I("argc[%d].", argc);
   }
+
+  QApplication app{argc, argv};
   Logger::SetAutoFlushAllLevel(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
 
   const QStringList& args = app.arguments();
@@ -36,7 +37,12 @@ int main(int argc, char* argv[]) {
   ExtraEvents extraViewVisibility{fileExplorer.m_fsPanel};
   extraViewVisibility.subscribe();
 
+  const PreferenceActions& prefInst = g_PreferenceActions();
+  prefInst.initAppStyle();
+  prefInst.initStyleSheet(true);
+
   fileExplorer.show();
+
   const int exitCode = app.exec();
   LOG_I("Program:[" PROJECT_NAME "] exit with code[%d].", exitCode);
   return exitCode;

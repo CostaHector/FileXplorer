@@ -48,23 +48,30 @@ void FavoriteItemData::SaveSortOrderReverse(bool bReverse) {
   Configuration().setValue(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, bReverse);
 }
 
-bool MyTreeNode::isAncestorOf(const MyTreeNode* descendant) const {
-  if (descendant == nullptr) {
-    return false;
+QDataStream& operator<<(QDataStream& out, const FavTreeNode& item) {
+  out << item.val;
+  int n = item.childsCount();
+  out << n;
+  for (FavTreeNode* pChild : item.childs) {
+    out << *pChild;
   }
-  return descendant->isDescendantOf(this);
+  return out;
 }
 
-bool MyTreeNode::isDescendantOf(const MyTreeNode* ancestor) const {
-  if (ancestor == nullptr) {
-    return false;
-  }
+QDataStream& operator>>(QDataStream& in, FavTreeNode& item) {
+  item.releaseAndClearChilds();
 
-  for (const MyTreeNode* parentNode = parent(); parentNode != nullptr; parentNode = parentNode->parent()) {
-    if (parentNode == ancestor) {
-      return true;
-    }
-  }
+  in >> item.val;
 
-  return false;
+  int n{0};
+  in >> n;
+
+  item.childs.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    FavTreeNode* node = new FavTreeNode;
+    in >> *node;
+    node->pParent = &item;
+    item.childs.push_back(node);
+  }
+  return in;
 }

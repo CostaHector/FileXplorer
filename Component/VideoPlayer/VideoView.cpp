@@ -20,6 +20,11 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
 
   mVideoList = new (std::nothrow) VideoTableView{this};
   mVideoList->setPlaybackMode(initPlaybackMode);
+  if (const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget()) {
+    if (!inst->isShowVideoListView()) {
+      mVideoList->setHidden(true);
+    }
+  }
 
   addWidget(mExtendLeftWidget);
   addWidget(mVideoList);
@@ -35,6 +40,9 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
 VideoView::~VideoView() {
   if (this->parent() != nullptr) {
     Configuration().setValue("VIDEO_VIEW_STATE", saveState());
+  }
+  if (const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget()) {
+    Configuration().setValue("VideoView/ShowVideoList", inst->isShowVideoListView());
   }
 }
 

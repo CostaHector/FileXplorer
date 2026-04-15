@@ -12,7 +12,7 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _SETTINGS->setShortcutVisibleInContextMenu(true);
   _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
 
-  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/PASSWORD_TABLE"), tr("Password book"), this};
+  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/PASSWORD_TABLE"), tr("Password Book"), this};
   CHECK_NULLPTR_RETURN_VOID(_PWD_BOOK);
   _PWD_BOOK->setCheckable(true);
   _PWD_BOOK->setShortcutVisibleInContextMenu(true);

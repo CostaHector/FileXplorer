@@ -17,6 +17,7 @@ Q_OBJECT
  public:
   static FileOpActs& GetInst();
   explicit FileOpActs(QObject* parent = nullptr);
+  ~FileOpActs();
   FileStructurePolicy::FileStuctureModeE GetCurFileStructurePolicy() const { return mFileStructureIntAction.curVal(); }
 
   QActionGroup* GetDeleteActions();

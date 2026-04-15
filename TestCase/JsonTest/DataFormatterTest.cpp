@@ -60,9 +60,9 @@ class DataFormatterTest : public PlainTestSuite {
       QVariant expectSzVar = QVariant::fromValue(expectSz);
       QCOMPARE(formatDefault(expectSz), expectSzVar);
 
-      qint64 newValue{0};
-      QCOMPARE(writeqint64(newValue, expectSzVar), true);
-      QCOMPARE(newValue, expectSz);
+      qint64 modifiedToValue{0};
+      QCOMPARE(writeqint64(modifiedToValue, expectSzVar), true);
+      QCOMPARE(modifiedToValue, expectSz);
     }
   }
 

@@ -19,7 +19,7 @@ class SceneStyleDelegateTest : public PlainTestSuite {
     sceneStyleDel.paint(nullptr, QStyleOptionViewItem{}, {});
     sceneStyleDel.drawRatingGrid(nullptr, QRect{}, 8, 10);
     sceneStyleDel.onSceneClicked({}, {}, {});
-    SceneStyleDelegate::GetRealImageVisualRect({});
+    SceneStyleDelegate::GetRatingAreaRect({});
   }
 };
 

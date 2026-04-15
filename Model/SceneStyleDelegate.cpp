@@ -2,8 +2,9 @@
 #include "PublicMacro.h"
 #include "ScenesListModel.h"
 #include <QPainter>
-#include <QGraphicsEffect>
+
 constexpr QColor SceneStyleDelegate::GRAY_AND_HALF_TRANS;
+constexpr QColor SceneStyleDelegate::YELLOW_COLOR;
 
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_VOID(option);
@@ -32,64 +33,71 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   // 2. only when index = curIndex and display = true. plot rating bar is needed
   painter->save();
   if (mRateMachine.status() == RatingState::SELECTED_SHOW && index == mRateMachine.curIndex()) {
-    QRect imageRect{GetRealImageVisualRect(option.rect)};
-    drawRatingGrid(painter, RateHelper::getRatingRect(imageRect), mRateMachine.oldRate(), mRateMachine.newRate());
+    drawRatingGrid(painter, GetRatingAreaRect(option.rect), mRateMachine.oldRate(), mRateMachine.newRate());
   }
   const int rating = index.data(SceneInfo::Role::RATE_ROLE).toInt();
-  QRect currentRateTextRect = option.rect;
-  currentRateTextRect.setHeight(32);
-  currentRateTextRect.setWidth(32);
-  painter->fillRect(currentRateTextRect, GRAY_AND_HALF_TRANS); // gray and half transparent
-  painter->setPen(Qt::white);
-  painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));
+  drawCurrentRateSquare(painter, option.rect, rating);
   painter->restore();
 }
 
-void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) const {
+void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating) {
+  CHECK_NULLPTR_RETURN_VOID(painter);
+  currentRateTextRect.setHeight(RateHelper::RATING_BAR_HEIGHT);
+  currentRateTextRect.setWidth(RateHelper::RATING_BAR_X);
+  painter->fillRect(currentRateTextRect, GRAY_AND_HALF_TRANS); // gray and half transparent
+  painter->setPen(Qt::white);
+  painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));
+}
+
+void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) {
   CHECK_NULLPTR_RETURN_VOID(painter);
   // 绘制半透明背景层
   painter->fillRect(rect, GRAY_AND_HALF_TRANS); // gray and half transparent
+  const int EACH_LINE_WIDTH{rect.width() / 10};
 
-  int gridHeight = rect.height() - 10;
-  int gridTop = rect.top() + 5;
+  // 黄色 评分条
+  QRect hoverRectBar{rect};
+  hoverRectBar.setWidth(hoverRating * EACH_LINE_WIDTH);
+  painter->setBrush(YELLOW_COLOR);
+  painter->fillRect(hoverRectBar, YELLOW_COLOR);
 
-  int hoverRateWidth = rect.width() * hoverRating / RateHelper::MOVIE_RATE_VALUE::MAX_V;
-  const QRect beforeHoverRect(rect.left(), gridTop, hoverRateWidth, gridHeight);
+  const int EACH_BAR_TOP{hoverRectBar.top()};
+  const int EACH_BAR_BOTTOM{hoverRectBar.bottom()};
+  const int LEFT_X{hoverRectBar.left()};
+  const int EACH_BAR_HEIGHT = rect.height();
 
-  // 悬浮点对应评分条
-  const QColor beforeHoverGridColor{QColor{255, 200, 0, 220}}; // yellow
-  painter->setBrush(beforeHoverGridColor);
-  painter->drawRect(beforeHoverRect);
-
-  // 均匀分布9条垂直线，从左侧开始
-  const int leftOfRect = rect.left();
-  const int rectWidth = rect.width();
-
+  // 灰色 均匀绘制9条垂直线，从左侧开始
   painter->setPen(Qt::lightGray);
-  painter->drawLines(QVector<QLine>{QLine(leftOfRect + rectWidth * 1 / 10, gridTop, leftOfRect + rectWidth * 1 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 2 / 10, gridTop, leftOfRect + rectWidth * 2 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 3 / 10, gridTop, leftOfRect + rectWidth * 3 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 4 / 10, gridTop, leftOfRect + rectWidth * 4 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 5 / 10, gridTop, leftOfRect + rectWidth * 5 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 6 / 10, gridTop, leftOfRect + rectWidth * 6 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 7 / 10, gridTop, leftOfRect + rectWidth * 7 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 8 / 10, gridTop, leftOfRect + rectWidth * 8 / 10, gridTop + gridHeight),
-                                    QLine(leftOfRect + rectWidth * 9 / 10, gridTop, leftOfRect + rectWidth * 9 / 10, gridTop + gridHeight)});
-  // 绘制数字
-  const int EACH_LINE_DISTANCE = rect.width() / 10;
-  painter->drawText(QRect(leftOfRect + rectWidth * 1 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "2");
-  painter->drawText(QRect(leftOfRect + rectWidth * 3 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "4");
-  painter->drawText(QRect(leftOfRect + rectWidth * 5 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "6");
-  painter->drawText(QRect(leftOfRect + rectWidth * 7 / 10, gridTop + 2, EACH_LINE_DISTANCE, 14), Qt::AlignCenter, "8");
+  painter->drawLines(QVector<QLine>{
+      QLine(LEFT_X + 1 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 1 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 2 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 2 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 3 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 3 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 4 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 4 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 5 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 5 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 6 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 6 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 7 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 7 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 8 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 8 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+      QLine(LEFT_X + 9 * EACH_LINE_WIDTH, EACH_BAR_TOP, LEFT_X + 9 * EACH_LINE_WIDTH, EACH_BAR_BOTTOM), //
+  });
 
+  // 深灰色 可见候选评分
+  painter->setPen(Qt::gray);
+  painter->drawText(QRect(LEFT_X + 1 * EACH_LINE_WIDTH, EACH_BAR_TOP, EACH_LINE_WIDTH, EACH_BAR_HEIGHT), Qt::AlignCenter, "2");
+  painter->drawText(QRect(LEFT_X + 3 * EACH_LINE_WIDTH, EACH_BAR_TOP, EACH_LINE_WIDTH, EACH_BAR_HEIGHT), Qt::AlignCenter, "4");
+  painter->drawText(QRect(LEFT_X + 5 * EACH_LINE_WIDTH, EACH_BAR_TOP, EACH_LINE_WIDTH, EACH_BAR_HEIGHT), Qt::AlignCenter, "6");
+  painter->drawText(QRect(LEFT_X + 7 * EACH_LINE_WIDTH, EACH_BAR_TOP, EACH_LINE_WIDTH, EACH_BAR_HEIGHT), Qt::AlignCenter, "8");
+
+  // 白色 悬浮评分/旧评分
   painter->setPen(Qt::white);
-  painter->drawText(beforeHoverRect, Qt::AlignCenter, QString::asprintf("%d(%d)", hoverRating, rating));
+  painter->drawText(hoverRectBar, Qt::AlignCenter, QString::asprintf("%d(%d)", hoverRating, rating));
 }
 
 void SceneStyleDelegate::onSceneClicked(const QModelIndex& nowInd, const QRect& visualRect, const QPoint& clickedPnt) {
   mRateMachine.DoStateTransition(*this, nowInd, visualRect, clickedPnt);
 }
 
-QRect SceneStyleDelegate::GetRealImageVisualRect(const QRect& gridVisualRect) {
-  return gridVisualRect.adjusted(2, 0, -2, 0);
+QRect SceneStyleDelegate::GetRatingAreaRect(QRect gridVisualRect) {
+  gridVisualRect.setLeft(gridVisualRect.left() + RateHelper::RATING_BAR_X);
+  gridVisualRect.setHeight(RateHelper::RATING_BAR_HEIGHT);
+  return gridVisualRect;
 }

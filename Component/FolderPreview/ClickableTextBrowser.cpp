@@ -333,9 +333,11 @@ void ClickableTextBrowser::AppendASelection(const QTextCursor& cursor) {
   if (!cursor.hasSelection()) {
     return;  // ignore empty selection
   }
+  static const QColor selectionColor{"#99D1FF"};
+  static const QBrush selectionBrush{selectionColor};
   QTextEdit::ExtraSelection extra;
   extra.cursor = cursor;
-  extra.format.setBackground(Qt::yellow);
+  extra.format.setBackground(selectionBrush);
   mMultiSelections.append(extra);
   setExtraSelections(mMultiSelections);
 }

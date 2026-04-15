@@ -9,6 +9,7 @@
 
 extern template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 
+class QLabel;
 class ScenePageControl: public QToolBar {
   Q_OBJECT
  public:
@@ -22,9 +23,7 @@ class ScenePageControl: public QToolBar {
   void currentPageIndexChanged(int newPageIndex);
   void maxScenesCountPerPageChanged(int newMaxScenesCountEachPage);
  public slots:
-  void onPagesCountChanged(int newPagesCount) {
-    mPagesCount = newPagesCount;
-  }
+  void onPagesCountChanged(int newPagesCount);
 
  private:
   QAction* _THE_FRONT_PAGE{nullptr};
@@ -32,9 +31,10 @@ class ScenePageControl: public QToolBar {
   QAction* _NEXT_PAGE{nullptr};
   QAction* _THE_BACK_PAGE{nullptr};
 
+  QLabel* mPageInfoLabel{nullptr};
   int mPagesCount {1};
 
-  QLineEdit* mPageDimensionLE{nullptr};
+  QLineEdit* mScenesPerPageLE{nullptr};
   QLineEdit* mPageIndexInputLE{nullptr};
   QToolBar* mPagesSelectTB{nullptr};
   EnumIntAction<ScenePageNaviHelper::PageNaviE> mPageNaviIntAction;

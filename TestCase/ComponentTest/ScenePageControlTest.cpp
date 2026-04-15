@@ -21,7 +21,7 @@ class ScenePageControlTest : public PlainTestSuite {
     QVERIFY(spc._PREVIOUS_PAGE != nullptr);
     QVERIFY(spc._NEXT_PAGE != nullptr);
     QVERIFY(spc._THE_BACK_PAGE != nullptr);
-    QVERIFY(spc.mPageDimensionLE != nullptr);
+    QVERIFY(spc.mScenesPerPageLE != nullptr);
     QVERIFY(spc.mPageIndexInputLE != nullptr);
     spc.onPagesCountChanged(99);
     QCOMPARE(spc.mPagesCount, 99);
@@ -109,14 +109,14 @@ class ScenePageControlTest : public PlainTestSuite {
     QSignalSpy spy(&spc, &ScenePageControl::maxScenesCountPerPageChanged);
 
     // 设置有效值
-    spc.mPageDimensionLE->setText("50");
+    spc.mScenesPerPageLE->setText("50");
     spc.SetScenesCountPerPage();
 
     QCOMPARE(spy.count(), 1);                     // 信号应被触发一次
     QCOMPARE(spy.takeFirst().at(0).toInt(), 50);  // 信号参数应为50
 
     // 设置无效值
-    spc.mPageDimensionLE->setText("invalid");
+    spc.mScenesPerPageLE->setText("invalid");
     bool result = spc.SetScenesCountPerPage();
 
     QVERIFY(!result);          // 应返回false

@@ -11,7 +11,7 @@
 #include <QDirIterator>
 #include <QRegularExpression>
 
-constexpr int RateHelper::RATING_BAR_HEIGHT;
+constexpr int RateHelper::RATING_BAR_X, RateHelper::RATING_BAR_HEIGHT;
 
 bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
   using namespace JsonHelper;
@@ -248,16 +248,7 @@ const QPixmap& RateHelper::GetRatePixmap(int rate) {
 }
 
 bool RateHelper::isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& visualRect) {
-  return getRatingRect(visualRect).contains(clickPnt);
-}
-
-QRect RateHelper::getRatingRect(const QRect& visualRect) {
-  return {
-      visualRect.x(),                          // 左边界不变
-      visualRect.bottom() + 1 - RATING_BAR_HEIGHT, // 上边界计算
-      visualRect.width(),                      // 宽度不变
-      RATING_BAR_HEIGHT                        // 固定高度
-  };
+  return visualRect.contains(clickPnt);
 }
 
 int RateHelper::ratingAtPosition(const QPoint& pos, const QRect& visualRect) {

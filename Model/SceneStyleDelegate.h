@@ -13,7 +13,7 @@ class SceneStyleDelegate : public QStyledItemDelegate {
   QString displayText(const QVariant& value, const QLocale& loc) const override;
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-  static QRect GetRealImageVisualRect(const QRect& gridVisualRect);
+  static QRect GetRatingAreaRect(QRect gridVisualRect);
   void onSceneClicked(const QModelIndex& nowInd, const QRect& vRect, const QPoint& clickedPnt);
 
  signals:
@@ -21,10 +21,12 @@ class SceneStyleDelegate : public QStyledItemDelegate {
 
  private:
   // 绘制评分网格
-  void drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating = 0) const;
+  static void drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating = 0);
+  static void drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating);
 
   RatingStateMachine mRateMachine;
   static constexpr QColor GRAY_AND_HALF_TRANS{0, 0, 0, 150};
+  static constexpr QColor YELLOW_COLOR{255, 200, 0, 220};
 };
 
 #endif  // SCENESTYLEDELEGATE_H

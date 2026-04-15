@@ -16,20 +16,20 @@ FileOpActs& FileOpActs::GetInst() {
 FileOpActs::FileOpActs(QObject* parent)
     : QObject(parent)  //
 {
-  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in explorer"), this);
-  _OPEN_IN_TERMINAL = new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), tr("Open in terminal"), this);
+  _REVEAL_IN_EXPLORER = new (std::nothrow) QAction(QIcon(":img/REVEAL_IN_EXPLORER"), tr("Reveal in Explorer"), this);
+  _OPEN_IN_TERMINAL = new (std::nothrow) QAction(QIcon(":img/OPEN_IN_TERMINAL"), tr("Open in Terminal"), this);
   OPEN_AG = GetOPENActions();
 
-  COPY_FULL_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), tr("Copy fullpath"), this);
-  COPY_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), tr("Copy path"), this);
-  COPY_NAME = new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), tr("Copy name"), this);
+  COPY_FULL_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_FULL_PATH"), tr("Copy Fullpath"), this);
+  COPY_PATH = new (std::nothrow) QAction(QIcon(":img/COPY_PATH"), tr("Copy Path"), this);
+  COPY_NAME = new (std::nothrow) QAction(QIcon(":img/COPY_NAME"), tr("Copy Name"), this);
 
-  COPY_RECORDS = new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), tr("Copy records"), this);
+  COPY_RECORDS = new (std::nothrow) QAction(QIcon(":img/COPY_RECORD"), tr("Copy Records"), this);
   COPY_PATH_AG = GetCOPY_PATHActions();
-  NEW_FOLDER = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), tr("New folder"), this);
+  NEW_FOLDER = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDER"), tr("New Folder"), this);
 
-  NEW_TEXT_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), tr("New text"), this);
-  NEW_JSON_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), tr("New json"), this);
+  NEW_TEXT_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENT"), tr("New Text"), this);
+  NEW_JSON_FILE = new (std::nothrow) QAction(QIcon(":img/NEW_JSON_FILE"), tr("New Json"), this);
   BATCH_NEW_FILES = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), tr("New Files"), this);
 
   BATCH_NEW_FOLDERS = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), tr("New Folders"), this);
@@ -45,7 +45,7 @@ FileOpActs::FileOpActs(QObject* parent)
   InitFileStructureActions();
 
   MOVE_TO_TRASHBIN = new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), tr("Recycle"), this);
-  DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), tr("Delete permanently"), this);
+  DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), tr("Delete Permanently"), this);
   DELETE_ACTIONS = GetDeleteActions();
 
   UNDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/UNDO"), tr("Undo"), this);
@@ -57,33 +57,37 @@ FileOpActs::FileOpActs(QObject* parent)
   PASTE = new (std::nothrow) QAction(QIcon(":img/PASTE_ITEM"), tr("Paste"), this);
   CUT_COPY_PASTE = Get_CUT_COPY_PASTE_OPERATIONS_Actions();
 
-  MERGE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), tr("Merged to front"), this);
-  MERGE_REVERSE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), tr("Merge to back"), this);
+  MERGE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_FIRST"), tr("Merged to Front"), this);
+  MERGE_REVERSE = new (std::nothrow) QAction(QIcon(":img/FOLDER_MERGE_TO_LAST"), tr("Merge to Back"), this);
   FOLDER_MERGE = FolderMergeActions();
 
-  _TS_FILES_MERGE = new (std::nothrow) QAction(QIcon(":img/TS_FILES_MERGE"), tr("Merged ts files"), this);
+  _TS_FILES_MERGE = new (std::nothrow) QAction(QIcon(":img/TS_FILES_MERGE"), tr("Merged TS Files"), this);
   _TS_FILES_MERGE->setToolTip(
       "Merges selected TS files in your chosen order (minimum 2 files).<br/>"
       "<b>Warning: Output sequence in merged file matches your selection order.</b>");
 
-  SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), tr("Select all"), this);
-  SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), tr("Select none"), this);
-  SELECT_INVERT = new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), tr("Invert selection"), this);
+  SELECT_ALL = new (std::nothrow) QAction(QIcon(":img/SELECT_ALL"), tr("Select All"), this);
+  SELECT_NONE = new (std::nothrow) QAction(QIcon(":img/SELECT_NONE"), tr("Select None"), this);
+  SELECT_INVERT = new (std::nothrow) QAction(QIcon(":img/SELECT_INVERT"), tr("Invert Selection"), this);
   SELECTION_RIBBONS = Get_SELECTION_RIBBON_Action();
 
   _PACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/PACK_FOLDERS"), tr("Packer"), this);
   _UNPACK_FOLDERS = new (std::nothrow) QAction(QIcon(":img/UNPACK_FOLDERS"), tr("Unpacker"), this);
-  _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAIL_FAST"), tr("Fail fast"), this);
-  _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), tr("Long path finder"), this);
+  _RETURN_ERROR_CODE_UPON_ANY_FAILURE = new (std::nothrow) QAction(QIcon(":img/FAIL_FAST"), tr("Fail Fast"), this);
+  _LONG_PATH_FINDER = new (std::nothrow) QAction(QIcon(":img/LONG_PATH_FINDER"), tr("Long Path Finder"), this);
   _RMV_EMPTY_FOLDER = new (std::nothrow) QAction(tr("Rmv empty folders"), this);
   _RMV_01_FILE_FOLDER = new (std::nothrow) QAction(tr("Rmv 0/1 file folders"), this);
   _RMV_FOLDER_BY_KEYWORD = new (std::nothrow) QAction(tr("Rmv folders by keyword"), this);
   _DUPLICATE_IMAGES_FINDER = new (std::nothrow) QAction(QIcon(":img/DUPLICATE_IMAGES_FINDER"), tr("Duplicate Images Finder"), this);
-  _LOW_RESOLUTION_IMGS_RMV = new (std::nothrow) QAction(QIcon(":img/LOW_RESOLUTION_IMGS_RMV"), tr("Low resolution imgs Rmv"), this);
+  _LOW_RESOLUTION_IMGS_RMV = new (std::nothrow) QAction(QIcon(":img/LOW_RESOLUTION_IMGS_RMV"), tr("Low Resolution Imgs Rmv"), this);
   _DUPLICATE_VIDEOS_FINDER = new (std::nothrow) QAction(QIcon(":img/DUPLICATE_VIDEOS_FINDER"), tr("Duplicate Videos Finder"), this);
   FolderFileCategoryProcess();
 
   _FORCE_RESEARCH = new (std::nothrow) QAction{QIcon{":img/FORCE_RESEARCH"}, tr("Force Research"), this};
+}
+
+FileOpActs::~FileOpActs() {
+  Configuration().setValue(BehaviorKey::FILESYSTEM_STRUCTURE.name, (int)GetCurFileStructurePolicy());
 }
 
 QActionGroup* FileOpActs::GetDeleteActions() {
@@ -357,15 +361,15 @@ void FileOpActs::FolderFileCategoryProcess() {
 
 void FileOpActs::InitFileStructureActions() {
   using namespace FileStructurePolicy;
-  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_QUERY"), c_str(FileStuctureModeE::QUERY)};
+  FILE_STRUCTURE_QRY_BEFORE_PASTE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_QUERY"), tr("Query")};
   FILE_STRUCTURE_QRY_BEFORE_PASTE->setToolTip("Query file structure before procceed each paste operation.");
   FILE_STRUCTURE_QRY_BEFORE_PASTE->setCheckable(true);
 
-  FILE_STRUCTURE_PRESERVE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_PRESERVE"), c_str(FileStuctureModeE::PRESERVE)};
+  FILE_STRUCTURE_PRESERVE = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_PRESERVE"), tr("Preserve")};
   FILE_STRUCTURE_PRESERVE->setToolTip("Set preserve file structure by default");
   FILE_STRUCTURE_PRESERVE->setCheckable(true);
 
-  FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), c_str(FileStuctureModeE::FLATTEN)};
+  FILE_STRUCTURE_FLATTEN = new (std::nothrow) QAction{QIcon(":img/FILE_STRUCTURE_FLATTEN"), tr("Flatten")};
   FILE_STRUCTURE_FLATTEN->setToolTip("Set flatten file structure by default");
   FILE_STRUCTURE_FLATTEN->setCheckable(true);
 

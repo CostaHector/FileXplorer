@@ -37,6 +37,7 @@ public:
   void clearClickPressHappend() { mClickPressHappend = false; }
   void onUserMouseClickOrKeyPressEvent() { mClickPressHappend = true; }
   bool isAutoHideToolBarDisabled() { return mDisableAutoHideToolBar->isChecked(); }
+  bool isShowVideoListView() const { return mShowVideoList != nullptr && mShowVideoList->isChecked(); }
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);

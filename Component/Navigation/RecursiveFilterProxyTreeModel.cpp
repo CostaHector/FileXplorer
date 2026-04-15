@@ -52,7 +52,7 @@ bool RecursiveFilterProxyTreeModel::filterAcceptsRow(int sourceRow, const QModel
     return false;
   }
 
-  MyTreeNode* item = m_sourceModel->itemFromIndex(index);
+  FavTreeNode* item = m_sourceModel->itemFromIndex(index);
   if (item == nullptr) {
     return false;
   }
@@ -76,14 +76,14 @@ bool RecursiveFilterProxyTreeModel::filterAcceptsRow(int sourceRow, const QModel
   return false;
 }
 
-bool RecursiveFilterProxyTreeModel::itemMatches(const MyTreeNode* item, const QString& filter) const {
+bool RecursiveFilterProxyTreeModel::itemMatches(const FavTreeNode* item, const QString& filter) const {
   // 检查名称
-  if (item->val.name.contains(filter, Qt::CaseInsensitive)) {
+  if (item->value().name.contains(filter, Qt::CaseInsensitive)) {
     return true;
   }
 
   // 检查路径
-  QString path = item->val.fullPath;
+  QString path = item->value().fullPath;
   if (!path.isEmpty() && path.contains(filter, Qt::CaseInsensitive)) {
     return true;
   }
@@ -91,9 +91,9 @@ bool RecursiveFilterProxyTreeModel::itemMatches(const MyTreeNode* item, const QS
   return false;
 }
 
-bool RecursiveFilterProxyTreeModel::hasMatchingChild(const MyTreeNode* item, const QString& filter) const {
+bool RecursiveFilterProxyTreeModel::hasMatchingChild(const FavTreeNode* item, const QString& filter) const {
   for (int i = 0; i < item->rowCount(); ++i) {
-    MyTreeNode* child = item->child(i);
+    FavTreeNode* child = item->child(i);
     if (!child)
       continue;
 
@@ -111,7 +111,7 @@ bool RecursiveFilterProxyTreeModel::hasMatchingParent(const QModelIndex& index, 
   QModelIndex parent = index.parent();
   while (parent.isValid()) {
     if (m_sourceModel) {
-      MyTreeNode* parentItem = m_sourceModel->itemFromIndex(parent);
+      FavTreeNode* parentItem = m_sourceModel->itemFromIndex(parent);
       if (parentItem && itemMatches(parentItem, filter)) {
         return true;
       }

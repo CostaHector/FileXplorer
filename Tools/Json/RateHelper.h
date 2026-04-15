@@ -22,9 +22,9 @@ class RateHelper {
   static inline int clampRate(int rate) { return std::max(std::min(rate, (int)MAX_V), (int)MIN_V); }
 
   static bool isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& vRect);
-  static QRect getRatingRect(const QRect& visualRect);
   static int ratingAtPosition(const QPoint& pos, const QRect& visualRect);
 
+  static constexpr int RATING_BAR_X = 32, RATING_BAR_HEIGHT = 32;
  private:
   static bool RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
 
@@ -32,8 +32,6 @@ class RateHelper {
   static QString getBaseNameForImage(const QString& imagePath);
 
   static QPixmap GenerateRatePixmap(int r, const int sliceCount = MAX_V, const bool hasBorder = false);
-
-  static constexpr int RATING_BAR_HEIGHT = 50;
 };
 
 #endif  // RATEHELPER_H
