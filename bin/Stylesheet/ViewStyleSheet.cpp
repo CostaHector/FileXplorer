@@ -59,17 +59,17 @@ QTableView::item:hover {
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QTableView QTableCornerButton::section {
-    background-color: #252525;
+    background-color: #3F3B39;
     border-right: none;
     border-bottom: none;
 }
 
 QTableView QTableCornerButton::section:hover {
-    background-color: #3c3c3c;
+    background-color: #252525;
 }
 
 QTableView QTableCornerButton::section:pressed {
-    background-color: #4e4e50;
+    background-color: #252525;
 }
 
 QTableView {

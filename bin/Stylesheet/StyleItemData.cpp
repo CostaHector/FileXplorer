@@ -62,6 +62,44 @@ bool StyleItemData::invalidateNewValue() {
   return true;
 }
 
+bool StyleItemData::match(const QString& subStr) const {
+  if (subStr.isEmpty()) {
+    return true;
+  }
+  if (isGroup) {
+    return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+  }
+  switch (dataType) {
+    case NUMBER:
+    case FONT_WEIGHT:
+    case FONT_STYLE:
+      return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+    case FONT_FAMILY:
+    case COLOR:
+      return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive)
+             || defValue.toString().contains(subStr, Qt::CaseSensitivity::CaseInsensitive)
+             || curValue.toString().contains(subStr, Qt::CaseSensitivity::CaseInsensitive)
+             || modifiedToValue.toString().contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+    default:
+      return false;
+  }
+}
+bool StyleItemData::match(const int& number) const {
+  if (isGroup) {
+    return false;
+  }
+  switch (dataType) {
+    case NUMBER:
+    case FONT_WEIGHT:
+    case FONT_STYLE:
+      return defValue.toInt() == number || curValue.toInt() == number || modifiedToValue.toInt() == number;
+    case FONT_FAMILY:
+    case COLOR:
+    default:
+      return false;
+  }
+}
+
 QDataStream& operator<<(QDataStream& out, const StyleTreeNode& item) {
   LOG_E("StyleTreeNode does not support serialization. Please implement serialization functions.");
   return out;

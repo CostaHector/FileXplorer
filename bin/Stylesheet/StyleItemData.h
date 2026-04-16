@@ -7,7 +7,7 @@
 
 struct StyleItemData final {
   enum DataTypeE {
-    NORMAL,
+    NUMBER,
     FONT_FAMILY,
     FONT_WEIGHT,
     FONT_STYLE,
@@ -40,16 +40,21 @@ struct StyleItemData final {
   bool setModifiedToValue(const QVariant& _newValue, bool& bNewValueValid);
   bool recoverToBackup();
   bool invalidateNewValue();
+  bool match(const QString& subStr) const;
+  bool match(const int& number) const;
 
   QString name;                                 // 显示名称
   QVariant defValue, curValue, modifiedToValue; // def, backup, modified to
-  DataTypeE dataType{NORMAL};
+  DataTypeE dataType{NUMBER};
   bool isGroup{true}; // 是否为分组
 
   static constexpr int EDITABLE_COLUMN = NEW_DATA_ROLE - DEF_BEGIN_ROLE;
   static constexpr int COLUMN_COUNT = IS_GROUP_ROLE - DEF_BEGIN_ROLE;
   static constexpr const char* HOR_HEADER_TITLES[COLUMN_COUNT]{"Name", "Default Value", "Backup Value", "Modified To Value"};
 };
+
+struct StyleTreeNode;
+extern template class TreeNodeBase<StyleTreeNode, StyleItemData>;
 
 struct StyleTreeNode final : public TreeNodeBase<StyleTreeNode, StyleItemData> {
   using TreeNodeBase<StyleTreeNode, StyleItemData>::TreeNodeBase;

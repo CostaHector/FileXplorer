@@ -11,7 +11,7 @@
 #include "PasswordBook.h"
 
 #include "PreferenceActions.h"
-#include "StyleSheetTreeView.h"
+#include "StyleSheetMgr.h"
 
 #include "MemoryKey.h"
 #include "NotificatorMacro.h"
@@ -56,8 +56,8 @@ void ExtraEvents::subscribe() {
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);
 
   auto& prefInst = g_PreferenceActions();
-  mStyleSheetManager = new (std::nothrow) PopupWidgetManager<StyleSheetTreeView>{prefInst.STYLESHEET_MGR, pParentWidget, "Geometry/StyleSheetMgr"};
-  CHECK_NULLPTR_RETURN_VOID(mStyleSheetManager);
+  mStyleSheetMgr = new (std::nothrow) PopupWidgetManager<StyleSheetMgr>{prefInst.STYLESHEET_MGR, pParentWidget, "Geometry/StyleSheetMgr"};
+  CHECK_NULLPTR_RETURN_VOID(mStyleSheetMgr);
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);

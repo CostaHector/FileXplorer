@@ -32,6 +32,7 @@ struct FavoriteItemData final {
   bool operator!=(const FavoriteItemData& other) const { return !(*this == other); }
 
   bool isValid() const { return !name.isEmpty() && (isGroup || !fullPath.isEmpty()); }
+  bool match(const QString& subStr) const;
 
   QString name;       // 显示名称
   QString fullPath;   // 完整路径（如果不是分组）
@@ -53,11 +54,13 @@ struct FavoriteItemData final {
 QDataStream& operator<<(QDataStream& out, const FavoriteItemData& item);
 QDataStream& operator>>(QDataStream& in, FavoriteItemData& item);
 
-using TFavDataType = FavoriteItemData;
-struct FavTreeNode final : public TreeNodeBase<FavTreeNode, TFavDataType> {
+struct FavTreeNode;
+extern template class TreeNodeBase<FavTreeNode, FavoriteItemData>;
+
+struct FavTreeNode final : public TreeNodeBase<FavTreeNode, FavoriteItemData> {
   friend QDataStream& operator<<(QDataStream& out, const FavTreeNode& item);
   friend QDataStream& operator>>(QDataStream& in, FavTreeNode& item);
-  using TreeNodeBase<FavTreeNode, TFavDataType>::TreeNodeBase;
+  using TreeNodeBase<FavTreeNode, FavoriteItemData>::TreeNodeBase;
 };
 
 QDataStream& operator<<(QDataStream& out, const FavTreeNode& item);

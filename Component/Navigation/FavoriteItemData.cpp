@@ -7,8 +7,13 @@ constexpr const char* FavoriteItemData::HOR_HEADER_TITLES[];
 constexpr int FavoriteItemData::SORT_COLUMN;
 constexpr FavoriteItemData::Role FavoriteItemData::DEF_SORT_ROLE;
 
-FavoriteItemData::FavoriteItemData(const QString& _name) : name{_name}, isGroup{true} {}
-FavoriteItemData::FavoriteItemData(const QString& _name, const QString& path) : name{_name}, isGroup{false}, fullPath{path} {}
+FavoriteItemData::FavoriteItemData(const QString& _name)
+  : name{_name}
+  , isGroup{true} {}
+FavoriteItemData::FavoriteItemData(const QString& _name, const QString& path)
+  : name{_name}
+  , isGroup{false}
+  , fullPath{path} {}
 
 QDataStream& operator<<(QDataStream& out, const FavoriteItemData& item) {
   out << item.name;
@@ -37,7 +42,7 @@ FavoriteItemData::Role FavoriteItemData::GetInitialSortRole() {
 }
 
 void FavoriteItemData::SaveInitialSortRole(Role sortRole) {
-  Configuration().setValue(FavoritesNavigationKey::SORT_BY_ROLE.name, (int)sortRole);
+  Configuration().setValue(FavoritesNavigationKey::SORT_BY_ROLE.name, (int) sortRole);
 }
 
 bool FavoriteItemData::GetInitialSortOrderReverse() {
@@ -46,6 +51,16 @@ bool FavoriteItemData::GetInitialSortOrderReverse() {
 
 void FavoriteItemData::SaveSortOrderReverse(bool bReverse) {
   Configuration().setValue(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, bReverse);
+}
+
+bool FavoriteItemData::match(const QString& subStr) const {
+  if (subStr.isEmpty()) {
+    return true;
+  }
+  if (isGroup) {
+    return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+  }
+  return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive) || fullPath.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
 }
 
 QDataStream& operator<<(QDataStream& out, const FavTreeNode& item) {

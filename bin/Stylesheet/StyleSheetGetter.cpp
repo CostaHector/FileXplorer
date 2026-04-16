@@ -164,13 +164,13 @@ QString GetColorForgroundGeneral(Style::StyleSheetE styleE) {
 
 QString ColorBackgroundGeneralDef(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#323232";
+    return "#3F3B39";
   }
   return "#FFFFFF";
 }
 QString ColorBackgroundAlternateRowDef(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#2A2A2A";
+    return "#5C5C5C";
   }
   return "#F5F5F5"; // (245,245,245)
 }
@@ -189,7 +189,7 @@ QString ColorBackgroundSelectedActiveDef(Style::StyleSheetE styleE) {
 }
 QString ColorBackgroundMenuDef(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#313131";
+    return "#4F4B49";
   }
   return "#FBFCFD";
 }

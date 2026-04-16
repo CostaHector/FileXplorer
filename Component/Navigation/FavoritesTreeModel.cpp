@@ -264,7 +264,7 @@ FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& pat
   QModelIndex parentIndex = indexFromItem(parentItem);
   beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
 
-  auto childNode = parentItem->appendRow(FavTreeNode::create(TFavDataType{name, path}));
+  auto childNode = parentItem->appendRow(FavTreeNode::create(FavoriteItemData{name, path}));
   endInsertRows();
   setDirty();
   return childNode;
