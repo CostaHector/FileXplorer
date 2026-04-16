@@ -62,7 +62,7 @@ StyleSheetEditDelegate::StyleSheetEditDelegate(QObject *parent)
 
 QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NORMAL || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
     return QStyledItemDelegate::createEditor(parent, option, index);
   }
 
@@ -88,7 +88,7 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
 
 void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NORMAL || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
     QStyledItemDelegate::setEditorData(editor, index);
     return;
   }
@@ -128,7 +128,7 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 
 void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NORMAL || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
     QStyledItemDelegate::setModelData(editor, model, index);
     return;
   }

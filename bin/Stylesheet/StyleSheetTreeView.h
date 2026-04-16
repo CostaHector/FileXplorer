@@ -3,6 +3,7 @@
 
 #include "CustomTreeView.h"
 #include "StyleSheetTreeModel.h"
+#include "StyleSheetFilterProxyModel.h"
 #include "StyleSheetEditDelegate.h"
 
 class StyleSheetTreeView : public CustomTreeView {
@@ -10,6 +11,7 @@ class StyleSheetTreeView : public CustomTreeView {
 public:
   explicit StyleSheetTreeView(QWidget* parent = nullptr);
   ~StyleSheetTreeView() = default;
+  void setFilter(const QString& filter);
 
 protected:
   void showEvent(QShowEvent* event) override;
@@ -31,6 +33,7 @@ private:
   QAction* mApplyInstantly{nullptr};
 
   StyleSheetTreeModel* mStyleModel{nullptr};
+  StyleSheetFilterProxyModel* mStyleFilterProxyModel{nullptr};
   StyleSheetEditDelegate* mStyleSheetEditDelegate{nullptr};
 };
 

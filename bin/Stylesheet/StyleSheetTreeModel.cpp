@@ -27,8 +27,8 @@ bool StyleSheetTreeModel::initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot)
   auto* pFontStyle = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Style"}));
   pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontFamilyDef, GetFontFamily(), StyleItemData::FONT_FAMILY}));
 
-  pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontSizeDef, GetFontSize(), StyleItemData::NORMAL}));
-  pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", mFontSizeDef, GetFontSizeTab(), StyleItemData::NORMAL}));
+  pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontSizeDef, GetFontSize(), StyleItemData::NUMBER}));
+  pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", mFontSizeDef, GetFontSizeTab(), StyleItemData::NUMBER}));
 
   pFontWeight->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontWeightDef, GetFontWeight(), StyleItemData::FONT_WEIGHT}));
 

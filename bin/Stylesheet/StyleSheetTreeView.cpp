@@ -9,7 +9,11 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   : CustomTreeView{"StyleSheetTreeView", parent} {
   setIndentation(12);
   mStyleModel = new StyleSheetTreeModel{this};
-  setModel(mStyleModel);
+
+  mStyleFilterProxyModel = new StyleSheetFilterProxyModel{this};
+  mStyleFilterProxyModel->setSourceModel(mStyleModel);
+  setModel(mStyleFilterProxyModel);
+  registerProxyModel(mStyleFilterProxyModel);
 
   mStyleSheetEditDelegate = new StyleSheetEditDelegate{this};
   setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);
@@ -30,8 +34,6 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
 
   InitTreeView();
   subscribe();
-  setWindowTitle("StyleSheet Manager");
-  setWindowIcon(QIcon{":styles/STYLESHEET_MGR"});
 }
 
 void StyleSheetTreeView::showEvent(QShowEvent* event) {
@@ -54,6 +56,10 @@ void StyleSheetTreeView::subscribe() {
   connect(mApplyChanges, &QAction::triggered, this, &StyleSheetTreeView::onApplyChanges);
   connect(mApplyInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantApplyChanged);
   connect(mStyleModel, &StyleSheetTreeModel::requestApplyChanges, this, &StyleSheetTreeView::onRequestApplyChanges);
+}
+
+void StyleSheetTreeView::setFilter(const QString& filter) {
+  mStyleFilterProxyModel->setFilterString(filter);
 }
 
 void StyleSheetTreeView::onClearModifiedValues() {

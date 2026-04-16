@@ -116,8 +116,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QCOMPARE(model.rowCount({}), 0);
 
     auto r0 = FavTreeNode::NewTreeNodeRoot();
-    r0->appendRow(new FavTreeNode{TFavDataType{"group"}});                                  // valid element 1
-    r0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});  // valid element 2
+    r0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});                                  // valid element 1
+    r0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});  // valid element 2
 
     QCOMPARE(model.setDatas(std::move(r0)), true);
     QCOMPARE(model.rowCount({}), 2);
@@ -133,12 +133,12 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void moveParentIndexesTo_sameParent_ok() {
     auto r = FavTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
-    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
+    auto r0 = r->appendRow(new FavTreeNode{FavoriteItemData{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{FavoriteItemData{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{FavoriteItemData{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/g2"}});                // Descendant
 
     QVERIFY(r0->isDescendantOf(r.get()));
     QVERIFY(r0->isAncestorOf(r02));
@@ -194,12 +194,12 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void moveParentIndexesTo_crossParent_ok() {
     auto r = FavTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
-    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
+    auto r0 = r->appendRow(new FavTreeNode{FavoriteItemData{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{FavoriteItemData{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{FavoriteItemData{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/g2"}});                // Descendant
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r)), true);  // failed
@@ -239,12 +239,12 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void moveParentIndexesTo_Ancestor_ok() {
     auto r = FavTreeNode::NewTreeNodeRoot();
-    auto r0 = r->appendRow(new FavTreeNode{TFavDataType{"g0"}});  // ancestor same parent
-    auto r1 = r->appendRow(new FavTreeNode{TFavDataType{"g1"}});
-    auto r2 = r->appendRow(new FavTreeNode{TFavDataType{"n2", "path/n2"}});
-    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n0", "path/g0/n0"}});  // Descendant
-    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/n1", "path/g0/n1"}});  // Descendant
-    auto r02 = r0->appendRow(new FavTreeNode{TFavDataType{"g0/g2"}});                // Descendant
+    auto r0 = r->appendRow(new FavTreeNode{FavoriteItemData{"g0"}});  // ancestor same parent
+    auto r1 = r->appendRow(new FavTreeNode{FavoriteItemData{"g1"}});
+    auto r2 = r->appendRow(new FavTreeNode{FavoriteItemData{"n2", "path/n2"}});
+    auto r00 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n0", "path/g0/n0"}});  // Descendant
+    auto r01 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/n1", "path/g0/n1"}});  // Descendant
+    auto r02 = r0->appendRow(new FavTreeNode{FavoriteItemData{"g0/g2"}});                // Descendant
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r)), true);  // failed
@@ -280,16 +280,16 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   void removeParentIndexes_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     auto p = FavTreeNode::NewTreeNodeRoot();
-    auto p0 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
-    auto p1 = p->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
-    auto p2 = p->appendRow(new FavTreeNode{TFavDataType{"group2Child"}});
-    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
-    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/group_1"}});
-    auto p3 = p->appendRow(new FavTreeNode{TFavDataType{"group3Child"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child0", "path/to/group3Child/child0"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child1"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child2"}});
-    auto p4 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup1", "path/to/nonGroup1"}});
+    auto p0 = p->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new FavTreeNode{FavoriteItemData{"group0Child"}});
+    auto p2 = p->appendRow(new FavTreeNode{FavoriteItemData{"group2Child"}});
+    /*     */ p2->appendRow(new FavTreeNode{FavoriteItemData{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new FavTreeNode{FavoriteItemData{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new FavTreeNode{FavoriteItemData{"group3Child"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child1"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child2"}});
+    auto p4 = p->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup1", "path/to/nonGroup1"}});
     QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
     const QByteArray elements{model.toByteArray()};
@@ -333,16 +333,16 @@ class FavoritesTreeModelTest : public PlainTestSuite {
   void moveParentIndexesTo_ok() {
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     auto p = FavTreeNode::NewTreeNodeRoot();
-    auto p0 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
-    auto p1 = p->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
-    auto p2 = p->appendRow(new FavTreeNode{TFavDataType{"group2Child"}});
-    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
-    /*     */ p2->appendRow(new FavTreeNode{TFavDataType{"group2Child/group_1"}});
-    auto p3 = p->appendRow(new FavTreeNode{TFavDataType{"group3Child"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child0", "path/to/group3Child/child0"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child1"}});
-    /*     */ p3->appendRow(new FavTreeNode{TFavDataType{"group3Child/child2"}});
-    auto p4 = p->appendRow(new FavTreeNode{TFavDataType{"nonGroup1", "path/to/nonGroup1"}});
+    auto p0 = p->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup0", "path/to/nonGroup0"}});
+    auto p1 = p->appendRow(new FavTreeNode{FavoriteItemData{"group0Child"}});
+    auto p2 = p->appendRow(new FavTreeNode{FavoriteItemData{"group2Child"}});
+    /*     */ p2->appendRow(new FavTreeNode{FavoriteItemData{"group2Child/non_group_0", "path/to/group2Child/non_group_0"}});
+    /*     */ p2->appendRow(new FavTreeNode{FavoriteItemData{"group2Child/group_1"}});
+    auto p3 = p->appendRow(new FavTreeNode{FavoriteItemData{"group3Child"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child0", "path/to/group3Child/child0"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child1"}});
+    /*     */ p3->appendRow(new FavTreeNode{FavoriteItemData{"group3Child/child2"}});
+    auto p4 = p->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup1", "path/to/nonGroup1"}});
 
     QCOMPARE(model.setDatas(std::move(p)), true);
     QCOMPARE(model.rowCount({}), 5);
@@ -436,8 +436,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void onRenameGroupName_ok() {
     auto r0 = FavTreeNode::NewTreeNodeRoot();
-    r0->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});
-    r0->appendRow(new FavTreeNode{TFavDataType{"group0Child"}});
+    r0->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup0", "path/to/nonGroup0"}});
+    r0->appendRow(new FavTreeNode{FavoriteItemData{"group0Child"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeView", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r0)), true);
@@ -456,10 +456,10 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
   void drag_drop_internal_ok() {
     auto r0 = FavTreeNode::NewTreeNodeRoot();
-    auto r00 = r0->appendRow(new FavTreeNode{TFavDataType{"nonGroup0", "path/to/nonGroup0"}});  // non-group
-    auto r01 = r0->appendRow(new FavTreeNode{TFavDataType{"groupChild1"}});                     // group
-    auto r010 = r01->appendRow(new FavTreeNode{TFavDataType{"groupChild1_group0"}});
-    auto r011 = r01->appendRow(new FavTreeNode{TFavDataType{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"}});
+    auto r00 = r0->appendRow(new FavTreeNode{FavoriteItemData{"nonGroup0", "path/to/nonGroup0"}});  // non-group
+    auto r01 = r0->appendRow(new FavTreeNode{FavoriteItemData{"groupChild1"}});                     // group
+    auto r010 = r01->appendRow(new FavTreeNode{FavoriteItemData{"groupChild1_group0"}});
+    auto r011 = r01->appendRow(new FavTreeNode{FavoriteItemData{"groupChild1_nonGroup1", "path/to/groupChild1_nonGroup1"}});
 
     FavoritesTreeModel model{"BelongToFavoritesTreeViewInternalDragDrop", nullptr, false};
     QCOMPARE(model.setDatas(std::move(r0)), true);

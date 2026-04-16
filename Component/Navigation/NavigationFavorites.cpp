@@ -2,7 +2,8 @@
 #include <QAction>
 #include <QIcon>
 
-NavigationFavorites::NavigationFavorites(QWidget* parent) : QWidget{parent} {
+NavigationFavorites::NavigationFavorites(QWidget* parent)
+  : QWidget{parent} {
   m_searchLineEdit = new QLineEdit{this};
   m_startSearchAct = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_searchLineEdit->setClearButtonEnabled(true);

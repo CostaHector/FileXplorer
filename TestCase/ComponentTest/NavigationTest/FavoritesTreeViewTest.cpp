@@ -44,9 +44,9 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     QCOMPARE(rootSrcIndex, (QModelIndex{}));
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"group_other"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group_other"}});
 
     view.mFavModel->setDatas(std::move(p0));
     QCOMPARE(view.mFavModel->rowCount(), 3);
@@ -111,8 +111,8 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     QCOMPARE(reqIntoAPathSpy.count(), 0);
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
     view.mFavModel->setDatas(std::move(p0));
 
     QCOMPARE(view.mFavModel->rowCount(), 2);
@@ -147,8 +147,8 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
     view.mFavModel->setDatas(std::move(p0));
     QCOMPARE(view.mFavModel->rowCount(), 2);
 
@@ -198,8 +198,8 @@ class FavoritesTreeViewTest : public PlainTestSuite {
 
     // 重置行为指定值 line=2
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
     view.mFavModel->setDatas(std::move(p0));
     QCOMPARE(view.mFavModel->rowCount(), 2);
 
@@ -234,8 +234,8 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     QCOMPARE(view.mFavModel->rowCount(), 0);
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
 
     view.mFavModel->setDatas(std::move(p0));
     QCOMPARE(view.mFavModel->rowCount(), 2);
@@ -267,11 +267,11 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     QVERIFY(view.mFavProxyModel->m_sourceModel != nullptr);
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    FavTreeNode* p00 = p0->appendRow(new FavTreeNode{TFavDataType{"group"}});
-    FavTreeNode* p01 = p0->appendRow(new FavTreeNode{TFavDataType{"non_group", "path/to/non_group_folder"}});
-    FavTreeNode* p02 = p0->appendRow(new FavTreeNode{TFavDataType{"Kaka"}});
-    p01->appendRow(new FavTreeNode{TFavDataType{"Real Madrid Vacation", "Cristiano Ronaldo"}});
-    p01->appendRow(new FavTreeNode{TFavDataType{"Brazil", "Neymar"}});
+    FavTreeNode* p00 = p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});
+    FavTreeNode* p01 = p0->appendRow(new FavTreeNode{FavoriteItemData{"non_group", "path/to/non_group_folder"}});
+    FavTreeNode* p02 = p0->appendRow(new FavTreeNode{FavoriteItemData{"Kaka"}});
+    p01->appendRow(new FavTreeNode{FavoriteItemData{"Real Madrid Vacation", "Cristiano Ronaldo"}});
+    p01->appendRow(new FavTreeNode{FavoriteItemData{"Brazil", "Neymar"}});
     view.mFavModel->setDatas(std::move(p0));
     QCOMPARE(view.mFavModel->rowCount(), 3);
 
@@ -297,13 +297,13 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     FavoriteItemData::SaveSortOrderReverse(true);  // reverse
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
-    FavTreeNode* p00 = p0->appendRow(new FavTreeNode{TFavDataType{"name0", "path2"}});
+    FavTreeNode* p00 = p0->appendRow(new FavTreeNode{FavoriteItemData{"name0", "path2"}});
     p00->val.accessCount = 10;
     p00->val.lastAccess = 0;  // 1970-01-01 08:00:00 时刻访问过
-    FavTreeNode* p01 = p0->appendRow(new FavTreeNode{TFavDataType{"name1", "path1"}});
+    FavTreeNode* p01 = p0->appendRow(new FavTreeNode{FavoriteItemData{"name1", "path1"}});
     p01->val.accessCount = 44;
     p01->val.lastAccess = 60 * 1000;  // 1970-01-01 08:01:00 时刻访问过
-    FavTreeNode* p02 = p0->appendRow(new FavTreeNode{TFavDataType{"name2", "path0"}});
+    FavTreeNode* p02 = p0->appendRow(new FavTreeNode{FavoriteItemData{"name2", "path0"}});
     p02->val.accessCount = 7;
     p02->val.lastAccess = 60 * 60 * 1000;  // 1970-01-01 09:00:00 时刻访问过
 

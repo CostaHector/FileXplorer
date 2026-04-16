@@ -8,7 +8,9 @@
 // TDataType must have implement
 // member function:
 // 1. TDataType(QString);
-// 2. operator==, operator!=;
+// 2. bool operator==(const TDataType&rhs) const;
+// 3. bool operator!=(const TDataType&rhs) const;
+// 3. bool match(const QString& subStr) const;
 // data member: bool isGroup; QString name;
 // static data member: constexpr int COLUMN_COUNT; constexpr const char* HOR_HEADER_TITLES[COLUMN_COUNT];
 
@@ -84,25 +86,8 @@ public:
     return TDataType::HOR_HEADER_TITLES;
   }
 
-  bool isAncestorOf(const Derived* descendant) const {
-    if (descendant == nullptr) {
-      return false;
-    }
-    return descendant->isDescendantOf(derived());
-  }
-  bool isDescendantOf(const Derived* ancestor) const {
-    if (ancestor == nullptr) {
-      return false;
-    }
-
-    for (const Derived* parentNode = parent(); parentNode != nullptr; parentNode = parentNode->parent()) {
-      if (parentNode == ancestor) {
-        return true;
-      }
-    }
-
-    return false;
-  }
+  bool isAncestorOf(const Derived* descendant) const;
+  bool isDescendantOf(const Derived* ancestor) const;
   TDataType& value() {
     return val;
   }
@@ -111,29 +96,7 @@ public:
   }
 
   bool operator!=(const Derived& rhs) const { return !(*this == rhs); }
-  bool operator==(const Derived& rhs) const {
-    if (val != rhs.val) {
-      return false;
-    }
-    if (childsCount() != rhs.childsCount()) {
-      return false;
-    }
-    for (int i = 0; i < childsCount(); ++i) {
-      const Derived* leftChild = child(i);
-      const Derived* rightChild = rhs.child(i);
-      if (leftChild == nullptr && rightChild == nullptr) {
-        continue;
-      }
-      if (leftChild != nullptr && rightChild != nullptr) {
-        if (*leftChild != *rightChild) {
-          return false;
-        }
-        continue;
-      }
-      return false;
-    }
-    return true;
-  }
+  bool operator==(const Derived& rhs) const;
 
   bool isGroup() const { return val.isGroup; }
   QString name() const { return val.name; }
@@ -144,6 +107,7 @@ public:
     val.name = newName;
     return true;
   }
+  bool filterAccept(const QString& text, QHash<const void*, bool>& passCache) const;
 
 protected:
   TreeNodeBase() = default;
@@ -155,6 +119,10 @@ protected:
   TDataType val;
   QList<Derived*> childs;
   Derived* pParent{nullptr};
+
+  bool isCurrentNodeMatch(const QString& text, QHash<const void*, bool>& passCache) const;
+  bool isChildNodeMatch(const QString& text, QHash<const void*, bool>& passCache) const;
+  bool isParentNodeMatch(const QString& text, QHash<const void*, bool>& passCache) const;
 };
 
 #endif // TREENODEBASE_H
