@@ -3,8 +3,10 @@
 
 #include "CustomTreeView.h"
 #include "StyleSheetTreeModel.h"
-#include "StyleSheetFilterProxyModel.h"
+#include "TreeFilterProxyModel.h"
 #include "StyleSheetEditDelegate.h"
+
+extern template class TreeFilterProxyModel<StyleTreeNode>;
 
 class StyleSheetTreeView : public CustomTreeView {
   Q_OBJECT
@@ -33,7 +35,7 @@ private:
   QAction* mApplyInstantly{nullptr};
 
   StyleSheetTreeModel* mStyleModel{nullptr};
-  StyleSheetFilterProxyModel* mStyleFilterProxyModel{nullptr};
+  TreeFilterProxyModel<StyleTreeNode>* mStyleFilterProxyModel{nullptr};
   StyleSheetEditDelegate* mStyleSheetEditDelegate{nullptr};
 };
 

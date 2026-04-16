@@ -4,27 +4,6 @@
 
 // setRecursiveFilteringEnabled(true); filterAcceptsRow override its behavior
 
-void RecursiveFilterProxyTreeModel::setFilterString(const QString& filter) {
-  m_filter = filter;
-  mPassCache.clear();
-  invalidateFilter();
-}
-
-bool RecursiveFilterProxyTreeModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const {
-  if (curFilter().isEmpty() && sourceModel() == nullptr) {
-    return true;
-  }
-  const QModelIndex index{sourceModel()->index(sourceRow, 0, sourceParent)};
-  if (!index.isValid()) {
-    return false;
-  }
-  const FavTreeNode* item = static_cast<FavTreeNode*>(index.internalPointer());
-  if (item == nullptr) {
-    return false;
-  }
-  return item->filterAccept(curFilter(), mPassCache);
-}
-
 void RecursiveFilterProxyTreeModel::initSortProxy(FavoriteItemData::Role initRole, bool bReverseOrder) {
   if (!isSortProxyInited()) {
     setSortRole(initRole);

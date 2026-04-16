@@ -1,9 +1,15 @@
-#ifndef STYLESHEETFILTERPROXYMODEL_H
-#define STYLESHEETFILTERPROXYMODEL_H
+#ifndef TREEFILTERPROXYMODEL_H
+#define TREEFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
 
-class StyleSheetFilterProxyModel : public QSortFilterProxyModel {
+// Requirement:
+// TTreeNode must have implement
+// member function:
+// bool filterAccept(const QString& subStr, QHash<const void*, bool>& cache)
+
+template<typename TTreeNode>
+class TreeFilterProxyModel : public QSortFilterProxyModel {
 public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
   void setFilterString(const QString& filter);
@@ -17,4 +23,4 @@ private:
   mutable QHash<const void*, bool> mPassCache;
 };
 
-#endif // STYLESHEETFILTERPROXYMODEL_H
+#endif // TREEFILTERPROXYMODEL_H

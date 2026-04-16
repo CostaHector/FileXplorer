@@ -10,7 +10,7 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   setIndentation(12);
   mStyleModel = new StyleSheetTreeModel{this};
 
-  mStyleFilterProxyModel = new StyleSheetFilterProxyModel{this};
+  mStyleFilterProxyModel = new TreeFilterProxyModel<StyleTreeNode>{this};
   mStyleFilterProxyModel->setSourceModel(mStyleModel);
   setModel(mStyleFilterProxyModel);
   registerProxyModel(mStyleFilterProxyModel);
