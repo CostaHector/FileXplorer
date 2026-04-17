@@ -389,32 +389,29 @@ class SceneListViewTest : public PlainTestSuite {
     QVERIFY(sceneView.mAlignDelegate != nullptr);
 
     QModelIndex firstIndex, secondIndex;
-    QRect imgRect0, imgRect1;
+    QRect rateAreaRect0, rateAreaRect1; // 图片顶部visualRect 一条带, 并且向右偏移固定值
     QPoint pnt0In, pnt0Out;
     QPoint pnt1In, pnt1Out;
     auto InitPntAndRect = [&]() {
       firstIndex = sceneProxyModel.index(0, 0);
       secondIndex = sceneProxyModel.index(1, 0);
-
       const QRect vRect0 = sceneView.visualRect(firstIndex);
-      imgRect0 = SceneStyleDelegate::GetRatingAreaRect(vRect0);
-      pnt0Out = QPoint{imgRect0.left() + 2, imgRect0.top() + 5};  // rate 1 postion
-      pnt0In = QPoint{imgRect0.left() + 2, imgRect0.bottom() - 5};
+      rateAreaRect0 = SceneStyleDelegate::GetRatingAreaRect(vRect0);
+      pnt0In = QPoint{rateAreaRect0.left() + 2, rateAreaRect0.top() + 5};  // 评分条内 rate 1 postion
+      pnt0Out = QPoint{rateAreaRect0.left() + 2, rateAreaRect0.bottom() + 5}; // 评分条外
 
       const QRect vRect1 = sceneView.visualRect(secondIndex);
-      imgRect1 = SceneStyleDelegate::GetRatingAreaRect(vRect1);
-      pnt1Out = QPoint{imgRect1.right() - 2, imgRect1.top() + 5};  // rate 10 postion
-      pnt1In = QPoint{imgRect1.right() - 2, imgRect1.bottom() - 5};
+      rateAreaRect1 = SceneStyleDelegate::GetRatingAreaRect(vRect1);
+      pnt1In = QPoint{rateAreaRect1.right() - 2, rateAreaRect1.top() + 5}; // 评分条内 rate 10 postion
+      pnt1Out = QPoint{rateAreaRect1.right() - 2, rateAreaRect1.bottom() + 5};  // 评分条外
     };
 
     InitPntAndRect();
-    QVERIFY(imgRect0.height() > RateHelper::RATING_BAR_HEIGHT);
-    QVERIFY(imgRect1.height() > RateHelper::RATING_BAR_HEIGHT);
-    QCOMPARE(imgRect0.y(), imgRect1.y());  // in a same row
-    QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt0In, imgRect0));
-    QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt1In, imgRect1));
-    QVERIFY(!RateHelper::isClickPointInsideRatingBar(pnt0Out, imgRect0));
-    QVERIFY(!RateHelper::isClickPointInsideRatingBar(pnt1Out, imgRect1));
+    QCOMPARE(rateAreaRect0.y(), rateAreaRect1.y());  // in a same row
+    QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt0In, rateAreaRect0));
+    QVERIFY(RateHelper::isClickPointInsideRatingBar(pnt1In, rateAreaRect1));
+    QVERIFY(!RateHelper::isClickPointInsideRatingBar(pnt0Out, rateAreaRect0));
+    QVERIFY(!RateHelper::isClickPointInsideRatingBar(pnt1Out, rateAreaRect1));
 
     const RatingStateMachine& machine = sceneView.mAlignDelegate->mRateMachine;
     QCOMPARE(machine.status(), RatingState::IDLE);

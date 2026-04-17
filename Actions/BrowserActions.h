@@ -1,13 +1,15 @@
 ﻿#ifndef BROWSER_ACTIONS_H
 #define BROWSER_ACTIONS_H
 
-#include <QMenu>
-#include <QToolBar>
-#include <QWidget>
 #include <QAction>
 #include <QActionGroup>
 
+class QMenu;
+class QToolBar;
+class QWidget;
+
 class BrowserActions:public QObject {
+  Q_OBJECT
 public:
   static BrowserActions& GetInst() {
     static BrowserActions inst;

@@ -58,6 +58,7 @@ file(GLOB SOURCES
     # test only module sources
     main_ut.cpp
     ActionsTest/*.cpp
+    binTest/StylesheetTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp

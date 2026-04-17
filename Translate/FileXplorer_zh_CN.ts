@@ -88,7 +88,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+94"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -124,6 +124,44 @@
         <location line="+2"/>
         <source>Archive</source>
         <translation>压缩打包</translation>
+    </message>
+</context>
+<context>
+    <name>BrowserActions</name>
+    <message>
+        <location filename="../Actions/BrowserActions.cpp" line="+9"/>
+        <source>Search Current Text</source>
+        <translation>搜索当前选中</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Search Multiple Texts</source>
+        <translation>多子串搜索</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Advanced Text Search</source>
+        <translation>高级搜索</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear All Selections</source>
+        <translation>清除选中</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Editor Mode</source>
+        <translation>编辑模式</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Add to CAST table</source>
+        <translation>添加到CAST表</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Copy Selected Text</source>
+        <translation>复制选中文本</translation>
     </message>
 </context>
 <context>
@@ -1494,7 +1532,7 @@
         <translation>样式配置</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+56"/>
         <source>App UI Style</source>
         <translation>应用风格</translation>
     </message>
@@ -2054,19 +2092,29 @@
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../bin/Stylesheet/StyleSheetTreeView.cpp" line="+21"/>
+        <location filename="../bin/Stylesheet/StyleSheetTreeView.cpp" line="+27"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Restore from Backup</source>
-        <translation>恢复修改后的值</translation>
+        <location line="-1"/>
+        <source>Apply Changes</source>
+        <translation>应用修改后的值</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Batch Set Color</source>
+        <translation>批量设置颜色</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Restore to Default</source>
+        <translation>恢复到默认值</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Apply Changes</source>
-        <translation>应用修改后的值</translation>
+        <source>Restore to Backup</source>
+        <translation>恢复到备份值</translation>
     </message>
     <message>
         <location line="+1"/>

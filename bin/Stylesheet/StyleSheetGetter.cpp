@@ -155,11 +155,11 @@ QString GetColorBorderMenuRight(Style::StyleSheetE styleE) {
   }
   return Configuration().value("StyleSheet/LightColor/Border/MenuRight", ColorBorderMenuRightDef(styleE)).toString();
 }
-QString GetColorForgroundGeneral(Style::StyleSheetE styleE) {
+QString GetColorForegroundGeneral(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Forground/General", ColorForgroundGeneralDef(styleE)).toString();
+    return Configuration().value("StyleSheet/DarkColor/Foreground/General", ColorForegroundGeneralDef(styleE)).toString();
   }
-  return Configuration().value("StyleSheet/LightColor/Forground/General", ColorForgroundGeneralDef(styleE)).toString();
+  return Configuration().value("StyleSheet/LightColor/Foreground/General", ColorForegroundGeneralDef(styleE)).toString();
 }
 
 QString ColorBackgroundGeneralDef(Style::StyleSheetE styleE) {
@@ -214,11 +214,11 @@ QString ColorBorderMenuRightDef(Style::StyleSheetE styleE) {
   }
   return "#3C3C3C";
 }
-QString ColorForgroundGeneralDef(Style::StyleSheetE styleE) {
+QString ColorForegroundGeneralDef(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#000000";
+    return "#FFFFFF";
   }
-  return "#FFFFFF";
+  return "#000000";
 }
 
 } // namespace ColorCfg

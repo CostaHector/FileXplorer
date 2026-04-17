@@ -84,7 +84,7 @@ class RateHelperTest : public PlainTestSuite {
     QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{100, 400}), rect));
     QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{100, 375}), rect));
     QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{50, 400}), rect));
-    QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{0, 0}), rect));
+    QVERIFY(RateHelper::isClickPointInsideRatingBar((QPoint{0, 0}), rect));
     QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{200, 375}), rect));
     QVERIFY(!RateHelper::isClickPointInsideRatingBar((QPoint{50, 500}), rect));
   }

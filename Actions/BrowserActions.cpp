@@ -1,37 +1,41 @@
 ﻿#include "BrowserActions.h"
 #include "PublicMacro.h"
 
+#include <QMenu>
+#include <QToolBar>
+#include <QWidget>
+
 BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
-  SEARCH_CUR_TEXT = new QAction{QIcon{":img/SEARCH"}, "Search Current Text", this};
+  SEARCH_CUR_TEXT = new QAction{QIcon{":img/SEARCH"}, tr("Search Current Text"), this};
   SEARCH_CUR_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_1));
   SEARCH_CUR_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for currently selected text in database"}//
                                   .arg(SEARCH_CUR_TEXT->text(), SEARCH_CUR_TEXT->shortcut().toString()));
 
-  SEARCH_MULTIPLE_TEXTS = new QAction{QIcon{":img/SEARCH_MULTI_KEYWORDS"}, "Search Multiple Texts", this};
+  SEARCH_MULTIPLE_TEXTS = new QAction{QIcon{":img/SEARCH_MULTI_KEYWORDS"}, tr("Search Multiple Texts"), this};
   SEARCH_MULTIPLE_TEXTS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F));
   SEARCH_MULTIPLE_TEXTS->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for multiple selected texts (order insensitive) in database"}//
                                         .arg(SEARCH_MULTIPLE_TEXTS->text(), SEARCH_MULTIPLE_TEXTS->shortcut().toString()));
 
-  ADVANCED_TEXT_SEARCH = new QAction{QIcon{":img/SEARCH_CHOICE"}, "Advanced Text Search", this};
+  ADVANCED_TEXT_SEARCH = new QAction{QIcon{":img/SEARCH_CHOICE"}, tr("Advanced Text Search"), this};
   ADVANCED_TEXT_SEARCH->setToolTip(QString{"<b>%1 (%2)</b><br/>Provides multiple search options and allows editing WHERE clause before executing search"}
                                        .arg(ADVANCED_TEXT_SEARCH->text(), ADVANCED_TEXT_SEARCH->shortcut().toString()));
 
-  CLEAR_ALL_SELECTIONS = new QAction{QIcon{":img/SELECT_NONE"}, "Clear All Selections", this};
+  CLEAR_ALL_SELECTIONS = new QAction{QIcon{":img/SELECT_NONE"}, tr("Clear All Selections"), this};
   CLEAR_ALL_SELECTIONS->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_2));
   CLEAR_ALL_SELECTIONS->setToolTip(QString{"<b>%1 (%2)</b><br/>Clear all text selections in current browser"}//
                                        .arg(CLEAR_ALL_SELECTIONS->text(), CLEAR_ALL_SELECTIONS->shortcut().toString()));
 
-  EDITOR_MODE = new QAction{QIcon{":img/EDITOR_MODE"}, "Editor Mode", this};
+  EDITOR_MODE = new QAction{QIcon{":img/EDITOR_MODE"}, tr("Editor Mode"), this};
   EDITOR_MODE->setToolTip(QString{"<b>%1 (%2)</b><br/>Toggle editor/viewer mode"}//
                               .arg(EDITOR_MODE->text(), EDITOR_MODE->shortcut().toString()));
   EDITOR_MODE->setCheckable(true);
   EDITOR_MODE->setChecked(false);
 
-  ADD_SELECTIONS_2_CAST_TABLE = new QAction{QIcon{":img/CAST_VIEW"}, "Add to CAST table", this};
+  ADD_SELECTIONS_2_CAST_TABLE = new QAction{QIcon{":img/CAST_VIEW"}, tr("Add to CAST table"), this};
   ADD_SELECTIONS_2_CAST_TABLE->setToolTip(QString{"<b>%1 (%2)</b><br/>Add current multi-selection text as casts name to `CAST` Table"}//
                                              .arg(ADD_SELECTIONS_2_CAST_TABLE->text(), ADD_SELECTIONS_2_CAST_TABLE->shortcut().toString()));
 
-  COPY_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, "Copy Selected Text", this};
+  COPY_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, tr("Copy Selected Text"), this};
   COPY_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_3));
 }
 

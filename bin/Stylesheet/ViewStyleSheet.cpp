@@ -119,7 +119,7 @@ QTableView::item:hover {
   QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %6
   QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %7
   QString gridline{ColorCfg::GetColorGridLine(styleE)}; // %8
-  QString forgroundGeneral{ColorCfg::GetColorForgroundGeneral(styleE)};
+  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
 
   styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, gridline);
   return styleSheet;
@@ -200,7 +200,7 @@ QListView::item:hover {
   QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)};// %7
   
   QString gridline{ColorCfg::GetColorGridLine(styleE)};
-  QString forgroundGeneral{ColorCfg::GetColorForgroundGeneral(styleE)};
+  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
   styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }
@@ -279,7 +279,7 @@ QTreeView::item:hover {
   QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %7
   
   QString gridline{ColorCfg::GetColorGridLine(styleE)};
-  QString forgroundGeneral{ColorCfg::GetColorForgroundGeneral(styleE)};
+  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
   styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }

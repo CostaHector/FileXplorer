@@ -9,6 +9,10 @@ class StyleSheetMgr : public QWidget {
 public:
   explicit StyleSheetMgr(QWidget* parent = nullptr);
 
+protected:
+  void showEvent(QShowEvent* event) override;
+  void hideEvent(QHideEvent* event) override;
+
 private:
   void onStartFilter();
 

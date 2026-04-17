@@ -113,12 +113,11 @@ class RedundantImageModelTest : public PlainTestSuite {
     QCOMPARE(rim.data(rim.index(3, DIColumnE::AbsPath), Qt::ItemDataRole::DisplayRole).toString(), "home/to/duplicate images.png");
 
     // image show in AbsPath column not Name column.
-    QCOMPARE(rim.data(rim.index(0, DIColumnE::Name), Qt::ItemDataRole::DecorationRole).isNull(), true);
-    QCOMPARE(rim.data(rim.index(0, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isValid(), true); // the first and second image exist
-    QCOMPARE(rim.data(rim.index(1, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isValid(), true);
-    QCOMPARE(rim.data(rim.index(1, DIColumnE::AbsPath), Qt::ItemDataRole::BackgroundRole).isNull(), true);  // this role not set
+    QCOMPARE(rim.data(rim.index(0, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isValid(), false); // the first and second image exist
+    QCOMPARE(rim.data(rim.index(1, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isValid(), false);
+    QCOMPARE(rim.data(rim.index(2, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isValid(), false); // the third image not exist
 
-    QCOMPARE(rim.data(rim.index(2, DIColumnE::AbsPath), Qt::ItemDataRole::DecorationRole).isNull(), true); // the third image not exist
+    QCOMPARE(rim.data(rim.index(1, DIColumnE::AbsPath), Qt::ItemDataRole::BackgroundRole).isNull(), true);  // this role not set
 
     QCOMPARE(rim.filePath(rim.index(0, DIColumnE::Name)), mPath1);
     QCOMPARE(rim.filePath(rim.index(1, DIColumnE::Name)), mPath2);

@@ -2,8 +2,8 @@
 #include "NotificatorMacro.h"
 #include "StyleSheetGetter.h"
 #include "MemoryKey.h"
-#include "StyleSheet.h"
 #include "PreferenceActions.h"
+#include <QColorDialog>
 
 StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   : CustomTreeView{"StyleSheetTreeView", parent} {
@@ -22,28 +22,20 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);
 
-  mClearModifiedValues = new QAction{tr("Clear Modified Values"), this};
-  mRestoreFromBackup = new QAction{tr("Restore from Backup"), this};
-  mApplyChanges = new QAction{tr("Apply Changes"), this};
-  mApplyInstantly = new QAction{tr("Instant Apply"), this};
+  mBatchSetColor = new QAction{QIcon{":/styles/COLOR_SELECT"}, tr("Batch Set Color"), this};
+  mApplyChanges = new QAction{QIcon{":img/SAVED"}, tr("Apply Changes"), this};
+  mClearModifiedValues = new QAction{QIcon{":/styles/CLEAR_MODIFIED_VALUES"}, tr("Clear Modified Values"), this};
+  mRestoreToDefault = new QAction{QIcon{":/styles/RESTORE_TO_DEFAULT"}, tr("Restore to Default"), this};
+  mRestoreToBackup = new QAction{QIcon{":/styles/RESTORE_TO_BACKUP"}, tr("Restore to Backup"), this};
+  mApplyInstantly = new QAction{QIcon{":/styles/INSTANT_APPLY"}, tr("Instant Apply"), this};
   mApplyInstantly->setToolTip("Apply changes immediately for real-time preview. Note: this may cause screen flickering.");
   mApplyInstantly->setCheckable(true);
   mApplyInstantly->setChecked(false);
-  QList<QAction*> exclusiveActs{mClearModifiedValues, mRestoreFromBackup, mApplyChanges, mApplyInstantly};
+  QList<QAction*> exclusiveActs{mBatchSetColor, mApplyChanges, mClearModifiedValues, mRestoreToDefault, mRestoreToBackup, mApplyInstantly};
   PushFrontExclusiveActions(exclusiveActs);
 
   InitTreeView();
   subscribe();
-}
-
-void StyleSheetTreeView::showEvent(QShowEvent* event) {
-  QWidget::showEvent(event);
-  StyleSheet::UpdateTitleBar(this);
-}
-
-void StyleSheetTreeView::hideEvent(QHideEvent* event) {
-  g_PreferenceActions().STYLESHEET_MGR->setChecked(false);
-  QWidget::hideEvent(event);
 }
 
 void StyleSheetTreeView::initExclusivePreferenceSetting() {
@@ -51,10 +43,12 @@ void StyleSheetTreeView::initExclusivePreferenceSetting() {
 }
 
 void StyleSheetTreeView::subscribe() {
-  connect(mClearModifiedValues, &QAction::triggered, this, &StyleSheetTreeView::onClearModifiedValues);
-  connect(mRestoreFromBackup, &QAction::triggered, this, &StyleSheetTreeView::onRestoreFromBackup);
+  connect(mBatchSetColor, &QAction::triggered, this, &StyleSheetTreeView::onBatchSetColor);
   connect(mApplyChanges, &QAction::triggered, this, &StyleSheetTreeView::onApplyChanges);
-  connect(mApplyInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantApplyChanged);
+  connect(mClearModifiedValues, &QAction::triggered, this, &StyleSheetTreeView::onClearModifiedValues);
+  connect(mRestoreToDefault, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToDefault);
+  connect(mRestoreToBackup, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToBackup);
+  connect(mApplyInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantApplySwitchChanged);
   connect(mStyleModel, &StyleSheetTreeModel::requestApplyChanges, this, &StyleSheetTreeView::onRequestApplyChanges);
 }
 
@@ -62,44 +56,92 @@ void StyleSheetTreeView::setFilter(const QString& filter) {
   mStyleFilterProxyModel->setFilterString(filter);
 }
 
-void StyleSheetTreeView::onClearModifiedValues() {
+QString StyleSheetTreeView::curFilter() const {
+  return mStyleFilterProxyModel->curFilter();
+}
+
+int StyleSheetTreeView::onClearModifiedValues() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("No row selected", "No modified value cleared");
-    return;
+    return 0;
   }
   int rowsAffected = mStyleModel->ClearNewValues(selectedRowsSource());
   LOG_OK_P("Modified values cleared", "%d row(s) reset to default", rowsAffected);
+  return rowsAffected;
 }
 
-void StyleSheetTreeView::onRestoreFromBackup() {
+int StyleSheetTreeView::onRestoreToDefault() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("No row selected", "No changes to restore");
-    return;
+    return 0;
   }
-  int rowsAffected = mStyleModel->recoverNewValuesToBackup(selectedRowsSource());
+  int rowsAffected = mStyleModel->RecoverNewValuesToDefault(selectedRowsSource());
   if (rowsAffected <= 0) {
-    LOG_INFO_NP("Restore from backup", "No changes to restore");
-    return;
+    LOG_INFO_NP("Restore to default", "No changes to restore");
+    return rowsAffected;
   }
-  LOG_OK_P("Values restored", "%d row(s) restored from backup", rowsAffected);
+  LOG_OK_P("Values restored", "%d row(s) restored to default", rowsAffected);
+  return rowsAffected;
 }
 
-void StyleSheetTreeView::onApplyChanges() {
+int StyleSheetTreeView::onRestoreToBackup() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("No row selected", "No changes to restore");
+    return 0;
+  }
+  int rowsAffected = mStyleModel->RecoverNewValuesToBackup(selectedRowsSource());
+  if (rowsAffected <= 0) {
+    LOG_INFO_NP("Restore to backup", "No changes to restore");
+    return rowsAffected;
+  }
+  LOG_OK_P("Values restored", "%d row(s) restored to backup", rowsAffected);
+  return rowsAffected;
+}
+
+int StyleSheetTreeView::onBatchSetColor() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("No row selected", "No color value set");
+    return 0;
+  }
+  const QModelIndexList indexes = selectedRowsSource();
+  const QString& colorSelectTitle{QString{"Select color for 1 rows"}.arg(indexes.size())};
+  QColor newColor = QColorDialog::getColor(Qt::GlobalColor::white, this, colorSelectTitle);
+  if (!newColor.isValid()) {
+    return -1;
+  }
+  const QString& newColorStr{newColor.name(QColor::HexArgb)};
+  const int rowsAffected = mStyleModel->SetNewColors(indexes, newColorStr);
+  LOG_OK_P("Set New Color", "%d/%d rows changed to %s", rowsAffected, indexes.size(), qPrintable(newColorStr));
+  return rowsAffected;
+}
+
+int StyleSheetTreeView::onApplyChanges() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("No row selected", "No changes to apply");
-    return;
+    return 0;
   }
-  const QVariantHash cfg = mStyleModel->ApplyNewValues(selectedRowsSource());
+  const QVariantHash cfg = mStyleModel->CollectItemsNeedApplyChange(selectedRowsSource());
   bool bChangeExist{!cfg.isEmpty()};
   if (!bChangeExist) {
     LOG_INFO_NP("Apply changes", "No changes to apply");
-    return;
+    return 0;
   }
-  LOG_OK_P("Changes applied", "%d value(s) updated", cfg.size());
+  int settingItemsUpdatedCnt{0};
+  QSettings& settings = Configuration();
   for (auto it = cfg.cbegin(); it != cfg.cend(); ++it) {
+    if (settings.contains(it.key()) && settings.value(it.key()) == it.value()) {
+      continue;
+    }
     Configuration().setValue(it.key(), it.value());
+    ++settingItemsUpdatedCnt;
   }
+  if (settingItemsUpdatedCnt == 0) {
+    LOG_INFO_P("No changes needed", "%d configuration value(s) modified but all match existing settings", cfg.size());
+    return 0;
+  }
+  LOG_OK_P("Changes applied successfully", "%d of %d value(s) updated", settingItemsUpdatedCnt, cfg.size());
   g_PreferenceActions().initStyleSheet(false);
+  return settingItemsUpdatedCnt;
 }
 
 void StyleSheetTreeView::onRequestApplyChanges(const QString& cfgKey, const QVariant& value) {

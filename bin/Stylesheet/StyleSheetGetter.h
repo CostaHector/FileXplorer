@@ -42,7 +42,7 @@ QString GetColorBackgroundMenuSelected(Style::StyleSheetE styleE);
 QString GetColorGridLine(Style::StyleSheetE styleE);
 QString GetColorBorderGeneral(Style::StyleSheetE styleE);
 QString GetColorBorderMenuRight(Style::StyleSheetE styleE);
-QString GetColorForgroundGeneral(Style::StyleSheetE styleE);
+QString GetColorForegroundGeneral(Style::StyleSheetE styleE);
 
 QString ColorBackgroundGeneralDef(Style::StyleSheetE styleE);
 QString ColorBackgroundAlternateRowDef(Style::StyleSheetE styleE);
@@ -55,7 +55,7 @@ QString ColorBackgroundMenuSelectedDef(Style::StyleSheetE styleE);
 QString ColorGridLineDef(Style::StyleSheetE styleE);
 QString ColorBorderGeneralDef(Style::StyleSheetE styleE);
 QString ColorBorderMenuRightDef(Style::StyleSheetE styleE);
-QString ColorForgroundGeneralDef(Style::StyleSheetE styleE);
+QString ColorForegroundGeneralDef(Style::StyleSheetE styleE);
 }
 
 class StyleSheetGetter {

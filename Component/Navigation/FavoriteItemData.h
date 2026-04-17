@@ -26,13 +26,13 @@ struct FavoriteItemData final {
   };
 
   bool operator==(const FavoriteItemData& other) const { //
-    return name == other.name && isGroup == other.isGroup && fullPath == other.fullPath;
+    return (this == &other) || (name == other.name && isGroup == other.isGroup && fullPath == other.fullPath);
   }
 
   bool operator!=(const FavoriteItemData& other) const { return !(*this == other); }
 
   bool isValid() const { return !name.isEmpty() && (isGroup || !fullPath.isEmpty()); }
-  bool match(const QString& subStr) const;
+  bool match(const QString& subStr, const Qt::CaseSensitivity caseMatter = Qt::CaseSensitivity::CaseInsensitive) const;
 
   QString name;       // 显示名称
   QString fullPath;   // 完整路径（如果不是分组）

@@ -71,7 +71,6 @@ void TypeFilterButton::EmitNameFilterDisablesChanged(bool bGrayUnpass) {
 
 void TypeFilterButton::EmitIncludingSubdirectoryChanged(const bool bInclude) {
   auto iteratorFlg = curIteratorFlag();
-  ;
   LOG_D("ModelFilterE[%s] including subdirectory bool:%d, iteratorFlg:%d", mFilterHelper.c_str(), bInclude, (int) iteratorFlg);
   emit includingSubdirectoryChanged(iteratorFlg);
 }

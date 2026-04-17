@@ -14,24 +14,25 @@ public:
   explicit StyleSheetTreeView(QWidget* parent = nullptr);
   ~StyleSheetTreeView() = default;
   void setFilter(const QString& filter);
-
-protected:
-  void showEvent(QShowEvent* event) override;
-  void hideEvent(QHideEvent* event) override;
+  QString curFilter() const;
 
 private:
   void initExclusivePreferenceSetting() override;
 
   void subscribe();
-  void onClearModifiedValues();
-  void onRestoreFromBackup();
-  void onApplyChanges();
+  int onClearModifiedValues();
+  int onRestoreToDefault();
+  int onRestoreToBackup();
+  int onBatchSetColor();
+  int onApplyChanges();
 
   void onRequestApplyChanges(const QString& cfgKey, const QVariant& value);
 
-  QAction* mClearModifiedValues{nullptr};
-  QAction* mRestoreFromBackup{nullptr};
+  QAction* mBatchSetColor{nullptr};
   QAction* mApplyChanges{nullptr};
+  QAction* mClearModifiedValues{nullptr};
+  QAction* mRestoreToDefault{nullptr};
+  QAction* mRestoreToBackup{nullptr};
   QAction* mApplyInstantly{nullptr};
 
   StyleSheetTreeModel* mStyleModel{nullptr};

@@ -262,9 +262,7 @@ class FavoritesTreeViewTest : public PlainTestSuite {
     FavoritesTreeView view;
     QVERIFY(view.mFavModel->setDatas(QByteArray{}));
     QCOMPARE(view.mFavModel->rowCount(), 0);
-    QVERIFY(view.mFavProxyModel->m_sourceModel != nullptr);
-    view.mFavProxyModel->setSourceModel(nullptr);
-    QVERIFY(view.mFavProxyModel->m_sourceModel != nullptr);
+    QVERIFY(view.mFavProxyModel->sourceModel() != nullptr);
 
     auto p0 = FavTreeNode::NewTreeNodeRoot();
     FavTreeNode* p00 = p0->appendRow(new FavTreeNode{FavoriteItemData{"group"}});

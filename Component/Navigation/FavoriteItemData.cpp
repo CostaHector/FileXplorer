@@ -36,7 +36,7 @@ QDataStream& operator>>(QDataStream& in, FavoriteItemData& item) {
 FavoriteItemData::Role FavoriteItemData::GetInitialSortRole() {
   const int role{Configuration().value(FavoritesNavigationKey::SORT_BY_ROLE.name, FavoritesNavigationKey::SORT_BY_ROLE.v).toInt()};
   if (role < DEF_BEGIN_ROLE || role > INVALID_BUTT_ROLE) {
-    return DEF_BEGIN_ROLE;
+    return FavoriteItemData::DEF_SORT_ROLE;
   }
   return static_cast<FavoriteItemData::Role>(role);
 }
@@ -53,14 +53,14 @@ void FavoriteItemData::SaveSortOrderReverse(bool bReverse) {
   Configuration().setValue(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, bReverse);
 }
 
-bool FavoriteItemData::match(const QString& subStr) const {
+bool FavoriteItemData::match(const QString& subStr, const Qt::CaseSensitivity caseMatter) const {
   if (subStr.isEmpty()) {
     return true;
   }
   if (isGroup) {
-    return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+    return name.contains(subStr, caseMatter);
   }
-  return name.contains(subStr, Qt::CaseSensitivity::CaseInsensitive) || fullPath.contains(subStr, Qt::CaseSensitivity::CaseInsensitive);
+  return name.contains(subStr, caseMatter) || fullPath.contains(subStr, caseMatter);
 }
 
 QDataStream& operator<<(QDataStream& out, const FavTreeNode& item) {

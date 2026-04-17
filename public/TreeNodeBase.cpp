@@ -26,6 +26,9 @@ bool TreeNodeBase<Derived, TDataType>::isDescendantOf(const Derived* ancestor) c
 
 template<typename Derived, typename TDataType>
 bool TreeNodeBase<Derived, TDataType>::operator==(const Derived& rhs) const {
+  if (this == &rhs) {
+    return true;
+  }
   if (val != rhs.val) {
     return false;
   }
@@ -47,6 +50,19 @@ bool TreeNodeBase<Derived, TDataType>::operator==(const Derived& rhs) const {
     return false;
   }
   return true;
+}
+
+template<typename Derived, typename TDataType>
+QString TreeNodeBase<Derived, TDataType>::GetConfigKey() const {
+  QStringList keyPrefixListRev;
+  keyPrefixListRev.reserve(5);
+  const Derived* node = derived();
+  while (node) {
+    keyPrefixListRev.push_back(node->name());
+    node = node->parent();
+  }
+  std::reverse(keyPrefixListRev.begin(), keyPrefixListRev.end());
+  return keyPrefixListRev.join('/');
 }
 
 template<typename Derived, typename TDataType>

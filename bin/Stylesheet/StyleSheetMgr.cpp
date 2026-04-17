@@ -1,6 +1,7 @@
 #include "StyleSheetMgr.h"
-#include <QAction>
-#include <QIcon>
+#include "StyleSheet.h"
+#include "PreferenceActions.h"
+#include "PublicMacro.h"
 
 StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   : QWidget{parent} {
@@ -20,9 +21,21 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   connect(m_startSearchAct, &QAction::triggered, this, &StyleSheetMgr::onStartFilter);
 
   setWindowTitle("StyleSheet Manager");
-  setWindowIcon(QIcon{":styles/STYLESHEET_MGR"});
+  setWindowIcon(QIcon{":/styles/STYLESHEET_MGR"});
 }
 
 void StyleSheetMgr::onStartFilter() {
   m_styleSheetView->setFilter(m_searchLineEdit->text());
+}
+
+void StyleSheetMgr::showEvent(QShowEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  QWidget::showEvent(event);
+  StyleSheet::UpdateTitleBar(this);
+}
+
+void StyleSheetMgr::hideEvent(QHideEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  g_PreferenceActions().STYLESHEET_MGR->setChecked(false);
+  QWidget::hideEvent(event);
 }
