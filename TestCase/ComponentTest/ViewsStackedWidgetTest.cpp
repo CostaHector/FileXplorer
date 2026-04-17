@@ -224,7 +224,10 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::TABLE);
 
     const QDir::Filters filters{m_fsPanel.m_fsModel->filter()};
-    QCOMPARE(filters, (QDir::Filter::NoDotAndDotDot | QDir::Filter::Dirs | QDir::Filter::Files | QDir::Filter::Drives));
+
+    const int expectFilterIntVal{(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::Hidden | QDir::Filter::NoDotAndDotDot)};
+    QCOMPARE(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt(), expectFilterIntVal);
+    QCOMPARE((int)filters, expectFilterIntVal);
     QCOMPARE(m_fsPanel.m_fsModel->nameFilterDisables(), false);
     {
       QSignalSpy spy(m_fsPanel.m_fsModel, &QFileSystemModel::directoryLoaded);

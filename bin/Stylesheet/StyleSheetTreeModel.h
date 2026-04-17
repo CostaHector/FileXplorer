@@ -18,10 +18,12 @@ public:
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
 
+  int SetNewColors(const QModelIndexList& indexes, const QString& newColor);
   int ClearNewValues(const QModelIndexList& indexes);
-  int recoverNewValuesToBackup(const QModelIndexList& indexes);
-  QVariantHash ApplyNewValues(const QModelIndexList& indexes);
-  void onInstantApplyChanged(bool bInstantApply) { m_bInstantApply = bInstantApply; }
+  int RecoverNewValuesToDefault(const QModelIndexList& indexes);
+  int RecoverNewValuesToBackup(const QModelIndexList& indexes);
+  QVariantHash CollectItemsNeedApplyChange(const QModelIndexList& indexes) const;
+  void onInstantApplySwitchChanged(bool bInstantApply) { m_bInstantApply = bInstantApply; }
 
 signals:
   void requestApplyChanges(const QString& cfgKey, const QVariant& value);

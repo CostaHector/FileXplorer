@@ -2,6 +2,10 @@
 #include "StyleItemData.h"
 #include "Logger.h"
 #include "PublicMacro.h"
+#include <QLineEdit>
+#include <QAction>
+#include <QColor>
+#include <QColorDialog>
 
 StyleSheetEditDelegate::StyleSheetEditDelegate(QObject *parent)
   : QStyledItemDelegate(parent) {
@@ -62,8 +66,27 @@ StyleSheetEditDelegate::StyleSheetEditDelegate(QObject *parent)
 
 QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (index.column() != StyleItemData::EDITABLE_COLUMN //
+      || dataType == StyleItemData::DataTypeE::GROUP   //
+      || dataType == StyleItemData::DataTypeE::NUMBER) {
     return QStyledItemDelegate::createEditor(parent, option, index);
+  }
+  if (dataType == StyleItemData::DataTypeE::COLOR) {
+    QWidget *editWidget = QStyledItemDelegate::createEditor(parent, option, index);
+    QLineEdit *lineEditor = qobject_cast<QLineEdit *>(editWidget);
+    if (lineEditor == nullptr) {
+      LOG_W("editWidget is not QLineEdit, cannot add action");
+      return editWidget;
+    }
+    QAction *colorAction = lineEditor->addAction(QIcon(":/styles/COLOR_SELECT"), QLineEdit::LeadingPosition);
+    connect(colorAction, &QAction::triggered, this, [lineEditor]() {
+      QColor newColor = QColorDialog::getColor(Qt::GlobalColor::white, lineEditor, "Select color");
+      if (!newColor.isValid()) {
+        return;
+      }
+      lineEditor->setText(newColor.name(QColor::HexArgb));
+    });
+    return lineEditor;
   }
 
   QComboBox *editor = new QComboBox(parent);
@@ -88,7 +111,10 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
 
 void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (index.column() != StyleItemData::EDITABLE_COLUMN //
+      || dataType == StyleItemData::DataTypeE::GROUP   //
+      || dataType == StyleItemData::DataTypeE::NUMBER  //
+      || dataType == StyleItemData::DataTypeE::COLOR) {
     QStyledItemDelegate::setEditorData(editor, index);
     return;
   }
@@ -113,12 +139,6 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
         rawText = "";
       }
       break;
-    case StyleItemData::DataTypeE::COLOR:
-      if (!QColor(rawText).isValid()) {
-        LOG_W("color[%s] invalid", qPrintable(rawText));
-        rawText = "";
-      }
-      break;
     default:
       LOG_E("dataType invalid[%d]", dataType);
       return;
@@ -128,48 +148,47 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 
 void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
-  if (dataType == StyleItemData::DataTypeE::NUMBER || dataType == StyleItemData::DataTypeE::COLOR || index.column() != StyleItemData::EDITABLE_COLUMN) {
+  if (index.column() != StyleItemData::EDITABLE_COLUMN //
+      || dataType == StyleItemData::DataTypeE::GROUP   //
+      || dataType == StyleItemData::DataTypeE::NUMBER  //
+      || dataType == StyleItemData::DataTypeE::COLOR) {
+    // 数值类型且无QComboxBox提供候选值时需要返回字符串, 例如height: "38.9", 后面预期要转换为int失败
     QStyledItemDelegate::setModelData(editor, model, index);
     return;
   }
   const QComboBox *comboBox = static_cast<QComboBox *>(editor);
   CHECK_NULLPTR_RETURN_VOID(comboBox);
 
-  QString rawText{comboBox->currentText()};
-  QVariant newValueData;
+  const QString rawText{comboBox->currentText()};
   switch (dataType) {
-    case StyleItemData::DataTypeE::FONT_FAMILY:
+    case StyleItemData::DataTypeE::FONT_FAMILY: {
+      QString family;
       if (mFontFamilyItems.contains(rawText)) {
-        newValueData = rawText;
+        family = rawText;
       } else {
-        LOG_E("font-family[%s] invalid", qPrintable(rawText));
-        newValueData = "";
+        LOG_E("font-family[%s] clear", qPrintable(rawText));
+        family = "";
       }
+      model->setData(index, family, Qt::EditRole);
       break;
+    }
     case StyleItemData::DataTypeE::FONT_WEIGHT: {
-      newValueData = mFontWeightItems.value(rawText, QFont::Weight::Normal);
+      QFont::Weight weightInt = mFontWeightItems.value(rawText, QFont::Weight::Normal);
+      model->setData(index, weightInt, Qt::EditRole);
       break;
     }
     case StyleItemData::DataTypeE::FONT_STYLE: {
-      newValueData = mFontStyleItems.value(rawText, QFont::Style::StyleNormal);
-      break;
-    }
-    case StyleItemData::DataTypeE::COLOR: {
-      if (QColor(rawText).isValid()) {
-        newValueData = rawText;
-      } else {
-        LOG_W("color[%s] invalid", qPrintable(rawText));
-        newValueData = "";
-      }
+      QFont::Style styleInt = mFontStyleItems.value(rawText, QFont::Style::StyleNormal);
+      model->setData(index, styleInt, Qt::EditRole);
       break;
     }
     default:
       LOG_E("dataType invalid[%d]", dataType);
       return;
   }
-  model->setData(index, newValueData, Qt::EditRole);
 }
 
 void StyleSheetEditDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+  CHECK_NULLPTR_RETURN_VOID(editor);
   editor->setGeometry(option.rect);
 }

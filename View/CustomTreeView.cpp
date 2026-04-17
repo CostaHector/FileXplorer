@@ -44,7 +44,7 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   mCollapseAll->setToolTip("Collapse all groups to hide their contents");
 
   // Animated
-  mAnimatedEnableAct = new QAction(CustomTreeView::tr("Enable Animation"), this);
+  mAnimatedEnableAct = new QAction(QIcon{":img/ANIMATION_ENABLE"}, CustomTreeView::tr("Enable Animation"), this);
   mAnimatedEnableAct->setToolTip("Enable or disable smooth expand/collapse animations");
   {
     const bool bDefAnimated{false};
@@ -53,7 +53,7 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
     setAnimated(bDefAnimated);
   }
 
-  mRootDecorationEnabled = new QAction(CustomTreeView::tr("Root Decoration"), this);
+  mRootDecorationEnabled = new QAction(QIcon{":img/ROOT_DECORATION"}, CustomTreeView::tr("Root Decoration"), this);
   {
     const bool bShowRootDecoration{true};
     mRootDecorationEnabled->setCheckable(true);

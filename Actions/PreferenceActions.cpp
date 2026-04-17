@@ -63,7 +63,7 @@ PreferenceActions::PreferenceActions(QObject* parent) //
   const int stylesheetInt = Configuration().value("STYLESHEET_NAME", (int) Style::DEFAULT_STYLE_SHEET).toInt();
   mStyleSheetIntAction.setCheckedIfActionExist(stylesheetInt);
 
-  STYLESHEET_MGR = new (std::nothrow) QAction{QIcon{":styles/STYLESHEET_MGR"}, tr("Stylesheet"), this};
+  STYLESHEET_MGR = new (std::nothrow) QAction{QIcon{":/styles/STYLESHEET_MGR"}, tr("Stylesheet"), this};
   STYLESHEET_MGR->setCheckable(true);
   STYLESHEET_MGR->setChecked(false);
 
@@ -82,13 +82,17 @@ void PreferenceActions::initAppStyle() const {
   }
 }
 
+void PreferenceActions::ApplyNewStyleSheet(const QString& newStyleSheetStr) {
+  qApp->setStyleSheet(newStyleSheetStr);
+}
+
 void PreferenceActions::initStyleSheet(bool bThemeChanged) const {
   const Style::StyleSheetE stylesheetEnum{CurStyleSheet()};
   if (bThemeChanged) {
     StyleSheet::setGlobalDarkMode(stylesheetEnum == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
   }
   const QString qssContents = StyleSheetGetter::GetInst()(stylesheetEnum);
-  qApp->setStyleSheet(qssContents);
+  ApplyNewStyleSheet(qssContents);
 }
 
 bool PreferenceActions::onAppStyleChanged(const QAction* pStyleAct) const {

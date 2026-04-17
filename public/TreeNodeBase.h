@@ -22,7 +22,7 @@ public:
                          Derived* _parent = nullptr) {
     return new Derived(_val, _childs, _parent);
   }
-  static std::unique_ptr<Derived> NewTreeNodeRoot() { return std::unique_ptr<Derived>{new Derived}; }
+  static std::unique_ptr<Derived> NewTreeNodeRoot(const QString& _name = "") { return std::unique_ptr<Derived>{new Derived{TDataType{_name}}}; }
   using DataType = TDataType;
 
   virtual ~TreeNodeBase() { releaseAndClearChilds(); }
@@ -107,6 +107,8 @@ public:
     val.name = newName;
     return true;
   }
+  QString GetConfigKey() const;
+
   bool filterAccept(const QString& text, QHash<const void*, bool>& passCache) const;
 
 protected:

@@ -24,6 +24,7 @@ public:
   Style::StyleE CurStyle() const;
   Style::StyleSheetE CurStyleSheet() const;
   QAction *STYLESHEET_MGR{nullptr};
+  static void ApplyNewStyleSheet(const QString& newStyleSheetStr);
 
 private:
   void subscribe();

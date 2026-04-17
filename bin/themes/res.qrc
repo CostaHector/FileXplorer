@@ -219,7 +219,6 @@
         <file alias="EXTRA_LARGE">PreferenceIcons/EXTRA_LARGE.png</file>
         <file alias="ICON_SIZE">PreferenceIcons/ICON_SIZE.svg</file>
         <file alias="FONT_SIZE">PreferenceIcons/FONT_SIZE.svg</file>
-        <file alias="ALTER_ROW_COLORS">PreferenceIcons/ALTER_ROW_COLORS.svg</file>
         <file alias="DRAG_DROP">PreferenceIcons/DRAG_DROP.svg</file>
         <file alias="NO_DRAG_DROP">PreferenceIcons/NO_DRAG_DROP.svg</file>
         <file alias="DRAG_DROP_INTERNAL_MOVE">PreferenceIcons/DRAG_DROP_INTERNAL_MOVE.svg</file>
@@ -276,6 +275,8 @@
         <file alias="LIST_TEXT_ELIDE_MODE_RIGHT">View/LIST_TEXT_ELIDE_MODE_RIGHT.svg</file>
         <file alias="IMAGE_TRANSFORMATION_SMOOTH">View/IMAGE_TRANSFORMATION_SMOOTH.svg</file>
         <file alias="UNIFORM_ITEM_SIZES">View/UNIFORM_ITEM_SIZES.svg</file>
+        <file alias="ANIMATION_ENABLE">View/ANIMATION_ENABLE.svg</file>
+        <file alias="ROOT_DECORATION">View/ROOT_DECORATION.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
@@ -335,10 +336,6 @@
         <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
         <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
         <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
-        <file alias="JSON_FILE_NEXT">JsonEditor/JSON_FILE_NEXT.png</file>
-        <file alias="JSON_FILE_PRECIOUS">JsonEditor/JSON_FILE_PRECIOUS.png</file>
-        <file alias="JSON_FILE_NEXT_PREVIOUS">JsonEditor/JSON_FILE_NEXT_PREVIOUS.png</file>
-        <file alias="JSON_FILE_NEXT_UNFINISHED">JsonEditor/JSON_FILE_NEXT_UNFINISHED.png</file>
         <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
         <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
         <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>
@@ -400,6 +397,11 @@
         <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
         <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
         <file alias="STYLESHEET_MGR">styles/STYLESHEET_MGR.svg</file>
+        <file alias="COLOR_SELECT">styles/COLOR_SELECT.svg</file>
+        <file alias="CLEAR_MODIFIED_VALUES">styles/CLEAR_MODIFIED_VALUES.svg</file>
+        <file alias="RESTORE_TO_BACKUP">styles/RESTORE_TO_BACKUP.svg</file>
+        <file alias="RESTORE_TO_DEFAULT">styles/RESTORE_TO_DEFAULT.svg</file>
+        <file alias="INSTANT_APPLY">styles/INSTANT_APPLY.svg</file>
     </qresource>
 
     <qresource prefix="/">
