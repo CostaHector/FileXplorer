@@ -2092,7 +2092,7 @@
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../bin/Stylesheet/StyleSheetTreeView.cpp" line="+27"/>
+        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+27"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>

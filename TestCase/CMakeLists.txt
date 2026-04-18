@@ -33,7 +33,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Gui Sql Widgets
 file(GLOB SOURCES
     # service module sources
     ${PARENT_DIR}/Actions/*.cpp
-    ${PARENT_DIR}/bin/Stylesheet/*.cpp
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
@@ -43,6 +42,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/Navigation/*.cpp
     ${PARENT_DIR}/Component/Pwd/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
+    ${PARENT_DIR}/Component/Stylesheet/*.cpp
     ${PARENT_DIR}/Component/VideoPlayer/*.cpp
     ${PARENT_DIR}/FileOperation/*.cpp
     ${PARENT_DIR}/Model/*.cpp
@@ -58,7 +58,6 @@ file(GLOB SOURCES
     # test only module sources
     main_ut.cpp
     ActionsTest/*.cpp
-    binTest/StylesheetTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
@@ -66,6 +65,7 @@ file(GLOB SOURCES
     ComponentTest/NavigationTest/*.cpp
     ComponentTest/PwdTest/*.cpp
     ComponentTest/RenameTest/*.cpp
+    ComponentTest/StylesheetTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
     DbManagerTest/*.cpp
     FileOperationTest/*.cpp
@@ -88,7 +88,6 @@ endforeach()
 
 set(SRV_HEADER_PATH
     ${PARENT_DIR}/Actions
-    ${PARENT_DIR}/bin/Stylesheet
     ${PARENT_DIR}/Model
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
@@ -98,6 +97,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/Navigation
     ${PARENT_DIR}/Component/Pwd
     ${PARENT_DIR}/Component/RenameWidgets
+    ${PARENT_DIR}/Component/Stylesheet
     ${PARENT_DIR}/Component/VideoPlayer
     ${PARENT_DIR}/FileOperation
     ${PARENT_DIR}/lib
@@ -117,7 +117,6 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     ${PARENT_DIR}/Actions/*.h
-    ${PARENT_DIR}/bin/Stylesheet/*.h
     ${PARENT_DIR}/Model/*.h
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
@@ -127,6 +126,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/Navigation/*.h
     ${PARENT_DIR}/Component/Pwd/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h
+    ${PARENT_DIR}/Component/Stylesheet/*.h
     ${PARENT_DIR}/Component/VideoPlayer/*.h
     ${PARENT_DIR}/FileOperation/*.h
     ${PARENT_DIR}/lib/*.h

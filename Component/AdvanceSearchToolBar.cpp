@@ -17,6 +17,7 @@ AdvanceSearchToolBar::AdvanceSearchToolBar(const QString& title, QWidget* parent
   m_nameFilterCB->setEditable(true);
   m_nameFilterCB->lineEdit()->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_nameFilterCB->lineEdit()->setClearButtonEnabled(true);
+  m_nameFilterCB->setPlaceholderText("Search items here");
   m_nameFilterCB->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_nameFilterCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 

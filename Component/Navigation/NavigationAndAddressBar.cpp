@@ -54,6 +54,7 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   mFsSearchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   mFsSearchLE->setClearButtonEnabled(true);
   mFsSearchLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+  mFsSearchLE->setPlaceholderText("Search items here");
   mFsSearchLE->setToolTip(
       QString("<b>%1</b><br/>").arg(tr("Search")) +
       "For FileSystemModel(wildcard) e.g., *target*\n"
