@@ -8,6 +8,7 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   m_searchLineEdit = new QLineEdit{this};
   m_startSearchAct = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
   m_searchLineEdit->setClearButtonEnabled(true);
+  m_searchLineEdit->setPlaceholderText("Search items here");
 
   m_styleSheetView = new StyleSheetTreeView{this};
 

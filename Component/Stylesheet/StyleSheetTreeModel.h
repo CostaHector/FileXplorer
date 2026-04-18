@@ -32,8 +32,8 @@ private:
   bool initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot) const;
   bool initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot, Style::StyleSheetE styleE) const;
   void editCell(const QModelIndex& ind, bool bSucceed);
-  void editCellFailed(const QModelIndex& failedInd);
-  void editCellSucceed(const QModelIndex& okInd);
+  bool editCellFailed(const QModelIndex& failedInd);
+  bool editCellSucceed(const QModelIndex& okInd);
   bool editCellEraseIndex(const QModelIndex& okInd);
   QSet<QModelIndex> mEditFailedCells;
 

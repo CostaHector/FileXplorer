@@ -52,10 +52,10 @@ bool StyleSheetTreeModel::initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot
       StyleTreeNode::create(StyleItemData{"SelectedActive", ColorBackgroundSelectedActiveDef(styleE), GetColorBackgroundSelectedActive(styleE), StyleItemData::COLOR}));
   auto* pColorBgSelectedInactive = pColorBg->appendRow(
       StyleTreeNode::create(StyleItemData{"SelectedInActive", ColorBackgroundSelectedInactiveDef(styleE), GetColorBackgroundSelectedInactive(styleE), StyleItemData::COLOR}));
-  auto* pColorBgMenu = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"Menu", ColorBackgroundMenuDef(styleE), GetColorBackgroundMenu(styleE), StyleItemData::COLOR}));
-  auto* pColorBgMenuChecked = pColorBg->appendRow(
+  auto* pColorBgMenu = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"Menu"}));
+  auto* pColorBgMenuChecked = pColorBgMenu->appendRow(
       StyleTreeNode::create(StyleItemData{"MenuChecked", ColorBackgroundMenuCheckedDef(styleE), GetColorBackgroundMenuChecked(styleE), StyleItemData::COLOR}));
-  auto* pColorBgMenuSelected = pColorBg->appendRow(
+  auto* pColorBgMenuSelected = pColorBgMenu->appendRow(
       StyleTreeNode::create(StyleItemData{"MenuSelected", ColorBackgroundMenuSelectedDef(styleE), GetColorBackgroundMenuSelected(styleE), StyleItemData::COLOR}));
 
   auto* pColorGridLine = pColor->appendRow(StyleTreeNode::create(StyleItemData{"Gridline", ColorGridLineDef(styleE), GetColorGridLine(styleE), StyleItemData::COLOR}));
@@ -180,22 +180,24 @@ void StyleSheetTreeModel::editCell(const QModelIndex& index, bool bSucceed) {
   }
 }
 
-void StyleSheetTreeModel::editCellFailed(const QModelIndex& failedInd) {
+bool StyleSheetTreeModel::editCellFailed(const QModelIndex& failedInd) {
   if (!failedInd.isValid()) {
-    return;
+    return false;
   }
   if (mEditFailedCells.contains(failedInd)) {
-    return;
+    return false;
   }
   mEditFailedCells.insert(failedInd);
   emit dataChanged(failedInd, failedInd, {Qt::DecorationRole});
+  return true;
 }
 
-void StyleSheetTreeModel::editCellSucceed(const QModelIndex& okInd) {
+bool StyleSheetTreeModel::editCellSucceed(const QModelIndex& okInd) {
   if (!editCellEraseIndex(okInd)) {
-    return;
+    return false;
   }
   emit dataChanged(okInd, okInd, {Qt::DecorationRole});
+  return true;
 }
 
 bool StyleSheetTreeModel::editCellEraseIndex(const QModelIndex& okInd) {

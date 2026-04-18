@@ -9,7 +9,6 @@ QString MenuStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
       styleSheet = R"(
 QMenu {
     %1
-    background-color: %2;
     border-right: 5px; /* preserve for border */
 }
 QMenu::item {
@@ -17,21 +16,20 @@ QMenu::item {
     color: #000000;
 }
 QMenu::item:checked {
-    background-color: %3;
+    background-color: %2;
     color: #000000;
 }
 QMenu::item:selected {
-    background-color: %4;
+    background-color: %3;
     color: #000000;
     border-right: 5px solid #3C3C3C;
 }
 QMenu::separator {
     height: 1px;
-    background-color: %3;
+    background-color: %2;
 }
 
 QMenuBar {
-    background-color: %2;
     border: none;
 }
 QMenuBar::item {
@@ -39,13 +37,13 @@ QMenuBar::item {
     color: #000000;
 }
 QMenuBar::item:checked {
-    background-color: %3;
+    background-color: %2;
     color: #000000;
 }
 QMenuBar::item:selected {
-    background-color: %4;
+    background-color: %3;
     color: #000000;
-    border-right: 5px solid %5;
+    border-right: 5px solid %4;
 }
 )";
       break;
@@ -53,7 +51,6 @@ QMenuBar::item:selected {
       styleSheet = R"(
 QMenu {
     %1
-    background-color: %2;
     border-right: 5px; /* preserve for border */
 }
 QMenu::item {
@@ -61,21 +58,20 @@ QMenu::item {
     color: #FFFFFF;
 }
 QMenu::item:checked {
-    background-color: %3;
+    background-color: %2;
     color: #000000;
 }
 QMenu::item:selected {
-    background-color: %4;
+    background-color: %3;
     color: #000000;
-    border-right: 5px solid %5;
+    border-right: 5px solid %4;
 }
 QMenu::separator {
     height: 1px;
-    background-color: %3;
+    background-color: %2;
 }
 
 QMenuBar {
-    background-color: %2;
     border: none;
 }
 QMenuBar::item {
@@ -83,11 +79,11 @@ QMenuBar::item {
     color: #FFFFFF;
 }
 QMenuBar::item:checked {
-    background: %3;
+    background: %2;
     color: #000000;
 }
 QMenuBar::item:selected {
-    background: %4;
+    background: %3;
     color: #000000;
 }
 )";
@@ -96,9 +92,8 @@ QMenuBar::item:selected {
       return "";
   }
   QString fontStr = FontCfg::ReadFontString();
-  QString menuBgColor = ColorCfg::GetColorBackgroundMenu(styleE);
   QString menuCheckedColor = ColorCfg::GetColorBackgroundMenuChecked(styleE);
   QString menuSelectedColor = ColorCfg::GetColorBackgroundMenuSelected(styleE);
   QString menuBorderRightColor = ColorCfg::GetColorBorderMenuRight(styleE);
-  return styleSheet.arg(fontStr, menuBgColor, menuCheckedColor, menuSelectedColor, menuBorderRightColor);
+  return styleSheet.arg(fontStr, menuCheckedColor, menuSelectedColor, menuBorderRightColor);
 }

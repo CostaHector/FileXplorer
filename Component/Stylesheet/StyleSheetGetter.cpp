@@ -75,14 +75,14 @@ QString GetFontStyleString() {
 }
 
 QFont ReadFont() {
-  return {GetFontFamily(), GetFontSize(), GetFontWeight(), GetFontStyle()};
+  return {GetFontFamily(), GetFontSize(), GetFontWeight(), GetFontStyle() == QFont::Style::StyleItalic};
 }
 
 void updateFont(const QFont& newFont) {
-  Configuration().setValue("StyleSheet/Font/Family", newFont.family());
-  Configuration().setValue("StyleSheet/Font/Size", newFont.pointSize());
-  Configuration().setValue("StyleSheet/Font/Weight", newFont.weight());
-  Configuration().setValue("StyleSheet/Font/Style", newFont.style());
+  Configuration().setValue("StyleSheet/Font/Family/General", newFont.family());
+  Configuration().setValue("StyleSheet/Font/Size/General", newFont.pointSize());
+  Configuration().setValue("StyleSheet/Font/Weight/General", newFont.weight());
+  Configuration().setValue("StyleSheet/Font/Style/General", newFont.style());
 
   g_PreferenceActions().initStyleSheet(false);
 }
@@ -118,12 +118,6 @@ QString GetColorBackgroundSelectedActive(Style::StyleSheetE styleE) {
     return Configuration().value("StyleSheet/DarkColor/Background/SelectedActive", ColorBackgroundSelectedActiveDef(styleE)).toString();
   }
   return Configuration().value("StyleSheet/LightColor/Background/SelectedActive", ColorBackgroundSelectedActiveDef(styleE)).toString();
-}
-QString GetColorBackgroundMenu(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/Menu", ColorBackgroundMenuDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/Menu", ColorBackgroundMenuDef(styleE)).toString();
 }
 QString GetColorBackgroundMenuChecked(Style::StyleSheetE styleE) {
   if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
@@ -186,12 +180,6 @@ QString ColorBackgroundSelectedInactiveDef(Style::StyleSheetE styleE) {
 }
 QString ColorBackgroundSelectedActiveDef(Style::StyleSheetE styleE) {
   return "#99D1FF";
-}
-QString ColorBackgroundMenuDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#4F4B49";
-  }
-  return "#FBFCFD";
 }
 QString ColorBackgroundMenuCheckedDef(Style::StyleSheetE styleE) {
   return "#99D1FF";

@@ -108,7 +108,7 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
   }
   return editor;
 }
-
+// 从模型中获取指定索引（index）的数据，并将其设置到编辑器中，以便用户可以看到当前值并进行编辑。
 void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
   if (index.column() != StyleItemData::EDITABLE_COLUMN //

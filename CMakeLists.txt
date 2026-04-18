@@ -27,17 +27,17 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Char
 
 file(GLOB SOURCES
     Actions/*.cpp
-    bin/Stylesheet/*.cpp
     Events/*.cpp
     Model/*.cpp
     View/*.cpp
     Component/*.cpp
     Component/FolderPreview/*.cpp
-    Component/RenameWidgets/*.cpp
-    Component/Pwd/*.cpp
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
     Component/Navigation/*.cpp
+    Component/Pwd/*.cpp
+    Component/RenameWidgets/*.cpp
+    Component/Stylesheet/*.cpp
     Component/VideoPlayer/*.cpp
     FileOperation/*.cpp
     Model/*.cpp
@@ -61,17 +61,17 @@ endforeach()
 
 set(SRV_HEADER_PATH
     Actions
-    bin/Stylesheet
     Events
     Model
     View
     Component
     Component/FolderPreview
-    Component/RenameWidgets
-    Component/Pwd
     Component/HeaderView
     Component/LineEdit
     Component/Navigation
+    Component/Pwd
+    Component/RenameWidgets
+    Component/Stylesheet
     Component/VideoPlayer
     FileOperation
     lib
@@ -90,16 +90,17 @@ set(SRV_HEADER_PATH
 
 file(GLOB HEADERS
     Actions/*.h
-    bin/Stylesheet/*.h
     Events/*.h
     Model/*.h
     View/*.h
     Component/*.h
     Component/FolderPreview/*.h
-    Component/RenameWidgets/*.h
     Component/HeaderView/*.h
     Component/LineEdit/*.h
     Component/Navigation/*.h
+    Component/Pwd/*.h
+    Component/RenameWidgets/*.h
+    Component/Stylesheet/*.h
     Component/VideoPlayer/*.h
     FileOperation/*.h
     lib/*.h

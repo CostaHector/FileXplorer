@@ -23,7 +23,6 @@ QTableView QTableCornerButton::section:pressed {
 QTableView {
     show-decoration-selected: 1;
     %1
-    background-color: %2;
     alternate-background-color: %3;
     gridline-color: %8;
 }
@@ -75,7 +74,6 @@ QTableView QTableCornerButton::section:pressed {
 QTableView {
     show-decoration-selected: 1;
     %1
-    background-color: %2;
     alternate-background-color: %3;
     gridline-color: %8;
 }
@@ -112,16 +110,15 @@ QTableView::item:hover {
   }
 
   QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgGeneral{ColorCfg::GetColorBackgroundGeneral(styleE)};// %2
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %3
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %4 
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %5
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %6
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %7
-  QString gridline{ColorCfg::GetColorGridLine(styleE)}; // %8
+  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
+  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
+  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
+  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
+  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
+  QString gridline{ColorCfg::GetColorGridLine(styleE)}; // %7
   QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
 
-  styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, gridline);
+  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, gridline);
   return styleSheet;
 }
 
@@ -134,7 +131,6 @@ QString ListViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
 QListView {
     show-decoration-selected: 1;
     %1
-    background-color: %2;
     alternate-background-color: %3;
 }
 QListView::item:alternate {
@@ -163,7 +159,6 @@ QListView::item:hover {
 QListView {
     show-decoration-selected: 1;
     %1
-    background-color: %2;
     alternate-background-color: %3;
 }
 QListView::item:alternate {
@@ -192,16 +187,15 @@ QListView::item:hover {
   }
 
   QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgGeneral{ColorCfg::GetColorBackgroundGeneral(styleE)};// %2
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %3
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %4
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %5
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)};// %6
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)};// %7
-  
+  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
+  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
+  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
+  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
+  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
+
   QString gridline{ColorCfg::GetColorGridLine(styleE)};
   QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
-  styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
+  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }
 
@@ -213,7 +207,6 @@ QString TreeViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
 QTreeView {
     show-decoration-selected: 0;
     %1
-    background-color: %2;
     alternate-background-color: %3;
 }
 QTreeView::item:alternate {
@@ -242,7 +235,6 @@ QTreeView::item:hover {
 QTreeView {
     show-decoration-selected: 0;
     %1
-    background-color: %2;
     alternate-background-color: %3;
 }
 QTreeView::item:alternate {
@@ -270,16 +262,15 @@ QTreeView::item:hover {
       return "";
   }
   QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgGeneral{ColorCfg::GetColorBackgroundGeneral(styleE)};// %2
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %3
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %4
+  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
+  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
   
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %5
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %6
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %7
-  
+  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
+  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
+  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
+
   QString gridline{ColorCfg::GetColorGridLine(styleE)};
   QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
-  styleSheet = styleSheet.arg(fontStr, bgGeneral, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
+  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }

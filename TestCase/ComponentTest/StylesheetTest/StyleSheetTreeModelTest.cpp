@@ -43,6 +43,14 @@ private slots:
     // headerData行号/列号默认行为: 从1开始计数
     QCOMPARE(defModel.headerData(998, Qt::Orientation::Horizontal, Qt::DisplayRole).toInt(), 998 + 1); // not crash
     QCOMPARE(defModel.headerData(0, Qt::Orientation::Vertical, Qt::DisplayRole).toInt(), 0 + 1);
+
+    // nullptr will not crash down
+    std::unique_ptr<StyleTreeNode> pRoot{nullptr};
+    QVERIFY(!defModel.initFontRelated(pRoot));
+    QVERIFY(!defModel.initColorRelated(pRoot, Style::StyleSheetE::STYLESHEET_LIGHT));
+
+    QCOMPARE(defModel.editCellFailed({}), false);
+    QCOMPARE(defModel.editCellEraseIndex({}), false);
   }
 
   void data_ok() {
@@ -269,6 +277,8 @@ private slots:
 
     // column not support, only ModifiedTo support setData
     {
+      QCOMPARE(model.setData({}, 124, Qt::EditRole), false);
+
       QCOMPARE(model.setData(r00Index0, "new View", Qt::EditRole), false); // group
       QCOMPARE(model.setData(r000Index0, "new RowHeight", Qt::EditRole), false);
       QCOMPARE(model.setData(r001Index0, "new FontFamily", Qt::EditRole), false);
@@ -468,7 +478,9 @@ private slots:
       QCOMPARE(doubleStrVarConvert, false);
 
       QCOMPARE(r000Index3.data(), defUnspecifiedVar);
+      QCOMPARE(model.data(r000Index3, Qt::DecorationRole).isValid(), false); //
       QCOMPARE(model.setData(r000Index3, "62.1", Qt::EditRole), false); // 数值类型无候选下拉框, Delegate将直接返回数值字符串
+      QCOMPARE(model.data(r000Index3, Qt::DecorationRole).isValid(), true); // failed Icon
       QCOMPARE(model.mEditFailedCells.size(), 1);
       QCOMPARE(dataChangedSpy.count(), 1);
       QCOMPARE(reqApplyChangesSpy.count(), 0);
@@ -529,10 +541,10 @@ private slots:
       dataChangedSpy.clear();
       reqApplyChangesSpy.clear();
 
-      const QModelIndexList selected5Node2Group{r000Index3, r001Index3, r002Index3, r010Index3, r011Index3, r00Index0, r01Index0};
+      const QModelIndexList selected5Node2Group{r000Index3, r001Index3, r002Index3, r010Index3, r011Index3, r00Index0, r01Index0, QModelIndex{}};
       // 上面只修改了r000Index3和r010Index3
       QVariantHash expectCfs;
-      QCOMPARE(model.ClearNewValues(selected5Node2Group), 2); // 最后两个是group
+      QCOMPARE(model.ClearNewValues(selected5Node2Group), 2); // 最后 两个group, 1个非法
       QCOMPARE(dataChangedSpy.count(), 2);                    // DisplayRole Changed 5 times
       QCOMPARE(reqApplyChangesSpy.count(), 0);
       dataChangedSpy.clear();
@@ -550,7 +562,7 @@ private slots:
       QCOMPARE(needApplyChangesCfgsDict, expectCfs);
 
       // 全都恢复为默认值
-      QCOMPARE(model.RecoverNewValuesToDefault(selected5Node2Group), 5); // 7 - 最后两个不处理group
+      QCOMPARE(model.RecoverNewValuesToDefault(selected5Node2Group), 5); // 7 - (两个group, 1个非法)
       QCOMPARE(dataChangedSpy.count(), 5);                               // DisplayRole Changed 5 times
       QCOMPARE(reqApplyChangesSpy.count(), 0);
       dataChangedSpy.clear();
@@ -574,7 +586,7 @@ private slots:
       QCOMPARE(cfgsDefaultDict, expectCfs);
 
       // 全都恢复为备份值 View/FontFamily无变化
-      QCOMPARE(model.RecoverNewValuesToBackup(selected5Node2Group), 4); // 7 - 最后两个不处理group - View/Family无变化
+      QCOMPARE(model.RecoverNewValuesToBackup(selected5Node2Group), 4); // 7 - (两个group, 1个非法) - View/Family无变化
       QCOMPARE(r000Index3.data(), 60);
       QCOMPARE(r001Index3.data(), "Microsoft YaHei");
       QCOMPARE(r002Index3.data(), "#5E5E5E");

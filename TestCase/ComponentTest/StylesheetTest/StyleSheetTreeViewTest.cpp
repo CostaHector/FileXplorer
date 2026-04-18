@@ -223,6 +223,14 @@ private slots:
       QCOMPARE(r0Index3.data(Qt::DisplayRole), "120");
       QCOMPARE(r0Index3.data(Qt::EditRole), "120");
       QCOMPARE(r0ItemData.modifiedToValue.toInt(), 120);
+
+      rowHeightLineEdit->setText("invalid row height number"); // 非数值
+      QCOMPARE(rowHeightLineEdit->text(), "invalid row height number"); // 直接从模型中读取EditRole
+      delegate->setEditorData(rowHeightLineEdit, r0Index3);
+      QCOMPARE(r0Index3.data(Qt::DisplayRole), "120");
+      QCOMPARE(r0Index3.data(Qt::EditRole), "120");
+      QCOMPARE(r0ItemData.modifiedToValue, 120);
+      QCOMPARE(rowHeightLineEdit->text(), "120");
     }
 
     {
@@ -239,6 +247,13 @@ private slots:
       QCOMPARE(r1Index3.data(Qt::DisplayRole), newFontFamilyStr);
       QCOMPARE(r1Index3.data(Qt::EditRole), newFontFamilyStr);
       QCOMPARE(r1ItemData.modifiedToValue, newFontFamilyStr);
+
+      fontFamilyCb->setCurrentText("inexist font family"); // 不在候选列表中
+      delegate->setEditorData(fontFamilyCb, r1Index3); // 直接从模型中读取EditRole
+      QCOMPARE(r1Index3.data(Qt::DisplayRole), newFontFamilyStr);
+      QCOMPARE(r1Index3.data(Qt::EditRole), newFontFamilyStr);
+      QCOMPARE(r1ItemData.modifiedToValue, newFontFamilyStr);
+      QCOMPARE(fontFamilyCb->currentText(), newFontFamilyStr);
     }
 
     {
@@ -256,6 +271,13 @@ private slots:
       QCOMPARE(r2Index3.data(Qt::DisplayRole), newFontWeightInt);
       QCOMPARE(r2Index3.data(Qt::EditRole), newFontWeightInt);
       QCOMPARE(r2ItemData.modifiedToValue, newFontWeightInt);
+
+      fontWeightCb->setCurrentText("inexist font weight"); // 不在候选列表中, 清空
+      delegate->setEditorData(fontWeightCb, r2Index3);  // 直接从模型中读取EditRole
+      QCOMPARE(r2Index3.data(Qt::DisplayRole), newFontWeightInt);
+      QCOMPARE(r2Index3.data(Qt::EditRole), newFontWeightInt);
+      QCOMPARE(r2ItemData.modifiedToValue, newFontWeightInt);
+      QVERIFY(fontWeightCb->currentText() != ""); // "Black" "Normal" etc.
     }
 
     {
@@ -273,6 +295,13 @@ private slots:
       QCOMPARE(r3Index3.data(Qt::DisplayRole), newFontStyleInt);
       QCOMPARE(r3Index3.data(Qt::EditRole), newFontStyleInt);
       QCOMPARE(r3ItemData.modifiedToValue, newFontStyleInt);
+
+      fontStyleCb->setCurrentText("inexist font style"); // 不在候选列表中, 清空
+      delegate->setEditorData(fontStyleCb, r3Index3);  // 直接从模型中读取EditRole
+      QCOMPARE(r3Index3.data(Qt::DisplayRole), newFontStyleInt);
+      QCOMPARE(r3Index3.data(Qt::EditRole), newFontStyleInt);
+      QCOMPARE(r3ItemData.modifiedToValue, newFontStyleInt);
+      QVERIFY(fontStyleCb->currentText() != ""); // "StyleItalic" "StyleNormal"
     }
 
     { // color lineedit with action
@@ -317,6 +346,14 @@ private slots:
       QCOMPARE(r4Index3.data(Qt::DisplayRole).toString().toUpper(), "#FFFFFF");
       QCOMPARE(r4Index3.data(Qt::EditRole).toString().toUpper(), "#FFFFFF");
       QCOMPARE(r4ItemData.modifiedToValue.toString().toUpper(), "#FFFFFF");
+
+      // 手动设置空字符串"", setEditorData不会修改r4ItemData
+      colorLineEdit->setText("");
+      delegate->setEditorData(colorLineEdit, r4Index3); // 直接从模型中读取EditRole
+      QCOMPARE(r4Index3.data(Qt::DisplayRole).toString().toUpper(), "#FFFFFF");
+      QCOMPARE(r4Index3.data(Qt::EditRole).toString().toUpper(), "#FFFFFF");
+      QCOMPARE(r4ItemData.modifiedToValue.toString().toUpper(), "#FFFFFF");
+      QCOMPARE(colorLineEdit->text(), "#FFFFFF");
     }
   }
 };
