@@ -23,10 +23,10 @@ public:
   int RecoverNewValuesToDefault(const QModelIndexList& indexes);
   int RecoverNewValuesToBackup(const QModelIndexList& indexes);
   QVariantHash CollectItemsNeedApplyChange(const QModelIndexList& indexes) const;
-  void onInstantApplySwitchChanged(bool bInstantApply) { m_bInstantApply = bInstantApply; }
+  void onInstantSeeSwitchChanged(bool bInstantApply) { m_bInstantSee = bInstantApply; }
 
 signals:
-  void requestApplyChanges(const QString& cfgKey, const QVariant& value);
+  void requestSeeChanges(const QString& cfgKey, const QVariant& value);
 
 private:
   bool initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot) const;
@@ -37,7 +37,7 @@ private:
   bool editCellEraseIndex(const QModelIndex& okInd);
   QSet<QModelIndex> mEditFailedCells;
 
-  bool m_bInstantApply{false};
+  bool m_bInstantSee{false};
 };
 
 #endif // STYLESHEETTREEMODEL_H

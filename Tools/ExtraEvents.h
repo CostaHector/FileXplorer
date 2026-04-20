@@ -13,7 +13,6 @@ private:
   PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
   PopupWidgetManager<PasswordBook>* mPwdBook{nullptr};
   PopupWidgetManager<ResourceMonitorPanel>* m_resMonitor{nullptr};
-  PopupWidgetManager<StyleSheetMgr>* mStyleSheetMgr{nullptr};
 };
 
 #endif  // EXTRAEVENTS_H

@@ -3,11 +3,12 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheetTreeView.h"
-#include "StyleSheetMgr.h"
 #include "EndToExposePrivateMember.h"
 
+#include "StyleSheetGetter.h"
 #include "MemoryKey.h"
-#include "PreferenceActions.h"
+
+#include <QLineEdit>
 #include <QColorDialog>
 
 #include <mockcpp/mokc.h>
@@ -22,62 +23,32 @@ public:
 private slots:
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
+  void initTestCase() {
+    Configuration().clear(); //
+  }
   void cleanupTestCase() {
     Configuration().clear(); //
   }
 
-  void StyleSheetMgr_ok() {
-    auto& prefInst = g_PreferenceActions();
-    QVERIFY(prefInst.STYLESHEET_MGR->isCheckable());
-    prefInst.STYLESHEET_MGR->setChecked(true);
-
-    StyleSheetMgr mgr;
-    mgr.showEvent(nullptr);
-    mgr.hideEvent(nullptr);
-    QVERIFY(prefInst.STYLESHEET_MGR->isChecked());
-
-    QShowEvent eventShow;
-    QHideEvent eventHide;
-    mgr.showEvent(&eventShow);
-    mgr.hideEvent(&eventHide);
-    QVERIFY(!prefInst.STYLESHEET_MGR->isChecked());
-
-    QVERIFY(mgr.m_searchLineEdit != nullptr);
-    QVERIFY(mgr.m_startSearchAct != nullptr);
-    QVERIFY(mgr.m_styleSheetView != nullptr);
-
-    mgr.m_searchLineEdit->setText("Kaka");
-    emit mgr.m_searchLineEdit->returnPressed();
-    QCOMPARE(mgr.m_styleSheetView->curFilter(), "Kaka");
-
-    mgr.m_searchLineEdit->setText("Cristinao Ronaldo");
-    mgr.m_startSearchAct->trigger();
-    QCOMPARE(mgr.m_styleSheetView->curFilter(), "Cristinao Ronaldo");
-
-    mgr.m_searchLineEdit->setText("Varane");
-    mgr.onStartFilter();
-    QCOMPARE(mgr.m_styleSheetView->curFilter(), "Varane");
-  }
-
   void onClearModifiedValues_ok() {
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(never());
-
     StyleSheetTreeView view;
     QCOMPARE(view.m_defaultExpandAll, true);
     QCOMPARE(view.dragDropMode(), QAbstractItemView::NoDragDrop);
     QCOMPARE(view.onClearModifiedValues(), 0);
     QVERIFY(view.mStyleModel != nullptr);
     QVERIFY(view.mStyleModel->rowCount() > 0);
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
 
     // all modified value is not specified, no need clear
     view.selectAll();
     QCOMPARE(view.onClearModifiedValues(), 0);
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
   void onRestoreToDefault_ok() {
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(never());
-
     StyleSheetTreeView view;
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
+
     QCOMPARE(view.onRestoreToDefault(), 0);
     view.selectAll();
 
@@ -87,12 +58,14 @@ private slots:
 
     QCOMPARE(view.onClearModifiedValues(), rowsAffected);
     QCOMPARE(view.onClearModifiedValues(), 0); // already cleared
+
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
   void onRestoreToBackup_ok() {
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(never());
-
     StyleSheetTreeView view;
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
+
     QCOMPARE(view.onRestoreToBackup(), 0);
     view.selectAll();
 
@@ -102,12 +75,12 @@ private slots:
 
     QCOMPARE(view.onClearModifiedValues(), rowsAffected);
     QCOMPARE(view.onClearModifiedValues(), 0); // already cleared
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
-  void onBatchSetColor_ok() {
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(never());
-
+  void onBatchSetColor_ok() {    
     StyleSheetTreeView view;
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
     QCOMPARE(view.onBatchSetColor(), 0);
 
     MOCKER(QColorDialog::getColor)            //
@@ -120,50 +93,64 @@ private slots:
     QCOMPARE(view.onBatchSetColor(), -1);
     QVERIFY(view.onBatchSetColor() > 0);  // 至少有1个Color类型的节点
     QVERIFY(view.onBatchSetColor() == 0); // 颜色没有变化
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
-  void onApplyChanges_ok() {
-    Configuration().clear();
-
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(exactly(1));
+  void onSeeChanges_ok() {
+    StyleSheetGetter::GetInst().init();
     StyleSheetTreeView view;
-    QCOMPARE(view.onApplyChanges(), 0); // 无选中, 不调用
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
+    QCOMPARE(view.onSeeChanges(), 0); // 无选中, 不调用
 
     view.selectAll();
-    QCOMPARE(view.onApplyChanges(), 0); // 所有modifiedTo列内容均未指定, 不调用
+    QCOMPARE(view.onSeeChanges(), 0); // 所有modifiedTo列内容均未指定, 不调用
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
 
     QVERIFY(view.onRestoreToBackup() > 0);
-    QVERIFY(view.onApplyChanges() > 0); // 存在modifiedTo列内容已经指定, 需要更新已有配置, 调用一次Apply
+    QCOMPARE(view.onSeeChanges(), 0); // 存在modifiedTo列内容已经指定, 同StyleSheetGetter字典一致,
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
 
-    view.mApplyChanges->trigger();
-    QCOMPARE(view.onApplyChanges(), 0); // 存在modifiedTo列内容已经指定, 但是无需更新已有配置, 不调用
+    view.mSeeChanges->trigger();
+    QCOMPARE(view.onSeeChanges(), 0); // 存在modifiedTo列内容已经指定, 但是无需更新已有配置, 不调用
+    QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
   void onRequestApplyChanges_ok() {
-    QVERIFY(!Configuration().contains("StyleSheet/RandomKey"));
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(exactly(2));
+    const auto &inst = StyleSheetGetter::GetInst();
+    bool bKeyFind = false;
+    inst.curValue("StyleSheet/Font/Size/General", &bKeyFind);
+    QCOMPARE(bKeyFind, true);
 
     StyleSheetTreeView view;
+    QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
+
     // 默认关闭自动应用
-    QVERIFY(view.mApplyInstantly != nullptr);
-    QVERIFY(!view.mApplyInstantly->isChecked());
-    QVERIFY(!view.mStyleModel->m_bInstantApply);
+    QVERIFY(view.mSeeChangesInstantly != nullptr);
+    QVERIFY(!view.mSeeChangesInstantly->isChecked());
+    QVERIFY(!view.mStyleModel->m_bInstantSee);
 
     // 开启自动应用
-    view.mApplyInstantly->toggle();
-    QVERIFY(view.mApplyInstantly->isChecked());
-    QVERIFY(view.mStyleModel->m_bInstantApply);
+    view.mSeeChangesInstantly->toggle();
+    QVERIFY(view.mSeeChangesInstantly->isChecked());
+    QVERIFY(view.mStyleModel->m_bInstantSee);
 
-    view.onRequestApplyChanges("StyleSheet/RandomKey", 124); // 调用第一次Apply
-    QVERIFY(Configuration().contains("StyleSheet/RandomKey"));
-    QCOMPARE(Configuration().value("StyleSheet/RandomKey").toInt(), 124);
+    view.onRequestSeeChanges("StyleSheet/Font/Size/General", 124); // call reqSeeChanges 1st
+    QCOMPARE(reqSeeChangesSpy.count(), 1);
+    reqSeeChangesSpy.takeLast();
+    bKeyFind = false;
+    QCOMPARE(inst.curValue("StyleSheet/Font/Size/General", &bKeyFind), 124);
+    QCOMPARE(bKeyFind, true);
 
-    emit view.mStyleModel->requestApplyChanges("StyleSheet/RandomKey", "126"); // 调用第二次Apply
-    QCOMPARE(Configuration().value("StyleSheet/RandomKey").toInt(), 126);
+    emit view.mStyleModel->requestSeeChanges("StyleSheet/Font/Size/General", "126"); // call reqSeeChanges 2nd
+    QCOMPARE(reqSeeChangesSpy.count(), 1);
+    reqSeeChangesSpy.takeLast();
+    bKeyFind = false;
+    QCOMPARE(inst.curValue("StyleSheet/Font/Size/General", &bKeyFind), 126);
+    QCOMPARE(bKeyFind, true);
 
     // 关闭自动应用
-    view.mStyleModel->onInstantApplySwitchChanged(false);
-    QVERIFY(!view.mStyleModel->m_bInstantApply);
+    view.mStyleModel->onInstantSeeSwitchChanged(false);
+    QVERIFY(!view.mStyleModel->m_bInstantSee);
   }
 
   void StyleSheetEditDelegate_ok() { //

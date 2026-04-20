@@ -10,116 +10,55 @@ QString TableViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
   QString styleSheet;
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
-      styleSheet = R"(
-QTableView QTableCornerButton::section {
-    border-right: none;
-    border-bottom: none;
-}
-QTableView QTableCornerButton::section:hover {
-}
-QTableView QTableCornerButton::section:pressed {
-}
-
-QTableView {
-    show-decoration-selected: 1;
-    %1
-    alternate-background-color: %3;
-    gridline-color: %8;
-}
-QTableView::item {
-    border-left: 2px solid transparent; /* preserve 2 px for focus */
-    border-right: 2px solid transparent; /* preserve 2 px for focus */
-}
-QTableView::item:alternate {
-}
-QTableView::item:selected {
-    border-bottom: 1px inherit %4;
-}
-QTableView::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-bottom: 2px solid %4;
-}
-QTableView::item:selected:!active {
-    background: %6;
-    color: #000000;
-}
-QTableView::item:focus {
-    border-left: 2px solid %4;
-    border-right: 2px solid %4;
-}
-QTableView::item:hover {
-    background: %7;
-    color: #000000;
-}
-
-        )";
-      break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
-QTableView QTableCornerButton::section {
-    background-color: #3F3B39;
-    border-right: none;
-    border-bottom: none;
-}
-
-QTableView QTableCornerButton::section:hover {
-    background-color: #252525;
-}
-
-QTableView QTableCornerButton::section:pressed {
-    background-color: #252525;
-}
-
 QTableView {
     show-decoration-selected: 1;
-    %1
-    alternate-background-color: %3;
-    gridline-color: %8;
+    alternate-background-color: %1;
+    gridline-color: %2;
 }
 QTableView::item {
-    border-left: 2px solid transparent; /* preserve 2 px for focus */
-    border-right: 2px solid transparent; /* preserve 2 px for focus */
+    border: none;
 }
 QTableView::item:alternate {
 }
 QTableView::item:selected {
-    border-bottom: 1px inherit %4;
+    border-bottom: 1px inherit %3;
 }
 QTableView::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-bottom: 2px solid %4;
+    background: %4;
+    border-bottom: 2px solid %3;
 }
 QTableView::item:selected:!active {
-    background: %6;
-    color: #000000;
+    background: %5;
 }
 QTableView::item:focus {
-    border-left: 2px solid %4;
-    border-right: 2px solid %4;
+    border: none;
 }
 QTableView::item:hover {
-    background: %7;
-    color: #FFFFFF;
+    background: %6;
 }
         )";
       break;
     default:
       return "";
   }
+  const auto& inst = GetInst();
+  QString bgAlternateRow{inst.GetColorValue("Background/View/AlternateRow", styleE)};
+  QString gridline{inst.GetColorValue("GridLine", styleE)};
+  QString borderGeneral{inst.GetColorValue("Border/General", styleE)};
+  QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};
+  QString bgSelectedInactive{inst.GetColorValue("Background/View/SelectedInactive", styleE)};
+  QString bgHover{inst.GetColorValue("Background/View/Hover", styleE)};
 
-  QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
-  QString gridline{ColorCfg::GetColorGridLine(styleE)}; // %7
-  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
-
-  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, gridline);
-  return styleSheet;
+  QString styleSheetTableCornerButton{R"(
+QTableView > QTableCornerButton::section {
+    background-color: %1;
+}
+)"};
+  QString tableCornerButtonSection{inst.GetColorValue("Background/View/TableCornerButton/Section", styleE)};
+  return styleSheet.arg(bgAlternateRow, gridline, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover) //
+               + styleSheetTableCornerButton.arg(tableCornerButtonSection);
 }
 
 QString ListViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
@@ -127,75 +66,40 @@ QString ListViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
 
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
-      styleSheet = R"(
-QListView {
-    show-decoration-selected: 1;
-    %1
-    alternate-background-color: %3;
-}
-QListView::item:alternate {
-}
-QListView:!icon-mode::item:selected {
-    border-bottom: 1px inherit %4;
-}
-QListView:!icon-mode::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-top: 2px solid %4;
-    border-bottom: 2px solid %4;
-}
-QListView:!icon-mode::item:selected:!active {
-    background: %6;
-    color: #000000;
-}
-QListView::item:hover {
-    background: %7;
-    color: #000000;
-}
-        )";
-      break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QListView {
     show-decoration-selected: 1;
-    %1
-    alternate-background-color: %3;
+    alternate-background-color: %1;
 }
-QListView::item:alternate {
+QListView:icon-mode::item {
+    border: none;
 }
-QListView:!icon-mode::item:selected {
-    border-bottom: 1px inherit #FFFFFF;
+QListView:list-mode::item:selected {
+    border-bottom: 1px inherit %2;
 }
-QListView:!icon-mode::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-top: 2px solid %4;
-    border-bottom: 2px solid %4;
+QListView:list-mode::item:selected:active {
+    background: %3;
+    border-bottom: 2px solid %3;
 }
-QListView:!icon-mode::item:selected:!active {
-    background: %6;
-    color: #000000;
+QListView::item:selected:!active {
+    background: %4;
 }
 QListView::item:hover {
-    background: %7;
-    color: #FFFFFF;
+    background: %5;
 }
         )";
       break;
     default:
       return "";
   }
-
-  QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
-
-  QString gridline{ColorCfg::GetColorGridLine(styleE)};
-  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
-  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
+  const auto& inst = GetInst();
+  QString bgAlternateRow{inst.GetColorValue("Background/View/AlternateRow", styleE)};         // %1
+  QString borderGeneral{inst.GetColorValue("Border/General", styleE)};                        // %2
+  QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};     // %3
+  QString bgSelectedInactive{inst.GetColorValue("Background/View/SelectedInactive", styleE)}; // %4
+  QString bgHover{inst.GetColorValue("Background/View/Hover", styleE)};                       // %5
+  styleSheet = styleSheet.arg(bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }
 
@@ -203,74 +107,40 @@ QString TreeViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
   QString styleSheet;
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
-      styleSheet = R"(
-QTreeView {
-    show-decoration-selected: 0;
-    %1
-    alternate-background-color: %3;
-}
-QTreeView::item:alternate {
-}
-QTreeView::item:selected {
-    border-bottom: 1px inherit %4;
-}
-QTreeView::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-top: 2px solid %4;
-    border-bottom: 2px solid %4;
-}
-QTreeView::item:selected:!active {
-    background: %6;
-    color: #000000;
-}
-QTreeView::item:hover {
-    background: %7;
-    color: #000000;
-}
-        )";
-      break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QTreeView {
     show-decoration-selected: 0;
-    %1
-    alternate-background-color: %3;
+    alternate-background-color: %1;
 }
 QTreeView::item:alternate {
 }
 QTreeView::item:selected {
-    border-bottom: 1px inherit %4;
+    border-bottom: 1px inherit %2;
 }
 QTreeView::item:selected:active {
-    background: %5;
-    color: #000000;
-    border-top: 2px solid %4;
-    border-bottom: 2px solid %4;
+    background: %3;
+    border-bottom: 2px solid %2;
 }
 QTreeView::item:selected:!active {
-    background: %6;
-    color: #000000;
+    background: %4;
 }
 QTreeView::item:hover {
-    background: %7;
-    color: #FFFFFF;
+    background: %5;
 }
         )";
       break;
     default:
       return "";
   }
-  QString fontStr{FontCfg::ReadFontString()}; // %1
-  QString bgAlternateRow{ColorCfg::GetColorBackgroundAlternateRow(styleE)}; // %2
-  QString borderGeneral{ColorCfg::GetColorBorderGeneral(styleE)}; // %3
-  
-  QString bgSelectedActive{ColorCfg::GetColorBackgroundSelectedActive(styleE)}; // %4
-  QString bgSelectedInactive{ColorCfg::GetColorBackgroundSelectedInactive(styleE)}; // %5
-  QString bgHover{ColorCfg::GetColorBackgroundHover(styleE)}; // %6
+  const auto& inst = GetInst();
+  QString bgAlternateRow{inst.GetColorValue("Background/View/AlternateRow", styleE)}; // %1
+  QString borderGeneral{inst.GetColorValue("Border/General", styleE)};                // %2
 
-  QString gridline{ColorCfg::GetColorGridLine(styleE)};
-  QString foregroundGeneral{ColorCfg::GetColorForegroundGeneral(styleE)};
-  styleSheet = styleSheet.arg(fontStr, bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
+  QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};     // %3
+  QString bgSelectedInactive{inst.GetColorValue("Background/View/SelectedInactive", styleE)}; // %4
+  QString bgHover{inst.GetColorValue("Background/View/Hover", styleE)};                       // %5
+
+  styleSheet = styleSheet.arg(bgAlternateRow, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover);
   return styleSheet;
 }

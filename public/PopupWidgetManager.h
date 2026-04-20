@@ -43,7 +43,6 @@ class ConfigsTable;
 class Archiver;
 class PasswordBook;
 class ResourceMonitorPanel;
-class StyleSheetMgr;
 
 extern template class PopupWidgetManager<QWidget>;
 extern template class PopupWidgetManager<DevicesDrivesTV>;
@@ -54,5 +53,4 @@ extern template class PopupWidgetManager<ConfigsTable>;
 extern template class PopupWidgetManager<Archiver>;
 extern template class PopupWidgetManager<PasswordBook>;
 extern template class PopupWidgetManager<ResourceMonitorPanel>;
-extern template class PopupWidgetManager<StyleSheetMgr>;
 #endif // POPUPWIDGETMANAGER_H

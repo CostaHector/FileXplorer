@@ -16,6 +16,7 @@ PropertiesWindow::PropertiesWindow(QWidget* parent)  //
 {
   m_propertyTB = g_propertiesWindowAct().getPropertiesToolBar(this);
   m_propertiesInfoTextEdit = new (std::nothrow) QTextEdit(this);
+  m_propertiesInfoTextEdit->setProperty("UseCodeFontFamily", true);
 
   m_mainLo = new (std::nothrow) QVBoxLayout{this};
   m_mainLo->addWidget(m_propertyTB);
@@ -146,7 +147,6 @@ void PropertiesWindow::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_propertiesInfoTextEdit->setFont(StyleSheet::CODE_EDITOR_FONT());
 }
 
 void PropertiesWindow::showEvent(QShowEvent* event) {

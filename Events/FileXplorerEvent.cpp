@@ -925,7 +925,7 @@ void FileXplorerEvent::on_FontChanged() {
   }
   LOG_OK_P("Font changed", "Selected font: %s, size: %d, weight:%d, Italic: %d",  //
            qPrintable(newFont.family()), newFont.pointSize(), newFont.weight(), newFont.italic());
-  FontCfg::updateFont(newFont);
+  StyleSheetGetter::GetInst().updateGeneralFont(newFont);
 }
 
 extern template struct RowHeightRegistry<CustomTableView>;

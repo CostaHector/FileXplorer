@@ -1,6 +1,8 @@
 #ifndef STYLEENUM_H
 #define STYLEENUM_H
 
+#include <QVariant>
+
 namespace Style {
 enum class StyleE : int {
   STYLE_WINDOWS_VISTA = 0,
@@ -30,6 +32,11 @@ constexpr const char* DEFAULT_FONT_FAMILY_CODE {
 #else
     "Monospace",
 #endif
+};
+
+struct CfgDefCur {
+  QVariant def;
+  QVariant cur;
 };
 }
 

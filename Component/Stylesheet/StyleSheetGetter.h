@@ -4,17 +4,16 @@
 #include <QString>
 #include <vector>
 #include <memory>
-#include <functional>
-#include "StyleEnum.h"
 #include <QFont>
+#include "StyleEnum.h"
 
 class StyleSheetTreeModel;
 
 namespace FontCfg {
 QFont ReadFont();
 QString ReadFontString();
-void updateFont(const QFont& newFont);
 QString GetFontFamily();
+QString GetFontFamilyCode();
 
 int GetFontSize();
 int GetFontSizeTab();
@@ -24,52 +23,42 @@ QString GetFontWeightString();
 QString GetFontStyleString();
 
 constexpr const char* mFontFamilyDef{Style::DEFAULT_FONT_FAMILY};
+constexpr const char* mFontFamilyCodeDef{Style::DEFAULT_FONT_FAMILY_CODE};
 constexpr int mFontSizeDef{14};                                  // 14 px
 constexpr int mFontSizeTabDef{mFontSizeDef + 1};                 // 15 px
 constexpr QFont::Weight mFontWeightDef{QFont::Weight::Normal};   // normal; bold
 constexpr QFont::Style mFontStyleDef{QFont::Style::StyleNormal}; // normal; italic
 }
 
-namespace ColorCfg {
-QString GetColorBackgroundGeneral(Style::StyleSheetE styleE);
-QString GetColorBackgroundAlternateRow(Style::StyleSheetE styleE);
-QString GetColorBackgroundHover(Style::StyleSheetE styleE);
-QString GetColorBackgroundSelectedInactive(Style::StyleSheetE styleE);
-QString GetColorBackgroundSelectedActive(Style::StyleSheetE styleE);
-QString GetColorBackgroundMenuChecked(Style::StyleSheetE styleE);
-QString GetColorBackgroundMenuSelected(Style::StyleSheetE styleE);
-QString GetColorGridLine(Style::StyleSheetE styleE);
-QString GetColorBorderGeneral(Style::StyleSheetE styleE);
-QString GetColorBorderMenuRight(Style::StyleSheetE styleE);
-QString GetColorForegroundGeneral(Style::StyleSheetE styleE);
-
-QString ColorBackgroundGeneralDef(Style::StyleSheetE styleE);
-QString ColorBackgroundAlternateRowDef(Style::StyleSheetE styleE);
-QString ColorBackgroundHoverDef(Style::StyleSheetE styleE);
-QString ColorBackgroundSelectedInactiveDef(Style::StyleSheetE styleE);
-QString ColorBackgroundSelectedActiveDef(Style::StyleSheetE styleE);
-QString ColorBackgroundMenuCheckedDef(Style::StyleSheetE styleE);
-QString ColorBackgroundMenuSelectedDef(Style::StyleSheetE styleE);
-QString ColorGridLineDef(Style::StyleSheetE styleE);
-QString ColorBorderGeneralDef(Style::StyleSheetE styleE);
-QString ColorBorderMenuRightDef(Style::StyleSheetE styleE);
-QString ColorForegroundGeneralDef(Style::StyleSheetE styleE);
-}
-
 class StyleSheetGetter {
 public:
   friend class StyleSheetTreeModel;
   static const StyleSheetGetter& GetInst();
-  StyleSheetGetter() = default;
+  StyleSheetGetter();
+  void init() const;
   virtual ~StyleSheetGetter() = default;
 
   using DerivedPtr = std::unique_ptr<StyleSheetGetter>;
   static bool Register(DerivedPtr creator);
   QString operator()(Style::StyleSheetE styleE) const;
 
+  const QVariant& defValue(const QString& key, bool* bKeyExist = nullptr) const;
+  const QVariant& curValue(const QString& key, bool* bKeyExist = nullptr) const;
+  const Style::CfgDefCur& defCurValue(const QString& key, bool* bKeyExist = nullptr) const;
+  void InitColorUnrelatedValue(const QString& keyCore, const QVariant& def) const;
+  void InitColorValue(const QString& keyCore, const QVariant& lightDef, const QVariant& darkDef) const;
+  QString GetColorValue(const QString& keyCore, Style::StyleSheetE styleE) const;
+
+  int UpdateCurValue(const QVariantHash& cfg) const;
+  static void WriteIntoSettingsCore(const StyleSheetGetter& self);
+  void WriteIntoSettings() const;
+
+  int updateGeneralFont(const QFont& newGeneralFont) const;
+
 private:
   virtual QString GetStyleSheet(Style::StyleSheetE styleE) const { return ""; }
 
+  mutable QHash<QString, Style::CfgDefCur> mStyleCfg;
   static std::vector<DerivedPtr>& GetRegistry();
 };
 

@@ -20,20 +20,17 @@ int AdvanceRenamer::execCore(AdvanceRenamer* self) {
   return self->exec();
 }
 
-AdvanceRenamer::AdvanceRenamer(QWidget* parent)  //
-  : QDialog{parent}
-{
+AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
+  : QDialog{parent} {
   m_nameExtIndependent = new (std::nothrow) QCheckBox{tr("Name Ext Independent"), this};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
-  m_nameExtIndependent->setToolTip(
-      "Show file base name and extension respectively.\n"
-      "So rename rules will work/or not work on extension");
+  m_nameExtIndependent->setToolTip("Show file base name and extension respectively.\n"
+                                   "So rename rules will work/or not work on extension");
 
   m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
-  m_recursiveCB->setToolTip(
-      "Recursive rename.\n"
-      "Rules will also work on itself and its subdirectories");
+  m_recursiveCB->setToolTip("Recursive rename.\n"
+                            "Rules will also work on itself and its subdirectories");
 
   regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
@@ -84,22 +81,30 @@ void AdvanceRenamer::initCommonSetting() {
 QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   m_relNameTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_relNameTE)
-  m_oBaseTE = new (std::nothrow) QPlainTextEdit{this};
-  CHECK_NULLPTR_RETURN_NULLPTR(m_oBaseTE)
-  m_oExtTE = new (std::nothrow) QPlainTextEdit{this};
-  CHECK_NULLPTR_RETURN_NULLPTR(m_oExtTE)
-  m_nBaseTE = new (std::nothrow) MultiCursorEditor{this};
-  CHECK_NULLPTR_RETURN_NULLPTR(m_nBaseTE)
-  m_nExtTE = new (std::nothrow) QPlainTextEdit{this};
-  CHECK_NULLPTR_RETURN_NULLPTR(m_nExtTE)
+  m_relNameTE->setProperty("UseCodeFontFamily", true);
   m_relNameTE->setReadOnly(true);
   m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+
+  m_oBaseTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_oBaseTE)
+  m_oBaseTE->setProperty("UseCodeFontFamily", true);
   m_oBaseTE->setReadOnly(true);
   m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+
+  m_oExtTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_oExtTE)
+  m_oExtTE->setProperty("UseCodeFontFamily", true);
   m_oExtTE->setReadOnly(true);
-  m_nBaseTE->setReadOnly(false);
+
+  m_nBaseTE = new (std::nothrow) MultiCursorEditor{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_nBaseTE)
+  m_nBaseTE->setProperty("UseCodeFontFamily", true);
   m_nBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
-  m_nExtTE->setReadOnly(false);
+
+  m_nExtTE = new (std::nothrow) QPlainTextEdit{this};
+  CHECK_NULLPTR_RETURN_NULLPTR(m_nExtTE)
+  m_nExtTE->setProperty("UseCodeFontFamily", true);
+  m_nExtTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
 
   auto* nameEditLayout = new (std::nothrow) QHBoxLayout;
   CHECK_NULLPTR_RETURN_NULLPTR(nameEditLayout);
@@ -112,7 +117,7 @@ QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   nameEditLayout->setStretch(1, 8);
   nameEditLayout->setStretch(2, 1);
   nameEditLayout->setStretch(3, 8);
-  nameEditLayout->setStretch(4, 1);  
+  nameEditLayout->setStretch(4, 1);
   return nameEditLayout;
 }
 
@@ -124,7 +129,7 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
   if (QPushButton* pOkBtn = buttonBox->button(QDialogButtonBox::Ok)) {
     pOkBtn->setIcon(QIcon(":img/SAVED"));
     pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
-    pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.")  //
+    pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.") //
                            .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
   }
 
@@ -154,7 +159,7 @@ void AdvanceRenamer::init() {
   m_mainLayout->setContentsMargins(5, 5, 5, 5);
 
   /* don't move this section up (Don't set state before UI)*/
-  initCommonSetting(); // 共用配置
+  initCommonSetting();    // 共用配置
   initExclusiveSetting(); // 独有配置
   /* don't move this section up */
 
@@ -271,8 +276,8 @@ void AdvanceRenamer::UpdateNameAndExt() {
 }
 
 void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringList& selectedNames) {
-  mWorkPath = workPath;            // will never change
-  mSelectedNames = selectedNames;  // will never change
+  mWorkPath = workPath;           // will never change
+  mSelectedNames = selectedNames; // will never change
 
   const bool bSubDir{m_recursiveCB->isChecked()};
   const bool bSuffixInsideFilename{!m_nameExtIndependent->isChecked()};

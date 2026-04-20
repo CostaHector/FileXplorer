@@ -92,6 +92,7 @@ MD5Window::MD5Window(QWidget* parent) : QDialog{parent} {
   m_md5InfoTB->addActions(mBytesRangeIntAct.getActionEnumAscendingList());
 
   m_md5TextEdit = new (std::nothrow) QPlainTextEdit{this};
+  m_md5TextEdit->setProperty("UseCodeFontFamily", true);
 
   mMainLayout = new (std::nothrow) QVBoxLayout(this);
   mMainLayout->addWidget(m_md5InfoTB);
@@ -195,7 +196,6 @@ void MD5Window::ReadSetting() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  m_md5TextEdit->setFont(StyleSheet::CODE_EDITOR_FONT());
 }
 
 void MD5Window::showEvent(QShowEvent* event) {

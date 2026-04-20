@@ -15,6 +15,8 @@ public:
   ~StyleSheetTreeView() = default;
   void setFilter(const QString& filter);
   QString curFilter() const;
+signals:
+  void reqSeeChanges();
 
 private:
   void initExclusivePreferenceSetting() override;
@@ -24,16 +26,16 @@ private:
   int onRestoreToDefault();
   int onRestoreToBackup();
   int onBatchSetColor();
-  int onApplyChanges();
+  int onSeeChanges();
 
-  void onRequestApplyChanges(const QString& cfgKey, const QVariant& value);
+  void onRequestSeeChanges(const QString& cfgKey, const QVariant& value);
 
   QAction* mBatchSetColor{nullptr};
-  QAction* mApplyChanges{nullptr};
+  QAction* mSeeChanges{nullptr};
   QAction* mClearModifiedValues{nullptr};
   QAction* mRestoreToDefault{nullptr};
   QAction* mRestoreToBackup{nullptr};
-  QAction* mApplyInstantly{nullptr};
+  QAction* mSeeChangesInstantly{nullptr};
 
   StyleSheetTreeModel* mStyleModel{nullptr};
   TreeFilterProxyModel<StyleTreeNode>* mStyleFilterProxyModel{nullptr};

@@ -6,94 +6,55 @@ QString MenuStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
   QString styleSheet;
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
-      styleSheet = R"(
-QMenu {
-    %1
-    border-right: 5px; /* preserve for border */
-}
-QMenu::item {
-    background-color: transparent;
-    color: #000000;
-}
-QMenu::item:checked {
-    background-color: %2;
-    color: #000000;
-}
-QMenu::item:selected {
-    background-color: %3;
-    color: #000000;
-    border-right: 5px solid #3C3C3C;
-}
-QMenu::separator {
-    height: 1px;
-    background-color: %2;
-}
-
-QMenuBar {
-    border: none;
-}
-QMenuBar::item {
-    background: transparent;
-    color: #000000;
-}
-QMenuBar::item:checked {
-    background-color: %2;
-    color: #000000;
-}
-QMenuBar::item:selected {
-    background-color: %3;
-    color: #000000;
-    border-right: 5px solid %4;
-}
-)";
-      break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QMenu {
-    %1
     border-right: 5px; /* preserve for border */
+    background-color: %2; /* background color */
 }
 QMenu::item {
+    color: %1; /* foreground font color */
     background-color: transparent;
-    color: #FFFFFF;
 }
 QMenu::item:checked {
-    background-color: %2;
-    color: #000000;
+    background-color: %3; /* checked bg color */
 }
 QMenu::item:selected {
-    background-color: %3;
-    color: #000000;
-    border-right: 5px solid %4;
+    background-color: %4; /* hovered bg color */
+    border-right: 5px solid %5; /* hovered border color */
 }
 QMenu::separator {
     height: 1px;
-    background-color: %2;
+    background-color: %6; /* separator color */
 }
 
 QMenuBar {
     border: none;
+    background-color: %2; /* background color */
 }
 QMenuBar::item {
+    color: %1; /* foreground font color */
     background: transparent;
-    color: #FFFFFF;
 }
 QMenuBar::item:checked {
-    background: %2;
-    color: #000000;
+    background-color: %3; /* checked bg color */
 }
 QMenuBar::item:selected {
-    background: %3;
-    color: #000000;
+    background-color: %4; /* hovered bg color */
+    border: 1px solid %5; /* hovered border color */
 }
 )";
       break;
     default:
       return "";
   }
-  QString fontStr = FontCfg::ReadFontString();
-  QString menuCheckedColor = ColorCfg::GetColorBackgroundMenuChecked(styleE);
-  QString menuSelectedColor = ColorCfg::GetColorBackgroundMenuSelected(styleE);
-  QString menuBorderRightColor = ColorCfg::GetColorBorderMenuRight(styleE);
-  return styleSheet.arg(fontStr, menuCheckedColor, menuSelectedColor, menuBorderRightColor);
+  const auto& inst = GetInst();
+  QString menuFontForeground = inst.GetColorValue("Foreground/MenuFont", styleE);
+  QString menuBg = inst.GetColorValue("Background/Menu/Item", styleE);
+  QString menuCheckedColor = inst.GetColorValue("Background/Menu/ItemChecked", styleE);
+  QString menuSelectedColor = inst.GetColorValue("Background/Menu/ItemHovered", styleE);
+  QString menuBorderRightColor = inst.GetColorValue("Border/MenuRight", styleE);
+  QString separatorColor = inst.GetColorValue("Background/Menu/Separator", styleE);
+  
+  return styleSheet.arg(menuFontForeground, menuBg, menuCheckedColor, menuSelectedColor, menuBorderRightColor, separatorColor);
 }

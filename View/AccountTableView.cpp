@@ -2,7 +2,6 @@
 #include "PwdPublicVariable.h"
 #include "PwdTableEditActions.h"
 #include "NotificatorMacro.h"
-#include "StyleSheet.h"
 #include <QHeaderView>
 #include <QDateTime>
 #include <QInputDialog>
@@ -24,7 +23,6 @@ AccountTableView::AccountTableView(QWidget* parent)
   setModel(mSortProxyModel);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
   InitTableView();
-  setFont(StyleSheet::CODE_EDITOR_FONT());
   Subscribe();
 }
 

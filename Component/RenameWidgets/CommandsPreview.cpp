@@ -1,8 +1,8 @@
 #include "CommandsPreview.h"
 #include "MemoryKey.h"
-#include "StyleSheet.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
+#include "StyleSheet.h"
 
 #include <QResizeEvent>
 
@@ -10,6 +10,7 @@ CommandsPreview::CommandsPreview(const QString& name, QWidget* parent) //
   : QTextBrowser{parent}
   , mName{name} //
 {
+  setProperty("UseCodeFontFamily", true);
   COPY_TEXT = new (std::nothrow) QAction{QIcon(":img/COPY_TEXT"), "Copy", this};
   CHECK_NULLPTR_RETURN_VOID(COPY_TEXT);
   COPY_TEXT->setToolTip("Copy all text in this window to system clipboard");
@@ -47,7 +48,6 @@ void CommandsPreview::ReadSettings() {
   } else {
     setGeometry(DEFAULT_GEOMETRY);
   }
-  setFont(StyleSheet::CODE_EDITOR_FONT());
   setWindowIcon(QIcon(":img/COMMAND_PREVIEW"));
 }
 

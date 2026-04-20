@@ -1,7 +1,6 @@
 #include "CSVInputDialog.h"
 #include "AccountStorage.h"
 #include "PublicMacro.h"
-#include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include <QIcon>
 #include <QMessageBox>
@@ -82,6 +81,7 @@ CSVInputDialog::CSVInputDialog(QWidget* parent)  //
     : QDialog{parent}                            //
 {
   textEdit = new (std::nothrow) DragDropTextEdit(this);
+  textEdit->setProperty("UseCodeFontFamily", true);
   CHECK_NULLPTR_RETURN_VOID(textEdit);
   textEdit->setPlaceholderText("Enter your text here or drag encrypt csv file here...");
 
@@ -105,7 +105,6 @@ CSVInputDialog::CSVInputDialog(QWidget* parent)  //
   connect(buttonBox, &QDialogButtonBox::helpRequested, this, &CSVInputDialog::onHelpRequest);
   connect(textEdit->document(), &QTextDocument::contentsChanged, this, &CSVInputDialog::onContentsChanged);
 
-  setFont(StyleSheet::CODE_EDITOR_FONT());
   setWindowIcon(QIcon(":/edit/LOAD_FROM_INPUT"));
   setWindowTitle("Get record(s) from CSV input");
 }

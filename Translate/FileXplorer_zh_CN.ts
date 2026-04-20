@@ -1456,7 +1456,7 @@
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../Component/Navigation/NavigationAndAddressBar.cpp" line="+58"/>
+        <location filename="../Component/Navigation/NavigationAndAddressBar.cpp" line="+59"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>

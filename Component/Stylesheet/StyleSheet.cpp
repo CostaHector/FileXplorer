@@ -50,11 +50,6 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
 }
 #endif
 
-const QFont& CODE_EDITOR_FONT() {
-  static QFont UNIVERSAL_MONOSPACE_FONT{Style::DEFAULT_FONT_FAMILY_CODE, 15};
-  return UNIVERSAL_MONOSPACE_FONT;
-}
-
 QIcon GetSystemDirOpenIcon() {
   return QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon);
 }

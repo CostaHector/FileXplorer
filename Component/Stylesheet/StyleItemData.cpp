@@ -17,6 +17,10 @@ StyleItemData::StyleItemData(const QString& _name, const QVariant& _defValue, co
   , dataType{_dataType}
   , isGroup{_dataType == DataTypeE::GROUP} {}
 
+StyleItemData::StyleItemData(const QString& _name, const Style::CfgDefCur& _defCurValue, const DataTypeE& _dataType):
+  StyleItemData{_name, _defCurValue.def, _defCurValue.cur, _dataType}
+{}
+
 bool StyleItemData::modifyValueTo(const QVariant& _newValue, bool& bNewValueAccept) {
   // return value: changed or not
   // input value: accept or not

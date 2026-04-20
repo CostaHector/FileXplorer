@@ -56,8 +56,10 @@ void ExtraEvents::subscribe() {
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);
 
   auto& prefInst = g_PreferenceActions();
-  mStyleSheetMgr = new (std::nothrow) PopupWidgetManager<StyleSheetMgr>{prefInst.STYLESHEET_MGR, pParentWidget, "Geometry/StyleSheetMgr"};
-  CHECK_NULLPTR_RETURN_VOID(mStyleSheetMgr);
+  connect(prefInst.STYLESHEET_MGR, &QAction::triggered, this, []() {
+    StyleSheetMgr styleSheetMgr;
+    styleSheetMgr.exec();
+  });
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
     Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);

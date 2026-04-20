@@ -1,9 +1,9 @@
 #include "ConfigsTable.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
-#include "StyleSheet.h"
 #include "FileLeafAction.h"
 #include "FileTool.h"
+#include "StyleSheet.h"
 #include "PublicMacro.h"
 
 #include <QDialogButtonBox>
@@ -13,8 +13,6 @@
 #include <QFile>
 
 ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
-  setFont(StyleSheet::CODE_EDITOR_FONT());
-
   m_failItemCnt = new (std::nothrow) QLabel{"Configs status here", this};
   CHECK_NULLPTR_RETURN_VOID(m_failItemCnt);
   m_alertModel = new (std::nothrow) ConfigsModel{this};

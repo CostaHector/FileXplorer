@@ -1,8 +1,6 @@
 #include "StyleSheetTreeView.h"
 #include "NotificatorMacro.h"
 #include "StyleSheetGetter.h"
-#include "MemoryKey.h"
-#include "PreferenceActions.h"
 #include <QColorDialog>
 
 StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
@@ -23,15 +21,15 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   setSortingEnabled(true);
 
   mBatchSetColor = new QAction{QIcon{":/styles/COLOR_SELECT"}, tr("Batch Set Color"), this};
-  mApplyChanges = new QAction{QIcon{":img/SAVED"}, tr("Apply Changes"), this};
+  mSeeChanges = new QAction{QIcon{":img/SAVED"}, tr("See Changes"), this};
   mClearModifiedValues = new QAction{QIcon{":/styles/CLEAR_MODIFIED_VALUES"}, tr("Clear Modified Values"), this};
   mRestoreToDefault = new QAction{QIcon{":/styles/RESTORE_TO_DEFAULT"}, tr("Restore to Default"), this};
   mRestoreToBackup = new QAction{QIcon{":/styles/RESTORE_TO_BACKUP"}, tr("Restore to Backup"), this};
-  mApplyInstantly = new QAction{QIcon{":/styles/INSTANT_APPLY"}, tr("Instant Apply"), this};
-  mApplyInstantly->setToolTip("Apply changes immediately for real-time preview. Note: this may cause screen flickering.");
-  mApplyInstantly->setCheckable(true);
-  mApplyInstantly->setChecked(false);
-  QList<QAction*> exclusiveActs{mBatchSetColor, mApplyChanges, mClearModifiedValues, mRestoreToDefault, mRestoreToBackup, mApplyInstantly};
+  mSeeChangesInstantly = new QAction{QIcon{":/styles/INSTANT_APPLY"}, tr("Instant See"), this};
+  mSeeChangesInstantly->setToolTip("See changes immediately for real-time preview. Note: this may cause screen flickering.");
+  mSeeChangesInstantly->setCheckable(true);
+  mSeeChangesInstantly->setChecked(false);
+  QList<QAction*> exclusiveActs{mBatchSetColor, mSeeChanges, mClearModifiedValues, mRestoreToDefault, mRestoreToBackup, mSeeChangesInstantly};
   PushFrontExclusiveActions(exclusiveActs);
 
   InitTreeView();
@@ -44,12 +42,12 @@ void StyleSheetTreeView::initExclusivePreferenceSetting() {
 
 void StyleSheetTreeView::subscribe() {
   connect(mBatchSetColor, &QAction::triggered, this, &StyleSheetTreeView::onBatchSetColor);
-  connect(mApplyChanges, &QAction::triggered, this, &StyleSheetTreeView::onApplyChanges);
+  connect(mSeeChanges, &QAction::triggered, this, &StyleSheetTreeView::onSeeChanges);
   connect(mClearModifiedValues, &QAction::triggered, this, &StyleSheetTreeView::onClearModifiedValues);
   connect(mRestoreToDefault, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToDefault);
   connect(mRestoreToBackup, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToBackup);
-  connect(mApplyInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantApplySwitchChanged);
-  connect(mStyleModel, &StyleSheetTreeModel::requestApplyChanges, this, &StyleSheetTreeView::onRequestApplyChanges);
+  connect(mSeeChangesInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantSeeSwitchChanged);
+  connect(mStyleModel, &StyleSheetTreeModel::requestSeeChanges, this, &StyleSheetTreeView::onRequestSeeChanges);
 }
 
 void StyleSheetTreeView::setFilter(const QString& filter) {
@@ -115,7 +113,7 @@ int StyleSheetTreeView::onBatchSetColor() {
   return rowsAffected;
 }
 
-int StyleSheetTreeView::onApplyChanges() {
+int StyleSheetTreeView::onSeeChanges() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("No row selected", "No changes to apply");
     return 0;
@@ -123,28 +121,23 @@ int StyleSheetTreeView::onApplyChanges() {
   const QVariantHash cfg = mStyleModel->CollectItemsNeedApplyChange(selectedRowsSource());
   bool bChangeExist{!cfg.isEmpty()};
   if (!bChangeExist) {
-    LOG_INFO_NP("Apply changes", "No changes to apply");
+    LOG_INFO_NP("See changes", "No changes to apply");
     return 0;
   }
-  int settingItemsUpdatedCnt{0};
-  QSettings& settings = Configuration();
-  for (auto it = cfg.cbegin(); it != cfg.cend(); ++it) {
-    if (settings.contains(it.key()) && settings.value(it.key()) == it.value()) {
-      continue;
-    }
-    Configuration().setValue(it.key(), it.value());
-    ++settingItemsUpdatedCnt;
-  }
+  int settingItemsUpdatedCnt = StyleSheetGetter::GetInst().UpdateCurValue(cfg);
   if (settingItemsUpdatedCnt == 0) {
     LOG_INFO_P("No changes needed", "%d configuration value(s) modified but all match existing settings", cfg.size());
     return 0;
   }
-  LOG_OK_P("Changes applied successfully", "%d of %d value(s) updated", settingItemsUpdatedCnt, cfg.size());
-  g_PreferenceActions().initStyleSheet(false);
+  LOG_OK_P("Changes shown successfully", "%d of %d value(s) updated", settingItemsUpdatedCnt, cfg.size());
+  emit reqSeeChanges();
   return settingItemsUpdatedCnt;
 }
 
-void StyleSheetTreeView::onRequestApplyChanges(const QString& cfgKey, const QVariant& value) {
-  Configuration().setValue(cfgKey, value);
-  g_PreferenceActions().initStyleSheet(false);
+void StyleSheetTreeView::onRequestSeeChanges(const QString& cfgKey, const QVariant& value) {
+  int settingItemsUpdatedCnt = StyleSheetGetter::GetInst().UpdateCurValue({{cfgKey, value}});
+  if (settingItemsUpdatedCnt == 0) {
+    return;
+  }
+  emit reqSeeChanges();
 }
