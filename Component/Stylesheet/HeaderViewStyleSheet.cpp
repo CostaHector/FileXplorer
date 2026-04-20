@@ -6,35 +6,37 @@ QString HeaderViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
   QString styleSheet;
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
-      styleSheet = R"(
-QHeaderView::section {
-
-}
-QHeaderView#Horizontal::section {
-    %1
-}
-QHeaderView#Vertical::section {
-    %2
-}
-)";
-      break;
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QHeaderView::section {
-    background-color: #3F3B39;
-    color: #FFFFFF;
+    background-color: %1;
+    border: 1px solid %4;
 }
-QHeaderView#Horizontal::section {
-    %1
+QHeaderView::section:horizontal {
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
 }
-QHeaderView#Vertical::section {
-    %2
+QHeaderView::section:vertical {
+    border: none;
+}
+QHeaderView::section:hover {
+    background-color: %2;
+}
+QHeaderView::section:pressed {
+    background-color: %3;
 }
 )";
       break;
     default:
       return "";
   }
-  QString fontStr = FontCfg::ReadFontString();
-  return styleSheet.arg(fontStr, fontStr);
+
+  const auto& inst = GetInst();
+  QString notHoverColor{inst.GetColorValue("Background/HeaderView/NotHover", styleE)};
+  QString hoverColor{inst.GetColorValue("Background/HeaderView/Hover", styleE)};
+  QString pressedColor{inst.GetColorValue("Background/HeaderView/Pressed", styleE)};
+  QString borderColor{inst.GetColorValue("Border/HeaderView", styleE)};
+
+  return styleSheet.arg(notHoverColor, hoverColor, pressedColor, borderColor);
 }

@@ -13,8 +13,6 @@ void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
 
-const QFont& CODE_EDITOR_FONT();
-
 QIcon GetSystemDirOpenIcon();
 }  // namespace StyleSheet
 

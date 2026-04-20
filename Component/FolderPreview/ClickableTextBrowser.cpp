@@ -38,12 +38,6 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   setOpenLinks(false);
   setOpenExternalLinks(true);
 
-  double fontPointSize =
-      Configuration().value(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.v).toDouble();
-  auto curFont = font();
-  curFont.setPointSizeF(fontPointSize);
-  setFont(curFont);
-
   mCurIconSizeIndex = IMAGE_SIZE::GetInitialScaledSize("ClickableTextBrowser");  // [0, WHEEL_CANDIDATES_N)
   mIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconSizeIndex];
 
@@ -68,7 +62,6 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
 }
 
 ClickableTextBrowser::~ClickableTextBrowser() {
-  Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, font().pointSizeF());
   IMAGE_SIZE::SaveInitialScaledSize("ClickableTextBrowser", mCurIconSizeIndex);
   Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, mCastVideosVisisble);
   Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, mCastImagesVisisble);

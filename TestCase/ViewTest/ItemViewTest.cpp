@@ -21,7 +21,7 @@ class ItemViewTest : public PlainTestSuite {
  public:
   TDir mTDir;
  private slots:
-  void initupTestcase() {
+  void initTestCase() {
     QVERIFY(mTDir.IsValid());
     QList<FsNodeEntry> nodes{
         {"emptyImageFolder", true, ""},

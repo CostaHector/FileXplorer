@@ -64,8 +64,6 @@ PreferenceActions::PreferenceActions(QObject* parent) //
   mStyleSheetIntAction.setCheckedIfActionExist(stylesheetInt);
 
   STYLESHEET_MGR = new (std::nothrow) QAction{QIcon{":/styles/STYLESHEET_MGR"}, tr("Stylesheet"), this};
-  STYLESHEET_MGR->setCheckable(true);
-  STYLESHEET_MGR->setChecked(false);
 
   subscribe();
 }

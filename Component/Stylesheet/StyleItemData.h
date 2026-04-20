@@ -2,6 +2,7 @@
 #define STYLEITEMDATA_H
 
 #include "TreeNodeBase.h"
+#include "StyleEnum.h"
 #include <QString>
 #include <QVariant>
 
@@ -27,8 +28,10 @@ struct StyleItemData final {
   };
 
   StyleItemData() = default;
-  explicit StyleItemData(const QString& _name) : name{_name} {}
+  explicit StyleItemData(const QString& _name)
+    : name{_name} {}
   StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const DataTypeE& _dataType);
+  StyleItemData(const QString& _name, const Style::CfgDefCur& _defCurValue, const DataTypeE& _dataType);
 
   bool operator==(const StyleItemData& other) const { //
     return (this == &other) || (name == other.name && isGroup == other.isGroup && defValue == other.defValue && curValue == other.curValue);

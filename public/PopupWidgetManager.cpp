@@ -10,7 +10,6 @@
 #include "Archiver.h"
 #include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
-#include "StyleSheetMgr.h"
 #include "MemoryKey.h"
 #include "Logger.h"
 
@@ -25,7 +24,6 @@ template class PopupWidgetManager<ConfigsTable>;
 template class PopupWidgetManager<Archiver>;
 template class PopupWidgetManager<PasswordBook>;
 template class PopupWidgetManager<ResourceMonitorPanel>;
-template class PopupWidgetManager<StyleSheetMgr>;
 
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent, const QString& geometryCfgKey)

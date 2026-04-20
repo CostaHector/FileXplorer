@@ -230,7 +230,7 @@ private slots:
 
     StyleSheetTreeModel model;
     model.setDatas(std::move(rootNode));
-    QCOMPARE(model.m_bInstantApply, false);
+    QCOMPARE(model.m_bInstantSee, false);
 
     QModelIndex r00Index0{model.index(0, StyleItemData::NAME_COLUMN, {})};
     QModelIndex r000Index0{model.index(0, StyleItemData::NAME_COLUMN, r00Index0)};
@@ -265,7 +265,7 @@ private slots:
     QModelIndex r011Index3{model.index(1, StyleItemData::EDITABLE_COLUMN, r01Index0)};
 
     // onInstantApplySwitchChanged
-    QCOMPARE(model.m_bInstantApply, false);
+    QCOMPARE(model.m_bInstantSee, false);
 
     // r00 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
     // r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER}));
@@ -334,9 +334,9 @@ private slots:
     }
 
     QSignalSpy dataChangedSpy{&model, &StyleSheetTreeModel::dataChanged};
-    QSignalSpy reqApplyChangesSpy{&model, &StyleSheetTreeModel::requestApplyChanges};
+    QSignalSpy reqApplyChangesSpy{&model, &StyleSheetTreeModel::requestSeeChanges};
     // 不触发通知应用修改信号
-    QCOMPARE(model.m_bInstantApply, false);
+    QCOMPARE(model.m_bInstantSee, false);
     {
       QVariant defUnspecifiedVar;
 
@@ -401,8 +401,8 @@ private slots:
     }
 
     // 立即触发应用修改信号
-    model.onInstantApplySwitchChanged(true);
-    QCOMPARE(model.m_bInstantApply, true);
+    model.onInstantSeeSwitchChanged(true);
+    QCOMPARE(model.m_bInstantSee, true);
 
     QCOMPARE(model.mEditFailedCells.isEmpty(), true); // true
     // 成功修改, 且editCell失败字典为空, 只会有1次dataChanged
@@ -465,8 +465,8 @@ private slots:
       QCOMPARE(model.mEditFailedCells.size(), 0);
     }
 
-    model.onInstantApplySwitchChanged(false);
-    QCOMPARE(model.m_bInstantApply, false);
+    model.onInstantSeeSwitchChanged(false);
+    QCOMPARE(model.m_bInstantSee, false);
     QCOMPARE(model.mEditFailedCells.isEmpty(), true);
 
     {

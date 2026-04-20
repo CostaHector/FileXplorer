@@ -36,7 +36,6 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
   void initTestCase() {
     Configuration().clear();
 
-    Configuration().setValue(BrowserKey::CLICKABLE_TEXT_BROWSER_FONT_POINT_SIZE.name, 12);
     IMAGE_SIZE::SaveInitialScaledSize("ClickableTextBrowser", IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1);
 
     QList<FsNodeEntry> nodes;

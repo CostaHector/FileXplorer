@@ -1,6 +1,5 @@
 #include "AccountDetailView.h"
 #include "PublicVariable.h"
-#include "StyleSheet.h"
 #include "PublicMacro.h"
 
 AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
@@ -38,7 +37,6 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
 
   mFormWid->setLayout(mForm);
   setWidget(mFormWid);
-  setFont(StyleSheet::CODE_EDITOR_FONT());
   Subscribe();
   editNotHappen();
   setWindowTitle(tr("Detail View"));

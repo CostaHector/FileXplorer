@@ -1,27 +1,26 @@
 #include "StyleSheetGetter.h"
 #include "PublicMacro.h"
-#include "MemoryKey.h"
 #include "PreferenceActions.h"
+#include "MemoryKey.h"
 #include <unordered_set>
 
 namespace FontCfg {
 QString ReadFontString() {
-  return QString{R"(font-family: "%1"; font-size: %2px; font-weight: %3; font-style: %4;)"}
-      .arg(GetFontFamily())
-      .arg(GetFontSize())
-      .arg(GetFontWeightString(), GetFontStyleString());
+  return QString{R"(font-family: "%1"; font-size: %2px; font-weight: %3; font-style: %4;)"}.arg(GetFontFamily()).arg(GetFontSize()).arg(GetFontWeightString(), GetFontStyleString());
 }
 
 QString GetFontFamily() {
-  return Configuration().value("StyleSheet/Font/Family/General", mFontFamilyDef).toString();
+  return StyleSheetGetter::GetInst().curValue("StyleSheet/Font/Family/General").toString();
 }
-
+QString GetFontFamilyCode() {
+  return StyleSheetGetter::GetInst().curValue("StyleSheet/Font/Family/Code").toString();
+}
 int GetFontSize() {
-  return Configuration().value("StyleSheet/Font/Size/General", mFontSizeDef).toInt();
+  return StyleSheetGetter::GetInst().curValue("StyleSheet/Font/Size/General").toInt();
 }
 
 int GetFontSizeTab() {
-  return Configuration().value("StyleSheet/Font/Size/QTabBar", mFontSizeTabDef).toInt();
+  return StyleSheetGetter::GetInst().curValue("StyleSheet/Font/Size/QTabBar").toInt();
 }
 
 QFont::Weight GetFontWeight() {
@@ -35,8 +34,10 @@ QFont::Weight GetFontWeight() {
                                                   QFont::Weight::Bold,
                                                   QFont::Weight::ExtraBold,
                                                   QFont::Weight::Black};
-  int weight = Configuration().value("StyleSheet/Font/Weight/General", mFontWeightDef).toInt();
-  if (weightsSet.find(weight) == weightsSet.cend()) {
+  static const auto& inst = StyleSheetGetter::GetInst();
+  bool bKeyExist{false};
+  int weight = inst.curValue("StyleSheet/Font/Weight/General", &bKeyExist).toInt();
+  if (!bKeyExist || weightsSet.find(weight) == weightsSet.cend()) {
     return QFont::Weight::Normal;
   }
   return static_cast<QFont::Weight>(weight);
@@ -44,8 +45,10 @@ QFont::Weight GetFontWeight() {
 
 QFont::Style GetFontStyle() {
   static const std::unordered_set<int> styleSet{QFont::Style::StyleNormal, QFont::Style::StyleItalic, QFont::Style::StyleOblique};
-  int style = Configuration().value("StyleSheet/Font/Style/General", mFontStyleDef).toInt();
-  if (styleSet.find(style) == styleSet.cend()) {
+  static const auto& inst = StyleSheetGetter::GetInst();
+  bool bKeyExist{false};
+  int style = inst.curValue("StyleSheet/Font/Style/General", &bKeyExist).toInt();
+  if (!bKeyExist || styleSet.find(style) == styleSet.cend()) {
     return QFont::Style::StyleNormal;
   }
   return static_cast<QFont::Style>(style);
@@ -78,142 +81,70 @@ QFont ReadFont() {
   return {GetFontFamily(), GetFontSize(), GetFontWeight(), GetFontStyle() == QFont::Style::StyleItalic};
 }
 
-void updateFont(const QFont& newFont) {
-  Configuration().setValue("StyleSheet/Font/Family/General", newFont.family());
-  Configuration().setValue("StyleSheet/Font/Size/General", newFont.pointSize());
-  Configuration().setValue("StyleSheet/Font/Weight/General", newFont.weight());
-  Configuration().setValue("StyleSheet/Font/Style/General", newFont.style());
-
-  g_PreferenceActions().initStyleSheet(false);
-}
 } // namespace FontCfg
-
-namespace ColorCfg {
-QString GetColorBackgroundGeneral(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/General", ColorBackgroundGeneralDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/General", ColorBackgroundGeneralDef(styleE)).toString();
-}
-QString GetColorBackgroundAlternateRow(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/AlternateRow", ColorBackgroundAlternateRowDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/AlternateRow", ColorBackgroundAlternateRowDef(styleE)).toString();
-}
-QString GetColorBackgroundHover(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/Hover", ColorBackgroundHoverDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/Hover", ColorBackgroundHoverDef(styleE)).toString();
-}
-QString GetColorBackgroundSelectedInactive(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/SelectedInactive", ColorBackgroundSelectedInactiveDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/SelectedInactive", ColorBackgroundSelectedInactiveDef(styleE)).toString();
-}
-QString GetColorBackgroundSelectedActive(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/SelectedActive", ColorBackgroundSelectedActiveDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/SelectedActive", ColorBackgroundSelectedActiveDef(styleE)).toString();
-}
-QString GetColorBackgroundMenuChecked(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/MenuChecked", ColorBackgroundMenuCheckedDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/MenuChecked", ColorBackgroundMenuCheckedDef(styleE)).toString();
-}
-QString GetColorBackgroundMenuSelected(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Background/MenuSelected", ColorBackgroundMenuSelectedDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Background/MenuSelected", ColorBackgroundMenuSelectedDef(styleE)).toString();
-}
-QString GetColorGridLine(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/GridLine", ColorGridLineDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/GridLine", ColorGridLineDef(styleE)).toString();
-}
-QString GetColorBorderGeneral(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Border/General", ColorBorderGeneralDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Border/General", ColorBorderGeneralDef(styleE)).toString();
-}
-QString GetColorBorderMenuRight(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Border/MenuRight", ColorBorderMenuRightDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Border/MenuRight", ColorBorderMenuRightDef(styleE)).toString();
-}
-QString GetColorForegroundGeneral(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return Configuration().value("StyleSheet/DarkColor/Foreground/General", ColorForegroundGeneralDef(styleE)).toString();
-  }
-  return Configuration().value("StyleSheet/LightColor/Foreground/General", ColorForegroundGeneralDef(styleE)).toString();
-}
-
-QString ColorBackgroundGeneralDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#3F3B39";
-  }
-  return "#FFFFFF";
-}
-QString ColorBackgroundAlternateRowDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#5C5C5C";
-  }
-  return "#F5F5F5"; // (245,245,245)
-}
-
-QString ColorBackgroundHoverDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#3C3C3C";
-  }
-  return "#CCEBFF";
-}
-QString ColorBackgroundSelectedInactiveDef(Style::StyleSheetE styleE) {
-  return "#999999";
-}
-QString ColorBackgroundSelectedActiveDef(Style::StyleSheetE styleE) {
-  return "#99D1FF";
-}
-QString ColorBackgroundMenuCheckedDef(Style::StyleSheetE styleE) {
-  return "#99D1FF";
-}
-QString ColorBackgroundMenuSelectedDef(Style::StyleSheetE styleE) {
-  return "#CCEBFF";
-}
-QString ColorGridLineDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#3C3C3C";
-  }
-  return "#D8D8D8";
-}
-QString ColorBorderGeneralDef(Style::StyleSheetE styleE) {
-  return "#CCEBFF";
-}
-QString ColorBorderMenuRightDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#CCEBFF";
-  }
-  return "#3C3C3C";
-}
-QString ColorForegroundGeneralDef(Style::StyleSheetE styleE) {
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
-    return "#FFFFFF";
-  }
-  return "#000000";
-}
-
-} // namespace ColorCfg
 
 const StyleSheetGetter& StyleSheetGetter::GetInst() {
   static StyleSheetGetter inst;
   return inst;
+}
+
+StyleSheetGetter::StyleSheetGetter() {
+  init();
+}
+
+void StyleSheetGetter::init() const {
+  InitColorValue("Background/General", "#FFFFFF", "#000000");
+  InitColorValue("Background/Disabled", "#F0F0F0", "#2D2D2D");
+  InitColorValue("Background/Label", "#F5F6F7", "#202020");
+  InitColorValue("Background/LineEdit", "#FFFFFF", "#252525");
+  InitColorValue("Background/ComboBox", "#E1E1E1", "#252525");
+  InitColorValue("Background/ToolBar", "#F5F6F7", "#323232");
+  InitColorValue("Background/StatusBar", "#FFFFFF", "#333333");
+  InitColorValue("Background/TabBar/tabNotSelected", "#FFFFFF", "#000000");
+  InitColorValue("Background/TabBar/tabSelected", "#CCE8FF", "#75673D");
+  InitColorValue("Background/TabBar/tabHover", "#FDFDFF", "#323232");
+  InitColorValue("Background/Menu/Item", "#FBFCFD", "#2B2B2B");
+  InitColorValue("Background/Menu/ItemChecked", "#C9E8F7", "#5E5E5E");
+  InitColorValue("Background/Menu/ItemHovered", "#E8EFF7", "#474747");
+  InitColorValue("Background/Menu/Separator", "#7F7F7F", "#7F7F7F");
+  InitColorValue("Background/View/Panel", "#FCFCFC", "#202020");
+  InitColorValue("Background/View/AlternateRow", "#F5F5F5", "#5C5C5C");
+  InitColorValue("Background/View/SelectedInactive", "#D9D9D9", "#333333");
+  InitColorValue("Background/View/SelectedActive", "#CCE8FF", "#777777");
+  InitColorValue("Background/View/Hover", "#E5F3FF", "#4D4D4D");
+  InitColorValue("Background/View/GridLine", "#D8D8D8", "#3C3C3C");
+  InitColorValue("Background/View/TableCornerButton/Section", "#F5F6F7", "#323232");
+  InitColorValue("Background/HeaderView/Pressed", "#BCDCF4", "#838383");
+  InitColorValue("Background/HeaderView/Hover", "#D9EBF9", "#434343");
+  InitColorValue("Background/HeaderView/NotHover", "#FFFFFF", "#202020");
+  InitColorValue("Background/ScrollBar/EmptyZone", "#F0F0F0", "#171717");
+  InitColorValue("Background/ScrollBar/Handle", "#CDCDCD", "#4D4D4D");
+  InitColorValue("Background/ScrollBar/Checked", "#A6A6A6", "#7A7A7A");
+  InitColorValue("Background/AbstractButton/ToolButton/General", "#F5F6F7", "#323232");
+  InitColorValue("Background/AbstractButton/ToolButton/Hovered", "#E5F1FB", "#4A4A4A");
+  InitColorValue("Background/AbstractButton/ToolButton/Pressed", "#CCE4F7", "#5A5A5A");
+  InitColorValue("Background/AbstractButton/ToolButton/Checked", "#CCE8FF", "#75673D"); // dark also can be 666666
+  InitColorValue("Background/AbstractButton/PushButton/General", "#E1E1E1", "#3F3F3F");
+  InitColorValue("Background/AbstractButton/PushButton/Hovered", "#E5F1FB", "#4A4A4A");
+  InitColorValue("Background/AbstractButton/PushButton/Pressed", "#CCE4F7", "#5A5A5A");
+  InitColorValue("Background/AbstractButton/PushButton/Checked", "#CCE8FF", "#75673D"); // dark also can be 666666
+  InitColorValue("Border/General", "#3C3C3C", "#CCEBFF");
+  InitColorValue("Border/MenuRight", "#3C3C3C", "#CCEBFF");
+  InitColorValue("Border/ComboBox", "#D9D9D9", "#666666");
+  InitColorValue("Border/TabWidget", "#A0A0A0", "#A0A0A0");
+  InitColorValue("Border/HeaderView", "#E5E5E5", "#636363");
+  InitColorValue("Foreground/General", "#000000", "#FFFFFF");
+  InitColorValue("Foreground/Disabled", "#A0A0A0", "#707070");
+  InitColorValue("Foreground/Placeholder", "#6D6D6D", "#6D6D6D");
+  InitColorValue("Foreground/MenuFont", "#000000", "#FFFFFF");
+
+  using namespace FontCfg;
+  InitColorUnrelatedValue("Font/Family/General", mFontFamilyDef);
+  InitColorUnrelatedValue("Font/Family/Code", mFontFamilyCodeDef);
+  InitColorUnrelatedValue("Font/Size/General", mFontSizeDef);
+  InitColorUnrelatedValue("Font/Size/QTabBar", mFontSizeTabDef);
+  InitColorUnrelatedValue("Font/Weight/General", mFontWeightDef);
+  InitColorUnrelatedValue("Font/Style/General", mFontStyleDef);
 }
 
 QString StyleSheetGetter::operator()(Style::StyleSheetE styleE) const {
@@ -228,6 +159,99 @@ QString StyleSheetGetter::operator()(Style::StyleSheetE styleE) const {
     styleSheets += pComp->GetStyleSheet(styleE);
   }
   return styleSheets;
+}
+
+const QVariant& StyleSheetGetter::defValue(const QString& key, bool* bKeyExist) const {
+  return defCurValue(key, bKeyExist).def;
+}
+
+const QVariant& StyleSheetGetter::curValue(const QString& key, bool* bKeyExist) const {
+  return defCurValue(key, bKeyExist).cur;
+}
+
+const Style::CfgDefCur& StyleSheetGetter::defCurValue(const QString& key, bool* bKeyExist) const {
+  auto it = mStyleCfg.find(key);
+  const bool bNotFindKey{it == mStyleCfg.end()};
+  if (bKeyExist != nullptr) {
+    *bKeyExist = !bNotFindKey;
+  }
+  if (bNotFindKey) {
+    LOG_W("Cannot find key: %s, fallback to default", qPrintable(key));
+    static const Style::CfgDefCur whenNotFind;
+    return whenNotFind;
+  }
+  return it.value();
+}
+
+int StyleSheetGetter::UpdateCurValue(const QVariantHash& cfg) const {
+  int settingItemsUpdatedCnt{0};
+  for (auto newIt = cfg.cbegin(); newIt != cfg.cend(); ++newIt) {
+    auto itFind = mStyleCfg.find(newIt.key());
+    if (itFind == mStyleCfg.end()) {
+      LOG_W("key[%s] not in StyleCfg cache", qPrintable(newIt.key()));
+      continue;
+    }
+    if (newIt.value() == itFind.value().cur) {
+      continue;
+    }
+    itFind->cur = newIt.value();
+    ++settingItemsUpdatedCnt;
+  }
+  return settingItemsUpdatedCnt;
+}
+
+void StyleSheetGetter::InitColorUnrelatedValue(const QString& keyCore, const QVariant& def) const {
+  static const auto& cfg = Configuration();
+  QString keyComplete{"StyleSheet/" + keyCore};
+  mStyleCfg[keyComplete] = {def, cfg.value(keyComplete, def)};
+}
+
+void StyleSheetGetter::InitColorValue(const QString& keyCore, const QVariant& lightDef, const QVariant& darkDef) const {
+  static const auto& cfg = Configuration();
+  QString lightKeyComplete{"StyleSheet/LightColor/" + keyCore};
+  QString darkKeyComplete{"StyleSheet/DarkColor/" + keyCore};
+  mStyleCfg[lightKeyComplete] = {lightDef, cfg.value(lightKeyComplete, lightDef)};
+  mStyleCfg[darkKeyComplete] = {darkDef, cfg.value(darkKeyComplete, darkDef)};
+}
+
+QString StyleSheetGetter::GetColorValue(const QString& keyCore, Style::StyleSheetE styleE) const {
+  QString keyComplete{"StyleSheet/"};
+  keyComplete.reserve(30);
+  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+    keyComplete += "DarkColor/";
+  } else {
+    keyComplete += "LightColor/";
+  }
+  keyComplete += keyCore;
+  return curValue(keyComplete).toString();
+}
+
+void StyleSheetGetter::WriteIntoSettingsCore(const StyleSheetGetter& self) {
+  QSettings& settings = Configuration();
+  for (auto it = self.mStyleCfg.cbegin(); it != self.mStyleCfg.cend(); ++it) {
+    settings.setValue(it.key(), it.value().cur);
+  }
+}
+
+void StyleSheetGetter::WriteIntoSettings() const {
+  WriteIntoSettingsCore(*this);
+}
+
+int StyleSheetGetter::updateGeneralFont(const QFont& newGeneralFont) const {
+  Configuration().setValue("StyleSheet/Font/Family/General", newGeneralFont.family());
+  Configuration().setValue("StyleSheet/Font/Size/General", newGeneralFont.pointSize());
+  Configuration().setValue("StyleSheet/Font/Weight/General", newGeneralFont.weight());
+  Configuration().setValue("StyleSheet/Font/Style/General", newGeneralFont.style());
+
+  const QVariantHash generalFont{
+      {"StyleSheet/Font/Family/General", newGeneralFont.family()},
+      {"StyleSheet/Font/Size/General", newGeneralFont.pointSize()},
+      {"StyleSheet/Font/Weight/General", newGeneralFont.weight()},
+      {"StyleSheet/Font/Style/General", newGeneralFont.style()},
+  };
+  const int changedCnt = UpdateCurValue(generalFont);
+  g_PreferenceActions().initStyleSheet(false);
+  return changedCnt;
 }
 
 bool StyleSheetGetter::Register(DerivedPtr creator) {
