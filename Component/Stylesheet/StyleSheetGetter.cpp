@@ -129,10 +129,12 @@ void StyleSheetGetter::init() const {
   InitColorValue("Background/TabBar/tabNotSelected", "#FFFFFF", "#000000");
   InitColorValue("Background/TabBar/tabSelected", "#CCE8FF", "#75673D");
   InitColorValue("Background/TabBar/tabHover", "#FDFDFF", "#323232");
-  InitColorValue("Background/Menu/Item", "#FBFCFD", "#2B2B2B");
+  InitColorValue("Background/Menu/Item", "#EEEEEE", "#2B2B2B");
   InitColorValue("Background/Menu/ItemChecked", "#C9E8F7", "#5E5E5E");
   InitColorValue("Background/Menu/ItemHovered", "#E8EFF7", "#474747");
-  InitColorValue("Background/Menu/Separator", "#7F7F7F", "#7F7F7F");
+  InitColorValue("Background/Menu/Separator", "#919191", "#7F7F7F");
+  InitColorValue("Background/Menu/ItemRightBorder", "#3C3C3C", "#CCEBFF");
+  InitColorValue("Background/Menu/Border", "#A0A0A0", "#A0A0A0");
   InitColorValue("Background/View/Panel", "#FCFCFC", "#202020");
   InitColorValue("Background/View/AlternateRow", "#F5F5F5", "#5C5C5C");
   InitColorValue("Background/View/SelectedInactive", "#D9D9D9", "#333333");
@@ -155,7 +157,6 @@ void StyleSheetGetter::init() const {
   InitColorValue("Background/AbstractButton/PushButton/Pressed", "#CCE4F7", "#5A5A5A");
   InitColorValue("Background/AbstractButton/PushButton/Checked", "#CCE8FF", "#75673D"); // dark also can be 666666
   InitColorValue("Border/General", "#3C3C3C", "#CCEBFF");
-  InitColorValue("Border/MenuRight", "#3C3C3C", "#CCEBFF");
   InitColorValue("Border/ComboBox", "#D9D9D9", "#666666");
   InitColorValue("Border/TabWidget", "#A0A0A0", "#A0A0A0");
   InitColorValue("Border/HeaderView", "#E5E5E5", "#636363");

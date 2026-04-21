@@ -74,6 +74,7 @@ void StyleSheetMgr::subscribe() {
   auto* pApplyChanges = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Apply);
   pApplyChanges->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pApplyChanges->setIcon(QIcon(":img/SAVED"));
+  StyleSheet::UpdateApplyPushButton(pApplyChanges);
 
   auto* pAbort = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Cancel);
   pAbort->setText("Abort changes");
@@ -244,6 +245,7 @@ QWidget* StyleSheetMgr::GetEffectPreviewer() {
         QPushButton* pOkBtn = dlgBtnBox->button(QDialogButtonBox::StandardButton::Yes);
         pOkBtn->setIcon(QIcon(":img/SAVED"));
         pOkBtn->setToolTip("QPushButton in QDialogButtonBox");
+        StyleSheet::UpdateApplyPushButton(pOkBtn);
       }
       pathSections->addWidget(dlgBtnBox);
 

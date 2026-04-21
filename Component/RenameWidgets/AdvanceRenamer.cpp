@@ -131,6 +131,7 @@ QDialogButtonBox* AdvanceRenamer::GetDlgButtonBox() {
     pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
     pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.") //
                            .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+    StyleSheet::UpdateApplyPushButton(pOkBtn);
   }
 
   if (QPushButton* pHelpBtn = buttonBox->button(QDialogButtonBox::Help)) {

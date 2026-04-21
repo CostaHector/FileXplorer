@@ -12,6 +12,7 @@ namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget);
 void setDarkTitleBar(QWidget* widget, bool enable);
 void setGlobalDarkMode(bool enable);
+void UpdateApplyPushButton(QWidget* pushButton);
 
 QIcon GetSystemDirOpenIcon();
 }  // namespace StyleSheet

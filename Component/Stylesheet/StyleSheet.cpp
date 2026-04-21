@@ -50,6 +50,15 @@ void setDarkTitleBar(QWidget* widget, bool enable) {
 }
 #endif
 
+void UpdateApplyPushButton(QWidget* pushButton) {
+  if (pushButton == nullptr) {
+    return;
+  }
+  pushButton->setProperty("applyButtonFlag", true);
+  pushButton->style()->unpolish(pushButton);
+  pushButton->style()->polish(pushButton);
+}
+
 QIcon GetSystemDirOpenIcon() {
   return QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon);
 }

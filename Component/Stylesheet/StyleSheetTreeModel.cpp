@@ -84,6 +84,8 @@ bool StyleSheetTreeModel::initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot
       menu->appendRow(StyleTreeNode::create(StyleItemData{"ItemChecked", inst.defCurValue(prefixKeyName + "/ItemChecked"), StyleItemData::COLOR}));
       menu->appendRow(StyleTreeNode::create(StyleItemData{"ItemHovered", inst.defCurValue(prefixKeyName + "/ItemHovered"), StyleItemData::COLOR}));
       menu->appendRow(StyleTreeNode::create(StyleItemData{"Separator", inst.defCurValue(prefixKeyName + "/Separator"), StyleItemData::COLOR}));
+      menu->appendRow(StyleTreeNode::create(StyleItemData{"ItemRightBorder", inst.defCurValue(prefixKeyName + "/ItemRightBorder"), StyleItemData::COLOR}));
+      menu->appendRow(StyleTreeNode::create(StyleItemData{"Border", inst.defCurValue(prefixKeyName + "/Border"), StyleItemData::COLOR}));
     }
 
     auto* view = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
@@ -144,7 +146,6 @@ bool StyleSheetTreeModel::initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot
   {
     prefixKeyName = pColorBorder->GetConfigKey();
     pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"MenuRight", inst.defCurValue(prefixKeyName + "/MenuRight"), StyleItemData::COLOR}));
     pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"ComboBox", inst.defCurValue(prefixKeyName + "/ComboBox"), StyleItemData::COLOR}));
     pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"TabWidget", inst.defCurValue(prefixKeyName + "/TabWidget"), StyleItemData::COLOR}));
     pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"HeaderView", inst.defCurValue(prefixKeyName + "/HeaderView"), StyleItemData::COLOR}));

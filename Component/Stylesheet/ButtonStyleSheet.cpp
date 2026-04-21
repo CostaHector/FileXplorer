@@ -37,6 +37,9 @@ QString ButtonStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
   QPushButton:checked {
     background-color: %8;
   }
+  QPushButton[applyButtonFlag] {
+    border: 1px solid #1E90FF;
+  }
 
   QRadioButton {
     background-color: %5;

@@ -2,6 +2,8 @@
 #include "AccountStorage.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "StyleSheet.h"
+
 #include <QIcon>
 #include <QMessageBox>
 #include <QDragEnterEvent>
@@ -89,10 +91,8 @@ CSVInputDialog::CSVInputDialog(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(buttonBox);
   buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help);
   pOkBtn = buttonBox->button(QDialogButtonBox::Ok);
+  StyleSheet::UpdateApplyPushButton(pOkBtn);
 
-  QPalette pal = pOkBtn->palette();
-  pal.setColor(QPalette::ButtonText, QColor(30, 144, 255));
-  pOkBtn->setPalette(pal);
   onContentsChanged();
 
   mainLayout = new (std::nothrow) QVBoxLayout(this);

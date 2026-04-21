@@ -9,39 +9,39 @@ QString MenuStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QMenu {
-    border-right: 5px; /* preserve for border */
-    background-color: %2; /* background color */
+    color: %1;
+    background-color: %2;
+    border: 1px solid %7;
 }
 QMenu::item {
-    color: %1; /* foreground font color */
     background-color: transparent;
+    border-right: 5px solid transparent;
 }
 QMenu::item:checked {
-    background-color: %3; /* checked bg color */
+    background-color: %3;
 }
 QMenu::item:selected {
-    background-color: %4; /* hovered bg color */
-    border-right: 5px solid %5; /* hovered border color */
+    background-color: %4;
+    border-right: 5px solid %5;
 }
 QMenu::separator {
     height: 1px;
-    background-color: %6; /* separator color */
+    background-color: %6;
 }
 
 QMenuBar {
-    border: none;
-    background-color: %2; /* background color */
+    color: %1;
+    background-color: %2;
 }
 QMenuBar::item {
-    color: %1; /* foreground font color */
     background: transparent;
 }
 QMenuBar::item:checked {
-    background-color: %3; /* checked bg color */
+    background-color: %3;
 }
 QMenuBar::item:selected {
-    background-color: %4; /* hovered bg color */
-    border: 1px solid %5; /* hovered border color */
+    background-color: %4;
+    border: 1px solid %5;
 }
 )";
       break;
@@ -53,8 +53,10 @@ QMenuBar::item:selected {
   QString menuBg = inst.GetColorValue("Background/Menu/Item", styleE);
   QString menuCheckedColor = inst.GetColorValue("Background/Menu/ItemChecked", styleE);
   QString menuSelectedColor = inst.GetColorValue("Background/Menu/ItemHovered", styleE);
-  QString menuBorderRightColor = inst.GetColorValue("Border/MenuRight", styleE);
+
+  QString menuItemRightBorder = inst.GetColorValue("Background/Menu/ItemRightBorder", styleE);
   QString separatorColor = inst.GetColorValue("Background/Menu/Separator", styleE);
-  
-  return styleSheet.arg(menuFontForeground, menuBg, menuCheckedColor, menuSelectedColor, menuBorderRightColor, separatorColor);
+  QString menuBorder = inst.GetColorValue("Background/Menu/Border", styleE);
+
+  return styleSheet.arg(menuFontForeground, menuBg, menuCheckedColor, menuSelectedColor, menuItemRightBorder, separatorColor, menuBorder);
 }

@@ -28,9 +28,10 @@ ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
   m_dlgBtnBox = new (std::nothrow) QDialogButtonBox{stdBtns, Qt::Orientation::Horizontal, this};
   CHECK_NULLPTR_RETURN_VOID(m_dlgBtnBox);
 
-  auto* pOk = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok);
-  pOk->setShortcut(QKeySequence(Qt::Key::Key_F10));
-  pOk->setIcon(QIcon(":img/SAVED"));
+  auto* pOkBtn = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok);
+  pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
+  pOkBtn->setIcon(QIcon(":img/SAVED"));
+  StyleSheet::UpdateApplyPushButton(pOkBtn);
   auto* pOpen = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Open);
   pOpen->setText("Edit");
   pOpen->setIcon(QIcon(":img/CONFIGURE"));
@@ -49,7 +50,7 @@ ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
   connect(m_alertsTable, &QTableView::doubleClicked, this, &ConfigsTable::on_cellDoubleClicked);
   connect(m_alertModel, &QAbstractItemModel::dataChanged, this, &ConfigsTable::RefreshWindowIcon);
 
-  connect(pOk, &QPushButton::clicked, this, &QDialog::accept);
+  connect(pOkBtn, &QPushButton::clicked, this, &QDialog::accept);
   connect(pOpen, &QPushButton::clicked, this, &ConfigsTable::onEditPreferenceSetting);
   connect(pRetry, &QPushButton::clicked, this, &ConfigsTable::RefreshWindowIcon);
 
