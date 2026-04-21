@@ -88,7 +88,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+103"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -293,7 +293,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.cpp" line="+40"/>
+        <location filename="../View/CustomTableView.cpp" line="+41"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -308,22 +308,22 @@
         <translation>显示水平表头</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+10"/>
         <source>Show Vertical Header</source>
         <translation>显示垂直表头</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>Resize Rows to Contents</source>
         <translation>调整行高适应内容</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Resize Columns to Contents</source>
         <translation>调整列宽适应内容</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Auto Scroll</source>
         <translation>自动滚动视点</translation>
     </message>
@@ -412,7 +412,7 @@
 <context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+18"/>
+        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
