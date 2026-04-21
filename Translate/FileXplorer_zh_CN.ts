@@ -2092,7 +2092,7 @@
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+25"/>
+        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+30"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
@@ -2102,8 +2102,13 @@
         <translation>批量设置颜色</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>See Changes</source>
+        <location line="-4"/>
+        <source>Set General Font</source>
+        <translation>设置通用字体</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>View Changes</source>
         <translation>查看变更</translation>
     </message>
     <message>
@@ -2118,8 +2123,13 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Instant See</source>
-        <translation>变更后立即查看</translation>
+        <source>Live Preview</source>
+        <translation>变更立即可见</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>See changes immediately for real-time preview when enable. Otherwise manually click `View Changes` needed. Note: this may cause screen flickering when enabled.</source>
+        <translation>启用后变更将立即可见, 否则需要手动点击`查看变更`, 注意: 启用后可能造成屏幕闪烁.</translation>
     </message>
 </context>
 <context>
@@ -2371,14 +2381,9 @@
         <translation>在系统应用中打开</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+12"/>
         <source>Row Height</source>
         <translation>行高</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Font</source>
-        <translation>字体</translation>
     </message>
     <message>
         <location line="-5"/>

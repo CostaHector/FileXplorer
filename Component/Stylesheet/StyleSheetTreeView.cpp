@@ -2,6 +2,7 @@
 #include "NotificatorMacro.h"
 #include "StyleSheetGetter.h"
 #include <QColorDialog>
+#include <QFontDialog>
 
 StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   : CustomTreeView{"StyleSheetTreeView", parent} {
@@ -20,16 +21,20 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);
 
+  mSetFontGeneral = new QAction{QIcon{":img/FONT_SIZE"}, tr("Set General Font"), this};
+  mSetFontGeneral->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                      "Configure text font family/size/weight/style")
+                                  .arg(mSetFontGeneral->text(), mSetFontGeneral->shortcut().toString()));
   mBatchSetColor = new QAction{QIcon{":/styles/COLOR_SELECT"}, tr("Batch Set Color"), this};
-  mSeeChanges = new QAction{QIcon{":img/SAVED"}, tr("See Changes"), this};
+  mSeeChanges = new QAction{QIcon{":img/SAVED"}, tr("View Changes"), this};
   mClearModifiedValues = new QAction{QIcon{":/styles/CLEAR_MODIFIED_VALUES"}, tr("Clear Modified Values"), this};
   mRestoreToDefault = new QAction{QIcon{":/styles/RESTORE_TO_DEFAULT"}, tr("Restore to Default"), this};
   mRestoreToBackup = new QAction{QIcon{":/styles/RESTORE_TO_BACKUP"}, tr("Restore to Backup"), this};
-  mSeeChangesInstantly = new QAction{QIcon{":/styles/INSTANT_APPLY"}, tr("Instant See"), this};
-  mSeeChangesInstantly->setToolTip("See changes immediately for real-time preview. Note: this may cause screen flickering.");
-  mSeeChangesInstantly->setCheckable(true);
-  mSeeChangesInstantly->setChecked(false);
-  QList<QAction*> exclusiveActs{mBatchSetColor, mSeeChanges, mClearModifiedValues, mRestoreToDefault, mRestoreToBackup, mSeeChangesInstantly};
+  mLivePreviewSwitch = new QAction{QIcon{":/styles/INSTANT_APPLY"}, tr("Live Preview"), this};
+  mLivePreviewSwitch->setToolTip(tr("See changes immediately for real-time preview when enable. Otherwise manually click `View Changes` needed. Note: this may cause screen flickering when enabled."));
+  mLivePreviewSwitch->setCheckable(true);
+  mLivePreviewSwitch->setChecked(false);
+  QList<QAction*> exclusiveActs{mSetFontGeneral, mBatchSetColor, mSeeChanges, mClearModifiedValues, mRestoreToDefault, mRestoreToBackup, mLivePreviewSwitch};
   PushFrontExclusiveActions(exclusiveActs);
 
   InitTreeView();
@@ -41,12 +46,13 @@ void StyleSheetTreeView::initExclusivePreferenceSetting() {
 }
 
 void StyleSheetTreeView::subscribe() {
+  connect(mSetFontGeneral, &QAction::triggered, this, &StyleSheetTreeView::onSetFontGeneral);
   connect(mBatchSetColor, &QAction::triggered, this, &StyleSheetTreeView::onBatchSetColor);
   connect(mSeeChanges, &QAction::triggered, this, &StyleSheetTreeView::onSeeChanges);
   connect(mClearModifiedValues, &QAction::triggered, this, &StyleSheetTreeView::onClearModifiedValues);
   connect(mRestoreToDefault, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToDefault);
   connect(mRestoreToBackup, &QAction::triggered, this, &StyleSheetTreeView::onRestoreToBackup);
-  connect(mSeeChangesInstantly, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onInstantSeeSwitchChanged);
+  connect(mLivePreviewSwitch, &QAction::toggled, mStyleModel, &StyleSheetTreeModel::onLivePreviewSwitchChanged);
   connect(mStyleModel, &StyleSheetTreeModel::requestSeeChanges, this, &StyleSheetTreeView::onRequestSeeChanges);
 }
 
@@ -96,6 +102,32 @@ int StyleSheetTreeView::onRestoreToBackup() {
   return rowsAffected;
 }
 
+std::pair<bool, QFont> GetFontWithInitial(const QFont& initialFont, QWidget* parent, const QString& title) {
+  bool bOk{false};
+  const QFont& newFont = QFontDialog::getFont(&bOk, initialFont, parent, title);
+  return {bOk, newFont};
+}
+
+int StyleSheetTreeView::onSetFontGeneral() {
+  const QFont& beforeFont = FontCfg::ReadGeneralFont();
+
+  bool bOk{false};
+  QFont newFont;
+  std::tie(bOk, newFont) = GetFontWithInitial(beforeFont, nullptr, mSetFontGeneral->text());
+  if (!bOk) {
+    LOG_INFO_NP("Font setting cancelled", "User cancelled font selection");
+    return -1;
+  }
+  const int attChangedCnt = mStyleModel->SetFontGeneral(newFont);
+  const QString fontDetail{FontCfg::Font2String(newFont)};
+  if (attChangedCnt <= 0) {
+    LOG_INFO_P("Font unchanged", "No attributes modified. Current font: [%s]", qPrintable(fontDetail));
+    return 0;
+  }
+  LOG_OK_P("Font updated", "%d attribute(s) changed. New font: [%s]", attChangedCnt, qPrintable(fontDetail));
+  return attChangedCnt;
+}
+
 int StyleSheetTreeView::onBatchSetColor() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("No row selected", "No color value set");
@@ -115,21 +147,21 @@ int StyleSheetTreeView::onBatchSetColor() {
 
 int StyleSheetTreeView::onSeeChanges() {
   if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("No row selected", "No changes to apply");
+    LOG_INFO_NP("No row selected", "No selection to process");
     return 0;
   }
-  const QVariantHash cfg = mStyleModel->CollectItemsNeedApplyChange(selectedRowsSource());
+  const QVariantHash cfg = mStyleModel->CollectItemsNeedSeeChange(selectedRowsSource());
   bool bChangeExist{!cfg.isEmpty()};
   if (!bChangeExist) {
-    LOG_INFO_NP("See changes", "No changes to apply");
+    LOG_INFO_NP("View changes", "No changes to display");
     return 0;
   }
   int settingItemsUpdatedCnt = StyleSheetGetter::GetInst().UpdateCurValue(cfg);
   if (settingItemsUpdatedCnt == 0) {
-    LOG_INFO_P("No changes needed", "%d configuration value(s) modified but all match existing settings", cfg.size());
+    LOG_INFO_P("Settings unchanged", "%d configuration value(s) modified, but all match current settings", cfg.size());
     return 0;
   }
-  LOG_OK_P("Changes shown successfully", "%d of %d value(s) updated", settingItemsUpdatedCnt, cfg.size());
+  LOG_OK_P("Changes applied successfully", "%d of %d value(s) updated", settingItemsUpdatedCnt, cfg.size());
   emit reqSeeChanges();
   return settingItemsUpdatedCnt;
 }

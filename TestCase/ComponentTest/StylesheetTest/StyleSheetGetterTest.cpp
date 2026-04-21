@@ -4,14 +4,8 @@
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheetGetter.h"
 #include "EndToExposePrivateMember.h"
-#include "PreferenceActions.h"
 
 #include "MemoryKey.h"
-#include <mockcpp/mokc.h>
-#include <mockcpp/GlobalMockObject.h>
-#include <mockcpp/MockObject.h>
-#include <mockcpp/MockObjectHelper.h>
-USING_MOCKCPP_NS
 
 class StyleSheetGetterTest : public PlainTestSuite {
   Q_OBJECT
@@ -20,12 +14,7 @@ private slots:
   void initTestCase() { Configuration().clear(); }
   void cleanupTestCase() { Configuration().clear(); }
 
-  void init() { GlobalMockObject::reset(); }
-  void cleanup() { GlobalMockObject::verify(); }
-
   void updateFont_will_writeSettings() {
-    MOCKER(PreferenceActions::ApplyNewStyleSheet).expects(exactly(1));
-
     auto& inst = StyleSheetGetter::GetInst();
     QCOMPARE(inst.mStyleCfg.isEmpty(), false);
     // base class return empty
@@ -33,33 +22,9 @@ private slots:
     QCOMPARE(inst.GetStyleSheet(Style::StyleSheetE::STYLESHEET_LIGHT), "");
     QCOMPARE(inst.GetStyleSheet(Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG), "");
 
-    QFont fromEmptySettingFont = FontCfg::ReadFont();
+    QFont fromEmptySettingFont = FontCfg::ReadGeneralFont();
     QFont newFont{"Noto Sans", 18, QFont::Weight::Bold, true}; // bold and italic
     QVERIFY(newFont != fromEmptySettingFont);
-
-    int changedCnt = inst.updateGeneralFont(newFont); // 1st time call ApplyNewStyleSheet
-    QVERIFY(changedCnt > 0);
-
-    { // check if correct
-      using namespace FontCfg;
-      QFont fromSaved = ReadFont();
-      QCOMPARE(fromSaved.family(), newFont.family());
-      QCOMPARE(fromSaved.styleName(), newFont.styleName());
-      QCOMPARE(fromSaved.pointSize(), newFont.pointSize());
-      QCOMPARE(fromSaved.style(), newFont.style());
-
-      QCOMPARE(GetFontWeightString(), "bold");
-      QCOMPARE(GetFontStyleString(), "italic");
-
-      QCOMPARE(GetFontFamily().isEmpty(), false);
-      QCOMPARE(GetFontFamilyCode().isEmpty(), false);
-    }
-
-    // will also write into QSettings
-    QCOMPARE(Configuration().contains("StyleSheet/Font/Family/General"), true);
-    QCOMPARE(Configuration().contains("StyleSheet/Font/Size/General"), true);
-    QCOMPARE(Configuration().contains("StyleSheet/Font/Weight/General"), true);
-    QCOMPARE(Configuration().contains("StyleSheet/Font/Style/General"), true);
   }
 
   void WriteIntoSettings_ok() {

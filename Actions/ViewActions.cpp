@@ -93,11 +93,6 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
                                 "Double click to open an har file")
                             .arg(_HAR_VIEW->text(), _HAR_VIEW->shortcut().toString()));
 
-  _FONT_TYPE_AND_SIZE = new (std::nothrow) QAction{QIcon{":img/FONT_SIZE"}, tr("Font"), this};
-  _FONT_TYPE_AND_SIZE->setToolTip(QString("<b>%1 (%2)</b><br/>"
-                                          "Configure text font settings")
-                                      .arg(_FONT_TYPE_AND_SIZE->text(), _FONT_TYPE_AND_SIZE->shortcut().toString()));
-
   _ROW_HEIGHT = new (std::nothrow) QAction{QIcon{":img/DEFAULT_ROW_HEIGHT"}, tr("Row Height"), this};
   _ROW_HEIGHT->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                   "Configure tableview/treeview row height")

@@ -3,28 +3,27 @@
 bool HeaderViewStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new HeaderViewStyleSheet));
 
 QString HeaderViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+// padding: 2px 0px 2px 2px; /* top right bottom left */
   QString styleSheet;
   switch (styleE) {
     case Style::StyleSheetE::STYLESHEET_LIGHT:
     case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
       styleSheet = R"(
 QHeaderView::section {
-    background-color: %1;
-    border: 1px solid %4;
-}
-QHeaderView::section:horizontal {
-    border-top: none;
-    border-bottom: none;
-    border-left: none;
-}
-QHeaderView::section:vertical {
     border: none;
+    background-color: %1;
 }
 QHeaderView::section:hover {
     background-color: %2;
 }
 QHeaderView::section:pressed {
     background-color: %3;
+}
+QHeaderView::section:horizontal {
+    border-right: 1px solid %4;
+    padding: 5px 0px 0px 5px;
+}
+QHeaderView::section:vertical {
 }
 )";
       break;

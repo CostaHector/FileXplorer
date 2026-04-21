@@ -43,7 +43,7 @@ private slots:
     QCOMPARE(group.match("randomText", Qt::CaseSensitive), false);
 
     StyleItemData numberNode{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER};
-    StyleItemData stringNode{"FontFamily", "Microsoft YaHei", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
+    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
     StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, StyleItemData::DataTypeE::FONT_STYLE};
     StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT};
     StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
@@ -54,14 +54,14 @@ private slots:
 
     QCOMPARE(stringNode.isGroup, false);
     QCOMPARE(stringNode.name, "FontFamily");
-    QCOMPARE(stringNode.defValue, "Microsoft YaHei");
+    QCOMPARE(stringNode.defValue, "Microsoft YaHei UI");
     QCOMPARE(stringNode.curValue, "Noto Sans");
     QCOMPARE(stringNode.modifiedToValue, (QVariant{}));
     QCOMPARE(stringNode.isValid(), true);
     QCOMPARE(stringNode.match("FontFamily", Qt::CaseSensitive), true);
     QCOMPARE(stringNode.match("FONTFAMILY", Qt::CaseSensitive), false);
     QCOMPARE(stringNode.match("FONTFAMILY", Qt::CaseInsensitive), true);
-    QCOMPARE(stringNode.match("Microsoft YaHei", Qt::CaseSensitive), true);
+    QCOMPARE(stringNode.match("Microsoft YaHei UI", Qt::CaseSensitive), true);
     QCOMPARE(stringNode.match("Noto Sans", Qt::CaseSensitive), true);
     QCOMPARE(stringNode.match("randomText", Qt::CaseInsensitive), false);
     QCOMPARE(stringNode.match("randomText", Qt::CaseSensitive), false);
@@ -103,7 +103,7 @@ private slots:
     QVERIFY(!group.modifiedColorTo("ABC"));
 
     StyleItemData numberNode{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER};
-    StyleItemData stringNode{"FontFamily", "Microsoft YaHei", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
+    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
     StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, StyleItemData::DataTypeE::FONT_STYLE};
     StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT};
     StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
@@ -288,7 +288,7 @@ private slots:
     }
 
     { // 字符串类型
-      StyleItemData stringNode{"FontFamily", "Microsoft YaHei", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
+      StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
 
       QVERIFY(stringNode.recoverToBackup());
@@ -302,9 +302,9 @@ private slots:
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
 
       QVERIFY(stringNode.recoverToDefault());
-      QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei");
+      QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei UI");
       QVERIFY(!stringNode.recoverToDefault()); // no need recover again
-      QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei");
+      QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei UI");
     }
   }
 
@@ -317,7 +317,7 @@ private slots:
     auto* pFontFamilyGeneral = pFontFamily->appendRow(
         StyleTreeNode::create(StyleItemData{"General", "Arial", "Times New Roman", StyleItemData::FONT_FAMILY}));
     auto* pFontFamilySpecial = pFontFamily->appendRow(
-        StyleTreeNode::create(StyleItemData{"Special", "Microsoft YaHei", "Noto Sans", StyleItemData::FONT_FAMILY}));
+        StyleTreeNode::create(StyleItemData{"Special", "Microsoft YaHei UI", "Noto Sans", StyleItemData::FONT_FAMILY}));
 
     QCOMPARE(r0->childsCount(), 1);
     QCOMPARE(pFont->childsCount(), 1);

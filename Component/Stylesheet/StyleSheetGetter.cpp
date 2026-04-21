@@ -1,12 +1,34 @@
 #include "StyleSheetGetter.h"
 #include "PublicMacro.h"
-#include "PreferenceActions.h"
 #include "MemoryKey.h"
 #include <unordered_set>
 
 namespace FontCfg {
-QString ReadFontString() {
-  return QString{R"(font-family: "%1"; font-size: %2px; font-weight: %3; font-style: %4;)"}.arg(GetFontFamily()).arg(GetFontSize()).arg(GetFontWeightString(), GetFontStyleString());
+bool isCoarseEqual(const QFont& lhs, const QFont& rhs) {
+  const bool bEq{lhs.family() == rhs.family() && lhs.pointSize() == rhs.pointSize() && lhs.weight() == rhs.weight() && lhs.style() == rhs.style()};
+  if (!bEq) {
+    LOG_D("family: %s, %s", qPrintable(lhs.family()), qPrintable(rhs.family()));
+    LOG_D("pointSize: %d, %d", lhs.pointSize(), rhs.pointSize());
+    LOG_D("weight: %d, %d", lhs.weight(), rhs.weight());
+    LOG_D("style: %d, %d", lhs.style(), rhs.style());
+  }
+  return bEq;
+}
+
+QString Font2String(const QFont& font) {
+  return QString{R"(font-family: "%1"; font-size: %2px; font-weight: %3; font-style: %4;)"} //
+      .arg(font.family())
+      .arg(font.pointSize())
+      .arg(GetFontWeightString(font.weight()), GetFontStyleString(font.style()));
+}
+
+QFont ReadGeneralFont() {
+  return {GetFontFamily(), GetFontSize(), GetFontWeight(), GetFontStyle() == QFont::Style::StyleItalic};
+}
+
+QString ReadFontGeneralString() {
+  QFont generalFont = ReadGeneralFont();
+  return Font2String(generalFont);
 }
 
 QString GetFontFamily() {
@@ -54,8 +76,7 @@ QFont::Style GetFontStyle() {
   return static_cast<QFont::Style>(style);
 }
 
-QString GetFontWeightString() {
-  QFont::Weight weightE = GetFontWeight();
+QString GetFontWeightString(int weightE) {
   switch (weightE) {
     case QFont::Weight::DemiBold:
     case QFont::Weight::Bold:
@@ -66,8 +87,12 @@ QString GetFontWeightString() {
   }
 }
 
-QString GetFontStyleString() {
-  QFont::Style styleE = GetFontStyle();
+QString GetFontGeneralWeightString() {
+  QFont::Weight weightE = GetFontWeight();
+  return GetFontWeightString(weightE);
+}
+
+QString GetFontStyleString(int styleE) {
   switch (styleE) {
     case QFont::Style::StyleItalic:
     case QFont::Style::StyleOblique:
@@ -77,8 +102,9 @@ QString GetFontStyleString() {
   }
 }
 
-QFont ReadFont() {
-  return {GetFontFamily(), GetFontSize(), GetFontWeight(), GetFontStyle() == QFont::Style::StyleItalic};
+QString GetFontGeneralStyleString() {
+  QFont::Style styleE = GetFontStyle();
+  return GetFontStyleString(styleE);
 }
 
 } // namespace FontCfg
@@ -235,23 +261,6 @@ void StyleSheetGetter::WriteIntoSettingsCore(const StyleSheetGetter& self) {
 
 void StyleSheetGetter::WriteIntoSettings() const {
   WriteIntoSettingsCore(*this);
-}
-
-int StyleSheetGetter::updateGeneralFont(const QFont& newGeneralFont) const {
-  Configuration().setValue("StyleSheet/Font/Family/General", newGeneralFont.family());
-  Configuration().setValue("StyleSheet/Font/Size/General", newGeneralFont.pointSize());
-  Configuration().setValue("StyleSheet/Font/Weight/General", newGeneralFont.weight());
-  Configuration().setValue("StyleSheet/Font/Style/General", newGeneralFont.style());
-
-  const QVariantHash generalFont{
-      {"StyleSheet/Font/Family/General", newGeneralFont.family()},
-      {"StyleSheet/Font/Size/General", newGeneralFont.pointSize()},
-      {"StyleSheet/Font/Weight/General", newGeneralFont.weight()},
-      {"StyleSheet/Font/Style/General", newGeneralFont.style()},
-  };
-  const int changedCnt = UpdateCurValue(generalFont);
-  g_PreferenceActions().initStyleSheet(false);
-  return changedCnt;
 }
 
 bool StyleSheetGetter::Register(DerivedPtr creator) {

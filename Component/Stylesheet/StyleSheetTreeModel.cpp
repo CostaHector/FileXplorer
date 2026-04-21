@@ -1,6 +1,7 @@
 #include "StyleSheetTreeModel.h"
 #include "StyleSheetGetter.h"
 #include "Logger.h"
+#include "PublicMacro.h"
 #include <QVariantHash>
 #include <QIcon>
 #include <QColor>
@@ -23,24 +24,24 @@ bool StyleSheetTreeModel::initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot)
   {
     auto* pFontFamily = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Family"}));
     {
-      pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontFamilyDef, GetFontFamily(), StyleItemData::FONT_FAMILY}));
+      mFontGeneralFamilyNode = pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontFamilyDef, GetFontFamily(), StyleItemData::FONT_FAMILY}));
       pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Code", mFontFamilyCodeDef, GetFontFamilyCode(), StyleItemData::FONT_FAMILY}));
     }
 
     auto* pFontSize = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Size"}));
     {
-      pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontSizeDef, GetFontSize(), StyleItemData::NUMBER}));
+      mFontGeneralSizeNode = pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontSizeDef, GetFontSize(), StyleItemData::NUMBER}));
       pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", mFontSizeDef, GetFontSizeTab(), StyleItemData::NUMBER}));
     }
 
     auto* pFontWeight = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Weight"}));
     {
-      pFontWeight->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontWeightDef, GetFontWeight(), StyleItemData::FONT_WEIGHT}));
+      mFontGeneralWeightNode = pFontWeight->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontWeightDef, GetFontWeight(), StyleItemData::FONT_WEIGHT}));
     }
 
     auto* pFontStyle = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Style"}));
     {
-      pFontStyle->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontStyleDef, GetFontStyle(), StyleItemData::FONT_STYLE}));
+      mFontGeneralStyleNode = pFontStyle->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontStyleDef, GetFontStyle(), StyleItemData::FONT_STYLE}));
     }
   }
   return true;
@@ -255,7 +256,7 @@ bool StyleSheetTreeModel::setData(const QModelIndex& index, const QVariant& valu
     return false;
   }
   emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
-  if (m_bInstantSee) {
+  if (m_bLivePreviewSwitch) {
     QString cfgKey = node->GetConfigKey();
     emit requestSeeChanges(cfgKey, value);
   }
@@ -315,6 +316,20 @@ Qt::ItemFlags StyleSheetTreeModel::flags(const QModelIndex& index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
   }
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+int StyleSheetTreeModel::SetFontGeneral(const QFont& newGeneralFont) {
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralFamilyNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralSizeNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralWeightNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralStyleNode, -1);
+
+  int attributeChangedCnt{0};
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralFamilyNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.family(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralSizeNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.pointSize(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralWeightNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.weight(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralStyleNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.style(), Qt::EditRole);
+  return attributeChangedCnt;
 }
 
 int StyleSheetTreeModel::SetNewColors(const QModelIndexList& indexes, const QString& newColor) {
@@ -434,7 +449,7 @@ int StyleSheetTreeModel::RecoverNewValuesToBackup(const QModelIndexList& indexes
   return affectedRows;
 }
 
-QVariantHash StyleSheetTreeModel::CollectItemsNeedApplyChange(const QModelIndexList& indexes) const {
+QVariantHash StyleSheetTreeModel::CollectItemsNeedSeeChange(const QModelIndexList& indexes) const {
   if (indexes.isEmpty()) {
     return {};
   }

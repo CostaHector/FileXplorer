@@ -9,6 +9,7 @@
 #include "MemoryKey.h"
 
 #include <QLineEdit>
+#include <QFontDialog>
 #include <QColorDialog>
 
 #include <mockcpp/mokc.h>
@@ -78,7 +79,7 @@ private slots:
     QCOMPARE(reqSeeChangesSpy.count(), 0);
   }
 
-  void onBatchSetColor_ok() {    
+  void onBatchSetColor_ok() {
     StyleSheetTreeView view;
     QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
     QCOMPARE(view.onBatchSetColor(), 0);
@@ -116,7 +117,7 @@ private slots:
   }
 
   void onRequestApplyChanges_ok() {
-    const auto &inst = StyleSheetGetter::GetInst();
+    const auto& inst = StyleSheetGetter::GetInst();
     bool bKeyFind = false;
     inst.curValue("StyleSheet/Font/Size/General", &bKeyFind);
     QCOMPARE(bKeyFind, true);
@@ -125,14 +126,14 @@ private slots:
     QSignalSpy reqSeeChangesSpy{&view, &StyleSheetTreeView::reqSeeChanges};
 
     // 默认关闭自动应用
-    QVERIFY(view.mSeeChangesInstantly != nullptr);
-    QVERIFY(!view.mSeeChangesInstantly->isChecked());
-    QVERIFY(!view.mStyleModel->m_bInstantSee);
+    QVERIFY(view.mLivePreviewSwitch != nullptr);
+    QVERIFY(!view.mLivePreviewSwitch->isChecked());
+    QVERIFY(!view.mStyleModel->m_bLivePreviewSwitch);
 
     // 开启自动应用
-    view.mSeeChangesInstantly->toggle();
-    QVERIFY(view.mSeeChangesInstantly->isChecked());
-    QVERIFY(view.mStyleModel->m_bInstantSee);
+    view.mLivePreviewSwitch->toggle();
+    QVERIFY(view.mLivePreviewSwitch->isChecked());
+    QVERIFY(view.mStyleModel->m_bLivePreviewSwitch);
 
     view.onRequestSeeChanges("StyleSheet/Font/Size/General", 124); // call reqSeeChanges 1st
     QCOMPARE(reqSeeChangesSpy.count(), 1);
@@ -149,8 +150,46 @@ private slots:
     QCOMPARE(bKeyFind, true);
 
     // 关闭自动应用
-    view.mStyleModel->onInstantSeeSwitchChanged(false);
-    QVERIFY(!view.mStyleModel->m_bInstantSee);
+    view.mStyleModel->onLivePreviewSwitchChanged(false);
+    QVERIFY(!view.mStyleModel->m_bLivePreviewSwitch);
+  }
+
+  void onSetFontGeneral_ok() {
+    QFont font0 = FontCfg::ReadGeneralFont();
+
+    QString newFamily{"NewFontFamily"};
+    int newPointSize = 99;
+    QFont::Weight newWeight = QFont::Weight::Bold;
+    QFont::Style newStyle = QFont::Style::StyleItalic;
+    QFont font1{newFamily, newPointSize, newWeight, newStyle};
+
+    std::pair<bool, QFont> cancel0{false, font0};
+    std::pair<bool, QFont> acceptNotChanged{true, font0};
+    std::pair<bool, QFont> acceptChanged2{true, font1};
+
+    MOCKER(GetFontWithInitial)               //
+        .expects(exactly(4))                 //
+        // .with(any(), eq(nullptr), any())     // QFont自带的成员相等会比较没有明确设置的属性
+        .will(returnValue(cancel0))          // 主动取消 -> -1
+        .then(returnValue(acceptNotChanged)) // modifiedToValue原先为空, 修改为有效值, 视为变更 -> 4
+        .then(returnValue(acceptNotChanged)) // modifiedToValue已经和font0一致, 无变更 -> 0
+        .then(returnValue(acceptChanged2));  // modifiedToValue和font1有四项不一致 -> 4
+
+    // 实时预览开启情况下, 无需调用 onSeeChanges, 就会刷新缓存值
+    StyleSheetTreeView view;
+    QCOMPARE(view.mLivePreviewSwitch->isChecked(), false);
+    QCOMPARE(view.mStyleModel->m_bLivePreviewSwitch, false);
+    view.mLivePreviewSwitch->toggle();
+    QCOMPARE(view.mLivePreviewSwitch->isChecked(), true);
+    QCOMPARE(view.mStyleModel->m_bLivePreviewSwitch, true);
+
+    QCOMPARE(view.onSetFontGeneral(), -1); // user cancelled
+    QCOMPARE(view.onSetFontGeneral(), 4);  // modifiedToValue changed from invalid to valid
+    QCOMPARE(view.onSetFontGeneral(), 0);  // no changes
+    QCOMPARE(view.onSetFontGeneral(), 4);  // user accept font1
+
+    QFont recoverFont1 = FontCfg::ReadGeneralFont();
+    QVERIFY(FontCfg::isCoarseEqual(recoverFont1, font1));
   }
 
   void StyleSheetEditDelegate_ok() { //
@@ -165,7 +204,7 @@ private slots:
     std::unique_ptr<StyleTreeNode> rootNode{StyleTreeNode::NewTreeNodeRoot("StyleSheetInTest")};
     auto r = rootNode.get();
     auto r0 = r->appendRow(StyleTreeNode::create(StyleItemData{"0ViewRowHeightNumberLineEdit", 30, 60, StyleItemData::DataTypeE::NUMBER}));
-    auto r1 = r->appendRow(StyleTreeNode::create(StyleItemData{"1FontFamilyStringComboBox", "Microsoft YaHei", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY}));
+    auto r1 = r->appendRow(StyleTreeNode::create(StyleItemData{"1FontFamilyStringComboBox", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY}));
     auto r2 = r->appendRow(StyleTreeNode::create(StyleItemData{"2FontWeightEnumComboBox", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT}));
     auto r3 = r->appendRow(StyleTreeNode::create(StyleItemData{"3FontStyleEnumComboBox", QFont::Style::StyleItalic, QFont::Style::StyleNormal, StyleItemData::DataTypeE::FONT_STYLE}));
     auto r4 = r->appendRow(StyleTreeNode::create(StyleItemData{"4FontForegroundColorLineEditAndAction", "#FF0000", "#FF00FF", StyleItemData::DataTypeE::COLOR}));
@@ -211,7 +250,7 @@ private slots:
       QCOMPARE(r0Index3.data(Qt::EditRole), "120");
       QCOMPARE(r0ItemData.modifiedToValue.toInt(), 120);
 
-      rowHeightLineEdit->setText("invalid row height number"); // 非数值
+      rowHeightLineEdit->setText("invalid row height number");          // 非数值
       QCOMPARE(rowHeightLineEdit->text(), "invalid row height number"); // 直接从模型中读取EditRole
       delegate->setEditorData(rowHeightLineEdit, r0Index3);
       QCOMPARE(r0Index3.data(Qt::DisplayRole), "120");
@@ -236,7 +275,7 @@ private slots:
       QCOMPARE(r1ItemData.modifiedToValue, newFontFamilyStr);
 
       fontFamilyCb->setCurrentText("inexist font family"); // 不在候选列表中
-      delegate->setEditorData(fontFamilyCb, r1Index3); // 直接从模型中读取EditRole
+      delegate->setEditorData(fontFamilyCb, r1Index3);     // 直接从模型中读取EditRole
       QCOMPARE(r1Index3.data(Qt::DisplayRole), newFontFamilyStr);
       QCOMPARE(r1Index3.data(Qt::EditRole), newFontFamilyStr);
       QCOMPARE(r1ItemData.modifiedToValue, newFontFamilyStr);
@@ -260,7 +299,7 @@ private slots:
       QCOMPARE(r2ItemData.modifiedToValue, newFontWeightInt);
 
       fontWeightCb->setCurrentText("inexist font weight"); // 不在候选列表中, 清空
-      delegate->setEditorData(fontWeightCb, r2Index3);  // 直接从模型中读取EditRole
+      delegate->setEditorData(fontWeightCb, r2Index3);     // 直接从模型中读取EditRole
       QCOMPARE(r2Index3.data(Qt::DisplayRole), newFontWeightInt);
       QCOMPARE(r2Index3.data(Qt::EditRole), newFontWeightInt);
       QCOMPARE(r2ItemData.modifiedToValue, newFontWeightInt);
@@ -284,7 +323,7 @@ private slots:
       QCOMPARE(r3ItemData.modifiedToValue, newFontStyleInt);
 
       fontStyleCb->setCurrentText("inexist font style"); // 不在候选列表中, 清空
-      delegate->setEditorData(fontStyleCb, r3Index3);  // 直接从模型中读取EditRole
+      delegate->setEditorData(fontStyleCb, r3Index3);    // 直接从模型中读取EditRole
       QCOMPARE(r3Index3.data(Qt::DisplayRole), newFontStyleInt);
       QCOMPARE(r3Index3.data(Qt::EditRole), newFontStyleInt);
       QCOMPARE(r3ItemData.modifiedToValue, newFontStyleInt);

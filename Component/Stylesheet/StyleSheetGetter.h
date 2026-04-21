@@ -10,8 +10,10 @@
 class StyleSheetTreeModel;
 
 namespace FontCfg {
-QFont ReadFont();
-QString ReadFontString();
+bool isCoarseEqual(const QFont& lhs, const QFont& rhs);
+QString Font2String(const QFont& font);
+QFont ReadGeneralFont();
+QString ReadFontGeneralString();
 QString GetFontFamily();
 QString GetFontFamilyCode();
 
@@ -19,8 +21,11 @@ int GetFontSize();
 int GetFontSizeTab();
 QFont::Weight GetFontWeight();
 QFont::Style GetFontStyle();
-QString GetFontWeightString();
-QString GetFontStyleString();
+
+QString GetFontWeightString(int weightE);
+QString GetFontGeneralWeightString();
+QString GetFontStyleString(int styleE);
+QString GetFontGeneralStyleString();
 
 constexpr const char* mFontFamilyDef{Style::DEFAULT_FONT_FAMILY};
 constexpr const char* mFontFamilyCodeDef{Style::DEFAULT_FONT_FAMILY_CODE};
@@ -52,8 +57,6 @@ public:
   int UpdateCurValue(const QVariantHash& cfg) const;
   static void WriteIntoSettingsCore(const StyleSheetGetter& self);
   void WriteIntoSettings() const;
-
-  int updateGeneralFont(const QFont& newGeneralFont) const;
 
 private:
   virtual QString GetStyleSheet(Style::StyleSheetE styleE) const { return ""; }

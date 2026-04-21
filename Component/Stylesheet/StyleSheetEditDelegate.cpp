@@ -12,7 +12,7 @@ StyleSheetEditDelegate::StyleSheetEditDelegate(QObject *parent)
   mFontFamilyItems = decltype(mFontFamilyItems){
 #ifdef _WIN32
       // Windows平台字体
-      "Microsoft YaHei",    // 微软雅黑
+      "Microsoft YaHei UI",    // 微软雅黑
       "SimSun",             // 宋体
       "NSimSun",            // 新宋体
       "Microsoft JhengHei", // 微软正黑体

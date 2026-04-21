@@ -521,7 +521,6 @@ void FileXplorerEvent::subscribe() {
     auto& viewInst = g_viewActions();
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileXplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileXplorerEvent::on_PlayVideo);
-    connect(viewInst._FONT_TYPE_AND_SIZE, &QAction::triggered, this, &FileXplorerEvent::on_FontChanged);
     connect(viewInst._ROW_HEIGHT, &QAction::triggered, this, &FileXplorerEvent::on_RowHeightChanged);
   }
 
@@ -907,25 +906,6 @@ bool FileXplorerEvent::on_PlayVideo() const {
   LOG_OK_NP("Playing...", playPath);
   _logger->onMsgChanged(QString{"Playing... %1"}.arg(playPath), STATUS_ALERT_LEVEL::NORMAL);
   return true;
-}
-
-void FileXplorerEvent::on_FontChanged() {
-  bool bOk{false};
-
-  const QFont& beforeFont = FontCfg::ReadFont();
-  const QFont& newFont = QFontDialog::getFont(&bOk, beforeFont, nullptr);
-  if (!bOk) {
-    LOG_INFO_NP("[Cancel]", "User cancelled font setting");
-    return;
-  }
-  if (newFont == beforeFont) {
-    LOG_INFO_P("[Skip]", "font setting unchaned remains font: %s, size: %d, weight:%d, Italic: %d",  //
-               qPrintable(beforeFont.family()), beforeFont.pointSize(), beforeFont.weight(), beforeFont.italic());
-    return;
-  }
-  LOG_OK_P("Font changed", "Selected font: %s, size: %d, weight:%d, Italic: %d",  //
-           qPrintable(newFont.family()), newFont.pointSize(), newFont.weight(), newFont.italic());
-  StyleSheetGetter::GetInst().updateGeneralFont(newFont);
 }
 
 extern template struct RowHeightRegistry<CustomTableView>;

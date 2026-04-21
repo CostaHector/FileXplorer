@@ -56,7 +56,7 @@ QProgressBar:indeterminate::chunk {
       return "";
   }
   const auto& inst = GetInst();
-  QString fontStr = FontCfg::ReadFontString();                                  // %1
+  QString fontStr = FontCfg::ReadFontGeneralString();                                  // %1
   QString fontColor{inst.GetColorValue("Foreground/General", styleE)};          // %2
   QString bgColor{inst.GetColorValue("Background/General", styleE)};            // %3
   QString fontDisabledColor{inst.GetColorValue("Foreground/Disabled", styleE)}; // %4

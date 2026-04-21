@@ -230,7 +230,7 @@ private slots:
 
     StyleSheetTreeModel model;
     model.setDatas(std::move(rootNode));
-    QCOMPARE(model.m_bInstantSee, false);
+    QCOMPARE(model.m_bLivePreviewSwitch, false);
 
     QModelIndex r00Index0{model.index(0, StyleItemData::NAME_COLUMN, {})};
     QModelIndex r000Index0{model.index(0, StyleItemData::NAME_COLUMN, r00Index0)};
@@ -265,7 +265,7 @@ private slots:
     QModelIndex r011Index3{model.index(1, StyleItemData::EDITABLE_COLUMN, r01Index0)};
 
     // onInstantApplySwitchChanged
-    QCOMPARE(model.m_bInstantSee, false);
+    QCOMPARE(model.m_bLivePreviewSwitch, false);
 
     // r00 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
     // r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER}));
@@ -336,7 +336,7 @@ private slots:
     QSignalSpy dataChangedSpy{&model, &StyleSheetTreeModel::dataChanged};
     QSignalSpy reqApplyChangesSpy{&model, &StyleSheetTreeModel::requestSeeChanges};
     // 不触发通知应用修改信号
-    QCOMPARE(model.m_bInstantSee, false);
+    QCOMPARE(model.m_bLivePreviewSwitch, false);
     {
       QVariant defUnspecifiedVar;
 
@@ -401,8 +401,8 @@ private slots:
     }
 
     // 立即触发应用修改信号
-    model.onInstantSeeSwitchChanged(true);
-    QCOMPARE(model.m_bInstantSee, true);
+    model.onLivePreviewSwitchChanged(true);
+    QCOMPARE(model.m_bLivePreviewSwitch, true);
 
     QCOMPARE(model.mEditFailedCells.isEmpty(), true); // true
     // 成功修改, 且editCell失败字典为空, 只会有1次dataChanged
@@ -465,8 +465,8 @@ private slots:
       QCOMPARE(model.mEditFailedCells.size(), 0);
     }
 
-    model.onInstantSeeSwitchChanged(false);
-    QCOMPARE(model.m_bInstantSee, false);
+    model.onLivePreviewSwitchChanged(false);
+    QCOMPARE(model.m_bLivePreviewSwitch, false);
     QCOMPARE(model.mEditFailedCells.isEmpty(), true);
 
     {
@@ -479,8 +479,8 @@ private slots:
 
       QCOMPARE(r000Index3.data(), defUnspecifiedVar);
       QCOMPARE(model.data(r000Index3, Qt::DecorationRole).isValid(), false); //
-      QCOMPARE(model.setData(r000Index3, "62.1", Qt::EditRole), false); // 数值类型无候选下拉框, Delegate将直接返回数值字符串
-      QCOMPARE(model.data(r000Index3, Qt::DecorationRole).isValid(), true); // failed Icon
+      QCOMPARE(model.setData(r000Index3, "62.1", Qt::EditRole), false);      // 数值类型无候选下拉框, Delegate将直接返回数值字符串
+      QCOMPARE(model.data(r000Index3, Qt::DecorationRole).isValid(), true);  // failed Icon
       QCOMPARE(model.mEditFailedCells.size(), 1);
       QCOMPARE(dataChangedSpy.count(), 1);
       QCOMPARE(reqApplyChangesSpy.count(), 0);
@@ -557,7 +557,7 @@ private slots:
       QCOMPARE(model.mEditFailedCells.size(), 0);
 
       // 已经没有任何需要应用的变更
-      const QVariantHash needApplyChangesCfgsDict = model.CollectItemsNeedApplyChange(selected5Node2Group);
+      const QVariantHash needApplyChangesCfgsDict = model.CollectItemsNeedSeeChange(selected5Node2Group);
       expectCfs = QVariantHash{};
       QCOMPARE(needApplyChangesCfgsDict, expectCfs);
 
@@ -572,10 +572,10 @@ private slots:
       QCOMPARE(r002Index3.data(), "#4F4F4F");
       QCOMPARE(r010Index3.data(), "#000000");
       QCOMPARE(r011Index3.data(), QFont::Weight::Normal);
-      const QVariantHash needApplyChangesCfgsNoSelectedDict = model.CollectItemsNeedApplyChange({});
+      const QVariantHash needApplyChangesCfgsNoSelectedDict = model.CollectItemsNeedSeeChange({});
       QCOMPARE(needApplyChangesCfgsNoSelectedDict, expectCfs); // 没有选中时, 没有任何需要应用的变更
 
-      const QVariantHash cfgsDefaultDict = model.CollectItemsNeedApplyChange(selected5Node2Group);
+      const QVariantHash cfgsDefaultDict = model.CollectItemsNeedSeeChange(selected5Node2Group);
       expectCfs = QVariantHash{
           {"StyleSheetInTest/View/RowHeight", 30},
           {"StyleSheetInTest/View/FontFamily", "Microsoft YaHei"},
@@ -597,7 +597,7 @@ private slots:
       dataChangedSpy.clear();
       reqApplyChangesSpy.clear();
 
-      const QVariantHash cfgsBackupDict = model.CollectItemsNeedApplyChange(selected5Node2Group);
+      const QVariantHash cfgsBackupDict = model.CollectItemsNeedSeeChange(selected5Node2Group);
       expectCfs = QVariantHash{
           {"StyleSheetInTest/View/RowHeight", 60},
           {"StyleSheetInTest/View/FontFamily", "Microsoft YaHei"},
@@ -633,6 +633,53 @@ private slots:
       dataChangedSpy.clear();
       reqApplyChangesSpy.clear();
     }
+  }
+
+  void SetFontGeneral_ok() {
+    StyleSheetTreeModel model;
+    QVERIFY(model.m_pRoot);
+    QVERIFY(model.mFontGeneralFamilyNode != nullptr);
+    QVERIFY(model.mFontGeneralSizeNode != nullptr);
+    QVERIFY(model.mFontGeneralWeightNode != nullptr);
+    QVERIFY(model.mFontGeneralStyleNode != nullptr);
+
+    // 默认已关闭实时预览变更
+    QVERIFY(!model.m_bLivePreviewSwitch);
+
+    QSignalSpy dataChangedSpy{&model, &StyleSheetTreeModel::dataChanged};
+    QSignalSpy reqApplyChangesSpy{&model, &StyleSheetTreeModel::requestSeeChanges};
+
+    QString newFamily{"NewFontFamily"};
+    int newPointSize = 99;
+    QFont::Weight newWeight = QFont::Weight::Bold;
+    QFont::Style newStyle = QFont::Style::StyleItalic;
+    QFont newFont{newFamily, newPointSize, newWeight, newStyle};
+
+    QVERIFY(model.mFontGeneralFamilyNode->value().modifiedToValue != newFamily);
+    QVERIFY(model.mFontGeneralSizeNode->value().modifiedToValue != newPointSize);
+    QVERIFY(model.mFontGeneralWeightNode->value().modifiedToValue != newWeight);
+    QVERIFY(model.mFontGeneralStyleNode->value().modifiedToValue != newStyle);
+
+    // 4次调用setData, 全accept, 全changed
+    QCOMPARE(model.SetFontGeneral(newFont), 4);
+    QVERIFY(model.mEditFailedCells.isEmpty());
+    QCOMPARE(dataChangedSpy.count(), 4);
+    QCOMPARE(reqApplyChangesSpy.count(), 0);
+    dataChangedSpy.clear();
+    reqApplyChangesSpy.clear();
+
+    QCOMPARE(model.mFontGeneralFamilyNode->value().modifiedToValue, newFamily);
+    QCOMPARE(model.mFontGeneralSizeNode->value().modifiedToValue, newPointSize);
+    QCOMPARE(model.mFontGeneralWeightNode->value().modifiedToValue, newWeight);
+    QCOMPARE(model.mFontGeneralStyleNode->value().modifiedToValue, newStyle);
+
+    // 没有任何变更, 4次调用setData, 全accept, 全not changed
+    QCOMPARE(model.SetFontGeneral(newFont), 0);
+    QVERIFY(model.mEditFailedCells.isEmpty());
+    QCOMPARE(dataChangedSpy.count(), 0);
+    QCOMPARE(reqApplyChangesSpy.count(), 0);
+    dataChangedSpy.clear();
+    reqApplyChangesSpy.clear();
   }
 };
 
