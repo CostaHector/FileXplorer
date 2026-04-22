@@ -4,7 +4,7 @@
 <context>
     <name>AccountDetailView</name>
     <message>
-        <location filename="../Component/Pwd/AccountDetailView.cpp" line="+22"/>
+        <location filename="../Component/Pwd/AccountDetailView.cpp" line="+21"/>
         <source>Recover</source>
         <translation>恢复</translation>
     </message>
@@ -39,7 +39,7 @@
         <translation>其它</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+7"/>
         <source>Detail View</source>
         <translation>详细内容</translation>
     </message>
@@ -73,22 +73,22 @@
 <context>
     <name>AdvanceRenamer</name>
     <message>
-        <location filename="../Component/RenameWidgets/AdvanceRenamer.cpp" line="+26"/>
+        <location filename="../Component/RenameWidgets/AdvanceRenamer.cpp" line="+25"/>
         <source>Name Ext Independent</source>
         <translation>名/扩展名独立</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Recursive</source>
         <translation>穿透</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Regex expression state</source>
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+94"/>
+        <location line="+102"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -412,7 +412,7 @@
 <context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+19"/>
+        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+18"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
@@ -1532,7 +1532,7 @@
         <translation>样式配置</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+54"/>
         <source>App UI Style</source>
         <translation>应用风格</translation>
     </message>
@@ -2092,22 +2092,27 @@
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+27"/>
+        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+30"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
     <message>
-        <location line="-1"/>
-        <source>Apply Changes</source>
-        <translation>应用修改后的值</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="-2"/>
         <source>Batch Set Color</source>
         <translation>批量设置颜色</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-4"/>
+        <source>Set General Font</source>
+        <translation>设置通用字体</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>View Changes</source>
+        <translation>查看变更</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Restore to Default</source>
         <translation>恢复到默认值</translation>
     </message>
@@ -2118,8 +2123,13 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Instant Apply</source>
-        <translation>修改立即生效</translation>
+        <source>Live Preview</source>
+        <translation>变更立即可见</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>See changes immediately for real-time preview when enable. Otherwise manually click `View Changes` needed. Note: this may cause screen flickering when enabled.</source>
+        <translation>启用后变更将立即可见, 否则需要手动点击`查看变更`, 注意: 启用后可能造成屏幕闪烁.</translation>
     </message>
 </context>
 <context>
@@ -2371,14 +2381,9 @@
         <translation>在系统应用中打开</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+12"/>
         <source>Row Height</source>
         <translation>行高</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Font</source>
-        <translation>字体</translation>
     </message>
     <message>
         <location line="-5"/>

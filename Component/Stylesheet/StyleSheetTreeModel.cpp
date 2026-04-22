@@ -1,164 +1,20 @@
 #include "StyleSheetTreeModel.h"
 #include "StyleSheetGetter.h"
 #include "Logger.h"
+#include "PublicMacro.h"
 #include <QVariantHash>
 #include <QIcon>
 #include <QColor>
 
-StyleSheetTreeModel::StyleSheetTreeModel(QObject* parent)
-  : QAbstractTreeModelPub<StyleTreeNode>{parent} {
-  std::unique_ptr<StyleTreeNode> pRoot{StyleTreeNode::NewTreeNodeRoot("StyleSheet")};
-  initColorRelated(pRoot, Style::StyleSheetE::STYLESHEET_LIGHT);
-  initColorRelated(pRoot, Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
-  initFontRelated(pRoot);
-  setDatas(std::move(pRoot));
-}
-
-bool StyleSheetTreeModel::initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot) const {
-  if (!pRoot) {
-    return false;
-  }
-  using namespace FontCfg;
-  auto* pFont = pRoot->appendRow(StyleTreeNode::create(StyleItemData{"Font"}));
+StyleSheetTreeModel::StyleSheetTreeModel(QObject* parent) : QAbstractTreeModelPub<StyleTreeNode>{parent} {
+  auto pRootUniquePtr = StyleSheetGetter::GetInst().GetModelData();
   {
-    auto* pFontFamily = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Family"}));
-    {
-      pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontFamilyDef, GetFontFamily(), StyleItemData::FONT_FAMILY}));
-      pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Code", mFontFamilyCodeDef, GetFontFamilyCode(), StyleItemData::FONT_FAMILY}));
-    }
-
-    auto* pFontSize = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Size"}));
-    {
-      pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontSizeDef, GetFontSize(), StyleItemData::NUMBER}));
-      pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", mFontSizeDef, GetFontSizeTab(), StyleItemData::NUMBER}));
-    }
-
-    auto* pFontWeight = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Weight"}));
-    {
-      pFontWeight->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontWeightDef, GetFontWeight(), StyleItemData::FONT_WEIGHT}));
-    }
-
-    auto* pFontStyle = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Style"}));
-    {
-      pFontStyle->appendRow(StyleTreeNode::create(StyleItemData{"General", mFontStyleDef, GetFontStyle(), StyleItemData::FONT_STYLE}));
-    }
+    mFontGeneralFamilyNode = pRootUniquePtr->FindNode("StyleSheet/Font/Family/General");
+    mFontGeneralSizeNode = pRootUniquePtr->FindNode("StyleSheet/Font/Size/General");
+    mFontGeneralWeightNode = pRootUniquePtr->FindNode("StyleSheet/Font/Weight/General");
+    mFontGeneralStyleNode = pRootUniquePtr->FindNode("StyleSheet/Font/Style/General");
   }
-  return true;
-}
-
-bool StyleSheetTreeModel::initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot, Style::StyleSheetE styleE) const {
-  if (!pRoot) {
-    return false;
-  }
-  const auto& inst = StyleSheetGetter::GetInst();
-  QString prefixKeyName;
-
-  using namespace Style;
-  const QString styleName{styleE == StyleSheetE::STYLESHEET_LIGHT ? "LightColor" : "DarkColor"};
-  auto* pColor = pRoot->appendRow(StyleTreeNode::create(StyleItemData{styleName}));
-
-  auto* pColorBg = pColor->appendRow(StyleTreeNode::create(StyleItemData{"Background"}));
-  {
-    prefixKeyName = pColorBg->GetConfigKey();
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"Disabled", inst.defCurValue(prefixKeyName + "/Disabled"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"Label", inst.defCurValue(prefixKeyName + "/Label"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"LineEdit", inst.defCurValue(prefixKeyName + "/LineEdit"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"ComboBox", inst.defCurValue(prefixKeyName + "/ComboBox"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"ToolBar", inst.defCurValue(prefixKeyName + "/ToolBar"), StyleItemData::COLOR}));
-    pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"StatusBar", inst.defCurValue(prefixKeyName + "/StatusBar"), StyleItemData::COLOR}));
-
-    auto* tabBar = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"TabBar"}));
-    {
-      prefixKeyName = tabBar->GetConfigKey();
-      tabBar->appendRow(StyleTreeNode::create(StyleItemData{"tabNotSelected", inst.defCurValue(prefixKeyName + "/tabNotSelected"), StyleItemData::COLOR}));
-      tabBar->appendRow(StyleTreeNode::create(StyleItemData{"tabSelected", inst.defCurValue(prefixKeyName + "/tabSelected"), StyleItemData::COLOR}));
-      tabBar->appendRow(StyleTreeNode::create(StyleItemData{"tabHover", inst.defCurValue(prefixKeyName + "/tabHover"), StyleItemData::COLOR}));
-    }
-
-    auto* menu = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"Menu"}));
-    {
-      prefixKeyName = menu->GetConfigKey();
-      menu->appendRow(StyleTreeNode::create(StyleItemData{"Item", inst.defCurValue(prefixKeyName + "/Item"), StyleItemData::COLOR}));
-      menu->appendRow(StyleTreeNode::create(StyleItemData{"ItemChecked", inst.defCurValue(prefixKeyName + "/ItemChecked"), StyleItemData::COLOR}));
-      menu->appendRow(StyleTreeNode::create(StyleItemData{"ItemHovered", inst.defCurValue(prefixKeyName + "/ItemHovered"), StyleItemData::COLOR}));
-      menu->appendRow(StyleTreeNode::create(StyleItemData{"Separator", inst.defCurValue(prefixKeyName + "/Separator"), StyleItemData::COLOR}));
-    }
-
-    auto* view = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
-    {
-      prefixKeyName = view->GetConfigKey();
-      view->appendRow(StyleTreeNode::create(StyleItemData{"Panel", inst.defCurValue(prefixKeyName + "/Panel"), StyleItemData::COLOR}));
-      view->appendRow(StyleTreeNode::create(StyleItemData{"AlternateRow", inst.defCurValue(prefixKeyName + "/AlternateRow"), StyleItemData::COLOR}));
-      view->appendRow(StyleTreeNode::create(StyleItemData{"SelectedActive", inst.defCurValue(prefixKeyName + "/SelectedActive"), StyleItemData::COLOR}));
-      view->appendRow(StyleTreeNode::create(StyleItemData{"SelectedInActive", inst.defCurValue(prefixKeyName + "/SelectedInActive"), StyleItemData::COLOR}));
-      view->appendRow(StyleTreeNode::create(StyleItemData{"Hover", inst.defCurValue(prefixKeyName + "/Hover"), StyleItemData::COLOR}));
-      view->appendRow(StyleTreeNode::create(StyleItemData{"Gridline", inst.defCurValue(prefixKeyName + "/Gridline"), StyleItemData::COLOR}));
-
-      auto* tableCornerButton = view->appendRow(StyleTreeNode::create(StyleItemData{"TableCornerButton"}));
-      {
-        prefixKeyName = tableCornerButton->GetConfigKey();
-        tableCornerButton->appendRow(StyleTreeNode::create(StyleItemData{"Section", inst.defCurValue(prefixKeyName + "/Section"), StyleItemData::COLOR}));
-      }
-    }
-
-    auto* headerView = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"HeaderView"}));
-    {
-      prefixKeyName = headerView->GetConfigKey();
-      headerView->appendRow(StyleTreeNode::create(StyleItemData{"NotHover", inst.defCurValue(prefixKeyName + "/NotHover"), StyleItemData::COLOR}));
-      headerView->appendRow(StyleTreeNode::create(StyleItemData{"Hover", inst.defCurValue(prefixKeyName + "/Hover"), StyleItemData::COLOR}));
-      headerView->appendRow(StyleTreeNode::create(StyleItemData{"Clicked", inst.defCurValue(prefixKeyName + "/Pressed"), StyleItemData::COLOR}));
-    }
-
-    auto* scrollBar = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"ScrollBar"}));
-    {
-      prefixKeyName = scrollBar->GetConfigKey();
-      scrollBar->appendRow(StyleTreeNode::create(StyleItemData{"EmptyZone", inst.defCurValue(prefixKeyName + "/EmptyZone"), StyleItemData::COLOR}));
-      scrollBar->appendRow(StyleTreeNode::create(StyleItemData{"Handle", inst.defCurValue(prefixKeyName + "/Handle"), StyleItemData::COLOR}));
-      scrollBar->appendRow(StyleTreeNode::create(StyleItemData{"Checked", inst.defCurValue(prefixKeyName + "/Checked"), StyleItemData::COLOR}));
-    }
-
-    auto* abstractButton = pColorBg->appendRow(StyleTreeNode::create(StyleItemData{"AbstractButton"}));
-    {
-      auto* pushButton = abstractButton->appendRow(StyleTreeNode::create(StyleItemData{"PushButton"}));
-      {
-        prefixKeyName = pushButton->GetConfigKey();
-        pushButton->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-        pushButton->appendRow(StyleTreeNode::create(StyleItemData{"Hovered", inst.defCurValue(prefixKeyName + "/Hovered"), StyleItemData::COLOR}));
-        pushButton->appendRow(StyleTreeNode::create(StyleItemData{"Pressed", inst.defCurValue(prefixKeyName + "/Pressed"), StyleItemData::COLOR}));
-        pushButton->appendRow(StyleTreeNode::create(StyleItemData{"Checked", inst.defCurValue(prefixKeyName + "/Checked"), StyleItemData::COLOR}));
-      }
-      auto* toolButton = abstractButton->appendRow(StyleTreeNode::create(StyleItemData{"ToolButton"}));
-      {
-        prefixKeyName = toolButton->GetConfigKey();
-        toolButton->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-        toolButton->appendRow(StyleTreeNode::create(StyleItemData{"Hovered", inst.defCurValue(prefixKeyName + "/Hovered"), StyleItemData::COLOR}));
-        toolButton->appendRow(StyleTreeNode::create(StyleItemData{"Pressed", inst.defCurValue(prefixKeyName + "/Pressed"), StyleItemData::COLOR}));
-        toolButton->appendRow(StyleTreeNode::create(StyleItemData{"Checked", inst.defCurValue(prefixKeyName + "/Checked"), StyleItemData::COLOR}));
-      }
-    }
-  }
-
-  auto* pColorBorder = pColor->appendRow(StyleTreeNode::create(StyleItemData{"Border"}));
-  {
-    prefixKeyName = pColorBorder->GetConfigKey();
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"MenuRight", inst.defCurValue(prefixKeyName + "/MenuRight"), StyleItemData::COLOR}));
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"ComboBox", inst.defCurValue(prefixKeyName + "/ComboBox"), StyleItemData::COLOR}));
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"TabWidget", inst.defCurValue(prefixKeyName + "/TabWidget"), StyleItemData::COLOR}));
-    pColorBorder->appendRow(StyleTreeNode::create(StyleItemData{"HeaderView", inst.defCurValue(prefixKeyName + "/HeaderView"), StyleItemData::COLOR}));
-  }
-
-  auto* pColorForeground = pColor->appendRow(StyleTreeNode::create(StyleItemData{"Foreground"}));
-  {
-    prefixKeyName = pColorForeground->GetConfigKey();
-    pColorForeground->appendRow(StyleTreeNode::create(StyleItemData{"General", inst.defCurValue(prefixKeyName + "/General"), StyleItemData::COLOR}));
-    pColorForeground->appendRow(StyleTreeNode::create(StyleItemData{"Disabled", inst.defCurValue(prefixKeyName + "/Disabled"), StyleItemData::COLOR}));
-    pColorForeground->appendRow(StyleTreeNode::create(StyleItemData{"Placeholder", inst.defCurValue(prefixKeyName + "/Placeholder"), StyleItemData::COLOR}));
-    pColorForeground->appendRow(StyleTreeNode::create(StyleItemData{"MenuFont", inst.defCurValue(prefixKeyName + "/MenuFont"), StyleItemData::COLOR}));
-  }
-
-  return true;
+  setDatas(std::move(pRootUniquePtr));
 }
 
 QVariant StyleSheetTreeModel::data(const QModelIndex& index, int role) const {
@@ -255,7 +111,7 @@ bool StyleSheetTreeModel::setData(const QModelIndex& index, const QVariant& valu
     return false;
   }
   emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
-  if (m_bInstantSee) {
+  if (m_bLivePreviewSwitch) {
     QString cfgKey = node->GetConfigKey();
     emit requestSeeChanges(cfgKey, value);
   }
@@ -317,6 +173,20 @@ Qt::ItemFlags StyleSheetTreeModel::flags(const QModelIndex& index) const {
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
+int StyleSheetTreeModel::SetFontGeneral(const QFont& newGeneralFont) {
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralFamilyNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralSizeNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralWeightNode, -1);
+  CHECK_NULLPTR_RETURN_INT(mFontGeneralStyleNode, -1);
+
+  int attributeChangedCnt{0};
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralFamilyNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.family(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralSizeNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.pointSize(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralWeightNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.weight(), Qt::EditRole);
+  attributeChangedCnt += setData(siblingAtColumn(indexFromItem(mFontGeneralStyleNode), StyleItemData::EDITABLE_COLUMN), newGeneralFont.style(), Qt::EditRole);
+  return attributeChangedCnt;
+}
+
 int StyleSheetTreeModel::SetNewColors(const QModelIndexList& indexes, const QString& newColor) {
   if (indexes.isEmpty()) {
     return 0;
@@ -364,7 +234,7 @@ int StyleSheetTreeModel::ClearNewValues(const QModelIndexList& indexes) {
     }
     StyleItemData& item = node->value();
     if (!item.invalidateNewValue()) {
-      continue; // group: no need clear
+      continue;  // group: no need clear
     }
 
     const QModelIndex editInd{siblingAtColumn(ind, StyleItemData::EDITABLE_COLUMN)};
@@ -394,7 +264,7 @@ int StyleSheetTreeModel::RecoverNewValuesToDefault(const QModelIndexList& indexe
     }
     StyleItemData& item = node->value();
     if (!item.recoverToDefault()) {
-      continue; // group: no need recover to default
+      continue;  // group: no need recover to default
     }
     const QModelIndex editInd{siblingAtColumn(ind, StyleItemData::EDITABLE_COLUMN)};
     editCellEraseIndex(editInd);
@@ -423,7 +293,7 @@ int StyleSheetTreeModel::RecoverNewValuesToBackup(const QModelIndexList& indexes
     }
     StyleItemData& item = node->value();
     if (!item.recoverToBackup()) {
-      continue; // group: no need recover to backup
+      continue;  // group: no need recover to backup
     }
     const QModelIndex editInd{siblingAtColumn(ind, StyleItemData::EDITABLE_COLUMN)};
     editCellEraseIndex(editInd);
@@ -434,22 +304,20 @@ int StyleSheetTreeModel::RecoverNewValuesToBackup(const QModelIndexList& indexes
   return affectedRows;
 }
 
-QVariantHash StyleSheetTreeModel::CollectItemsNeedApplyChange(const QModelIndexList& indexes) const {
+QVariantHash StyleSheetTreeModel::CollectItemsNeedSeeChange(const QModelIndexList& indexes) const {
   if (indexes.isEmpty()) {
     return {};
   }
 
-  const int N{columnCount()};
   QVariantHash key2Cfg;
   for (const QModelIndex& ind : indexes) {
-    const int row = ind.row();
-    if (row < 0 || row >= N) {
-      LOG_W("row[%d] out of range", row);
+    if (!ind.isValid()) {
+      LOG_W("row[%d] out of range", ind.row());
       continue;
     }
     const StyleTreeNode* node = static_cast<StyleTreeNode*>(ind.internalPointer());
     if (node == nullptr) {
-      LOG_W("node in row[%d] is nullptr", row);
+      LOG_W("node in row[%d] is nullptr", ind.row());
       continue;
     }
     if (node->isGroup()) {

@@ -4,6 +4,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSet>
+#include <QFontDialog>
+
 namespace UserInteractiveMock {
 using QUESTION_TYPE = QMessageBox::StandardButton (*)(QWidget *, const QString &, const QString&, QMessageBox::StandardButtons, QMessageBox::StandardButton);
 using FILE_EXIST_TYPE = bool (*)(const QString&);

@@ -10,7 +10,7 @@ QString ScrollBarStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
       styleSheet = R"(
 QScrollBar {
     border-radius: 3px;
-    margin: 0px 0 0px 0;
+    margin: 0px 0px 0px 0px;
     background-color: %1;
 }
 QScrollBar:vertical {

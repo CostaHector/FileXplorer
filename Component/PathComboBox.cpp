@@ -7,5 +7,8 @@ void PathComboBox::focusInEvent(QFocusEvent* event) {
 
 void PathComboBox::focusOutEvent(QFocusEvent* event) {
   QComboBox::focusOutEvent(event);
+  if (event->reason() == Qt::FocusReason::PopupFocusReason) {
+    return;
+  }
   emit focusChanged(false);
 }

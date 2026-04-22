@@ -2,6 +2,8 @@
 #include "StyleItemData.h"
 #include "Logger.h"
 #include "PublicMacro.h"
+#include "PathTool.h"
+
 #include <QLineEdit>
 #include <QAction>
 #include <QColor>
@@ -12,7 +14,7 @@ StyleSheetEditDelegate::StyleSheetEditDelegate(QObject *parent)
   mFontFamilyItems = decltype(mFontFamilyItems){
 #ifdef _WIN32
       // Windows平台字体
-      "Microsoft YaHei",    // 微软雅黑
+      "Microsoft YaHei UI", // 微软雅黑
       "SimSun",             // 宋体
       "NSimSun",            // 新宋体
       "Microsoft JhengHei", // 微软正黑体
@@ -68,7 +70,8 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
   const int dataType = index.data(StyleItemData::Role::DATA_TYPE_ROLE).toInt();
   if (index.column() != StyleItemData::EDITABLE_COLUMN //
       || dataType == StyleItemData::DataTypeE::GROUP   //
-      || dataType == StyleItemData::DataTypeE::NUMBER) {
+      || dataType == StyleItemData::DataTypeE::NUMBER  //
+      || dataType == StyleItemData::DataTypeE::FILE_PATH) {
     return QStyledItemDelegate::createEditor(parent, option, index);
   }
   if (dataType == StyleItemData::DataTypeE::COLOR) {
@@ -114,7 +117,8 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
   if (index.column() != StyleItemData::EDITABLE_COLUMN //
       || dataType == StyleItemData::DataTypeE::GROUP   //
       || dataType == StyleItemData::DataTypeE::NUMBER  //
-      || dataType == StyleItemData::DataTypeE::COLOR) {
+      || dataType == StyleItemData::DataTypeE::COLOR   //
+      || dataType == StyleItemData::DataTypeE::FILE_PATH) {
     QStyledItemDelegate::setEditorData(editor, index);
     return;
   }
@@ -151,8 +155,19 @@ void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
   if (index.column() != StyleItemData::EDITABLE_COLUMN //
       || dataType == StyleItemData::DataTypeE::GROUP   //
       || dataType == StyleItemData::DataTypeE::NUMBER  //
-      || dataType == StyleItemData::DataTypeE::COLOR) {
+      || dataType == StyleItemData::DataTypeE::COLOR ) {
     // 数值类型且无QComboxBox提供候选值时需要返回字符串, 例如height: "38.9", 后面预期要转换为int失败
+    QStyledItemDelegate::setModelData(editor, model, index);
+    return;
+  }
+  if (dataType == StyleItemData::DataTypeE::FILE_PATH) {
+    if (QLineEdit* lineEdit = static_cast<QLineEdit *>(editor)) {
+      QString oldPath = lineEdit->text();
+      QString stdPath = PathTool::normPath(oldPath);
+      if (stdPath != oldPath) {
+        lineEdit->setText(stdPath);
+      }
+    }
     QStyledItemDelegate::setModelData(editor, model, index);
     return;
   }

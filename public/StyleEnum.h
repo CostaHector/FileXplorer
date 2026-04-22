@@ -21,7 +21,7 @@ constexpr StyleSheetE DEFAULT_STYLE_SHEET = StyleSheetE::STYLESHEET_LIGHT;
 
 constexpr const char* DEFAULT_FONT_FAMILY {
 #ifdef _WIN32
-    "Microsoft YaHei",
+    "Microsoft YaHei UI",
 #else
     "Noto Sans",
 #endif
@@ -34,10 +34,6 @@ constexpr const char* DEFAULT_FONT_FAMILY_CODE {
 #endif
 };
 
-struct CfgDefCur {
-  QVariant def;
-  QVariant cur;
-};
 }
 
 #endif // STYLEENUM_H

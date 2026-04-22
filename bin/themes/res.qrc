@@ -402,6 +402,7 @@
         <file alias="RESTORE_TO_BACKUP">styles/RESTORE_TO_BACKUP.svg</file>
         <file alias="RESTORE_TO_DEFAULT">styles/RESTORE_TO_DEFAULT.svg</file>
         <file alias="INSTANT_APPLY">styles/INSTANT_APPLY.svg</file>
+        <file alias="BACKGROUND_IMAGE_TABLEVIEW">styles/BACKGROUND_IMAGE_TABLEVIEW.svg</file>
     </qresource>
 
     <qresource prefix="/">

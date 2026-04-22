@@ -74,7 +74,7 @@ private:
   bool on_HarView();
 
   bool on_PlayVideo() const;
-  void on_FontChanged();
+
   void on_RowHeightChanged();
 
   bool on_Merge(const bool reverse = false);

@@ -1,6 +1,7 @@
 #include "StyleItemData.h"
 #include "Logger.h"
 #include <QColor>
+#include <QFile>
 
 constexpr int StyleItemData::NAME_COLUMN;
 constexpr int StyleItemData::DEF_COLUMN;
@@ -16,10 +17,6 @@ StyleItemData::StyleItemData(const QString& _name, const QVariant& _defValue, co
   , curValue{_curValue}
   , dataType{_dataType}
   , isGroup{_dataType == DataTypeE::GROUP} {}
-
-StyleItemData::StyleItemData(const QString& _name, const Style::CfgDefCur& _defCurValue, const DataTypeE& _dataType):
-  StyleItemData{_name, _defCurValue.def, _defCurValue.cur, _dataType}
-{}
 
 bool StyleItemData::modifyValueTo(const QVariant& _newValue, bool& bNewValueAccept) {
   // return value: changed or not
@@ -54,6 +51,12 @@ bool StyleItemData::modifyValueTo(const QVariant& _newValue, bool& bNewValueAcce
     bNewValueAccept = true;
     modifiedToValue = _newValue;
     return true;
+  } else if (dataType == DataTypeE::FILE_PATH) {
+    const QString& newFilePath = _newValue.toString();
+    if (bNewValueAccept = QFile::exists(newFilePath)) {
+      modifiedToValue = newFilePath;
+    }
+    return bNewValueAccept;
   }
   // NUMBER类型的数值字符串{"123"}, 或者FONT_WEIGHT, FONT_STYLE下拉框提供的QVariant{123};
   const int newValueInt = _newValue.toInt(&bNewValueAccept);
@@ -129,6 +132,7 @@ bool StyleItemData::match(const QString& subStr, const Qt::CaseSensitivity caseM
       return name.contains(subStr, caseMatter);
     case FONT_FAMILY:
     case COLOR:
+    case FILE_PATH:
       return name.contains(subStr, caseMatter)                   //
              || defValue.toString().contains(subStr, caseMatter) //
              || curValue.toString().contains(subStr, caseMatter) //
@@ -152,6 +156,7 @@ bool StyleItemData::match(const int& number) const {
     }
     case FONT_FAMILY:
     case COLOR:
+    case FILE_PATH:
     default:
       return false;
   }
