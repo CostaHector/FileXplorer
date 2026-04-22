@@ -78,6 +78,9 @@ public:
     return childs.indexOf(const_cast<Derived*>(child));  // 封装在这里
   }
 
+  const Derived* FindNode(const QString& fullPath) const;
+  static std::unique_ptr<Derived> fromPairList(const QList<std::pair<QString, TDataType>>& pairList, const QString& rootNodeName);
+
   static int columnCount() {
     return TDataType::COLUMN_COUNT;
   }

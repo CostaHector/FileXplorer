@@ -30,8 +30,6 @@ signals:
   void requestSeeChanges(const QString& cfgKey, const QVariant& value);
 
 private:
-  bool initFontRelated(std::unique_ptr<StyleTreeNode>& pRoot) const;
-  bool initColorRelated(std::unique_ptr<StyleTreeNode>& pRoot, Style::StyleSheetE styleE) const;
   void editCell(const QModelIndex& ind, bool bSucceed);
   bool editCellFailed(const QModelIndex& failedInd);
   bool editCellSucceed(const QModelIndex& okInd);

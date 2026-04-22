@@ -14,6 +14,16 @@ private slots:
   void initTestCase() { Configuration().clear(); }
   void cleanupTestCase() { Configuration().clear(); }
 
+  void GetModelData_ok() {
+    auto& inst = StyleSheetGetter::GetInst();
+    QVERIFY(inst.mStyleCfg.size() > 0);
+
+    std::unique_ptr<StyleTreeNode> pRoot = inst.GetModelData();
+    QVERIFY(pRoot);
+    QCOMPARE(pRoot->name(), StyleSheetGetter::ROOT_NODE_NAME);
+    QVERIFY(pRoot->childsCount() > 0);
+  }
+
   void updateFont_will_writeSettings() {
     auto& inst = StyleSheetGetter::GetInst();
     QCOMPARE(inst.mStyleCfg.isEmpty(), false);

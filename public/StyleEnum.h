@@ -34,10 +34,6 @@ constexpr const char* DEFAULT_FONT_FAMILY_CODE {
 #endif
 };
 
-struct CfgDefCur {
-  QVariant def;
-  QVariant cur;
-};
 }
 
 #endif // STYLEENUM_H

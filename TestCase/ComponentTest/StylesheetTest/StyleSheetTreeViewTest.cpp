@@ -161,7 +161,7 @@ private slots:
     int newPointSize = 99;
     QFont::Weight newWeight = QFont::Weight::Bold;
     QFont::Style newStyle = QFont::Style::StyleItalic;
-    QFont font1{newFamily, newPointSize, newWeight, newStyle};
+    QFont font1{newFamily, newPointSize, newWeight, newStyle == QFont::Style::StyleItalic};
 
     std::pair<bool, QFont> cancel0{false, font0};
     std::pair<bool, QFont> acceptNotChanged{true, font0};
@@ -182,6 +182,8 @@ private slots:
     view.mLivePreviewSwitch->toggle();
     QCOMPARE(view.mLivePreviewSwitch->isChecked(), true);
     QCOMPARE(view.mStyleModel->m_bLivePreviewSwitch, true);
+    view.selectAll();
+    view.onClearModifiedValues();
 
     QCOMPARE(view.onSetFontGeneral(), -1); // user cancelled
     QCOMPARE(view.onSetFontGeneral(), 4);  // modifiedToValue changed from invalid to valid

@@ -33,6 +33,7 @@ class CustomTableView : public QTableView {
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
   bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true};
+  void paintEvent(QPaintEvent *event) override;
 
  private:
   void AddItselfAction2Menu();

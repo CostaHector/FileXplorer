@@ -2,7 +2,6 @@
 #define STYLEITEMDATA_H
 
 #include "TreeNodeBase.h"
-#include "StyleEnum.h"
 #include <QString>
 #include <QVariant>
 
@@ -14,9 +13,10 @@ struct StyleItemData final {
     FONT_WEIGHT,
     FONT_STYLE,
     COLOR,
+    FILE_PATH,  // resource url or local path
   };
 
-  enum Role { // -DEF_BEGIN_ROLE represent column
+  enum Role {  // -DEF_BEGIN_ROLE represent column
     DEF_BEGIN_ROLE = Qt::UserRole + 1,
     DEF_NAME_TEXT_ROLE = DEF_BEGIN_ROLE,
     DEFAULT_DATA_ROLE,
@@ -28,12 +28,10 @@ struct StyleItemData final {
   };
 
   StyleItemData() = default;
-  explicit StyleItemData(const QString& _name)
-    : name{_name} {}
+  explicit StyleItemData(const QString& _name) : name{_name} {}
   StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const DataTypeE& _dataType);
-  StyleItemData(const QString& _name, const Style::CfgDefCur& _defCurValue, const DataTypeE& _dataType);
 
-  bool operator==(const StyleItemData& other) const { //
+  bool operator==(const StyleItemData& other) const {  //
     return (this == &other) || (name == other.name && isGroup == other.isGroup && defValue == other.defValue && curValue == other.curValue);
   }
 
@@ -49,10 +47,10 @@ struct StyleItemData final {
   bool match(const QString& subStr, const Qt::CaseSensitivity caseMatter = Qt::CaseSensitivity::CaseInsensitive) const;
   bool match(const int& number) const;
 
-  QString name;                                 // 显示名称
-  QVariant defValue, curValue, modifiedToValue; // def, backup, modified to
-  const DataTypeE dataType{GROUP};
-  const bool isGroup{true}; // 是否为分组
+  QString name;                                  // 显示名称
+  QVariant defValue, curValue, modifiedToValue;  // def, backup, modified to
+  DataTypeE dataType{GROUP};
+  bool isGroup{true};  // 是否为分组
 
   static constexpr int NAME_COLUMN = DEF_NAME_TEXT_ROLE - DEF_BEGIN_ROLE;
   static constexpr int DEF_COLUMN = DEFAULT_DATA_ROLE - DEF_BEGIN_ROLE;
@@ -73,4 +71,4 @@ struct StyleTreeNode final : public TreeNodeBase<StyleTreeNode, StyleItemData> {
 QDataStream& operator<<(QDataStream& out, const StyleTreeNode& item);
 QDataStream& operator>>(QDataStream& in, StyleTreeNode& item);
 
-#endif // STYLEITEMDATA_H
+#endif  // STYLEITEMDATA_H

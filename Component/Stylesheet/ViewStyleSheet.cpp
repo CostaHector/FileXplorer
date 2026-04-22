@@ -38,6 +38,12 @@ QTableView::item:focus {
 QTableView::item:hover {
     background: %6;
 }
+QTableView {
+    background-image: url("%7");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
         )";
       break;
     default:
@@ -50,6 +56,7 @@ QTableView::item:hover {
   QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};
   QString bgSelectedInactive{inst.GetColorValue("Background/View/SelectedInactive", styleE)};
   QString bgHover{inst.GetColorValue("Background/View/Hover", styleE)};
+  QString bgImage{inst.GetNoColorValue("BackgroundImage/TableView")};
 
   QString styleSheetTableCornerButton{R"(
 QTableView > QTableCornerButton::section {
@@ -57,8 +64,8 @@ QTableView > QTableCornerButton::section {
 }
 )"};
   QString tableCornerButtonSection{inst.GetColorValue("Background/View/TableCornerButton/Section", styleE)};
-  return styleSheet.arg(bgAlternateRow, gridline, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover) //
-               + styleSheetTableCornerButton.arg(tableCornerButtonSection);
+  return styleSheet.arg(bgAlternateRow, gridline, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, bgImage) //
+         + styleSheetTableCornerButton.arg(tableCornerButtonSection);
 }
 
 QString ListViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {

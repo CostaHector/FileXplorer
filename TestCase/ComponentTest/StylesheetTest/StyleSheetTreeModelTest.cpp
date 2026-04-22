@@ -44,11 +44,6 @@ private slots:
     QCOMPARE(defModel.headerData(998, Qt::Orientation::Horizontal, Qt::DisplayRole).toInt(), 998 + 1); // not crash
     QCOMPARE(defModel.headerData(0, Qt::Orientation::Vertical, Qt::DisplayRole).toInt(), 0 + 1);
 
-    // nullptr will not crash down
-    std::unique_ptr<StyleTreeNode> pRoot{nullptr};
-    QVERIFY(!defModel.initFontRelated(pRoot));
-    QVERIFY(!defModel.initColorRelated(pRoot, Style::StyleSheetE::STYLESHEET_LIGHT));
-
     QCOMPARE(defModel.editCellFailed({}), false);
     QCOMPARE(defModel.editCellEraseIndex({}), false);
   }
@@ -653,7 +648,7 @@ private slots:
     int newPointSize = 99;
     QFont::Weight newWeight = QFont::Weight::Bold;
     QFont::Style newStyle = QFont::Style::StyleItalic;
-    QFont newFont{newFamily, newPointSize, newWeight, newStyle};
+    QFont newFont{newFamily, newPointSize, newWeight, newStyle == QFont::Style::StyleItalic};
 
     QVERIFY(model.mFontGeneralFamilyNode->value().modifiedToValue != newFamily);
     QVERIFY(model.mFontGeneralSizeNode->value().modifiedToValue != newPointSize);
