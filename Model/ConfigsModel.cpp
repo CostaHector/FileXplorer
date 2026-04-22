@@ -12,13 +12,13 @@ bool ConfigsModel::isCfgPass(const QSettings& curCfg, const KV& record) {
 }
 
 int ConfigsModel::rowCount(const QModelIndex& /*parent*/) const {
-  return KV::mEditableKVs.size();
+  return KV::GetEditableKVs().size();
 }
 
 int ConfigsModel::failCount() const {
   const QSettings& curCfg = Configuration();
   int succeeCnt = 0;
-  for (const KV* record : KV::mEditableKVs) {
+  for (const KV* record : KV::GetEditableKVs()) {
     const bool isPass{isCfgPass(curCfg, *record)};
     succeeCnt += isPass;
   }
@@ -32,7 +32,8 @@ QVariant ConfigsModel::data(const QModelIndex& index, int role) const {
   if (index.row() < 0 || index.row() >= rowCount()) {
     return {};
   }
-  const KV* record = KV::mEditableKVs[index.row()];
+  static const auto& kvs = KV::GetEditableKVs();
+  const KV* record = kvs[index.row()];
   const QSettings& curCfg = Configuration();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
@@ -56,7 +57,8 @@ QVariant ConfigsModel::data(const QModelIndex& index, int role) const {
 bool ConfigsModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole && flags(index).testFlag(Qt::ItemFlag::ItemIsEditable)) {
     // for direct edit, using EditRole
-    const KV* record = KV::mEditableKVs[index.row()];
+    static const auto& kvs = KV::GetEditableKVs();
+    const KV* record = kvs[index.row()];
     if (!record->checker(value)) {
       LOG_D("Edit %s[modifiedToValue] not pass the checker", qPrintable(record->name));
       return false;

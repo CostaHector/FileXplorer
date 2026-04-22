@@ -3,11 +3,13 @@
 #include "VerMenuInHeader.h"
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
+#include "StyleKey.h"
 #include "MemoryKey.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
 #include "RowHeightRegistry.h"
+#include "InputDialogHelper.h"
 
 #include <QPainter>
 #include <QContextMenuEvent>
@@ -36,6 +38,8 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
+
+  m_bgOverlayOpacity = Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, StyleKey::BACKGROUND_OVERLAY_OPACITY.v).toInt();
 
   {
     const QString textElideModeMenuName{GetName() + " " + CustomTableView::tr("Text elide mode")};
@@ -93,6 +97,10 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   setShowGrid(_SHOW_GRID->isChecked());
 
   // 6.
+  _BG_OVERLAY_OPACITY = new (std::nothrow) QAction(QIcon{":/styles/BACKGROUND_OVERLAY_OPACITY"}, CustomTableView::tr("Background Overlay Opacity"), this);
+  CHECK_NULLPTR_RETURN_VOID(_BG_OVERLAY_OPACITY);
+
+  // 7.
   const QString horMenuName{GetName() + " " + CustomTableView::tr("Horizontal scroll bar policy")};
   m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
@@ -118,6 +126,7 @@ CustomTableView::~CustomTableView() {
   Configuration().setValue(m_autoScrollKey, _AUTO_SCROLL->isChecked());
   Configuration().setValue(m_alternatingRowColorsKey, _ALTERNATING_ROW_COLORS->isChecked());
   Configuration().setValue(m_showGridKey, _SHOW_GRID->isChecked());
+  Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, m_bgOverlayOpacity);
 }
 
 void CustomTableView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
@@ -151,6 +160,7 @@ void CustomTableView::AddItselfAction2Menu() {
   m_menu->addAction(_AUTO_SCROLL);
   m_menu->addAction(_ALTERNATING_ROW_COLORS);
   m_menu->addAction(_SHOW_GRID);
+  m_menu->addAction(_BG_OVERLAY_OPACITY);
 }
 
 void CustomTableView::SubscribeHeaderActions() {
@@ -160,6 +170,7 @@ void CustomTableView::SubscribeHeaderActions() {
   connect(_AUTO_SCROLL, &QAction::toggled, this, &QTableView::setAutoScroll);
   connect(_ALTERNATING_ROW_COLORS, &QAction::toggled, this, &QTableView::setAlternatingRowColors);
   connect(_SHOW_GRID, &QAction::toggled, this, &QTableView::setShowGrid);
+  connect(_BG_OVERLAY_OPACITY, &QAction::triggered, this, &CustomTableView::SetBgOverlayOpacity);
   connect(m_horScrollBarPolicyMenu, &ScrollBarPolicyMenu::reqScrollBarPolicyChanged, this, &QTableView::setHorizontalScrollBarPolicy);
   connect(m_verScrollBarPolicyMenu, &ScrollBarPolicyMenu::reqScrollBarPolicyChanged, this, &QTableView::setVerticalScrollBarPolicy);
 
@@ -190,6 +201,24 @@ bool CustomTableView::ShowOrHideColumnCore() {
   for (int c = 0; c < tableColumnsCount; ++c) {
     setColumnHidden(c, switches[c] == '0');
   }
+  return true;
+}
+
+bool CustomTableView::SetBgOverlayOpacity() {
+  bool bNewOpacityAccept{false};
+  int newOpacity{m_bgOverlayOpacity};
+  const QString label{"Enter background overlay opacity (0-255, where 255 is fully opaque):"};
+  std::tie(bNewOpacityAccept, newOpacity) = InputDialogHelper::GetIntWithInitial(this, _BG_OVERLAY_OPACITY->text(), label, m_bgOverlayOpacity, 0, 255, 1);
+  if (!bNewOpacityAccept) {
+    LOG_INFO_P("Canceled by user Background overlay opacity change", "remains[%d]", m_bgOverlayOpacity);
+    return false;
+  }
+  if (m_bgOverlayOpacity == newOpacity) {
+    LOG_INFO_P("Unchanged Background overlay opacity", "remains[%d]", m_bgOverlayOpacity);
+    return false;
+  }
+  LOG_OK_P("Changed Background overlay opacity", "%d->%d", m_bgOverlayOpacity, newOpacity);
+  m_bgOverlayOpacity = newOpacity;
   return true;
 }
 
@@ -237,10 +266,11 @@ void CustomTableView::scrollContentsBy(int dx, int dy) {
 }
 
 void CustomTableView::paintEvent(QPaintEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
   QWidget* pViewport = viewport();
 
   QColor baseColor = palette().color(QPalette::Base);
-  baseColor.setAlpha(255 * 0.8);
+  baseColor.setAlpha(m_bgOverlayOpacity);
 
   QPainter painter{pViewport};
   painter.fillRect(pViewport->rect(), baseColor);

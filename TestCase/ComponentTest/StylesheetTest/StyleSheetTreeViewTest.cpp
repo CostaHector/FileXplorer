@@ -7,9 +7,9 @@
 
 #include "StyleSheetGetter.h"
 #include "MemoryKey.h"
+#include "InputDialogHelper.h"
 
 #include <QLineEdit>
-#include <QFontDialog>
 #include <QColorDialog>
 
 #include <mockcpp/mokc.h>
@@ -167,7 +167,7 @@ private slots:
     std::pair<bool, QFont> acceptNotChanged{true, font0};
     std::pair<bool, QFont> acceptChanged2{true, font1};
 
-    MOCKER(GetFontWithInitial)               //
+    MOCKER(InputDialogHelper::GetFontWithInitial)               //
         .expects(exactly(4))                 //
         // .with(any(), eq(nullptr), any())     // QFont自带的成员相等会比较没有明确设置的属性
         .will(returnValue(cancel0))          // 主动取消 -> -1

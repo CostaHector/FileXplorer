@@ -4,7 +4,7 @@
 #include "MenuToolButton.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
-#include <QInputDialog>
+#include "InputDialogHelper.h"
 
 RateActions& RateActions::GetInst(RateRequestFrom reqFrom) {
   if (reqFrom < RateRequestFrom::FROM_BEGIN || reqFrom >= RateRequestFrom::FROM_BUTT) {
@@ -98,14 +98,16 @@ void RateActions::subscribe() {
   connect(_DECREASING_RATETING_RECURSIVELY, &QAction::triggered, this, [this]() {emit AdjustRateMovieRecursivelyReq(-1);});
 }
 
-void RateActions::onRateActionTriggered(QAction* pActTriggered) {
+bool RateActions::onRateActionTriggered(const QAction* pActTriggered) {
+  CHECK_NULLPTR_RETURN_FALSE(pActTriggered);
   bool bOk = false;
   int newRate = pActTriggered->data().toInt(&bOk);
   if (!bOk) {
     LOG_W("data property in QAction is not a number");
-    return;
+    return false;
   }
   emit RateMovieReq(newRate);
+  return true;
 }
 
 int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const {
@@ -115,9 +117,10 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
 
   const int defaultRate = Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
 
-  bool bOk = false;
-  const int newRate = QInputDialog::getInt(parent, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1, &bOk);
-  if (!bOk) {
+  bool bAccept{false};
+  int newRate{defaultRate};
+  std::tie(bAccept, newRate) = InputDialogHelper::GetIntWithInitial(parent, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1);
+  if (!bAccept) {
     LOG_INFO_NP("User cancel rate recursively", rootPath);
     return 0;
   }

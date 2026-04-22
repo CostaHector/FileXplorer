@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "StyleKey.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "CustomTableView.h"
@@ -21,16 +22,18 @@
 #include "ViewActions.h"
 #include "SizeTool.h"
 
+#include "InputDialogHelper.h"
+
 #include "MouseKeyboardEventHelper.h"
 using namespace MouseKeyboardEventHelper;
 using namespace SizeTool;
 struct FileInfo {
   FileInfo(QString&& name_, QByteArray&& contents_, QString&& createTime_, QString&& fileExtenstion_)
-      : name{std::move(name_)},
-        fileSize{contents_.size()},
-        contents{contents_},
-        createTime{std::move(createTime_)},
-        fileExtenstion{std::move(fileExtenstion_)} {}
+    : name{std::move(name_)}
+    , fileSize{contents_.size()}
+    , contents{contents_}
+    , createTime{std::move(createTime_)}
+    , fileExtenstion{std::move(fileExtenstion_)} {}
   QString name;
   qint64 fileSize;
   QString createTime;
@@ -38,24 +41,31 @@ struct FileInfo {
   QByteArray contents;
 };
 
+constexpr int NEW_BG_OVERLAY_OPACITY{249};
+
 #define SIMPLE_TABLE_VIEW "SIMPLE_TABLE_VIEW"
 class SimpleCustomTableView : public CustomTableView {
- public:
-  explicit SimpleCustomTableView(QStandardItemModel* pModel, QWidget* parent = nullptr) : CustomTableView{SIMPLE_TABLE_VIEW, parent} {
+public:
+  explicit SimpleCustomTableView(QStandardItemModel* pModel, QWidget* parent = nullptr)
+    : CustomTableView{SIMPLE_TABLE_VIEW, parent} {
     setModel(pModel);
     InitTableView();
   }
-
- private:
 };
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class CustomTableViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   const QList<FileInfo> nodes{
-      {"1.txt", "contents 333", "2025/11/20 00:00:00.001", "txt"},  //
-      {"2.zip", "contents 22", "2025/11/20 00:00:00.000", "zip"},   //
-      {"3.txt", "contents 1", "2025/11/20 00:00:00.003", "txt"},    //
+      {"1.txt", "contents 333", "2025/11/20 00:00:00.001", "txt"}, //
+      {"2.zip", "contents 22", "2025/11/20 00:00:00.000", "zip"},  //
+      {"3.txt", "contents 1", "2025/11/20 00:00:00.003", "txt"},   //
   };
   //
   const QStringList mTitles{"Name", "Size", "Create Time", "File Extenstion"};
@@ -64,22 +74,25 @@ class CustomTableViewTest : public PlainTestSuite {
     model.setColumnCount(EXPECT_COL_CNT);
     for (const FileInfo& fi : nodes) {
       model.appendRow(QList<QStandardItem*>{
-          {new QStandardItem{fi.name},                       //
-           new QStandardItem{QString::number(fi.fileSize)},  //
-           new QStandardItem{fi.createTime},                 //
-           new QStandardItem{fi.fileExtenstion}},            //
+          {new QStandardItem{fi.name},                      //
+           new QStandardItem{QString::number(fi.fileSize)}, //
+           new QStandardItem{fi.createTime},                //
+           new QStandardItem{fi.fileExtenstion}},           //
       });
     }
     model.setHorizontalHeaderLabels(mTitles);
   }
- private slots:
-  void initTestCase() {  //
+private slots:
+  void initTestCase() { //
     QCOMPARE(nodes.size(), 3);
   }
 
-  void cleanupTestCase() {  //
+  void cleanupTestCase() { //
     Configuration().clear();
   }
+
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
 
   void QTableView_standardItemModel_ok() {
     Configuration().clear();
@@ -107,7 +120,7 @@ class CustomTableViewTest : public PlainTestSuite {
     QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "2.zip");
     QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "1.txt");
 
-    tv.sortByColumn(2, Qt::SortOrder::AscendingOrder);  // sort by size
+    tv.sortByColumn(2, Qt::SortOrder::AscendingOrder); // sort by size
     QCOMPARE(model.index(0, 0).data(Qt::DisplayRole).toString(), "2.zip");
     QCOMPARE(model.index(1, 0).data(Qt::DisplayRole).toString(), "1.txt");
     QCOMPARE(model.index(2, 0).data(Qt::DisplayRole).toString(), "3.txt");
@@ -117,6 +130,35 @@ class CustomTableViewTest : public PlainTestSuite {
 
     QCOMPARE(tv.verticalHeader()->count(), nodes.size());
     QVERIFY(tv.verticalHeader()->model() != nullptr);
+  }
+
+  void ShowOrHideColumnCore_ok() {
+    QStandardItemModel model;
+    SimpleCustomTableView tv{&model};
+    QVERIFY(tv.m_horHeader != nullptr);
+
+    {
+      tv.m_horHeader->SetColumnsShowSwitch("");
+      QCOMPARE(tv.m_horHeader->GetColumnsShowSwitch(), "");
+      QCOMPARE(tv.ShowOrHideColumnCore(), false);
+    }
+
+    {
+      // 0 columns
+      QCOMPARE(model.columnCount(), 0);
+      InitModel(model);
+      // 4 columns
+      QCOMPARE(model.columnCount(), 4);
+
+      // switchs count: 1 should at least >= columns count: 4
+      tv.m_horHeader->SetColumnsShowSwitch("1");
+      QCOMPARE(tv.m_horHeader->GetColumnsShowSwitch(), "1");
+      QCOMPARE(tv.ShowOrHideColumnCore(), false);
+
+      tv.m_horHeader->SetColumnsShowSwitch("111111");
+      QCOMPARE(tv.m_horHeader->GetColumnsShowSwitch(), "111111");
+      QCOMPARE(tv.ShowOrHideColumnCore(), true);
+    }
   }
 
   void CustomTableView_standardItemModel_ok() {
@@ -298,6 +340,8 @@ class CustomTableViewTest : public PlainTestSuite {
       view.m_defaultShowHorizontalHeader = false;
       view.m_defaultShowVerticalHeader = false;
 
+      view.m_bgOverlayOpacity = NEW_BG_OVERLAY_OPACITY;
+
       view.InitTableView();
       QVERIFY(!view.m_defaultShowHorizontalHeader);
       QVERIFY(!view.m_defaultShowVerticalHeader);
@@ -315,6 +359,53 @@ class CustomTableViewTest : public PlainTestSuite {
 
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_HORIZONTAL_HEADER").toBool(), false);
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_VERTICAL_HEADER").toBool(), false);
+    QVERIFY(Configuration().contains(StyleKey::BACKGROUND_OVERLAY_OPACITY.name));
+    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY);
+  }
+
+  void SetBgOverlayOpacity_ok() {
+    Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, NEW_BG_OVERLAY_OPACITY);
+
+    std::pair<bool, int> cancel0{false, -999};
+    std::pair<bool, int> accepet1Unchanged{true, NEW_BG_OVERLAY_OPACITY};
+    std::pair<bool, int> accepet2Changed{true, NEW_BG_OVERLAY_OPACITY + 1};
+    MOCKER(InputDialogHelper::GetIntWithInitial) //
+        .expects(exactly(3))                     //
+        .will(returnValue(cancel0))              // cancel
+        .then(returnValue(accepet1Unchanged))    // accept but unchange
+        .then(returnValue(accepet2Changed));     // accept and changed
+
+    CustomTableView view("CustomTableViewSetBgOverlayOpacity");
+    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
+
+    view._BG_OVERLAY_OPACITY->trigger(); // cancel
+    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
+
+    QVERIFY(!view.SetBgOverlayOpacity()); // accept but unchange
+    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
+
+    QVERIFY(view.SetBgOverlayOpacity()); // accept and changed
+    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY + 1);
+  }
+
+  void override_member_function_ok() {
+    CustomTableView view("CustomTableView_override_member_function");
+
+    view.contextMenuEvent(nullptr); // not crash down
+    {
+      QPoint centerPnt{view.geometry().center()};
+      QContextMenuEvent validMenuEvent(QContextMenuEvent::Mouse, centerPnt, view.mapToGlobal(centerPnt));
+      view.contextMenuEvent(&validMenuEvent);
+      QCOMPARE(validMenuEvent.isAccepted(), true);
+    }
+
+    view.paintEvent(nullptr);
+    {
+      QPaintEvent validPaintEvent{QRect{0, 0, 1, 1}};
+      view.paintEvent(&validPaintEvent);
+    }
+
+    view.scrollContentsBy(0, 0);
   }
 
   void mouseSideClick_NavigationSignals() {
@@ -328,7 +419,7 @@ class CustomTableViewTest : public PlainTestSuite {
     QSignalSpy backViewSpy(viewInst._VIEW_BACK_TO, &QAction::triggered);
     QSignalSpy forwardViewSpy(viewInst._VIEW_FORWARD_TO, &QAction::triggered);
 
-    {  // accepted events
+    { // accepted events
       QVERIFY(SendMousePressEvent<CustomTableView>(view, Qt::BackButton, Qt::NoModifier));
       QCOMPARE(backAddressSpy.count(), 1);
 

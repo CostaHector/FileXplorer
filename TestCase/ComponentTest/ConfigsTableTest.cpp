@@ -27,8 +27,8 @@ class ConfigsTableTest : public PlainTestSuite {
   void cleanup() { GlobalMockObject::verify(); }
 
   void default_ok() {
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::mEditableKVs};
-    KV::mEditableKVs.clear();
+    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
+    KV::GetEditableKVs().clear();
 
     Configuration().clear();
 
@@ -80,14 +80,14 @@ class ConfigsTableTest : public PlainTestSuite {
   }
 
   void label_message_after_user_edit_ok() {
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::mEditableKVs};
-    KV::mEditableKVs.clear();
+    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
+    KV::GetEditableKVs().clear();
 
     KV playerFilePath{"playerFilePath", "inexists player file path", ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::FILE_PATH}, true};    // invalid
     KV workFolderPath{"workFolderPath", "inexists work folder path", ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::FOLDER_PATH}, true};  // invalid
     KV volumeValue{"volumeValue", -5, ValueChecker{0, 101}, true};                                                                      // invalid
     KV playerMute{"playerMute", false, ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::PLAIN_BOOL}, true};                                 // valid
-    QCOMPARE(KV::mEditableKVs.size(), 4);
+    QCOMPARE(KV::GetEditableKVs().size(), 4);
 
     // 配置当前值清空, 检查总共4条配置, 预设值有3个错误; 标签内容正确
     Configuration().clear();

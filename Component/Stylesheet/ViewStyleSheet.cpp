@@ -40,7 +40,7 @@ QTableView::item:hover {
 }
 QTableView {
     background-image: url("%7");
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }

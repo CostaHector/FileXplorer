@@ -293,7 +293,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.cpp" line="+41"/>
+        <location filename="../View/CustomTableView.cpp" line="+45"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -339,6 +339,11 @@
     </message>
     <message>
         <location line="+7"/>
+        <source>Background Overlay Opacity</source>
+        <translation>背景遮罩不透明度</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Horizontal scroll bar policy</source>
         <translation>水平滚动条显示策略</translation>
     </message>

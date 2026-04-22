@@ -1,7 +1,7 @@
 ﻿#ifndef MEMORYKEY_H
 #define MEMORYKEY_H
 
-#include "ValueChecker.h"
+#include "KV.h"
 #include <QSettings>
 
 static inline QSettings& Configuration() {
@@ -12,24 +12,6 @@ static inline QSettings& Configuration() {
 #endif
   return settings;
 }
-
-class ConfigsModel;
-class KV {
- public:
-  friend class ConfigsModel;
-  KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_, bool bUserEditable = false);
-
-  QString InitialValueToString() const;
-  QString valueToString(const QVariant& v_) const;
-  bool isPath() const { return checker.isPath(); }
-
-  QString name;
-  QVariant v;
-
- private:
-  static QList<const KV*> mEditableKVs;
-  ValueChecker checker;
-};
 
 struct MemoryKey {
   static const KV LANGUAGE_ZH_CN;
