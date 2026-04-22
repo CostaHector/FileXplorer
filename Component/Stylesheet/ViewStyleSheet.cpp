@@ -38,7 +38,7 @@ QTableView::item:focus {
 QTableView::item:hover {
     background: %6;
 }
-QTableView {
+QTableView[showBackgroundImageFlag] {
     background-image: url("%7");
     background-position: center top;
     background-repeat: no-repeat;

@@ -19,6 +19,7 @@ FileSystemTableView::FileSystemTableView(FileSystemModel* fsmModel, QWidget* par
   : CustomTableView{"FILE_SYSTEM", parent}
   , _fsModel{fsmModel} { //
   CHECK_NULLPTR_RETURN_VOID(_fsModel);
+  setProperty("showBackgroundImageFlag", true);
   PushFrontExclusiveActions(GetRightClickMenuActions(this));
   setModel(_fsModel);
 
