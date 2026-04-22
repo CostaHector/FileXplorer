@@ -8,9 +8,12 @@
 #include "StyleSheetGetter.h"
 #include "MemoryKey.h"
 #include "InputDialogHelper.h"
+#include "PublicVariable.h"
+#include "PathTool.h"
 
 #include <QLineEdit>
 #include <QColorDialog>
+#include <QFileDialog>
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -167,8 +170,8 @@ private slots:
     std::pair<bool, QFont> acceptNotChanged{true, font0};
     std::pair<bool, QFont> acceptChanged2{true, font1};
 
-    MOCKER(InputDialogHelper::GetFontWithInitial)               //
-        .expects(exactly(4))                 //
+    MOCKER(InputDialogHelper::GetFontWithInitial) //
+        .expects(exactly(4))                      //
         // .with(any(), eq(nullptr), any())     // QFont自带的成员相等会比较没有明确设置的属性
         .will(returnValue(cancel0))          // 主动取消 -> -1
         .then(returnValue(acceptNotChanged)) // modifiedToValue原先为空, 修改为有效值, 视为变更 -> 4
@@ -210,7 +213,8 @@ private slots:
     auto r2 = r->appendRow(StyleTreeNode::create(StyleItemData{"2FontWeightEnumComboBox", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT}));
     auto r3 = r->appendRow(StyleTreeNode::create(StyleItemData{"3FontStyleEnumComboBox", QFont::Style::StyleItalic, QFont::Style::StyleNormal, StyleItemData::DataTypeE::FONT_STYLE}));
     auto r4 = r->appendRow(StyleTreeNode::create(StyleItemData{"4FontForegroundColorLineEditAndAction", "#FF0000", "#FF00FF", StyleItemData::DataTypeE::COLOR}));
-    auto r5 = r->appendRow(StyleTreeNode::create(StyleItemData{"5Group"}));
+    auto r5 = r->appendRow(StyleTreeNode::create(StyleItemData{"5BackgroundImageFileLineEditAndAction", ":/img0", ":/img0", StyleItemData::DataTypeE::FILE_PATH}));
+    auto r6 = r->appendRow(StyleTreeNode::create(StyleItemData{"6Group"}));
 
     QVERIFY(srcModel->setDatas(std::move(rootNode)));
     proxyModel->setSortRole(Qt::DisplayRole);
@@ -218,19 +222,21 @@ private slots:
 
     view.selectAll();
     const QModelIndexList srcIndexes = view.selectedRowsSource();
-    QCOMPARE(srcIndexes.size(), 6);
+    QCOMPARE(srcIndexes.size(), 7);
     QCOMPARE(srcIndexes[0].data(), "0ViewRowHeightNumberLineEdit");
     QCOMPARE(srcIndexes[1].data(), "1FontFamilyStringComboBox");
     QCOMPARE(srcIndexes[2].data(), "2FontWeightEnumComboBox");
     QCOMPARE(srcIndexes[3].data(), "3FontStyleEnumComboBox");
     QCOMPARE(srcIndexes[4].data(), "4FontForegroundColorLineEditAndAction");
-    QCOMPARE(srcIndexes[5].data(), "5Group");
+    QCOMPARE(srcIndexes[5].data(), "5BackgroundImageFileLineEditAndAction");
+    QCOMPARE(srcIndexes[6].data(), "6Group");
     const QModelIndex r0Index3 = srcModel->siblingAtColumn(srcIndexes[0], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r1Index3 = srcModel->siblingAtColumn(srcIndexes[1], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r2Index3 = srcModel->siblingAtColumn(srcIndexes[2], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r3Index3 = srcModel->siblingAtColumn(srcIndexes[3], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r4Index3 = srcModel->siblingAtColumn(srcIndexes[4], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r5Index3 = srcModel->siblingAtColumn(srcIndexes[5], StyleItemData::EDITABLE_COLUMN);
+    const QModelIndex r6Index3 = srcModel->siblingAtColumn(srcIndexes[6], StyleItemData::EDITABLE_COLUMN);
 
     QVERIFY(delegate->mFontFamilyItems.size() > 0);
     QVERIFY(delegate->mFontWeightItems.size() > 0);
@@ -332,7 +338,7 @@ private slots:
       QVERIFY(fontStyleCb->currentText() != ""); // "StyleItalic" "StyleNormal"
     }
 
-    { // color lineedit with action
+    { // color chooser lineedit with action
       QWidget* fontForegroundColorLineEditAndAction = delegate->createEditor(&view, QStyleOptionViewItem{}, r4Index3);
       QLineEdit* colorLineEdit = qobject_cast<QLineEdit*>(fontForegroundColorLineEditAndAction);
       QVERIFY(colorLineEdit != nullptr);
@@ -382,6 +388,58 @@ private slots:
       QCOMPARE(r4Index3.data(Qt::EditRole).toString().toUpper(), "#FFFFFF");
       QCOMPARE(r4ItemData.modifiedToValue.toString().toUpper(), "#FFFFFF");
       QCOMPARE(colorLineEdit->text(), "#FFFFFF");
+    }
+
+    { // file chooser lineedit with action
+      QWidget* fileChooserLineEditAndAction = delegate->createEditor(&view, QStyleOptionViewItem{}, r5Index3);
+      QLineEdit* fileLineEdit = qobject_cast<QLineEdit*>(fileChooserLineEditAndAction);
+      QVERIFY(fileLineEdit != nullptr);
+      QCOMPARE(fileLineEdit->text(), "");
+      fileLineEdit->setText("invalid/file/path");
+      QCOMPARE(fileLineEdit->text(), "invalid/file/path");
+
+      QList<QAction*> acts = fileLineEdit->actions();
+      QCOMPARE(acts.size(), 1);
+
+      const QString parmOpenedPath{SystemPath::HOME_PATH()};
+      const QFileDialog::Options parmOptions{QFileDialog::Option::DontUseNativeDialog};
+      QString backSlashPath = QString{__FILE__}.replace('/', '\\');
+      const QString expectFileSelected{backSlashPath};
+      const QString filePathInLineEdit{PathTool::normPath(expectFileSelected)};
+
+      // 点击输出两次
+      MOCKER(QFileDialog::getOpenFileName)                                             //
+          .expects(exactly(2))                                                         //
+          .with(any(), any(), any(), any(), any(), eq(parmOptions)) //
+          .will(returnValue(QString{}))                                                //
+          .then(returnValue(expectFileSelected));                                      //
+
+      QAction* fileAction = acts.front();
+      QVERIFY(fileAction != nullptr);
+      fileAction->trigger(); // 第一次
+      QCOMPARE(fileLineEdit->text(), "invalid/file/path");
+
+      fileAction->trigger(); // 第二次
+      QCOMPARE(fileLineEdit->text(), filePathInLineEdit);
+
+      const StyleItemData& r5ItemData = r5->value();
+      // 这里暂时没有调用setData
+      QCOMPARE(r5Index3.data(Qt::DisplayRole), QVariant());
+      QCOMPARE(r5Index3.data(Qt::EditRole), QVariant());
+      QCOMPARE(r5ItemData.modifiedToValue, QVariant());
+
+      // 调用setData
+      delegate->setModelData(fileLineEdit, srcModel, r5Index3);
+      QCOMPARE(r5Index3.data(Qt::DisplayRole).toString(), filePathInLineEdit);
+      QCOMPARE(r5Index3.data(Qt::EditRole).toString(), filePathInLineEdit);
+      QCOMPARE(r5ItemData.modifiedToValue.toString(), filePathInLineEdit);
+
+      // 手动设置非文件值, 修改不生效
+      fileLineEdit->setText("Not/existed/File");
+      delegate->setModelData(fileLineEdit, srcModel, r5Index3);
+      QCOMPARE(r5Index3.data(Qt::DisplayRole).toString(), filePathInLineEdit);
+      QCOMPARE(r5Index3.data(Qt::EditRole).toString(), filePathInLineEdit);
+      QCOMPARE(r5ItemData.modifiedToValue.toString(), filePathInLineEdit);
     }
   }
 };
