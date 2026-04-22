@@ -29,7 +29,7 @@ public slots:
 
 private:
   void subscribe();
-  void onRateActionTriggered(QAction* pActTriggered);
+  bool onRateActionTriggered(const QAction* pActTriggered);
   QList<QAction*> ALL_RATE_ACTIONS_LIST;
 
   QActionGroup* RATE_AGS {nullptr};

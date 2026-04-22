@@ -458,16 +458,27 @@ class StyleItemDataTest : public PlainTestSuite {
         auto* pColorDarkBg = pColorDark->appendRow(StyleTreeNode::create(StyleItemData{"Background"}));
         { pColorDarkBg->appendRow(StyleTreeNode::create(StyleItemData{"General", "#000000", "#000000", StyleItemData::DataTypeE::COLOR})); }
       }
-
-      QCOMPARE(pRoot->FindNode("Not/Exist/Path/Font"), nullptr);
-      QCOMPARE(pRoot->FindNode(rootName + "/Not/Exist/Path/Font"), nullptr);
-      QCOMPARE(pRoot->FindNode(""), pRoot.get());  // empty return root
-      QCOMPARE(pRoot->FindNode(rootName + "/Font"), pFont);
     }
 
     std::unique_ptr<StyleTreeNode> pRecoverRoot = StyleTreeNode::fromPairList(pairList, rootName);
     QVERIFY(pRecoverRoot);
     QCOMPARE(*pRecoverRoot, *pRoot);
+  }
+
+  void FindNode_ok() {
+    std::unique_ptr<StyleTreeNode> pRoot{StyleTreeNode::NewTreeNodeRoot("StyleSheet")};
+    auto* pFont = pRoot->appendRow(StyleTreeNode::create(StyleItemData{"Font"}));
+
+    QVERIFY(pRoot->isAncestorOf(pFont));
+
+    auto* p0 = pRoot->FindNode("Not/Exist/Path/Font");
+    auto* p1 = pRoot->FindNode("StyleSheet/Not/Exist/Path/Font");
+    auto* p2 = pRoot->FindNode("");
+    auto* p3 = pRoot->FindNode("StyleSheet/Font");
+    QCOMPARE(p0, nullptr);
+    QCOMPARE(p1, nullptr);
+    QCOMPARE(p2, pRoot.get());  // empty return root
+    QCOMPARE(p3, pFont);
   }
 };
 

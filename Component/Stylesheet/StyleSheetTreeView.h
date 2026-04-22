@@ -8,8 +8,6 @@
 
 extern template class TreeFilterProxyModel<StyleTreeNode>;
 
-std::pair<bool, QFont> GetFontWithInitial(const QFont& initialFont, QWidget* parent = nullptr, const QString& title = "");
-
 class StyleSheetTreeView : public CustomTreeView {
   Q_OBJECT
 public:

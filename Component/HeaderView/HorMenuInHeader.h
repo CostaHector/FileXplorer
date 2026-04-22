@@ -10,6 +10,7 @@ public:
   ~HorMenuInHeader();
 
   bool isSortingEnabled() const { return _ENABLE_COLUMN_SORT->isChecked(); }
+  void SetColumnsShowSwitch(const QString& newColumnsShowSwitch) { m_columnsShowSwitch = newColumnsShowSwitch; }
   const QString& GetColumnsShowSwitch() const { return m_columnsShowSwitch; }
   const QStringList& getTitles() const;
 

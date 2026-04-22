@@ -1,8 +1,8 @@
 #include "StyleSheetTreeView.h"
 #include "NotificatorMacro.h"
 #include "StyleSheetGetter.h"
+#include "InputDialogHelper.h"
 #include <QColorDialog>
-#include <QFontDialog>
 
 StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   : CustomTreeView{"StyleSheetTreeView", parent} {
@@ -102,18 +102,12 @@ int StyleSheetTreeView::onRestoreToBackup() {
   return rowsAffected;
 }
 
-std::pair<bool, QFont> GetFontWithInitial(const QFont& initialFont, QWidget* parent, const QString& title) {
-  bool bOk{false};
-  const QFont& newFont = QFontDialog::getFont(&bOk, initialFont, parent, title);
-  return {bOk, newFont};
-}
-
 int StyleSheetTreeView::onSetFontGeneral() {
   const QFont& beforeFont = FontCfg::ReadGeneralFont();
 
   bool bOk{false};
   QFont newFont;
-  std::tie(bOk, newFont) = GetFontWithInitial(beforeFont, nullptr, mSetFontGeneral->text());
+  std::tie(bOk, newFont) = InputDialogHelper::GetFontWithInitial(beforeFont, nullptr, mSetFontGeneral->text());
   if (!bOk) {
     LOG_INFO_NP("Font setting cancelled", "User cancelled font selection");
     return -1;

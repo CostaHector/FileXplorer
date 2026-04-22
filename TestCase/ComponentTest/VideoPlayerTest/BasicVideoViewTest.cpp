@@ -11,7 +11,7 @@
 #include "FileTool.h"
 #include "VideoTestPrecoditionTools.h"
 
-#include <QInputDialog>
+#include "InputDialogHelper.h"
 #include <QSplitter>
 
 #include <mockcpp/mokc.h>
@@ -295,11 +295,11 @@ class BasicVideoViewTest : public PlainTestSuite {
     const QString expectRatePathRecursive{QFileInfo{__FILE__}.absolutePath()};
     const int rateSucceedFilesCnt{3};
     const int expectScore{9};
-    bool expectOk{true};
-    MOCKER(QInputDialog::getInt)
+    const bool expectOk{true};
+    const std::pair<bool, int> expectAcceptIntNumberPair{expectOk, expectScore};
+    MOCKER(InputDialogHelper::GetIntWithInitial)
         .expects(exactly(2))                                                                                   //
-        .with(any(), any(), any(), any(), any(), any(), any(), outBoundP(&expectOk, sizeof(expectOk)), any())  //
-        .will(returnValue(expectScore));                                                                       //
+        .will(returnValue(expectAcceptIntNumberPair));                                                         //
     MOCKER(RateHelper::RateMovieRecursively)
         .expects(exactly(2))                                                     //
         .with(eq(expectRatePathRecursive), eq(expectScore), eq(bForceRecusive))  //

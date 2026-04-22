@@ -39,6 +39,7 @@ class CustomTableView : public QTableView {
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
   bool ShowOrHideColumnCore();
+  bool SetBgOverlayOpacity();
 
   const QString m_name;
 
@@ -54,12 +55,15 @@ class CustomTableView : public QTableView {
   QAction* _AUTO_SCROLL{nullptr};
   QAction* _ALTERNATING_ROW_COLORS{nullptr};
   QAction* _SHOW_GRID{nullptr};
+  QAction* _BG_OVERLAY_OPACITY{nullptr};
   ScrollBarPolicyMenu *m_horScrollBarPolicyMenu{nullptr}, *m_verScrollBarPolicyMenu{nullptr};
 
   DoubleRowHeader* m_horHeader{nullptr};
   VerMenuInHeader* m_verHeader{nullptr};
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
+
+  int m_bgOverlayOpacity{255};
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }
   static QSet<QString> mTableInstSet;

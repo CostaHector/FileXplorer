@@ -2,23 +2,6 @@
 #include "SizeTool.h"
 #include <QDir>
 
-QList<const KV*> KV::mEditableKVs;
-
-KV::KV(const QString& name_, const QVariant& v_, const ValueChecker& checker_, bool bUserEditable)  //
-    : name{name_}, v{v_}, checker{checker_} {
-  if (bUserEditable) {
-    mEditableKVs.push_back(this);
-  }
-}
-
-QString KV::InitialValueToString() const {
-  return checker.valueToString(v);
-}
-
-QString KV::valueToString(const QVariant& v_) const {
-  return checker.valueToString(v_);
-}
-
 using namespace VALUE_CHECKER_TYPE;
 
 const KV MemoryKey::LANGUAGE_ZH_CN("LANGUAGE_ZH_CN", false, ValueChecker{PLAIN_BOOL});
