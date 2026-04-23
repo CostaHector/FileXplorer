@@ -161,7 +161,7 @@ QHash<QString, StyleItemData> StyleSheetGetter::GetPairDict() {
   InsertPath2ColorPair("Background/Menu/ItemRightBorder", "#3C3C3C", "#CCEBFF");
   InsertPath2ColorPair("Background/Menu/Border", "#A0A0A0", "#A0A0A0");
   InsertPath2ColorPair("Background/View/Panel", "#FCFCFC", "#202020");
-  InsertPath2ColorPair("Background/View/AlternateRow", "#F5F5F5", "#5C5C5C");
+  InsertPath2ColorPair("Background/View/AlternateRow", "#7FF5F5F5", "#7F5C5C5C");
   InsertPath2ColorPair("Background/View/SelectedInactive", "#D9D9D9", "#333333");
   InsertPath2ColorPair("Background/View/SelectedActive", "#CCE8FF", "#777777");
   InsertPath2ColorPair("Background/View/Hover", "#E5F3FF", "#4D4D4D");
@@ -294,6 +294,25 @@ QString StyleSheetGetter::GetNoColorValue(const QString& keyCore) const {
   keyComplete.reserve(30);
   keyComplete += keyCore;
   return curValue(keyComplete).toString();
+}
+
+// input can be "#7F123456" or "#123456"
+QString StyleSheetGetter::toRgbaString(const QString& colorStr) {
+  int alphaOpacity = 0x00;
+  int rStart = 1;
+  bool bConvertOk{false};
+  if (colorStr.size() == 1 + 8) {
+    rStart = 3;
+    alphaOpacity = colorStr.midRef(1, 2).toInt(&bConvertOk, 16);
+  } else if (colorStr.size() == 1 + 6) {
+  } else {
+    LOG_E("colorStr[%s] length:%d invalid", qPrintable(colorStr), colorStr.size());
+    return "";
+  }
+  const int r = colorStr.midRef(rStart, 2).toInt(&bConvertOk, 16);
+  const int g = colorStr.midRef(rStart + 2, 2).toInt(&bConvertOk, 16);
+  const int b = colorStr.midRef(rStart + 4, 2).toInt(&bConvertOk, 16);
+  return QString("rgba(%1, %2, %3, %4)").arg(r).arg(g).arg(b).arg(alphaOpacity);
 }
 
 void StyleSheetGetter::WriteIntoSettingsCore(const StyleSheetGetter& self) {

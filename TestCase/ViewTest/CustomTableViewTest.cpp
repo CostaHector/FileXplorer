@@ -321,6 +321,7 @@ private slots:
   }
 
   void saveSettings_ok() {
+    Configuration().clear();
     const QString tableInstanceName{"saveSettingTest_ok"};
     {
       CustomTableView view{tableInstanceName};
@@ -359,8 +360,7 @@ private slots:
 
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_HORIZONTAL_HEADER").toBool(), false);
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_VERTICAL_HEADER").toBool(), false);
-    QVERIFY(Configuration().contains(StyleKey::BACKGROUND_OVERLAY_OPACITY.name));
-    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY);
+    QVERIFY(!Configuration().contains(StyleKey::BACKGROUND_OVERLAY_OPACITY.name)); // key唯一, 因此不在析构函数中存储, 避免多次存储互相覆盖
   }
 
   void SetBgOverlayOpacity_ok() {
@@ -383,9 +383,11 @@ private slots:
 
     QVERIFY(!view.SetBgOverlayOpacity()); // accept but unchange
     QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
+    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY);
 
     QVERIFY(view.SetBgOverlayOpacity()); // accept and changed
     QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY + 1);
+    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY + 1);
   }
 
   void override_member_function_ok() {

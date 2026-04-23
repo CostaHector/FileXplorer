@@ -56,7 +56,7 @@ ConfigsTable::ConfigsTable(QWidget* parent) : QDialog{parent} {
 
   ReadSettings();
 
-  setWindowFlag(Qt::WindowMaximizeButtonHint);
+  setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
   setWindowTitle("Configs Table");
   setWindowIcon(QIcon{":img/SETTINGS"});
   RefreshWindowIcon();

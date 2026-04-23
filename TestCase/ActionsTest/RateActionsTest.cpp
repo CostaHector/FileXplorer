@@ -4,7 +4,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "RateActions.h"
 #include "EndToExposePrivateMember.h"
-#include "InputDialogHelper.H"
+#include "InputDialogHelper.h"
 #include "MemoryKey.h"
 #include "RateHelper.h"
 
@@ -18,15 +18,15 @@ USING_MOCKCPP_NS
 
 class RateActionsTest : public PlainTestSuite {
   Q_OBJECT
-public:
-private slots:
+ public:
+ private slots:
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
   void basic_ok() {
     auto& inst0 = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
     auto& inst1 = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
-    auto& inst2 = RateActions::GetInst(RateActions::RateRequestFrom::FROM_BUTT); // fall back to FILE_XPLORER
+    auto& inst2 = RateActions::GetInst(RateActions::RateRequestFrom::FROM_BUTT);  // fall back to FILE_XPLORER
     QCOMPARE(&inst0, &inst2);
     QVERIFY(&inst0 != &inst1);
   }
@@ -99,17 +99,17 @@ private slots:
     const std::pair<bool, int> cancel0{false, 7};
     const std::pair<bool, int> accept1{true, userInputNewValue};
 
-    MOCKER(InputDialogHelper::GetIntWithInitial)                                                            //
-        .expects(exactly(2))                                                                                //
-        // .with(eq(nullptr), any(), any(), eq(initRate), eq(RateHelper::MIN_V), eq(RateHelper::MAX_V), eq(1)) //
-        .will(returnValue(cancel0))                                                                         // user cancelled
-        .then(returnValue(accept1));                                                                        // path not exist
+    MOCKER(InputDialogHelper::GetIntWithInitial)                                                                                 //
+        .expects(exactly(2))                                                                                                     //
+        .with(eq((QWidget*)nullptr), any(), any(), eq(initRate), eq((int)RateHelper::MIN_V), eq((int)RateHelper::MAX_V), eq(1))  //
+        .will(returnValue(cancel0))                                                                                              // user cancelled
+        .then(returnValue(accept1));                                                                                             // path not exist
 
     auto& inst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
-    QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0); // user cancelled
+    QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0);  // user cancelled
     QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt(), initRate);
 
-    QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0); // path not exist
+    QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0);  // path not exist
     QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt(), userInputNewValue);
   }
 };

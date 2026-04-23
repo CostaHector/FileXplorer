@@ -50,7 +50,7 @@ QTableView[showBackgroundImageFlag] {
       return "";
   }
   const auto& inst = GetInst();
-  QString bgAlternateRow{inst.GetColorValue("Background/View/AlternateRow", styleE)};
+  QString bgAlternateRow{toRgbaString(inst.GetColorValue("Background/View/AlternateRow", styleE))};
   QString gridline{inst.GetColorValue("GridLine", styleE)};
   QString borderGeneral{inst.GetColorValue("Border/General", styleE)};
   QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};
