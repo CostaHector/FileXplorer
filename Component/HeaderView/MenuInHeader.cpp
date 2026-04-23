@@ -2,7 +2,7 @@
 #include "MemoryKey.h"
 #include "Logger.h"
 #include "PublicMacro.h"
-#include "MockFriendlyTool.h"
+#include "InputDialogHelper.h"
 #include "SizeTool.h"
 #include <QContextMenuEvent>
 #include <utility>
@@ -162,7 +162,7 @@ bool MenuInHeader::onSetDefaultSectionSize() {
   const QString labelMsg{QString::asprintf("Current: %d px | Range: %d-%d px", beforeDefSize, minSize, maxSize)};
 
   bool setOk{false};
-  std::tie(afterDefSize, setOk) = MockFriendlyTool::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
+  std::tie(setOk, afterDefSize) = InputDialogHelper::GetIntWithInitial(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
   if (!setOk) {
     LOG_W("User canceled default section size setting");
     return false;
@@ -179,7 +179,7 @@ bool MenuInHeader::onSetMaxSectionSize() {
   const QString labelMsg{QString::asprintf("Current: %d px | Range: %d-%d px", beforeDefSize, minSize, maxSize)};
 
   bool setOk{false};
-  std::tie(afterDefSize, setOk) = MockFriendlyTool::getInt(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
+  std::tie(setOk, afterDefSize) = InputDialogHelper::GetIntWithInitial(this, titleMsg, labelMsg, beforeDefSize, minSize, maxSize, sizeStep);
   if (!setOk) {
     LOG_W("User canceled maximum section size setting");
     return false;

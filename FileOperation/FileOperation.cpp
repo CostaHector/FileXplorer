@@ -59,11 +59,11 @@ RETURN_TYPE moveToTrash(const QString& pre, const QString& rel) {
     return {OK, revertCmds};
   }
   const QString& pth = PathTool::Path2Join(pre, rel);
-  if (not QFile::exists(pth)) {
+  if (!QFile::exists(pth)) {
     return {OK, revertCmds};
   }
   QFile file(pth);
-  auto ret = file.moveToTrash();
+  const bool ret = file.moveToTrash();
   if (ret) {
     if (file.fileName().isEmpty()) {
       LOG_C("The file[%s] name in trashbin is not accessible", qPrintable(pth));
@@ -88,12 +88,12 @@ RETURN_TYPE rmFolderForceAgent(const QStringList& parms) {
 RETURN_TYPE rmFolderForce(const QString& pre, const QString& dirName) {
   const QString& pth = PathTool::Path2Join(pre, dirName);
   if (!QFile::exists(pth)) {
-    return {};  // already inexists
+    return {OK, {}};  // already inexists
   }
   if (!QDir{pth}.removeRecursively()) {
     return {CANNOT_REMOVE_FOLDER_FORCE, {}};
   }
-  return {};
+  return {OK, {}};
 }
 
 RETURN_TYPE rmpathAgent(const QStringList& parms) {
@@ -399,6 +399,9 @@ RETURN_TYPE cpdirAgent(const QStringList& parms) {
 }
 
 RETURN_TYPE cpdir(const QString& pre, const QString& rel, const QString& to) {
+  if (pre == to) {
+    return {OK, {}};
+  }
   if (!QFileInfo{pre, rel}.isDir()) {
     return {SRC_INEXIST, {}};
   }

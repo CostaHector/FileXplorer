@@ -38,7 +38,7 @@ QTableView::item:focus {
 QTableView::item:hover {
     background: %6;
 }
-QTableView {
+QTableView[showBackgroundImageFlag] {
     background-image: url("%7");
     background-position: center top;
     background-repeat: no-repeat;
@@ -50,7 +50,7 @@ QTableView {
       return "";
   }
   const auto& inst = GetInst();
-  QString bgAlternateRow{inst.GetColorValue("Background/View/AlternateRow", styleE)};
+  QString bgAlternateRow{toRgbaString(inst.GetColorValue("Background/View/AlternateRow", styleE))};
   QString gridline{inst.GetColorValue("GridLine", styleE)};
   QString borderGeneral{inst.GetColorValue("Border/General", styleE)};
   QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};

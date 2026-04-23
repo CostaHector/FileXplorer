@@ -27,7 +27,6 @@
 
 StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   : QDialog{parent} {
-  setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
   m_searchLineEdit = new QLineEdit{this};
   {
     m_startSearchAct = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
@@ -62,6 +61,8 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   setLayout(m_layout);
 
   seeChanges();
+
+  setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
   setWindowTitle("StyleSheet Manager");
   setWindowIcon(QIcon{":/styles/STYLESHEET_MGR"});
   subscribe();

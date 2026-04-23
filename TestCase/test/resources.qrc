@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file>test_zh_CN.qm</file>
+    </qresource>
+    <qresource prefix="/image_test">
+        <file alias="resolution_ratio">resolution_ratio.png</file>
+    </qresource>
+</RCC>

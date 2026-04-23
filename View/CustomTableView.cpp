@@ -126,7 +126,6 @@ CustomTableView::~CustomTableView() {
   Configuration().setValue(m_autoScrollKey, _AUTO_SCROLL->isChecked());
   Configuration().setValue(m_alternatingRowColorsKey, _ALTERNATING_ROW_COLORS->isChecked());
   Configuration().setValue(m_showGridKey, _SHOW_GRID->isChecked());
-  Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, m_bgOverlayOpacity);
 }
 
 void CustomTableView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
@@ -219,6 +218,7 @@ bool CustomTableView::SetBgOverlayOpacity() {
   }
   LOG_OK_P("Changed Background overlay opacity", "%d->%d", m_bgOverlayOpacity, newOpacity);
   m_bgOverlayOpacity = newOpacity;
+  Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, m_bgOverlayOpacity);
   return true;
 }
 

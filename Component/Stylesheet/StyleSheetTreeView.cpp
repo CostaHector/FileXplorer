@@ -17,7 +17,7 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   mStyleSheetEditDelegate = new StyleSheetEditDelegate{this};
   setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);
 
-  setEditTriggers(QAbstractItemView::EditKeyPressed);
+  setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::DoubleClicked);
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);
 

@@ -13,7 +13,7 @@ QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObjec
   setPixmapHeight(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].height());
 
   m_isSmooth = Configuration().value(GetName() + "/PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
-  _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{":img/IMAGE_TRANSFORMATION_SMOOTH"}, tr("smooth transformation"), this};
+  _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{":img/IMAGE_TRANSFORMATION_SMOOTH"}, tr("Smooth Transformation"), this};
   _PIXMAP_TRANSFORMATION_SMOOTH->setCheckable(true);
   _PIXMAP_TRANSFORMATION_SMOOTH->setChecked(m_isSmooth);
   _PIXMAP_TRANSFORMATION_SMOOTH->setToolTip(

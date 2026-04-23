@@ -109,11 +109,13 @@ class StyleItemDataTest : public PlainTestSuite {
     StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, StyleItemData::DataTypeE::FONT_STYLE};
     StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT};
     StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
+    StyleItemData fileNode{"ImageFile", ":/imgDef", ":/imgCur", StyleItemData::DataTypeE::FILE_PATH};
     QVERIFY(!numberNode.isNeedApplyChange());
     QVERIFY(!stringNode.isNeedApplyChange());
     QVERIFY(!styleIntNode.isNeedApplyChange());
     QVERIFY(!weightIntNode.isNeedApplyChange());
     QVERIFY(!colorNode.isNeedApplyChange());
+    QVERIFY(!fileNode.isNeedApplyChange());
 
     {
       // 数值类型且无下拉框候选, 返回QVariant{"123"}, 预期正确处理 ok
@@ -227,6 +229,31 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(newColorStrAccepted);
       QCOMPARE(colorNode.modifiedToValue, (QVariant()));
       QVERIFY(!colorNode.isNeedApplyChange());
+    }
+
+    { // file ok
+      QCOMPARE(fileNode.modifiedToValue, (QVariant()));
+      QVERIFY(!fileNode.isNeedApplyChange());
+      // 存在 -> 接受, 修改
+      bool newFileStrAccepted = false;
+      QVERIFY(fileNode.modifyValueTo(__FILE__, newFileStrAccepted));
+      QVERIFY(newFileStrAccepted);
+      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QVERIFY(fileNode.isNeedApplyChange());
+
+      // 不变 -> 接受, 不修改
+      newFileStrAccepted = false;
+      QVERIFY(!fileNode.modifyValueTo(__FILE__, newFileStrAccepted));  // unchange
+      QVERIFY(newFileStrAccepted);
+      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QVERIFY(fileNode.isNeedApplyChange());
+
+      // 不存在的文件 -> 不接受, 不修改
+      newFileStrAccepted = true;
+      QVERIFY(!fileNode.modifyValueTo("inexist/file/path", newFileStrAccepted));
+      QVERIFY(!newFileStrAccepted);
+      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QVERIFY(fileNode.isNeedApplyChange());
     }
   }
 

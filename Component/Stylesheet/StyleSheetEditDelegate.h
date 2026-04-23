@@ -18,6 +18,9 @@ public:
   void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
+  QWidget* createLineEditorWithColorDialog(QWidget* editWidget) const;
+  QWidget* createLineEditorWithFileDialog(QWidget* editWidget) const;
+
   QStringList mFontFamilyItems;
   QMap<QString, QFont::Weight> mFontWeightItems;
   QMap<QString, QFont::Style> mFontStyleItems;

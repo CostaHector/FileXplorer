@@ -54,6 +54,7 @@ class StyleSheetGetter {
 
   QString GetColorValue(const QString& keyCore, Style::StyleSheetE styleE) const;
   QString GetNoColorValue(const QString& keyCore) const;
+  static QString toRgbaString(const QString& colorStr);
 
   int UpdateCurValue(const QVariantHash& cfg) const;
   static void WriteIntoSettingsCore(const StyleSheetGetter& self);
