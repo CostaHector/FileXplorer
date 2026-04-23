@@ -67,6 +67,9 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   _SHOW_VERTICAL_HEADER->setToolTip(QString("<b>%1 (%2)</b><br/> Hide/Show the vertical header").arg(_SHOW_VERTICAL_HEADER->text(), _SHOW_VERTICAL_HEADER->shortcut().toString()));
   m_verHeader = new (std::nothrow) VerMenuInHeader{GetName() + "/VerHeader", this};
   CHECK_NULLPTR_RETURN_VOID(m_verHeader);
+  m_verHeader->setMinimumWidth(30);
+  m_verHeader->setMaximumWidth(30);
+  m_verHeader->setFixedWidth(30);
   setVerticalHeader(m_verHeader);
 
   _RESIZE_ROW_TO_CONTENTS = new (std::nothrow) QAction(QIcon(":img/RESIZE_ROW_TO_CONTENTS"), CustomTableView::tr("Resize Rows to Contents"), this);
