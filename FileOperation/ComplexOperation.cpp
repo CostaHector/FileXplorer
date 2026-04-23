@@ -48,7 +48,7 @@ BATCH_COMMAND_LIST_TYPE ComplexMove::To(const QStringList& selectionAbsFilePaths
       lst.append(ACMD::GetInstMV(rootPath, rel2Section, dest));
     }
   } else {
-    LOG_W("File Structure Mode[%s] not support", c_str(mode));
+    LOG_W("File Structure Mode[%d] not support", (int)mode);
   }
   return lst;
 }
@@ -77,7 +77,7 @@ BATCH_COMMAND_LIST_TYPE ComplexCopy::To(const QStringList& selectionAbsFilePaths
       }
     }
   } else {
-    LOG_W("File Structure Mode[%s] not support", c_str(mode));
+    LOG_W("File Structure Mode[%d] not support", (int)mode);
   }
   return lst;
 }
@@ -98,7 +98,7 @@ BATCH_COMMAND_LIST_TYPE ComplexLink::To(const QStringList& selectionAbsFilePaths
       lst.append(ACMD::GetInstLINK(rootPath, rel2Section, dest));
     }
   } else {
-    LOG_W("File Structure Mode[%s] not support", c_str(mode));
+    LOG_W("File Structure Mode[%d] not support", (int)mode);
   }
 
   return lst;

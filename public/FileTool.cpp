@@ -146,6 +146,10 @@ bool OpenLocalFile(const QString& localFilePath) {
 }
 
 bool OpenLocalImageFile(const QString& localFilePath) {
+  if (!QFile::exists(localFilePath)) {
+    LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
+    return false;
+  }
   auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
   QString prepath, name;
   name = PathTool::GetPrepathAndFileName(localFilePath, prepath);
@@ -211,6 +215,10 @@ bool IsTorrentTxtFile(const QString& localFilePath) {
 }
 
 bool OpenLocalTorrentFile(const QString& localFilePath) {
+  if (!QFile::exists(localFilePath)) {
+    LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
+    return false;
+  }
   // Precondition: program torrent-file-
   // link https://torrent-file-editor.github.io/
 
@@ -241,10 +249,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
     defaultPath = Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString();
   }
-  QString selectPath = defaultPath;
-#ifndef RUNNING_UNIT_TESTS
-  selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath);
-#endif
+  QString selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath, QFileDialog::Option::ShowDirsOnly);
   QFileInfo dstFi(selectPath); // system may return back slash seperated path
   if (!dstFi.isDir()) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));

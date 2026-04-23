@@ -124,11 +124,11 @@ endforeach()
 
 
 set(RESOURCES
-    "bin/themes/res.qrc"
+    "resources/images.qrc"
 )
 
 file(GLOB TS_FILES
-    Translate/*.ts
+    resources/Translate/*.ts
 )
 
 list(LENGTH TS_FILES ts_files_count)

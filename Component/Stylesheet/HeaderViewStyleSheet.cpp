@@ -24,6 +24,9 @@ QHeaderView::section:horizontal {
     padding: 5px 0px 0px 5px;
 }
 QHeaderView::section:vertical {
+    width: 30px;
+    min-width: 30px;
+    max-width: 30px;
 }
 )";
       break;

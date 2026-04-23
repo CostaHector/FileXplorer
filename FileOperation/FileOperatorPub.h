@@ -149,6 +149,8 @@ struct RETURN_TYPE {
 
   inline ACMD& operator[](int i) noexcept { return cmds[i]; }
   inline const ACMD& operator[](int i) const noexcept { return cmds[i]; }
+  bool operator==(const RETURN_TYPE& rhs) const;
+  bool operator!=(const RETURN_TYPE& rhs) const;
 
   ErrorCode ret;
   BATCH_COMMAND_LIST_TYPE cmds;

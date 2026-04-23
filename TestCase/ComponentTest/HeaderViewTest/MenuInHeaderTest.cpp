@@ -5,9 +5,10 @@
 #include "BeginToExposePrivateMember.h"
 #include "MenuInHeader.h"
 #include "EndToExposePrivateMember.h"
+#include "InputDialogHelper.h"
+
 #include <QStandardItemModel>
 #include <QTableView>
-#include "MockFriendlyTool.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -129,11 +130,11 @@ class MenuInHeaderTest : public PlainTestSuite {
       int afterValue = 99;
       QVERIFY(afterValue != beforeValue);
 
-      MOCKER(MockFriendlyTool::getInt)
+      MOCKER(InputDialogHelper::GetIntWithInitial)
           .expects(exactly(3))                                   //
-          .will(returnValue(std::make_pair(99999, false)))       // UserCancel0
-          .then(returnValue(std::make_pair(beforeValue, true)))  // Yes but unchange
-          .then(returnValue(std::make_pair(afterValue, true)));  // Yes and changed ok
+          .will(returnValue(std::make_pair(false, 99999)))       // UserCancel0
+          .then(returnValue(std::make_pair(true, beforeValue)))  // Yes but unchange
+          .then(returnValue(std::make_pair(true, afterValue)));  // Yes and changed ok
 
       QCOMPARE(horHeader.onSetDefaultSectionSize(), false);  // UserCancel0
       QCOMPARE(horHeader.defaultSectionSize(), beforeValue);
@@ -166,11 +167,11 @@ class MenuInHeaderTest : public PlainTestSuite {
       int afterValue = 999;
       QVERIFY(afterValue != beforeValue);
 
-      MOCKER(MockFriendlyTool::getInt)
+      MOCKER(InputDialogHelper::GetIntWithInitial)
           .expects(exactly(3))                                   //
-          .will(returnValue(std::make_pair(99999, false)))       // UserCancel0
-          .then(returnValue(std::make_pair(beforeValue, true)))  // Yes but unchange
-          .then(returnValue(std::make_pair(afterValue, true)));  // Yes and changed ok
+          .will(returnValue(std::make_pair(false, 99999)))       // UserCancel0
+          .then(returnValue(std::make_pair(true, beforeValue)))  // Yes but unchange
+          .then(returnValue(std::make_pair(true, afterValue)));  // Yes and changed ok
 
       QCOMPARE(horHeader.onSetMaxSectionSize(), false);  // UserCancel0
       QCOMPARE(horHeader.maximumSectionSize(), beforeValue);

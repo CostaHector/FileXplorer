@@ -169,7 +169,7 @@ foreach(header_file ${HEADERS})
 endforeach()
 
 set(RESOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/translations.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/resources.qrc
 )
 
 if(WIN32)

@@ -20,4 +20,13 @@ void SetReturnErrorCodeUponAnyFailureSw(bool sw) {
   Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, sw);
 }
 
+
+bool RETURN_TYPE::operator==(const RETURN_TYPE& rhs) const {
+  return ret == rhs.ret && cmds == rhs.cmds;
+}
+
+bool RETURN_TYPE::operator!=(const RETURN_TYPE& rhs) const {
+  return !(*this == rhs);
+}
+
 }  // namespace FileOperatorType

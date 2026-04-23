@@ -6,13 +6,24 @@
 #include "PublicVariable.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
+
+#include <QFileDialog>
 #include <QPushButton>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class FileToolTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void test_mvToANewPath() {
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
+  void mvToANewPath_ok() {
     QString mvToANewPath = "5";
     QAction act1{"1", this};
     QAction act2{"2", this};
@@ -28,7 +39,7 @@ class FileToolTest : public PlainTestSuite {
     QCOMPARE(MoveToNewPathAutoUpdateActionText(mvToANewPath, &ag), expectStr);
   }
 
-  void test_mvToANewPath_again() {
+  void mvToANewPath_again_ok() {
     QString mvToANewPath = "3";
     QAction act1{"1", this};
     QAction act2{"2", this};
@@ -46,6 +57,8 @@ class FileToolTest : public PlainTestSuite {
     const QStringList& expectList{"3", "1", "2", "4", "5"};
     const QString& expectStr = expectList.join('\n');
     QCOMPARE(MoveToNewPathAutoUpdateActionText(mvToANewPath, &ag), expectStr);
+
+    QCOMPARE(MoveToNewPathAutoUpdateActionText(mvToANewPath, nullptr), "");
   }
 
   void file_read_write_ok() {
@@ -113,6 +126,11 @@ class FileToolTest : public PlainTestSuite {
 
     Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, fileParentParentFolder);
 
+    MOCKER(QFileDialog::getExistingDirectory)//
+        .expects(exactly(2))//
+        .will(returnValue(fileParentFolder))//
+        .then(returnValue(fileParentParentFolder));
+
     // user specified
     QCOMPARE(ChooseCopyDestination(fileParentFolder, nullptr), fileParentFolder);
     QCOMPARE(Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
@@ -154,6 +172,27 @@ class FileToolTest : public PlainTestSuite {
     QPushButton recoverCancelButton(tr("Cancel"));
     QCOMPARE(recoverApplyButton.text(), "Apply");
     QCOMPARE(recoverCancelButton.text(), "Cancel");
+  }
+
+  void execpt_branch_ok() {
+    const QString inexistFilePath{"inexist/path/inexistFilePath.txt"};
+    bool bReadOk{true};
+    QCOMPARE(FileTool::TextReader(inexistFilePath, &bReadOk), "");
+    QVERIFY(!bReadOk);
+
+    bReadOk = true;
+    QCOMPARE(FileTool::ByteArrayReader(inexistFilePath, &bReadOk), "");
+    QVERIFY(!bReadOk);
+
+    QVERIFY(!FileTool::ByteArrayWriter(inexistFilePath, "Contents in QByteArray"));
+
+    QVERIFY(!FileTool::OpenLocalFile(inexistFilePath));
+    QVERIFY(!FileTool::OpenLocalImageFile(inexistFilePath));
+    QVERIFY(!FileTool::OpenLocalFileUsingDesktopService(inexistFilePath));
+    QVERIFY(!FileTool::RevealInSystemExplorer(inexistFilePath));
+    QVERIFY(FileTool::RevealInSystemExplorer(__FILE__)); // will not system call
+
+    QVERIFY(!FileTool::OpenLocalTorrentFile(inexistFilePath));
   }
 };
 

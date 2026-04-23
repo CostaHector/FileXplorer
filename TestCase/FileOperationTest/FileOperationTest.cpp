@@ -18,9 +18,10 @@ extern bool g_bReturnErrorCodeUponAnyFailure;
 class FileOperationTest : public PlainTestSuite {
   Q_OBJECT
 
- public:
-  FileOperationTest() : PlainTestSuite{} {}
- private slots:
+public:
+  FileOperationTest()
+    : PlainTestSuite{} {}
+private slots:
   void test_file_remove_not_recoverable() {
     TDir dir;
     QVERIFY(dir.touch("a.txt", "contents in a.txt"));
@@ -32,7 +33,7 @@ class FileOperationTest : public PlainTestSuite {
     QCOMPARE(retEle.ret, ErrorCode::OK);
 
     QVERIFY(!dir.fileExists("a.txt", false));
-    QVERIFY(retEle.cmds.isEmpty());  // not_recoverable
+    QVERIFY(retEle.cmds.isEmpty()); // not_recoverable
   }
 
   void test_mkpath_direct_or_relative_path_ok() {
@@ -92,7 +93,7 @@ class FileOperationTest : public PlainTestSuite {
 
     const auto& rmpthRecOk = FileOperation::executer(reversedaBatch);
     QCOMPARE(rmpthRecOk.ret, OK);
-    QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
+    QVERIFY(QFile::exists(workPath)); // no unintended side effect. this folder should keep here
     QVERIFY(dir.dirExists("a", false));
   }
 
@@ -128,7 +129,7 @@ class FileOperationTest : public PlainTestSuite {
 
     const auto& rmpthRecOk = FileOperation::executer(reversedaBatch);
     QCOMPARE(rmpthRecOk.ret, OK);
-    QVERIFY(QFile::exists(workPath));  // no unintended side effect. this folder should keep here
+    QVERIFY(QFile::exists(workPath)); // no unintended side effect. this folder should keep here
     QVERIFY(dir.dirExists("a", false));
     QVERIFY(dir.dirExists("a/a1", false));
   }
@@ -181,12 +182,12 @@ class FileOperationTest : public PlainTestSuite {
 
     QVERIFY(dir.dirExists("a/a1", false));
     QVERIFY(dir.fileExists("a/a1.txt", false));
-    RETURN_TYPE retEle =  //
+    RETURN_TYPE retEle = //
         FileOperation::rmFolderForce(workPath, "a");
     auto aBatch = retEle.cmds;
     QCOMPARE(retEle.ret, ErrorCode::OK);
-    QVERIFY(!dir.dirExists("a"));  // deleted
-    QVERIFY(aBatch.isEmpty());     // remove cannot be recover
+    QVERIFY(!dir.dirExists("a")); // deleted
+    QVERIFY(aBatch.isEmpty());    // remove cannot be recover
   }
 
   void test_file_to_trashbin_and_undo_ok() {
@@ -224,7 +225,7 @@ class FileOperationTest : public PlainTestSuite {
 
     const QString workPath{dir.path()};
 
-    RETURN_TYPE retEle =  //
+    RETURN_TYPE retEle = //
         FileOperation::cpfile(workPath, existFile, QString("%1/b").arg(workPath));
     auto ret = retEle.ret;
     auto aBatch = retEle.cmds;
@@ -256,8 +257,9 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(!dir.exists(QString("b/%1").arg(relativeExistFile)));
 
     const QString workPath{dir.path()};
-    RETURN_TYPE retEle =                                    //
-        FileOperation::cpfile(workPath, relativeExistFile,  //
+    RETURN_TYPE retEle = //
+        FileOperation::cpfile(workPath,
+                              relativeExistFile, //
                               QString("%1/b").arg(workPath));
     const auto& aBatch = retEle.cmds;
 
@@ -286,8 +288,9 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(!dir.fileExists(QString("b/%1").arg(inexistFileName), false));
 
     const QString workPath{dir.path()};
-    RETURN_TYPE retEle =                                  //
-        FileOperation::cpfile(workPath, inexistFileName,  //
+    RETURN_TYPE retEle = //
+        FileOperation::cpfile(workPath,
+                              inexistFileName, //
                               QString("%1/b").arg(workPath));
     const auto& aBatch = retEle.cmds;
 
@@ -312,7 +315,7 @@ class FileOperationTest : public PlainTestSuite {
 
     QVERIFY(dir.exists("a.txt"));
     QVERIFY(dir.exists("a.txt.lnk"));
-    QVERIFY(!aBatch.isEmpty());  // can recover
+    QVERIFY(!aBatch.isEmpty()); // can recover
 
     const BATCH_COMMAND_LIST_TYPE reversedaBatch{aBatch.crbegin(), aBatch.crend()};
     const auto& exeRetEle = FileOperation::executer(reversedaBatch);
@@ -355,7 +358,7 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(dir.touch(lowerCaseName, "contents in a.txt"));
     QVERIFY2(dir.fileExists(lowerCaseName, true), "a.txt should exists");
     const QString workPath{dir.path()};
-    RETURN_TYPE retEle =  //
+    RETURN_TYPE retEle = //
         FileOperation::rename(workPath, lowerCaseName, upperCaseName);
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QCOMPARE(retEle.isRecoverable(), true);
@@ -557,13 +560,13 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(dir.fileExists("home/a.txt", false));
     QVERIFY(dir.fileExists("bin/A.TXT", false));
 
-#else  // in linux "a.txt" "A.TXT" exists in bin
+#else // in linux "a.txt" "A.TXT" exists in bin
     QCOMPARE(retEle.ret, ErrorCode::OK);
     QCOMPARE(retEle.isRecoverable(), true);
     QVERIFY(!dir.fileExists("home/a.txt", false));
 
     QDir binDir{dir.itemPath("bin")};
-    QCOMPARE(binDir.entryList(QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name),  //
+    QCOMPARE(binDir.entryList(QDir::Filter::Files | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::Name), //
              (QStringList{"A.TXT", "a.txt"}));
 #endif
   }
@@ -632,7 +635,8 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(dir.mkpath("b"));
 
     const QString mTestPath{dir.path()};
-    RETURN_TYPE retEle = FileOperation::cpdir(mTestPath, existFolder,  //
+    RETURN_TYPE retEle = FileOperation::cpdir(mTestPath,
+                                              existFolder, //
                                               QString("%1/b").arg(mTestPath));
     auto aBatch = retEle.cmds;
 
@@ -678,7 +682,7 @@ class FileOperationTest : public PlainTestSuite {
     QVERIFY(!dir.dirExists(QString("b/%1").arg(subDir), false));
     QVERIFY(!dir.fileExists(QString("b/%1").arg(subFile), false));
     const QString mTestPath{dir.path()};
-    RETURN_TYPE retEle =  //
+    RETURN_TYPE retEle = //
         FileOperation::cpdir(mTestPath, relativeExistFolder, QString("%1/b").arg(mTestPath));
 
     auto aBatch = retEle.cmds;
@@ -806,7 +810,7 @@ class FileOperationTest : public PlainTestSuite {
 
     RETURN_TYPE retEle = FileOperation::executer(aBatch);
     QCOMPARE(retEle.ret, ErrorCode::SRC_INEXIST);
-    QCOMPARE(retEle.cmds, expectEmptyRecoverCmds);  // recover commands should be empty
+    QCOMPARE(retEle.cmds, expectEmptyRecoverCmds); // recover commands should be empty
     QVERIFY(!dir.fileExists("nfilea", false));
     QVERIFY(!dir.fileExists("nfileb.txt", false));
     QVERIFY(dir.fileExists(existFile, false));
@@ -857,6 +861,76 @@ class FileOperationTest : public PlainTestSuite {
 
     SetReturnErrorCodeUponAnyFailureSw(false);
     QVERIFY(!IsReturnErrorCodeUponAnyFailureSw());
+  }
+
+  void except_branch_test() {
+    // 非法类型和参数
+    ACMD emptyCmd{FILE_OPERATOR_E::OPERATOR_BUTT, QStringList{}};
+    QVERIFY(emptyCmd.isEmpty());
+    BATCH_COMMAND_LIST_TYPE aBatch{emptyCmd};
+    RETURN_TYPE expectReturn{ErrorCode::OK, BATCH_COMMAND_LIST_TYPE{}};
+    QCOMPARE(FileOperation::executer(aBatch), expectReturn);
+
+    // 未指定文件
+    QCOMPARE(FileOperation::moveToTrash("", ""), expectReturn);
+    {
+      // 资源文件只可读
+      const QString iconPathInQrc{":/image_test/resolution_ratio"};
+      QVERIFY(QFile::exists(iconPathInQrc));
+      RETURN_TYPE expectUnknowReturn{ErrorCode::UNKNOWN_ERROR, BATCH_COMMAND_LIST_TYPE{}};
+      QCOMPARE(FileOperation::moveToTrash("", iconPathInQrc), expectUnknowReturn);
+    }
+
+    {
+      RETURN_TYPE expectNotMatchReturn{ErrorCode::OPERATION_PARMS_NOT_MATCH, {}};
+      QCOMPARE(FileOperation::rmFolderForceAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::rmpathAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::mkpathAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::rmfileAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::mkdirAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::rmdirAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::moveToTrashAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::renameAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::mvAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::cpfileAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::cpdirAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::touchAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::linkAgent({"", "", "", "", ""}), expectNotMatchReturn);
+      QCOMPARE(FileOperation::unlinkAgent({"", "", "", "", ""}), expectNotMatchReturn);
+    }
+
+    {
+      QCOMPARE(FileOperation::rmFolderForce("path/to", "AlreadyNotExistFolder"), expectReturn);
+      QCOMPARE(FileOperation::rmpath("path/to", "AlreadyNotExistFolder"), expectReturn);
+      QCOMPARE(FileOperation::rmfile("path/to", "AlreadyNotExistFile.txt"), expectReturn);
+
+      const QFileInfo fi{__FILE__};
+      const QString thisFileName{fi.fileName()};
+      const QString thisPrePath{fi.absolutePath()};
+      const QFileInfo parentFi{thisPrePath};
+      const QString prePath = parentFi.absolutePath();
+      const QString dirName = parentFi.fileName();
+      QVERIFY(parentFi.exists());
+      QVERIFY(parentFi.isDir());
+      QCOMPARE(FileOperation::mkdir(prePath, dirName), expectReturn);
+
+      QCOMPARE(FileOperation::rmdir("path/to", "AlreadyNotExistFolder"), expectReturn);
+
+      RETURN_TYPE expectSrcInexistReturn{ErrorCode::SRC_INEXIST, {}};
+      QCOMPARE(FileOperation::mv("path/to", "AlreadyNotExistFolder", thisPrePath), expectSrcInexistReturn);
+
+      RETURN_TYPE expectDstFileAlreadyExistReturn{ErrorCode::DST_FILE_ALREADY_EXIST, {}};
+      QCOMPARE(FileOperation::cpfile(thisPrePath, thisFileName, thisPrePath), expectDstFileAlreadyExistReturn);
+
+      RETURN_TYPE expectDstDirInexistReturn{ErrorCode::DST_DIR_INEXIST, {}};
+      QCOMPARE(FileOperation::cpdir(prePath, dirName, "dst/dir/Inexist"), expectDstDirInexistReturn);
+      QCOMPARE(FileOperation::cpdir(prePath, dirName, prePath), expectReturn); // pre == to
+
+      QCOMPARE(FileOperation::link("path/to", "AlreadyNotExistFolder", prePath), expectSrcInexistReturn);
+      QCOMPARE(FileOperation::link(prePath, dirName, "dst/dir/Inexist"), expectDstDirInexistReturn);
+
+      QCOMPARE(FileOperation::unlink(prePath, "AlreadyNotExistFolder", "path/from"), expectReturn);
+    }
   }
 };
 #include "FileOperationTest.moc"

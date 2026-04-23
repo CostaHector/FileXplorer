@@ -219,7 +219,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     slm.onDisableImageDecorationChanged(false);
     QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 1 image, but not exist, load failed
-    QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 0 image, use default from res.qrc
+    QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 0 image, use default from resources/images.qrc
 
     slm.onDisableImageDecorationChanged(true);
     QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), false);  // disabled
