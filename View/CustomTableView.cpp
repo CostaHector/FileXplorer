@@ -278,7 +278,7 @@ void CustomTableView::scrollContentsBy(int dx, int dy) {
 void CustomTableView::paintEvent(QPaintEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   // 0: no overlay needed, 255: no alpha Opacity needed
-  if (m_bgOverlayOpacity > 0) {
+  if (Q_LIKELY(m_bgOverlayOpacity > 0)) {
     QWidget* pViewport = viewport();
     QPainter painter{pViewport};
     painter.fillRect(pViewport->rect(), m_cachedColor);
