@@ -270,13 +270,15 @@ void CustomTableView::scrollContentsBy(int dx, int dy) {
 
 void CustomTableView::paintEvent(QPaintEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  QWidget* pViewport = viewport();
-
-  QColor baseColor = palette().color(QPalette::Base);
-  baseColor.setAlpha(m_bgOverlayOpacity);
-
-  QPainter painter{pViewport};
-  painter.fillRect(pViewport->rect(), baseColor);
-
+  // 0: no overlay needed, 255: no alpha Opacity needed
+  if (m_bgOverlayOpacity > 0) {
+    QColor baseColor = palette().color(QPalette::Base);
+    if (m_bgOverlayOpacity < 255) {
+      baseColor.setAlpha(m_bgOverlayOpacity);
+    }
+    QWidget* pViewport = viewport();
+    QPainter painter{pViewport};
+    painter.fillRect(pViewport->rect(), baseColor);
+  }
   QTableView::paintEvent(event);
 }
