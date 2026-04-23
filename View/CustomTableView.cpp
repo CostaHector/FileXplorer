@@ -39,8 +39,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setEditTriggers(QAbstractItemView::EditKeyPressed);
 
-  m_bgOverlayOpacity = Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, StyleKey::BACKGROUND_OVERLAY_OPACITY.v).toInt();
-
   {
     const QString textElideModeMenuName{GetName() + " " + CustomTableView::tr("Text elide mode")};
     _TEXT_ELIDE_MODE_MENU = new (std::nothrow) TextElideModeMenu{textElideModeMenuName, GetName(), this};
@@ -121,6 +119,9 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   SubscribeHeaderActions();
   RowHeightRegistry<CustomTableView>::registerWidgetForAdjust(this, true);
+
+  m_bgOverlayOpacity = Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, StyleKey::BACKGROUND_OVERLAY_OPACITY.v).toInt();
+  UpdateCachedColor();
 }
 
 CustomTableView::~CustomTableView() {
@@ -221,8 +222,14 @@ bool CustomTableView::SetBgOverlayOpacity() {
   }
   LOG_OK_P("Changed Background overlay opacity", "%d->%d", m_bgOverlayOpacity, newOpacity);
   m_bgOverlayOpacity = newOpacity;
+  UpdateCachedColor();
   Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, m_bgOverlayOpacity);
   return true;
+}
+
+void CustomTableView::UpdateCachedColor() {
+  m_cachedColor = palette().color(QPalette::Base);
+  m_cachedColor.setAlpha(m_bgOverlayOpacity);
 }
 
 void CustomTableView::InitTableView() {
@@ -272,13 +279,17 @@ void CustomTableView::paintEvent(QPaintEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   // 0: no overlay needed, 255: no alpha Opacity needed
   if (m_bgOverlayOpacity > 0) {
-    QColor baseColor = palette().color(QPalette::Base);
-    if (m_bgOverlayOpacity < 255) {
-      baseColor.setAlpha(m_bgOverlayOpacity);
-    }
     QWidget* pViewport = viewport();
     QPainter painter{pViewport};
-    painter.fillRect(pViewport->rect(), baseColor);
+    painter.fillRect(pViewport->rect(), m_cachedColor);
   }
   QTableView::paintEvent(event);
+}
+
+void CustomTableView::changeEvent(QEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  QTableView::changeEvent(event);
+  if (event->type() == QEvent::PaletteChange) {
+    UpdateCachedColor();
+  }
 }

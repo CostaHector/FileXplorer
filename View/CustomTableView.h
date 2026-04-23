@@ -34,12 +34,14 @@ class CustomTableView : public QTableView {
   virtual void initExclusivePreferenceSetting() {}
   bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true};
   void paintEvent(QPaintEvent *event) override;
+  void changeEvent(QEvent* event) override;
 
  private:
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
   bool ShowOrHideColumnCore();
   bool SetBgOverlayOpacity();
+  void UpdateCachedColor();
 
   const QString m_name;
 
@@ -64,6 +66,7 @@ class CustomTableView : public QTableView {
   AddableMenu* m_menu{nullptr};
 
   int m_bgOverlayOpacity{255};
+  QColor m_cachedColor;
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }
   static QSet<QString> mTableInstSet;
