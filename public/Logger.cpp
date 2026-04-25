@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "FileTool.h"

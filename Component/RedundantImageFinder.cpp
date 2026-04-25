@@ -4,6 +4,7 @@
 #include "RedundantImageFinderActions.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "PublicMacro.h"
@@ -22,7 +23,7 @@ RedundantImageFinder::RedundantImageFinder(QWidget* parent) //
   : QMainWindow{parent}                                     //
 {
   mResultAlsoContainEmptyImage
-      = Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool();
+      = Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.toVariant()).toBool();
 
   auto& redunInst = g_redunImgFinderAg();
   QMenu* findByMenu = new (std::nothrow) QMenu{"Find by Menu", this};

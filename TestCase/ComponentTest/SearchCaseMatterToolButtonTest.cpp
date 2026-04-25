@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "SearchCaseMatterToolButton.h"
 #include "EndToExposePrivateMember.h"
@@ -28,8 +29,8 @@ private slots:
 
   void test_initialState() {
     SearchCaseMatterToolButton btn;
-    QCOMPARE(SearchKey::NAME_CASE_SENSITIVE.v, false);
-    QCOMPARE(SearchKey::CONTENTS_CASE_SENSITIVE.v, false);
+    QCOMPARE(SearchKey::NAME_CASE_SENSITIVE.v.data.b, false);
+    QCOMPARE(SearchKey::CONTENTS_CASE_SENSITIVE.v.data.b, false);
     QCOMPARE(btn.curNameCaseSensitive(), Qt::CaseInsensitive);
     QCOMPARE(btn.curContentCaseSensitive(), Qt::CaseInsensitive);
   }

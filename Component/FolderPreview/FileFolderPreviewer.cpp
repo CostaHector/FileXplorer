@@ -2,6 +2,7 @@
 #include "CastBrowserHelper.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include <QIcon>
 #include <QFileInfo>

@@ -1,5 +1,6 @@
 ﻿#include "SearchModeToolButton.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include <QMenu>
 
 SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent} {

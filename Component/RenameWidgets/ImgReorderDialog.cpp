@@ -1,5 +1,6 @@
 #include "ImgReorderDialog.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "PublicMacro.h"
 #include <QDialogButtonBox>

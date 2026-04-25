@@ -3,6 +3,7 @@
 #include <QSignalSpy>
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "InteractiveVideoWidget.h"
 #include "EndToExposePrivateMember.h"

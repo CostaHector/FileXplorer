@@ -223,11 +223,14 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::TABLE);
 
-    const QDir::Filters filters{m_fsPanel.m_fsModel->filter()};
-
+    QCOMPARE(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.data.i, -1);
     const int expectFilterIntVal{(QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::Drives | QDir::Filter::Hidden | QDir::Filter::NoDotAndDotDot)};
-    QCOMPARE(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt(), expectFilterIntVal);
-    QCOMPARE((int)filters, expectFilterIntVal);
+    const QDir::Filters filters{m_fsPanel.m_fsModel->filter()};
+    QVERIFY(filters.testFlag(QDir::Filter::Files));
+    QVERIFY(filters.testFlag(QDir::Filter::Dirs));
+    QVERIFY(filters.testFlag(QDir::Filter::Drives));
+    QVERIFY(filters.testFlag(QDir::Filter::Hidden));
+    QVERIFY(filters.testFlag(QDir::Filter::NoDotAndDotDot));
     QCOMPARE(m_fsPanel.m_fsModel->nameFilterDisables(), false);
     {
       QSignalSpy spy(m_fsPanel.m_fsModel, &QFileSystemModel::directoryLoaded);

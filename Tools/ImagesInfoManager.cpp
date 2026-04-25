@@ -3,6 +3,7 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include <QDirIterator>
 
@@ -11,7 +12,7 @@ template class SingletonManager<ImagesInfoManager, IMG_INFO_DATA_T>;
 using namespace DuplicateImageMetaInfo;
 
 QString ImagesInfoManager::GetDynRedunPath() {
-  return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.v).toString();
+  return Configuration().value(RedunImgFinderKey::RUND_IMG_PATH.name, RedunImgFinderKey::RUND_IMG_PATH.toVariant()).toString();
 }
 
 ImagesInfoManager::ImagesInfoManager() {

@@ -1,5 +1,6 @@
 ﻿#include "RenameWidget_Numerize.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "RenameHelper.h"
@@ -13,49 +14,45 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
   m_dragToReorderNames = new (std::nothrow) QAction{QIcon{":img/RENAME_REORDER_LISTVIEW"}, tr("Sort by dragging"), this};
   CHECK_NULLPTR_RETURN_VOID(m_dragToReorderNames);
   m_dragToReorderNames->setShortcut(QKeySequence{Qt::Key_F2});
-  m_dragToReorderNames->setToolTip(QString{"<b>%1 (%2)</b><br/>Drag-and-drop to reorder name sequence in list view"}.arg(
-      m_dragToReorderNames->text(), m_dragToReorderNames->shortcut().toString()));
+  m_dragToReorderNames->setToolTip(QString{"<b>%1 (%2)</b><br/>Drag-and-drop to reorder name sequence in list view"}.arg(m_dragToReorderNames->text(), m_dragToReorderNames->shortcut().toString()));
 
   m_completeBaseName = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(m_completeBaseName)
   m_completeBaseName->setClearButtonEnabled(true);
 
-  m_startNo = new (std::nothrow) QComboBox{this};  // "0"
+  m_startNo = new (std::nothrow) QComboBox{this}; // "0"
   CHECK_NULLPTR_RETURN_VOID(m_startNo);
   m_startNo->setEditable(true);
   m_startNo->setDuplicatesEnabled(false);
   m_startNo->setToolTip("Starting no for the sequence");
-  m_startNo->addItems({"0", "260"});
+  m_startNo->addItems({"0", "1", "10", "100", "-10", "-100"});
 
   m_isUniqueCounterPerExtension = new (std::nothrow) QCheckBox{tr("Extension Unique Counter"), this};
   CHECK_NULLPTR_RETURN_VOID(m_isUniqueCounterPerExtension);
-  m_isUniqueCounterPerExtension->setToolTip(
-      "Controls whether file renaming uses a shared counter across extensions:\n"
-      "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
-      "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
-      "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
-  const bool uniqueCnter{
-      Configuration().value(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.v).toBool()};
+  m_isUniqueCounterPerExtension->setToolTip("Controls whether file renaming uses a shared counter across extensions:\n"
+                                            "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
+                                            "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
+                                            "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
+  const bool uniqueCnter{Configuration().value(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.toVariant()).toBool()};
   m_isUniqueCounterPerExtension->setChecked(uniqueCnter);
 
-  m_numberPattern = new (std::nothrow) QComboBox{this};  // " - %1"
+  m_numberPattern = new (std::nothrow) QComboBox{this}; // " - %1"
   CHECK_NULLPTR_RETURN_VOID(m_numberPattern)
   m_numberPattern->setEditable(true);
   m_numberPattern->setDuplicatesEnabled(false);
   m_numberPattern->setMaximumWidth(60);
-  const QStringList& noFormatCandidate{
-      Configuration().value(RenamerKey::NUMERIAZER_NO_FORMAT.name, RenamerKey::NUMERIAZER_NO_FORMAT.v).toStringList()};
-  m_numberPattern->addItems(noFormatCandidate);
-
-  const int noFormatDefaultIndex =
-      Configuration()
-          .value(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.v)
-          .toInt();
-  if (noFormatDefaultIndex < 0 && noFormatDefaultIndex >= noFormatCandidate.size()) {
-    LOG_W("number[%d] pattern out of bound[%d, %d)", noFormatDefaultIndex, 0, noFormatCandidate.size());
-  } else {
-    m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
+  const QStringList& noFormatCandidate{MultiLineStr2StrList(RenamerKey::NUMERIAZER_NO_FORMAT)};
+  if (noFormatCandidate.isEmpty()) {
+    return;
   }
+
+  int noFormatDefaultIndex = Configuration().value(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.toVariant()).toInt();
+  if (noFormatDefaultIndex < 0 || noFormatDefaultIndex >= noFormatCandidate.size()) {
+    LOG_W("number pattern[%d] out of bound[%d, %d) fallback to 0", noFormatDefaultIndex, 0, noFormatCandidate.size());
+    noFormatDefaultIndex = 0;
+  }
+  m_numberPattern->addItems(noFormatCandidate);
+  m_numberPattern->setCurrentIndex(noFormatDefaultIndex);
 }
 
 void RenameWidget_Numerize::InitExtraCommonVariable() {

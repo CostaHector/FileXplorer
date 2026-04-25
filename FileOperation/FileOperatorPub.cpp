@@ -1,5 +1,6 @@
 ﻿#include "FileOperatorPub.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 namespace FileOperatorType {
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs) {
@@ -8,7 +9,7 @@ BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_T
 
 bool g_bReturnErrorCodeUponAnyFailure = true;
 void InitReturnErrorCodeUponAnyFailureSw() {
-  g_bReturnErrorCodeUponAnyFailure = Configuration().value(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.v).toBool();
+  g_bReturnErrorCodeUponAnyFailure = Configuration().value(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.toVariant()).toBool();
 }
 
 bool IsReturnErrorCodeUponAnyFailureSw() {

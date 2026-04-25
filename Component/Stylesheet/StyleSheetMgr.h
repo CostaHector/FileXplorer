@@ -10,6 +10,7 @@
 class StyleSheetMgr : public QDialog {
 public:
   explicit StyleSheetMgr(QWidget* parent = nullptr);
+  ~StyleSheetMgr();
   void seeChanges();
 
 protected:
@@ -18,10 +19,12 @@ protected:
 private:
   void subscribe();
   void onStartFilter();
+  void initStyleSheetPreview();
   QWidget* GetEffectPreviewer();
   void onApplyChanges();
 
   QLineEdit* m_searchLineEdit{nullptr};
+  QAction *m_autoInitPreviewWindow{nullptr}, *m_initPreviewWindow{nullptr};
   QVBoxLayout* m_layout{nullptr};
   StyleSheetTreeView* m_styleSheetView{nullptr};
   QSplitter* m_spiltter{nullptr};

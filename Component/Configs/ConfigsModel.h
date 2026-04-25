@@ -7,16 +7,19 @@ class KV;
 
 class ConfigsModel : public QAbstractTableModel {
 public:
-  enum DataType {
+  enum ColumnE {
     NAME = 0,
     INITIAL_VALUE = 1,
     CURRENT_VALUE = 2,
+    VALIDATIDATION_VALUE = 3,
+    COLUMNS_COUNT,
+    DATA_TYPE_ROLE = Qt::UserRole + 1,
   };
 
   using QAbstractTableModel::QAbstractTableModel;
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override;
-  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return CONFIGS_TABLE_HEADER.size(); }
+  int columnCount(const QModelIndex& /*parent*/ = {}) const override { return ColumnE::COLUMNS_COUNT; }
   int failCount() const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
@@ -38,15 +41,18 @@ public:
   }
 
   Qt::ItemFlags flags(const QModelIndex& index) const override {
-    if (index.column() == CURRENT_VALUE) {
+    if (index.column() == EDITABLE_COLUMN) {
       return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
     }
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
 
+  bool isPath(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
+
   static bool isCfgPass(const QSettings& curCfg, const KV& record);
 
+  static constexpr int EDITABLE_COLUMN = ColumnE::CURRENT_VALUE;
 private:
   static const QStringList CONFIGS_TABLE_HEADER;
 };

@@ -4,6 +4,7 @@
 #include "FdBasedDb.h"
 #include "CastBaseDb.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "JsonRenameRegex.h"
 #include "PublicVariable.h"
@@ -30,10 +31,10 @@ const QString ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT = "[
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
     : QTextBrowser{parent} {
   mCastVideosVisisble = Configuration()
-                            .value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.v)
+                            .value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.toVariant())
                             .toBool();
   mCastImagesVisisble = Configuration()
-                            .value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.v)
+                            .value(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.toVariant())
                             .toBool();
   setOpenLinks(false);
   setOpenExternalLinks(true);

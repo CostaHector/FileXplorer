@@ -1,6 +1,7 @@
 #include "CustomListView.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "ImageTool.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"

@@ -23,6 +23,7 @@
 #include "SizeChangeAnimation.h"
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
 #include <QTimer>
@@ -62,7 +63,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
                                   .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
   _EXPAND_RIBBONS->setCheckable(true);
   _EXPAND_RIBBONS->setChecked(
-      Configuration().value(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.v).toBool());
+      Configuration().value(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.toVariant()).toBool());
   m_corner = GetMenuRibbonCornerWid();
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -410,7 +411,7 @@ void RibbonMenu::Subscribe() {
 }
 
 void RibbonMenu::AfterSubscribeInitialSettings() {
-  setCurrentIndex(Configuration().value(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.v).toInt());
+  setCurrentIndex(Configuration().value(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.toVariant()).toInt());
   QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
 }
 

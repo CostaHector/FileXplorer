@@ -5,13 +5,26 @@
 #include "StyleItemData.h"
 #include "EndToExposePrivateMember.h"
 
+#include "PublicVariable.h"
+#include "Configuration.h"
 #include <QHash>
 
 class StyleItemDataTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void initTestCase() {  //
+public:
+  const QFileInfo curFile{__FILE__};
+  const QString curFilePath{curFile.absoluteFilePath()};
+  const QString curFolderPath{curFile.absolutePath()};
+  const QString otherFilePath{Configuration().fileName()};
+  const QString otherFolderPath{SystemPath::HOME_PATH()};
+
+private slots:
+  void initTestCase() { //
+    QVERIFY(QFile::exists(curFilePath));
+    QVERIFY(QFile::exists(curFolderPath));
+    QVERIFY(QFile::exists(otherFilePath)); // precondition must exists
+    QVERIFY(QFile::exists(otherFolderPath));
+
     QVERIFY(StyleItemData::COLUMN_COUNT > 0);
     constexpr int elementCntInHorArray{sizeof(StyleItemData::HOR_HEADER_TITLES) / sizeof(StyleItemData::HOR_HEADER_TITLES[0])};
     QCOMPARE(elementCntInHorArray, StyleItemData::COLUMN_COUNT);
@@ -44,11 +57,11 @@ class StyleItemDataTest : public PlainTestSuite {
     QCOMPARE(group.match("randomText", Qt::CaseInsensitive), false);
     QCOMPARE(group.match("randomText", Qt::CaseSensitive), false);
 
-    StyleItemData numberNode{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER};
-    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
-    StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, StyleItemData::DataTypeE::FONT_STYLE};
-    StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT};
-    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
+    StyleItemData numberNode{"RowHeight", 30, 60, GeneralDataType::Type::PLAIN_INT};
+    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", GeneralDataType::Type::FONT_FAMILY};
+    StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, GeneralDataType::Type::FONT_STYLE};
+    StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, GeneralDataType::Type::FONT_WEIGHT};
+    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", GeneralDataType::Type::COLOR};
 
     QCOMPARE(numberNode.match(30), true);
     QCOMPARE(numberNode.match(60), true);
@@ -104,29 +117,36 @@ class StyleItemDataTest : public PlainTestSuite {
     QVERIFY(!def.modifiedColorTo("ABC"));
     QVERIFY(!group.modifiedColorTo("ABC"));
 
-    StyleItemData numberNode{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER};
-    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
-    StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, StyleItemData::DataTypeE::FONT_STYLE};
-    StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT};
-    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
-    StyleItemData fileNode{"ImageFile", ":/imgDef", ":/imgCur", StyleItemData::DataTypeE::FILE_PATH};
+    StyleItemData numberNode{"RowHeight", 30, 60, GeneralDataType::Type::PLAIN_INT};
+    StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", GeneralDataType::Type::FONT_FAMILY};
+    StyleItemData styleIntNode{"FontStyle", QFont::Style::StyleNormal, QFont::Style::StyleItalic, GeneralDataType::Type::FONT_STYLE};
+    StyleItemData weightIntNode{"FontWeight", QFont::Weight::Normal, QFont::Weight::Bold, GeneralDataType::Type::FONT_WEIGHT};
+    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", GeneralDataType::Type::COLOR};
+    StyleItemData fileNode{"MustExistFile", curFilePath, curFilePath, GeneralDataType::Type::FILE_PATH};
+    StyleItemData imgOptionalNode{"ImageOptional", ":/DefImg", ":/CurImg", GeneralDataType::Type::IMAGE_PATH_OPTIONAL};
+    StyleItemData folderNode{"MustExistFolder", curFolderPath, curFolderPath, GeneralDataType::Type::FOLDER_PATH};
+    StyleItemData boolNode{"boolNode", false, true, GeneralDataType::Type::PLAIN_BOOL};
+
     QVERIFY(!numberNode.isNeedApplyChange());
     QVERIFY(!stringNode.isNeedApplyChange());
     QVERIFY(!styleIntNode.isNeedApplyChange());
     QVERIFY(!weightIntNode.isNeedApplyChange());
     QVERIFY(!colorNode.isNeedApplyChange());
     QVERIFY(!fileNode.isNeedApplyChange());
+    QVERIFY(!imgOptionalNode.isNeedApplyChange());
+    QVERIFY(!folderNode.isNeedApplyChange());
+    QVERIFY(!boolNode.isNeedApplyChange());
 
     {
       // 数值类型且无下拉框候选, 返回QVariant{"123"}, 预期正确处理 ok
-      {  // precondition
+      { // precondition
         bool bVarString2Int{true};
         QCOMPARE((QVariant{"123"}.toInt(&bVarString2Int)), 123);
         QVERIFY(bVarString2Int);
 
         bool bVarDouble2Int{true};
         QCOMPARE((QVariant{3.14}.toInt(&bVarDouble2Int)), 3);
-        QVERIFY(bVarDouble2Int);  // 这里居然可以
+        QVERIFY(bVarDouble2Int); // 这里居然可以
 
         bool bVarStringDouble2Int{true};
         QCOMPARE(QVariant{"3.14"}.toInt(&bVarStringDouble2Int), 0);
@@ -142,19 +162,19 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(numberNode.isNeedApplyChange());
 
       newNumberAccepted = false;
-      QVERIFY(!numberNode.modifyValueTo("48", newNumberAccepted));  // unchange
+      QVERIFY(!numberNode.modifyValueTo("48", newNumberAccepted)); // unchange
       QVERIFY(newNumberAccepted);
       QCOMPARE(numberNode.modifiedToValue, 48);
       QVERIFY(numberNode.isNeedApplyChange());
 
       newNumberAccepted = true;
-      QVERIFY(!numberNode.modifyValueTo("58.9", newNumberAccepted));  // double cannot convert
+      QVERIFY(!numberNode.modifyValueTo("58.9", newNumberAccepted)); // double cannot convert
       QVERIFY(!newNumberAccepted);
       QCOMPARE(numberNode.modifiedToValue, 48);
       QVERIFY(numberNode.isNeedApplyChange());
 
       newNumberAccepted = true;
-      QVERIFY(!numberNode.modifyValueTo("CannotConvertToNumber", newNumberAccepted));  // cannot convert QVariant{"string"}.toInt()
+      QVERIFY(!numberNode.modifyValueTo("CannotConvertToNumber", newNumberAccepted)); // cannot convert QVariant{"string"}.toInt()
       QVERIFY(!newNumberAccepted);
       QCOMPARE(numberNode.modifiedToValue, 48);
       QVERIFY(numberNode.isNeedApplyChange());
@@ -167,7 +187,7 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(numberNode.isNeedApplyChange());
     }
 
-    {  // 枚举数值类型且有下拉框候选, 返回QVariant{123}, 预期正确处理 ok
+    { // 枚举数值类型且有下拉框候选, 返回QVariant{123}, 预期正确处理 ok
       QCOMPARE(weightIntNode.modifiedToValue, (QVariant()));
       QVERIFY(!weightIntNode.isNeedApplyChange());
 
@@ -178,13 +198,13 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(weightIntNode.isNeedApplyChange());
 
       newNumberAccepted = false;
-      QVERIFY(!weightIntNode.modifyValueTo(123, newNumberAccepted));  // unchange
+      QVERIFY(!weightIntNode.modifyValueTo(123, newNumberAccepted)); // unchange
       QVERIFY(newNumberAccepted);
       QCOMPARE(weightIntNode.modifiedToValue, 123);
       QVERIFY(weightIntNode.isNeedApplyChange());
     }
 
-    {  // string ok, 且由下拉框返回标准项
+    { // string ok, 且由下拉框返回标准项
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
       QVERIFY(!stringNode.isNeedApplyChange());
 
@@ -194,7 +214,7 @@ class StyleItemDataTest : public PlainTestSuite {
       QCOMPARE(stringNode.modifiedToValue, "Arial");
       QVERIFY(stringNode.isNeedApplyChange());
 
-      QVERIFY(!stringNode.modifyValueTo("Arial", newFontFamilyStrAccepted));  // unchange
+      QVERIFY(!stringNode.modifyValueTo("Arial", newFontFamilyStrAccepted)); // unchange
       QVERIFY(newFontFamilyStrAccepted);
       QCOMPARE(stringNode.modifiedToValue, "Arial");
       QVERIFY(stringNode.isNeedApplyChange());
@@ -207,7 +227,7 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(!stringNode.isNeedApplyChange());
     }
 
-    {  // color ok
+    { // color ok
       QCOMPARE(colorNode.modifiedToValue, (QVariant()));
       QVERIFY(!colorNode.isNeedApplyChange());
 
@@ -218,7 +238,7 @@ class StyleItemDataTest : public PlainTestSuite {
       QVERIFY(colorNode.isNeedApplyChange());
 
       newColorStrAccepted = false;
-      QVERIFY(!colorNode.modifyValueTo("#FF0000", newColorStrAccepted));  // unchange
+      QVERIFY(!colorNode.modifyValueTo("#FF0000", newColorStrAccepted)); // unchange
       QVERIFY(newColorStrAccepted);
       QCOMPARE(colorNode.modifiedToValue, "#FF0000");
       QVERIFY(colorNode.isNeedApplyChange());
@@ -234,105 +254,205 @@ class StyleItemDataTest : public PlainTestSuite {
     { // file ok
       QCOMPARE(fileNode.modifiedToValue, (QVariant()));
       QVERIFY(!fileNode.isNeedApplyChange());
-      // 存在 -> 接受, 修改
+      // 存在且之前是初始值 -> (接受, 有修改)
       bool newFileStrAccepted = false;
-      QVERIFY(fileNode.modifyValueTo(__FILE__, newFileStrAccepted));
+      QVERIFY(fileNode.modifyValueTo(otherFilePath, newFileStrAccepted));
       QVERIFY(newFileStrAccepted);
-      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QCOMPARE(fileNode.modifiedToValue, otherFilePath);
       QVERIFY(fileNode.isNeedApplyChange());
 
-      // 不变 -> 接受, 不修改
+      // 存在但和之前已知, -> (接受, 不修改)
       newFileStrAccepted = false;
-      QVERIFY(!fileNode.modifyValueTo(__FILE__, newFileStrAccepted));  // unchange
+      QVERIFY(!fileNode.modifyValueTo(otherFilePath, newFileStrAccepted)); // unchange
       QVERIFY(newFileStrAccepted);
-      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QCOMPARE(fileNode.modifiedToValue, otherFilePath);
       QVERIFY(fileNode.isNeedApplyChange());
 
-      // 不存在的文件 -> 不接受, 不修改
+      // 不存在的文件 -> (不接受, 不修改)
       newFileStrAccepted = true;
       QVERIFY(!fileNode.modifyValueTo("inexist/file/path", newFileStrAccepted));
       QVERIFY(!newFileStrAccepted);
-      QCOMPARE(fileNode.modifiedToValue, __FILE__);
+      QCOMPARE(fileNode.modifiedToValue, otherFilePath);
       QVERIFY(fileNode.isNeedApplyChange());
+
+      // 存在, 但是是文件夹 类型不一致 -> (不接受, 不修改)
+      newFileStrAccepted = true;
+      QVERIFY(!fileNode.modifyValueTo(otherFolderPath, newFileStrAccepted));
+      QVERIFY(!newFileStrAccepted);
+      QCOMPARE(fileNode.modifiedToValue, otherFilePath);
+      QVERIFY(fileNode.isNeedApplyChange());
+    }
+
+
+    { // imgOptionalNode ok
+      QCOMPARE(imgOptionalNode.modifiedToValue, (QVariant()));
+      QVERIFY(!imgOptionalNode.isNeedApplyChange());
+      // 存在且之前是初始值 -> (接受, 有修改)
+      bool newImgOptStrAccepted = false;
+      QVERIFY(imgOptionalNode.modifyValueTo(otherFilePath, newImgOptStrAccepted));
+      QVERIFY(newImgOptStrAccepted);
+      QCOMPARE(imgOptionalNode.modifiedToValue, otherFilePath);
+      QVERIFY(imgOptionalNode.isNeedApplyChange());
+
+      // 存在但和之前已知, -> (接受, 不修改)
+      newImgOptStrAccepted = false;
+      QVERIFY(!imgOptionalNode.modifyValueTo(otherFilePath, newImgOptStrAccepted)); // unchange
+      QVERIFY(newImgOptStrAccepted);
+      QCOMPARE(imgOptionalNode.modifiedToValue, otherFilePath);
+      QVERIFY(imgOptionalNode.isNeedApplyChange());
+
+      // 不存在的文件 -> (不接受, 不修改)
+      newImgOptStrAccepted = true;
+      QVERIFY(!imgOptionalNode.modifyValueTo("inexist/file/path", newImgOptStrAccepted));
+      QVERIFY(!newImgOptStrAccepted);
+      QCOMPARE(imgOptionalNode.modifiedToValue, otherFilePath);
+      QVERIFY(imgOptionalNode.isNeedApplyChange());
+
+      // 存在, 但是是文件夹 类型不一致 -> (不接受, 不修改)
+      newImgOptStrAccepted = true;
+      QVERIFY(!imgOptionalNode.modifyValueTo(otherFolderPath, newImgOptStrAccepted));
+      QVERIFY(!newImgOptStrAccepted);
+      QCOMPARE(imgOptionalNode.modifiedToValue, otherFilePath);
+      QVERIFY(imgOptionalNode.isNeedApplyChange());
+
+      // "", 接受空字符串且之前非空 (接受, 有修改)
+      newImgOptStrAccepted = false;
+      QVERIFY(imgOptionalNode.modifyValueTo("", newImgOptStrAccepted));
+      QVERIFY(newImgOptStrAccepted);
+      QCOMPARE(imgOptionalNode.modifiedToValue, (QVariant{}));
+      QVERIFY(!imgOptionalNode.isNeedApplyChange());
+    }
+
+    { // folder ok
+      QCOMPARE(folderNode.modifiedToValue, (QVariant()));
+      QVERIFY(!folderNode.isNeedApplyChange());
+      // 存在且之前是初始值 -> (接受, 有修改)
+      bool newFolderStrAccepted = false;
+      QVERIFY(folderNode.modifyValueTo(otherFolderPath, newFolderStrAccepted));
+      QVERIFY(newFolderStrAccepted);
+      QCOMPARE(folderNode.modifiedToValue, otherFolderPath);
+      QVERIFY(folderNode.isNeedApplyChange());
+
+      // 存在但和之前已知, -> (接受, 不修改)
+      newFolderStrAccepted = false;
+      QVERIFY(!folderNode.modifyValueTo(otherFolderPath, newFolderStrAccepted)); // unchange
+      QVERIFY(newFolderStrAccepted);
+      QCOMPARE(folderNode.modifiedToValue, otherFolderPath);
+      QVERIFY(folderNode.isNeedApplyChange());
+
+      // 不存在的文件夹 -> (不接受, 不修改)
+      newFolderStrAccepted = true;
+      QVERIFY(!folderNode.modifyValueTo("inexist/folder/path", newFolderStrAccepted));
+      QVERIFY(!newFolderStrAccepted);
+      QCOMPARE(folderNode.modifiedToValue, otherFolderPath);
+      QVERIFY(folderNode.isNeedApplyChange());
+
+      // 存在, 但是是文件 类型不一致 -> (不接受, 不修改)
+      newFolderStrAccepted = true;
+      QVERIFY(!folderNode.modifyValueTo(otherFilePath, newFolderStrAccepted));
+      QVERIFY(!newFolderStrAccepted);
+      QCOMPARE(folderNode.modifiedToValue, otherFolderPath);
+      QVERIFY(folderNode.isNeedApplyChange());
+    }
+
+    {
+      // boolNode ok
+      QCOMPARE(boolNode.modifiedToValue, (QVariant()));
+      QVERIFY(!boolNode.isNeedApplyChange());
+
+      // 初始值->false (accept, changed)
+      bool newNumberAccepted = false;
+      QVERIFY(weightIntNode.modifyValueTo(false, newNumberAccepted));
+      QVERIFY(newNumberAccepted);
+
+      // false->false (accept, not changed)
+      newNumberAccepted = false;
+      QVERIFY(!weightIntNode.modifyValueTo(false, newNumberAccepted));
+      QVERIFY(newNumberAccepted);
+
+      // false->true (accept, changed)
+      newNumberAccepted = false;
+      QVERIFY(weightIntNode.modifyValueTo(true, newNumberAccepted));
+      QVERIFY(newNumberAccepted);
     }
   }
 
   void modifiedColorTo_ok() {
     StyleItemData def;
     StyleItemData group{"groupName"};
-    QVERIFY(!def.modifiedColorTo("#FF01234"));  // group no need modifiedColorTo
+    QVERIFY(!def.modifiedColorTo("#FF01234")); // group no need modifiedColorTo
     QCOMPARE(def.modifiedToValue, (QVariant()));
-    QVERIFY(!group.modifiedColorTo("#FF01234"));  // group no need modifiedColorTo
+    QVERIFY(!group.modifiedColorTo("#FF01234")); // group no need modifiedColorTo
     QCOMPARE(group.modifiedToValue, (QVariant()));
 
-    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", StyleItemData::DataTypeE::COLOR};
+    StyleItemData colorNode{"ForegroundColor", "#FFFFFF", "#000000", GeneralDataType::Type::COLOR};
     QCOMPARE(colorNode.modifiedToValue, (QVariant()));
 
     QVERIFY(colorNode.modifiedColorTo("#FF0000"));
-    QVERIFY(!colorNode.modifiedColorTo("#FF0000"));  // unchange
+    QVERIFY(!colorNode.modifiedColorTo("#FF0000")); // unchange
 
     QVERIFY(colorNode.recoverToBackup());
     QCOMPARE(colorNode.modifiedToValue, "#000000");
 
-    QVERIFY(!colorNode.recoverToBackup());  // no need recover again
+    QVERIFY(!colorNode.recoverToBackup()); // no need recover again
     QCOMPARE(colorNode.modifiedToValue, "#000000");
 
     QVERIFY(colorNode.invalidateNewValue());
     QCOMPARE(colorNode.modifiedToValue, (QVariant()));
-    QVERIFY(!colorNode.invalidateNewValue());  // no need invalidateNewValue again
+    QVERIFY(!colorNode.invalidateNewValue()); // no need invalidateNewValue again
     QCOMPARE(colorNode.modifiedToValue, (QVariant()));
 
     QVERIFY(colorNode.recoverToDefault());
     QCOMPARE(colorNode.modifiedToValue, "#FFFFFF");
-    QVERIFY(!colorNode.recoverToDefault());  // no need recover again
+    QVERIFY(!colorNode.recoverToDefault()); // no need recover again
     QCOMPARE(colorNode.modifiedToValue, "#FFFFFF");
   }
 
   void recoverToBackup_invalidateNewValue_ok() {
     StyleItemData def;
     StyleItemData group{"groupName"};
-    QVERIFY(!def.recoverToBackup());  // group no need recover/invalidate
+    QVERIFY(!def.recoverToBackup()); // group no need recover/invalidate
     QVERIFY(!def.invalidateNewValue());
-    QVERIFY(!group.recoverToBackup());  // group no need recover/invalidate
+    QVERIFY(!group.recoverToBackup()); // group no need recover/invalidate
     QVERIFY(!group.invalidateNewValue());
 
-    {  // 数值类型
-      StyleItemData numberNode{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER};
+    { // 数值类型
+      StyleItemData numberNode{"RowHeight", 30, 60, GeneralDataType::Type::PLAIN_INT};
       QCOMPARE(numberNode.modifiedToValue, (QVariant()));
 
       QVERIFY(numberNode.recoverToBackup());
       QCOMPARE(numberNode.modifiedToValue, 60);
-      QVERIFY(!numberNode.recoverToBackup());  // no need recover again
+      QVERIFY(!numberNode.recoverToBackup()); // no need recover again
       QCOMPARE(numberNode.modifiedToValue, 60);
 
       QVERIFY(numberNode.invalidateNewValue());
       QCOMPARE(numberNode.modifiedToValue, (QVariant()));
-      QVERIFY(!numberNode.invalidateNewValue());  // no need invalidate again
+      QVERIFY(!numberNode.invalidateNewValue()); // no need invalidate again
       QCOMPARE(numberNode.modifiedToValue, (QVariant()));
 
       QVERIFY(numberNode.recoverToDefault());
       QCOMPARE(numberNode.modifiedToValue, 30);
-      QVERIFY(!numberNode.recoverToDefault());  // no need recover again
+      QVERIFY(!numberNode.recoverToDefault()); // no need recover again
       QCOMPARE(numberNode.modifiedToValue, 30);
     }
 
-    {  // 字符串类型
-      StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY};
+    { // 字符串类型
+      StyleItemData stringNode{"FontFamily", "Microsoft YaHei UI", "Noto Sans", GeneralDataType::Type::FONT_FAMILY};
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
 
       QVERIFY(stringNode.recoverToBackup());
       QCOMPARE(stringNode.modifiedToValue, "Noto Sans");
-      QVERIFY(!stringNode.recoverToBackup());  // no need recover again
+      QVERIFY(!stringNode.recoverToBackup()); // no need recover again
       QCOMPARE(stringNode.modifiedToValue, "Noto Sans");
 
       QVERIFY(stringNode.invalidateNewValue());
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
-      QVERIFY(!stringNode.invalidateNewValue());  // no need invalidate again
+      QVERIFY(!stringNode.invalidateNewValue()); // no need invalidate again
       QCOMPARE(stringNode.modifiedToValue, (QVariant()));
 
       QVERIFY(stringNode.recoverToDefault());
       QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei UI");
-      QVERIFY(!stringNode.recoverToDefault());  // no need recover again
+      QVERIFY(!stringNode.recoverToDefault()); // no need recover again
       QCOMPARE(stringNode.modifiedToValue, "Microsoft YaHei UI");
     }
   }
@@ -343,8 +463,8 @@ class StyleItemDataTest : public PlainTestSuite {
 
     auto* pFont = r0->appendRow(StyleTreeNode::create(StyleItemData{"Font"}));
     auto* pFontFamily = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Family"}));
-    auto* pFontFamilyGeneral = pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", "Arial", "Times New Roman", StyleItemData::FONT_FAMILY}));
-    auto* pFontFamilySpecial = pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Special", "Microsoft YaHei UI", "Noto Sans", StyleItemData::FONT_FAMILY}));
+    auto* pFontFamilyGeneral = pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", "Arial", "Times New Roman", GeneralDataType::Type::FONT_FAMILY}));
+    auto* pFontFamilySpecial = pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Special", "Microsoft YaHei UI", "Noto Sans", GeneralDataType::Type::FONT_FAMILY}));
 
     QCOMPARE(r0->childsCount(), 1);
     QCOMPARE(pFont->childsCount(), 1);
@@ -378,16 +498,16 @@ class StyleItemDataTest : public PlainTestSuite {
     QCOMPARE(pFontFamilyGeneral->GetConfigKey(), "StyleSheetInTest/Font/Family/General");
     QCOMPARE(pFontFamilySpecial->GetConfigKey(), "StyleSheetInTest/Font/Family/Special");
 
-    {  // filterAccept
+    { // filterAccept
       QString searchText{"NotExistName"};
       QHash<const void*, bool> passCache;
       QCOMPARE(r0->filterAccept(searchText, passCache), false);
-      QCOMPARE(passCache.size(), totalNodeCount);  // 遍历入口根, 无任何匹配, 所有节点过滤结果都已经缓存
+      QCOMPARE(passCache.size(), totalNodeCount); // 遍历入口根, 无任何匹配, 所有节点过滤结果都已经缓存
 
       QCOMPARE(pFontFamily->filterAccept(searchText, passCache), false);
       QCOMPARE(pFontFamilyGeneral->filterAccept(searchText, passCache), false);
       QCOMPARE(pFontFamilySpecial->filterAccept(searchText, passCache), false);
-      QCOMPARE(passCache.size(), totalNodeCount);  // 多次查询, 缓存词典不会增大
+      QCOMPARE(passCache.size(), totalNodeCount); // 多次查询, 缓存词典不会增大
 
       {
         // 目标就在itself
@@ -398,7 +518,7 @@ class StyleItemDataTest : public PlainTestSuite {
 
         passCache.clear();
         QCOMPARE(pFontFamilySpecial->filterAccept(searchText, passCache), true);
-        QCOMPARE(passCache.size(), 1);  // 先1个自己节点
+        QCOMPARE(passCache.size(), 1); // 先1个自己节点
       }
 
       {
@@ -410,7 +530,7 @@ class StyleItemDataTest : public PlainTestSuite {
 
         passCache.clear();
         QCOMPARE(pFontFamily->filterAccept(searchText, passCache), true);
-        QCOMPARE(passCache.size(), 1 + 2);  // 先1个自己节点, 再2个子节点
+        QCOMPARE(passCache.size(), 1 + 2); // 先1个自己节点, 再2个子节点
       }
 
       {
@@ -422,7 +542,7 @@ class StyleItemDataTest : public PlainTestSuite {
 
         passCache.clear();
         QCOMPARE(pFontFamilyGeneral->filterAccept(searchText, passCache), true);
-        QCOMPARE(passCache.size(), 1 + 0 + 2);  // 先1个自己节点, 再0个子节点, 再2次父节点
+        QCOMPARE(passCache.size(), 1 + 0 + 2); // 先1个自己节点, 再0个子节点, 再2次父节点
       }
     }
 
@@ -450,12 +570,12 @@ class StyleItemDataTest : public PlainTestSuite {
   void fromPairList_ok() {
     const QString rootName{"StyleSheet"};
     const QList<std::pair<QString, StyleItemData>> pairList{
-        {"Font/Family", StyleItemData{"General", "Noto Sans", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY}},
-        {"Font/Family", StyleItemData{"Code", "Noto Sans", "Noto Sans", StyleItemData::DataTypeE::FONT_FAMILY}},
-        {"Font/Size", StyleItemData{"General", 14, 14, StyleItemData::DataTypeE::NUMBER}},
-        {"Font/Size", StyleItemData{"QTabBar", 15, 15, StyleItemData::DataTypeE::NUMBER}},
-        {"LightColor/Background", StyleItemData{"General", "#FFFFFF", "#FFFFFF", StyleItemData::DataTypeE::COLOR}},
-        {"DarkColor/Background", StyleItemData{"General", "#000000", "#000000", StyleItemData::DataTypeE::COLOR}},
+        {"Font/Family", StyleItemData{"General", "Noto Sans", "Noto Sans", GeneralDataType::Type::FONT_FAMILY}},
+        {"Font/Family", StyleItemData{"Code", "Noto Sans", "Noto Sans", GeneralDataType::Type::FONT_FAMILY}},
+        {"Font/Size", StyleItemData{"General", 14, 14, GeneralDataType::Type::PLAIN_INT}},
+        {"Font/Size", StyleItemData{"QTabBar", 15, 15, GeneralDataType::Type::PLAIN_INT}},
+        {"LightColor/Background", StyleItemData{"General", "#FFFFFF", "#FFFFFF", GeneralDataType::Type::COLOR}},
+        {"DarkColor/Background", StyleItemData{"General", "#000000", "#000000", GeneralDataType::Type::COLOR}},
     };
 
     std::unique_ptr<StyleTreeNode> pRoot{StyleTreeNode::NewTreeNodeRoot(rootName)};
@@ -464,26 +584,30 @@ class StyleItemDataTest : public PlainTestSuite {
       {
         auto* pFontFamily = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Family"}));
         {
-          pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", "Noto Sans", "Noto Sans", StyleItemData::FONT_FAMILY}));
-          pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Code", "Noto Sans", "Noto Sans", StyleItemData::FONT_FAMILY}));
+          pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"General", "Noto Sans", "Noto Sans", GeneralDataType::Type::FONT_FAMILY}));
+          pFontFamily->appendRow(StyleTreeNode::create(StyleItemData{"Code", "Noto Sans", "Noto Sans", GeneralDataType::Type::FONT_FAMILY}));
         }
         auto* pFontSize = pFont->appendRow(StyleTreeNode::create(StyleItemData{"Size"}));
         {
-          pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", 14, 14, StyleItemData::NUMBER}));
-          pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", 15, 15, StyleItemData::NUMBER}));
+          pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"General", 14, 14, GeneralDataType::Type::PLAIN_INT}));
+          pFontSize->appendRow(StyleTreeNode::create(StyleItemData{"QTabBar", 15, 15, GeneralDataType::Type::PLAIN_INT}));
         }
       }
 
       auto* pColorLight = pRoot->appendRow(StyleTreeNode::create(StyleItemData{"LightColor"}));
       {
         auto* pColorLightBg = pColorLight->appendRow(StyleTreeNode::create(StyleItemData{"Background"}));
-        { pColorLightBg->appendRow(StyleTreeNode::create(StyleItemData{"General", "#FFFFFF", "#FFFFFF", StyleItemData::DataTypeE::COLOR})); }
+        {
+          pColorLightBg->appendRow(StyleTreeNode::create(StyleItemData{"General", "#FFFFFF", "#FFFFFF", GeneralDataType::Type::COLOR}));
+        }
       }
 
       auto* pColorDark = pRoot->appendRow(StyleTreeNode::create(StyleItemData{"DarkColor"}));
       {
         auto* pColorDarkBg = pColorDark->appendRow(StyleTreeNode::create(StyleItemData{"Background"}));
-        { pColorDarkBg->appendRow(StyleTreeNode::create(StyleItemData{"General", "#000000", "#000000", StyleItemData::DataTypeE::COLOR})); }
+        {
+          pColorDarkBg->appendRow(StyleTreeNode::create(StyleItemData{"General", "#000000", "#000000", GeneralDataType::Type::COLOR}));
+        }
       }
     }
 
@@ -504,7 +628,7 @@ class StyleItemDataTest : public PlainTestSuite {
     auto* p3 = pRoot->FindNode("StyleSheet/Font");
     QCOMPARE(p0, nullptr);
     QCOMPARE(p1, nullptr);
-    QCOMPARE(p2, pRoot.get());  // empty return root
+    QCOMPARE(p2, pRoot.get()); // empty return root
     QCOMPARE(p3, pFont);
   }
 };

@@ -53,7 +53,7 @@ QVariant StyleSheetTreeModel::data(const QModelIndex& index, int role) const {
       if (column == StyleItemData::EDITABLE_COLUMN && mEditFailedCells.contains(index)) {
         return failedIcon;
       }
-      if (item.dataType == StyleItemData::DataTypeE::COLOR) {
+      if (item.dataType == GeneralDataType::Type::COLOR) {
         QString colorStr;
         switch (column) {
           case StyleItemData::DEF_COLUMN:

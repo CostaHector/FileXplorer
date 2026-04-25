@@ -1,6 +1,7 @@
 #include "CastDBActions.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 
 #include <QMenu>

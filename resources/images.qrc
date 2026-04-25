@@ -387,15 +387,15 @@
 
     <qresource prefix="/styles">
         <!--Style icon here-->
-        <file alias="STYLE_SETTING">styles/STYLE_SETTING.svg</file>
-        <file alias="STYLE_WINDOWS_VISTA">styles/STYLE_WINDOWS_VISTA.svg</file>
-        <file alias="STYLE_WINDOWS_TRADITIONAL">styles/STYLE_WINDOWS_TRADITIONAL.svg</file>
-        <file alias="STYLE_FUSION">styles/STYLE_FUSION.svg</file>
-        <file alias="STYLE_MACOS">styles/STYLE_MACOS.svg</file>
-        <file alias="STYLESHEET_SETTING">styles/STYLESHEET_SETTING.svg</file>
-        <file alias="STYLESHEET_NONE">styles/STYLESHEET_NONE.svg</file>
-        <file alias="STYLESHEET_LIGHT_THEME_SUN">styles/STYLESHEET_LIGHT_THEME_SUN.svg</file>
-        <file alias="STYLESHEET_DARK_THEME_MOON_FOG">styles/STYLESHEET_DARK_THEME_MOON_FOG.svg</file>
+        <file alias="STYLE_PRESET">styles/STYLE_PRESET.svg</file>
+        <file alias="PRESET_WINDOWS_VISTA">styles/PRESET_WINDOWS_VISTA.svg</file>
+        <file alias="PRESET_WINDOWS_TRADITIONAL">styles/PRESET_WINDOWS_TRADITIONAL.svg</file>
+        <file alias="PRESET_FUSION">styles/PRESET_FUSION.svg</file>
+        <file alias="PRESET_MACOS">styles/PRESET_MACOS.svg</file>
+        <file alias="STYLE_THEME">styles/STYLE_THEME.svg</file>
+        <file alias="THEME_NONE">styles/THEME_NONE.svg</file>
+        <file alias="THEME_LIGHT">styles/THEME_LIGHT.svg</file>
+        <file alias="THEME_DARK_MOON_FOG">styles/THEME_DARK_MOON_FOG.svg</file>
         <file alias="STYLESHEET_MGR">styles/STYLESHEET_MGR.svg</file>
         <file alias="COLOR_SELECT">styles/COLOR_SELECT.svg</file>
         <file alias="CLEAR_MODIFIED_VALUES">styles/CLEAR_MODIFIED_VALUES.svg</file>

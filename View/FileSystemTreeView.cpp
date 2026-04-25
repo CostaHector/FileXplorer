@@ -2,6 +2,7 @@
 #include "ViewHelper.h"
 #include "StyleSheet.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include "RightClickMenuActions.h"
 #include "RightClickMenu.h"

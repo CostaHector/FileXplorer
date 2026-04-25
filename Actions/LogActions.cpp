@@ -1,5 +1,6 @@
 #include "LogActions.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "MenuToolButton.h"
 #include "PublicMacro.h"
 #include "Logger.h"
@@ -69,7 +70,7 @@ LogActions::LogActions(QObject* parent) : QObject{parent} {
   CHECK_NULLPTR_RETURN_VOID(_AUTO_FLUSH_IGNORE_LEVEL)
   _AUTO_FLUSH_IGNORE_LEVEL->setToolTip(QString("<b>%1 (%2)</b><br/>Auto flush log to local files no matter what log level it is.").arg(_AUTO_FLUSH_IGNORE_LEVEL->text(), _AUTO_FLUSH_IGNORE_LEVEL->shortcut().toString()));
   _AUTO_FLUSH_IGNORE_LEVEL->setCheckable(true);
-  _AUTO_FLUSH_IGNORE_LEVEL->setChecked(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
+  _AUTO_FLUSH_IGNORE_LEVEL->setChecked(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.toVariant()).toBool());
   _AUTO_FLUSH_IGNORE_LEVEL->setShortcutVisibleInContextMenu(true);
   _DROPDOWN_LIST += nullptr;
   _DROPDOWN_LIST += _AUTO_FLUSH_IGNORE_LEVEL;

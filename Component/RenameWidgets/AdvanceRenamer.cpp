@@ -1,5 +1,6 @@
 #include "AdvanceRenamer.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PathTool.h"
 #include "FileOsWalker.h"
 #include "UndoRedo.h"
@@ -71,8 +72,8 @@ void AdvanceRenamer::ReadSettings() {
 }
 
 void AdvanceRenamer::initCommonSetting() {
-  m_recursiveCB->setChecked(Configuration().value(RenamerKey::INCLUDING_DIR.name, RenamerKey::INCLUDING_DIR.v).toBool());
-  const bool bNameExtIndependent{Configuration().value(RenamerKey::NAME_EXT_INDEPENDENT.name, RenamerKey::NAME_EXT_INDEPENDENT.v).toBool()};
+  m_recursiveCB->setChecked(Configuration().value(RenamerKey::INCLUDING_DIR.name, RenamerKey::INCLUDING_DIR.toVariant()).toBool());
+  const bool bNameExtIndependent{Configuration().value(RenamerKey::NAME_EXT_INDEPENDENT.name, RenamerKey::NAME_EXT_INDEPENDENT.toVariant()).toBool()};
   m_nameExtIndependent->setChecked(bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
@@ -302,4 +303,15 @@ void AdvanceRenamer::OnlyTriggerRenameCore() {
   setWindowTitle(windowTitleFormat.arg(mNames.size()).arg(mWorkPath));
   const auto& newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
+}
+
+QStringList AdvanceRenamer::MultiLineStr2StrList(const KV& kv) {
+  if (kv.dataType() != GeneralDataType::Type::MULTI_LINE_STR) {
+    LOG_W("Key[%s] type[%d] not support", kv.name, kv.dataType());
+    return {};
+  }
+  const QString multiLineSeperatedByNewLine = Configuration().value(kv.name, kv.v.data.str).toString();
+  const QStringList strList{multiLineSeperatedByNewLine.split(NAME_SEP, Qt::KeepEmptyParts)};
+  LOG_W("before[%s], count:%d", kv.v.data.str, strList.size());
+  return strList;
 }

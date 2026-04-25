@@ -2,6 +2,7 @@
 #include "PreferenceActions.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleEnum.h"
 #include <QApplication>
 #include <QWidget>
@@ -12,7 +13,7 @@
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {
   CHECK_NULLPTR_RETURN_VOID(widget);
-  if (g_PreferenceActions().CurStyleSheet() == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+  if (g_PreferenceActions().CurStyleTheme() == Style::StyleThemeE::THEME_DARK_MOON_FOG) {
     setDarkTitleBar(widget, true);
   }
 }

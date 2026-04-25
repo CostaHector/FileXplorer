@@ -64,7 +64,7 @@ void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePers
     LOG_W("No action in QMenu at all");
     return;
   }
-  int initalActionIndex = Configuration().value(memoryKey, kv.v).toInt();
+  int initalActionIndex = Configuration().value(memoryKey, kv.toVariant()).toInt();
   if (initalActionIndex < 0 || initalActionIndex >= actsList.size()) {
     LOG_W("Action[%s] not find from %d actions in menu, use first by default", qPrintable(memoryKey), initalActionIndex);
     initalActionIndex = 0;

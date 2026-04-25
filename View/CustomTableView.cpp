@@ -5,6 +5,7 @@
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
@@ -20,15 +21,15 @@ QSet<QString> CustomTableView::mTableInstSet;
 // a bunch of widget with same model should share the only one setting. e.g., HAR_TABLEVIEW
 
 CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
-    : QTableView{parent},                                               //
-      m_name{instName},                                                 //
-      m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"},  //
-      m_showVerticalHeaderKey{instName + "/SHOW_VERTICAL_HEADER"},      //
-      m_autoScrollKey{instName + "/AUTO_SCROLL"},                       //
-      m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"},  //
-      m_showGridKey{instName + "/SHOW_GRID"}                            //
+  : QTableView{parent}
+  , m_name{instName}
+  , m_showHorizontalHeaderKey{instName + "/SHOW_HORIZONTAL_HEADER"}
+  , m_showVerticalHeaderKey{instName + "/SHOW_VERTICAL_HEADER"}
+  , m_autoScrollKey{instName + "/AUTO_SCROLL"}
+  , m_alternatingRowColorsKey{instName + "/ALTERNATING_ROW_COLORS"}
+  , m_showGridKey{instName + "/SHOW_GRID"} //
 {
-  if (isNameExists(GetName())) {  // not in sharing list, but name already find
+  if (isNameExists(GetName())) { // not in sharing list, but name already find
     LOG_D("Instance table name[%s] already exist, QSetting may conflict", qPrintable(GetName()));
   }
   mTableInstSet.insert(GetName());
@@ -98,10 +99,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   setShowGrid(_SHOW_GRID->isChecked());
 
   // 6.
-  _BG_OVERLAY_OPACITY = new (std::nothrow) QAction(QIcon{":/styles/BACKGROUND_OVERLAY_OPACITY"}, CustomTableView::tr("Background Overlay Opacity"), this);
-  CHECK_NULLPTR_RETURN_VOID(_BG_OVERLAY_OPACITY);
-
-  // 7.
   const QString horMenuName{GetName() + " " + CustomTableView::tr("Horizontal scroll bar policy")};
   m_horScrollBarPolicyMenu = new (std::nothrow) ScrollBarPolicyMenu{horMenuName, GetName() + "/Horizontal", this};
   CHECK_NULLPTR_RETURN_VOID(m_horScrollBarPolicyMenu);
@@ -120,7 +117,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
   SubscribeHeaderActions();
   RowHeightRegistry<CustomTableView>::registerWidgetForAdjust(this, true);
 
-  m_bgOverlayOpacity = Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, StyleKey::BACKGROUND_OVERLAY_OPACITY.v).toInt();
   UpdateCachedColor();
 }
 
@@ -142,7 +138,7 @@ void CustomTableView::contextMenuEvent(QContextMenuEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(m_menu);
 #ifndef RUNNING_UNIT_TESTS
   QPoint pnt = event->globalPos();
-  m_menu->popup(pnt);  // or QCursor::pos()
+  m_menu->popup(pnt); // or QCursor::pos()
 #endif
   event->accept();
   return;
@@ -163,7 +159,6 @@ void CustomTableView::AddItselfAction2Menu() {
   m_menu->addAction(_AUTO_SCROLL);
   m_menu->addAction(_ALTERNATING_ROW_COLORS);
   m_menu->addAction(_SHOW_GRID);
-  m_menu->addAction(_BG_OVERLAY_OPACITY);
 }
 
 void CustomTableView::SubscribeHeaderActions() {
@@ -173,7 +168,6 @@ void CustomTableView::SubscribeHeaderActions() {
   connect(_AUTO_SCROLL, &QAction::toggled, this, &QTableView::setAutoScroll);
   connect(_ALTERNATING_ROW_COLORS, &QAction::toggled, this, &QTableView::setAlternatingRowColors);
   connect(_SHOW_GRID, &QAction::toggled, this, &QTableView::setShowGrid);
-  connect(_BG_OVERLAY_OPACITY, &QAction::triggered, this, &CustomTableView::SetBgOverlayOpacity);
   connect(m_horScrollBarPolicyMenu, &ScrollBarPolicyMenu::reqScrollBarPolicyChanged, this, &QTableView::setHorizontalScrollBarPolicy);
   connect(m_verScrollBarPolicyMenu, &ScrollBarPolicyMenu::reqScrollBarPolicyChanged, this, &QTableView::setVerticalScrollBarPolicy);
 
@@ -207,29 +201,14 @@ bool CustomTableView::ShowOrHideColumnCore() {
   return true;
 }
 
-bool CustomTableView::SetBgOverlayOpacity() {
-  bool bNewOpacityAccept{false};
-  int newOpacity{m_bgOverlayOpacity};
-  const QString label{"Enter background overlay opacity (0-255, where 255 is fully opaque):"};
-  std::tie(bNewOpacityAccept, newOpacity) = InputDialogHelper::GetIntWithInitial(this, _BG_OVERLAY_OPACITY->text(), label, m_bgOverlayOpacity, 0, 255, 1);
-  if (!bNewOpacityAccept) {
-    LOG_INFO_P("Canceled by user Background overlay opacity change", "remains[%d]", m_bgOverlayOpacity);
-    return false;
-  }
-  if (m_bgOverlayOpacity == newOpacity) {
-    LOG_INFO_P("Unchanged Background overlay opacity", "remains[%d]", m_bgOverlayOpacity);
-    return false;
-  }
-  LOG_OK_P("Changed Background overlay opacity", "%d->%d", m_bgOverlayOpacity, newOpacity);
-  m_bgOverlayOpacity = newOpacity;
-  UpdateCachedColor();
-  Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, m_bgOverlayOpacity);
-  return true;
-}
-
 void CustomTableView::UpdateCachedColor() {
   m_cachedColor = palette().color(QPalette::Base);
-  m_cachedColor.setAlpha(m_bgOverlayOpacity);
+  m_cachedColor.setAlpha(StyleKey::GetBgOverlayOpacity());
+}
+
+void CustomTableView::onStyleChanged() {
+  UpdateCachedColor();
+  viewport()->update();
 }
 
 void CustomTableView::InitTableView() {
@@ -249,6 +228,11 @@ void CustomTableView::InitTableView() {
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
+
+  if (m_defaultShowBackgroundImage) {
+    using namespace StyleKey;
+    connect(&Notifier::instance(), &Notifier::styleChanged, this, &CustomTableView::onStyleChanged);
+  }
 }
 
 int CustomTableView::rowHeight() const {
@@ -277,11 +261,13 @@ void CustomTableView::scrollContentsBy(int dx, int dy) {
 
 void CustomTableView::paintEvent(QPaintEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  // 0: no overlay needed, 255: no alpha Opacity needed
-  if (Q_LIKELY(m_bgOverlayOpacity > 0)) {
-    QWidget* pViewport = viewport();
-    QPainter painter{pViewport};
-    painter.fillRect(pViewport->rect(), m_cachedColor);
+  if (m_defaultShowBackgroundImage) {
+    const QImage& bgImg = StyleKey::GetBgImage();
+    if (!bgImg.isNull()) {
+      QWidget* pViewport = viewport();
+      QPainter painter{pViewport};
+      painter.drawImage(0, 0, bgImg);
+    }
   }
   QTableView::paintEvent(event);
 }

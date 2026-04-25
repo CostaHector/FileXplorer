@@ -14,7 +14,7 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   setModel(mStyleFilterProxyModel);
   registerProxyModel(mStyleFilterProxyModel);
 
-  mStyleSheetEditDelegate = new StyleSheetEditDelegate{this};
+  mStyleSheetEditDelegate = new StyleSheetEditDelegate{StyleItemData::Role::DATA_TYPE_ROLE, StyleItemData::EDITABLE_COLUMN, this};
   setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);
 
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::DoubleClicked);

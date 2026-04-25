@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>

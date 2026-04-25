@@ -7,6 +7,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "FileSystemModel.h"
@@ -118,7 +119,7 @@ class FileSystemTableViewTest : public PlainTestSuite {
     pClip->clear();
 
     // precondition
-    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.data.i};
     QString currentPath = QFileInfo(__FILE__).absolutePath();
     QDir currentDir{currentPath, "", QDir::SortFlag::NoSort, defaultFilters};
     QStringList itemsInCurrentDir = currentDir.entryList();
@@ -150,7 +151,7 @@ class FileSystemTableViewTest : public PlainTestSuite {
 
   void dragMove_and_drop_and_dragLeave_protection_ok() {
     // precondition
-    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.data.i};
 
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);  // need call manually
@@ -259,7 +260,7 @@ class FileSystemTableViewTest : public PlainTestSuite {
 
   void drag_enter_and_drop_event_function_ok() {
     // precondition
-    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.data.i};
 
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);  // need call manually
@@ -384,7 +385,7 @@ class FileSystemTableViewTest : public PlainTestSuite {
   }
 
   void keyPressEvent_ok() {
-    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.toInt()};
+    const QDir::Filters defaultFilters{BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v.data.i};
     FileSystemModel fsModel;
     fsModel.setFilter(defaultFilters);
     FileSystemTableView fsView{&fsModel};

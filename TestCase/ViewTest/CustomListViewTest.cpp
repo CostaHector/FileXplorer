@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "CustomListView.h"
 #include "EndToExposePrivateMember.h"

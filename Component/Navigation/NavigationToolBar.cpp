@@ -1,6 +1,7 @@
 ﻿#include "NavigationToolBar.h"
 #include "PopupWidgetManager.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "SizeChangeAnimation.h"
 #include "ImageTool.h"
@@ -16,7 +17,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
   setObjectName(title);
 
   const bool bExpandSideBar{
-      Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.v).toBool()};
+      Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.toVariant()).toBool()};
 
   // 0. expand and minimum
   {

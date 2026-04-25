@@ -1,5 +1,6 @@
 #include "ScenesListModel.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
@@ -12,9 +13,9 @@
 
 ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  //
     : QAbstractListModelPub{listViewName, object} {
-  m_bDisableImage = Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.v).toBool();
+  m_bDisableImage = Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.toVariant()).toBool();
 
-  const int perPageCnt{Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.v).toInt()};
+  const int perPageCnt{Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.toVariant()).toInt()};
   mPagedData.initPerPageCnt(perPageCnt);
   mPagedData.registerCallback(                                                         //
       std::bind(&ScenesListModel::beginResetModel, this),                              //

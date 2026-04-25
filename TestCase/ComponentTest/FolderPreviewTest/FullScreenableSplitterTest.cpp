@@ -3,6 +3,7 @@
 
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FullScreenableSplitter.h"
 #include "EndToExposePrivateMember.h"

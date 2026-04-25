@@ -8,6 +8,7 @@
 #include "EndToExposePrivateMember.h"
 #include "ImageTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "ClipboardGuard.h"
 #include "SqlRecordTestHelper.h"
 #include "MouseKeyboardEventHelper.h"

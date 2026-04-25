@@ -2,6 +2,7 @@
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include <QSignalSpy>
 #include <QPushButton>
@@ -122,7 +123,7 @@ private slots:
   }
 
   void test_WriteUniqueHistoryToQSetting() {
-    const QString beforeCfg = Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.v).toString();
+    const QString beforeCfg = Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.toVariant()).toString();
     ON_SCOPE_EXIT {
       Configuration().setValue(BehaviorKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
     };

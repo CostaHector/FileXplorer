@@ -8,7 +8,7 @@
 
 class ViewsStackedWidget;
 class CustomStatusBar;
-class ConfigsTable;
+class ConfigsMgr;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;

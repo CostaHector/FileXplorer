@@ -1,6 +1,7 @@
 #include "CastManager.h"
 #include "JsonRenameRegex.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
 #include "JsonKey.h"

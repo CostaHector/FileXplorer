@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleKey.h"
 
 #include "BeginToExposePrivateMember.h"
@@ -40,8 +41,6 @@ struct FileInfo {
   QString fileExtenstion;
   QByteArray contents;
 };
-
-constexpr int NEW_BG_OVERLAY_OPACITY{249};
 
 #define SIMPLE_TABLE_VIEW "SIMPLE_TABLE_VIEW"
 class SimpleCustomTableView : public CustomTableView {
@@ -341,8 +340,6 @@ private slots:
       view.m_defaultShowHorizontalHeader = false;
       view.m_defaultShowVerticalHeader = false;
 
-      view.m_bgOverlayOpacity = NEW_BG_OVERLAY_OPACITY;
-
       view.InitTableView();
       QVERIFY(!view.m_defaultShowHorizontalHeader);
       QVERIFY(!view.m_defaultShowVerticalHeader);
@@ -361,33 +358,6 @@ private slots:
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_HORIZONTAL_HEADER").toBool(), false);
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_VERTICAL_HEADER").toBool(), false);
     QVERIFY(!Configuration().contains(StyleKey::BACKGROUND_OVERLAY_OPACITY.name)); // key唯一, 因此不在析构函数中存储, 避免多次存储互相覆盖
-  }
-
-  void SetBgOverlayOpacity_ok() {
-    Configuration().setValue(StyleKey::BACKGROUND_OVERLAY_OPACITY.name, NEW_BG_OVERLAY_OPACITY);
-
-    std::pair<bool, int> cancel0{false, -999};
-    std::pair<bool, int> accepet1Unchanged{true, NEW_BG_OVERLAY_OPACITY};
-    std::pair<bool, int> accepet2Changed{true, NEW_BG_OVERLAY_OPACITY + 1};
-    MOCKER(InputDialogHelper::GetIntWithInitial) //
-        .expects(exactly(3))                     //
-        .will(returnValue(cancel0))              // cancel
-        .then(returnValue(accepet1Unchanged))    // accept but unchange
-        .then(returnValue(accepet2Changed));     // accept and changed
-
-    CustomTableView view("CustomTableViewSetBgOverlayOpacity");
-    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
-
-    view._BG_OVERLAY_OPACITY->trigger(); // cancel
-    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
-
-    QVERIFY(!view.SetBgOverlayOpacity()); // accept but unchange
-    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY);
-    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY);
-
-    QVERIFY(view.SetBgOverlayOpacity()); // accept and changed
-    QCOMPARE(view.m_bgOverlayOpacity, NEW_BG_OVERLAY_OPACITY + 1);
-    QCOMPARE(Configuration().value(StyleKey::BACKGROUND_OVERLAY_OPACITY.name).toInt(), NEW_BG_OVERLAY_OPACITY + 1);
   }
 
   void override_member_function_ok() {

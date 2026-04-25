@@ -2,12 +2,12 @@
 
 bool HeaderViewStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new HeaderViewStyleSheet));
 
-QString HeaderViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString HeaderViewStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
 // padding: 2px 0px 2px 2px; /* top right bottom left */
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QHeaderView::section {
     border: none;

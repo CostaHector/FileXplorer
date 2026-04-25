@@ -2,6 +2,7 @@
 #include "PublicMacro.h"
 #include "MenuToolButton.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
   _CREATE_1_BY_1_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_1_BY_1"), tr("Create 1x1 thumbnail"), this);

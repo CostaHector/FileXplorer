@@ -13,6 +13,7 @@
 #include "MultiCursorEditor.h"
 
 class FileOsWalker;
+struct KV;
 
 class AdvanceRenamer : public QDialog {
   Q_OBJECT
@@ -73,6 +74,8 @@ class AdvanceRenamer : public QDialog {
   // absolutefilepath = m_pre + m_relNameTE + m_oBaseTE + m_oExtTE
   MultiCursorEditor* m_nBaseTE{nullptr};
   QPlainTextEdit* m_nExtTE{nullptr};
+
+  static QStringList MultiLineStr2StrList(const KV& kv);
 
  private:
   void SetApplyResult(bool applyResult) { m_bApplyResult = applyResult; }

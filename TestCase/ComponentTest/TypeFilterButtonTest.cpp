@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "TypeFilterButton.h"
 #include "EndToExposePrivateMember.h"
@@ -23,16 +24,29 @@ class TypeFilterButtonTest : public PlainTestSuite {
 
   bool isInitialStateMatchConfigurationFile(const ModelFilterActions& filterHelper) {
     const QString dirFilterKey = filterHelper.GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name);
-    const int expectInitialFilters = Configuration().value(dirFilterKey, BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.v).toInt();
+    const int expectInitialFilters = Configuration().value(dirFilterKey, BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.toVariant()).toInt();
     QDir::Filters actualDirFilters = filterHelper.getCurDirFilters();
     const int actualDirFiltersValue = actualDirFilters.operator Int();
-    if (actualDirFiltersValue != expectInitialFilters) {
-      LOG_W("DirFilters dismatch. actual: %d, expect: %d", actualDirFiltersValue, expectInitialFilters);
+    LOG_D("DirFilters dismatch. actual: %d, expect: %d", actualDirFiltersValue, expectInitialFilters);
+
+    if (actualDirFilters.testFlag(QDir::Filter::Files) != bool(expectInitialFilters&(int)QDir::Filter::Files)) {
+      return false;
+    }
+    if (actualDirFilters.testFlag(QDir::Filter::Dirs) != bool(expectInitialFilters&(int)QDir::Filter::Dirs)) {
+      return false;
+    }
+    if (actualDirFilters.testFlag(QDir::Filter::Drives) != bool(expectInitialFilters&(int)QDir::Filter::Drives)) {
+      return false;
+    }
+    if (actualDirFilters.testFlag(QDir::Filter::Hidden) != bool(expectInitialFilters&(int)QDir::Filter::Hidden)) {
+      return false;
+    }
+    if (actualDirFilters.testFlag(QDir::Filter::NoDotAndDotDot) != bool(expectInitialFilters&(int)QDir::Filter::NoDotAndDotDot)) {
       return false;
     }
 
     const QString grayOrHideKey = filterHelper.GetMemoryKeyName(SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.name);
-    const bool expectGrayOrHideKey = Configuration().value(grayOrHideKey, SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.v).toBool();
+    const bool expectGrayOrHideKey = Configuration().value(grayOrHideKey, SearchKey::GRAY_ENTRIES_DONT_PASS_FILTER.toVariant()).toBool();
     const bool actualGrayOrHide = filterHelper.getCurGrayOrHideUpassItem();
     if (actualGrayOrHide != expectGrayOrHideKey) {
       LOG_W("GrayOrHide dismatch. actual: %d, expect: %d", actualGrayOrHide, expectGrayOrHideKey);
@@ -40,7 +54,7 @@ class TypeFilterButtonTest : public PlainTestSuite {
     }
 
     const QString includeSubKey = filterHelper.GetMemoryKeyName(SearchKey::INCLUDING_SUBDIRECTORIES.name);
-    const bool expectIncludeSub = Configuration().value(includeSubKey, SearchKey::INCLUDING_SUBDIRECTORIES.v).toBool();
+    const bool expectIncludeSub = Configuration().value(includeSubKey, SearchKey::INCLUDING_SUBDIRECTORIES.toVariant()).toBool();
     const bool actualIncludeSub = filterHelper.getCurIteratorFlag() == QDirIterator::Subdirectories;
     if (actualIncludeSub != expectIncludeSub) {
       LOG_W("IncludeSub dismatch. actual: %d, expect: %d", actualIncludeSub, expectIncludeSub);

@@ -1,6 +1,7 @@
 #include "StyleSheetGetter.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include <unordered_set>
 
 namespace FontCfg {
@@ -127,7 +128,7 @@ void StyleSheetGetter::init() const {
 QHash<QString, StyleItemData> StyleSheetGetter::GetPairDict() {
   QHash<QString, StyleItemData> dict;
 
-  auto InsertPath2DataPair = [&dict](const QString& prePath, const QVariant& defVal, StyleItemData::DataTypeE dataType) -> void {
+  auto InsertPath2DataPair = [&dict](const QString& prePath, const QVariant& defVal, GeneralDataType::Type dataType) -> void {
     const int nameStart = prePath.lastIndexOf('/');
     const QString name{nameStart == -1 ? prePath : prePath.mid(nameStart + 1)};
 
@@ -140,8 +141,8 @@ QHash<QString, StyleItemData> StyleSheetGetter::GetPairDict() {
   };
 
   auto InsertPath2ColorPair = [InsertPath2DataPair](const QString& prePath, const QString& lightDef, const QString darkDef) -> void {
-    InsertPath2DataPair("LightColor/" + prePath, lightDef, StyleItemData::DataTypeE::COLOR);
-    InsertPath2DataPair("DarkColor/" + prePath, darkDef, StyleItemData::DataTypeE::COLOR);
+    InsertPath2DataPair("LightColor/" + prePath, lightDef, GeneralDataType::Type::COLOR);
+    InsertPath2DataPair("DarkColor/" + prePath, darkDef, GeneralDataType::Type::COLOR);
   };
 
   InsertPath2ColorPair("Background/General", "#FFFFFF", "#000000");
@@ -191,13 +192,12 @@ QHash<QString, StyleItemData> StyleSheetGetter::GetPairDict() {
   InsertPath2ColorPair("Foreground/MenuFont", "#000000", "#FFFFFF");
 
   using namespace FontCfg;
-  InsertPath2DataPair("Font/Family/General", mFontFamilyDef, StyleItemData::DataTypeE::FONT_FAMILY);
-  InsertPath2DataPair("Font/Family/Code", mFontFamilyCodeDef, StyleItemData::DataTypeE::FONT_FAMILY);
-  InsertPath2DataPair("Font/Size/General", mFontSizeDef, StyleItemData::DataTypeE::NUMBER);
-  InsertPath2DataPair("Font/Size/QTabBar", mFontSizeTabDef, StyleItemData::DataTypeE::NUMBER);
-  InsertPath2DataPair("Font/Weight/General", mFontWeightDef, StyleItemData::DataTypeE::FONT_WEIGHT);
-  InsertPath2DataPair("Font/Style/General", mFontStyleDef, StyleItemData::DataTypeE::FONT_STYLE);
-  InsertPath2DataPair("BackgroundImage/TableView", ":/styles/BACKGROUND_IMAGE_TABLEVIEW", StyleItemData::DataTypeE::FILE_PATH);
+  InsertPath2DataPair("Font/Family/General", mFontFamilyDef, GeneralDataType::Type::FONT_FAMILY);
+  InsertPath2DataPair("Font/Family/Code", mFontFamilyCodeDef, GeneralDataType::Type::FONT_FAMILY);
+  InsertPath2DataPair("Font/Size/General", mFontSizeDef, GeneralDataType::Type::PLAIN_INT);
+  InsertPath2DataPair("Font/Size/QTabBar", mFontSizeTabDef, GeneralDataType::Type::PLAIN_INT);
+  InsertPath2DataPair("Font/Weight/General", mFontWeightDef, GeneralDataType::Type::FONT_WEIGHT);
+  InsertPath2DataPair("Font/Style/General", mFontStyleDef, GeneralDataType::Type::FONT_STYLE);
 
   return dict;
 }
@@ -224,7 +224,7 @@ std::unique_ptr<StyleTreeNode> StyleSheetGetter::GetModelData() const {
   return StyleTreeNode::fromPairList(lst, ROOT_NODE_NAME);
 }
 
-QString StyleSheetGetter::operator()(Style::StyleSheetE styleE) const {
+QString StyleSheetGetter::operator()(Style::StyleThemeE styleE) const {
   QString styleSheets;
   styleSheets.reserve(2000);
   LOG_D("Components count: %d", GetRegistry().size());
@@ -277,10 +277,10 @@ int StyleSheetGetter::UpdateCurValue(const QVariantHash& cfg) const {
   return settingItemsUpdatedCnt;
 }
 
-QString StyleSheetGetter::GetColorValue(const QString& keyCore, Style::StyleSheetE styleE) const {
+QString StyleSheetGetter::GetColorValue(const QString& keyCore, Style::StyleThemeE styleE) const {
   QString keyComplete{"StyleSheet/"};
   keyComplete.reserve(30);
-  if (styleE == Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG) {
+  if (styleE == Style::StyleThemeE::THEME_DARK_MOON_FOG) {
     keyComplete += "DarkColor/";
   } else {
     keyComplete += "LightColor/";

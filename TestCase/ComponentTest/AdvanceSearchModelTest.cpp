@@ -3,6 +3,7 @@
 #include "PlainTestSuite.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "TDir.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchModel.h"

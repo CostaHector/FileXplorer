@@ -1,5 +1,6 @@
 #include "Archiver.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "DataFormatter.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"

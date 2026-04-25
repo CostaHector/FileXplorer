@@ -6,11 +6,12 @@
 #include "RedundantImageFinder.h"
 #include "DuplicateVideosFinder.h"
 #include "TorrentsManagerWidget.h"
-#include "ConfigsTable.h"
+#include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 
 #include <QEvent>
@@ -20,7 +21,7 @@ template class PopupWidgetManager<DevicesDrivesTV>;
 template class PopupWidgetManager<DuplicateVideosFinder>;
 template class PopupWidgetManager<RedundantImageFinder>;
 template class PopupWidgetManager<TorrentsManagerWidget>;
-template class PopupWidgetManager<ConfigsTable>;
+template class PopupWidgetManager<ConfigsMgr>;
 template class PopupWidgetManager<Archiver>;
 template class PopupWidgetManager<PasswordBook>;
 template class PopupWidgetManager<ResourceMonitorPanel>;

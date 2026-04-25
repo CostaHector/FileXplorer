@@ -4,7 +4,7 @@
 <context>
     <name>AccountDetailView</name>
     <message>
-        <location filename="../Component/Pwd/AccountDetailView.cpp" line="+21"/>
+        <location filename="../../Component/Pwd/AccountDetailView.cpp" line="+21"/>
         <source>Recover</source>
         <translation>恢复</translation>
     </message>
@@ -47,7 +47,7 @@
 <context>
     <name>ActionsSearcher</name>
     <message>
-        <location filename="../Actions/ActionsSearcher.cpp" line="+11"/>
+        <location filename="../../Actions/ActionsSearcher.cpp" line="+11"/>
         <source>Search action by name here</source>
         <translation>通过名称查找动作</translation>
     </message>
@@ -55,7 +55,7 @@
 <context>
     <name>AddressBarActions</name>
     <message>
-        <location filename="../Actions/AddressBarActions.cpp" line="+4"/>
+        <location filename="../../Actions/AddressBarActions.cpp" line="+4"/>
         <source>back to</source>
         <translation>回到</translation>
     </message>
@@ -73,7 +73,7 @@
 <context>
     <name>AdvanceRenamer</name>
     <message>
-        <location filename="../Component/RenameWidgets/AdvanceRenamer.cpp" line="+25"/>
+        <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+26"/>
         <source>Name Ext Independent</source>
         <translation>名/扩展名独立</translation>
     </message>
@@ -96,7 +96,7 @@
 <context>
     <name>ArchiveFilesActions</name>
     <message>
-        <location filename="../Actions/ArchiveFilesActions.cpp" line="+6"/>
+        <location filename="../../Actions/ArchiveFilesActions.cpp" line="+6"/>
         <source>Compressd here</source>
         <translation>压缩到此处</translation>
     </message>
@@ -129,7 +129,7 @@
 <context>
     <name>BrowserActions</name>
     <message>
-        <location filename="../Actions/BrowserActions.cpp" line="+9"/>
+        <location filename="../../Actions/BrowserActions.cpp" line="+9"/>
         <source>Search Current Text</source>
         <translation>搜索当前选中</translation>
     </message>
@@ -167,7 +167,7 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../Actions/CastDBActions.cpp" line="+12"/>
+        <location filename="../../Actions/CastDBActions.cpp" line="+13"/>
         <source>Submit All</source>
         <translation>提交全部</translation>
     </message>
@@ -255,7 +255,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../View/CustomListView.cpp" line="+31"/>
+        <location filename="../../View/CustomListView.cpp" line="+32"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -293,7 +293,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../View/CustomTableView.cpp" line="+45"/>
+        <location filename="../../View/CustomTableView.cpp" line="+44"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -313,7 +313,7 @@
         <translation>显示垂直表头</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Resize Rows to Contents</source>
         <translation>调整行高适应内容</translation>
     </message>
@@ -339,11 +339,6 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>Background Overlay Opacity</source>
-        <translation>背景遮罩不透明度</translation>
-    </message>
-    <message>
-        <location line="+4"/>
         <source>Horizontal scroll bar policy</source>
         <translation>水平滚动条显示策略</translation>
     </message>
@@ -356,7 +351,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../View/CustomTreeView.cpp" line="+39"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+40"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -409,7 +404,7 @@
 <context>
     <name>DoubleRowHeader</name>
     <message>
-        <location filename="../Component/HeaderView/DoubleRowHeader.cpp" line="+9"/>
+        <location filename="../../Component/HeaderView/DoubleRowHeader.cpp" line="+10"/>
         <source>Enable filters for each column</source>
         <translation>允许全列过滤</translation>
     </message>
@@ -417,7 +412,7 @@
 <context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
+        <location filename="../../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
@@ -425,7 +420,7 @@
 <context>
     <name>DualIconCheckableAction</name>
     <message>
-        <location filename="../Actions/DualIconCheckableAction.cpp" line="+33"/>
+        <location filename="../../Actions/DualIconCheckableAction.cpp" line="+33"/>
         <source>Unmute</source>
         <translation>已静音</translation>
     </message>
@@ -468,7 +463,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeModel.cpp" line="+275"/>
+        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+276"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -481,7 +476,7 @@
 <context>
     <name>FavoritesTreeView</name>
     <message>
-        <location filename="../Component/Navigation/FavoritesTreeView.cpp" line="+32"/>
+        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+33"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -549,7 +544,7 @@
 <context>
     <name>FileLeafActions</name>
     <message>
-        <location filename="../Actions/FileLeafAction.cpp" line="+9"/>
+        <location filename="../../Actions/FileLeafAction.cpp" line="+10"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -587,7 +582,7 @@
 <context>
     <name>FileOpActs</name>
     <message>
-        <location filename="../Actions/FileOpActs.cpp" line="+19"/>
+        <location filename="../../Actions/FileOpActs.cpp" line="+20"/>
         <source>Reveal in Explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
@@ -790,7 +785,7 @@
 <context>
     <name>FileRenameRulerActions</name>
     <message>
-        <location filename="../Actions/FileRenameRulerActions.cpp" line="+15"/>
+        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+16"/>
         <source>Name Ruler</source>
         <translation>名称标准化</translation>
     </message>
@@ -833,7 +828,7 @@
 <context>
     <name>FileToolTest</name>
     <message>
-        <location filename="../TestCase/publicTest/FileToolTest.cpp" line="+128"/>
+        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+147"/>
         <location line="+18"/>
         <location line="+7"/>
         <source>Apply</source>
@@ -850,7 +845,7 @@
 <context>
     <name>HorMenuInHeader</name>
     <message>
-        <location filename="../Component/HeaderView/HorMenuInHeader.cpp" line="+20"/>
+        <location filename="../../Component/HeaderView/HorMenuInHeader.cpp" line="+21"/>
         <source>Column visibility</source>
         <translation>列可见性</translation>
     </message>
@@ -868,7 +863,7 @@
 <context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
+        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
         <source>Shift right 100</source>
         <translation>命名编号右移100</translation>
     </message>
@@ -891,7 +886,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+18"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+19"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -1034,7 +1029,7 @@
 <context>
     <name>ItemView</name>
     <message>
-        <location filename="../View/ItemView.cpp" line="+13"/>
+        <location filename="../../View/ItemView.cpp" line="+13"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
@@ -1052,7 +1047,7 @@
 <context>
     <name>JsonActions</name>
     <message>
-        <location filename="../Actions/JsonActions.cpp" line="+9"/>
+        <location filename="../../Actions/JsonActions.cpp" line="+9"/>
         <source>Save</source>
         <translatorcomment>写入变更到json文件中</translatorcomment>
         <translation>保存变更</translation>
@@ -1198,7 +1193,7 @@
 <context>
     <name>LogActions</name>
     <message>
-        <location filename="../Actions/LogActions.cpp" line="+9"/>
+        <location filename="../../Actions/LogActions.cpp" line="+10"/>
         <source>Open logs file</source>
         <translation>打开日志文件</translation>
     </message>
@@ -1246,7 +1241,7 @@
 <context>
     <name>LoginQryWidget</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+240"/>
+        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+241"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
@@ -1277,7 +1272,7 @@
 <context>
     <name>MD5Window</name>
     <message>
-        <location filename="../Component/MD5Window.cpp" line="+25"/>
+        <location filename="../../Component/MD5Window.cpp" line="+26"/>
         <source>First 16 Bytes</source>
         <translation>首16字节</translation>
     </message>
@@ -1300,7 +1295,7 @@
 <context>
     <name>MenuInHeader</name>
     <message>
-        <location filename="../Component/HeaderView/MenuInHeader.cpp" line="+42"/>
+        <location filename="../../Component/HeaderView/MenuInHeader.cpp" line="+43"/>
         <source>Set default section size</source>
         <translation>设置默认尺寸</translation>
     </message>
@@ -1343,7 +1338,7 @@
 <context>
     <name>MovieDBActions</name>
     <message>
-        <location filename="../Actions/MovieDBActions.cpp" line="+12"/>
+        <location filename="../../Actions/MovieDBActions.cpp" line="+12"/>
         <source>Submit</source>
         <translation>提交变更</translation>
     </message>
@@ -1461,7 +1456,7 @@
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../Component/Navigation/NavigationAndAddressBar.cpp" line="+59"/>
+        <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+59"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
@@ -1474,7 +1469,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../Component/Navigation/NavigationToolBar.cpp" line="+23"/>
+        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+24"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1517,7 +1512,7 @@
 <context>
     <name>PreferenceActions</name>
     <message>
-        <location filename="../Actions/PreferenceActions.cpp" line="+46"/>
+        <location filename="../../Actions/PreferenceActions.cpp" line="+46"/>
         <source>None</source>
         <translation>无</translation>
     </message>
@@ -1532,17 +1527,17 @@
         <translation>深色主题</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+10"/>
         <source>Stylesheet</source>
         <translation>样式配置</translation>
     </message>
     <message>
-        <location line="+54"/>
-        <source>App UI Style</source>
-        <translation>应用风格</translation>
+        <location line="+53"/>
+        <source>Style Preset</source>
+        <translation>预设样式</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+5"/>
         <source>Color Theme</source>
         <translation>色彩主题</translation>
     </message>
@@ -1550,7 +1545,7 @@
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../Component/FolderPreview/PreviewDockWidget.cpp" line="+9"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+10"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1578,7 +1573,7 @@
 <context>
     <name>PropertiesWindowActions</name>
     <message>
-        <location filename="../Actions/PropertiesWindowActions.cpp" line="+8"/>
+        <location filename="../../Actions/PropertiesWindowActions.cpp" line="+8"/>
         <source>Files Size</source>
         <translation>文件大小</translation>
     </message>
@@ -1596,7 +1591,7 @@
 <context>
     <name>PwdTableEditActions</name>
     <message>
-        <location filename="../Actions/PwdTableEditActions.cpp" line="+5"/>
+        <location filename="../../Actions/PwdTableEditActions.cpp" line="+5"/>
         <source>Insert a row</source>
         <translation>插入一行</translation>
     </message>
@@ -1649,15 +1644,15 @@
 <context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../Model/QAbstractListModelPub.cpp" line="+16"/>
-        <source>smooth transformation</source>
-        <translation>平滑变换</translation>
+        <location filename="../../Model/QAbstractListModelPub.cpp" line="+17"/>
+        <source>Smooth Transformation</source>
+        <translation>平滑图片</translation>
     </message>
 </context>
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../Actions/RateActions.cpp" line="+28"/>
+        <location filename="../../Actions/RateActions.cpp" line="+29"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
@@ -1701,7 +1696,7 @@
 <context>
     <name>RegisterWid</name>
     <message>
-        <location filename="../Component/Pwd/LoginQryWidget.cpp" line="+128"/>
+        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+128"/>
         <source>Encryption Key</source>
         <translation>设置密钥</translation>
     </message>
@@ -1714,7 +1709,7 @@
 <context>
     <name>RenameActions</name>
     <message>
-        <location filename="../Actions/RenameActions.cpp" line="+4"/>
+        <location filename="../../Actions/RenameActions.cpp" line="+4"/>
         <source>Rename (ith)</source>
         <translation>重命名(编号)</translation>
     </message>
@@ -1792,7 +1787,7 @@
 <context>
     <name>RenameWidget_ArrangeSection</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_ArrangeSection.cpp" line="+26"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_ArrangeSection.cpp" line="+27"/>
         <source>Swap 2 sections:</source>
         <translation>交换两段:</translation>
     </message>
@@ -1810,7 +1805,7 @@
 <context>
     <name>RenameWidget_ConsecutiveFileNo</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.cpp" line="+44"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.cpp" line="+44"/>
         <source>Start no.:</source>
         <translation>编号起点:</translation>
     </message>
@@ -1818,7 +1813,7 @@
 <context>
     <name>RenameWidget_ConvertBoldUnicodeCharset2Ascii</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.cpp" line="+9"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_ConvertBoldUnicodeCharset2Ascii.cpp" line="+9"/>
         <source>Unicode to ASCII</source>
         <translation>Unicode字符转ASCII字符</translation>
     </message>
@@ -1826,7 +1821,7 @@
 <context>
     <name>RenameWidget_Insert</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_Insert.cpp" line="+56"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Insert.cpp" line="+57"/>
         <source>Insert string</source>
         <translation>插入字符串</translation>
     </message>
@@ -1844,7 +1839,7 @@
 <context>
     <name>RenameWidget_LongPath</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_LongPath.cpp" line="+13"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_LongPath.cpp" line="+13"/>
         <source>Drop Section:</source>
         <translation>丢弃段号:</translation>
     </message>
@@ -1857,17 +1852,17 @@
 <context>
     <name>RenameWidget_Numerize</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_Numerize.cpp" line="+13"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Numerize.cpp" line="+14"/>
         <source>Sort by dragging</source>
         <translation>拖拽排序</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+16"/>
         <source>Extension Unique Counter</source>
         <translation>扩展名独立计数</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+40"/>
         <source>Base name:</source>
         <translation>基础名:</translation>
     </message>
@@ -1885,7 +1880,7 @@
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+9"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+10"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>
@@ -1903,7 +1898,7 @@
 <context>
     <name>RenameWidget_SwapFileNames</name>
     <message>
-        <location filename="../Component/RenameWidgets/RenameWidget_SwapFileNames.cpp" line="+21"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_SwapFileNames.cpp" line="+21"/>
         <source>Swap 2 file names</source>
         <translation>交换二者文件名</translation>
     </message>
@@ -1911,7 +1906,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../Component/RibbonJson.cpp" line="+64"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+64"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -1919,7 +1914,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../Component/RibbonMenu.cpp" line="+42"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+43"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -1942,7 +1937,7 @@
 <context>
     <name>RightClickMenuActions</name>
     <message>
-        <location filename="../Actions/RightClickMenuActions.cpp" line="+7"/>
+        <location filename="../../Actions/RightClickMenuActions.cpp" line="+7"/>
         <source>Search in Net Explorer</source>
         <translation>在浏览器中搜索</translation>
     </message>
@@ -1965,7 +1960,7 @@
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../Actions/SceneInPageActions.cpp" line="+13"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+13"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -2028,7 +2023,7 @@
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../View/SceneListView.cpp" line="+39"/>
+        <location filename="../../View/SceneListView.cpp" line="+39"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
@@ -2056,7 +2051,7 @@
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../Component/ScenePageControl.cpp" line="+11"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+12"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>
@@ -2079,7 +2074,7 @@
 <context>
     <name>ScrollBarPolicyMenu</name>
     <message>
-        <location filename="../Component/ScrollBarPolicyMenu.cpp" line="+14"/>
+        <location filename="../../Component/ScrollBarPolicyMenu.cpp" line="+15"/>
         <source>As Needed</source>
         <translation>需要时</translation>
     </message>
@@ -2097,7 +2092,7 @@
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../Component/Stylesheet/StyleSheetTreeView.cpp" line="+30"/>
+        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+30"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
@@ -2140,7 +2135,7 @@
 <context>
     <name>SyncFileSystemModificationActions</name>
     <message>
-        <location filename="../Actions/SyncFileSystemModificationActions.cpp" line="+14"/>
+        <location filename="../../Actions/SyncFileSystemModificationActions.cpp" line="+14"/>
         <source>Sync</source>
         <translation>同步</translation>
     </message>
@@ -2153,7 +2148,7 @@
 <context>
     <name>TextElideModeMenu</name>
     <message>
-        <location filename="../Component/TextElideModeMenu.cpp" line="+12"/>
+        <location filename="../../Component/TextElideModeMenu.cpp" line="+13"/>
         <source>Elide Left</source>
         <translation>省略左侧</translation>
     </message>
@@ -2176,7 +2171,7 @@
 <context>
     <name>ThumbnailImageViewer</name>
     <message>
-        <location filename="../Component/ThumbnailImageViewer.cpp" line="+298"/>
+        <location filename="../../Component/ThumbnailImageViewer.cpp" line="+299"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -2194,7 +2189,7 @@
 <context>
     <name>ThumbnailProcessActions</name>
     <message>
-        <location filename="../Actions/ThumbnailProcessActions.cpp" line="+7"/>
+        <location filename="../../Actions/ThumbnailProcessActions.cpp" line="+8"/>
         <source>Create 1x1 thumbnail</source>
         <translation>创建1x1缩略图</translation>
     </message>
@@ -2247,7 +2242,7 @@
 <context>
     <name>TorrDBAction</name>
     <message>
-        <location filename="../Actions/TorrDBAction.cpp" line="+7"/>
+        <location filename="../../Actions/TorrDBAction.cpp" line="+7"/>
         <source>&amp;Open with Sys App</source>
         <translation>用系统应用打开(&amp;O)</translation>
     </message>
@@ -2285,7 +2280,7 @@
 <context>
     <name>TypeFilterButton</name>
     <message>
-        <location filename="../Component/TypeFilterButton.cpp" line="+12"/>
+        <location filename="../../Component/TypeFilterButton.cpp" line="+13"/>
         <source>Filter</source>
         <translation>过滤</translation>
     </message>
@@ -2293,7 +2288,7 @@
 <context>
     <name>VideoTableView</name>
     <message>
-        <location filename="../Component/VideoPlayer/VideoTableView.cpp" line="+24"/>
+        <location filename="../../Component/VideoPlayer/VideoTableView.cpp" line="+24"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
@@ -2321,7 +2316,7 @@
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../Actions/ViewActions.cpp" line="+8"/>
+        <location filename="../../Actions/ViewActions.cpp" line="+9"/>
         <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>

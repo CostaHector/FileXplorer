@@ -1,6 +1,7 @@
 ﻿#include "ComplexOperation.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicVariable.h"
 #include "Logger.h"
 #include "UndoRedo.h"

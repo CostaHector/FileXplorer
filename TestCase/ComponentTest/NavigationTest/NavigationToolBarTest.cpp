@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -31,7 +32,7 @@ class NavigationToolBarTest : public PlainTestSuite {
 
   void D2Ev_D0Ev_ok() {
     Configuration().remove(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name);
-    QCOMPARE(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.v).toBool(), false);
+    QCOMPARE(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.toVariant()).toBool(), false);
     {  // 普通析构函数
       NavigationToolBar naviTooBar{"NaviToolbarOnExpandSidebar"};
       QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), false);

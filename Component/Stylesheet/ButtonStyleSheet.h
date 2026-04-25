@@ -5,7 +5,7 @@
 
 class ButtonStyleSheet : public StyleSheetGetter {
 public:
-  QString GetStyleSheet(Style::StyleSheetE styleE) const override;
+  QString GetStyleSheet(Style::StyleThemeE styleE) const override;
 private:
   static bool mRegistered;
 };

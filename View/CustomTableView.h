@@ -32,7 +32,7 @@ class CustomTableView : public QTableView {
   void scrollContentsBy(int dx, int dy) override;
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
-  bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true};
+  bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
   void changeEvent(QEvent* event) override;
 
@@ -40,8 +40,8 @@ class CustomTableView : public QTableView {
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
   bool ShowOrHideColumnCore();
-  bool SetBgOverlayOpacity();
   void UpdateCachedColor();
+  void onStyleChanged();
 
   const QString m_name;
 
@@ -57,7 +57,6 @@ class CustomTableView : public QTableView {
   QAction* _AUTO_SCROLL{nullptr};
   QAction* _ALTERNATING_ROW_COLORS{nullptr};
   QAction* _SHOW_GRID{nullptr};
-  QAction* _BG_OVERLAY_OPACITY{nullptr};
   ScrollBarPolicyMenu *m_horScrollBarPolicyMenu{nullptr}, *m_verScrollBarPolicyMenu{nullptr};
 
   DoubleRowHeader* m_horHeader{nullptr};
@@ -65,7 +64,6 @@ class CustomTableView : public QTableView {
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
 
-  int m_bgOverlayOpacity{255};
   QColor m_cachedColor;
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }

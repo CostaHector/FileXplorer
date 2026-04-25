@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include <QLineEdit>
 #include <QMenu>
 #include <QLabel>

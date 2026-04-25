@@ -1,6 +1,7 @@
 ﻿#include "RenameWidget_Replace.h"
 #include "RenameHelper.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
@@ -33,7 +34,7 @@ void RenameWidget_Replace::extraSubscribe() {
 auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   m_oldStrCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_oldStrCB)
-  m_oldStrCB->addItems(Configuration().value(RenamerKey::OLD_STR_LIST.name, RenamerKey::OLD_STR_LIST.v).toStringList());
+  m_oldStrCB->addItems(MultiLineStr2StrList(RenamerKey::REP_OLD_STR_LIST));
   m_oldStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_oldStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_oldStrCB->setEditable(true);
@@ -41,7 +42,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
 
   m_newStrCB = new (std::nothrow) QComboBox{this};
   CHECK_NULLPTR_RETURN_VOID(m_newStrCB)
-  m_newStrCB->addItems(Configuration().value(RenamerKey::NEW_STR_LIST.name, RenamerKey::NEW_STR_LIST.v).toStringList());
+  m_newStrCB->addItems(MultiLineStr2StrList(RenamerKey::NEW_STR_LIST));
   m_newStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   m_newStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   m_newStrCB->setEditable(true);
@@ -51,7 +52,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
   m_regexCB->setIcon(QIcon(":img/REGEX"));
   m_regexCB->setToolTip("Enable regex");
-  m_regexCB->setChecked(Configuration().value(RenamerKey::REGEX_ENABLED.name, RenamerKey::REGEX_ENABLED.v).toBool());
+  m_regexCB->setChecked(Configuration().value(RenamerKey::REGEX_ENABLED.name, RenamerKey::REGEX_ENABLED.toVariant()).toBool());
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {

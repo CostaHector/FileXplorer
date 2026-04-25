@@ -2,6 +2,7 @@
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NameSectionArrange.h"
 
 RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
@@ -46,7 +47,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   m_swap2Index->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_swap2Index->setToolTip("Section at two indexes will be swapped");
   m_swap2Index->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  const QString& defaultUserInput = Configuration().value(RenamerKey::ARRANGE_SECTION_INDEX.name, RenamerKey::ARRANGE_SECTION_INDEX.v).toString();
+  const QString& defaultUserInput = Configuration().value(RenamerKey::ARRANGE_SECTION_INDEX.name, RenamerKey::ARRANGE_SECTION_INDEX.toVariant()).toString();
   m_swap2Index->addItem(defaultUserInput);
   m_swap2Index->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
 

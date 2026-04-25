@@ -2,6 +2,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include <QFileInfo>
 #include <QFile>
@@ -144,7 +145,7 @@ bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, 
 }
 
 SceneInfo::Role SceneInfo::GetInitialSortRole() {
-  const int role{Configuration().value(SceneKey::SORT_BY_ROLE.name, SceneKey::SORT_BY_ROLE.v).toInt()};
+  const int role{Configuration().value(SceneKey::SORT_BY_ROLE.name, SceneKey::SORT_BY_ROLE.toVariant()).toInt()};
   if (role < DEF_BEGIN_ROLE || role > INVALID_BUTT_ROLE) {
     return DEF_BEGIN_ROLE;
   }
@@ -156,7 +157,7 @@ void SceneInfo::SaveInitialSortRole(Role sortRole) {
 }
 
 bool SceneInfo::GetInitialSortOrderReverse() {
-  return Configuration().value(SceneKey::SORT_ORDER_REVERSE.name, SceneKey::SORT_ORDER_REVERSE.v).toBool();
+  return Configuration().value(SceneKey::SORT_ORDER_REVERSE.name, SceneKey::SORT_ORDER_REVERSE.toVariant()).toBool();
 }
 
 void SceneInfo::SaveSortOrderReverse(bool bReverse) {
@@ -164,7 +165,7 @@ void SceneInfo::SaveSortOrderReverse(bool bReverse) {
 }
 
 bool SceneInfo::GetInitialDisableImageDecoration() {
-  return Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.v).toBool();
+  return Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.toVariant()).toBool();
 }
 
 void SceneInfo::SaveDisableImageDecoration(bool bDisable) {

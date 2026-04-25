@@ -9,6 +9,7 @@
 #include "FileToolMock.h"
 #include "BatchRenameBy.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>

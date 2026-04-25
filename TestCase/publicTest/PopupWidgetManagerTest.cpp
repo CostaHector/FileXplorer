@@ -2,6 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "PopupWidgetManager.h"
@@ -11,7 +12,7 @@
 #include "RedundantImageFinder.h"
 #include "DuplicateVideosFinder.h"
 #include "TorrentsManagerWidget.h"
-#include "ConfigsTable.h"
+#include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
@@ -89,7 +90,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
     PopupWidgetManagerTestTemplate<DuplicateVideosFinder>("DuplicateVideosFinder", true);
     PopupWidgetManagerTestTemplate<RedundantImageFinder>("RedundantImageFinder", true);
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
-    PopupWidgetManagerTestTemplate<ConfigsTable>("ConfigsTable", true);
+    PopupWidgetManagerTestTemplate<ConfigsMgr>("ConfigsTable", true);
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
     PopupWidgetManagerTestTemplate<PasswordBook>("PasswordBook", true);
     PopupWidgetManagerTestTemplate<ResourceMonitorPanel>("ResourceMonitorPanel", true);

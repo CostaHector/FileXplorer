@@ -1,5 +1,6 @@
 #include "DoubleRowHeader.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 
 DoubleRowHeader::DoubleRowHeader(const QString &parentTableName, QWidget *parent)

@@ -3,6 +3,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include <QPixmapCache>
 #include <QBuffer>
 

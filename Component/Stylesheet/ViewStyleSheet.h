@@ -5,21 +5,21 @@
 
 class TableViewStyleSheet: public StyleSheetGetter {
 public:
-  QString GetStyleSheet(Style::StyleSheetE styleE) const override;
+  QString GetStyleSheet(Style::StyleThemeE styleE) const override;
 private:
   static bool mRegistered;
 };
 
 class ListViewStyleSheet: public StyleSheetGetter {
 public:
-  QString GetStyleSheet(Style::StyleSheetE styleE) const override;
+  QString GetStyleSheet(Style::StyleThemeE styleE) const override;
 private:
   static bool mRegistered;
 };
 
 class TreeViewStyleSheet: public StyleSheetGetter {
 public:
-  QString GetStyleSheet(Style::StyleSheetE styleE) const override;
+  QString GetStyleSheet(Style::StyleThemeE styleE) const override;
 private:
   static bool mRegistered;
 };

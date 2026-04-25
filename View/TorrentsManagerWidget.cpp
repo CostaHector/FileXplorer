@@ -1,6 +1,7 @@
 #include "TorrentsManagerWidget.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 
 #include "TorrDBAction.h"
@@ -107,7 +108,7 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   }
 
   const QString& defaultOpenDir =
-      Configuration().value(PathKey::DB_INSERT_TORRENTS_FROM.name, PathKey::DB_INSERT_TORRENTS_FROM.v).toString();
+      Configuration().value(PathKey::DB_INSERT_TORRENTS_FROM.name, PathKey::DB_INSERT_TORRENTS_FROM.toVariant()).toString();
   QString loadFromPath;
 #ifdef RUNNING_UNIT_TESTS
   loadFromPath = defaultOpenDir;

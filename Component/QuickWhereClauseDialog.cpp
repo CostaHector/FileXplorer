@@ -4,6 +4,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "StringTool.h"
 #include "TableFields.h"
@@ -41,7 +42,7 @@ void QuickWhereClauseDialog::Init() {
   m_whereHistComboBox->setEditable(false);
   m_whereHistComboBox->setInsertPolicy(QComboBox::InsertAtTop);
 
-  QString hists{Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.v).toString()};
+  QString hists{Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.toVariant()).toString()};
   if (hists.isEmpty()) {
     hists += R"(`NAME` LIKE "%%")";
     hists += WHERE_HIST_SPLIT_CHAR;

@@ -3,6 +3,7 @@
 #include "DuplicateVideosFinderActions.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
 

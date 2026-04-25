@@ -4,6 +4,7 @@
 #include "MenuToolButton.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "InputDialogHelper.h"
 
 RateActions& RateActions::GetInst(RateRequestFrom reqFrom) {
@@ -115,7 +116,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
   message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";
 
-  const int defaultRate = Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt();
+  const int defaultRate = Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.toVariant()).toInt();
 
   bool bAccept{false};
   int newRate{defaultRate};

@@ -3,6 +3,7 @@
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "ViewItemDelegate.h"

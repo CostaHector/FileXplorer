@@ -7,7 +7,7 @@
 
 class StyleSheetEditDelegate : public QStyledItemDelegate {
 public:
-  explicit StyleSheetEditDelegate(QObject *parent = nullptr);
+  explicit StyleSheetEditDelegate(int dataTypeRole = Qt::ItemDataRole::UserRole, int editableColumn = 0, QObject *parent = nullptr);
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
@@ -18,9 +18,15 @@ public:
   void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
-  QWidget* createLineEditorWithColorDialog(QWidget* editWidget) const;
-  QWidget* createLineEditorWithFileDialog(QWidget* editWidget) const;
+  QWidget *createLineEditorWithColorDialog(QWidget *editWidget) const;
+  QWidget *createLineEditorWithFileDialog(QWidget *editWidget) const;
+  QWidget *createLineEditorWithFolderDialog(QWidget *editWidget) const;
+  QComboBox *createComboBoxEditor(int dataType, QWidget *parent) const;
 
+  void setComboBoxEditorData(QWidget *editor, const QModelIndex &index, int dataType) const;
+  void setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
+
+  const int mDataTypeRole, mEditableColumn;
   QStringList mFontFamilyItems;
   QMap<QString, QFont::Weight> mFontWeightItems;
   QMap<QString, QFont::Style> mFontStyleItems;

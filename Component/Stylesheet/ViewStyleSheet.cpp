@@ -6,11 +6,11 @@ bool TableViewStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_p
 bool ListViewStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new ListViewStyleSheet));
 bool TreeViewStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new TreeViewStyleSheet));
 
-QString TableViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString TableViewStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QTableView {
     show-decoration-selected: 1;
@@ -38,25 +38,26 @@ QTableView::item:focus {
 QTableView::item:hover {
     background: %6;
 }
+        )";
+      break;
+    default:
+      return "";
+  }
+  /* 5.15 版本样式表使用背景图片时存在严重内存泄漏!
 QTableView[showBackgroundImageFlag] {
     background-image: url("%7");
     background-position: center top;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-        )";
-      break;
-    default:
-      return "";
-  }
+   */
   const auto& inst = GetInst();
   QString bgAlternateRow{toRgbaString(inst.GetColorValue("Background/View/AlternateRow", styleE))};
-  QString gridline{inst.GetColorValue("GridLine", styleE)};
+  QString gridline{inst.GetColorValue("Background/View/GridLine", styleE)};
   QString borderGeneral{inst.GetColorValue("Border/General", styleE)};
   QString bgSelectedActive{inst.GetColorValue("Background/View/SelectedActive", styleE)};
   QString bgSelectedInactive{inst.GetColorValue("Background/View/SelectedInactive", styleE)};
   QString bgHover{inst.GetColorValue("Background/View/Hover", styleE)};
-  QString bgImage{inst.GetNoColorValue("BackgroundImage/TableView")};
 
   QString styleSheetTableCornerButton{R"(
 QTableView > QTableCornerButton::section {
@@ -64,16 +65,16 @@ QTableView > QTableCornerButton::section {
 }
 )"};
   QString tableCornerButtonSection{inst.GetColorValue("Background/View/TableCornerButton/Section", styleE)};
-  return styleSheet.arg(bgAlternateRow, gridline, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover, bgImage) //
+  return styleSheet.arg(bgAlternateRow, gridline, borderGeneral, bgSelectedActive, bgSelectedInactive, bgHover) //
          + styleSheetTableCornerButton.arg(tableCornerButtonSection);
 }
 
-QString ListViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString ListViewStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
 
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QListView {
     show-decoration-selected: 1;
@@ -110,11 +111,11 @@ QListView::item:hover {
   return styleSheet;
 }
 
-QString TreeViewStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString TreeViewStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QTreeView {
     show-decoration-selected: 0;

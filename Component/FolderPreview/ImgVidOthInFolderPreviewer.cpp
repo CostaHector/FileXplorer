@@ -3,16 +3,17 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 constexpr ImgVidOthInFolderPreviewer::MediaBtnHandlerFunc ImgVidOthInFolderPreviewer::MEDIA_HANDLERS_MAP[];
 
 ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent)
     : FullScreenableSplitter{memoryName, Qt::Orientation::Vertical, parent} {
-  m_bImgVisible = Configuration().value(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, BrowserKey::FLOATING_IMAGE_VIEW_SHOW.v).toBool();
-  m_bVidVisible = Configuration().value(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, BrowserKey::FLOATING_VIDEO_VIEW_SHOW.v).toBool();
-  m_bOthVisible = Configuration().value(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, BrowserKey::FLOATING_OTHER_VIEW_SHOW.v).toBool();
+  m_bImgVisible = Configuration().value(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, BrowserKey::FLOATING_IMAGE_VIEW_SHOW.toVariant()).toBool();
+  m_bVidVisible = Configuration().value(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, BrowserKey::FLOATING_VIDEO_VIEW_SHOW.toVariant()).toBool();
+  m_bOthVisible = Configuration().value(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, BrowserKey::FLOATING_OTHER_VIEW_SHOW.toVariant()).toBool();
 
-  const QString& seqStr = Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, BrowserKey::FLOATING_MEDIA_TYPE_SEQ.v).toString();
+  const QString& seqStr = Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, BrowserKey::FLOATING_MEDIA_TYPE_SEQ.toVariant()).toString();
   decltype(mMediaSequence) mediaSequenceMemory;
   if (IsValidMediaTypeSeq(seqStr, mediaSequenceMemory) && mediaSequenceMemory.size() == mMediaSequence.size()) {
     mMediaSequence.swap(mediaSequenceMemory);

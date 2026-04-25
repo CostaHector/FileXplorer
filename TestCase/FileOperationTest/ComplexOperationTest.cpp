@@ -8,6 +8,7 @@
 #include "EndToExposePrivateMember.h"
 #include "PathTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 using namespace ComplexOperation;
 

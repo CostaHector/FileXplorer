@@ -2,29 +2,34 @@
 #include "PlainTestSuite.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "MemoryKey.h"
 #include "ConfigsModel.h"
 #include "EndToExposePrivateMember.h"
+
 #include "GlbDataProtect.h"
+
+#include "MemoryKey.h"
+#include "StyleKey.h"
+#include "Configuration.h"
 
 #include <QSignalSpy>
 
 class ConfigsModelTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
   void default_ok() {
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
+    GlbDataProtect<QList<const KV *>> editableKVsBackup{KV::GetEditableKVs()};
     KV::GetEditableKVs().clear();
 
     // not crash down
     ConfigsModel model;
     QCOMPARE(model.rowCount(), 0);
-    QCOMPARE(model.columnCount(), 3);
-    QCOMPARE(model.CONFIGS_TABLE_HEADER.size(), 3);
+    QCOMPARE(model.columnCount(), (int) ConfigsModel::ColumnE::COLUMNS_COUNT);
+    QCOMPARE(model.CONFIGS_TABLE_HEADER.size(), (int) ConfigsModel::ColumnE::COLUMNS_COUNT);
     QCOMPARE(model.headerData(0, Qt::Orientation::Horizontal, Qt::DisplayRole).toString(), "Name");
     QCOMPARE(model.headerData(1, Qt::Orientation::Horizontal, Qt::DisplayRole).toString(), "Initial value");
     QCOMPARE(model.headerData(2, Qt::Orientation::Horizontal, Qt::DisplayRole).toString(), "Current value");
+    QCOMPARE(model.headerData(3, Qt::Orientation::Horizontal, Qt::DisplayRole).toString(), "Validation");
 
     QCOMPARE(model.headerData(0, Qt::Orientation::Vertical, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
     QCOMPARE(model.headerData(0, Qt::Orientation::Vertical, Qt::DisplayRole).toInt(), 1);
@@ -41,14 +46,19 @@ class ConfigsModelTest : public PlainTestSuite {
     QCOMPARE(model.filePath({}), "");
   }
 
-  void basic_function_ok() {
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
+  void data_set_data_ok() {
+    using namespace RawVariant;
+    using namespace ValueChecker;
+
+    GlbDataProtect<QList<const KV *>> editableKVsBackup{KV::GetEditableKVs()};
     KV::GetEditableKVs().clear();
 
-    KV playerFilePath{"playerFilePath", "inexists player file path", ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::FILE_PATH}, true};    // invalid
-    KV workFolderPath{"workFolderPath", "inexists work folder path", ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::FOLDER_PATH}, true};  // invalid
-    KV volumeValue{"volumeValue", -5, ValueChecker{0, 101}, true};                                                                      // invalid
-    KV playerMute{"playerMute", false, ValueChecker{VALUE_CHECKER_TYPE::VALUE_TYPE::PLAIN_BOOL}, true};                                 // valid
+    constexpr KV playerFilePath{"playerFilePath", Var{"inexists/player/file/path"}, GeneralDataType::Type::FILE_PATH, ValueChecker::GeneralFilePathChecker};     // invalid
+    constexpr KV workFolderPath{"workFolderPath", Var{"inexists/work/folder/path"}, GeneralDataType::Type::FOLDER_PATH, ValueChecker::GeneralFolderPathChecker}; // invalid
+    constexpr KV volumeValue{"volumeValue", Var{-5}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 100>};                                          // invalid
+    constexpr KV playerMute{"playerMute", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};                                                    // valid
+    QList<const KV *> tempLst{&playerFilePath, &workFolderPath, &volumeValue, &playerMute};
+    KV::GetEditableKVs().swap(tempLst);
     QCOMPARE(KV::GetEditableKVs().size(), 4);
 
     // 配置当前值清空, 检查总共4条配置, 预设值有3个错误;
@@ -67,14 +77,14 @@ class ConfigsModelTest : public PlainTestSuite {
     QCOMPARE(model.data(volumeValueIndex).toString(), "volumeValue");
     QCOMPARE(model.data(playerMuteIndex).toString(), "playerMute");
 
-    QCOMPARE(model.data(playerFilePathIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toString(), "inexists player file path");
-    QCOMPARE(model.data(workFolderPathIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toString(), "inexists work folder path");
+    QCOMPARE(model.data(playerFilePathIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toString(), "inexists/player/file/path");
+    QCOMPARE(model.data(workFolderPathIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toString(), "inexists/work/folder/path");
     QCOMPARE(model.data(volumeValueIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toInt(), -5);
     QCOMPARE(model.data(playerMuteIndex.siblingAtColumn(ConfigsModel::INITIAL_VALUE)).toBool(), false);
 
     // 无当前值时, 将使用预设值
-    QCOMPARE(model.data(playerFilePathIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toString(), "inexists player file path");
-    QCOMPARE(model.data(workFolderPathIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toString(), "inexists work folder path");
+    QCOMPARE(model.data(playerFilePathIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toString(), "inexists/player/file/path");
+    QCOMPARE(model.data(workFolderPathIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toString(), "inexists/work/folder/path");
     QCOMPARE(model.data(volumeValueIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toInt(), -5);
     QCOMPARE(model.data(playerMuteIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toBool(), false);
 
@@ -147,6 +157,52 @@ class ConfigsModelTest : public PlainTestSuite {
     QCOMPARE(model.data(volumeValueIndex.siblingAtColumn(ConfigsModel::CURRENT_VALUE)).toInt(), correctVolumeValue);
     QCOMPARE(model.filePath(playerFilePathIndex), correctPlayerPath);
     QCOMPARE(model.filePath(workFolderPathIndex), correctWorkFolderPath);
+  }
+
+  void setData_callback_ok() {
+    Configuration().clear();
+
+    using namespace RawVariant;
+    using namespace ValueChecker;
+
+    GlbDataProtect<QList<const KV *>> editableKVsBackup{KV::GetEditableKVs()};
+    QList<const KV *> tempLst{&StyleKey::BACKGROUND_IMAGE, &StyleKey::BACKGROUND_OVERLAY_OPACITY};
+    KV::GetEditableKVs().swap(tempLst);
+    QCOMPARE(KV::GetEditableKVs().size(), 2);
+
+    Configuration().clear();
+    ConfigsModel model;
+    QCOMPARE(model.rowCount(), 2);
+    // QCOMPARE(model.failCount(), 0); don't check here BACKGROUND_IMAGE dependents on image in resources.qrc
+
+    QModelIndex bgImgIndex = model.index(0, ConfigsModel::EDITABLE_COLUMN);
+    QModelIndex bgOverlayOpacityIndex = model.index(1, ConfigsModel::EDITABLE_COLUMN);
+
+    QVERIFY(StyleKey::BACKGROUND_IMAGE.pChecker(StyleKey::BACKGROUND_IMAGE.v.data.str));
+    QVERIFY(StyleKey::BACKGROUND_OVERLAY_OPACITY.pChecker(StyleKey::BACKGROUND_OVERLAY_OPACITY.v.data.i));
+
+    QVERIFY(StyleKey::BACKGROUND_OVERLAY_OPACITY.changedCallback != nullptr);
+
+    using namespace StyleKey;
+    QVERIFY(StyleKey::BACKGROUND_OVERLAY_OPACITY.v.data.i != 140);
+    QVERIFY(StyleKey::GetBgOverlayOpacity() != 140);
+    QSignalSpy notifierSpy{&Notifier::instance(), &Notifier::styleChanged};
+
+    QVERIFY(model.setData(bgOverlayOpacityIndex, 140, Qt::EditRole));
+    QCOMPARE(notifierSpy.count(), 1);
+    notifierSpy.clear();
+    QCOMPARE(StyleKey::GetBgOverlayOpacity(), 140);
+
+    QVERIFY(model.setData(bgOverlayOpacityIndex, 140, Qt::EditRole)); // unchange set ok, but will not emit signal
+    QCOMPARE(notifierSpy.count(), 0);
+    notifierSpy.clear();
+    QCOMPARE(StyleKey::GetBgOverlayOpacity(), 140);
+
+    QString curFile{__FILE__};
+    QVERIFY(model.setData(bgImgIndex, curFile, Qt::EditRole));
+    QCOMPARE(notifierSpy.count(), 1);
+    notifierSpy.clear();
+    QCOMPARE(StyleKey::GetBgImage().isNull(), true); // file but not not image
   }
 };
 

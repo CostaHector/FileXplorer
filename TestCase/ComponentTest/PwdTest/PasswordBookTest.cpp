@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "PasswordBook.h"
 #include "SimpleAES.h"

@@ -17,8 +17,8 @@
 
 template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 template struct EnumIntAction<ViewTypeTool::ViewType>;
-template struct EnumIntAction<Style::StyleE>;
-template struct EnumIntAction<Style::StyleSheetE>;
+template struct EnumIntAction<Style::StylePresetE>;
+template struct EnumIntAction<Style::StyleThemeE>;
 template struct EnumIntAction<SearchTools::SearchModeE>;
 template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 template struct EnumIntAction<QCryptographicHash::Algorithm>;
