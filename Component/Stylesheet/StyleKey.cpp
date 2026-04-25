@@ -107,7 +107,7 @@ bool onBgImgPathChanged(const QVariant& newBgImgPath) {
 
   WhenBackGroundImageParms();
 
-  emit Notifier::instance().styleChanged();
+  emit Notifier::instance().styleChanged(Notifier::ChangedReason::IMAGE_PATH);
   return true;
 }
 
@@ -123,7 +123,7 @@ bool onBgImgOverlayOpacityChanged(const QVariant& newBgOverlayOpacity) {
 
   WhenBackGroundImageParms();
 
-  emit Notifier::instance().styleChanged();
+  emit Notifier::instance().styleChanged(Notifier::ChangedReason::OVERLAY_OPACITY);
   return true;
 }
 
@@ -148,7 +148,7 @@ bool onStyleThemeChanged(const QVariant& newStyleTheme) {
 
   WhenBackGroundImageParms();
 
-  emit Notifier::instance().styleChanged();
+  emit Notifier::instance().styleChanged(Notifier::ChangedReason::THEME);
   return true;
 }
 

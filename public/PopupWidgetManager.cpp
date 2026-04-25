@@ -118,7 +118,7 @@ void PopupWidgetManager<WidgetType>::createWidget() {
   if (Configuration().contains(m_geometryCfgKey)) {
     m_widget->restoreGeometry(Configuration().value(m_geometryCfgKey).toByteArray());
   } else {
-    m_widget->setGeometry(DEFAULT_GEOMETRY);
+    m_widget->setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 
   // window flag must ahead of event filter; setWindowFlags must ahead of setWindowFlag

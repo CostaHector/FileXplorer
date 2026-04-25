@@ -1,8 +1,8 @@
 #include "KV.h"
+#include "Configuration.h"
 
-QList<const KV*>& KV::GetEditableKVs() {
-  static QList<const KV*> editableKVs;
-  return editableKVs;
+bool KV::isCurValuePassChecker() const {
+  return pChecker == nullptr || pChecker(getConfig(*this));
 }
 
 QVariant KV::toVariant() const {

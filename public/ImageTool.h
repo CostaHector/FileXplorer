@@ -2,6 +2,7 @@
 #define IMAGETOOL_H
 
 #include <QFileIconProvider>
+#include <QStyle>
 
 namespace ImageTool {
 bool IsFileAbsPathImage(const QString& fileAbsPath);
@@ -15,6 +16,8 @@ QIcon GetIconFromCached(const QString& starDotExt);
 
 QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight, bool bSmooth=false);
 QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase);
+
+QIcon GetBuiltInIcon(QStyle::StandardPixmap spE);
 }
 
 struct IMAGE_SIZE {

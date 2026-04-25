@@ -3,7 +3,7 @@
 #include "PublicMacro.h"
 #include "FileTool.h"
 #include "NotificatorMacro.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 
 #include <QCompleter>
 #include <QKeyEvent>
@@ -74,7 +74,7 @@ AddressELineEdit::AddressELineEdit(QWidget* parent) : QStackedWidget{parent} {
   m_pathComboBox->setInsertPolicy(QComboBox::InsertAtTop);
   {
     auto* le = m_pathComboBox->lineEdit();
-    le->addAction(StyleSheet::GetSystemDirOpenIcon(), QLineEdit::ActionPosition::LeadingPosition);
+    le->addAction(ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DirOpenIcon), QLineEdit::ActionPosition::LeadingPosition);
   }
   m_pathComboBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 

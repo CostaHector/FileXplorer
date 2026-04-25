@@ -54,7 +54,7 @@ void CurrentRowPreviewer::UpdatePreview() {
 }
 
 QSize CurrentRowPreviewer::sizeHint() const {
-  static const int w = Configuration().value("CurrentRowPreviewer/width", DOCKER_DEFAULT_SIZE.width()).toInt();
+  static const int w = Configuration().value("CurrentRowPreviewer/width", SizeTool::DOCKER_DEFAULT_SIZE.width()).toInt();
   return {w, QStackedWidget::sizeHint().height()};
 }
 

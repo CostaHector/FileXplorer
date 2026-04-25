@@ -6,6 +6,7 @@
 #include "PublicVariable.h"
 #include "JsonActions.h"
 #include "ViewActions.h"
+#include "MemoryKey.h"
 
 RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   : QToolBar{title, parent}                                   //

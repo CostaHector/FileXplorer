@@ -12,7 +12,6 @@ class StyleSheetTreeView : public CustomTreeView {
   Q_OBJECT
 public:
   explicit StyleSheetTreeView(QWidget* parent = nullptr);
-  ~StyleSheetTreeView() = default;
   void setFilter(const QString& filter);
   QString curFilter() const;
 signals:

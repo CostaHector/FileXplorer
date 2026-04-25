@@ -22,22 +22,6 @@ int main(int argc, char* argv[]) {
     LOG_I("argc[%d].", argc);
   }
 
-  {
-    QList<const KV*>& lst = KV::GetEditableKVs();
-    lst.push_back(&PathKey::LAST_TIME_COPY_TO);
-
-    lst.push_back(&BehaviorKey::VIDS_LAST_TABLE_NAME);
-    lst.push_back(&BehaviorKey::WHERE_CLAUSE_HISTORY);
-
-    lst.push_back(&RedunImgFinderKey::RUND_IMG_PATH);
-
-    lst.push_back(&StyleKey::STYLE_PRESET);
-    lst.push_back(&StyleKey::STYLE_THEME);
-    lst.push_back(&StyleKey::BACKGROUND_IMAGE);
-    lst.push_back(&StyleKey::BACKGROUND_OVERLAY_OPACITY);
-  }
-
-
   QApplication app{argc, argv};
   Logger::SetAutoFlushAllLevel(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.toVariant()).toBool());
 

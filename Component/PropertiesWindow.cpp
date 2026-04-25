@@ -146,7 +146,7 @@ void PropertiesWindow::ReadSetting() {
   if (Configuration().contains("Geometry/PropertiesWindow")) {
     restoreGeometry(Configuration().value("Geometry/PropertiesWindow").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

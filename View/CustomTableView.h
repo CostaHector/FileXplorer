@@ -34,13 +34,11 @@ class CustomTableView : public QTableView {
   virtual void initExclusivePreferenceSetting() {}
   bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
-  void changeEvent(QEvent* event) override;
 
  private:
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
   bool ShowOrHideColumnCore();
-  void UpdateCachedColor();
   void onStyleChanged();
 
   const QString m_name;
@@ -63,8 +61,6 @@ class CustomTableView : public QTableView {
   VerMenuInHeader* m_verHeader{nullptr};
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
-
-  QColor m_cachedColor;
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }
   static QSet<QString> mTableInstSet;

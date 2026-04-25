@@ -106,7 +106,7 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
   if (Configuration().contains("FileXplorer/Geometry")) {
     restoreGeometry(Configuration().value("FileXplorer/Geometry").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
   setWindowTitle("FileXplorer");
   setWindowIcon(QIcon(":img/APP_ICON_PATH"));

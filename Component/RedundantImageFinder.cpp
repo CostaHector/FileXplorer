@@ -78,7 +78,7 @@ void RedundantImageFinder::ReadSetting() {
   if (Configuration().contains(GEOMETRY_KEY)) {
     restoreGeometry(Configuration().value(GEOMETRY_KEY).toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

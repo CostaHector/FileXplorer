@@ -116,8 +116,6 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   SubscribeHeaderActions();
   RowHeightRegistry<CustomTableView>::registerWidgetForAdjust(this, true);
-
-  UpdateCachedColor();
 }
 
 CustomTableView::~CustomTableView() {
@@ -201,13 +199,7 @@ bool CustomTableView::ShowOrHideColumnCore() {
   return true;
 }
 
-void CustomTableView::UpdateCachedColor() {
-  m_cachedColor = palette().color(QPalette::Base);
-  m_cachedColor.setAlpha(StyleKey::GetBgOverlayOpacity());
-}
-
 void CustomTableView::onStyleChanged() {
-  UpdateCachedColor();
   viewport()->update();
 }
 
@@ -270,12 +262,4 @@ void CustomTableView::paintEvent(QPaintEvent* event) {
     }
   }
   QTableView::paintEvent(event);
-}
-
-void CustomTableView::changeEvent(QEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  QTableView::changeEvent(event);
-  if (event->type() == QEvent::PaletteChange) {
-    UpdateCachedColor();
-  }
 }

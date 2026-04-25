@@ -170,9 +170,6 @@ bool StyleItemData::match(const int& number) const {
              || (curValue.toInt(&bIsInt) == number && bIsInt) //
              || (modifiedToValue.toInt(&bIsInt) == number && bIsInt);
     }
-    case GeneralDataType::Type::FONT_FAMILY:
-    case GeneralDataType::Type::COLOR:
-    case GeneralDataType::Type::FILE_PATH:
     default:
       return false;
   }

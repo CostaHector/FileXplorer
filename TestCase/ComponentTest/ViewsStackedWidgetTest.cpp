@@ -16,6 +16,8 @@
 #include "Logger.h"
 #include "TableFields.h"
 #include "ScenesListModel.h"
+#include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>

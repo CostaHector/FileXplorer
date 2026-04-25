@@ -1,5 +1,7 @@
 #include "MenuToolButton.h"
 #include "PublicMacro.h"
+#include "KV.h"
+#include "Configuration.h"
 #include <QMenu>
 
 MenuToolButton::MenuToolButton(QList<QAction*> dropdownActions,             //
