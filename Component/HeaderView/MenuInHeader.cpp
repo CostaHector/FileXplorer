@@ -1,5 +1,6 @@
 #include "MenuInHeader.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "InputDialogHelper.h"

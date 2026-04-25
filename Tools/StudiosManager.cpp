@@ -5,6 +5,7 @@
 #include "JsonRenameRegex.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "JsonKey.h"
 #include "JsonHelper.h"
 #include <QVariantHash>

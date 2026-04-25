@@ -1,6 +1,7 @@
 #include "VideoView.h"
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 

@@ -7,6 +7,7 @@
 #include "TDir.h"
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchTableView.h"
 #include "EndToExposePrivateMember.h"

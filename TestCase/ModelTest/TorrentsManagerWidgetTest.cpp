@@ -2,6 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "TorrentsManagerWidget.h"
 #include "EndToExposePrivateMember.h"

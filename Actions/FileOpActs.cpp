@@ -2,6 +2,7 @@
 #include "FileOperatorPub.h"
 #include "ComplexOperation.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"
 #include <QToolBar>
@@ -122,7 +123,7 @@ QActionGroup* FileOpActs::GetMOVE_COPY_TOActions() {
 }
 
 QActionGroup* FileOpActs::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey) {
-  QString historyStr = Configuration().value(memoryKey.name, memoryKey.v).toString();
+  QString historyStr = Configuration().value(memoryKey.name, memoryKey.toVariant()).toString();
   QStringList historyList = historyStr.split('\n');
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   for (const QString& path : historyList) {
@@ -377,7 +378,7 @@ void FileOpActs::InitFileStructureActions() {
                                 {FILE_STRUCTURE_PRESERVE, FileStuctureModeE::PRESERVE},       //
                                 {FILE_STRUCTURE_FLATTEN, FileStuctureModeE::FLATTEN}},
                                DEFAULT_FILE_STRUCTURE_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  const int fileStructureModeInt = Configuration().value(BehaviorKey::FILESYSTEM_STRUCTURE.name, BehaviorKey::FILESYSTEM_STRUCTURE.v).toInt();
+  const int fileStructureModeInt = Configuration().value(BehaviorKey::FILESYSTEM_STRUCTURE.name, BehaviorKey::FILESYSTEM_STRUCTURE.toVariant()).toInt();
   FileStuctureModeE fileStructureMode = mFileStructureIntAction.intVal2Enum(fileStructureModeInt);
   mFileStructureIntAction.setCheckedIfActionExist(fileStructureMode);
 }

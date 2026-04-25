@@ -1,4 +1,5 @@
 #include "StyleItemData.h"
+#include "ValueChecker.h"
 #include "Logger.h"
 #include <QColor>
 #include <QFile>
@@ -11,12 +12,12 @@ constexpr int StyleItemData::EDITABLE_COLUMN;
 constexpr const char* StyleItemData::HOR_HEADER_TITLES[];
 constexpr int StyleItemData::SORT_COLUMN;
 
-StyleItemData::StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const DataTypeE& _dataType)
+StyleItemData::StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const GeneralDataType::Type& _dataType)
   : name{_name}
   , defValue{_defValue}
   , curValue{_curValue}
   , dataType{_dataType}
-  , isGroup{_dataType == DataTypeE::GROUP} {}
+  , isGroup{_dataType == GeneralDataType::Type::GROUP} {}
 
 bool StyleItemData::modifyValueTo(const QVariant& _newValue, bool& bNewValueAccept) {
   // return value: changed or not
@@ -31,40 +32,55 @@ bool StyleItemData::modifyValueTo(const QVariant& _newValue, bool& bNewValueAcce
     return false;
   }
 
-  if (dataType == DataTypeE::COLOR) {
-    if (_newValue.toString().isEmpty()) {
-      bNewValueAccept = true;
-      modifiedToValue.clear();
-      return true;
+  using StringValidChecker = bool (*)(const QString& s);
+  static const auto emptyStringWillClear = [](const QVariant& newValue, QVariant& modifiedTo, bool& acceptInput, StringValidChecker checker) -> bool{
+    // return value: changed
+    if (newValue.toString().isEmpty()) { // 空字符串视为重置为QVariant()
+      modifiedTo.clear();
+      return acceptInput = true;
     }
-    if (bNewValueAccept = QColor::isValidColor(_newValue.toString())) {
+    if (checker == nullptr || checker(newValue.toString())) {
+      modifiedTo = newValue;
+      return acceptInput = true;
+    }
+    return acceptInput = false;
+  };
+
+  switch (dataType) {
+    case GeneralDataType::Type::PLAIN_STR:
+    case GeneralDataType::Type::MULTI_LINE_STR:
+    case GeneralDataType::Type::FONT_FAMILY: {
+      return emptyStringWillClear(_newValue, modifiedToValue, bNewValueAccept, nullptr);
+    }
+    case GeneralDataType::Type::PLAIN_BOOL: {
+      modifiedToValue = _newValue.toBool();
+      return bNewValueAccept = true;
+    }
+    case GeneralDataType::Type::PLAIN_INT: {
+      // NUMBER类型的数值字符串{"123"}, 或者FONT_WEIGHT, FONT_STYLE下拉框提供的QVariant{123};
+      const int newValueInt = _newValue.toInt(&bNewValueAccept);
+      if (bNewValueAccept) {
+        modifiedToValue = newValueInt;
+      }
+      return bNewValueAccept;
+    }
+    case GeneralDataType::Type::COLOR: {
+      return emptyStringWillClear(_newValue, modifiedToValue, bNewValueAccept, QColor::isValidColor);
+    }
+    case GeneralDataType::Type::FILE_PATH: {
+      return emptyStringWillClear(_newValue, modifiedToValue, bNewValueAccept, ValueChecker::GeneralFilePathStrChecker<false>);
+    }
+    case GeneralDataType::Type::IMAGE_PATH_OPTIONAL: {
+      return emptyStringWillClear(_newValue, modifiedToValue, bNewValueAccept, ValueChecker::GeneralFilePathStrChecker<true>);
+    }
+    case GeneralDataType::Type::FOLDER_PATH: {
+      return emptyStringWillClear(_newValue, modifiedToValue, bNewValueAccept, ValueChecker::GeneralFolderPathStrChecker);
+    }
+    default: {
       modifiedToValue = _newValue;
-      return true;
+      return bNewValueAccept = true;
     }
-    return false;
-  } else if (dataType == DataTypeE::FONT_FAMILY) {
-    if (_newValue.toString().isEmpty()) {
-      bNewValueAccept = true;
-      modifiedToValue.clear();
-      return true;
-    }
-    bNewValueAccept = true;
-    modifiedToValue = _newValue;
-    return true;
-  } else if (dataType == DataTypeE::FILE_PATH) {
-    const QString& newFilePath = _newValue.toString();
-    if (bNewValueAccept = QFile::exists(newFilePath)) {
-      modifiedToValue = newFilePath;
-    }
-    return bNewValueAccept;
   }
-  // NUMBER类型的数值字符串{"123"}, 或者FONT_WEIGHT, FONT_STYLE下拉框提供的QVariant{123};
-  const int newValueInt = _newValue.toInt(&bNewValueAccept);
-  if (bNewValueAccept) {
-    modifiedToValue = newValueInt;
-    return true;
-  }
-  return false;
 }
 
 bool StyleItemData::modifiedColorTo(const QString& newColor) {
@@ -72,7 +88,7 @@ bool StyleItemData::modifiedColorTo(const QString& newColor) {
   if (isGroup) {
     return false;
   }
-  if (dataType != DataTypeE::COLOR) {
+  if (dataType != GeneralDataType::Type::COLOR) {
     return false;
   }
   if (modifiedToValue.toString() == newColor) {
@@ -126,13 +142,13 @@ bool StyleItemData::match(const QString& subStr, const Qt::CaseSensitivity caseM
     return name.contains(subStr, caseMatter);
   }
   switch (dataType) {
-    case NUMBER:
-    case FONT_WEIGHT:
-    case FONT_STYLE:
+    case GeneralDataType::Type::PLAIN_INT:
+    case GeneralDataType::Type::FONT_WEIGHT:
+    case GeneralDataType::Type::FONT_STYLE:
       return name.contains(subStr, caseMatter);
-    case FONT_FAMILY:
-    case COLOR:
-    case FILE_PATH:
+    case GeneralDataType::Type::FONT_FAMILY:
+    case GeneralDataType::Type::COLOR:
+    case GeneralDataType::Type::FILE_PATH:
       return name.contains(subStr, caseMatter)                   //
              || defValue.toString().contains(subStr, caseMatter) //
              || curValue.toString().contains(subStr, caseMatter) //
@@ -146,17 +162,17 @@ bool StyleItemData::match(const int& number) const {
     return false;
   }
   switch (dataType) {
-    case NUMBER:
-    case FONT_WEIGHT:
-    case FONT_STYLE: {
+    case GeneralDataType::Type::PLAIN_INT:
+    case GeneralDataType::Type::FONT_WEIGHT:
+    case GeneralDataType::Type::FONT_STYLE: {
       bool bIsInt{false};
       return (defValue.toInt(&bIsInt) == number && bIsInt)    //
              || (curValue.toInt(&bIsInt) == number && bIsInt) //
              || (modifiedToValue.toInt(&bIsInt) == number && bIsInt);
     }
-    case FONT_FAMILY:
-    case COLOR:
-    case FILE_PATH:
+    case GeneralDataType::Type::FONT_FAMILY:
+    case GeneralDataType::Type::COLOR:
+    case GeneralDataType::Type::FILE_PATH:
     default:
       return false;
   }

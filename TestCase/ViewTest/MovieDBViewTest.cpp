@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "MovieDBView.h"
 #include "EndToExposePrivateMember.h"

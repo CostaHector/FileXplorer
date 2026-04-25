@@ -56,6 +56,10 @@ void FileSystemTableView::subscribe() {
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
+void FileSystemTableView::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultShowBackgroundImage = true;
+}
+
 void FileSystemTableView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, _fsModel, event);
 }

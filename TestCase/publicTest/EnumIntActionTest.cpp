@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "EnumIntAction.h"
 #include "EndToExposePrivateMember.h"
@@ -27,8 +28,8 @@
 
 extern template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
 extern template struct EnumIntAction<ViewTypeTool::ViewType>;
-extern template struct EnumIntAction<Style::StyleE>;
-extern template struct EnumIntAction<Style::StyleSheetE>;
+extern template struct EnumIntAction<Style::StylePresetE>;
+extern template struct EnumIntAction<Style::StyleThemeE>;
 extern template struct EnumIntAction<SearchTools::SearchModeE>;
 extern template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 extern template struct EnumIntAction<QCryptographicHash::Algorithm>;
@@ -99,16 +100,16 @@ class EnumIntActionTest : public PlainTestSuite {
         ViewTypeTool::DEFAULT_VIEW_TYPE,           //
         QActionGroup::ExclusionPolicy::Exclusive);
 
-    EnumIntActionChecker<Style::StyleE>(     //
-        Style::StyleE::STYLE_WINDOWS_VISTA,  //
-        Style::StyleE::STYLE_FUSION,         //
-        Style::StyleE::STYLE_WINDOWS_VISTA,  //
+    EnumIntActionChecker<Style::StylePresetE>(     //
+        Style::StylePresetE::PRESET_WINDOWS_VISTA,  //
+        Style::StylePresetE::PRESET_FUSION,         //
+        Style::StylePresetE::PRESET_WINDOWS_VISTA,  //
         QActionGroup::ExclusionPolicy::Exclusive);
 
-    EnumIntActionChecker<Style::StyleSheetE>(                //
-        Style::StyleSheetE::STYLESHEET_LIGHT,        //
-        Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG,  //
-        Style::StyleSheetE::STYLESHEET_LIGHT,        //
+    EnumIntActionChecker<Style::StyleThemeE>(                //
+        Style::StyleThemeE::THEME_LIGHT,        //
+        Style::StyleThemeE::THEME_DARK_MOON_FOG,  //
+        Style::StyleThemeE::THEME_LIGHT,        //
         QActionGroup::ExclusionPolicy::Exclusive);
 
     EnumIntActionChecker<SearchTools::SearchModeE>(  //

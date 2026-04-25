@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 class StyleSheetGetterTest : public PlainTestSuite {
   Q_OBJECT
@@ -28,9 +29,9 @@ private slots:
     auto& inst = StyleSheetGetter::GetInst();
     QCOMPARE(inst.mStyleCfg.isEmpty(), false);
     // base class return empty
-    QCOMPARE(inst.GetStyleSheet(Style::StyleSheetE::STYLESHEET_DEFAULT_NONE), "");
-    QCOMPARE(inst.GetStyleSheet(Style::StyleSheetE::STYLESHEET_LIGHT), "");
-    QCOMPARE(inst.GetStyleSheet(Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG), "");
+    QCOMPARE(inst.GetStyleSheet(Style::StyleThemeE::THEME_NONE), "");
+    QCOMPARE(inst.GetStyleSheet(Style::StyleThemeE::THEME_LIGHT), "");
+    QCOMPARE(inst.GetStyleSheet(Style::StyleThemeE::THEME_DARK_MOON_FOG), "");
 
     QFont fromEmptySettingFont = FontCfg::ReadGeneralFont();
     QFont newFont{"Noto Sans", 18, QFont::Weight::Bold, true}; // bold and italic

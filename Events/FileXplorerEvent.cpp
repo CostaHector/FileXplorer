@@ -42,6 +42,7 @@
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
@@ -120,8 +121,8 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   QString title{"Create Batch "};
   title += (isFolder ? "Folders" : "Files");
   const QString folderDefName{
-      Configuration().value(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name, BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.v).toString()};
-  const QString fileDefName{Configuration().value(BehaviorKey::BATCH_FILES_NAME_PATTERN.name, BehaviorKey::BATCH_FILES_NAME_PATTERN.v).toString()};
+      Configuration().value(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name, BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.toVariant()).toString()};
+  const QString fileDefName{Configuration().value(BehaviorKey::BATCH_FILES_NAME_PATTERN.name, BehaviorKey::BATCH_FILES_NAME_PATTERN.toVariant()).toString()};
   const QString defNamePattern{isFolder ? folderDefName : fileDefName};
   const QString userInputRule =
       QInputDialog::getText(_contentPane, title, "Rule Pattern: C-style Format String$StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
@@ -911,8 +912,8 @@ bool FileXplorerEvent::on_PlayVideo() const {
 extern template struct RowHeightRegistry<CustomTableView>;
 extern template struct RowHeightRegistry<CustomTreeView>;
 void FileXplorerEvent::on_RowHeightChanged() {
-  int beforeRowHeight = Configuration().value(MemoryKey::ROW_HEIGHT.name, MemoryKey::ROW_HEIGHT.v).toInt();
-  QString msg{QString{"will be used in tableview/treeview.\nIt is recommend that %1"}.arg(MemoryKey::ROW_HEIGHT.v.toInt())};
+  int beforeRowHeight = Configuration().value(MemoryKey::ROW_HEIGHT.name, MemoryKey::ROW_HEIGHT.toVariant()).toInt();
+  QString msg{QString{"will be used in tableview/treeview.\nIt is recommend that %1"}.arg(MemoryKey::ROW_HEIGHT.v.data.i)};
   bool bOk{false};
   int newRowHeight = QInputDialog::getInt(nullptr, "Row height setting", msg, beforeRowHeight, 0, 9999, 1, &bOk);
   if (!bOk) {

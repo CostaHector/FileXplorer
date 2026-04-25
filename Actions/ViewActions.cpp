@@ -1,13 +1,14 @@
 ﻿#include "ViewActions.h"
 #include "ViewTypeTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
   _NAVIGATION_PANE = new (std::nothrow) QAction(QIcon(":img/NAVIGATION_PANE"), tr("Navigation Pane"), this);
   _NAVIGATION_PANE->setCheckable(true);
-  _NAVIGATION_PANE->setChecked(Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool());
+  _NAVIGATION_PANE->setChecked(Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.toVariant()).toBool());
   _NAVIGATION_PANE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the navigation pane.").arg(_NAVIGATION_PANE->text(), _NAVIGATION_PANE->shortcut().toString()));
 
@@ -74,7 +75,7 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _VIEWS_NAVIGATE += _VIEW_BACK_TO;
   _VIEWS_NAVIGATE += _VIEW_FORWARD_TO;
 
-  const bool bShowPreviewPanel{Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool()};
+  const bool bShowPreviewPanel{Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.toVariant()).toBool()};
   _PREVIEW_PANEL = new (std::nothrow) QAction{QIcon{":img/SHOW_FOLDER_PREVIEW"}, tr("Preview Panel"), this};
   _PREVIEW_PANEL->setCheckable(true);
   _PREVIEW_PANEL->setChecked(bShowPreviewPanel);

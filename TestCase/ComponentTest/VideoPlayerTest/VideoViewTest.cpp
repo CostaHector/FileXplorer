@@ -5,6 +5,7 @@
 #include <QSignalSpy>
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "VideoView.h"
 #include "EndToExposePrivateMember.h"

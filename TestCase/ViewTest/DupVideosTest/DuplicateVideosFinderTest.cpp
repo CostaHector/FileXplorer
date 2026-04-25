@@ -4,6 +4,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideosFinder.h"
 #include "EndToExposePrivateMember.h"

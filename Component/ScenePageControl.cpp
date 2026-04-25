@@ -1,5 +1,6 @@
 #include "ScenePageControl.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "ImageTool.h"
 #include "NotificatorMacro.h"
 #include <QFormLayout>
@@ -39,7 +40,7 @@ ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
         QActionGroup::ExclusionPolicy::None); //
   }
 
-  const int sceneCnt1Page = Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.v).toInt();
+  const int sceneCnt1Page = Configuration().value(SceneKey::CNT_EACH_PAGE.name, SceneKey::CNT_EACH_PAGE.toVariant()).toInt();
   mScenesPerPageLE = new (std::nothrow) QLineEdit(QString::number(sceneCnt1Page), this);
   CHECK_NULLPTR_RETURN_VOID(mScenesPerPageLE);
   mScenesPerPageLE->setAlignment(Qt::AlignmentFlag::AlignHCenter);

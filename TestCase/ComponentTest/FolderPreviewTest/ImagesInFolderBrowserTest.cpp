@@ -6,6 +6,7 @@
 #include "OnScopeExit.h"
 #include "TDir.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include "ArchiveFiles.h"
 #include "BeginToExposePrivateMember.h"

@@ -5,6 +5,7 @@
 #include "PlainTestSuite.h"
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "SearchModeToolButton.h"
 #include "EndToExposePrivateMember.h"
@@ -28,7 +29,7 @@ private slots:
 
   void test_initialState() {
     // precondition
-    QCOMPARE(SearchKey::ADVANCE_MODE.v.toInt(), ((int)SearchTools::SearchModeE::NORMAL));
+    QCOMPARE(SearchKey::ADVANCE_MODE.v.data.i, ((int)SearchTools::SearchModeE::NORMAL));
 
     SearchModeToolButton btn;
     QCOMPARE(btn.curSearchMode(), SearchTools::SearchModeE::NORMAL);

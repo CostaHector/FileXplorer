@@ -2,6 +2,7 @@
 #include "CastPsonFileHelper.h"
 #include "TableFields.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"

@@ -1,5 +1,6 @@
 #include "LeftVideoGroupsModel.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 using namespace DuplicateVideoDetectionCriteria;
 
@@ -9,11 +10,11 @@ LeftVideoGroupsModel::LeftVideoGroupsModel(QObject* parent)  //
     : QAbstractTableModelPub{parent} {
   m_deviationSz = Configuration()
                       .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name,  //
-                             VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.v)
+                             VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.toVariant())
                       .toInt();
   m_deviationDur = Configuration()
                        .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name,  //
-                              VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.v)
+                              VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.toVariant())
                        .toInt();
 }
 

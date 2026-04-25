@@ -8,6 +8,7 @@
 #include "FileOperation.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 using namespace FileOperatorType;
 

@@ -3,7 +3,7 @@
 #include "TorrentsManagerWidget.h"
 
 #include "FileLeafAction.h"
-#include "ConfigsTable.h"
+#include "ConfigsMgr.h"
 #include "SystemContextMenuControl.h"
 
 #include "PopupWidgetManager.h"
@@ -14,6 +14,7 @@
 #include "StyleSheetMgr.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include <QMessageBox>
@@ -37,7 +38,7 @@ void ExtraEvents::subscribe() {
   CHECK_NULLPTR_RETURN_VOID(mTorrentsManager);
 
   auto& leafInst = g_fileLeafActions();
-  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsTable>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
+  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsMgr>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
 
   mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "Geometry/PasswordBook"};

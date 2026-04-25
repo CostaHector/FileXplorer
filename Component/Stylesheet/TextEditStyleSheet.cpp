@@ -2,11 +2,11 @@
 
 bool TextEditStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new TextEditStyleSheet));
 
-QString TextEditStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString TextEditStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QPlainTextEdit, QTextEdit {
     selection-background-color: #99D1FF;

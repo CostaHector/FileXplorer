@@ -1,6 +1,7 @@
 ﻿#include "RedundantImageFinderActions.h"
 #include "PublicMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
     : QObject{parent} {
@@ -35,7 +36,7 @@ RedundantImageFinderActions::RedundantImageFinderActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(INCLUDING_EMPTY_IMAGES);
   INCLUDING_EMPTY_IMAGES->setCheckable(true);
   INCLUDING_EMPTY_IMAGES->setChecked(
-      Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v).toBool());
+      Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.toVariant()).toBool());
   INCLUDING_EMPTY_IMAGES->setToolTip(
       QString("<b>%1 (%2)</b><br/> Blank images (with a file size of 0Byte) will also be considered redundant images.")  //
           .arg(INCLUDING_EMPTY_IMAGES->text(), INCLUDING_EMPTY_IMAGES->shortcut().toString()));

@@ -46,13 +46,13 @@ class StyleSheetGetter {
 
   using DerivedPtr = std::unique_ptr<StyleSheetGetter>;
   static bool Register(DerivedPtr creator);
-  QString operator()(Style::StyleSheetE styleE) const;
+  QString operator()(Style::StyleThemeE styleE) const;
 
   const QVariant& defValue(const QString& key, bool* bKeyExist = nullptr) const;
   const QVariant& curValue(const QString& key, bool* bKeyExist = nullptr) const;
   const StyleItemData& defCurValue(const QString& key, bool* bKeyExist = nullptr) const;
 
-  QString GetColorValue(const QString& keyCore, Style::StyleSheetE styleE) const;
+  QString GetColorValue(const QString& keyCore, Style::StyleThemeE styleE) const;
   QString GetNoColorValue(const QString& keyCore) const;
   static QString toRgbaString(const QString& colorStr);
 
@@ -63,7 +63,7 @@ class StyleSheetGetter {
   std::unique_ptr<StyleTreeNode> GetModelData() const;
 
  private:
-  virtual QString GetStyleSheet(Style::StyleSheetE styleE) const { return ""; }
+  virtual QString GetStyleSheet(Style::StyleThemeE styleE) const { return ""; }
 
   static QHash<QString, StyleItemData> GetPairDict();
   static constexpr const char ROOT_NODE_NAME[] = "StyleSheet";

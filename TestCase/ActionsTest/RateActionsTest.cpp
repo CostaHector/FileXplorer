@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 #include "InputDialogHelper.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "RateHelper.h"
 
 #include <QSignalSpy>
@@ -93,7 +94,7 @@ class RateActionsTest : public PlainTestSuite {
   void onRateMoviesRecursively_ok() {
     constexpr int initRate = 6;
     Configuration().setValue(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, initRate);
-    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt(), initRate);
+    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.toVariant()).toInt(), initRate);
 
     constexpr int userInputNewValue = 9;
     const std::pair<bool, int> cancel0{false, 7};
@@ -107,10 +108,10 @@ class RateActionsTest : public PlainTestSuite {
 
     auto& inst = RateActions::GetInst(RateActions::RateRequestFrom::VIDEO_TABLE_VIEW);
     QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0);  // user cancelled
-    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt(), initRate);
+    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.toVariant()).toInt(), initRate);
 
     QCOMPARE(inst.onRateMoviesRecursively("path/2/inexists path", true, nullptr), 0);  // path not exist
-    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.v).toInt(), userInputNewValue);
+    QCOMPARE(Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.toVariant()).toInt(), userInputNewValue);
   }
 };
 

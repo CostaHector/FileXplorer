@@ -1,6 +1,7 @@
 #include "SearchProxyModel.h"
 #include "PublicVariable.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "FileTool.h"
 #include "PathTool.h"
 

@@ -1,5 +1,6 @@
 #include "HarTableView.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -23,7 +24,7 @@ HarTableView::HarTableView(QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(mEXPORT_TO)
   mEXPORT_TO->setToolTip(QString("<b>%1</b><br/> Export the selection items to local path.").arg(mEXPORT_TO->text()));
 
-  mShowImagePreview = Configuration().value(CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.name, CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.v).toBool();
+  mShowImagePreview = Configuration().value(CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.name, CompoVisKey::SHOW_HAR_IMAGE_PREVIEW.toVariant()).toBool();
   mQUICK_PREVIEW = new (std::nothrow) QAction{QIcon{":img/IMAGE"}, "Enable Images Preview", this};
   CHECK_NULLPTR_RETURN_VOID(mQUICK_PREVIEW)
   mQUICK_PREVIEW->setCheckable(true);

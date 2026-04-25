@@ -1,10 +1,11 @@
 ﻿#include "RenameWidget_Insert.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicMacro.h"
 #include "RenameHelper.h"
 
-RenameWidget_Insert::RenameWidget_Insert(QWidget* parent)  //
-    : AdvanceRenamer(parent) {
+RenameWidget_Insert::RenameWidget_Insert(QWidget* parent) //
+  : AdvanceRenamer(parent) {
   insertStrCB = new (std::nothrow) QComboBox;
   CHECK_NULLPTR_RETURN_VOID(insertStrCB)
   insertAtCB = new (std::nothrow) QComboBox;
@@ -23,13 +24,13 @@ void RenameWidget_Insert::extraSubscribe() {
 void RenameWidget_Insert::InitExtraMemberWidget() {
   insertStrCB->setEditable(true);
   insertStrCB->setCompleter(nullptr);
-  insertStrCB->addItems(Configuration().value(RenamerKey::OLD_STR_LIST.name, RenamerKey::OLD_STR_LIST.v).toStringList());
+  insertStrCB->addItems(MultiLineStr2StrList(RenamerKey::INS_OLD_STR_LIST));
   insertStrCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   insertStrCB->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
   insertAtCB->setEditable(true);
   insertAtCB->setCompleter(nullptr);
-  insertAtCB->addItems(Configuration().value(RenamerKey::INSERT_INDEXES_LIST.name, RenamerKey::INSERT_INDEXES_LIST.v).toStringList());
+  insertAtCB->addItems(MultiLineStr2StrList(RenamerKey::INSERT_INDEXES_LIST));
   insertAtCB->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   insertAtCB->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
 }

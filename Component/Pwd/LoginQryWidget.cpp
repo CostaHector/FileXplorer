@@ -3,6 +3,7 @@
 #include "CredentialUtil.h"
 #include "SimpleAES.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"

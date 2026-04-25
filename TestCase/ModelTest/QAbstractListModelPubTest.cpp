@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 #include <QSignalSpy>
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 using intQList = QList<int>;
 extern template std::pair<bool, intQList> MoveItemsBase<intQList>(const intQList&, const QList<int>&, int);

@@ -1,6 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "LoginQryWidget.h"

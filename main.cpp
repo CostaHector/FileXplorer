@@ -4,7 +4,9 @@
 #include "FileTool.h"
 #include "PreferenceActions.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
+#include "StyleKey.h"
 #include <QApplication>
 
 #define RUN_MAIN_FILE 1
@@ -20,12 +22,28 @@ int main(int argc, char* argv[]) {
     LOG_I("argc[%d].", argc);
   }
 
+  {
+    QList<const KV*>& lst = KV::GetEditableKVs();
+    lst.push_back(&PathKey::LAST_TIME_COPY_TO);
+
+    lst.push_back(&BehaviorKey::VIDS_LAST_TABLE_NAME);
+    lst.push_back(&BehaviorKey::WHERE_CLAUSE_HISTORY);
+
+    lst.push_back(&RedunImgFinderKey::RUND_IMG_PATH);
+
+    lst.push_back(&StyleKey::STYLE_PRESET);
+    lst.push_back(&StyleKey::STYLE_THEME);
+    lst.push_back(&StyleKey::BACKGROUND_IMAGE);
+    lst.push_back(&StyleKey::BACKGROUND_OVERLAY_OPACITY);
+  }
+
+
   QApplication app{argc, argv};
-  Logger::SetAutoFlushAllLevel(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.v).toBool());
+  Logger::SetAutoFlushAllLevel(Configuration().value(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.toVariant()).toBool());
 
   const QStringList& args = app.arguments();
   QTranslator translator;  // cannot define in local. will be release.
-  if (Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.v).toBool()) {
+  if (Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.toVariant()).toBool()) {
     LoadCNLanguagePack(translator, ":/language/ZH_CN");
   }
 
@@ -38,8 +56,8 @@ int main(int argc, char* argv[]) {
   extraViewVisibility.subscribe();
 
   const PreferenceActions& prefInst = g_PreferenceActions();
-  prefInst.initAppStyle();
-  prefInst.initStyleSheet(true);
+  prefInst.initStylePreset();
+  prefInst.initStyleTheme(true);
 
   fileExplorer.show();
 

@@ -6,6 +6,7 @@
 #include <QSignalSpy>
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "ReorderableToolBar.h"

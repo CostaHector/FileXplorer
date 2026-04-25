@@ -10,7 +10,7 @@ public:
   void subscribe();
 private:
   PopupWidgetManager<TorrentsManagerWidget>* mTorrentsManager{nullptr};
-  PopupWidgetManager<ConfigsTable>* m_settingSys{nullptr};
+  PopupWidgetManager<ConfigsMgr>* m_settingSys{nullptr};
   PopupWidgetManager<PasswordBook>* mPwdBook{nullptr};
   PopupWidgetManager<ResourceMonitorPanel>* m_resMonitor{nullptr};
 };

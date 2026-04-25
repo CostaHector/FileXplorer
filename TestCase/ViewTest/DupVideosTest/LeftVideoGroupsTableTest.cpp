@@ -5,6 +5,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "LeftVideoGroupsTable.h"
 #include "EndToExposePrivateMember.h"

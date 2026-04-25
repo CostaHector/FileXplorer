@@ -31,6 +31,7 @@ file(GLOB SOURCES
     Model/*.cpp
     View/*.cpp
     Component/*.cpp
+    Component/Configs/*.cpp
     Component/FolderPreview/*.cpp
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
@@ -65,6 +66,7 @@ set(SRV_HEADER_PATH
     Model
     View
     Component
+    Component/Configs
     Component/FolderPreview
     Component/HeaderView
     Component/LineEdit
@@ -94,6 +96,7 @@ file(GLOB HEADERS
     Model/*.h
     View/*.h
     Component/*.h
+    Component/Configs/*.h
     Component/FolderPreview/*.h
     Component/HeaderView/*.h
     Component/LineEdit/*.h

@@ -4,6 +4,7 @@
 #include "FavoriteItemData.h"
 #include "EndToExposePrivateMember.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 class FavoriteItemDataTest : public PlainTestSuite {
   Q_OBJECT

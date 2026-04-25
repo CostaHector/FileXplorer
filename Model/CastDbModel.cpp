@@ -2,6 +2,7 @@
 #include "CastBaseDb.h"
 #include "CastDBActions.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicVariable.h"
 #include "TableFields.h"
 #include "PublicMacro.h"
@@ -24,7 +25,7 @@ CastDbModel::CastDbModel(QObject* parent, QSqlDatabase db)
   : SqlTableModelPub{parent, db}
   , m_imageHostPath{Configuration()                                             //
                         .value(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, //
-                               PathKey::PERFORMER_IMAGEHOST_LOCATE.v)    //
+                               PathKey::PERFORMER_IMAGEHOST_LOCATE.toVariant())    //
                         .toString()} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 

@@ -62,21 +62,21 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
                                                   IMAGE_SIZE::TABS_ICON_IN_MENU_24,
                                                   this};
   mStudioMenu->SetCaption(QIcon(":img/STUDIO"), tr("Studio"), "Set/Clear studio");
-  mStudioMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::STUDIO_OPERATION(), true);
+  mStudioMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::STUDIO_OPERATION, true);
 
   mCastMenu = new (std::nothrow) MenuToolButton{inst.m_castOperationList,
                                                 QToolButton::ToolButtonPopupMode::MenuButtonPopup,
                                                 Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
                                                 IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                                                 this};
-  mCastMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::CAST_OPERATION(), true);
+  mCastMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::CAST_OPERATION, true);
 
   mTagsMenu = new (std::nothrow) MenuToolButton{inst.m_tagsOperationList,
                                                 QToolButton::ToolButtonPopupMode::MenuButtonPopup,
                                                 Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
                                                 IMAGE_SIZE::TABS_ICON_IN_MENU_48,
                                                 this};
-  mTagsMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::TAGS_OPERATION(), true);
+  mTagsMenu->InitDefaultActionFromQSetting(JsonOpMemoryKey::TAGS_OPERATION, true);
 
   mUpdateFieldTb = new (std::nothrow) QToolBar{"Duration/Size/Hash field update", this};
   CHECK_NULLPTR_RETURN_VOID(mUpdateFieldTb);

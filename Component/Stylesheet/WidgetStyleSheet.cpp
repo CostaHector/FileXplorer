@@ -2,11 +2,11 @@
 
 bool WidgetStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new WidgetStyleSheet));
 
-QString WidgetStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString WidgetStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QWidget {
     %1

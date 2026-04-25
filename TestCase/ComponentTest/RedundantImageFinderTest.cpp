@@ -3,6 +3,7 @@
 #include "PlainTestSuite.h"
 #include "TDir.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "ImagesInfoManager.h"
@@ -162,7 +163,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
     redunImgLib.InitializeImpl("");  // has nothing to do with a library
 
     Configuration().clear();  //
-    QCOMPARE(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v.toBool(), true);
+    QCOMPARE(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.v.data.b, true);
     auto& inst = g_redunImgFinderAg();
     QCOMPARE(inst.INCLUDING_EMPTY_IMAGES->isChecked(), true);
 

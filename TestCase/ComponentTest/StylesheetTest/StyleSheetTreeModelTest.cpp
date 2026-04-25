@@ -19,13 +19,13 @@ std::unique_ptr<StyleTreeNode> GetRootNodeForTest(StyleTreeNode*& r0, //
   r0 = rootNode.get();
 
   r00 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
-  r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER}));
-  r001 = r00->appendRow(StyleTreeNode::create(StyleItemData{"FontFamily", "Microsoft YaHei", "Microsoft YaHei", StyleItemData::DataTypeE::FONT_FAMILY}));
-  r002 = r00->appendRow(StyleTreeNode::create(StyleItemData{"AlternateRowColor", "#4F4F4F", "#5E5E5E", StyleItemData::DataTypeE::COLOR}));
+  r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, GeneralDataType::Type::PLAIN_INT}));
+  r001 = r00->appendRow(StyleTreeNode::create(StyleItemData{"FontFamily", "Microsoft YaHei", "Microsoft YaHei", GeneralDataType::Type::FONT_FAMILY}));
+  r002 = r00->appendRow(StyleTreeNode::create(StyleItemData{"AlternateRowColor", "#4F4F4F", "#5E5E5E", GeneralDataType::Type::COLOR}));
 
   r01 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"Font"}));
-  r010 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Foreground", "#000000", "#FFFFFF", StyleItemData::DataTypeE::COLOR}));
-  r011 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Weight", QFont::Weight::Normal, QFont::Weight::Bold, StyleItemData::DataTypeE::FONT_WEIGHT}));
+  r010 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Foreground", "#000000", "#FFFFFF", GeneralDataType::Type::COLOR}));
+  r011 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Weight", QFont::Weight::Normal, QFont::Weight::Bold, GeneralDataType::Type::FONT_WEIGHT}));
   return rootNode;
 }
 
@@ -119,43 +119,43 @@ private slots:
       QCOMPARE(model.data(r00Index1, Qt::DisplayRole), defVar);
       QCOMPARE(model.data(r00Index2, Qt::DisplayRole), defVar);
       QCOMPARE(model.data(r00Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r00Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::GROUP);
+      QCOMPARE(model.data(r00Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::GROUP);
 
       QCOMPARE(model.data(r000Index0, Qt::DisplayRole), "RowHeight");
       QCOMPARE(model.data(r000Index1, Qt::DisplayRole), 30);
       QCOMPARE(model.data(r000Index2, Qt::DisplayRole), 60);
       QCOMPARE(model.data(r000Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r000Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::NUMBER);
+      QCOMPARE(model.data(r000Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::PLAIN_INT);
 
       QCOMPARE(model.data(r001Index0, Qt::DisplayRole), "FontFamily");
       QCOMPARE(model.data(r001Index1, Qt::DisplayRole), "Microsoft YaHei");
       QCOMPARE(model.data(r001Index2, Qt::DisplayRole), "Microsoft YaHei");
       QCOMPARE(model.data(r001Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r001Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::FONT_FAMILY);
+      QCOMPARE(model.data(r001Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::FONT_FAMILY);
 
       QCOMPARE(model.data(r002Index0, Qt::DisplayRole), "AlternateRowColor");
       QCOMPARE(model.data(r002Index1, Qt::DisplayRole), "#4F4F4F");
       QCOMPARE(model.data(r002Index2, Qt::DisplayRole), "#5E5E5E");
       QCOMPARE(model.data(r002Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r002Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::COLOR);
+      QCOMPARE(model.data(r002Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::COLOR);
 
       QCOMPARE(model.data(r01Index0, Qt::DisplayRole), "Font");
       QCOMPARE(model.data(r01Index1, Qt::DisplayRole), defVar);
       QCOMPARE(model.data(r01Index2, Qt::DisplayRole), defVar);
       QCOMPARE(model.data(r01Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r01Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::GROUP);
+      QCOMPARE(model.data(r01Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::GROUP);
 
       QCOMPARE(model.data(r010Index0, Qt::DisplayRole), "Foreground");
       QCOMPARE(model.data(r010Index1, Qt::DisplayRole), "#000000");
       QCOMPARE(model.data(r010Index2, Qt::DisplayRole), "#FFFFFF");
       QCOMPARE(model.data(r010Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r010Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::COLOR);
+      QCOMPARE(model.data(r010Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::COLOR);
 
       QCOMPARE(model.data(r011Index0, Qt::DisplayRole), "Weight");
       QCOMPARE(model.data(r011Index1, Qt::DisplayRole), QFont::Weight::Normal);
       QCOMPARE(model.data(r011Index2, Qt::DisplayRole), QFont::Weight::Bold);
       QCOMPARE(model.data(r011Index3, Qt::DisplayRole), defVar);
-      QCOMPARE(model.data(r011Index0, StyleItemData::DATA_TYPE_ROLE), StyleItemData::FONT_WEIGHT);
+      QCOMPARE(model.data(r011Index0, StyleItemData::DATA_TYPE_ROLE), GeneralDataType::Type::FONT_WEIGHT);
     }
 
     { // EditRole ok
@@ -263,12 +263,12 @@ private slots:
     QCOMPARE(model.m_bLivePreviewSwitch, false);
 
     // r00 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"View"}));
-    // r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, StyleItemData::DataTypeE::NUMBER}));
-    // r001 = r00->appendRow(StyleTreeNode::create(StyleItemData{"FontFamily", "Microsoft YaHei", "Microsoft YaHei", StyleItemData::DataTypeE::FONT_FAMILY}));
-    // r002 = r00->appendRow(StyleTreeNode::create(StyleItemData{"AlternateRowColor", "#4F4F4F", "#5E5E5E", StyleItemData::DataTypeE::COLOR}));
+    // r000 = r00->appendRow(StyleTreeNode::create(StyleItemData{"RowHeight", 30, 60, GeneralDataType::Type::PLAIN_INT}));
+    // r001 = r00->appendRow(StyleTreeNode::create(StyleItemData{"FontFamily", "Microsoft YaHei", "Microsoft YaHei", GeneralDataType::Type::FONT_FAMILY}));
+    // r002 = r00->appendRow(StyleTreeNode::create(StyleItemData{"AlternateRowColor", "#4F4F4F", "#5E5E5E", GeneralDataType::Type::COLOR}));
 
     // r01 = rootNode->appendRow(StyleTreeNode::create(StyleItemData{"Font"}));
-    // r010 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Foreground", "#000000", "#FFFFFF", StyleItemData::DataTypeE::COLOR}));
+    // r010 = r01->appendRow(StyleTreeNode::create(StyleItemData{"Foreground", "#000000", "#FFFFFF", GeneralDataType::Type::COLOR}));
 
     // column not support, only ModifiedTo support setData
     {

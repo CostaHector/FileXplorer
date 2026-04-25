@@ -6,6 +6,7 @@
 #include "PublicVariable.h"
 #include "OnScopeExit.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <QFileDialog>
 #include <QPushButton>

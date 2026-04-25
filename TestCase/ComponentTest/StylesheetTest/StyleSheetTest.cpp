@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheet.h"
 #include "PreferenceActions.h"
@@ -46,12 +47,12 @@ class StyleSheetTest : public PlainTestSuite {
   void test_ui_theme_ok() {
     QToolBar tb;
     PreferenceActions& prefInst = g_PreferenceActions();
-    QActionGroup* pAgGrp = prefInst.mStyleSheetIntAction.getActionGroup();
+    QActionGroup* pAgGrp = prefInst.mStyleThemeIntAction.getActionGroup();
     QAction* pStyleSheetActBackUp = pAgGrp->checkedAction();
     QVERIFY(pStyleSheetActBackUp != nullptr);
 
-    prefInst.STYLESHEET_DARK_THEME_MOON_FOG->setChecked(true);
-    emit prefInst.STYLESHEET_DARK_THEME_MOON_FOG->triggered(true); // in test project qss file not exist
+    prefInst.THEME_DARK_MOON_FOG->setChecked(true);
+    emit prefInst.THEME_DARK_MOON_FOG->triggered(true); // in test project qss file not exist
     ON_SCOPE_EXIT { // recover
       pStyleSheetActBackUp->setChecked(true);
       emit pStyleSheetActBackUp->triggered(true); // in test project qss file not exist

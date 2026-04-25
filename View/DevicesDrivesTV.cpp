@@ -2,6 +2,7 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "TableFields.h"
 #include "StyleSheet.h"
 

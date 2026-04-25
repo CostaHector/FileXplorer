@@ -4,6 +4,7 @@
 #include "ViewTypeTool.h"
 #include "ViewActions.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include <QFileInfo>
 
@@ -87,7 +88,7 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
 #endif
   // when not specified or specied path is invalid, use last time path in preference setting
   if (!bIsSpecifiedPath || (!path.isEmpty() && !QFile::exists(path))) {
-    QString lastTimePath = Configuration().value(PathKey::STARTUP_PATH.name, PathKey::STARTUP_PATH.v).toString();
+    QString lastTimePath = Configuration().value(PathKey::STARTUP_PATH.name, PathKey::STARTUP_PATH.toVariant()).toString();
     LOG_D("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
@@ -112,12 +113,12 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 }
 
 void FileXplorer::InitComponentVisibility() {
-  const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool()};
+  const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.toVariant()).toBool()};
   if (!showNavi) {
     m_naviSideBarDock->setHidden(true);
   }
 
-  const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool();
+  const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.toVariant()).toBool();
   if (!showFolderPreview) {
     m_previewHtmlDock->setHidden(true);
   }

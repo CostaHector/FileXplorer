@@ -36,6 +36,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
+    ${PARENT_DIR}/Component/Configs/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
@@ -59,6 +60,7 @@ file(GLOB SOURCES
     main_ut.cpp
     ActionsTest/*.cpp
     ComponentTest/*.cpp
+    ComponentTest/ConfigsTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
@@ -67,7 +69,6 @@ file(GLOB SOURCES
     ComponentTest/RenameTest/*.cpp
     ComponentTest/StylesheetTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
-    DbManagerTest/*.cpp
     FileOperationTest/*.cpp
     JsonTest/*.cpp
     MockTool/*.cpp
@@ -75,6 +76,7 @@ file(GLOB SOURCES
     publicTest/*.cpp
     pubTestTool/*.cpp
     ToolsTest/*.cpp
+    ToolsTest/FileDescriptorTest/*.cpp
     ToolsTest/PasswordTableTest/*.cpp
     ViewTest/*.cpp
     ViewTest/DupVideosTest/*.cpp
@@ -91,6 +93,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Model
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
+    ${PARENT_DIR}/Component/Configs
     ${PARENT_DIR}/Component/FolderPreview
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
@@ -120,6 +123,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Model/*.h
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
+    ${PARENT_DIR}/Component/Configs/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h

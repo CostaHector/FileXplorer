@@ -1,21 +1,12 @@
 #ifndef STYLEITEMDATA_H
 #define STYLEITEMDATA_H
 
+#include "GeneralDataType.h"
 #include "TreeNodeBase.h"
 #include <QString>
 #include <QVariant>
 
-struct StyleItemData final {
-  enum DataTypeE {
-    GROUP,
-    NUMBER,
-    FONT_FAMILY,
-    FONT_WEIGHT,
-    FONT_STYLE,
-    COLOR,
-    FILE_PATH,  // resource url or local path
-  };
-
+struct StyleItemData {
   enum Role {  // -DEF_BEGIN_ROLE represent column
     DEF_BEGIN_ROLE = Qt::UserRole + 1,
     DEF_NAME_TEXT_ROLE = DEF_BEGIN_ROLE,
@@ -29,7 +20,7 @@ struct StyleItemData final {
 
   StyleItemData() = default;
   explicit StyleItemData(const QString& _name) : name{_name} {}
-  StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const DataTypeE& _dataType);
+  StyleItemData(const QString& _name, const QVariant& _defValue, const QVariant& _curValue, const GeneralDataType::Type& _dataType);
 
   bool operator==(const StyleItemData& other) const {  //
     return (this == &other) || (name == other.name && isGroup == other.isGroup && defValue == other.defValue && curValue == other.curValue);
@@ -49,7 +40,7 @@ struct StyleItemData final {
 
   QString name;                                  // 显示名称
   QVariant defValue, curValue, modifiedToValue;  // def, backup, modified to
-  DataTypeE dataType{GROUP};
+  GeneralDataType::Type dataType{GeneralDataType::Type::GROUP};
   bool isGroup{true};  // 是否为分组
 
   static constexpr int NAME_COLUMN = DEF_NAME_TEXT_ROLE - DEF_BEGIN_ROLE;

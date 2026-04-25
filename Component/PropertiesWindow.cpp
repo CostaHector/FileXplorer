@@ -4,6 +4,7 @@
 #include "FileSystemItemFilter.h"
 #include "MD5Calculator.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "StyleSheet.h"
 #include "DataFormatter.h"
 #include "VideoDurationGetter.h"

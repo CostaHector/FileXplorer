@@ -4,6 +4,7 @@
 #include "PlainTestSuite.h"
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "RibbonMenu.h"
 #include "EndToExposePrivateMember.h"

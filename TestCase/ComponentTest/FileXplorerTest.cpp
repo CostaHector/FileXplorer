@@ -3,6 +3,7 @@
 #include <QSignalSpy>
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FileXplorer.h"
 #include "EndToExposePrivateMember.h"
@@ -76,9 +77,9 @@ class FileXplorerTest : public PlainTestSuite {
     const QString existPath{QFileInfo{__FILE__}.absolutePath()};
     QStringList args{"a.exe", existPath};
 
-    QCOMPARE(Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.v).toBool(), true);
-    QCOMPARE(Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.v).toBool(), true);
-    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.v).toInt(),
+    QCOMPARE(Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.toVariant()).toBool(), true);
+    QCOMPARE(Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.toVariant()).toBool(), true);
+    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.toVariant()).toInt(),
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
 
     auto& viewActInst = g_viewActions();
@@ -151,7 +152,7 @@ class FileXplorerTest : public PlainTestSuite {
     Configuration().setValue(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, false);
     Configuration().setValue(CompoVisKey::SHOW_PREVIEW_DOCKER.name, false);
 
-    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.v).toInt(),
+    QCOMPARE(Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.toVariant()).toInt(),
              ((int)PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL));
     // configuration read and used
     viewActInst._TABLE_VIEW->setChecked(true);

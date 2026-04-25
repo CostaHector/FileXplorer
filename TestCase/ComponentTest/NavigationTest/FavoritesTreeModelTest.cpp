@@ -2,6 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "PublicVariable.h"
 
 #include "BeginToExposePrivateMember.h"

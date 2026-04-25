@@ -1,5 +1,6 @@
 ﻿#include "ViewHelper.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "FileSystemModel.h"
 #include "NotificatorMacro.h"
 #include "ComplexOperation.h"

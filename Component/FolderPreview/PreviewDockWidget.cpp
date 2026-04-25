@@ -1,6 +1,7 @@
 #include "PreviewDockWidget.h"
 #include "StyleSheet.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "ViewActions.h"
 #include <QApplication>
 #include <QStyle>

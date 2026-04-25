@@ -6,6 +6,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "ScenesListModel.h"
 #include "SceneSortProxyModel.h"
@@ -132,7 +133,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(defModel.rel2fileNames({}).isEmpty());
 
     // 测试分页功能
-    QCOMPARE(defModel.mPagedData.GetPerPageEleCnt(), SceneKey::CNT_EACH_PAGE.v);
+    QCOMPARE(defModel.mPagedData.GetPerPageEleCnt(), SceneKey::CNT_EACH_PAGE.toVariant());
     QVERIFY(defModel.onScenesCountsPerPageChanged(10));
     QCOMPARE(defModel.rowCount(), 0);
     QVERIFY(defModel.onPageIndexChanged(1));

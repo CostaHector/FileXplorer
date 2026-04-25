@@ -4,6 +4,7 @@
 #include "PublicVariable.h"
 #include "ImageTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include <QFile>
 
 QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObject* parent)  //

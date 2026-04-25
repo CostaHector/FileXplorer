@@ -1,112 +1,86 @@
 #include "ValueChecker.h"
-#include "PathTool.h"
 #include <QFileInfo>
 
-using namespace VALUE_CHECKER_TYPE;
+namespace ValueChecker {
 
-ValueChecker::ValueChecker(const QStringList& candidates, const VALUE_TYPE valueType_) : valueType{valueType_}, m_strCandidates{candidates.cbegin(), candidates.cend()} {}
-
-ValueChecker::ValueChecker(int minV_, int maxV_) : valueType{RANGE_INT}, minV{minV_}, maxV{maxV_} {}
-
-ValueChecker::ValueChecker(const QSet<QChar>& chars, int minLength) : valueType{SWITCH_STRING}, m_switchStates{chars}, m_switchMinCnt{minLength} {}
-
-ValueChecker::ValueChecker(const VALUE_TYPE valueType_) : valueType(valueType_) {}
-
-bool ValueChecker::isFileExist(const QString& path) {
-  return QFileInfo(path).isFile();
-}
-
-bool ValueChecker::isFolderExist(const QString& path) {
-  return QFileInfo(path).isDir();
-}
-
-bool ValueChecker::isStrInCandidate(const QString& str) const {
-  return m_strCandidates.isEmpty() || m_strCandidates.contains(str);
-}
-
-bool ValueChecker::isSpecifiedExtensionFileExist(const QString& path) const {
-  const QString& ext = PathTool::GetDotFileExtension(path);
-  return isFileExist(path) && !ext.isEmpty() && isStrInCandidate(ext);
-}
-
-bool ValueChecker::isIntInRange(const int v) const {
-  return minV <= v && v < maxV;
-}
-
-bool ValueChecker::isSwitchString(const QString& switchs) const {
-  return switchs.size() >= m_switchMinCnt && QSet<QChar>(switchs.cbegin(), switchs.cend()) == m_switchStates;
-}
-
-bool ValueChecker::operator()(const QVariant& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-      return isSpecifiedExtensionFileExist(v.toString());
-    case CANDIDATE_STRING:
-      return isStrInCandidate(v.toString());
-    case FILE_PATH:
-      return isFileExist(v.toString());
-    case FOLDER_PATH:
-      return isFolderExist(v.toString());
-    case RANGE_INT:
-      return isIntInRange(v.toInt());
-    case SWITCH_STRING:
-      return isSwitchString(v.toString());
-    case PLAIN_STR:
-    case PLAIN_INT:
-    case PLAIN_BOOL:
-    case PLAIN_FLOAT:
-    case PLAIN_DOUBLE:
-    case QSTRING_LIST:
-    default:
-      return true;
+template<int MIN, int MAX>
+bool GeneralIntRangeChecker(const QVariant& v) {
+  if (!v.isValid()) { return false; }
+  bool ok = false;
+  int val = v.toInt(&ok);
+  if (!ok) {
+    return false;
   }
+  return MIN <= val && val <= MAX;
 }
 
-QString ValueChecker::valueToString(const QVariant& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-    case CANDIDATE_STRING:
-    case FILE_PATH:
-    case FOLDER_PATH:
-    case SWITCH_STRING:
-    case PLAIN_STR:
-      return v.toString();
-    case RANGE_INT:
-    case PLAIN_INT:
-    case PLAIN_BOOL:
-      return QString::number(v.toInt());
-    case PLAIN_FLOAT:
-      return QString::number(v.toFloat());
-    case PLAIN_DOUBLE:
-      return QString::number(v.toDouble());
-    case QSTRING_LIST:
-      return v.toStringList().join('\n');
-    default:
-      return "";
+template bool GeneralIntRangeChecker<INT_MIN, INT_MAX>(const QVariant&);
+template bool GeneralIntRangeChecker<0, 10>(const QVariant&);
+template bool GeneralIntRangeChecker<0, 16>(const QVariant&);
+template bool GeneralIntRangeChecker<0, 100>(const QVariant&);
+template bool GeneralIntRangeChecker<0, 255>(const QVariant&);
+template bool GeneralIntRangeChecker<0, 500>(const QVariant&);
+template bool GeneralIntRangeChecker<0, INT_MAX>(const QVariant&);
+
+template<bool isPathOptionalAllowed>
+bool GeneralFilePathStrChecker(const QString& filePath) {
+  if (filePath.isEmpty()) {
+    return isPathOptionalAllowed;
   }
+  return QFileInfo(filePath).isFile();
+}
+template bool GeneralFilePathStrChecker<false>(const QString& filePath);
+template bool GeneralFilePathStrChecker<true>(const QString& filePath);
+
+bool GeneralFolderPathStrChecker(const QString& folderPath) {
+  if (folderPath.isEmpty()) {
+    return false;
+  }
+  return QFileInfo(folderPath).isDir();
 }
 
-QVariant ValueChecker::strToQVariant(const QString& v) const {
-  switch (valueType) {
-    case EXT_SPECIFIED_FILE_PATH:
-    case CANDIDATE_STRING:
-    case FILE_PATH:
-    case FOLDER_PATH:
-    case SWITCH_STRING:
-    case PLAIN_STR:
-      return v;
-    case RANGE_INT:
-    case PLAIN_INT:
-      return v.toInt();
-    case PLAIN_BOOL:
-      return v == "true";
-    case PLAIN_FLOAT:
-      return v.toFloat();
-    case PLAIN_DOUBLE:
-      return v.toDouble();
-    case QSTRING_LIST:
-      return v.split('\n');
-    default:
-      return QVariant();
+bool GeneralFilePathChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
   }
+  return GeneralFilePathStrChecker<false>(v.toString());
+}
+
+bool GeneralFilePathOptionalChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  return GeneralFilePathStrChecker<true>(v.toString());
+}
+
+bool GeneralFolderPathChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  return GeneralFolderPathStrChecker(v.toString());
+}
+
+bool GeneralSequenceChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  const QString seqStr = v.toString();
+  const int len = seqStr.length();
+  if (len == 0 || len > 10) {
+    return false;
+  }
+  bool seen[10] = {false};
+  for (QChar ch : seqStr) {
+    if (!ch.isDigit()) {
+      return false;
+    }
+    const int num = ch.digitValue();
+    if (seen[num]) {
+      return false;
+    }
+    seen[num] = true;
+  }
+  return true;
+}
+
 }

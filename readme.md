@@ -273,13 +273,13 @@ find ./ -name "RemovedFileName*" -delete
 ```bash
 cd path_to_project
 # windows
-C:/Qt/5.15.2/mingw81_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
-C:/Qt/5.15.2/mingw81_64/bin/linguist ./Translate/FileXplorer_zh_CN.ts
-C:/Qt/5.15.2/mingw81_64/bin/lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
+C:/Qt/5.15.2/mingw81_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./resources/Translate/FileXplorer_zh_CN.ts
+C:/Qt/5.15.2/mingw81_64/bin/linguist ./resources/Translate/FileXplorer_zh_CN.ts
+C:/Qt/5.15.2/mingw81_64/bin/lrelease ./resources/Translate/FileXplorer_zh_CN.ts -qm ./resources/Translate/FileXplorer_zh_CN.qm
 # linux
-/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./Translate/FileXplorer_zh_CN.ts
-/home/ariel/Qt/5.15.2/gcc_64/bin/linguist ./Translate/FileXplorer_zh_CN.ts
-/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease ./Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
+/home/ariel/Qt/5.15.2/gcc_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./resources/Translate/FileXplorer_zh_CN.ts
+/home/ariel/Qt/5.15.2/gcc_64/bin/linguist ./resources/Translate/FileXplorer_zh_CN.ts
+/home/ariel/Qt/5.15.2/gcc_64/bin/lrelease ./resources/Translate/FileXplorer_zh_CN.ts -qm ./Translate/FileXplorer_zh_CN.qm
 ```
 
 ## Font type and size
@@ -312,6 +312,7 @@ Add and fill contents below
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "$ClassName$.h"
 #include "EndToExposePrivateMember.h"

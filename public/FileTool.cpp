@@ -3,6 +3,7 @@
 #include "PathTool.h"
 #include "ImageTool.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "ThumbnailImageViewer.h"
 

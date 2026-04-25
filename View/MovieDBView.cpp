@@ -2,6 +2,7 @@
 #include "MovieDBActions.h"
 #include "FileOpActs.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "MountHelper.h"
 #include "NotificatorMacro.h"
 #include "StudiosManager.h"
@@ -123,7 +124,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
 
   const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
-  QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.v).toString();
+  QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.toVariant()).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = tblPeerPath;
   }

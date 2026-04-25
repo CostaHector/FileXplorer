@@ -1,62 +1,71 @@
 #ifndef VALUECHECKER_H
 #define VALUECHECKER_H
-#include <QStringList>
 #include <QVariant>
-#include <QSet>
+#include <climits>
 
-namespace VALUE_CHECKER_TYPE {
-enum VALUE_TYPE {
-  ERROR_TYPE = 0,
-  PLAIN_STR = 1,
-  PLAIN_BOOL = 2,
-  PLAIN_INT = 3,
-  PLAIN_FLOAT = 4,
-  PLAIN_DOUBLE,
-  FILE_PATH,
-  EXT_SPECIFIED_FILE_PATH,
-  FOLDER_PATH,
-  RANGE_INT,
-  SWITCH_STRING,  // "010101"
-  CANDIDATE_STRING,
-  QSTRING_LIST,
-  QBYTEARRAY
-};
+namespace ValueChecker {
+using RawVariantChecker = bool (*)(const QVariant& v);
+
+inline bool GeneralNoChecker(const QVariant& /*v*/) {
+  return true;
 }
 
-class ValueChecker {
- public:
-  friend struct KV;
+template<int MIN = INT_MIN, int MAX = INT_MAX>
+bool GeneralIntRangeChecker(const QVariant& v);
+extern template bool GeneralIntRangeChecker<INT_MIN, INT_MAX>(const QVariant&);
+extern template bool GeneralIntRangeChecker<0, 10>(const QVariant&);      // used in rating score
+extern template bool GeneralIntRangeChecker<0, 16>(const QVariant&);      // used in extra small enum
+extern template bool GeneralIntRangeChecker<0, 100>(const QVariant&);     // used in small enum, or volume
+extern template bool GeneralIntRangeChecker<0, 255>(const QVariant&);     // used in opacity
+extern template bool GeneralIntRangeChecker<0, 500>(const QVariant&);     // used in large enum
+extern template bool GeneralIntRangeChecker<0, INT_MAX>(const QVariant&); // no negative number
 
-  explicit ValueChecker(const QStringList& candidates,  //
-                        const VALUE_CHECKER_TYPE::VALUE_TYPE valueType_ = VALUE_CHECKER_TYPE::VALUE_TYPE::EXT_SPECIFIED_FILE_PATH);
+inline bool GeneralIntChecker(const QVariant& v) {
+  return GeneralIntRangeChecker<>(v);
+}
 
-  explicit ValueChecker(int minV_ = INT32_MIN, int maxV_ = INT32_MAX);
-  explicit ValueChecker(const QSet<QChar>& chars = {'0', '1'}, int minLength = 1);
+inline bool GeneralCharChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  return true;
+}
 
-  explicit ValueChecker(const VALUE_CHECKER_TYPE::VALUE_TYPE valueType_);
+inline bool GeneralBoolChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  return v.canConvert<bool>();
+}
 
-  static bool isFileExist(const QString& path);
-  static bool isFolderExist(const QString& path);
-  bool isStrInCandidate(const QString& str) const;
-  bool isSpecifiedExtensionFileExist(const QString& path) const;
-  bool isIntInRange(const int v) const;
-  bool isSwitchString(const QString& switchs) const;
+inline bool GeneralDoubleChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  bool bDouble{false};
+  v.toDouble(&bDouble);
+  return bDouble;
+}
 
-  bool operator()(const QVariant& v) const;
-  QString valueToString(const QVariant& v) const;
-  QVariant strToQVariant(const QString& v) const;
-  bool isPath() const {return valueType == VALUE_CHECKER_TYPE::VALUE_TYPE::FILE_PATH || valueType == VALUE_CHECKER_TYPE::VALUE_TYPE::FOLDER_PATH;}
+inline bool GeneralCStrChecker(const QVariant& v) {
+  if (!v.isValid()) {
+    return false;
+  }
+  return v.canConvert<QString>();
+}
 
- private:
-  ValueChecker() = delete;
-  VALUE_CHECKER_TYPE::VALUE_TYPE valueType;
+bool GeneralIntRangeChecker(const QString& v);
 
-  QSet<QString> m_strCandidates;  // e.g. extension candidates
-  QSet<QChar> m_switchStates;
-  int m_switchMinCnt;
+template<bool isPathOptionalAllowed = false>
+bool GeneralFilePathStrChecker(const QString& filePath);
+bool GeneralFolderPathStrChecker(const QString& folderPath);
 
-  int minV;
-  int maxV;
-};
+bool GeneralFilePathChecker(const QVariant& v);
+bool GeneralFilePathOptionalChecker(const QVariant& v);
+bool GeneralFolderPathChecker(const QVariant& v);
+
+bool GeneralSequenceChecker(const QVariant& v);
+
+} // namespace ValueChecker
 
 #endif // VALUECHECKER_H

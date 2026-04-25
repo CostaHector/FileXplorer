@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FdBasedDb.h"
 #include "CastDBView.h"

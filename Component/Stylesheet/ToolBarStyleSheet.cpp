@@ -2,11 +2,11 @@
 
 bool ToolBarStyleSheet::mRegistered = StyleSheetGetter::Register(std::unique_ptr<StyleSheetGetter>(new ToolBarStyleSheet));
 
-QString ToolBarStyleSheet::GetStyleSheet(Style::StyleSheetE styleE) const {
+QString ToolBarStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
   QString styleSheet;
   switch (styleE) {
-    case Style::StyleSheetE::STYLESHEET_LIGHT:
-    case Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG:
+    case Style::StyleThemeE::THEME_LIGHT:
+    case Style::StyleThemeE::THEME_DARK_MOON_FOG:
       styleSheet = R"(
 QLabel {
     background-color: %1;

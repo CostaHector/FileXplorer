@@ -7,6 +7,8 @@
 #include "CustomTableView.h"
 #include "CustomListView.h"
 #include "StyleSheetGetter.h"
+#include "MemoryKey.h"
+#include "Configuration.h"
 
 #include <QMainWindow>
 #include <QMenuBar>
@@ -34,20 +36,23 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
     m_searchLineEdit->setPlaceholderText("Search items here");
   }
 
-  m_effectSpiltter = new QSplitter{Qt::Orientation::Vertical, this};
-  {
-    m_effectLightPreviewer = GetEffectPreviewer();
-    m_effectDarkPreviewer = GetEffectPreviewer();
-    m_effectSpiltter->addWidget(m_effectLightPreviewer);
-    m_effectSpiltter->addWidget(m_effectDarkPreviewer);
-  }
+  const bool autoInitPreviewWindowWhenStartup = Configuration().value("INIT_PREVIEW_WINDOW_WHEN_STARTUP", true).toBool();
+
+  QToolBar* ctrlTb = new QToolBar{"Control Toolbar", this};
+  ctrlTb->addWidget(m_searchLineEdit);
+  m_autoInitPreviewWindow = ctrlTb->addAction("Auto Init Preview");
+  m_autoInitPreviewWindow->setCheckable(true);
+  m_autoInitPreviewWindow->setChecked(autoInitPreviewWindowWhenStartup);
+  m_initPreviewWindow = ctrlTb->addAction("Init Preview");
 
   m_spiltter = new QSplitter{Qt::Orientation::Horizontal, this};
   {
     m_styleSheetView = new StyleSheetTreeView{this};
     m_styleSheetView->setMinimumWidth(600);
     m_spiltter->addWidget(m_styleSheetView);
-    m_spiltter->addWidget(m_effectSpiltter);
+  }
+  if (autoInitPreviewWindowWhenStartup) {
+    initStyleSheetPreview();
   }
 
   const QDialogButtonBox::StandardButtons stdBtns{QDialogButtonBox::Apply | QDialogButtonBox::Cancel};
@@ -55,7 +60,7 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   CHECK_NULLPTR_RETURN_VOID(m_dlgBtnBox);
 
   m_layout = new QVBoxLayout{this};
-  m_layout->addWidget(m_searchLineEdit);
+  m_layout->addWidget(ctrlTb);
   m_layout->addWidget(m_spiltter);
   m_layout->addWidget(m_dlgBtnBox);
   setLayout(m_layout);
@@ -68,9 +73,29 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   subscribe();
 }
 
+StyleSheetMgr::~StyleSheetMgr() {
+  Configuration().setValue("INIT_PREVIEW_WINDOW_WHEN_STARTUP", m_autoInitPreviewWindow->isChecked());
+}
+
+void StyleSheetMgr::initStyleSheetPreview() {
+  if (m_effectSpiltter != nullptr) {
+    return;
+  }
+  m_initPreviewWindow->setEnabled(false);
+  m_effectSpiltter = new QSplitter{Qt::Orientation::Vertical, this};
+  {
+    m_effectLightPreviewer = GetEffectPreviewer();
+    m_effectDarkPreviewer = GetEffectPreviewer();
+    m_effectSpiltter->addWidget(m_effectLightPreviewer);
+    m_effectSpiltter->addWidget(m_effectDarkPreviewer);
+  }
+  m_spiltter->addWidget(m_effectSpiltter);
+}
+
 void StyleSheetMgr::subscribe() {
   connect(m_searchLineEdit, &QLineEdit::returnPressed, this, &StyleSheetMgr::onStartFilter);
   connect(m_startSearchAct, &QAction::triggered, this, &StyleSheetMgr::onStartFilter);
+  connect(m_initPreviewWindow, &QAction::triggered, this, &StyleSheetMgr::initStyleSheetPreview);
 
   auto* pApplyChanges = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Apply);
   pApplyChanges->setShortcut(QKeySequence(Qt::Key::Key_F10));
@@ -89,7 +114,7 @@ void StyleSheetMgr::subscribe() {
 void StyleSheetMgr::onApplyChanges() {
   StyleSheetGetter::GetInst().WriteIntoSettings();
   const PreferenceActions& prefInst = g_PreferenceActions();
-  prefInst.initStyleSheet(false);
+  prefInst.initStyleTheme(false);
   accept();
 }
 
@@ -308,8 +333,11 @@ QWidget* StyleSheetMgr::GetEffectPreviewer() {
 }
 
 void StyleSheetMgr::seeChanges() {
-  const QString lightQss = StyleSheetGetter::GetInst()(Style::StyleSheetE::STYLESHEET_LIGHT);
+  if (m_initPreviewWindow->isEnabled()) { // need inited
+    return;
+  }
+  const QString lightQss = StyleSheetGetter::GetInst()(Style::StyleThemeE::THEME_LIGHT);
   m_effectLightPreviewer->setStyleSheet(lightQss);
-  const QString darkQss = StyleSheetGetter::GetInst()(Style::StyleSheetE::STYLESHEET_DARK_THEME_MOON_FOG);
+  const QString darkQss = StyleSheetGetter::GetInst()(Style::StyleThemeE::THEME_DARK_MOON_FOG);
   m_effectDarkPreviewer->setStyleSheet(darkQss);
 }

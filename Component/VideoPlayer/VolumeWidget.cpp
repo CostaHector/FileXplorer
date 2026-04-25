@@ -1,5 +1,6 @@
 #include "VolumeWidget.h"
 #include "MemoryKey.h"
+#include "Configuration.h"
 #include "DualIconCheckableAction.h"
 #include "NotificatorMacro.h"
 #include <cmath>
@@ -54,13 +55,13 @@ short nextLevelInLinearScale(short target) {
 constexpr int VolumeWidget::MIN_VOLUME, VolumeWidget::MAX_VOLUME;
 
 VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
-  const bool bMuteVolume = Configuration().value(VideoPlayerKey::MUTE.name, VideoPlayerKey::MUTE.v).toBool();
+  const bool bMuteVolume = Configuration().value(VideoPlayerKey::MUTE.name, VideoPlayerKey::MUTE.toVariant()).toBool();
   mMuteAct = DualIconCheckableAction::CreateMuteAction(this, bMuteVolume);
 
   mMuteBtn = new QToolButton{this};
   mMuteBtn->setDefaultAction(mMuteAct);
 
-  const int sliderValue = Configuration().value(VideoPlayerKey::VOLUME.name, VideoPlayerKey::VOLUME.v).toInt();
+  const int sliderValue = Configuration().value(VideoPlayerKey::VOLUME.name, VideoPlayerKey::VOLUME.toVariant()).toInt();
   mVolumeSlider = new ClickableSlider{Qt::Orientation::Horizontal, this};
   mVolumeSlider->setRange(MIN_VOLUME, MAX_VOLUME);
   mVolumeSlider->setValue(sliderValue);
