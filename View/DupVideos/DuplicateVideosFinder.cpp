@@ -74,7 +74,7 @@ void DuplicateVideosFinder::updateWindowsSize() {
   if (Configuration().contains("Geometry/DuplicateVideosFinder")) {
     restoreGeometry(Configuration().value("Geometry/DuplicateVideosFinder").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
   m_tbl_detail_ver->restoreState(Configuration().value("DuplicateVideosFinderSplitterState", QByteArray()).toByteArray());
 }

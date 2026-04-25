@@ -1,13 +1,12 @@
 #ifndef MENUTOOLBUTTON_H
 #define MENUTOOLBUTTON_H
 #include "ImageTool.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include <QToolButton>
 #include <QString>
 #include <QList>
 #include <QAction>
-#include <QActionGroup>
+
+class KV;
 
 class MenuToolButton : public QToolButton {
  public:

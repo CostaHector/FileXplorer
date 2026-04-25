@@ -1,10 +1,9 @@
 #include "PreviewDockWidget.h"
 #include "StyleSheet.h"
+#include "ImageTool.h"
 #include "MemoryKey.h"
 #include "Configuration.h"
 #include "ViewActions.h"
-#include <QApplication>
-#include <QStyle>
 
 PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::WindowFlags flags) : QDockWidget{title, parent, flags} {
   CATEGORY_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CATEGORY"), tr("Category Preview"), this};
@@ -33,15 +32,15 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   int curPreviewType = Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.name).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
-  m_floatingPanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarNormalButton), tr("Float"), this};
+  m_floatingPanel = new QAction{ImageTool::GetBuiltInIcon(QStyle::SP_TitleBarNormalButton), tr("Float"), this};
   m_floatingPanel->setCheckable(true);
 
-  m_minimizePanel = new QAction{QApplication::style()->standardIcon(QStyle::SP_TitleBarMinButton), tr("Minimize"), this};
+  m_minimizePanel = new QAction{ImageTool::GetBuiltInIcon(QStyle::SP_TitleBarMinButton), tr("Minimize"), this};
 
   QAction* originalCloseAction = toggleViewAction();
   originalCloseAction->setCheckable(false);
   originalCloseAction->setText("close");
-  originalCloseAction->setIcon(QApplication::style()->standardIcon(QStyle::SP_DockWidgetCloseButton));
+  originalCloseAction->setIcon(ImageTool::GetBuiltInIcon(QStyle::SP_DockWidgetCloseButton));
 
   m_titleBar = new ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   m_titleBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);

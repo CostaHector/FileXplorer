@@ -125,7 +125,7 @@ void HarTableView::updateWindowsSize() {
   if (Configuration().contains("Geometry/HAR_TABLEVIEW")) {
     restoreGeometry(Configuration().value("Geometry/HAR_TABLEVIEW").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

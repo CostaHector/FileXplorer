@@ -5,9 +5,7 @@
 #include "PublicMacro.h"
 #include "SizeChangeAnimation.h"
 #include "ImageTool.h"
-#include <QApplication>
 #include <QDir>
-#include <QStyle>
 
 constexpr int NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND, NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND;
 
@@ -40,7 +38,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
 
   {
     // 2. all home links
-    auto* pDesktop = addAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DesktopIcon), tr("Desktop"));
+    auto* pDesktop = addAction(ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DesktopIcon), tr("Desktop"));
     auto* pDocument = addAction(QIcon(":img/FOLDER_OF_DOCUMENTS"), tr("Documents"));
     auto* pDownloads = addAction(QIcon(":img/FOLDER_OF_DOWNLOADS"), tr("Downloads"));
     auto* pPictures = addAction(QIcon(":img/FOLDER_OF_PICTURES"), tr("Pictures"));
@@ -76,7 +74,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
     m_pathActionGroups->addAction(pFavorite);
 
     // 3. all volumes
-    const QIcon diskIcon = QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DriveHDIcon);
+    const QIcon diskIcon = ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DriveHDIcon);
     foreach (const QFileInfo& fi, QDir::drives()) {
       const QString diskAbsPath{fi.absoluteFilePath()};
       auto* pVolume = addAction(diskIcon, diskAbsPath);

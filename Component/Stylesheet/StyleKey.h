@@ -19,7 +19,8 @@ bool onBgImgOverlayOpacityChanged(const QVariant& newBgOverlayOpacity);
 using namespace Style;
 
 constexpr KV BACKGROUND_IMAGE{"StyleKey/BACKGROUND_IMAGE", Var{Style::DEF_BACKGROUND_IMAGE}, GeneralDataType::Type::IMAGE_PATH_OPTIONAL, GeneralFilePathOptionalChecker, onBgImgPathChanged, ":img/IMAGE", "Background image used in QTableView"};
-constexpr KV BACKGROUND_OVERLAY_OPACITY{"StyleKey/BACKGROUND_OVERLAY_OPACITY", Var{Style::DEF_BACKGROUND_OVERLAY_OPACITY}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<0, 255>, onBgImgOverlayOpacityChanged, ":/styles/BACKGROUND_OVERLAY_OPACITY", "Overlay Opacity"};
+constexpr KV BACKGROUND_OVERLAY_OPACITY{
+    "StyleKey/BACKGROUND_OVERLAY_OPACITY", Var{Style::DEF_BACKGROUND_OVERLAY_OPACITY}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<0, 255>, onBgImgOverlayOpacityChanged, ":/styles/BACKGROUND_OVERLAY_OPACITY", "Overlay Opacity"};
 
 bool onStylePresetChanged(const QVariant& newStylePreset);
 bool onStyleThemeChanged(const QVariant& newStyleTheme);
@@ -29,15 +30,21 @@ constexpr KV STYLE_THEME{"StyleKey/STYLE_THEME", Var{(int)Style::DEFAULT_STYLE_T
 
 struct Notifier : public QObject {
   Q_OBJECT
-public:
+ public:
+  enum ChangedReason {
+    IMAGE_PATH,
+    OVERLAY_OPACITY,
+    THEME,
+  };
+
   static Notifier& instance() {
     static Notifier inst;
     return inst;
   }
-signals:
-  void styleChanged();
+ signals:
+  void styleChanged(int changedReason);
 };
 
-} // namespace StyleKey
+}  // namespace StyleKey
 
-#endif // STYLEKEY_H
+#endif  // STYLEKEY_H

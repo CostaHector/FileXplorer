@@ -32,8 +32,8 @@ public:
   constexpr const char* iconUrlStr() const { return iconUrl; }
   constexpr const char* toolTipStr() const { return toolTip; }
   constexpr bool isPath() const { return GeneralDataType::isPathRelatedType(dataType()); }
+  bool isCurValuePassChecker() const;
   QVariant toVariant() const;
-  static QList<const KV*>& GetEditableKVs();
 
   const char* name;
   RawVariant::Var v;

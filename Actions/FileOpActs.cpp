@@ -6,8 +6,6 @@
 #include "StyleSheet.h"
 #include "ImageTool.h"
 #include <QToolBar>
-#include <QApplication>
-#include <QStyle>
 
 FileOpActs& FileOpActs::GetInst() {
   static FileOpActs fileOpIns;
@@ -127,7 +125,7 @@ QActionGroup* FileOpActs::GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKe
   QStringList historyList = historyStr.split('\n');
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   for (const QString& path : historyList) {
-    QAction* tempPath = new (std::nothrow) QAction(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirIcon), path);
+    QAction* tempPath = new (std::nothrow) QAction(ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DirIcon), path);
     tempPath->setCheckable(false);
     actionGroup->addAction(tempPath);
   }

@@ -5,4 +5,7 @@
     <qresource prefix="/image_test">
         <file alias="resolution_ratio">resolution_ratio.png</file>
     </qresource>
+    <qresource prefix="/styles">
+        <file alias="BACKGROUND_IMAGE_TABLEVIEW">BACKGROUND_IMAGE_TABLEVIEW.svg</file>
+    </qresource>
 </RCC>

@@ -51,7 +51,7 @@ void ImgReorderDialog::ReadSettings() {
   if (Configuration().contains("Geometry/IMG_REORDER_DIALOG")) {
     restoreGeometry(Configuration().value("Geometry/IMG_REORDER_DIALOG").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

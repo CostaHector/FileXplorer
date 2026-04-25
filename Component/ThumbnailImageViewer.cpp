@@ -86,7 +86,7 @@ void ThumbnailImageViewer::ReadSetting() {
   if (Configuration().contains(m_memoryKeyName + "/GEOMETRY")) {
     restoreGeometry(Configuration().value(m_memoryKeyName + "/GEOMETRY").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

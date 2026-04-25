@@ -9,7 +9,6 @@ class ValueCheckerTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-
   void GeneralIntChecker_ok() {
     QVERIFY(!GeneralIntChecker(QVariant{}));
 

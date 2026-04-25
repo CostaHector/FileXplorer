@@ -1,12 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "ConfigsMgr.h"
 #include "EndToExposePrivateMember.h"
+
+#include "MemoryKey.h"
+#include "Configuration.h"
 #include "FileLeafAction.h"
 #include "FileTool.h"
 
@@ -21,15 +21,12 @@ USING_MOCKCPP_NS
 
 class ConfigsMgrTest : public PlainTestSuite {
   Q_OBJECT
-public:
-private slots:
+ public:
+ private slots:
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
   void default_ok() {
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
-    KV::GetEditableKVs().clear();
-
     Configuration().clear();
 
     // not crash
@@ -69,13 +66,13 @@ private slots:
       MOCKER(FileTool::OpenLocalFile)
           .expects(exactly(3))
           .with(eq(cfgFilePath))
-          .will(returnValue(false))                                     // 1st
-          .then(returnValue(true))                                      // 2nd
-          .then(returnValue(true));                                     // 3rd
+          .will(returnValue(false))  // 1st
+          .then(returnValue(true))   // 2nd
+          .then(returnValue(true));  // 3rd
 
-      QCOMPARE(cfgTbl.onEditPreferenceSetting(), false);                // 1st
-      QCOMPARE(cfgTbl.onEditPreferenceSetting(), true);                 // 2nd
-      emit cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Open)->click(); // 3rd
+      QCOMPARE(cfgTbl.onEditPreferenceSetting(), false);                 // 1st
+      QCOMPARE(cfgTbl.onEditPreferenceSetting(), true);                  // 2nd
+      emit cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Open)->click();  // 3rd
     } else {
       MOCKER(FileTool::OpenLocalFile).expects(never()).will(returnValue(true));
 
@@ -84,32 +81,25 @@ private slots:
   }
 
   void label_message_after_user_edit_ok() {
-    using namespace RawVariant;
-    using namespace ValueChecker;
-
-    GlbDataProtect<QList<const KV*>> editableKVsBackup{KV::GetEditableKVs()};
-    constexpr KV playerFilePath{"playerFilePath", Var{"inexists/player/file/path"}, GeneralDataType::Type::FILE_PATH, ValueChecker::GeneralFilePathChecker};     // invalid
-    constexpr KV workFolderPath{"workFolderPath", Var{"inexists/work/folder/path"}, GeneralDataType::Type::FOLDER_PATH, ValueChecker::GeneralFolderPathChecker}; // invalid
-    constexpr KV volumeValue{"volumeValue", Var{-5}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 100>};                                          // invalid
-    constexpr KV playerMute{"playerMute", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};                                                    // valid
-    QList<const KV*> tempLst{&playerFilePath, &workFolderPath, &volumeValue, &playerMute};
-    KV::GetEditableKVs().swap(tempLst);
-    QCOMPARE(KV::GetEditableKVs().size(), 4);
+    QCOMPARE(KVTestOnly::KV_TEST_COUNT, 4);
 
     // 配置当前值清空, 检查总共4条配置, 预设值有3个错误; 标签内容正确
     Configuration().clear();
     ConfigsMgr cfgTbl;
-    QString failed3ItemsMsg = cfgTbl.m_failItemCnt->text();
-    QVERIFY(failed3ItemsMsg.contains("3 in 4 setting(s) error"));
-    QVERIFY(!failed3ItemsMsg.contains("All 4 setting passed"));
 
     const QAbstractTableModel* pConstModel = cfgTbl.m_alertsTable->GetModel();
     QVERIFY(pConstModel != nullptr);
+    QCOMPARE(pConstModel->rowCount(), KVTestOnly::KV_TEST_COUNT);
 
     QAbstractTableModel* pModel = cfgTbl.m_alertsTable->GetModel();
     QVERIFY(pModel != nullptr);
+    QCOMPARE(pModel->rowCount(), KVTestOnly::KV_TEST_COUNT);
 
     QCOMPARE(pModel, pConstModel);
+
+    QString failed3ItemsMsg = cfgTbl.m_failItemCnt->text();
+    QVERIFY(failed3ItemsMsg.contains("3 in 4 setting(s) error"));
+    QVERIFY(!failed3ItemsMsg.contains("All 4 setting passed"));
 
     QAbstractTableModel& model = *pModel;
 
@@ -123,8 +113,8 @@ private slots:
     const QString correctPlayerPath{__FILE__};
     const QString correctWorkFolderPath{QFileInfo{__FILE__}.absolutePath()};
     const int correctVolumeValue{99};
-    Configuration().setValue(playerFilePath.name, correctPlayerPath);
-    Configuration().setValue(workFolderPath.name, correctWorkFolderPath);
+    Configuration().setValue(KVTestOnly::playerFilePath.name, correctPlayerPath);
+    Configuration().setValue(KVTestOnly::workFolderPath.name, correctWorkFolderPath);
     const QString stillFailed3ItemsMsg = cfgTbl.m_failItemCnt->text();
     QVERIFY(stillFailed3ItemsMsg.contains("3 in 4 setting(s) error"));
     QVERIFY(!stillFailed3ItemsMsg.contains("All 4 setting passed"));

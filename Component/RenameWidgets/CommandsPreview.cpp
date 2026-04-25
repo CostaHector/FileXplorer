@@ -47,7 +47,7 @@ void CommandsPreview::ReadSettings() {
   if (Configuration().contains(mName + "/GEOMETRY")) {
     restoreGeometry(Configuration().value(mName + "/GEOMETRY").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
   setWindowIcon(QIcon(":img/COMMAND_PREVIEW"));
 }

@@ -60,10 +60,6 @@ void UpdateApplyPushButton(QWidget* pushButton) {
   pushButton->style()->polish(pushButton);
 }
 
-QIcon GetSystemDirOpenIcon() {
-  return QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_DirOpenIcon);
-}
-
 }  // namespace StyleSheet
 
 void SetLayoutAlightment(QLayout* lay, const Qt::AlignmentFlag align) {

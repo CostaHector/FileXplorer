@@ -67,7 +67,7 @@ void AdvanceRenamer::ReadSettings() {
   if (Configuration().contains("Geometry/ADVANCE_RENAMER")) {
     restoreGeometry(Configuration().value("Geometry/ADVANCE_RENAMER").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

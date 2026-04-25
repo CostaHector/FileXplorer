@@ -264,6 +264,6 @@ void TorrentsManagerWidget::updateWindowsSize() {
   if (Configuration().contains("Geometry/TorrentsManagerWidget")) {
     restoreGeometry(Configuration().value("Geometry/TorrentsManagerWidget").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }

@@ -195,7 +195,7 @@ void MD5Window::ReadSetting() {
   if (Configuration().contains("Geometry/MD5Window")) {
     restoreGeometry(Configuration().value("Geometry/MD5Window").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

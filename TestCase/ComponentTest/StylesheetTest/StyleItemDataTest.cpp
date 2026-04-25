@@ -361,19 +361,19 @@ private slots:
       QVERIFY(!boolNode.isNeedApplyChange());
 
       // 初始值->false (accept, changed)
-      bool newNumberAccepted = false;
-      QVERIFY(weightIntNode.modifyValueTo(false, newNumberAccepted));
-      QVERIFY(newNumberAccepted);
+      bool newBoolAccept = false;
+      QVERIFY(boolNode.modifyValueTo(false, newBoolAccept));
+      QVERIFY(newBoolAccept);
 
       // false->false (accept, not changed)
-      newNumberAccepted = false;
-      QVERIFY(!weightIntNode.modifyValueTo(false, newNumberAccepted));
-      QVERIFY(newNumberAccepted);
+      newBoolAccept = false;
+      QVERIFY(!boolNode.modifyValueTo(false, newBoolAccept));
+      QVERIFY(newBoolAccept);
 
       // false->true (accept, changed)
-      newNumberAccepted = false;
-      QVERIFY(weightIntNode.modifyValueTo(true, newNumberAccepted));
-      QVERIFY(newNumberAccepted);
+      newBoolAccept = false;
+      QVERIFY(boolNode.modifyValueTo(true, newBoolAccept));
+      QVERIFY(newBoolAccept);
     }
   }
 

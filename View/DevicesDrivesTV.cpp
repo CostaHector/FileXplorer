@@ -108,7 +108,7 @@ void DevicesDrivesTV::ReadSettings() {
   if (Configuration().contains("Geometry/DevicesDriveTableView")) {
     restoreGeometry(Configuration().value("Geometry/DevicesDriveTableView").toByteArray());
   } else {
-    setGeometry(DEFAULT_GEOMETRY);
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 

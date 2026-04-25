@@ -4,6 +4,7 @@
 #include "PublicVariable.h"
 #include "MemoryKey.h"
 #include "Configuration.h"
+#include <QApplication>
 #include <QPixmapCache>
 #include <QBuffer>
 
@@ -85,6 +86,14 @@ QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase) {
     imgStr = it.value();
   }
   return imgStr;
+}
+
+QIcon GetBuiltInIcon(QStyle::StandardPixmap spE) {
+#ifdef RUNNING_UNIT_TESTS
+  return {};
+#endif
+  static const QStyle* pStyle = QApplication::style();
+  return pStyle->standardIcon(spE);
 }
 
 } // namespace ImageTool
