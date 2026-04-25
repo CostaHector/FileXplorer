@@ -36,7 +36,7 @@ private slots:
     QVERIFY(!(GeneralIntRangeChecker<0, 255>(-1)));
     QVERIFY(!(GeneralIntRangeChecker<0, 255>(257)));
     QVERIFY((GeneralIntRangeChecker<0, 255>(0)));
-    QVERIFY((GeneralIntRangeChecker<0, 255>(256)));
+    QVERIFY(!(GeneralIntRangeChecker<0, 255>(256)));
 
     QVERIFY(!(GeneralIntRangeChecker<0, 500>(-1)));
     QVERIFY(!(GeneralIntRangeChecker<0, 500>(501)));
