@@ -582,7 +582,7 @@
 <context>
     <name>FileOpActs</name>
     <message>
-        <location filename="../../Actions/FileOpActs.cpp" line="+20"/>
+        <location filename="../../Actions/FileOpActs.cpp" line="+18"/>
         <source>Reveal in Explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
@@ -1469,7 +1469,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+24"/>
+        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+22"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1545,7 +1545,7 @@
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+10"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+9"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1906,7 +1906,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+64"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+65"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
