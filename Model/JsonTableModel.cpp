@@ -5,10 +5,13 @@
 #include "DataFormatter.h"
 #include "CastManager.h"
 #include "PathTool.h"
+#include "GeneralDataType.h"
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
 #include <QTextCharFormat>
+
+constexpr int JsonTableModel::DATA_TYPE_ROLE;
 
 QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
@@ -18,12 +21,11 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   const int col = index.column();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
-  case enu:                                                                          \
-    return format(item.m_##enu);  //
-      JSON_MODEL_FIELD_MAPPING    //
-#undef JSON_KEY_ITEM              //
-          default : return {};
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
+      case enu: return format(item.m_##enu); //
+      JSON_MODEL_FIELD_MAPPING   //
+#undef JSON_KEY_ITEM             //
+      default: return {};
     }
   } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
     if (item.m_ContentFixed) {
@@ -52,6 +54,14 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
       }
       default:
         break;
+    }
+  } else if (role == JsonTableModel::DATA_TYPE_ROLE) {
+    switch (col) {
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
+      case enu: return generalDataType; //
+        JSON_MODEL_FIELD_MAPPING    //
+#undef JSON_KEY_ITEM                //
+      default: return GeneralDataType::Type::ERROR_TYPE;
     }
   }
   return {};
@@ -88,7 +98,7 @@ bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, in
   if (role == Qt::EditRole) {
     auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) \
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
   case enu: {                                                                        \
     if (!writer(item.m_##enu, value)) {                                              \
       return false;                                                                  \

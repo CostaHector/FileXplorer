@@ -4,7 +4,8 @@
 #include "DuplicateVideosFinderActions.h"
 #include "FileOpActs.h"
 
-#include "MemoryKey.h"
+#include "VideoPlayerKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
@@ -22,12 +23,12 @@ DuplicateVideosFinder::DuplicateVideosFinder(QWidget* parent) : QMainWindow{pare
   tableNameFilterLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   tableNameFilterLE->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 
-  int szDev = Configuration().value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.toVariant()).toInt();
+  int szDev = getConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE).toInt();
   sizeDevLE = new (std::nothrow) QLineEdit{QString::number(szDev), parent};
   CHECK_NULLPTR_RETURN_VOID(sizeDevLE);
   sizeDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
 
-  int durDev = Configuration().value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.toVariant()).toInt();
+  int durDev = getConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION).toInt();
   durationDevLE = new (std::nothrow) QLineEdit{QString::number(durDev), parent};
   CHECK_NULLPTR_RETURN_VOID(durationDevLE);
   durationDevLE->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);

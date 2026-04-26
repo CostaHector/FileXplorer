@@ -1,24 +1,21 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "ClipboardGuard.h"
-#include "TDir.h"
-
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "FileSystemModel.h"
 #include "FileSystemTableView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "TDir.h"
+#include "Logger.h"
 #include "FileOpActs.h"
 #include "MimeDataHelper.h"
+#include "ClipboardGuard.h"
+#include "BehaviorKey.h"
 
 #include "ViewHelper.h"
-#include <QDir>
 #include <QDirIterator>
+#include <QSignalSpy>
 
 class FileSystemTableViewTest : public PlainTestSuite {
   Q_OBJECT

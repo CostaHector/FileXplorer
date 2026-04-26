@@ -5,7 +5,7 @@
 #include "NavigationToolBar.h"
 #include "EndToExposePrivateMember.h"
 
-#include "MemoryKey.h"
+#include "CompoVisKey.h"
 #include "Configuration.h"
 
 #include <mockcpp/mokc.h>
@@ -32,7 +32,7 @@ class NavigationToolBarTest : public PlainTestSuite {
 
   void D2Ev_D0Ev_ok() {
     Configuration().remove(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name);
-    QCOMPARE(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name, CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.toVariant()).toBool(), false);
+    QCOMPARE(getConfig(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR).toBool(), false);
     {  // 普通析构函数
       NavigationToolBar naviTooBar{"NaviToolbarOnExpandSidebar"};
       QCOMPARE(naviTooBar.EXPAND_SIDEBAR->isChecked(), false);
@@ -46,7 +46,7 @@ class NavigationToolBarTest : public PlainTestSuite {
       QCOMPARE(naviTooBar.maximumWidth(), NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND);
     }
     QVERIFY(Configuration().contains(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name));
-    QVERIFY(Configuration().value(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR.name).toBool());
+    QVERIFY(getConfig(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR).toBool());
 
     {  // 删除析构函数
       std::unique_ptr<NavigationToolBar> d0ev{new NavigationToolBar};

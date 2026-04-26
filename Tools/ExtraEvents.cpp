@@ -1,4 +1,5 @@
 #include "ExtraEvents.h"
+
 #include "TorrDBAction.h"
 #include "TorrentsManagerWidget.h"
 
@@ -15,8 +16,10 @@
 
 #include "MemoryKey.h"
 #include "Configuration.h"
+
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
+
 #include <QMessageBox>
 
 ExtraEvents::ExtraEvents(QWidget* parent)
@@ -63,7 +66,7 @@ void ExtraEvents::subscribe() {
   });
 
   connect(leafInst._LANUAGE, &QAction::triggered, this, [](const bool cnEnabled) {
-    Configuration().setValue(MemoryKey::LANGUAGE_ZH_CN.name, cnEnabled);
+    setConfig(MemoryKey::LANGUAGE_ZH_CN, cnEnabled);
     const char* languageName{cnEnabled ? "zh-cn" : "us-en"};
     LOG_INFO_P("Language switch", "[%s] work after reopen", qPrintable(languageName));
   });

@@ -1,13 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "JsonTableView.h"
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
+
+#include "VideoDurationGetter.h"
 #include "JsonActions.h"
 #include "TDir.h"
 #include "UserInteractiveMock.h"
@@ -18,7 +18,6 @@
 #include <QTextEdit>
 #include <QMessageBox>
 
-#include "VideoDurationGetter.h"
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -76,7 +75,6 @@ class JsonTableViewTest : public PlainTestSuite {
 
     QVERIFY(jsonView._JsonModel != nullptr);
     QVERIFY(jsonView._JsonProxyModel != nullptr);
-    QVERIFY(jsonView.m_DetailEdit != nullptr);
 
     QVERIFY(!jsonView.CurrentIndexSource().isValid());
     QVERIFY(jsonView.selectedRowsSource(JSON_KEY_E::Name).isEmpty());

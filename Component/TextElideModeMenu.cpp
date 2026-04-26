@@ -1,7 +1,6 @@
 #include "TextElideModeMenu.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "PublicMacro.h"
+#include "Configuration.h"
 
 TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
     : QMenu{menuName, parent}, m_memoryName{belongToName + "/TextElideMode"} {

@@ -1,5 +1,5 @@
 #include "LeftVideoGroupsModel.h"
-#include "MemoryKey.h"
+#include "VideoPlayerKey.h"
 #include "Configuration.h"
 
 using namespace DuplicateVideoDetectionCriteria;
@@ -8,14 +8,8 @@ const QStringList LeftVideoGroupsModel::DUPLICATE_LIST_HEADER{"Count", "Value"};
 
 LeftVideoGroupsModel::LeftVideoGroupsModel(QObject* parent)  //
     : QAbstractTableModelPub{parent} {
-  m_deviationSz = Configuration()
-                      .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name,  //
-                             VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.toVariant())
-                      .toInt();
-  m_deviationDur = Configuration()
-                       .value(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name,  //
-                              VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.toVariant())
-                       .toInt();
+  m_deviationSz = getConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE).toInt();
+  m_deviationDur = getConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION).toInt();
 }
 
 QVariant LeftVideoGroupsModel::data(const QModelIndex& index, int role) const {
@@ -126,7 +120,7 @@ int LeftVideoGroupsModel::setDeviationDuration(int newDuration) {
     LOG_D("no need to update DeviationDuration, already [%d]ms", (int)newDuration);
     return 0;
   }
-  Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, newDuration);
+  setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION, newDuration);
 
   const int oldDuration{newDuration};
   const int beforeRowCnt = rowCount();
@@ -150,7 +144,7 @@ int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
     LOG_D("no need to update DeviationSize, already [%d]bytes", (int)newSize);
     return 0;
   }
-  Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, newSize);
+  setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, newSize);
 
   const qint64 oldSize{newSize};
   const int beforeRowCnt = rowCount();

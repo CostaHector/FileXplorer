@@ -1,7 +1,7 @@
 #include "CastDbModel.h"
 #include "CastBaseDb.h"
 #include "CastDBActions.h"
-#include "MemoryKey.h"
+#include "PathKey.h"
 #include "Configuration.h"
 #include "PublicVariable.h"
 #include "TableFields.h"
@@ -23,10 +23,7 @@ constexpr int CastDbModel::MAX_RATE;
 
 CastDbModel::CastDbModel(QObject* parent, QSqlDatabase db)
   : SqlTableModelPub{parent, db}
-  , m_imageHostPath{Configuration()                                             //
-                        .value(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, //
-                               PathKey::PERFORMER_IMAGEHOST_LOCATE.toVariant())    //
-                        .toString()} {
+  , m_imageHostPath{getConfig(PathKey::PERFORMER_IMAGEHOST_LOCATE).toString()} {
   setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 
   if (isDbValidAndOpened(db)) {

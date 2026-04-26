@@ -3,7 +3,6 @@
 #include "StringTool.h"
 #include "PublicVariable.h"
 #include "ImageTool.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include <QFile>
 

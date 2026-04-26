@@ -1,15 +1,10 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "RedundantImageModel.h"
 #include "EndToExposePrivateMember.h"
+
 #include "TDir.h"
 #include "ImageTestPrecoditionTools.h"
 

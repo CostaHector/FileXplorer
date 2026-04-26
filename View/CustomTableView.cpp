@@ -4,7 +4,6 @@
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"

@@ -1,14 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "DoubleRowHeader.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
+
+#include <QSignalSpy>
 #include <QTableView>
 #include <QStandardItemModel>
 

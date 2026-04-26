@@ -1,13 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "VolumeWidget.h"
 #include "EndToExposePrivateMember.h"
+
+#include "VideoPlayerKey.h"
+#include "Configuration.h"
+#include <QSignalSpy>
 
 class VolumeWidgetTest : public PlainTestSuite {
   Q_OBJECT
@@ -31,9 +31,9 @@ class VolumeWidgetTest : public PlainTestSuite {
     // status keep in memory ok
     {
       QVERIFY(Configuration().contains(VideoPlayerKey::MUTE.name));
-      QCOMPARE(Configuration().value(VideoPlayerKey::MUTE.name).toBool(), true);
+      QCOMPARE(getConfig(VideoPlayerKey::MUTE).toBool(), true);
       QVERIFY(Configuration().contains(VideoPlayerKey::VOLUME.name));
-      QCOMPARE(Configuration().value(VideoPlayerKey::VOLUME.name).toInt(), 88);
+      QCOMPARE(getConfig(VideoPlayerKey::VOLUME).toInt(), 88);
     }
 
     // init status ok[exist configuration]
@@ -46,7 +46,7 @@ class VolumeWidgetTest : public PlainTestSuite {
   }
 
   void cleanupTestCase() {  //
-    // Configuration().clear();
+    Configuration().clear();
   }
 
   void convertBetweenLinearScaleAndLogScale_ok() {
@@ -97,8 +97,8 @@ class VolumeWidgetTest : public PlainTestSuite {
   }
 
   void mutedStateToggled_Signal_ok() {
-    Configuration().setValue(VideoPlayerKey::MUTE.name, false);
-    Configuration().setValue(VideoPlayerKey::VOLUME.name, 77);
+    setConfig(VideoPlayerKey::MUTE, false);
+    setConfig(VideoPlayerKey::VOLUME, 77);
 
     VolumeWidget volWid;
     QSignalSpy mutedStateToggledSpy(&volWid, &VolumeWidget::mutedStateToggled);
@@ -115,8 +115,8 @@ class VolumeWidgetTest : public PlainTestSuite {
   }
 
   void sliderVolumeChanged_signal_ok() {
-    Configuration().setValue(VideoPlayerKey::MUTE.name, true);
-    Configuration().setValue(VideoPlayerKey::VOLUME.name, 66);
+    setConfig(VideoPlayerKey::MUTE, true);
+    setConfig(VideoPlayerKey::VOLUME, 66);
 
     VolumeWidget volWid;
     QSignalSpy mutedStateToggledSpy(&volWid, &VolumeWidget::mutedStateToggled);
@@ -155,8 +155,8 @@ class VolumeWidgetTest : public PlainTestSuite {
   }
 
   void reqLogVolumeDecrease_ok() {
-    Configuration().setValue(VideoPlayerKey::MUTE.name, false);
-    Configuration().setValue(VideoPlayerKey::VOLUME.name, 3);
+    setConfig(VideoPlayerKey::MUTE, false);
+    setConfig(VideoPlayerKey::VOLUME, 3);
     VolumeWidget volWid;
     QSignalSpy sliderVolumeChangedSpy(&volWid, &VolumeWidget::sliderVolumeChanged);
 
@@ -169,8 +169,8 @@ class VolumeWidgetTest : public PlainTestSuite {
   }
 
   void reqLogVolumeIncrease_ok() {
-    Configuration().setValue(VideoPlayerKey::MUTE.name, false);
-    Configuration().setValue(VideoPlayerKey::VOLUME.name, 97);
+    setConfig(VideoPlayerKey::MUTE, false);
+    setConfig(VideoPlayerKey::VOLUME, 97);
     VolumeWidget volWid;
     QSignalSpy sliderVolumeChangedSpy(&volWid, &VolumeWidget::sliderVolumeChanged);
 

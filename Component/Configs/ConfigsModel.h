@@ -3,6 +3,9 @@
 
 #include <QAbstractTableModel>
 #include "MemoryKey.h"
+#include "BehaviorKey.h"
+#include "PathKey.h"
+#include "RedunImgFinderKey.h"
 #include "StyleKey.h"
 
 namespace KVTestOnly {
@@ -33,9 +36,9 @@ constexpr const KV* mKVs[]{
     &KVTestOnly::volumeValue,
     &KVTestOnly::playerMute,
 #else
-    &PathKey::LAST_TIME_COPY_TO,            //
     &BehaviorKey::VIDS_LAST_TABLE_NAME,     //
     &BehaviorKey::WHERE_CLAUSE_HISTORY,     //
+    &PathKey::LAST_TIME_COPY_TO,            //
     &RedunImgFinderKey::RUND_IMG_PATH,      //
     &StyleKey::STYLE_PRESET,                //
     &StyleKey::STYLE_THEME,                 //

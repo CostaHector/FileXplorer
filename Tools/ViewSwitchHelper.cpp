@@ -1,7 +1,5 @@
 ﻿#include "ViewSwitchHelper.h"
 #include "CastDBView.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "NavigationToolBar.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"

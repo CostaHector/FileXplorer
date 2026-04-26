@@ -1,24 +1,21 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "ScenesListModel.h"
 #include "SceneSortProxyModel.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Logger.h"
+#include "SceneKey.h"
+#include "Configuration.h"
 #include "SceneInfoManager.h"
 #include "StringTool.h"
-
 #include "JsonKey.h"
 #include "RateHelper.h"
-#include <random>
 
+#include <QSignalSpy>
+#include <random>
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -160,7 +157,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .will(returnValue(scenesLstInPath1))  //
         .id("1");
 
-    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
+    setConfig(SceneKey::CNT_EACH_PAGE, 40);
     ScenesListModel slm{"ScenesListModelSetRootPath"};
     QCOMPARE(slm.rootPath(), "");
     QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 40);
@@ -207,7 +204,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
+    setConfig(SceneKey::CNT_EACH_PAGE, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
@@ -274,7 +271,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .with(QString{"inexist/path"})       //
         .will(returnValue(sceneList));       //
 
-    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 40);
+    setConfig(SceneKey::CNT_EACH_PAGE, 40);
     ScenesListModel slm{"ScenesListModelData"};
     QCOMPARE(slm.setRootPath("inexist/path"), true);
 
@@ -543,7 +540,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(scenesLst.size(), 6);
     MOCKER(SceneHelper::GetScnsLstFromPath).expects(exactly(1)).with(eq(QString{"inexist/GlobalSortPath"})).will(returnValue(scenesLst));
 
-    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 4);
+    setConfig(SceneKey::CNT_EACH_PAGE, 4);
     // global rate descending
     ScenesListModel slm{"ScenesListViewGlobalSort"};
     slm.initSortSetting(SceneInfo::Role::RATE_ROLE, true);
@@ -590,7 +587,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(scenesLst.size(), 6);
     MOCKER(SceneHelper::GetScnsLstFromPath).expects(exactly(1)).with(eq(QString{"inexist/RowRemovePath"})).will(returnValue(scenesLst));
 
-    Configuration().setValue(SceneKey::CNT_EACH_PAGE.name, 4);
+    setConfig(SceneKey::CNT_EACH_PAGE, 4);
     ScenesListModel slm{"RowRemovedTest"};
     QSignalSpy pagesCntChanged(&slm, &ScenesListModel::pagesCountChanged);
     QCOMPARE(slm.setRootPath("inexist/RowRemovePath"), true);

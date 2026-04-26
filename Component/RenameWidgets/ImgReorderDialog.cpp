@@ -1,5 +1,5 @@
 #include "ImgReorderDialog.h"
-#include "MemoryKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "PublicMacro.h"

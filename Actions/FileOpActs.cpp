@@ -1,10 +1,10 @@
 #include "FileOpActs.h"
 #include "FileOperatorPub.h"
 #include "ComplexOperation.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"
+#include "BehaviorKey.h"
+#include "Configuration.h"
 #include <QToolBar>
 
 FileOpActs& FileOpActs::GetInst() {
@@ -86,7 +86,7 @@ FileOpActs::FileOpActs(QObject* parent)
 }
 
 FileOpActs::~FileOpActs() {
-  Configuration().setValue(BehaviorKey::FILESYSTEM_STRUCTURE.name, (int)GetCurFileStructurePolicy());
+  setConfig(BehaviorKey::FILESYSTEM_STRUCTURE, (int)GetCurFileStructurePolicy());
 }
 
 QActionGroup* FileOpActs::GetDeleteActions() {

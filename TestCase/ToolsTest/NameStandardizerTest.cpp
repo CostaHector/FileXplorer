@@ -54,7 +54,7 @@ class NameStandardizerTest : public PlainTestSuite {
     tempStudios["realmadrid"] = "ReadMadrid";
     tempStudios["real madrid"] = "ReadMadrid";
     psm.ProStudioMap().swap(tempStudios);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       psm.ProStudioMap().swap(tempStudios);
     };
     QCOMPARE(ns("marvelfilms-1.mp4"), "MarvelFilms - 1.mp4");

@@ -2,7 +2,7 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "ImageTool.h"
-#include "MemoryKey.h"
+#include "PathKey.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "ThumbnailImageViewer.h"
@@ -248,7 +248,7 @@ bool OpenLocalTorrentFile(const QString& localFilePath) {
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
   if (!QFileInfo(defaultPath).isDir()) {
-    defaultPath = Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString();
+    defaultPath = getConfig(PathKey::LAST_TIME_COPY_TO).toString();
   }
   QString selectPath = QFileDialog::getExistingDirectory(parent, "Choose a destination", defaultPath, QFileDialog::Option::ShowDirsOnly);
   QFileInfo dstFi(selectPath); // system may return back slash seperated path
@@ -256,7 +256,7 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent) {
     LOG_D("selectPath[%s] is not a directory", qPrintable(selectPath));
     return "";
   }
-  Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, dstFi.absoluteFilePath());
+  setConfig(PathKey::LAST_TIME_COPY_TO, dstFi.absoluteFilePath());
   return dstFi.absoluteFilePath();
 }
 

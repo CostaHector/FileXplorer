@@ -75,13 +75,13 @@ class JsonPrTest : public PlainTestSuite {
     tempStudios["realmadrid"] = "ReadMadrid";
     tempStudios["real madrid"] = "ReadMadrid";
     psm.ProStudioMap().swap(tempStudios);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       psm.ProStudioMap().swap(tempStudios);
     };
     auto& pm = CastManager::getInst();
     CAST_MGR_DATA_T tempCast{"a1 c1", "b1 d1", "a1 b1"};
     pm.CastSet().swap(tempCast);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       pm.CastSet().swap(tempCast);
     };
 
@@ -269,7 +269,7 @@ class JsonPrTest : public PlainTestSuite {
     STUDIO_MGR_DATA_T tempStudiosMap{{"paramount pictures", "Paramount Pictures"}};
     pm.CastSet().swap(tempCastsList);
     psm.ProStudioMap().swap(tempStudiosMap);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       pm.CastSet().swap(tempCastsList);
       psm.ProStudioMap().swap(tempStudiosMap);
     };

@@ -1,22 +1,22 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "LeftVideoGroupsTable.h"
 #include "EndToExposePrivateMember.h"
+
+#include "VideoPlayerKey.h"
+#include "Configuration.h"
 #include "ModelTestHelper.h"
+
+#include <QSignalSpy>
 
 class LeftVideoGroupsTableTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
   void selection_toggle_non_and_valid_ok() {
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2kB
 
     LeftVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
@@ -63,8 +63,8 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
   }
 
   void when_groupsCountChanged_emit_windowTitleChangedSignal_ok() {
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2kB
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 2000);  // 2kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION, 2000);  // 2kB
 
     static auto isTitleMessageInExpect = [](const QString& title, const int batchCount, const QString& differBy) -> bool {
       return title.contains(QString("%1 batch(es)").arg(batchCount), Qt::CaseInsensitive)  //
@@ -133,7 +133,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
   }
 
   void sort_by_column_enabled_ok() {
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2kB
 
     LeftVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);

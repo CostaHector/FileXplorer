@@ -1,13 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "BatchRenameBy.h"
 #include "EndToExposePrivateMember.h"
+
+#include "RenamerKey.h"
+#include "Configuration.h"
 #include "AdvanceRenamerTestTool.h"
 
 #include "AdvanceRenamer.h"
@@ -167,10 +166,10 @@ class BatchRenameByTest : public PlainTestSuite {
   }
 
   void NumerizerQueryAndConfirm_ok() {
-    Configuration().setValue(RenamerKey::NAME_EXT_INDEPENDENT.name, true);
-    Configuration().setValue(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, false);
-    Configuration().setValue(RenamerKey::NUMERIAZER_NO_FORMAT.name, " %1");
-    Configuration().setValue(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, 0);
+    setConfig(RenamerKey::NAME_EXT_INDEPENDENT, true);
+    setConfig(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER, false);
+    setConfig(RenamerKey::NUMERIAZER_NO_FORMAT, " %1");
+    setConfig(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX, 0);
 
     using namespace AdvanceRenamerTestTool;
     set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted});

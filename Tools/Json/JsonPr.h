@@ -27,7 +27,7 @@ struct JsonPr {
   QStringList GetVideosAbsPath() const;
 
 // Json Key and Value
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
   JSON_MODEL_FIELD_MAPPING
 #undef JSON_KEY_ITEM
 

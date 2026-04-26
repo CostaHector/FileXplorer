@@ -1,9 +1,10 @@
 ﻿#include "MD5Window.h"
 #include "NotificatorMacro.h"
 #include "MD5Calculator.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "StyleSheet.h"
+#include "Configuration.h"
+#include "SizeTool.h"
+
 #include <QMenu>
 #include <QFileInfo>
 #include <QIcon>

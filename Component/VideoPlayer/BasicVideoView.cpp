@@ -2,8 +2,6 @@
 #include "DataFormatter.h"
 #include "DualIconCheckableAction.h"
 #include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "FileTool.h"

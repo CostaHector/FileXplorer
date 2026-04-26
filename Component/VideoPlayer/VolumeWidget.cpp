@@ -1,5 +1,5 @@
 #include "VolumeWidget.h"
-#include "MemoryKey.h"
+#include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include "DualIconCheckableAction.h"
 #include "NotificatorMacro.h"
@@ -55,13 +55,13 @@ short nextLevelInLinearScale(short target) {
 constexpr int VolumeWidget::MIN_VOLUME, VolumeWidget::MAX_VOLUME;
 
 VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
-  const bool bMuteVolume = Configuration().value(VideoPlayerKey::MUTE.name, VideoPlayerKey::MUTE.toVariant()).toBool();
+  const bool bMuteVolume = getConfig(VideoPlayerKey::MUTE).toBool();
   mMuteAct = DualIconCheckableAction::CreateMuteAction(this, bMuteVolume);
 
   mMuteBtn = new QToolButton{this};
   mMuteBtn->setDefaultAction(mMuteAct);
 
-  const int sliderValue = Configuration().value(VideoPlayerKey::VOLUME.name, VideoPlayerKey::VOLUME.toVariant()).toInt();
+  const int sliderValue = getConfig(VideoPlayerKey::VOLUME).toInt();
   mVolumeSlider = new ClickableSlider{Qt::Orientation::Horizontal, this};
   mVolumeSlider->setRange(MIN_VOLUME, MAX_VOLUME);
   mVolumeSlider->setValue(sliderValue);
@@ -81,8 +81,8 @@ VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : Q
 }
 
 VolumeWidget::~VolumeWidget() {
-  Configuration().setValue(VideoPlayerKey::MUTE.name, isMuted());
-  Configuration().setValue(VideoPlayerKey::VOLUME.name, volumeVal());
+  setConfig(VideoPlayerKey::MUTE, isMuted());
+  setConfig(VideoPlayerKey::VOLUME, volumeVal());
 }
 
 void VolumeWidget::onMouseEventProcessor(const int sliderValue) {

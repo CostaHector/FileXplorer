@@ -22,7 +22,8 @@
 #include "RibbonMovieDB.h"
 #include "SizeChangeAnimation.h"
 #include "MenuToolButton.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
+#include "CompoVisKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "StyleSheet.h"
@@ -62,8 +63,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
   _EXPAND_RIBBONS->setToolTip(QString("<b>%1 (%2)</b><br/>Displays the Ribbon Menu when enabled, or hides it when disabled.")
                                   .arg(_EXPAND_RIBBONS->text(), _EXPAND_RIBBONS->shortcut().toString()));
   _EXPAND_RIBBONS->setCheckable(true);
-  _EXPAND_RIBBONS->setChecked(
-      Configuration().value(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.toVariant()).toBool());
+  _EXPAND_RIBBONS->setChecked(getConfig(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR).toBool());
   m_corner = GetMenuRibbonCornerWid();
   setCornerWidget(m_corner, Qt::Corner::TopRightCorner);
 
@@ -411,7 +411,7 @@ void RibbonMenu::Subscribe() {
 }
 
 void RibbonMenu::AfterSubscribeInitialSettings() {
-  setCurrentIndex(Configuration().value(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.toVariant()).toInt());
+  setCurrentIndex(getConfig(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX).toInt());
   QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
 }
 
@@ -424,7 +424,7 @@ bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
 }
 
 void RibbonMenu::on_expandStackedWidget(bool bExpand) {
-  Configuration().setValue(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, bExpand);
+  setConfig(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR, bExpand);
   updateStackedWidgetHeight(bExpand, true);
 }
 
@@ -439,7 +439,7 @@ void RibbonMenu::updateStackedWidgetHeight(bool bExpand, bool bAnimationEnabled)
 }
 
 void RibbonMenu::on_currentTabChangedRecordIndex(const int tabIndex) {
-  Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, tabIndex);
+  setConfig(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX, tabIndex);
 }
 
 void RibbonMenu::on_ViewTypeChanged(ViewTypeTool::ViewType vt) {

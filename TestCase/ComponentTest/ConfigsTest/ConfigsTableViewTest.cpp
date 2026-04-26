@@ -3,6 +3,7 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "ConfigsTableView.h"
+#include "ConfigsModel.h"
 #include "EndToExposePrivateMember.h"
 
 #include "GlbDataProtect.h"

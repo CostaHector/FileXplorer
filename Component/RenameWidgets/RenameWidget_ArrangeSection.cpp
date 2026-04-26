@@ -1,7 +1,7 @@
 #include "RenameWidget_ArrangeSection.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
-#include "MemoryKey.h"
+#include "RenamerKey.h"
 #include "Configuration.h"
 #include "NameSectionArrange.h"
 
@@ -47,7 +47,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
   m_swap2Index->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
   m_swap2Index->setToolTip("Section at two indexes will be swapped");
   m_swap2Index->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
-  const QString& defaultUserInput = Configuration().value(RenamerKey::ARRANGE_SECTION_INDEX.name, RenamerKey::ARRANGE_SECTION_INDEX.toVariant()).toString();
+  const QString& defaultUserInput = getConfig(RenamerKey::ARRANGE_SECTION_INDEX).toString();
   m_swap2Index->addItem(defaultUserInput);
   m_swap2Index->addItems(NameSectionArrange::SWAP_INDEX_FREQ);
 
@@ -84,7 +84,7 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
       return {};
     }
 #ifndef RUNNING_UNIT_TESTS
-    Configuration().setValue(RenamerKey::ARRANGE_SECTION_INDEX.name, m_swap2Index->currentText());
+    setConfig(RenamerKey::ARRANGE_SECTION_INDEX, m_swap2Index->currentText());
 #endif
     nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {

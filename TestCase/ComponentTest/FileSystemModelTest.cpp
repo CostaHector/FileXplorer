@@ -154,7 +154,7 @@ class FileSystemModelTest : public PlainTestSuite {
     // only 1 item with this filter and hide item that don't pass the filter directly
     QModelIndex rootIndex = model->setRootPath(pathRoot5);
 
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       model->setFilter(INITIAL_DIR_FILTERS);
       model->setNameFilterDisables(true);
       QTRY_COMPARE(model->rowCount(rootIndex), 5);

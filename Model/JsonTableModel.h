@@ -49,7 +49,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   Qt::ItemFlags flags(const QModelIndex& /*index*/) const override {
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
   }
-
+  static constexpr int DATA_TYPE_ROLE = Qt::UserRole + 1;
  private:
   int JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JSON_KEY_E field, const int ITERATE_FOLDER_FIRST_LIMIT=50);
   QHash<QString, QString> GetVidBaseName2FullPath() const;

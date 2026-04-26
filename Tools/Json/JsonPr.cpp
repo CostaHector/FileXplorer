@@ -32,7 +32,7 @@ JsonPr::JsonPr(const QString& jsonAbsFile) {  //
 
 JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonObject& json)  //
     : m_Prepath{filePrePath},                                                                 //
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu{initer(json, ENUM_2_STR(enu), defValue)},
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) m_##enu{initer(json, ENUM_2_STR(enu), defValue)},
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
       jsonFileName{fileName} {  //
@@ -41,7 +41,7 @@ JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonO
 
 bool JsonPr::operator==(const JsonPr& rhs) const {
   return
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu == rhs.m_##enu&&
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) m_##enu == rhs.m_##enu&&
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
           jsonFileName == rhs.jsonFileName;
@@ -58,7 +58,7 @@ bool JsonPr::Reload() {
     return false;
   }
   const auto& json = JsonHelper::GetJsonObject(absPth);
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) m_##enu = initer(json, ENUM_2_STR(enu), defValue);
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) m_##enu = initer(json, ENUM_2_STR(enu), defValue);
   JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
   m_Detail.replace("<br/>", "\n");
@@ -81,7 +81,7 @@ bool JsonPr::WriteIntoFiles() const {
 
 QByteArray JsonPr::GetJsonBA() const {
   QJsonObject json;
-#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, format, writer, initer, jsonWriter) jsonWriter(json, ENUM_2_STR(enu), m_##enu);
+#define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) jsonWriter(json, ENUM_2_STR(enu), m_##enu);
   JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
   return QJsonDocument(json).toJson(QJsonDocument::Indented);

@@ -1,7 +1,8 @@
 ﻿#include "CurrentRowPreviewer.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
+#include "SizeTool.h"
+#include "Configuration.h"
 
 constexpr int CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL;  // ms
 

@@ -2,7 +2,6 @@
 #include "StringTool.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include <QApplication>
 #include <QPixmapCache>

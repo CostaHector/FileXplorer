@@ -16,14 +16,14 @@ class OnScopeExitTest : public PlainTestSuite {
     EXEC_CNT = 0;
     {
       QCOMPARE(EXEC_CNT, 0);
-      ON_SCOPE_EXIT {
+      OnScopeExit {
         ++EXEC_CNT;
       };
       QCOMPARE(EXEC_CNT, 0);
     }
     QCOMPARE(EXEC_CNT, 1);
     {
-      ON_SCOPE_EXIT {
+      OnScopeExit {
         ++EXEC_CNT;
       };
       QCOMPARE(EXEC_CNT, 1);

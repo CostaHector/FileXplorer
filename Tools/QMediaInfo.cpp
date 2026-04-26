@@ -1,7 +1,5 @@
 #ifdef _WIN32
 #include "QMediaInfo.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "PathTool.h"
 #include "Logger.h"
 #include <QFileInfo>

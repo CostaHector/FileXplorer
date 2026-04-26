@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 #include "OnScopeExit.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "Logger.h"
 #include <QSignalSpy>
@@ -123,16 +123,16 @@ private slots:
   }
 
   void test_WriteUniqueHistoryToQSetting() {
-    const QString beforeCfg = Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.toVariant()).toString();
-    ON_SCOPE_EXIT {
-      Configuration().setValue(BehaviorKey::WHERE_CLAUSE_HISTORY.name, beforeCfg);
+    const QString beforeCfg = getConfig(BehaviorKey::WHERE_CLAUSE_HISTORY).toString();
+    OnScopeExit {
+      setConfig(BehaviorKey::WHERE_CLAUSE_HISTORY, beforeCfg);
     };
     QuickWhereClauseDialogMock::mockWhereHistsList() = QStringList{"\t  \n", "", " A", "C ", "A \t", "\t B", "A"};
     dialog->onEditHistory();
     QCOMPARE(dialog->WriteUniqueHistoryToQSetting(), 3);
 
     const QString expectNewHistStr{"A\nC\nB"};
-    QCOMPARE(Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name).toString(), expectNewHistStr);
+    QCOMPARE(getConfig(BehaviorKey::WHERE_CLAUSE_HISTORY).toString(), expectNewHistStr);
   }
 
   void test_enter_will_not_close_the_dialog_and_f10_will() {

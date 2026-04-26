@@ -1,8 +1,8 @@
 #include "FileLeafAction.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "MemoryKey.h"
+#include "Configuration.h"
 #include "ImageTool.h"
 #include <QMenu>
 
@@ -26,7 +26,7 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), "语言/Language", this};
   CHECK_NULLPTR_RETURN_VOID(_LANUAGE);
   _LANUAGE->setCheckable(true);
-  _LANUAGE->setChecked(Configuration().value(MemoryKey::LANGUAGE_ZH_CN.name, MemoryKey::LANGUAGE_ZH_CN.toVariant()).toBool());
+  _LANUAGE->setChecked(getConfig(MemoryKey::LANGUAGE_ZH_CN).toBool());
   _LANUAGE->setToolTip("Toggle language between 中文(Chinese) and English, by default: English");
 
   _CPU_MEMORY_USAGE_MONITOR = new (std::nothrow) QAction{QIcon(":img/USAGE_MONITOR"), tr("Usage Monitor"), this};

@@ -1,17 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
 #include "TDir.h"
 #include "JsonKey.h"
 #include "SceneInPageActions.h"
@@ -21,6 +16,7 @@
 #include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
 
+#include <QSignalSpy>
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>

@@ -1,5 +1,6 @@
+#include <QtTest/QtTest>
 #include <QCoreApplication>
-#include <QtTest>
+
 #include "GlbDataProtect.h"
 #include "TDir.h"
 #include "PublicVariable.h"
@@ -58,7 +59,7 @@ private slots:
 
     // // open log file failed, and open it's parent ok
     QVERIFY(QFile::rename(logAbsFilePath, logAbsFilePath+"Renamed"));
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QFile::rename(logAbsFilePath+"Renamed", logAbsFilePath));
     };
     QVERIFY(!QFile::exists(logAbsFilePath));
@@ -74,7 +75,7 @@ private slots:
 
   void setAutoFflushNoMatterWhatLogLevelIs() {
     GlbDataProtect<LOG_LVL_E> autoFlushBkp{Logger::m_autoFflushLevel};
-    ON_SCOPE_EXIT{
+    OnScopeExit{
       Logger::out() = Logger::GetFILEStream();
     };
 
@@ -92,7 +93,7 @@ private slots:
   void ignoreLogLevelAboveSpecifiedLevel() {
     // only >= warning will call fflush automatically
     GlbDataProtect<LOG_LVL_E> printLevelBkp{Logger::m_printLevel};
-    ON_SCOPE_EXIT{
+    OnScopeExit{
       Logger::out() = Logger::GetFILEStream();
     };
 
@@ -117,7 +118,7 @@ private slots:
   }
 
   void skipAged_if_logFileSize_below_threshold() {
-    ON_SCOPE_EXIT{
+    OnScopeExit{
       Logger::out() = Logger::GetFILEStream();
     };
 

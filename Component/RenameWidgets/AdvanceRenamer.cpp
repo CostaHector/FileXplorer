@@ -1,5 +1,6 @@
 #include "AdvanceRenamer.h"
-#include "MemoryKey.h"
+#include "RenamerKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "PathTool.h"
 #include "FileOsWalker.h"
@@ -72,8 +73,8 @@ void AdvanceRenamer::ReadSettings() {
 }
 
 void AdvanceRenamer::initCommonSetting() {
-  m_recursiveCB->setChecked(Configuration().value(RenamerKey::INCLUDING_DIR.name, RenamerKey::INCLUDING_DIR.toVariant()).toBool());
-  const bool bNameExtIndependent{Configuration().value(RenamerKey::NAME_EXT_INDEPENDENT.name, RenamerKey::NAME_EXT_INDEPENDENT.toVariant()).toBool()};
+  m_recursiveCB->setChecked(getConfig(RenamerKey::INCLUDING_DIR).toBool());
+  const bool bNameExtIndependent{getConfig(RenamerKey::NAME_EXT_INDEPENDENT).toBool()};
   m_nameExtIndependent->setChecked(bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
@@ -235,19 +236,19 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
 
 void AdvanceRenamer::onRegex(const int regexState) {
   const bool isRegexEnabled{regexState == Qt::Checked};
-  Configuration().setValue(RenamerKey::REGEX_ENABLED.name, isRegexEnabled);
+  setConfig(RenamerKey::REGEX_ENABLED, isRegexEnabled);
   OnlyTriggerRenameCore();
 }
 
 void AdvanceRenamer::onIncludingSub(int includingSubState) {
   const bool isIncludingDir = includingSubState == Qt::Checked;
-  Configuration().setValue(RenamerKey::INCLUDING_DIR.name, isIncludingDir);
+  setConfig(RenamerKey::INCLUDING_DIR, isIncludingDir);
   InitTextEditContent(mWorkPath, mSelectedNames);
 }
 
 void AdvanceRenamer::onNameExtRespective(int bStateIndependent) {
   const bool bNameExtIndependent{bStateIndependent == Qt::Checked};
-  Configuration().setValue(RenamerKey::NAME_EXT_INDEPENDENT.name, bNameExtIndependent);
+  setConfig(RenamerKey::NAME_EXT_INDEPENDENT, bNameExtIndependent);
   m_oExtTE->setVisible(bNameExtIndependent);
   m_nExtTE->setVisible(bNameExtIndependent);
   if (bNameExtIndependent) {

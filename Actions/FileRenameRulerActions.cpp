@@ -5,8 +5,6 @@
 #include "CastAkasManager.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include <QUrl>
 #include <QFile>
 #include <tuple>

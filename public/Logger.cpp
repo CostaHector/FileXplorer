@@ -1,5 +1,5 @@
 #include "Logger.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
@@ -132,5 +132,5 @@ void Logger::SetPrintLevel(LOG_LVL_E newLevel) {
 
 void Logger::SetAutoFlushAllLevel(bool allLevelChecked) {
   m_autoFflushLevel = allLevelChecked ? LOG_LVL_E::D : LOG_LVL_E::W;
-  Configuration().setValue(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH.name, allLevelChecked);
+  setConfig(BehaviorKey::ALL_LOG_LEVEL_AUTO_FFLUSH, allLevelChecked);
 }

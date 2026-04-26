@@ -1,5 +1,5 @@
 ﻿#include "SearchCaseMatterToolButton.h"
-#include "MemoryKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include <QMenu>
 
@@ -7,12 +7,12 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
   SEARCH_NAME_CASE_SENSITIVE = new (std::nothrow) QAction("Name sensitive", this);
   SEARCH_NAME_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Name Case matter.").arg(SEARCH_NAME_CASE_SENSITIVE->text(), SEARCH_NAME_CASE_SENSITIVE->shortcut().toString()));
   SEARCH_NAME_CASE_SENSITIVE->setCheckable(true);
-  SEARCH_NAME_CASE_SENSITIVE->setChecked(Configuration().value(SearchKey::NAME_CASE_SENSITIVE.name, SearchKey::NAME_CASE_SENSITIVE.toVariant()).toBool());
+  SEARCH_NAME_CASE_SENSITIVE->setChecked(getConfig(SearchKey::NAME_CASE_SENSITIVE).toBool());
 
   SEARCH_CONTENTS_CASE_SENSITIVE = new (std::nothrow) QAction("Content sensitive", this);
   SEARCH_CONTENTS_CASE_SENSITIVE->setToolTip(QString("<b>%1 (%2)</b><br/> Content Case matter.").arg(SEARCH_CONTENTS_CASE_SENSITIVE->text(), SEARCH_CONTENTS_CASE_SENSITIVE->shortcut().toString()));
   SEARCH_CONTENTS_CASE_SENSITIVE->setCheckable(true);
-  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(Configuration().value(SearchKey::CONTENTS_CASE_SENSITIVE.name, SearchKey::CONTENTS_CASE_SENSITIVE.toVariant()).toBool());
+  SEARCH_CONTENTS_CASE_SENSITIVE->setChecked(getConfig(SearchKey::CONTENTS_CASE_SENSITIVE).toBool());
 
   QMenu* m_searchCaseMenu = new (std::nothrow) QMenu{"Search case-sensitive", this};
   m_searchCaseMenu->addSection("search type(name or contents)");
@@ -36,6 +36,6 @@ SearchCaseMatterToolButton::SearchCaseMatterToolButton(QWidget* parent) : QToolB
 }
 
 SearchCaseMatterToolButton::~SearchCaseMatterToolButton() {
-  Configuration().setValue(SearchKey::CONTENTS_CASE_SENSITIVE.name, curNameCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
-  Configuration().setValue(SearchKey::NAME_CASE_SENSITIVE.name, curContentCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
+  setConfig(SearchKey::CONTENTS_CASE_SENSITIVE, curNameCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
+  setConfig(SearchKey::NAME_CASE_SENSITIVE, curContentCaseSensitive() == Qt::CaseSensitivity::CaseSensitive);
 }

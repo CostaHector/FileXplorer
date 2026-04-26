@@ -1,13 +1,5 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
-#include "StyleKey.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "CustomTableView.h"
@@ -16,14 +8,17 @@
 #include "ScrollBarPolicyMenu.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Logger.h"
+#include "Configuration.h"
 #include "ModelTestHelper.h"
 #include "AddressBarActions.h"
 #include "ViewHelper.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
 #include "SizeTool.h"
-
 #include "InputDialogHelper.h"
+
+#include <QSignalSpy>
 
 #include "MouseKeyboardEventHelper.h"
 using namespace MouseKeyboardEventHelper;
@@ -357,7 +352,6 @@ private slots:
 
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_HORIZONTAL_HEADER").toBool(), false);
     QCOMPARE(Configuration().value(tableInstanceName + "/SHOW_VERTICAL_HEADER").toBool(), false);
-    QVERIFY(!Configuration().contains(StyleKey::BACKGROUND_OVERLAY_OPACITY.name)); // key唯一, 因此不在析构函数中存储, 避免多次存储互相覆盖
   }
 
   void override_member_function_ok() {

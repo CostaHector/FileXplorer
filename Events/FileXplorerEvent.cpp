@@ -42,6 +42,7 @@
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
@@ -120,9 +121,8 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
 
   QString title{"Create Batch "};
   title += (isFolder ? "Folders" : "Files");
-  const QString folderDefName{
-      Configuration().value(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name, BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.toVariant()).toString()};
-  const QString fileDefName{Configuration().value(BehaviorKey::BATCH_FILES_NAME_PATTERN.name, BehaviorKey::BATCH_FILES_NAME_PATTERN.toVariant()).toString()};
+  const QString folderDefName{getConfig(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN).toString()};
+  const QString fileDefName{getConfig(BehaviorKey::BATCH_FILES_NAME_PATTERN).toString()};
   const QString defNamePattern{isFolder ? folderDefName : fileDefName};
   const QString userInputRule =
       QInputDialog::getText(_contentPane, title, "Rule Pattern: C-style Format String$StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
@@ -135,9 +135,7 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   const QString& namePattern = userInputLst[0];
   const int startIndex = userInputLst[1].toInt();
   const int endIndex = userInputLst[2].toInt();
-  Configuration().setValue(isFolder ? BehaviorKey::BATCH_FOLDERS_NAME_PATTERN.name  //
-                                    : BehaviorKey::BATCH_FILES_NAME_PATTERN.name,   //
-                           userInputRule);
+  setConfig(isFolder ? BehaviorKey::BATCH_FOLDERS_NAME_PATTERN : BehaviorKey::BATCH_FILES_NAME_PATTERN, userInputRule);
   const QString createIn{_fileSysModel->rootPath()};
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
@@ -912,7 +910,7 @@ bool FileXplorerEvent::on_PlayVideo() const {
 extern template struct RowHeightRegistry<CustomTableView>;
 extern template struct RowHeightRegistry<CustomTreeView>;
 void FileXplorerEvent::on_RowHeightChanged() {
-  int beforeRowHeight = Configuration().value(MemoryKey::ROW_HEIGHT.name, MemoryKey::ROW_HEIGHT.toVariant()).toInt();
+  int beforeRowHeight = getConfig(MemoryKey::ROW_HEIGHT).toInt();
   QString msg{QString{"will be used in tableview/treeview.\nIt is recommend that %1"}.arg(MemoryKey::ROW_HEIGHT.v.data.i)};
   bool bOk{false};
   int newRowHeight = QInputDialog::getInt(nullptr, "Row height setting", msg, beforeRowHeight, 0, 9999, 1, &bOk);
@@ -925,7 +923,7 @@ void FileXplorerEvent::on_RowHeightChanged() {
     return;
   }
   LOG_OK_P("Row height changed", "value[%d]", newRowHeight);
-  Configuration().setValue(MemoryKey::ROW_HEIGHT.name, newRowHeight);
+  setConfig(MemoryKey::ROW_HEIGHT, newRowHeight);
   RowHeightRegistry<CustomTableView>::updateRegisteredWidgetsForAdjust(newRowHeight);
   RowHeightRegistry<CustomTreeView>::updateRegisteredWidgetsForAdjust(newRowHeight);
 }
@@ -1269,11 +1267,9 @@ bool FileXplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, Q
 
   Qt::DropAction dropAction{Qt::DropAction::IgnoreAction};
   if (dropAct == Qt::DropAction::MoveAction) {
-    Configuration().setValue(BehaviorKey::MOVE_TO_HISTORY.name,  //
-                             MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().MOVE_TO_PATH_HISTORY));
+    setConfig(BehaviorKey::MOVE_TO_HISTORY, MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().MOVE_TO_PATH_HISTORY));
   } else if (dropAct == Qt::DropAction::CopyAction) {
-    Configuration().setValue(BehaviorKey::COPY_TO_HISTORY.name,  //
-                             MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().COPY_TO_PATH_HISTORY));
+    setConfig(BehaviorKey::COPY_TO_HISTORY, MoveToNewPathAutoUpdateActionText(dest, FileOpActs::GetInst().COPY_TO_PATH_HISTORY));
   } else {
     LOG_D("DropAction[%d] is invalid", static_cast<int>(dropAct));
     return false;

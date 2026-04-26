@@ -1,12 +1,11 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FullScreenableSplitter.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Configuration.h"
 #include <QPushButton>
 
 class FullScreenableSplitterDerived : public FullScreenableSplitter {

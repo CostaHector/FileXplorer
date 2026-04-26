@@ -5,7 +5,7 @@
 #include "QAbstractTreeModelPub.h"
 #include "FavoritesTreeModel.h"
 #include "EndToExposePrivateMember.h"
-#include "MemoryKey.h"
+
 #include "Configuration.h"
 
 class QAbstractTreeModelPubTest : public PlainTestSuite {

@@ -1,10 +1,9 @@
 #include "ViewItemDelegate.h"
 #include "MemoryKey.h"
 #include "Configuration.h"
-#include "SizeTool.h"
 
 ViewItemDelegate::ViewItemDelegate(QObject* parent) : QStyledItemDelegate {parent} {
-  m_rowHeight = Configuration().value(MemoryKey::ROW_HEIGHT.name, MemoryKey::ROW_HEIGHT.toVariant()).toInt();
+  m_rowHeight = getConfig(MemoryKey::ROW_HEIGHT).toInt();
 }
 
 bool ViewItemDelegate::setRowHeight(int newRowHeight) {

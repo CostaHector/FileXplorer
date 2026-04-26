@@ -1,7 +1,10 @@
 #include "ConfigsTableView.h"
+#include "ConfigsModel.h"
+
 #include "FileTool.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+
 #include <QFile>
 
 ConfigsTableView::ConfigsTableView(const QString &instName, QWidget *parent)
@@ -20,12 +23,19 @@ ConfigsTableView::ConfigsTableView(const QString &instName, QWidget *parent)
   subscribe();
 }
 
+std::pair<int, int> ConfigsTableView::GetStatistics() const {
+  const int failsCnt{m_alertModel->failCount()};
+  const int totalCnt{m_alertModel->rowCount()};
+  return {failsCnt, totalCnt};
+}
+
 void ConfigsTableView::initExclusivePreferenceSetting() { //
   CustomTableView::m_defaultShowBackgroundImage = true;
 }
 
 void ConfigsTableView::subscribe() {
   connect(this, &QTableView::doubleClicked, this, &ConfigsTableView::on_cellDoubleClicked);
+  connect(m_alertModel, &ConfigsModel::dataChanged, this, &ConfigsTableView::modelDataChanged);
 }
 
 bool ConfigsTableView::on_cellDoubleClicked(const QModelIndex &clickedIndex) const {

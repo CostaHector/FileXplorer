@@ -1,18 +1,15 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "CastDbModel.h"
 #include "CastBaseDb.h"
 #include "FdBasedDb.h"
-
 #include "EndToExposePrivateMember.h"
+
+#include "PathKey.h"
+#include "Configuration.h"
+
 #include "TableFields.h"
 #include "CastPsonFileHelper.h"
 #include "PublicVariable.h"
@@ -26,7 +23,7 @@ class CastDbModelTest : public PlainTestSuite {
 public:
 private slots:
   void default_initialized_ok() {
-    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, "Path/to/inexists/path");
+    setConfig(PathKey::PERFORMER_IMAGEHOST_LOCATE, "Path/to/inexists/path");
     CastDbModel castModel;
     { // precondition
       QVERIFY(!QFileInfo("Path/to/inexists/path").isDir());
@@ -109,7 +106,7 @@ private slots:
     QVERIFY(castDb.IsTableExist(tableName));
     QVERIFY(castDb.IsTableEmpty(tableName));
 
-    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
+    setConfig(PathKey::PERFORMER_IMAGEHOST_LOCATE, tDir.path());
     CastDbModel castModel(nullptr, castDb.GetDb());
     QVERIFY(castModel.database().isValid());
     QVERIFY(castModel.database().isOpen());

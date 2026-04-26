@@ -3,7 +3,8 @@
 #include "FileOpActs.h"
 #include "RedundantImageFinderActions.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
+#include "RedunImgFinderKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
@@ -22,8 +23,7 @@ constexpr char RedundantImageFinder::GEOMETRY_KEY[];
 RedundantImageFinder::RedundantImageFinder(QWidget* parent) //
   : QMainWindow{parent}                                     //
 {
-  mResultAlsoContainEmptyImage
-      = Configuration().value(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.toVariant()).toBool();
+  mResultAlsoContainEmptyImage = getConfig(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE).toBool();
 
   auto& redunInst = g_redunImgFinderAg();
   QMenu* findByMenu = new (std::nothrow) QMenu{"Find by Menu", this};
@@ -91,7 +91,7 @@ void RedundantImageFinder::showEvent(QShowEvent* event) {
 void RedundantImageFinder::closeEvent(QCloseEvent* event) {
   FileOpActs::GetInst()._DUPLICATE_IMAGES_FINDER->setChecked(false);
   Configuration().setValue(GEOMETRY_KEY, saveGeometry());
-  Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, mResultAlsoContainEmptyImage);
+  setConfig(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE, mResultAlsoContainEmptyImage);
   QMainWindow::closeEvent(event);
 }
 

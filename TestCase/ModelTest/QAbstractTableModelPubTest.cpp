@@ -1,18 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
-#include "ModelTools.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "QAbstractTableModelPub.h"
 #include "QAbstractListModelPub.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Logger.h"
+#include "ModelTools.h"
 
 template <typename Swappable2DimContainerDataType>
 class Dim2ContainerTableModel : public QAbstractTableModelPub {

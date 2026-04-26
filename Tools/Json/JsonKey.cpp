@@ -6,7 +6,7 @@
 namespace JsonKey {
 QVariantHash GetJsonDictDefault(const QString& jsonBaseName) {  //  QVariantHash dict {
   QVariantHash dict{
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) {ENUM_2_STR(enu), def},
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) {ENUM_2_STR(enu), def},
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
   };
@@ -15,12 +15,12 @@ QVariantHash GetJsonDictDefault(const QString& jsonBaseName) {  //  QVariantHash
 }
 
 QVariantHash ConstructJsonDict(
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) decltype(def) _##enu,
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) decltype(def) _##enu,
     JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
     void* P_DONT_USE_ME) {
   QVariantHash dict{
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) {ENUM_2_STR(enu), _##enu},
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) {ENUM_2_STR(enu), _##enu},
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
   };
@@ -28,13 +28,13 @@ QVariantHash ConstructJsonDict(
 }
 
 QByteArray ConstructJsonByteArray(
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) decltype(def) _##enu,
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) decltype(def) _##enu,
     JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
     void* P_DONT_USE_ME) {
 
   QVariantHash dict = ConstructJsonDict(
-#define JSON_KEY_ITEM(enu, val, def, enhanceDef, format, writer, initer, jsonWriter) _##enu,
+#define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) _##enu,
       JSON_FILE_KEY_MAPPING
 #undef JSON_KEY_ITEM
       P_DONT_USE_ME);

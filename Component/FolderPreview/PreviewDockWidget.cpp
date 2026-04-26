@@ -1,7 +1,7 @@
 #include "PreviewDockWidget.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"
-#include "MemoryKey.h"
+#include "CompoVisKey.h"
 #include "Configuration.h"
 #include "ViewActions.h"
 
@@ -29,7 +29,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
                               {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD},         //
                               {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},                        //
                              DEFULT_PREVIEW_TYPE_E, QActionGroup::ExclusionPolicy::Exclusive);  //
-  int curPreviewType = Configuration().value(CompoVisKey::FOLDER_PREVIEW_TYPE.name, CompoVisKey::FOLDER_PREVIEW_TYPE.name).toInt();
+  int curPreviewType = getConfig(CompoVisKey::FOLDER_PREVIEW_TYPE).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
   m_floatingPanel = new QAction{ImageTool::GetBuiltInIcon(QStyle::SP_TitleBarNormalButton), tr("Float"), this};
@@ -62,7 +62,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
 }
 
 PreviewDockWidget::~PreviewDockWidget() {
-  Configuration().setValue(CompoVisKey::FOLDER_PREVIEW_TYPE.name, (int)GetCurrentPreviewType());
+  setConfig(CompoVisKey::FOLDER_PREVIEW_TYPE, (int)GetCurrentPreviewType());
 }
 
 void PreviewDockWidget::showEvent(QShowEvent* event) {

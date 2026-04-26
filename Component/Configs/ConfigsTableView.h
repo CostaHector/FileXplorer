@@ -2,21 +2,22 @@
 #define CONFIGSTABLEVIEW_H
 
 #include "CustomTableView.h"
-#include "ConfigsModel.h"
 #include "StyleSheetEditDelegate.h"
 
+class ConfigsModel;
+
 class ConfigsTableView : public CustomTableView {
+  Q_OBJECT
 public:
   explicit ConfigsTableView(const QString& instName, QWidget* parent = nullptr);
 
-  const QAbstractTableModel* GetModel() const { return m_alertModel; }
-  QAbstractTableModel* GetModel() { return m_alertModel; }
+  const ConfigsModel* GetModel() const { return m_alertModel; }
+  ConfigsModel* GetModel() { return m_alertModel; }
 
-  std::pair<int, int> GetStatistics() const {
-    const int failsCnt{m_alertModel->failCount()};
-    const int totalCnt{m_alertModel->rowCount()};
-    return {failsCnt, totalCnt};
-  }
+  std::pair<int, int> GetStatistics() const;
+
+signals:
+  void modelDataChanged();
 
 protected:
   void initExclusivePreferenceSetting() override;

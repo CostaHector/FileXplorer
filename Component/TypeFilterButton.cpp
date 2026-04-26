@@ -1,6 +1,7 @@
 #include "TypeFilterButton.h"
 #include "PublicMacro.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include "Logger.h"
 #include <QMenu>

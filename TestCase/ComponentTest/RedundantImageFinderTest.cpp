@@ -2,7 +2,7 @@
 #include <QtTest>
 #include "PlainTestSuite.h"
 #include "TDir.h"
-#include "MemoryKey.h"
+#include "RedunImgFinderKey.h"
 #include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
@@ -131,7 +131,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
     redunImgLib.InitializeImpl(mBenchmarkRedunFolder);
 
     Configuration().clear();
-    Configuration().setValue(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE.name, true);
+    setConfig(RedunImgFinderKey::ALSO_RECYCLE_EMPTY_IMAGE, true);
 
     using namespace DuplicateImageDetectionCriteria;
     auto& redunInst = g_redunImgFinderAg();
@@ -223,7 +223,7 @@ class RedundantImageFinderTest : public PlainTestSuite {
     emit inst.RELOAD_BENCHMARK_LIB->triggered();      // force reload from an no items path
     QCOMPARE(redunImgLib.ImgDataStruct().size(), 0);  // 0+0
 
-    Configuration().setValue(RedunImgFinderKey::RUND_IMG_PATH.name, mFolderToFindRedun);
+    setConfig(RedunImgFinderKey::RUND_IMG_PATH, mFolderToFindRedun);
     emit inst.RELOAD_BENCHMARK_LIB->triggered();          // force reload from mFolderToFindRedun path
     QCOMPARE(redunImgLib.ImgDataStruct().size(), 3 + 2);  // 3 different hash + 2 different size
 

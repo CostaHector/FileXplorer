@@ -1,17 +1,16 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "VideoTableView.h"
 #include "EndToExposePrivateMember.h"
 #include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
 
+#include <QSignalSpy>
 #include <QHeaderView>
+
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>

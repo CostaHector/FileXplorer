@@ -2,8 +2,7 @@
 
 
 #include "PlainTestSuite.h"
-#include "Logger.h"
-#include "MemoryKey.h"
+#include "CompoVisKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "RibbonMenu.h"
@@ -15,8 +14,8 @@ class RibbonMenuTest : public PlainTestSuite {
  private slots:
   void test_ribbon_menu_basic_behavior_ok() {
     // precondition: default table widget=0, expand=true
-    Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, 0);
-    Configuration().setValue(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR.name, true);
+    setConfig(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX, 0);
+    setConfig(CompoVisKey::EXPAND_OFFICE_STYLE_MENUBAR, true);
 
     RibbonMenu rm;
     QVERIFY(rm.count() > 0);
@@ -30,7 +29,7 @@ class RibbonMenuTest : public PlainTestSuite {
     const int movieIndexInTabBar = rm.currentIndex();
     emit rm.currentChanged(movieIndexInTabBar);
     // memory updated
-    Configuration().setValue(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX.name, movieIndexInTabBar);
+    setConfig(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX, movieIndexInTabBar);
     // tab widget toggled
     auto* pTabBar = rm.tabBar();
     QVERIFY(pTabBar != nullptr);

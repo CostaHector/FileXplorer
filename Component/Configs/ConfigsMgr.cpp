@@ -1,6 +1,5 @@
 #include "ConfigsMgr.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "FileLeafAction.h"
 #include "FileTool.h"
@@ -59,7 +58,7 @@ void ConfigsMgr::subscribe() {
     connect(pRetry, &QPushButton::clicked, this, &ConfigsMgr::RefreshWindowIcon);
   }
 
-  connect(m_alertsTable->GetModel(), &QAbstractItemModel::dataChanged, this, &ConfigsMgr::RefreshWindowIcon);
+  connect(m_alertsTable, &ConfigsTableView::modelDataChanged, this, &ConfigsMgr::RefreshWindowIcon);
 }
 
 void ConfigsMgr::showEvent(QShowEvent* event) {

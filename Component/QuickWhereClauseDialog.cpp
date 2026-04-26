@@ -3,7 +3,7 @@
 #include "CastAkasManager.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "StringTool.h"
@@ -42,7 +42,7 @@ void QuickWhereClauseDialog::Init() {
   m_whereHistComboBox->setEditable(false);
   m_whereHistComboBox->setInsertPolicy(QComboBox::InsertAtTop);
 
-  QString hists{Configuration().value(BehaviorKey::WHERE_CLAUSE_HISTORY.name, BehaviorKey::WHERE_CLAUSE_HISTORY.toVariant()).toString()};
+  QString hists{getConfig(BehaviorKey::WHERE_CLAUSE_HISTORY).toString()};
   if (hists.isEmpty()) {
     hists += R"(`NAME` LIKE "%%")";
     hists += WHERE_HIST_SPLIT_CHAR;
@@ -101,7 +101,7 @@ QuickWhereClauseDialog::~QuickWhereClauseDialog() {
 int QuickWhereClauseDialog::WriteUniqueHistoryToQSetting() {
   QStringList hists = mStrListModel->stringList();
   StringTool::SearchHistoryListProc(hists);
-  Configuration().setValue(BehaviorKey::WHERE_CLAUSE_HISTORY.name, hists.join(WHERE_HIST_SPLIT_CHAR));
+  setConfig(BehaviorKey::WHERE_CLAUSE_HISTORY, hists.join(WHERE_HIST_SPLIT_CHAR));
   return hists.size();
 }
 

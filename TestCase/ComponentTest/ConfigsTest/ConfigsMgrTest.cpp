@@ -5,7 +5,7 @@
 #include "ConfigsMgr.h"
 #include "EndToExposePrivateMember.h"
 
-#include "MemoryKey.h"
+#include "ConfigsModel.h"
 #include "Configuration.h"
 #include "FileLeafAction.h"
 #include "FileTool.h"
@@ -113,8 +113,8 @@ class ConfigsMgrTest : public PlainTestSuite {
     const QString correctPlayerPath{__FILE__};
     const QString correctWorkFolderPath{QFileInfo{__FILE__}.absolutePath()};
     const int correctVolumeValue{99};
-    Configuration().setValue(KVTestOnly::playerFilePath.name, correctPlayerPath);
-    Configuration().setValue(KVTestOnly::workFolderPath.name, correctWorkFolderPath);
+    setConfig(KVTestOnly::playerFilePath, correctPlayerPath);
+    setConfig(KVTestOnly::workFolderPath, correctWorkFolderPath);
     const QString stillFailed3ItemsMsg = cfgTbl.m_failItemCnt->text();
     QVERIFY(stillFailed3ItemsMsg.contains("3 in 4 setting(s) error"));
     QVERIFY(!stillFailed3ItemsMsg.contains("All 4 setting passed"));

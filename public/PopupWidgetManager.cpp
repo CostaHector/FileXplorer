@@ -10,7 +10,7 @@
 #include "Archiver.h"
 #include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
-#include "MemoryKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "Logger.h"
 

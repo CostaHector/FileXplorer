@@ -2,13 +2,13 @@
 #include <QCoreApplication>
 #include "PlainTestSuite.h"
 #include "TDir.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "ComplexOperation.h"
 #include "FileOpActs.h"
 #include "EndToExposePrivateMember.h"
+
 #include "PathTool.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 
 using namespace ComplexOperation;
 

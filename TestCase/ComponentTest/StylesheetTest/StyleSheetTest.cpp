@@ -1,16 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheet.h"
 #include "PreferenceActions.h"
 #include "EndToExposePrivateMember.h"
+
+#include "OnScopeExit.h"
+
 #include <QToolBar>
 #include <QLayout>
 
@@ -53,7 +50,7 @@ class StyleSheetTest : public PlainTestSuite {
 
     prefInst.THEME_DARK_MOON_FOG->setChecked(true);
     emit prefInst.THEME_DARK_MOON_FOG->triggered(true); // in test project qss file not exist
-    ON_SCOPE_EXIT { // recover
+    OnScopeExit { // recover
       pStyleSheetActBackUp->setChecked(true);
       emit pStyleSheetActBackUp->triggered(true); // in test project qss file not exist
     };

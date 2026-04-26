@@ -1,13 +1,11 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "MemoryKey.h"
-#include "Configuration.h"
-
 #include "BeginToExposePrivateMember.h"
 #include "PopupWidgetManager.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
 #include "DevicesDrivesTV.h"
 #include "RedundantImageFinder.h"
 #include "DuplicateVideosFinder.h"

@@ -175,7 +175,7 @@ class JsonTableModelTest : public PlainTestSuite {
         {"set_root_path/b.json", false, contentsBJson},
     };
     QCOMPARE(mTDir.createEntries(rootPathNodes), 2);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("set_root_path")).removeRecursively());
     };
 
@@ -246,7 +246,7 @@ class JsonTableModelTest : public PlainTestSuite {
 
     const QString rootPath{mTDir.itemPath("decoration_check")};
     mTDir.touch("decoration_check/decoration.json", decorationJson);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("decoration_check")).removeRecursively());
     };
 
@@ -315,7 +315,7 @@ class JsonTableModelTest : public PlainTestSuite {
     const QString rootPath{mTDir.itemPath("duration_check")};
     mTDir.touch("duration_check/duration_test.json", durationJson);
     mTDir.touch("duration_check/duration_test.mp4", "not zero size video");
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("duration_check")).removeRecursively());
     };
 
@@ -355,7 +355,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(mTDir.createEntries(rootPathNodes), 1);
 
     const QString rootPath{mTDir.itemPath("property_retrieve")};
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("property_retrieve")).removeRecursively());
     };
 
@@ -576,7 +576,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QVERIFY(mTDir.touch("0.json", json0Contents));
     QVERIFY(mTDir.touch("1.json", json1Contents));
     QVERIFY(mTDir.touch("2.json", json2Contents));
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QVERIFY(QFile::remove(mTDir.itemPath("0.json")));
       QVERIFY(QFile::remove(mTDir.itemPath("1.json")));
       QVERIFY(QFile::remove(mTDir.itemPath("2.json")));

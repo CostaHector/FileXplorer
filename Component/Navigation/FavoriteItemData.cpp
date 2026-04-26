@@ -1,6 +1,6 @@
 // FavoriteItemData.cpp
 #include "FavoriteItemData.h"
-#include "MemoryKey.h"
+#include "FavoritesNavigationKey.h"
 #include "Configuration.h"
 
 constexpr int FavoriteItemData::COLUMN_COUNT;
@@ -35,7 +35,7 @@ QDataStream& operator>>(QDataStream& in, FavoriteItemData& item) {
 }
 
 FavoriteItemData::Role FavoriteItemData::GetInitialSortRole() {
-  const int role{Configuration().value(FavoritesNavigationKey::SORT_BY_ROLE.name, FavoritesNavigationKey::SORT_BY_ROLE.toVariant()).toInt()};
+  const int role{getConfig(FavoritesNavigationKey::SORT_BY_ROLE).toInt()};
   if (role < DEF_BEGIN_ROLE || role > INVALID_BUTT_ROLE) {
     return FavoriteItemData::DEF_SORT_ROLE;
   }
@@ -43,15 +43,15 @@ FavoriteItemData::Role FavoriteItemData::GetInitialSortRole() {
 }
 
 void FavoriteItemData::SaveInitialSortRole(Role sortRole) {
-  Configuration().setValue(FavoritesNavigationKey::SORT_BY_ROLE.name, (int) sortRole);
+  setConfig(FavoritesNavigationKey::SORT_BY_ROLE, (int) sortRole);
 }
 
 bool FavoriteItemData::GetInitialSortOrderReverse() {
-  return Configuration().value(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, FavoritesNavigationKey::SORT_ORDER_REVERSE.toVariant()).toBool();
+  return getConfig(FavoritesNavigationKey::SORT_ORDER_REVERSE).toBool();
 }
 
 void FavoriteItemData::SaveSortOrderReverse(bool bReverse) {
-  Configuration().setValue(FavoritesNavigationKey::SORT_ORDER_REVERSE.name, bReverse);
+  setConfig(FavoritesNavigationKey::SORT_ORDER_REVERSE, bReverse);
 }
 
 bool FavoriteItemData::match(const QString& subStr, const Qt::CaseSensitivity caseMatter) const {
