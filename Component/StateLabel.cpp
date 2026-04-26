@@ -1,4 +1,5 @@
 #include "StateLabel.h"
+#include "ImageTool.h"
 #include "Logger.h"
 
 QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
@@ -6,10 +7,7 @@ QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
     LOG_W("status[%d] out of bound", status);
     return {};
   }
-  static const QPixmap labelSavedStatusPxp[StateLabel::BUTT]       //
-      {QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio),  //
-       QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
-  return labelSavedStatusPxp[status];
+  return ImageTool::GetLabelStatusPixmap(status);
 }
 
 StateLabel::StateLabel(const QString& text, QWidget* parent)  //

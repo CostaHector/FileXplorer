@@ -3,6 +3,7 @@
 
 #include "CustomTableView.h"
 #include "StyleSheetEditDelegate.h"
+#include <QSortFilterProxyModel>
 
 class ConfigsModel;
 
@@ -10,23 +11,21 @@ class ConfigsTableView : public CustomTableView {
   Q_OBJECT
 public:
   explicit ConfigsTableView(const QString& instName, QWidget* parent = nullptr);
-
-  const ConfigsModel* GetModel() const { return m_alertModel; }
-  ConfigsModel* GetModel() { return m_alertModel; }
-
-  std::pair<int, int> GetStatistics() const;
+  int GetFailedCnt() const;
+  void setFilter(const QString& filter);
 
 signals:
-  void modelDataChanged();
+  void modelCfgFailedCountChanged(int newFailedCnt);
 
 protected:
   void initExclusivePreferenceSetting() override;
 
 private:
   void subscribe();
-  bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
+  bool on_cellDoubleClicked(const QModelIndex& proxyIndex) const;
 
-  ConfigsModel* m_alertModel{nullptr};
+  ConfigsModel* m_cfgModel{nullptr};
+  QSortFilterProxyModel* mSortFilterProxy{nullptr};
   StyleSheetEditDelegate* mStyleSheetEditDelegate{nullptr};
 };
 

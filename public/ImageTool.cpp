@@ -95,6 +95,19 @@ QIcon GetBuiltInIcon(QStyle::StandardPixmap spE) {
   return pStyle->standardIcon(spE);
 }
 
+const QIcon& GetCheckResultIcon(bool bPass) {
+  static const QIcon PASS_OR_NOT_ICONS_ARR[]{QIcon{":img/WRONG"}, QIcon{":img/CORRECT"}};
+  return PASS_OR_NOT_ICONS_ARR[(int) bPass];
+}
+
+const QPixmap& GetLabelStatusPixmap(int labelStatus) {
+  static const QPixmap labelSavedStatusPxp[]                      //
+      {QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio), //
+       QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
+  const int clampResult = std::max(0, std::min(1, labelStatus));
+  return labelSavedStatusPxp[clampResult];
+}
+
 } // namespace ImageTool
 
 constexpr int IMAGE_SIZE::TABS_ICON_IN_MENU_16;

@@ -4,9 +4,10 @@
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
+#include "NotificatorMacro.h"
 #include "PathTool.h"
-#include <QPlainTextEdit>
 
+#include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QAction>
 #include <QColor>
@@ -190,20 +191,18 @@ void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
   if (index.column() != mEditableColumn) {
     return;
   }
+  bool setResult{true};
   const int dataType = index.data(mDataTypeRole).toInt();
   if (GeneralDataType::isComboBoxNeededInEditor(dataType)) {
-    setComboBoxModelData(editor, model, index, dataType);
-    return;
-  }
-  if (GeneralDataType::isPlainTextEditNeededInEditor(dataType)) {
+    setResult = setComboBoxModelData(editor, model, index, dataType);
+  } else if (GeneralDataType::isPlainTextEditNeededInEditor(dataType)) {
     QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>(editor);
     if (!plainTextEdit) {
       LOG_E("Editor is not a QPlainTextEdit for dataType[%d]", dataType);
       return;
     }
     QString rawText = plainTextEdit->toPlainText();
-    model->setData(index, rawText, Qt::EditRole);
-    return;
+    setResult = model->setData(index, rawText, Qt::EditRole);
   } else if (GeneralDataType::isPathRelatedType(dataType)) {
     QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
     if (!lineEdit) {
@@ -211,12 +210,13 @@ void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
       return;
     }
     const QString stdPath = PathTool::normPath(lineEdit->text());
-    model->setData(index, stdPath, Qt::EditRole);
-    return;
+    setResult = model->setData(index, stdPath, Qt::EditRole);
+  } else {
+    QStyledItemDelegate::setModelData(editor, model, index);
   }
-
-  // 其他类型使用父类处理
-  QStyledItemDelegate::setModelData(editor, model, index);
+  if (!setResult) {
+    LOG_WARN_P("setModelData Failed", "dataType[%d], index[(%d, %d)]", dataType, index.row(), index.column());
+  }
 }
 
 void StyleSheetEditDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const {
@@ -277,11 +277,11 @@ void StyleSheetEditDelegate::setComboBoxEditorData(QWidget *editor, const QModel
   comboBox->setCurrentText(rawText);
 }
 
-void StyleSheetEditDelegate::setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const {
+bool StyleSheetEditDelegate::setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const {
   QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
   if (!comboBox) {
     LOG_E("Editor is not a QComboBox for dataType[%d]", dataType);
-    return;
+    return false;
   }
 
   QString rawText = comboBox->currentText();
@@ -298,8 +298,8 @@ void StyleSheetEditDelegate::setComboBoxModelData(QWidget *editor, QAbstractItem
       value = mFontStyleItems.value(rawText, QFont::Style::StyleNormal);
       break;
     default:
-      return;
+      return false;
   }
 
-  model->setData(index, value, Qt::EditRole);
+  return model->setData(index, value, Qt::EditRole);
 }

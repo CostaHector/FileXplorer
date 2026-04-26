@@ -24,7 +24,7 @@ private:
   QComboBox *createComboBoxEditor(int dataType, QWidget *parent) const;
 
   void setComboBoxEditorData(QWidget *editor, const QModelIndex &index, int dataType) const;
-  void setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
+  bool setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
 
   const int mDataTypeRole, mEditableColumn;
   QStringList mFontFamilyItems;

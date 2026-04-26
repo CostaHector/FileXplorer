@@ -8,8 +8,8 @@ class StateLabel : public QLabel {
  public:
   typedef enum tagLABEL_STATUS_E {
     BEGIN = 0,      //
-    SAVED = BEGIN,  //
-    NOT_SAVED = 1,  //
+    NOT_SAVED = BEGIN,  // false
+    SAVED,  // true
     BUTT = 2
   } LABEL_STATUS_E;
   explicit StateLabel(const QString& text, QWidget* parent = nullptr);
