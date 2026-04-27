@@ -313,6 +313,5 @@ QStringList AdvanceRenamer::MultiLineStr2StrList(const KV& kv) {
   }
   const QString multiLineSeperatedByNewLine = Configuration().value(kv.name, kv.v.data.str).toString();
   const QStringList strList{multiLineSeperatedByNewLine.split(NAME_SEP, Qt::KeepEmptyParts)};
-  LOG_W("before[%s], count:%d", kv.v.data.str, strList.size());
   return strList;
 }
