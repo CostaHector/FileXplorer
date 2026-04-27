@@ -102,13 +102,6 @@ private slots:
     QCOMPARE(model.setRootPath("inexist/folder", DICriteriaE::LIBRARY, true), -1);               // path not exist
     QCOMPARE(model.setRootPath(mWorkPath, DICriteriaE::END_INVALID, true), -1);                  // findBy invalid
 
-    // FsNodeEntry{"Benchmark/a.jpg", false, "123"},          // bench
-    // FsNodeEntry{"Benchmark/aDuplicate.png", false, "123"}, // bench
-    // FsNodeEntry{"Benchmark/bUnique.png", false, "456"},    // bench
-    // FsNodeEntry{"ToFindRedun/aRedun.jpg", false, "123"},   //
-    // FsNodeEntry{"ToFindRedun/cUnique.png", false, "789789"},   //
-    // FsNodeEntry{"ToFindRedun/dEmpty.webp", false, ""},    //
-
     ImagesInfoManager& redunImgLib = ImagesInfoManager::getInst();
     redunImgLib.InitializeImpl(mBenchmarkRedunFolder);
 
@@ -177,10 +170,10 @@ private slots:
     QCOMPARE(model.setIncludeEmptyImg(true), 0);  // no change
     QCOMPARE(model.setIncludeEmptyImg(false), 3); // MD5+not include empty
 
-    QCOMPARE(model.setFindBy(DICriteriaE::MD5), 0);     // no change
+    QCOMPARE(model.setFindBy(DICriteriaE::MD5), 0); // no change
 
     QCOMPARE(model.setRootPath(mFolderToFindRedun, DICriteriaE::MD5, false), 0); // MD5+not include empty. total files=3
-    QCOMPARE(model.setFindBy(DICriteriaE::LIBRARY), 1); // Benchmark+not include empty
+    QCOMPARE(model.setFindBy(DICriteriaE::LIBRARY), 1);                          // Benchmark+not include empty
     {
       QCOMPARE(model.filePath(model.index(0, DIColumnE::RelPath)), mDir.itemPath("ToFindRedun/aRedun.jpg"));
     }
@@ -196,6 +189,33 @@ private slots:
     const QModelIndexList lst{model.index(0, DIColumnE::Name), model.index(1, DIColumnE::Name)};
     QCOMPARE(model.UpdateDisplayWhenRecycled(lst), 2);
     QCOMPARE(model.rowCount(), 0);
+  }
+
+  void GetSameHashRowWithFirstOneIgnored_ok() {
+    DuplicateImagesModel model;
+
+    QItemSelection emptySelection = model.GetSameHashRowWithFirstOneIgnored();
+    QCOMPARE(emptySelection.isEmpty(), true);
+
+    QCOMPARE(model.setRootPath(mWorkPath, DICriteriaE::MD5, true), 4);
+
+    // FsNodeEntry{"Benchmark/a.jpg", false, validImgContents},          // bench
+    // FsNodeEntry{"Benchmark/aDuplicate.png", false, validImgContents}, // bench
+    // FsNodeEntry{"Benchmark/bUnique.png", false, "456"},               // bench
+    // FsNodeEntry{"ToFindRedun/aRedun.jpg", false, validImgContents},   //
+    // FsNodeEntry{"ToFindRedun/cUnique.png", false, "789789"},          //
+    // FsNodeEntry{"ToFindRedun/dEmpty.webp", false, ""},                //
+
+    QItemSelection selectionWith2Row = model.GetSameHashRowWithFirstOneIgnored();
+
+    QCOMPARE(model.index(0, DIColumnE::Name).data(Qt::DisplayRole).toString(), "a.jpg");          // keep
+    QCOMPARE(model.index(1, DIColumnE::Name).data(Qt::DisplayRole).toString(), "aDuplicate.png"); // contains
+    QCOMPARE(model.index(2, DIColumnE::Name).data(Qt::DisplayRole).toString(), "aRedun.jpg");     // contains
+    QCOMPARE(model.index(3, DIColumnE::Name).data(Qt::DisplayRole).toString(), "dEmpty.webp");    // keep
+    QVERIFY(!selectionWith2Row.contains(model.index(0, DIColumnE::Name)));
+    QVERIFY(selectionWith2Row.contains(model.index(1, DIColumnE::Name)));
+    QVERIFY(selectionWith2Row.contains(model.index(2, DIColumnE::Name)));
+    QVERIFY(!selectionWith2Row.contains(model.index(3, DIColumnE::Name)));
   }
 };
 

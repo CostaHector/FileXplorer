@@ -4,6 +4,8 @@
 #include "QAbstractTableModelPub.h"
 #include "DuplicateImagesHelper.h"
 
+#include <QItemSelection>
+
 class DuplicateImagesModel : public QAbstractTableModelPub {
 public:
   explicit DuplicateImagesModel(QObject* parent = nullptr);
@@ -21,6 +23,7 @@ public:
 
   bool onDisableImageDecorationChanged(bool bDisabled);
   int UpdateDisplayWhenRecycled(const QModelIndexList& indexes);
+  QItemSelection GetSameHashRowWithFirstOneIgnored() const;
 
   static constexpr int SMALL_PIXMAP_WIDTH{64};
 

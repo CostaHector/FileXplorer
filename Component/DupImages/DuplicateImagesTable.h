@@ -5,7 +5,8 @@
 #include "DuplicateImagesModel.h"
 #include <QSortFilterProxyModel>
 
-class DuplicateImagesTable: public CustomTableView {
+class DuplicateImagesTable : public CustomTableView {
+  Q_OBJECT
 public:
   explicit DuplicateImagesTable(QWidget* parent = nullptr);
 
@@ -19,7 +20,9 @@ private:
 
   bool onOpenImageDoubleClicked(const QModelIndex& proxyClickedIndex) const;
   int RecycleSelection();
+  bool SelectRowsToDelete();
 
+  QAction* mSelectSameHashRows{nullptr};
   DuplicateImagesModel* m_imgModel{nullptr};
   QSortFilterProxyModel* m_imgProxy{nullptr};
 };

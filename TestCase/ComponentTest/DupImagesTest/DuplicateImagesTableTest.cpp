@@ -142,6 +142,29 @@ private slots:
         .will(returnValue(true));
     QCOMPARE(RedundantImageFinderActions::onOpenBenchmarkFolder(), true);
   }
+
+  void SelectRowsToDelete_ok() {
+    auto& findActInst = g_redunImgFinderAg();
+    findActInst.mDecideByIntAction.setCheckedIfActionExist(DICriteriaE::MD5);
+    QCOMPARE(findActInst.GetCurFindDupBy(), DICriteriaE::MD5);
+
+    DuplicateImagesTable view;
+    QCOMPARE(view.SelectRowsToDelete(), false);
+    QCOMPARE(view(mWorkPath), true);
+
+    DuplicateImagesModel* srcModel = view.m_imgModel;
+    QSortFilterProxyModel* proModel = view.m_imgProxy;
+    QCOMPARE(srcModel->rowCount(), 2);
+    QCOMPARE(proModel->rowCount(), 2);
+
+    QCOMPARE(view.SelectRowsToDelete(), true);
+    QModelIndexList srcIndexes = view.selectedRowsSource();
+    QCOMPARE(srcIndexes.size(), 1); // expect one line get selected
+
+    // 0. "a.jpg" keep, not selected
+    // 1. "redun.png" selected
+    QCOMPARE(srcIndexes.front().data(Qt::DisplayRole).toString(), "redun.png");
+  }
 };
 
 #include "DuplicateImagesTableTest.moc"

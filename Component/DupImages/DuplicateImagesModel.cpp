@@ -161,3 +161,29 @@ int DuplicateImagesModel::UpdateDisplayWhenRecycled(const QModelIndexList& index
   const auto rowElementsRmv = [this](int beg, int end) { m_dupImgs.erase(m_dupImgs.begin() + beg, m_dupImgs.begin() + end); };
   return onRowsRemoved(indexes, rowElementsRmv);
 }
+
+QItemSelection DuplicateImagesModel::GetSameHashRowWithFirstOneIgnored() const {
+  if (rowCount() == 0) {
+    return {};
+  }
+  QItemSelection srcSelection;
+
+  QMap<QByteArray, QList<int>> md5ToRowsDict;
+  for (int i = 0; i < rowCount(); ++i) {
+    const REDUNDANT_IMG_INFO& info = m_dupImgs[i];
+    md5ToRowsDict[info.m_MD5].push_back(i);
+  }
+  // hash列内容相同时, 会用原始list中的顺序排序, 只保留每批hash中的首行不选, 其它的全选
+  const int lastColumn = columnCount() - 1;
+  for (auto it = md5ToRowsDict.cbegin(); it != md5ToRowsDict.cend(); ++it) {
+    const QList<int>& rows = it.value();
+    if (rows.size() < 2) {
+      continue;
+    }
+    // start from 1. ignore first row
+    for (int i = 1; i < rows.size(); ++i) {
+      srcSelection.select(index(rows[i], 0), index(rows[i], lastColumn));
+    }
+  }
+  return srcSelection;
+}

@@ -293,7 +293,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../../View/CustomTableView.cpp" line="+43"/>
+        <location filename="../../View/CustomTableView.cpp" line="+44"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -458,6 +458,14 @@
         <location line="+1"/>
         <source>Hide Toolbar</source>
         <translation>已隐藏工具栏</translation>
+    </message>
+</context>
+<context>
+    <name>DuplicateImagesTable</name>
+    <message>
+        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+27"/>
+        <source>Select Same Hash Rows(Ignore first one)</source>
+        <translation>选中相同哈希行(保留首个)</translation>
     </message>
 </context>
 <context>
@@ -1696,7 +1704,7 @@
 <context>
     <name>RedundantImageFinderActions</name>
     <message>
-        <location filename="../../Actions/RedundantImageFinderActions.cpp" line="+9"/>
+        <location filename="../../Actions/RedundantImageFinderActions.cpp" line="+14"/>
         <source>Find by benchmark library</source>
         <translation>通过基准库查找</translation>
     </message>

@@ -24,6 +24,11 @@ DuplicateImagesTable::DuplicateImagesTable(QWidget* parent)
   setModel(m_imgProxy);
   registerProxyModel(m_imgProxy);
 
+  mSelectSameHashRows = new QAction{tr("Select Same Hash Rows(Ignore first one)"), this};
+
+  QList<QAction*> exclusiveActs{mSelectSameHashRows};
+  PushFrontExclusiveActions(exclusiveActs);
+
   if (QHeaderView* horHeader = verticalHeader()) {
     horHeader->setDefaultSectionSize(DuplicateImagesModel::SMALL_PIXMAP_WIDTH);
     horHeader->setSectionResizeMode(QHeaderView::Fixed);
@@ -41,6 +46,8 @@ void DuplicateImagesTable::subscribe() {
   connect(inst.RECYLE_NOW, &QAction::triggered, this, &DuplicateImagesTable::RecycleSelection);
 
   connect(this, &QAbstractItemView::doubleClicked, this, &DuplicateImagesTable::onOpenImageDoubleClicked);
+
+  connect(mSelectSameHashRows, &QAction::triggered, this, &DuplicateImagesTable::SelectRowsToDelete);
 }
 
 QString DuplicateImagesTable::GetWinTitle() const {
@@ -106,4 +113,15 @@ int DuplicateImagesTable::RecycleSelection() {
   m_imgModel->UpdateDisplayWhenRecycled(srcIndexes);
 
   return SELECTED_CNT;
+}
+
+bool DuplicateImagesTable::SelectRowsToDelete() {
+  QItemSelection srcSelection = m_imgModel->GetSameHashRowWithFirstOneIgnored();
+  if (srcSelection.isEmpty()) {
+    LOG_INFO_NP("Skip selection", "No rows need select for delete");
+    return false;
+  }
+  QItemSelection proSelection = m_imgProxy->mapSelectionFromSource(srcSelection);
+  selectionModel()->select(proSelection, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+  return true;
 }

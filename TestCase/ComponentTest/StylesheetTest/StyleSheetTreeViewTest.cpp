@@ -3,6 +3,7 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheetTreeView.h"
+#include "GeneralComboBox.h"
 #include "EndToExposePrivateMember.h"
 
 #include "StyleSheetGetter.h"
@@ -245,9 +246,17 @@ private slots:
     const QModelIndex r7Index3 = srcModel->siblingAtColumn(srcIndexes[7], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r8Index3 = srcModel->siblingAtColumn(srcIndexes[8], StyleItemData::EDITABLE_COLUMN);
 
-    QVERIFY(delegate->mFontFamilyItems.size() > 0);
-    QVERIFY(delegate->mFontWeightItems.size() > 0);
-    QVERIFY(delegate->mFontStyleItems.size() > 0);
+    QVERIFY(StringComboBox::CANDIDATES_FONT_FAMILY.size() > 0);
+    const QMap<QString, int>* mFallbackOkItems = EnumComboBox::GetCandidates(GeneralDataType::Type::PLAIN_INT).first;
+    const QMap<QString, int>* mFontWeightItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_WEIGHT).first;
+    const QMap<QString, int>* mFontStyleItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_STYLE).first;
+    QVERIFY(mFallbackOkItems != nullptr);
+    QVERIFY(mFontWeightItems != nullptr);
+    QVERIFY(mFontStyleItems != nullptr);
+
+    EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_STYLE);
+    QVERIFY(mFontWeightItems->size() > 0);
+    QVERIFY(mFontStyleItems->size() > 0);
 
     delegate->updateEditorGeometry(nullptr, QStyleOptionViewItem{}, QModelIndex{});
 
@@ -279,8 +288,8 @@ private slots:
       QComboBox* fontFamilyCb = qobject_cast<QComboBox*>(fontFamilyStringComboBox);
       QVERIFY(fontFamilyCb != nullptr);
 
-      QCOMPARE(fontFamilyCb->count(), delegate->mFontFamilyItems.size());
-      QString newFontFamilyStr = delegate->mFontFamilyItems[0];
+      QCOMPARE(fontFamilyCb->count(), StringComboBox::CANDIDATES_FONT_FAMILY.size());
+      QString newFontFamilyStr = StringComboBox::CANDIDATES_FONT_FAMILY[0];
       fontFamilyCb->setCurrentText(newFontFamilyStr);
       delegate->setModelData(fontFamilyCb, srcModel, r1Index3);
 
@@ -301,12 +310,12 @@ private slots:
       QWidget* fontWeightEnumComboBox = delegate->createEditor(&view, QStyleOptionViewItem{}, r2Index3);
       QComboBox* fontWeightCb = qobject_cast<QComboBox*>(fontWeightEnumComboBox);
       QVERIFY(fontWeightCb != nullptr);
-      QCOMPARE(fontWeightCb->count(), delegate->mFontWeightItems.size());
+      QCOMPARE(fontWeightCb->count(), mFontWeightItems->size());
 
       const StyleItemData& r2ItemData = r2->value();
       QString newFontWeightStr = fontWeightCb->currentText();
       fontWeightCb->setCurrentText(newFontWeightStr);
-      QFont::Weight newFontWeightInt = delegate->mFontWeightItems.value(newFontWeightStr);
+      QFont::Weight newFontWeightInt = static_cast<QFont::Weight>(mFontWeightItems->value(newFontWeightStr));
       delegate->setModelData(fontWeightCb, srcModel, r2Index3);
 
       QCOMPARE(r2Index3.data(Qt::DisplayRole), newFontWeightInt);
@@ -325,12 +334,12 @@ private slots:
       QWidget* fontStyleEnumComboBox = delegate->createEditor(&view, QStyleOptionViewItem{}, r3Index3);
       QComboBox* fontStyleCb = qobject_cast<QComboBox*>(fontStyleEnumComboBox);
       QVERIFY(fontStyleCb != nullptr);
-      QCOMPARE(fontStyleCb->count(), delegate->mFontStyleItems.size());
+      QCOMPARE(fontStyleCb->count(), mFontStyleItems->size());
 
       const StyleItemData& r3ItemData = r3->value();
       QString newFontStyleStr = fontStyleCb->currentText();
       fontStyleCb->setCurrentText(newFontStyleStr);
-      QFont::Style newFontStyleInt = delegate->mFontStyleItems.value(newFontStyleStr);
+      QFont::Style newFontStyleInt = static_cast<QFont::Style>(mFontStyleItems->value(newFontStyleStr));
       delegate->setModelData(fontStyleCb, srcModel, r3Index3);
 
       QCOMPARE(r3Index3.data(Qt::DisplayRole), newFontStyleInt);

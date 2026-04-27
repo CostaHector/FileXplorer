@@ -6,6 +6,7 @@
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
+#include "GeneralComboBox.h"
 
 #include <QPlainTextEdit>
 #include <QLineEdit>
@@ -17,61 +18,7 @@
 StyleSheetEditDelegate::StyleSheetEditDelegate(int dataTypeRole, int editableColumn, QObject *parent)
   : QStyledItemDelegate(parent)
   , mDataTypeRole{dataTypeRole}
-  , mEditableColumn{editableColumn} {
-  mFontFamilyItems = decltype(mFontFamilyItems){
-#ifdef _WIN32
-      // Windows平台字体
-      "Microsoft YaHei UI", // 微软雅黑
-      "SimSun",             // 宋体
-      "NSimSun",            // 新宋体
-      "Microsoft JhengHei", // 微软正黑体
-      "Arial",              // 英文无衬线字体
-      "Times New Roman",    // 英文衬线字体
-      "Tahoma",             // Windows系统UI字体
-      "Segoe UI",           // Windows现代UI字体
-      "Calibri",            // Office默认字体
-      "Consolas",           // 等宽字体
-      "Courier New",        // 等宽字体
-      "Verdana",            // 屏幕显示优化字体
-      "Georgia",            // 适合屏幕阅读的衬线字体
-      "Trebuchet MS",       // Web安全字体
-      "Comic Sans MS"       // 手写风格字体
-#else
-      // Linux平台字体
-      "Noto Sans",        // Google跨平台字体
-      "Noto Sans CJK SC", // Noto Sans中文字体
-      "DejaVu Sans",      // 开源无衬线字体
-      "DejaVu Serif",     // 开源衬线字体
-      "Liberation Sans",  // 替换Arial的开源字体
-      "Liberation Serif", // 替换Times New Roman的开源字体
-      "Ubuntu",           // Ubuntu系统默认字体
-      "FreeSans",         // 开源无衬线字体
-      "Droid Sans",       // Android系统字体
-      "Arial",            // 英文无衬线字体
-      "Times New Roman",  // 英文衬线字体
-      "Tahoma",           // 屏幕显示字体
-      "Verdana",          // 屏幕显示优化字体
-      "Courier New",      // 等宽字体
-      "Monospace"         // 通用等宽字体
-#endif
-  };
-  mFontWeightItems = decltype(mFontWeightItems){
-      {"Thin", QFont::Weight::Thin},
-      {"ExtraLight", QFont::Weight::ExtraLight},
-      {"Light", QFont::Weight::Light},
-      {"Normal", QFont::Weight::Normal},
-      {"Medium", QFont::Weight::Medium},
-      {"DemiBold", QFont::Weight::DemiBold},
-      {"Bold", QFont::Weight::Bold},
-      {"ExtraBold", QFont::Weight::ExtraBold},
-      {"Black", QFont::Weight::Black},
-  };
-  mFontStyleItems = decltype(mFontStyleItems){
-      {"StyleNormal", QFont::Style::StyleNormal},
-      {"StyleItalic", QFont::Style::StyleItalic},
-      {"StyleOblique", QFont::Style::StyleOblique},
-  };
-}
+  , mEditableColumn{editableColumn} {}
 
 QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   if (index.column() != mEditableColumn) {
@@ -80,7 +27,7 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
   const int dataType = index.data(mDataTypeRole).toInt();
 
   if (GeneralDataType::isComboBoxNeededInEditor(dataType)) {
-    return createComboBoxEditor(dataType, parent);
+    return GeneralComboBox::create(dataType, parent);
   }
 
   switch (dataType) {
@@ -181,7 +128,13 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
   }
   const int dataType = index.data(mDataTypeRole).toInt();
   if (GeneralDataType::isComboBoxNeededInEditor(dataType)) {
-    setComboBoxEditorData(editor, index, dataType);
+    GeneralComboBox *comboBox = dynamic_cast<GeneralComboBox *>(editor);
+    if (!comboBox) {
+      LOG_E("Editor is not a GeneralComboBox for dataType[%d]", dataType);
+      return;
+    }
+    QVariant editRoleData = index.model()->data(index, Qt::EditRole);
+    comboBox->updateCurrentDisplayString(editRoleData);
     return;
   }
   QStyledItemDelegate::setEditorData(editor, index);
@@ -224,82 +177,12 @@ void StyleSheetEditDelegate::updateEditorGeometry(QWidget *editor, const QStyleO
   editor->setGeometry(option.rect);
 }
 
-QComboBox *StyleSheetEditDelegate::createComboBoxEditor(int dataType, QWidget *parent) const {
-  QComboBox *editor = new QComboBox(parent);
-  editor->setEditable(false);
-
-  switch (dataType) {
-    case GeneralDataType::Type::FONT_FAMILY:
-      editor->addItems(mFontFamilyItems);
-      break;
-    case GeneralDataType::Type::FONT_WEIGHT:
-      editor->addItems(mFontWeightItems.keys());
-      break;
-    case GeneralDataType::Type::FONT_STYLE:
-      editor->addItems(mFontStyleItems.keys());
-      break;
-    default:
-      LOG_E("type[%d] cannot edit in QComboBox", dataType);
-  }
-
-  return editor;
-}
-
-void StyleSheetEditDelegate::setComboBoxEditorData(QWidget *editor, const QModelIndex &index, int dataType) const {
-  QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
-  if (!comboBox) {
-    LOG_E("Editor is not a QComboBox for dataType[%d]", dataType);
-    return;
-  }
-
-  QString rawText = index.model()->data(index, Qt::EditRole).toString();
-  bool isValid = false;
-
-  switch (dataType) {
-    case GeneralDataType::Type::FONT_FAMILY:
-      isValid = mFontFamilyItems.contains(rawText);
-      break;
-    case GeneralDataType::Type::FONT_WEIGHT:
-      isValid = mFontWeightItems.contains(rawText);
-      break;
-    case GeneralDataType::Type::FONT_STYLE:
-      isValid = mFontStyleItems.contains(rawText);
-      break;
-    default:
-      return;
-  }
-
-  if (!isValid) {
-    LOG_W("Invalid value[%s] for dataType[%d]", qPrintable(rawText), dataType);
-    rawText = "";
-  }
-
-  comboBox->setCurrentText(rawText);
-}
-
 bool StyleSheetEditDelegate::setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const {
-  QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
+  const GeneralComboBox *comboBox = dynamic_cast<const GeneralComboBox *>(editor);
   if (!comboBox) {
-    LOG_E("Editor is not a QComboBox for dataType[%d]", dataType);
+    LOG_E("Editor is not a GeneralComboBox for dataType[%d]", dataType);
     return false;
   }
-
-  QString rawText = comboBox->currentText();
-  QVariant value;
-
-  switch (dataType) {
-    case GeneralDataType::Type::FONT_FAMILY:
-      value = mFontFamilyItems.contains(rawText) ? rawText : "";
-      break;
-    case GeneralDataType::Type::FONT_WEIGHT:
-      value = mFontWeightItems.value(rawText, QFont::Weight::Normal);
-      break;
-    case GeneralDataType::Type::FONT_STYLE:
-      value = mFontStyleItems.value(rawText, QFont::Style::StyleNormal);
-      break;
-    default:
-      return false;
-  }
-
+  QVariant value = comboBox->getSetDataVariant();
   return model->setData(index, value, Qt::EditRole);
 }
