@@ -1,6 +1,6 @@
 ﻿#include "RenameWidget_Replace.h"
 #include "RenameHelper.h"
-#include "MemoryKey.h"
+#include "RenamerKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 
@@ -52,7 +52,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
   m_regexCB->setIcon(QIcon(":img/REGEX"));
   m_regexCB->setToolTip("Enable regex");
-  m_regexCB->setChecked(Configuration().value(RenamerKey::REGEX_ENABLED.name, RenamerKey::REGEX_ENABLED.toVariant()).toBool());
+  m_regexCB->setChecked(getConfig(RenamerKey::REGEX_ENABLED).toBool());
 }
 
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {

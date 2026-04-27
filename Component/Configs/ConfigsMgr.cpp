@@ -1,6 +1,5 @@
 #include "ConfigsMgr.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "FileLeafAction.h"
 #include "FileTool.h"
@@ -10,32 +9,48 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QKeyEvent>
 #include <QFile>
+
+constexpr const char* STATISTIC_LABEL_ALL_PASSED_TEMPLATE{"All Passed"};
+constexpr const char* STATISTIC_LABEL_PARTIAL_FAILED_TEMPLATE{R"(<font color="#FF0000">Failed: %d</font>)"};
 
 ConfigsMgr::ConfigsMgr(QWidget* parent)
   : QDialog{parent} {
-  m_failItemCnt = new (std::nothrow) QLabel{"Configs status here", this};
-  CHECK_NULLPTR_RETURN_VOID(m_failItemCnt);
+  m_helpToolBar = new (std::nothrow) QToolBar{this};
 
-  m_alertsTable = new (std::nothrow) ConfigsTableView{"CONFIGS_TABLE", this};
-  CHECK_NULLPTR_RETURN_VOID(m_alertsTable);
+  m_failedCountLabel = new (std::nothrow) QLabel{this};
+  CHECK_NULLPTR_RETURN_VOID(m_failedCountLabel);
+  m_helpToolBar->addWidget(m_failedCountLabel);
+  m_recheckAction = m_helpToolBar->addAction(QIcon(":img/REFRESH_THIS_PATH"), "Re-check");
+  m_recheckAction->setToolTip("Re-check configuration items for pass/fail status");
+  m_helpToolBar->addSeparator();
 
-  constexpr QDialogButtonBox::StandardButtons stdBtns{QDialogButtonBox::Open | QDialogButtonBox::Ok | QDialogButtonBox::Retry};
-  m_dlgBtnBox = new (std::nothrow) QDialogButtonBox{stdBtns, Qt::Orientation::Horizontal, this};
+  m_searchLineEdit = new (std::nothrow) QLineEdit{this};
+  CHECK_NULLPTR_RETURN_VOID(m_searchLineEdit);
+  m_searchLineEdit->setClearButtonEnabled(true);
+  m_searchLineEdit->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+  m_searchAction = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
+  m_helpToolBar->addWidget(m_searchLineEdit);
+
+  m_cfgsTable = new (std::nothrow) ConfigsTableView{"CONFIGS_TABLE", this};
+  CHECK_NULLPTR_RETURN_VOID(m_cfgsTable);
+
+  m_dlgBtnBox = new (std::nothrow) QDialogButtonBox{QDialogButtonBox::Open | QDialogButtonBox::Ok, Qt::Orientation::Horizontal, this};
   CHECK_NULLPTR_RETURN_VOID(m_dlgBtnBox);
 
   auto* lo = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(lo)
-  lo->addWidget(m_failItemCnt);
-  lo->addWidget(m_alertsTable);
+  lo->addWidget(m_helpToolBar);
+  lo->addWidget(m_cfgsTable);
   lo->addWidget(m_dlgBtnBox);
 
   subscribe();
 
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-  setWindowTitle("Configs Table");
-  setWindowIcon(QIcon{":img/SETTINGS"});
-  RefreshWindowIcon();
+  setWindowTitle(g_fileLeafActions()._SETTINGS->text());
+  setWindowIcon(g_fileLeafActions()._SETTINGS->icon());
+  RefreshFailedCountLabel();
 }
 
 void ConfigsMgr::subscribe() {
@@ -53,13 +68,11 @@ void ConfigsMgr::subscribe() {
     connect(pOpen, &QPushButton::clicked, this, &ConfigsMgr::onEditPreferenceSetting);
   }
 
-  if (QPushButton* pRetry = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Retry)) {
-    pRetry->setText("Recheck");
-    pRetry->setIcon(QIcon(":JsonEditor/RELOAD_FROM_DISK"));
-    connect(pRetry, &QPushButton::clicked, this, &ConfigsMgr::RefreshWindowIcon);
-  }
+  connect(m_searchLineEdit, &QLineEdit::returnPressed, this, &ConfigsMgr::onStartFilter);
+  connect(m_searchAction, &QAction::triggered, this, &ConfigsMgr::onStartFilter);
 
-  connect(m_alertsTable->GetModel(), &QAbstractItemModel::dataChanged, this, &ConfigsMgr::RefreshWindowIcon);
+  connect(m_recheckAction, &QAction::triggered, this, &ConfigsMgr::RefreshFailedCountLabel);
+  connect(m_cfgsTable, &ConfigsTableView::modelCfgFailedCountChanged, this, &ConfigsMgr::UpdateFailedCountLabel);
 }
 
 void ConfigsMgr::showEvent(QShowEvent* event) {
@@ -74,21 +87,35 @@ void ConfigsMgr::hideEvent(QHideEvent* event) {
   QDialog::hideEvent(event);
 }
 
-void ConfigsMgr::RefreshWindowIcon() {
-  int failsCnt{0}, totalCnt{0};
-  std::tie(failsCnt, totalCnt) = m_alertsTable->GetStatistics();
+QWidget* ConfigsMgr::focusWidgetCore(ConfigsMgr* self) { // test-usage only
+  CHECK_NULLPTR_RETURN_NULLPTR(self);
+  return self->focusWidget();
+}
 
-  QString msg;
-  msg += R"(<b>)";
-  if (failsCnt != 0) {
-    msg += R"(<font color="#FF0000">)";
-    msg += QString{"%1 in %2 setting(s) error"}.arg(failsCnt).arg(totalCnt);
-    msg += R"(</font>)";
-  } else {
-    msg += QString("All %1 setting passed").arg(totalCnt);
+void ConfigsMgr::keyPressEvent(QKeyEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  // Return/Enter Eater/Consumer
+  if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+    QWidget* focused = focusWidgetCore(this);
+    if (focused == m_searchLineEdit) {
+      event->ignore();
+      return;
+    }
   }
-  msg += R"(</b>)";
-  m_failItemCnt->setText(msg);
+  QDialog::keyPressEvent(event);
+}
+
+void ConfigsMgr::UpdateFailedCountLabel(int newFailedCount) {
+  if (newFailedCount == 0) {
+    m_failedCountLabel->setText(STATISTIC_LABEL_ALL_PASSED_TEMPLATE);
+  } else {
+    m_failedCountLabel->setText(QString::asprintf(STATISTIC_LABEL_PARTIAL_FAILED_TEMPLATE, newFailedCount));
+  }
+}
+
+void ConfigsMgr::RefreshFailedCountLabel() {
+  const int failsCnt = m_cfgsTable->GetFailedCnt();
+  UpdateFailedCountLabel(failsCnt);
 }
 
 bool ConfigsMgr::onEditPreferenceSetting() const {
@@ -98,4 +125,8 @@ bool ConfigsMgr::onEditPreferenceSetting() const {
     return false;
   }
   return FileTool::OpenLocalFile(iniFileAbsPath);
+}
+
+void ConfigsMgr::onStartFilter() {
+  m_cfgsTable->setFilter(m_searchLineEdit->text());
 }

@@ -1,19 +1,19 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "BasicVideoView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "VideoPlayerKey.h"
+#include "Configuration.h"
 #include "RateHelper.h"
 #include "FileTool.h"
 #include "VideoTestPrecoditionTools.h"
-
 #include "InputDialogHelper.h"
+
 #include <QSplitter>
+#include <QSignalSpy>
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -80,7 +80,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void playAVideo_trigger_disabled_ok() {
-    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
     const QString existVideoPath{__FILE__};
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
@@ -111,7 +111,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void onStopPlaying_release_file_ok() {
-    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
 
     BasicVideoView basicVideoView{true, nullptr};
     QCOMPARE(basicVideoView.mIsMediaCleared, false);
@@ -133,7 +133,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void playAVideo_trigger_manual_ok() {
-    Configuration().setValue(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, (int)VideoPlayTool::PlaybackTriggerMode::MANUAL);
+    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::MANUAL);
 
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(2)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(2)).will(returnValue(true));
@@ -185,7 +185,7 @@ class BasicVideoViewTest : public PlainTestSuite {
   }
 
   void not_crash_ok() {
-    Configuration().setValue(VideoPlayerKey::VOLUME.name, 99);
+    setConfig(VideoPlayerKey::VOLUME, 99);
     BasicVideoView basicVideoView{false, nullptr};
     QCOMPARE(BasicVideoView::SetPositionCore(nullptr, 77), false);
     QCOMPARE(BasicVideoView::SetPositionCore(basicVideoView.mPlayer, 77), true);

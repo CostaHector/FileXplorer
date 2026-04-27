@@ -1,7 +1,7 @@
 ﻿#include "DevicesDrivesTV.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "TableFields.h"
 #include "StyleSheet.h"

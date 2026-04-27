@@ -1,16 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "CustomListView.h"
 #include "EndToExposePrivateMember.h"
 
+#include <QSignalSpy>
+#include "Configuration.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
 #include "ImageTool.h"
@@ -27,7 +23,9 @@ class CustomListViewTest : public PlainTestSuite {
     Configuration().clear();
   }
 
-  void init() { Configuration().clear(); }
+  void init() { //
+    Configuration().clear();
+  }
 
   void save_settings_in_destructor_ok() {
     const QString listInstanceName{"saveSettingTest_ok"};

@@ -1,20 +1,18 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideosFinder.h"
 #include "EndToExposePrivateMember.h"
+
 #include "DupVidsManager.h"
 #include "VideoTestPrecoditionTools.h"
 #include "DuplicateVideosFinderActions.h"
 #include "ClipboardGuard.h"
 #include "TDir.h"
-#include <QDesktopServices>
+#include "Logger.h"
 
+#include <QDesktopServices>
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>

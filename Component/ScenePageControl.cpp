@@ -1,5 +1,5 @@
 #include "ScenePageControl.h"
-#include "MemoryKey.h"
+#include "SceneKey.h"
 #include "Configuration.h"
 #include "ImageTool.h"
 #include "NotificatorMacro.h"

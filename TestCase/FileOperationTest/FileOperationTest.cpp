@@ -6,8 +6,10 @@
 #include "TDir.h"
 #include "PlainTestSuite.h"
 #include "FileOperation.h"
+
 #include "OnScopeExit.h"
-#include "MemoryKey.h"
+
+#include "BehaviorKey.h"
 #include "Configuration.h"
 
 using namespace FileOperatorType;
@@ -848,15 +850,15 @@ private slots:
   void returnErrorCodeUponAnyFailureSw_ok() {
     using namespace FileOperatorType;
     bool bkpUp = IsReturnErrorCodeUponAnyFailureSw();
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       SetReturnErrorCodeUponAnyFailureSw(bkpUp);
     };
 
-    Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, false);
+    setConfig(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE, false);
     InitReturnErrorCodeUponAnyFailureSw();
     QVERIFY(!IsReturnErrorCodeUponAnyFailureSw());
 
-    Configuration().setValue(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE.name, true);
+    setConfig(BehaviorKey::RETURN_ERRORCODE_UPON_ANY_FAILURE, true);
     InitReturnErrorCodeUponAnyFailureSw();
     QVERIFY(IsReturnErrorCodeUponAnyFailureSw());
 

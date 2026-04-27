@@ -1,12 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "TorrentsManagerWidget.h"
 #include "EndToExposePrivateMember.h"
+
 #include "TDir.h"
+#include "PathKey.h"
+#include "Configuration.h"
 
 #include "TorrDBAction.h"
 #include "PublicVariable.h"
@@ -52,7 +53,7 @@ class TorrentsManagerWidgetTest : public PlainTestSuite {
     torrWid.onInitDataBase();
     {
       QVERIFY(!torrWid.mDb.IsTableExist(DB_TABLE::TORRENTS));  // no tables cannot insert into
-      Configuration().setValue(PathKey::DB_INSERT_TORRENTS_FROM.name, tDir.path());
+      setConfig(PathKey::DB_INSERT_TORRENTS_FROM, tDir.path());
       QVERIFY(!torrWid.onInsertIntoTable());
     }
 
@@ -64,17 +65,17 @@ class TorrentsManagerWidgetTest : public PlainTestSuite {
 
     {  // onInsertIntoTable ok
       // inexist path
-      Configuration().setValue(PathKey::DB_INSERT_TORRENTS_FROM.name, "path/to/inexist_directory");
+      setConfig(PathKey::DB_INSERT_TORRENTS_FROM, "path/to/inexist_directory");
       QVERIFY(!torrWid.onInsertIntoTable());
 
       // exist path
-      Configuration().setValue(PathKey::DB_INSERT_TORRENTS_FROM.name, tDir.path());
+      setConfig(PathKey::DB_INSERT_TORRENTS_FROM, tDir.path());
       emit torrInst.INSERT_INTO_TABLE->triggered();
       QCOMPARE(torrWid.mDb.CountRow(DB_TABLE::TORRENTS), 3);  // 3 torrents in total
       QCOMPARE(torrWid.m_torrentsDBModel->rowCount(), 3);
 
       // the same exist path again
-      Configuration().setValue(PathKey::DB_INSERT_TORRENTS_FROM.name, tDir.path());
+      setConfig(PathKey::DB_INSERT_TORRENTS_FROM, tDir.path());
       QVERIFY(torrWid.onInsertIntoTable());
       QCOMPARE(torrWid.mDb.CountRow(DB_TABLE::TORRENTS), 3);  // 3 torrents unchange
       QCOMPARE(torrWid.m_torrentsDBModel->rowCount(), 3);

@@ -5,7 +5,7 @@
 #include <QSignalSpy>
 
 #include "Logger.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "DatabaseSearchToolBar.h"

@@ -1,12 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "HarTableView.h"
 #include "EndToExposePrivateMember.h"

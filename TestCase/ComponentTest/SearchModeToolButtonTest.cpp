@@ -1,10 +1,8 @@
 #include <QtTest/QtTest>
-
+#include "PlainTestSuite.h"
 #include <QSignalSpy>
 
-#include "PlainTestSuite.h"
-#include "Logger.h"
-#include "MemoryKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "SearchModeToolButton.h"
@@ -65,8 +63,7 @@ private slots:
     } // cofigure saved to local file when destruct called
 
     QVERIFY(Configuration().contains(SearchKey::ADVANCE_MODE.name));
-    QCOMPARE(Configuration().value(SearchKey::ADVANCE_MODE.name).toInt(),
-             ((int)SearchTools::SearchModeE::FILE_CONTENTS));
+    QCOMPARE(getConfig(SearchKey::ADVANCE_MODE).toInt(), ((int)SearchTools::SearchModeE::FILE_CONTENTS));
 
     SearchModeToolButton newBtn;
     QCOMPARE(newBtn.curSearchMode(), SearchTools::SearchModeE::FILE_CONTENTS);

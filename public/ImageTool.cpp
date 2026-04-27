@@ -2,7 +2,6 @@
 #include "StringTool.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include <QApplication>
 #include <QPixmapCache>
@@ -94,6 +93,19 @@ QIcon GetBuiltInIcon(QStyle::StandardPixmap spE) {
 #endif
   static const QStyle* pStyle = QApplication::style();
   return pStyle->standardIcon(spE);
+}
+
+const QIcon& GetCheckResultIcon(bool bPass) {
+  static const QIcon PASS_OR_NOT_ICONS_ARR[]{QIcon{":img/WRONG"}, QIcon{":img/CORRECT"}};
+  return PASS_OR_NOT_ICONS_ARR[(int) bPass];
+}
+
+const QPixmap& GetLabelStatusPixmap(int labelStatus) {
+  static const QPixmap labelSavedStatusPxp[]                      //
+      {QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio), //
+       QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
+  const int clampResult = std::max(0, std::min(1, labelStatus));
+  return labelSavedStatusPxp[clampResult];
 }
 
 } // namespace ImageTool

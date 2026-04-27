@@ -5,7 +5,7 @@
 #include <QSignalSpy>
 
 #include "Logger.h"
-#include "MemoryKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "SearchCaseMatterToolButton.h"
@@ -69,8 +69,8 @@ private slots:
     QVERIFY(Configuration().contains(SearchKey::NAME_CASE_SENSITIVE.name));
     QVERIFY(Configuration().contains(SearchKey::CONTENTS_CASE_SENSITIVE.name));
 
-    QCOMPARE(Configuration().value(SearchKey::NAME_CASE_SENSITIVE.name).toBool(), true);
-    QCOMPARE(Configuration().value(SearchKey::CONTENTS_CASE_SENSITIVE.name).toBool(), true);
+    QCOMPARE(getConfig(SearchKey::NAME_CASE_SENSITIVE).toBool(), true);
+    QCOMPARE(getConfig(SearchKey::CONTENTS_CASE_SENSITIVE).toBool(), true);
 
     // when initialize always use config from local file
     SearchCaseMatterToolButton newBtn;

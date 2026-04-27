@@ -1,16 +1,16 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include <QSignalSpy>
 
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "HorMenuInHeader.h"
 #include "EndToExposePrivateMember.h"
 
+#include "ColumnVisibilityDialog.h"
+
+#include <QSignalSpy>
 #include <QTableView>
 #include <QStandardItemModel>
-#include "ColumnVisibilityDialog.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>

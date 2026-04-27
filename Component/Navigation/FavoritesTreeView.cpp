@@ -1,6 +1,4 @@
 #include "FavoritesTreeView.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include <QContextMenuEvent>

@@ -1,14 +1,11 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "VideoView.h"
 #include "EndToExposePrivateMember.h"
+
+#include <QSignalSpy>
 
 class VideoViewTest : public PlainTestSuite {
   Q_OBJECT

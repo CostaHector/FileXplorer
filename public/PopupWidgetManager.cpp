@@ -3,14 +3,14 @@
 #include "StyleSheet.h"
 
 #include "DevicesDrivesTV.h"
-#include "RedundantImageFinder.h"
+#include "DuplicatesImagesFinder.h"
 #include "DuplicateVideosFinder.h"
 #include "TorrentsManagerWidget.h"
 #include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
-#include "MemoryKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "Logger.h"
 
@@ -19,7 +19,7 @@
 template class PopupWidgetManager<QWidget>;
 template class PopupWidgetManager<DevicesDrivesTV>;
 template class PopupWidgetManager<DuplicateVideosFinder>;
-template class PopupWidgetManager<RedundantImageFinder>;
+template class PopupWidgetManager<DuplicatesImagesFinder>;
 template class PopupWidgetManager<TorrentsManagerWidget>;
 template class PopupWidgetManager<ConfigsMgr>;
 template class PopupWidgetManager<Archiver>;

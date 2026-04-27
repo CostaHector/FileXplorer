@@ -35,9 +35,12 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
   IMG_INFO_DATA_T ReadOutImgsInfo() const;
   int ForceReloadImpl();
 
+  static QString GetDynRedunPath();
+
   // only used in decide by Benchmark library
   DuplicateImageMetaInfo::RedundantImagesList FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty = true) const;
-  static QString GetDynRedunPath();
+  // only used in decide by MD5
+  static DuplicateImageMetaInfo::RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
 
  private:
   ImagesInfoManager();
@@ -45,6 +48,4 @@ class ImagesInfoManager final : public SingletonManager<ImagesInfoManager, IMG_I
   void InitializeImpl(const QString& path, const QString& blackPath="");
 };
 
-// only used in decide by MD5
-DuplicateImageMetaInfo::RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty = true);
 #endif  // IMAGESINFOMANAGER_H

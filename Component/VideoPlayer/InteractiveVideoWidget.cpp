@@ -6,7 +6,8 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "Logger.h"
-#include "MemoryKey.h"
+#include "VideoPlayerKey.h"
+#include "PathKey.h"
 #include "Configuration.h"
 #include "ToolBarWidget.h"
 #include <QMouseEvent>
@@ -65,7 +66,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
                                {mPlaybackMode_Loop, QMediaPlaylist::PlaybackMode::Loop},
                                {mPlaybackMode_Random, QMediaPlaylist::PlaybackMode::Random}},
                               DEFAULT_PLAYBACK_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  const int playbackModeInt = Configuration().value(VideoPlayerKey::PLAYBACK_MODE.name, VideoPlayerKey::PLAYBACK_MODE.toVariant()).toInt();
+  const int playbackModeInt = getConfig(VideoPlayerKey::PLAYBACK_MODE).toInt();
   const QMediaPlaylist::PlaybackMode initPlaybackMode = mPlaybackModeIntAction.intVal2Enum(playbackModeInt);
   mPlaybackModeIntAction.setCheckedIfActionExist(initPlaybackMode);
 
@@ -75,8 +76,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
                                     {mPlaybackTrigger_AUTO, PlaybackTriggerMode::AUTO},      //
                                     {mPlaybackTrigger_DISABLED, PlaybackTriggerMode::DISABLED}},
                                    DEFAULT_PLAYBACK_TRIGGER_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-    const int playbackTriggerModeInt =
-        Configuration().value(VideoPlayerKey::PLAYBACK_TRIGGER_MODE.name, VideoPlayerKey::PLAYBACK_TRIGGER_MODE.toVariant()).toInt();
+    const int playbackTriggerModeInt = getConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE).toInt();
     const PlaybackTriggerMode initPlaybackTriggerMode = mPlaybackTriggerIntAction.intVal2Enum(playbackTriggerModeInt);
     mPlaybackTriggerIntAction.setCheckedIfActionExist(initPlaybackTriggerMode);
   }
@@ -93,7 +93,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mSelectVideoFolder = new (std::nothrow) QAction{QIcon{":/VideoPlayer/OPEN_A_FOLDER"}, tr("select a folder"), this};
   mDisableAutoHideToolBar = new (std::nothrow) QAction{QIcon{":/VideoPlayer/DISABLE_AUTO_HIDE"}, tr("disable auto hide"), this};
   mDisableAutoHideToolBar->setCheckable(true);
-  const bool isAutoHideDisabled = Configuration().value(VideoPlayerKey::AUTO_HIDE_TOOLBAR.name, VideoPlayerKey::AUTO_HIDE_TOOLBAR.toVariant()).toBool();
+  const bool isAutoHideDisabled = getConfig(VideoPlayerKey::AUTO_HIDE_TOOLBAR).toBool();
   mDisableAutoHideToolBar->setChecked(isAutoHideDisabled);
 
   mPlaybackModeMenu = new QMenu{tr("Playerback mode"), this};
@@ -156,7 +156,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
 }
 
 InteractiveVideoWidget::~InteractiveVideoWidget() {
-  Configuration().setValue(VideoPlayerKey::AUTO_HIDE_TOOLBAR.name, isAutoHideToolBarDisabled());
+  setConfig(VideoPlayerKey::AUTO_HIDE_TOOLBAR, isAutoHideToolBarDisabled());
 }
 
 MenuToolButton* InteractiveVideoWidget::GetPlaybackModelMenuToolButton(QWidget* notNullParent) const {
@@ -233,8 +233,7 @@ void InteractiveVideoWidget::onQuitFullScreenMode() {
 }
 
 bool InteractiveVideoWidget::onSelectAFile() {
-  QString defaultOpenPathLocatedIn =
-      Configuration().value(PathKey::VIDEO_PLAYER_OPEN_PATH.name, PathKey::VIDEO_PLAYER_OPEN_PATH.toVariant()).toString();
+  QString defaultOpenPathLocatedIn = getConfig(PathKey::VIDEO_PLAYER_OPEN_PATH).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
     defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
   }
@@ -245,14 +244,13 @@ bool InteractiveVideoWidget::onSelectAFile() {
   if (fileSelected.isEmpty()) {
     return false;
   }
-  Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, PathTool::absolutePath(fileSelected));
+  setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, PathTool::absolutePath(fileSelected));
   emit newFileSelectedByUser(fileSelected, true);
   return true;
 }
 
 bool InteractiveVideoWidget::onSelectAFolder() {
-  QString defaultOpenPathLocatedIn =
-      Configuration().value(PathKey::VIDEO_PLAYER_OPEN_PATH.name, PathKey::VIDEO_PLAYER_OPEN_PATH.toVariant()).toString();
+  QString defaultOpenPathLocatedIn = getConfig(PathKey::VIDEO_PLAYER_OPEN_PATH).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
     defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
   }
@@ -262,7 +260,7 @@ bool InteractiveVideoWidget::onSelectAFolder() {
   if (dirSelected.isEmpty()) {
     return false;
   }
-  Configuration().setValue(PathKey::VIDEO_PLAYER_OPEN_PATH.name, dirSelected);
+  setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, dirSelected);
   emit newFolderSelectedChangedByUser(dirSelected, true);
   return true;
 }

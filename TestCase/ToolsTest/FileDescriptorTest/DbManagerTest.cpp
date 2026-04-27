@@ -105,7 +105,7 @@ private slots:
     const QString testTable = "RANDOM_TEST_TABLE";
     const QString definition = R"(CREATE TABLE `%1` (id INTEGER PRIMARY KEY, data TEXT))";
     QVERIFY(mDBMgr.CreateTable(testTable, definition));
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QCOMPARE(mDBMgr.DropTable(testTable), 1);
     };
 
@@ -273,7 +273,7 @@ private slots:
   void test_RmvTableWithRegex() {
     QCOMPARE(mDBMgr.IsTableExist(DB_MANAGER_TEST_TBL_NAME), true);
     QCOMPARE(mDBMgr.DropTable(DB_MANAGER_TEST_TBL_NAME), true);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       QCOMPARE(CreateATableForTest(), true);
     };
 

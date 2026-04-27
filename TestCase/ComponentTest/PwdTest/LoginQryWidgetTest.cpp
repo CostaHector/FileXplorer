@@ -1,12 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 
 #include "BeginToExposePrivateMember.h"
 #include "LoginQryWidget.h"
 #include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Configuration.h"
+
 #include <openssl/err.h>
 #include <openssl/evp.h>
 

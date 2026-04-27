@@ -1,11 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "ImgVidOthInFolderPreviewer.h"
 #include "EndToExposePrivateMember.h"
+
+#include "BrowserKey.h"
+#include "Configuration.h"
 
 class ImgVidOthInFolderPreviewerTest : public PlainTestSuite {
   Q_OBJECT
@@ -41,10 +42,10 @@ class ImgVidOthInFolderPreviewerTest : public PlainTestSuite {
   }
 
   void all_action_unchecked() {
-    Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, false);
-    Configuration().setValue(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, false);
-    Configuration().setValue(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, false);
-    Configuration().setValue(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, "210");
+    setConfig(BrowserKey::FLOATING_IMAGE_VIEW_SHOW, false);
+    setConfig(BrowserKey::FLOATING_VIDEO_VIEW_SHOW, false);
+    setConfig(BrowserKey::FLOATING_OTHER_VIEW_SHOW, false);
+    setConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ, "210");
     ImgVidOthInFolderPreviewer ivoWid{"ImgVidOthInFolderPreviewer"};
     QCOMPARE(ivoWid._IMG_ACT->isChecked(), false);
     QCOMPARE(ivoWid._VID_ACT->isChecked(), false);

@@ -8,6 +8,7 @@ class VerMenuInHeader;
 class DoubleRowHeader;
 class ScrollBarPolicyMenu;
 class TextElideModeMenu;
+class QSortFilterProxyModel;
 
 class CustomTableView : public QTableView {
   Q_OBJECT
@@ -35,6 +36,9 @@ class CustomTableView : public QTableView {
   bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
 
+  void registerProxyModel(QSortFilterProxyModel* proxyModelInDerived);
+  QModelIndexList selectedRowsSource() const;
+
  private:
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
@@ -61,6 +65,8 @@ class CustomTableView : public QTableView {
   VerMenuInHeader* m_verHeader{nullptr};
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};
+
+  QSortFilterProxyModel* _proxyModel{nullptr};
 
   inline bool isNameExists(const QString& name) const { return mTableInstSet.contains(name); }
   static QSet<QString> mTableInstSet;

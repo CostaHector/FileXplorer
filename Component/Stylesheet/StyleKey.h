@@ -25,8 +25,8 @@ constexpr KV BACKGROUND_OVERLAY_OPACITY{
 bool onStylePresetChanged(const QVariant& newStylePreset);
 bool onStyleThemeChanged(const QVariant& newStyleTheme);
 
-constexpr KV STYLE_PRESET{"StyleKey/STYLE_PRESET", Var{(int)Style::DEFAULT_STYLE_PRESET}, GeneralDataType::Type::PLAIN_INT, StylePresetEChecker, onStylePresetChanged, ":/styles/STYLE_PRESET", STYLE_PRESET_TOOLTIP};
-constexpr KV STYLE_THEME{"StyleKey/STYLE_THEME", Var{(int)Style::DEFAULT_STYLE_THEME}, GeneralDataType::Type::PLAIN_INT, StyleThemeEChecker, onStyleThemeChanged, ":/styles/STYLE_THEME", STYLE_THEME_TOOLTIP};
+constexpr KV STYLE_PRESET{"StyleKey/STYLE_PRESET", Var{(int)Style::DEFAULT_STYLE_PRESET}, GeneralDataType::Type::RANGE_INT_STYLE_PRESET, StylePresetEChecker, onStylePresetChanged, ":/styles/STYLE_PRESET", STYLE_PRESET_TOOLTIP};
+constexpr KV STYLE_THEME{"StyleKey/STYLE_THEME", Var{(int)Style::DEFAULT_STYLE_THEME}, GeneralDataType::Type::RANGE_INT_STYLE_THEME, StyleThemeEChecker, onStyleThemeChanged, ":/styles/STYLE_THEME", STYLE_THEME_TOOLTIP};
 
 struct Notifier : public QObject {
   Q_OBJECT

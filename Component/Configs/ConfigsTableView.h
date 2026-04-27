@@ -2,30 +2,30 @@
 #define CONFIGSTABLEVIEW_H
 
 #include "CustomTableView.h"
-#include "ConfigsModel.h"
 #include "StyleSheetEditDelegate.h"
+#include <QSortFilterProxyModel>
+
+class ConfigsModel;
 
 class ConfigsTableView : public CustomTableView {
+  Q_OBJECT
 public:
   explicit ConfigsTableView(const QString& instName, QWidget* parent = nullptr);
+  int GetFailedCnt() const;
+  void setFilter(const QString& filter);
 
-  const QAbstractTableModel* GetModel() const { return m_alertModel; }
-  QAbstractTableModel* GetModel() { return m_alertModel; }
-
-  std::pair<int, int> GetStatistics() const {
-    const int failsCnt{m_alertModel->failCount()};
-    const int totalCnt{m_alertModel->rowCount()};
-    return {failsCnt, totalCnt};
-  }
+signals:
+  void modelCfgFailedCountChanged(int newFailedCnt);
 
 protected:
   void initExclusivePreferenceSetting() override;
 
 private:
   void subscribe();
-  bool on_cellDoubleClicked(const QModelIndex& clickedIndex) const;
+  bool on_cellDoubleClicked(const QModelIndex& proxyIndex) const;
 
-  ConfigsModel* m_alertModel{nullptr};
+  ConfigsModel* m_cfgModel{nullptr};
+  QSortFilterProxyModel* mSortFilterProxy{nullptr};
   StyleSheetEditDelegate* mStyleSheetEditDelegate{nullptr};
 };
 

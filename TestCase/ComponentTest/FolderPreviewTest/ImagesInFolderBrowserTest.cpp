@@ -1,19 +1,16 @@
 #include <QtTest/QtTest>
-
-#include <QSignalSpy>
-
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-#include "TDir.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
-#include "Logger.h"
-#include "ArchiveFiles.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "ImagesInFolderBrowser.h"
 #include "ImagesInFolderSlider.h"
 #include "ImgVidOthInFolderPreviewer.h"
 #include "EndToExposePrivateMember.h"
+
+#include "TDir.h"
+#include "BrowserKey.h"
+#include "Configuration.h"
+#include "ArchiveFiles.h"
 #include "DraggableToolButton.h"
 #include "StyleSheet.h"
 #include "ImageTestPrecoditionTools.h"
@@ -315,10 +312,10 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
   void default_order_imgVidOthInFolderPreviewer_ok() {
     // precondition:
     Configuration().clear();
-    Configuration().setValue(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, "012");
-    Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, true);
-    Configuration().setValue(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, true);
-    Configuration().setValue(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, true);
+    setConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ, "012");
+    setConfig(BrowserKey::FLOATING_IMAGE_VIEW_SHOW, true);
+    setConfig(BrowserKey::FLOATING_VIDEO_VIEW_SHOW, true);
+    setConfig(BrowserKey::FLOATING_OTHER_VIEW_SHOW, true);
 
     // in default order
     ImgVidOthInFolderPreviewer previewer("defaultOrder_imgVidOthInFolderPreview");
@@ -350,7 +347,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     previewer.onImgVidOthActTriggered(previewer._OTH_ACT);
 
     // before 012
-    QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "012");
+    QCOMPARE(getConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ).toString(), "012");
     QCOMPARE(previewer.widget(0), previewer.mImgTv);
     QCOMPARE(previewer.widget(1), previewer.mVidTv);
     QCOMPARE(previewer.widget(2), previewer.mOthTv);
@@ -359,7 +356,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     // reorder, after 120
     QVERIFY(MoveWidgetAtFromIndexInFrontOfDestIndex(0, 3, *previewer.mTypeToDisplayTB));
     emit previewer.mTypeToDisplayTB->widgetMoved(0, 3);
-    QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "120");
+    QCOMPARE(getConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ).toString(), "120");
     QCOMPARE(previewer.widget(0), previewer.mVidTv);
     QCOMPARE(previewer.widget(1), previewer.mOthTv);
     QCOMPARE(previewer.widget(2), previewer.mImgTv);
@@ -368,7 +365,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     // reorder, after 012
     QVERIFY(MoveWidgetAtFromIndexInFrontOfDestIndex(2, 0, *previewer.mTypeToDisplayTB));
     emit previewer.mTypeToDisplayTB->widgetMoved(2, 0);
-    QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "012");
+    QCOMPARE(getConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ).toString(), "012");
     QCOMPARE(previewer.widget(0), previewer.mImgTv);
     QCOMPARE(previewer.widget(1), previewer.mVidTv);
     QCOMPARE(previewer.widget(2), previewer.mOthTv);
@@ -378,10 +375,10 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
   void specified_order_imgVidOthInFolderPreviewer_ok() {
     // precondition:
     Configuration().clear();
-    Configuration().setValue(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name, "210");
-    Configuration().setValue(BrowserKey::FLOATING_IMAGE_VIEW_SHOW.name, true);
-    Configuration().setValue(BrowserKey::FLOATING_VIDEO_VIEW_SHOW.name, true);
-    Configuration().setValue(BrowserKey::FLOATING_OTHER_VIEW_SHOW.name, false);
+    setConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ, "210");
+    setConfig(BrowserKey::FLOATING_IMAGE_VIEW_SHOW, true);
+    setConfig(BrowserKey::FLOATING_VIDEO_VIEW_SHOW, true);
+    setConfig(BrowserKey::FLOATING_OTHER_VIEW_SHOW, false);
 
     // in default order
     ImgVidOthInFolderPreviewer previewer("specifiedOrder_imgVidOthInFolderPreview");
@@ -407,7 +404,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     QCOMPARE(previewer.mOthTv->isHidden(), true);  // should hide
 
     // before 210
-    QCOMPARE(Configuration().value(BrowserKey::FLOATING_MEDIA_TYPE_SEQ.name).toString(), "210");
+    QCOMPARE(getConfig(BrowserKey::FLOATING_MEDIA_TYPE_SEQ).toString(), "210");
     QCOMPARE(previewer.widget(0), previewer.mOthTv);
     QCOMPARE(previewer.widget(1), previewer.mVidTv);
     QCOMPARE(previewer.widget(2), previewer.mImgTv);

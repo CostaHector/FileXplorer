@@ -32,6 +32,8 @@ file(GLOB SOURCES
     View/*.cpp
     Component/*.cpp
     Component/Configs/*.cpp
+    Component/DupImages/*.cpp
+    Component/DupVideos/*.cpp
     Component/FolderPreview/*.cpp
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
@@ -50,7 +52,6 @@ file(GLOB SOURCES
     Tools/Json/*.cpp
     Tools/PasswordTable/*.cpp
     View/*.cpp
-    View/DupVideos/*.cpp
     main.cpp
 )
 list(LENGTH SOURCES src_cpp_count)
@@ -68,6 +69,8 @@ set(SRV_HEADER_PATH
     Component
     Component/Configs
     Component/FolderPreview
+    Component/DupImages
+    Component/DupVideos
     Component/HeaderView
     Component/LineEdit
     Component/Navigation
@@ -86,7 +89,6 @@ set(SRV_HEADER_PATH
     Tools/Json
     Tools/PasswordTable
     View
-    View/DupVideos
     ./
 )
 
@@ -97,6 +99,8 @@ file(GLOB HEADERS
     View/*.h
     Component/*.h
     Component/Configs/*.h
+    Component/DupImages/*.h
+    Component/DupVideos/*.h
     Component/FolderPreview/*.h
     Component/HeaderView/*.h
     Component/LineEdit/*.h
@@ -116,7 +120,6 @@ file(GLOB HEADERS
     Tools/Json/*.h
     Tools/PasswordTable/*.h
     View/*.h
-    View/DupVideos/*.h
 )
 
 list(LENGTH HEADERS header_cpp_count)

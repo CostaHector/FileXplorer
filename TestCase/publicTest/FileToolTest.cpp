@@ -1,12 +1,13 @@
+#include <QtTest/QtTest>
 #include <QCoreApplication>
-#include <QtTest>
 #include "PlainTestSuite.h"
+
 #include "FileTool.h"
+
+#include "PathKey.h"
+#include "Configuration.h"
 #include "TDir.h"
 #include "PublicVariable.h"
-#include "OnScopeExit.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 
 #include <QFileDialog>
 #include <QPushButton>
@@ -125,7 +126,7 @@ class FileToolTest : public PlainTestSuite {
     const QString fileParentParentFolder{QFileInfo(fileParentFolder).absolutePath()};
     QCOMPARE(QFileInfo{fileParentParentFolder}.isDir(), true);
 
-    Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    setConfig(PathKey::LAST_TIME_COPY_TO, fileParentParentFolder);
 
     MOCKER(QFileDialog::getExistingDirectory)//
         .expects(exactly(2))//
@@ -134,12 +135,12 @@ class FileToolTest : public PlainTestSuite {
 
     // user specified
     QCOMPARE(ChooseCopyDestination(fileParentFolder, nullptr), fileParentFolder);
-    QCOMPARE(Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString(), fileParentFolder);
+    QCOMPARE(getConfig(PathKey::LAST_TIME_COPY_TO).toString(), fileParentFolder);
 
     // from Configs file
-    Configuration().setValue(PathKey::LAST_TIME_COPY_TO.name, fileParentParentFolder);
+    setConfig(PathKey::LAST_TIME_COPY_TO, fileParentParentFolder);
     QCOMPARE(ChooseCopyDestination("", nullptr), fileParentParentFolder);
-    QCOMPARE(Configuration().value(PathKey::LAST_TIME_COPY_TO.name).toString(), fileParentParentFolder);
+    QCOMPARE(getConfig(PathKey::LAST_TIME_COPY_TO).toString(), fileParentParentFolder);
   }
 
   void load_and_remove_language_pack_ok() {

@@ -7,7 +7,6 @@
 #include "CustomTableView.h"
 #include "CustomListView.h"
 #include "StyleSheetGetter.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 
 #include <QMainWindow>

@@ -53,7 +53,7 @@ class SimpleAESTest : public PlainTestSuite {
 
     // 修改密钥为错误值
     mAes.setKey("WrongSecretKey123");
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       mAes.setKey(CORRECT_AES_KEY);
     };
 

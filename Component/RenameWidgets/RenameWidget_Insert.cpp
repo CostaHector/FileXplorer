@@ -1,6 +1,5 @@
 ﻿#include "RenameWidget_Insert.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
+#include "RenamerKey.h"
 #include "PublicMacro.h"
 #include "RenameHelper.h"
 

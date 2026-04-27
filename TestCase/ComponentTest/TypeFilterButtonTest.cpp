@@ -1,11 +1,11 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
 #include <QSignalSpy>
 
 #include "Logger.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "TypeFilterButton.h"
@@ -20,7 +20,6 @@ Q_DECLARE_METATYPE(QDirIterator::IteratorFlag)
 class TypeFilterButtonTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TypeFilterButtonTest() : PlainTestSuite{} { LOG_D("TypeFilterButtonTest object created\n"); }
 
   bool isInitialStateMatchConfigurationFile(const ModelFilterActions& filterHelper) {
     const QString dirFilterKey = filterHelper.GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name);

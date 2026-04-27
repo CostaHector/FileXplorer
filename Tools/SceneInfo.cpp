@@ -1,7 +1,7 @@
 #include "SceneInfo.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
-#include "MemoryKey.h"
+#include "SceneKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include <QFileInfo>
@@ -145,7 +145,7 @@ bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, 
 }
 
 SceneInfo::Role SceneInfo::GetInitialSortRole() {
-  const int role{Configuration().value(SceneKey::SORT_BY_ROLE.name, SceneKey::SORT_BY_ROLE.toVariant()).toInt()};
+  const int role{getConfig(SceneKey::SORT_BY_ROLE).toInt()};
   if (role < DEF_BEGIN_ROLE || role > INVALID_BUTT_ROLE) {
     return DEF_BEGIN_ROLE;
   }
@@ -153,23 +153,23 @@ SceneInfo::Role SceneInfo::GetInitialSortRole() {
 }
 
 void SceneInfo::SaveInitialSortRole(Role sortRole) {
-  Configuration().setValue(SceneKey::SORT_BY_ROLE.name, (int)sortRole);
+  setConfig(SceneKey::SORT_BY_ROLE, (int)sortRole);
 }
 
 bool SceneInfo::GetInitialSortOrderReverse() {
-  return Configuration().value(SceneKey::SORT_ORDER_REVERSE.name, SceneKey::SORT_ORDER_REVERSE.toVariant()).toBool();
+  return getConfig(SceneKey::SORT_ORDER_REVERSE).toBool();
 }
 
 void SceneInfo::SaveSortOrderReverse(bool bReverse) {
-  Configuration().setValue(SceneKey::SORT_ORDER_REVERSE.name, bReverse);
+  setConfig(SceneKey::SORT_ORDER_REVERSE, bReverse);
 }
 
 bool SceneInfo::GetInitialDisableImageDecoration() {
-  return Configuration().value(SceneKey::DISABLE_IMAGE_DECORATION.name, SceneKey::DISABLE_IMAGE_DECORATION.toVariant()).toBool();
+  return getConfig(SceneKey::DISABLE_IMAGE_DECORATION).toBool();
 }
 
 void SceneInfo::SaveDisableImageDecoration(bool bDisable) {
-  Configuration().setValue(SceneKey::DISABLE_IMAGE_DECORATION.name, bDisable);
+  setConfig(SceneKey::DISABLE_IMAGE_DECORATION, bDisable);
 }
 
 namespace SceneHelper {

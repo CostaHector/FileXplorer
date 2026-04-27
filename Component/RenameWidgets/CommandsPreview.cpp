@@ -1,9 +1,10 @@
 #include "CommandsPreview.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
 #include "StyleSheet.h"
+#include "SizeTool.h"
+#include "Configuration.h"
 
 #include <QResizeEvent>
 

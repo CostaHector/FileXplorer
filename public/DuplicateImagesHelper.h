@@ -8,19 +8,21 @@
   DUP_IMAGE_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \
   DUP_IMAGE_META_INFO_KEY_ITEM(Size, 1, qint64, DataFormatter::formatFileSizeGMKB) \
   DUP_IMAGE_META_INFO_KEY_ITEM(MD5, 2, QByteArray, DataFormatter::formatDefault) \
-  DUP_IMAGE_META_INFO_KEY_ITEM(AbsPath, 3, QString, DataFormatter::formatDefault)
+  DUP_IMAGE_META_INFO_KEY_ITEM(RelPath, 3, QString, DataFormatter::formatDefault)
 
 namespace DuplicateImageMetaInfo {
 enum DIColumnE {
 #define DUP_IMAGE_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) enu = enumVal,
   DUP_IMAGE_META_INFO_KEY_MAPPING
 #undef DUP_IMAGE_META_INFO_KEY_ITEM
+  DUP_IMG_PREVIEW,
 };
 
 constexpr const char* DI_TABLE_HEADERS[]{
 #define DUP_IMAGE_META_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) #enu,
     DUP_IMAGE_META_INFO_KEY_MAPPING
 #undef DUP_IMAGE_META_INFO_KEY_ITEM
+    "Preview",
 };
 constexpr int DI_TABLE_HEADERS_COUNT = sizeof(DI_TABLE_HEADERS) / sizeof(DI_TABLE_HEADERS[0]);
 
@@ -29,7 +31,10 @@ struct REDUNDANT_IMG_INFO {
   DUP_IMAGE_META_INFO_KEY_MAPPING
 #undef DUP_IMAGE_META_INFO_KEY_ITEM
   bool operator==(const REDUNDANT_IMG_INFO& rhs) const {
-    return m_Name == rhs.m_Name && m_Size == rhs.m_Size && m_AbsPath == rhs.m_AbsPath;
+    return m_Name == rhs.m_Name && m_Size == rhs.m_Size && m_RelPath == rhs.m_RelPath;
+  }
+  bool operator<(const REDUNDANT_IMG_INFO& rhs) const {
+    return m_RelPath < rhs.m_RelPath || (m_RelPath == rhs.m_RelPath && m_Name < rhs.m_Name);
   }
 };
 
@@ -51,6 +56,10 @@ enum class DICriteriaE {
       END_INVALID,
 };
 static constexpr DICriteriaE DEFAULT_DI_CRITERIA_E = DICriteriaE::LIBRARY;
+
+inline bool isDICriteriaEValid(DICriteriaE findBy) {
+  return (int)DICriteriaE::BEGIN <= (int)findBy && (int)findBy < (int)DICriteriaE::END_INVALID;
+}
 
 inline const char* c_str(DICriteriaE diCriteriaE) {
   if (diCriteriaE < DICriteriaE::BEGIN || diCriteriaE >= DICriteriaE::END_INVALID) {

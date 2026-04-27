@@ -3,7 +3,7 @@
 #include "RateHelper.h"
 #include "MenuToolButton.h"
 #include "NotificatorMacro.h"
-#include "MemoryKey.h"
+#include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include "InputDialogHelper.h"
 
@@ -116,7 +116,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
   message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";
 
-  const int defaultRate = Configuration().value(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.toVariant()).toInt();
+  const int defaultRate = getConfig(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE).toInt();
 
   bool bAccept{false};
   int newRate{defaultRate};
@@ -126,7 +126,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
     return 0;
   }
   if (newRate != defaultRate) {
-    Configuration().setValue(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE.name, newRate);
+    setConfig(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE, newRate);
   }
   const int succeedCnt = RateHelper::RateMovieRecursively(rootPath, newRate, bOverrideForce);
   LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);

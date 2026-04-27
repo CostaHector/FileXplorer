@@ -1,6 +1,6 @@
 #include "ThumbnailImageViewer.h"
 #include "ImageTool.h"
-#include "MemoryKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
 #include "PathTool.h"
 #include "FileTool.h"

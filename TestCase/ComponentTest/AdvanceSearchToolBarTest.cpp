@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 
 #include "PlainTestSuite.h"
-#include "MemoryKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchToolBar.h"
@@ -19,7 +19,7 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
     Configuration().clear();
     QWidget* parent = new (std::nothrow) QWidget;
     QVERIFY(parent != nullptr);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       delete parent;
       parent = nullptr;
     };
@@ -31,8 +31,8 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
 
   void test_initial_State() {
     // precondition
-    Configuration().setValue(SearchKey::ADVANCE_LINEEDIT_VALUE.name, "Name: hello word");
-    Configuration().setValue(SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE.name, "Contents: henry");
+    setConfig(SearchKey::ADVANCE_LINEEDIT_VALUE, "Name: hello word");
+    setConfig(SearchKey::ADVANCE_CONTENTS_LINEEDIT_VALUE, "Contents: henry");
 
     ModelFilterActions& inst = ModelFilterActions::GetInst(ModelFilterE::ADVANCE_SEARCH);
     inst.clearAllDirFilterFlags();
@@ -40,9 +40,9 @@ class AdvanceSearchToolBarTest : public PlainTestSuite {
     inst.GRAY_ENTRIES_DONT_PASS_FILTER->setChecked(true);
     inst.INCLUDING_SUBDIRECTORIES->setChecked(true);
 
-    Configuration().setValue(SearchKey::ADVANCE_MODE.name, (int)SearchTools::SearchModeE::FILE_CONTENTS);
-    Configuration().setValue(SearchKey::NAME_CASE_SENSITIVE.name, true);
-    Configuration().setValue(SearchKey::CONTENTS_CASE_SENSITIVE.name, true);
+    setConfig(SearchKey::ADVANCE_MODE, (int)SearchTools::SearchModeE::FILE_CONTENTS);
+    setConfig(SearchKey::NAME_CASE_SENSITIVE, true);
+    setConfig(SearchKey::CONTENTS_CASE_SENSITIVE, true);
 
     QWidget parent;
     AdvanceSearchToolBar advanceSearchToolbar{"advance search toolbar", &parent};

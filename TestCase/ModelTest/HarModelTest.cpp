@@ -1,18 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "HarFiles.h"
 #include "HarModel.h"
 #include "EndToExposePrivateMember.h"
+
 #include "TDir.h"
-#include <QDir>
+
 #include <QDirIterator>
 
 class HarModelTest : public PlainTestSuite {

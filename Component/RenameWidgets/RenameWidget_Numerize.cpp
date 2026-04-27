@@ -1,5 +1,5 @@
 ﻿#include "RenameWidget_Numerize.h"
-#include "MemoryKey.h"
+#include "RenamerKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
@@ -33,7 +33,7 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
                                             "✔ Enabled: Files with the same base name share a counter (e.g., 'A 1.jpeg', 'A 1.jpg').\n"
                                             "✖ Disabled: Each extension gets an independent counter (e.g., 'A 1.jpeg', 'A 2.jpg').\n"
                                             "Use case: Preserve version links for multi-format files (e.g., JPEG/WEBP variants).");
-  const bool uniqueCnter{Configuration().value(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.toVariant()).toBool()};
+  const bool uniqueCnter{getConfig(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER).toBool()};
   m_isUniqueCounterPerExtension->setChecked(uniqueCnter);
 
   m_numberPattern = new (std::nothrow) QComboBox{this}; // " - %1"
@@ -46,7 +46,7 @@ void RenameWidget_Numerize::InitExtraMemberWidget() {
     return;
   }
 
-  int noFormatDefaultIndex = Configuration().value(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.toVariant()).toInt();
+  int noFormatDefaultIndex = getConfig(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX).toInt();
   if (noFormatDefaultIndex < 0 || noFormatDefaultIndex >= noFormatCandidate.size()) {
     LOG_W("number pattern[%d] out of bound[%d, %d) fallback to 0", noFormatDefaultIndex, 0, noFormatCandidate.size());
     noFormatDefaultIndex = 0;
@@ -96,13 +96,13 @@ void RenameWidget_Numerize::extraSubscribe() {
   });
 
   connect(m_isUniqueCounterPerExtension, &QCheckBox::stateChanged, this, [this](int checked) -> void {
-    Configuration().setValue(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER.name, checked == Qt::Checked);
+    setConfig(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER, checked == Qt::Checked);
     OnlyTriggerRenameCore();
   });
 
   connect(m_numberPattern, &QComboBox::currentTextChanged, this, [this]() -> void {
     int defaultFormateInd = m_numberPattern->currentIndex();
-    Configuration().setValue(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX.name, defaultFormateInd);
+    setConfig(RenamerKey::NUMERIAZER_NO_FORMAT_DEFAULT_INDEX, defaultFormateInd);
     OnlyTriggerRenameCore();
   });
 

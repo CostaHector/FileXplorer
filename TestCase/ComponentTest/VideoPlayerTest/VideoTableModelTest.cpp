@@ -1,16 +1,14 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "VideoTableModel.h"
 #include "VideoTableView.h"
 #include "EndToExposePrivateMember.h"
 
 #include "TDir.h"
+
+#include <QSignalSpy>
 
 class VideoTableModelTest : public PlainTestSuite {
   Q_OBJECT

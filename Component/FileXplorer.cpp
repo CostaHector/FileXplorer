@@ -3,8 +3,12 @@
 #include "ViewSwitchHelper.h"
 #include "ViewTypeTool.h"
 #include "ViewActions.h"
-#include "MemoryKey.h"
+
+#include "PathKey.h"
+#include "CompoVisKey.h"
+#include "SizeTool.h"
 #include "Configuration.h"
+
 #include "StyleSheet.h"
 #include <QFileInfo>
 
@@ -65,7 +69,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
 void FileXplorer::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   Configuration().setValue("FileXplorer/Geometry", saveGeometry());
-  Configuration().setValue(PathKey::STARTUP_PATH.name, m_fsPanel->m_fsModel->rootPath());
+  setConfig(PathKey::STARTUP_PATH, m_fsPanel->m_fsModel->rootPath());
   m_previewFolder->saveSizeHint();
   QMainWindow::closeEvent(event);
 }
@@ -88,7 +92,7 @@ QString FileXplorer::GetInitialPathFromArgs(const QStringList& args) {
 #endif
   // when not specified or specied path is invalid, use last time path in preference setting
   if (!bIsSpecifiedPath || (!path.isEmpty() && !QFile::exists(path))) {
-    QString lastTimePath = Configuration().value(PathKey::STARTUP_PATH.name, PathKey::STARTUP_PATH.toVariant()).toString();
+    QString lastTimePath = getConfig(PathKey::STARTUP_PATH).toString();
     LOG_D("path[%s] not exists. use last time path[%s]", qPrintable(path), qPrintable(lastTimePath));
     path.swap(lastTimePath);
   }
@@ -113,12 +117,12 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 }
 
 void FileXplorer::InitComponentVisibility() {
-  const bool showNavi{Configuration().value(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, CompoVisKey::SHOW_NAVIGATION_SIDEBAR.toVariant()).toBool()};
+  const bool showNavi{getConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR).toBool()};
   if (!showNavi) {
     m_naviSideBarDock->setHidden(true);
   }
 
-  const bool showFolderPreview = Configuration().value(CompoVisKey::SHOW_PREVIEW_DOCKER.name, CompoVisKey::SHOW_PREVIEW_DOCKER.toVariant()).toBool();
+  const bool showFolderPreview = getConfig(CompoVisKey::SHOW_PREVIEW_DOCKER).toBool();
   if (!showFolderPreview) {
     m_previewHtmlDock->setHidden(true);
   }

@@ -1,13 +1,12 @@
 #include <QtTest/QtTest>
-
-
 #include "PlainTestSuite.h"
-#include "Logger.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "ClickableTextBrowser.h"
 #include "EndToExposePrivateMember.h"
+
 #include "ImageTool.h"
-#include "MemoryKey.h"
+#include "BrowserKey.h"
 #include "Configuration.h"
 #include "ClipboardGuard.h"
 #include "SqlRecordTestHelper.h"
@@ -362,8 +361,8 @@ class ClickableTextBrowserTest : public PlainTestSuite {
 
   void hideOrShowRelatedVideosImages_ok() {
     Configuration().clear();
-    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS.name, true);
-    Configuration().setValue(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES.name, true);
+    setConfig(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS, true);
+    setConfig(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES, true);
 
     const CastHtmlParts parts{"body", {"vidTitle%1", "vidListStr"}, {"imgTitle%1", "imgListStr"}};
 

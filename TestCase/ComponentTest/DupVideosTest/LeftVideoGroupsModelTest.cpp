@@ -1,11 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "LeftVideoGroupsModel.h"
 #include "EndToExposePrivateMember.h"
+
+#include "VideoPlayerKey.h"
+#include "Configuration.h"
 
 class LeftVideoGroupsModelTest : public PlainTestSuite {
   Q_OBJECT
@@ -13,8 +14,8 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
  private slots:
   void default_construct_ok() {
     // with configs
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1 * 1000);  // 1 s
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 1 * 1024);  // 1 kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION, 1 * 1000);  // 1 s
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 1 * 1024);  // 1 kB
     {
       LeftVideoGroupsModel model;
       QCOMPARE(model.rowCount(), 0);
@@ -84,7 +85,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   }
 
   void deviationDurationChange_only_ok() {
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION.name, 1050);  // 1050ms
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_DURATION, 1050);  // 1050ms
 
     LeftVideoGroupsModel model;
     QCOMPARE(model.setDifferType(DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION), 0);
@@ -111,7 +112,7 @@ class LeftVideoGroupsModelTest : public PlainTestSuite {
   }
 
   void dataUpdate_increase_decrease_row_count_ok() {
-    Configuration().setValue(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE.name, 2048);  // 2 kB
+    setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2 kB
 
     LeftVideoGroupsModel model;
     QCOMPARE(model.rowCount(), 0);

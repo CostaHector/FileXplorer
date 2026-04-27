@@ -1,13 +1,13 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include <QSignalSpy>
 
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FavoritesTreeView.h"
 #include "NavigationFavorites.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Configuration.h"
+#include <QSignalSpy>
 #include <QInputDialog>
 
 #include <mockcpp/mokc.h>

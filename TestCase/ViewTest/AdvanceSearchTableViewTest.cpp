@@ -1,19 +1,15 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
-#include <QSignalSpy>
-
-#include "TDir.h"
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "AdvanceSearchTableView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "TDir.h"
 #include "FileOpActs.h"
 #include "MimeDataHelper.h"
-#include <QDir>
+
+#include <QSignalSpy>
 
 class AdvanceSearchTableViewTest : public PlainTestSuite {
   Q_OBJECT

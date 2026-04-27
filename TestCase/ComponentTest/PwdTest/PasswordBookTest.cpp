@@ -1,14 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "PasswordBook.h"
 #include "SimpleAES.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"

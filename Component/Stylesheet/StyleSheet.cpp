@@ -1,8 +1,6 @@
 ﻿#include "StyleSheet.h"
 #include "PreferenceActions.h"
 #include "PublicMacro.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "StyleEnum.h"
 #include <QApplication>
 #include <QWidget>

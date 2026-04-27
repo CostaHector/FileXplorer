@@ -1,5 +1,5 @@
 #include "LogActions.h"
-#include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "MenuToolButton.h"
 #include "PublicMacro.h"

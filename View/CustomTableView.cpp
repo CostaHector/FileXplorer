@@ -4,7 +4,6 @@
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
@@ -14,6 +13,7 @@
 
 #include <QPainter>
 #include <QContextMenuEvent>
+#include <QSortFilterProxyModel>
 
 extern template struct RowHeightRegistry<CustomTableView>;
 
@@ -262,4 +262,23 @@ void CustomTableView::paintEvent(QPaintEvent* event) {
     }
   }
   QTableView::paintEvent(event);
+}
+
+void CustomTableView::registerProxyModel(QSortFilterProxyModel* proxyModelInDerived) {
+  CHECK_NULLPTR_RETURN_VOID(proxyModelInDerived);
+  _proxyModel = proxyModelInDerived;
+}
+
+QModelIndexList CustomTableView::selectedRowsSource() const {
+  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
+  if (_proxyModel == nullptr) {
+    return proxyIndexes;
+  }
+
+  QModelIndexList srcIndexes;
+  srcIndexes.reserve(proxyIndexes.size());
+  for (const QModelIndex& proxyIndex : proxyIndexes) {
+    srcIndexes.push_back(_proxyModel->mapToSource(proxyIndex));
+  }
+  return srcIndexes;
 }

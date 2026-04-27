@@ -1,16 +1,16 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "FdBasedDb.h"
 #include "CastDBView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "TDir.h"
+#include "PathKey.h"
+#include "Configuration.h"
 #include "PublicVariable.h"
 #include "TableFields.h"
-#include "TDir.h"
 
 #include <QSignalSpy>
 #include <QSqlRecord>
@@ -27,12 +27,14 @@ class CastDBViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() { qRegisterMetaType<QSqlRecord>("QSqlRecord"); }
+  void initTestCase() { //
+    qRegisterMetaType<QSqlRecord>("QSqlRecord"); 
+  }
 
   void default_construct() {
     TDir tDir;
     QVERIFY(tDir.IsValid());
-    Configuration().setValue(PathKey::PERFORMER_IMAGEHOST_LOCATE.name, tDir.path());
+    setConfig(PathKey::PERFORMER_IMAGEHOST_LOCATE, tDir.path());
 
     const QString dbName{tDir.itemPath("CaseViewTest.db")};
     const QString connName{"CaseViewTestConn"};

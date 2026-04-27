@@ -1,6 +1,5 @@
 #include "FullScreenableSplitter.h"
 #include "PublicMacro.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include <QVBoxLayout>
 

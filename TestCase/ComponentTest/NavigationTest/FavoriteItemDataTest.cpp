@@ -1,9 +1,11 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "FavoriteItemData.h"
 #include "EndToExposePrivateMember.h"
-#include "MemoryKey.h"
+
+#include "FavoritesNavigationKey.h"
 #include "Configuration.h"
 
 class FavoriteItemDataTest : public PlainTestSuite {
@@ -25,7 +27,7 @@ private slots:
     FavoriteItemData::SaveInitialSortRole(FavoriteItemData::Role::FULL_PATH_ROLE);
     QCOMPARE(FavoriteItemData::GetInitialSortRole(), FavoriteItemData::Role::FULL_PATH_ROLE);
     // Set an invalid sort role value intentionally, expecting to return the default value
-    Configuration().setValue(FavoritesNavigationKey::SORT_BY_ROLE.name, -1);
+    setConfig(FavoritesNavigationKey::SORT_BY_ROLE, -1);
     QCOMPARE(FavoriteItemData::GetInitialSortRole(), FavoriteItemData::DEF_SORT_ROLE);
 
     FavoriteItemData::SaveSortOrderReverse(true);

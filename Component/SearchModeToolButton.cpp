@@ -1,5 +1,5 @@
 ﻿#include "SearchModeToolButton.h"
-#include "MemoryKey.h"
+#include "SearchKey.h"
 #include "Configuration.h"
 #include <QMenu>
 
@@ -18,7 +18,7 @@ SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent
                              {MATCH_REGEX, SearchModeE::REGEX},
                              {SEARCH_SCOPE_CONTENT, SearchModeE::FILE_CONTENTS}},//
                             SearchTools::DEFAULT_SEARCH_MODE, QActionGroup::ExclusionPolicy::Exclusive);
-  int searchModeInt = Configuration().value(SearchKey::ADVANCE_MODE.name, (int)SearchTools::DEFAULT_SEARCH_MODE).toInt();
+  int searchModeInt = getConfig(SearchKey::ADVANCE_MODE).toInt();
   QAction* defaultModeAct = mSearchModeIntAction.setCheckedIfActionExist(searchModeInt);
   if (defaultModeAct != nullptr) {
     setDefaultAction(defaultModeAct); //
@@ -43,7 +43,7 @@ SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent
 }
 
 SearchModeToolButton::~SearchModeToolButton() {
-  Configuration().setValue(SearchKey::ADVANCE_MODE.name, (int)curSearchMode());
+  setConfig(SearchKey::ADVANCE_MODE, (int)curSearchMode());
 }
 
 void SearchModeToolButton::EmitSearchModeChanged(QAction* checkedAction) {

@@ -3,9 +3,9 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "ConfigsTableView.h"
+#include "ConfigsModel.h"
 #include "EndToExposePrivateMember.h"
 
-#include "GlbDataProtect.h"
 #include "Configuration.h"
 #include "FileTool.h"
 
@@ -27,19 +27,34 @@ private slots:
     GlobalMockObject::verify();
   }
 
-  void GetStatistics_ok() {
-    std::pair<int, int> failedTotalPair{3, 4};
-    ConfigsTableView alertView{"AlertViewInTest"};
-    QCOMPARE(alertView.GetStatistics(), failedTotalPair);
+  void cleanupTestCase() { //
+    Configuration().clear();
+  }
 
-    QCOMPARE(alertView.GetName(), "AlertViewInTest");
-    QCOMPARE(alertView.ConfigsTableView::m_defaultShowBackgroundImage, true);
+  void GetFailedCnt_ok() {
+    const int failedCnt{3};
+    ConfigsTableView cfgView{"cfgViewInTest"};
+    QCOMPARE(cfgView.GetName(), "cfgViewInTest");
+    QCOMPARE(cfgView.GetFailedCnt(), failedCnt);
+    QCOMPARE(cfgView.ConfigsTableView::m_defaultShowBackgroundImage, true);
+  }
 
-    auto *model = alertView.GetModel();
-    QVERIFY(model != nullptr);
-    QModelIndex r0 = model->index(0, 0);
-    QModelIndex r1 = model->index(0, 0);
-    QModelIndex r2 = model->index(0, 0);
+  void on_cellDoubleClicked_ok() {
+    ConfigsTableView cfgView{"cfgViewInTest"};
+    ConfigsModel *srcModel = cfgView.m_cfgModel;
+    QVERIFY(srcModel != nullptr);
+    QSortFilterProxyModel *proxyModel = cfgView.mSortFilterProxy;
+    QVERIFY(proxyModel != nullptr);
+
+    QModelIndex src0 = srcModel->index(0, 0); // file
+    QModelIndex src1 = srcModel->index(1, 0); // folder
+    QModelIndex src2 = srcModel->index(2, 0); // int volume
+    QModelIndex src3 = srcModel->index(3, 0); // bool mute
+
+    QModelIndex pro0 = proxyModel->mapFromSource(src0);
+    QModelIndex pro1 = proxyModel->mapFromSource(src1);
+    QModelIndex pro2 = proxyModel->mapFromSource(src2);
+    QModelIndex pro3 = proxyModel->mapFromSource(src3);
 
     const QFileInfo curFi{__FILE__};
     const QString filePath{curFi.absoluteFilePath()};
@@ -50,18 +65,55 @@ private slots:
         .will(returnValue(true))    // 1st
         .then(returnValue(false));  // 2nd. return false for distinguish usage only
 
-    QCOMPARE(alertView.selectionModel()->hasSelection(), false);
-    emit alertView.doubleClicked({});
+    QCOMPARE(cfgView.selectionModel()->hasSelection(), false);
+    emit cfgView.doubleClicked({});
 
-    QCOMPARE(alertView.on_cellDoubleClicked({}), false);
-    QCOMPARE(alertView.on_cellDoubleClicked(r0), false); // path related, but file path not exist
-    QCOMPARE(alertView.on_cellDoubleClicked(r1), false); // path related, but folder path not exist
-    QCOMPARE(alertView.on_cellDoubleClicked(r2), false); // not path related
+    QCOMPARE(cfgView.on_cellDoubleClicked({}), false);
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro0), false); // path related, but file path not exist
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro1), false); // path related, but folder path not exist
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro2), false); // not path related
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro3), false); // not path related
 
-    setConfig(KVTestOnly::playerFilePath, filePath);
-    setConfig(KVTestOnly::workFolderPath, folderPath);
-    QCOMPARE(alertView.on_cellDoubleClicked(r0), true);  // 1st path related, and file path exist
-    QCOMPARE(alertView.on_cellDoubleClicked(r1), false); // 2nd path related, and folder path exist
+    setConfig(KVTestOnly::PLAYER_FILE_PATH, filePath);
+    setConfig(KVTestOnly::WORK_FOLDER_PATH, folderPath);
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro0), true);  // 1st path related, and file path exist
+    QCOMPARE(cfgView.on_cellDoubleClicked(pro1), false); // 2nd path related, and folder path exist
+  }
+
+  void setFilter_ok() {
+    ConfigsTableView cfgView{"cfgViewInTest"};
+    ConfigsModel *srcModel = cfgView.m_cfgModel;
+    QVERIFY(srcModel != nullptr);
+    QCOMPARE(srcModel->rowCount(), 4);
+
+    QSortFilterProxyModel *proxyModel = cfgView.mSortFilterProxy;
+    QVERIFY(proxyModel != nullptr);
+    QCOMPARE(proxyModel->rowCount(), 4);
+    QCOMPARE(proxyModel->sortCaseSensitivity(), Qt::CaseSensitivity::CaseInsensitive);
+    QCOMPARE(proxyModel->filterCaseSensitivity(), Qt::CaseSensitivity::CaseInsensitive);
+
+    cfgView.setFilter("NoRowMatch");
+    QCOMPARE(proxyModel->rowCount(), 0);
+
+    cfgView.setFilter("PLAYER_MUTE");
+    QCOMPARE(proxyModel->rowCount(), 1);
+
+    cfgView.setFilter("");
+    QCOMPARE(proxyModel->rowCount(), 4);
+
+    cfgView.setFilter("player_mute"); // 大小写不敏感
+    QCOMPARE(proxyModel->rowCount(), 1);
+  }
+
+  void modelCfgFailedCountChanged_ok() {
+    ConfigsTableView cfgView{"cfgViewInTest"};
+    ConfigsModel *srcModel = cfgView.m_cfgModel;
+    QVERIFY(srcModel != nullptr);
+
+    QSignalSpy modelCfgFailedCountChangedSpy{srcModel, &ConfigsModel::failedCountChanged};
+    emit srcModel->failedCountChanged(99);
+    QCOMPARE(modelCfgFailedCountChangedSpy.count(), 1);
+    QCOMPARE(modelCfgFailedCountChangedSpy.takeLast(), (QVariantList{99}));
   }
 };
 

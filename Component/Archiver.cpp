@@ -1,12 +1,11 @@
 #include "Archiver.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "DataFormatter.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
+#include "Configuration.h"
 #include <QToolBar>
 
 Archiver::Archiver(QWidget* parent) : QMainWindow{parent} {

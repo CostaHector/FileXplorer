@@ -5,6 +5,8 @@
 #include "NameTool.h"
 #include "PathTool.h"
 #include "BatchRenameBy.h"
+#include "StyleSheetEditDelegate.h"
+
 #include <QDir>
 #include <QHeaderView>
 #include <QInputDialog>
@@ -18,8 +20,9 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
     : CustomTableView{"JSON_TABLE_VIEW", parent}                                                                 //
 {
   CHECK_NULLPTR_RETURN_VOID(jsonModel);
-  _JsonModel = jsonModel;
   CHECK_NULLPTR_RETURN_VOID(jsonProxyModel);
+
+  _JsonModel = jsonModel;
   _JsonProxyModel = jsonProxyModel;
 
   _JsonProxyModel->setSourceModel(_JsonModel);
@@ -28,9 +31,9 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 
-  m_DetailEdit = new (std::nothrow) MultiLineEditDelegate;
-  CHECK_NULLPTR_RETURN_VOID(jsonModel);
-  setItemDelegateForColumn(JSON_KEY_E::Detail, m_DetailEdit);
+  auto* delegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Detail, this};
+  CHECK_NULLPTR_RETURN_VOID(delegator);
+  setItemDelegateForColumn(JSON_KEY_E::Detail, delegator);
 
   {
     auto& jsonInst = g_JsonActions();

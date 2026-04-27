@@ -1,25 +1,25 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
-#include <QInputDialog>
-#include <QFileDialog>
-#include <QMessageBox>
-#include "Logger.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "MovieDBView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Logger.h"
+#include "Configuration.h"
 #include "PublicVariable.h"
 #include "TDir.h"
 #include "MountHelper.h"
 #include "TableFields.h"
+#include "MovieDBActions.h"
+#include "VideoDurationGetter.h"
+
+#include <QInputDialog>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QSqlQuery>
-#include "MovieDBActions.h"
-#include "VideoDurationGetter.h"
 
 #include "UserInteractiveMock.h"
 #include "MountPathTableNameMapperMock.h"

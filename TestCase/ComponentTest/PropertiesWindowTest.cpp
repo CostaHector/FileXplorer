@@ -5,7 +5,6 @@
 #include <QSignalSpy>
 
 #include "Logger.h"
-#include "MemoryKey.h"
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
 #include "PropertiesWindow.h"
@@ -88,7 +87,7 @@ class PropertiesWindowTest : public PlainTestSuite {
 
   void fileSizeDisplay_ok() {
     actInst.SHOW_FILES_SIZE->setChecked(true);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       actInst.SHOW_FILES_SIZE->setChecked(false);
     };
 
@@ -106,7 +105,7 @@ class PropertiesWindowTest : public PlainTestSuite {
 
   void duration_display_stringList_ok() {
     actInst.SHOW_VIDS_DURATION->setChecked(true);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       actInst.SHOW_VIDS_DURATION->setChecked(false);
     };
     QStringList videoFiles{
@@ -122,7 +121,7 @@ class PropertiesWindowTest : public PlainTestSuite {
   void duration_display_intList_ok() {
     actInst.SHOW_VIDS_DURATION->setChecked(true);
     actInst.SHOW_FILES_SIZE->setChecked(true);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       actInst.SHOW_VIDS_DURATION->setChecked(false);
       actInst.SHOW_FILES_SIZE->setChecked(false);
     };
@@ -145,7 +144,7 @@ class PropertiesWindowTest : public PlainTestSuite {
 
   void md5_display_ok() {
     actInst.SHOW_FILES_MD5->setChecked(true);
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       actInst.SHOW_FILES_MD5->setChecked(false);
     };
 
@@ -173,7 +172,7 @@ class PropertiesWindowTest : public PlainTestSuite {
   }
 
   void toggle_display_options_ok() {
-    ON_SCOPE_EXIT {
+    OnScopeExit {
       actInst.SHOW_FILES_SIZE->setChecked(false);
       actInst.SHOW_VIDS_DURATION->setChecked(false);
       actInst.SHOW_FILES_MD5->setChecked(false);

@@ -37,7 +37,7 @@ private:
 class QWidget;
 class DevicesDrivesTV;
 class DuplicateVideosFinder;
-class RedundantImageFinder;
+class DuplicatesImagesFinder;
 class TorrentsManagerWidget;
 class ConfigsMgr;
 class Archiver;
@@ -47,7 +47,7 @@ class ResourceMonitorPanel;
 extern template class PopupWidgetManager<QWidget>;
 extern template class PopupWidgetManager<DevicesDrivesTV>;
 extern template class PopupWidgetManager<DuplicateVideosFinder>;
-extern template class PopupWidgetManager<RedundantImageFinder>;
+extern template class PopupWidgetManager<DuplicatesImagesFinder>;
 extern template class PopupWidgetManager<TorrentsManagerWidget>;
 extern template class PopupWidgetManager<ConfigsMgr>;
 extern template class PopupWidgetManager<Archiver>;

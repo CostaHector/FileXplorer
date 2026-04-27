@@ -5,7 +5,6 @@
 #include "StyleSheetGetter.h"
 #include "EndToExposePrivateMember.h"
 
-#include "MemoryKey.h"
 #include "Configuration.h"
 
 class StyleSheetGetterTest : public PlainTestSuite {

@@ -4,12 +4,12 @@
 #include "BeginToExposePrivateMember.h"
 #include "ItemView.h"
 #include "EndToExposePrivateMember.h"
+
+#include "Configuration.h"
 #include "TDir.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "BatchRenameBy.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>

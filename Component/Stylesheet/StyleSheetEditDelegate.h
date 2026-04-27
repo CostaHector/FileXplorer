@@ -21,14 +21,9 @@ private:
   QWidget *createLineEditorWithColorDialog(QWidget *editWidget) const;
   QWidget *createLineEditorWithFileDialog(QWidget *editWidget) const;
   QWidget *createLineEditorWithFolderDialog(QWidget *editWidget) const;
-  QComboBox *createComboBoxEditor(int dataType, QWidget *parent) const;
 
-  void setComboBoxEditorData(QWidget *editor, const QModelIndex &index, int dataType) const;
-  void setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
+  bool setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
 
   const int mDataTypeRole, mEditableColumn;
-  QStringList mFontFamilyItems;
-  QMap<QString, QFont::Weight> mFontWeightItems;
-  QMap<QString, QFont::Style> mFontStyleItems;
 };
 #endif // STYLESHEETEDITDELEGATE_H

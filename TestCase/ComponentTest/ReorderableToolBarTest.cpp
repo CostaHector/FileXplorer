@@ -1,13 +1,9 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
 
 #include <QToolButton>
 #include <QSignalSpy>
 
-#include "MemoryKey.h"
-#include "Configuration.h"
-#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "ReorderableToolBar.h"
 #include "EndToExposePrivateMember.h"
@@ -15,7 +11,6 @@
 class ReorderableToolBarTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  ReorderableToolBarTest() : PlainTestSuite{} { LOG_D("ReorderableToolBarTest object created\n"); }
  private slots:
   void toolButton_no_need_moveWidget() {
     QAction act0("0");

@@ -3,7 +3,6 @@
 
 #include "CustomTableView.h"
 #include "JsonTableModel.h"
-#include "MultiLineEditDelegate.h"
 #include <QSortFilterProxyModel>
 
 class JsonTableView : public CustomTableView {
@@ -52,7 +51,6 @@ class JsonTableView : public CustomTableView {
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
-  MultiLineEditDelegate* m_DetailEdit{nullptr};
 
 #ifdef RUNNING_UNIT_TESTS
   QWidget* pWidgetInCellMock{nullptr};

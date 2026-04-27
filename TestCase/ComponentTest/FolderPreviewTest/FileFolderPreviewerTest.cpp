@@ -1,14 +1,12 @@
 #include <QtTest/QtTest>
-
-
 #include "PlainTestSuite.h"
-#include "TDir.h"
-#include "MemoryKey.h"
-#include "Configuration.h"
-#include "Logger.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "FileFolderPreviewer.h"
 #include "EndToExposePrivateMember.h"
+
+#include "TDir.h"
+#include "Configuration.h"
 #include "SqlRecordTestHelper.h"
 
 class FileFolderPreviewerTest : public PlainTestSuite {

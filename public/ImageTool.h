@@ -18,6 +18,9 @@ QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int exp
 QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase);
 
 QIcon GetBuiltInIcon(QStyle::StandardPixmap spE);
+
+const QIcon& GetCheckResultIcon(bool bPass);
+const QPixmap& GetLabelStatusPixmap(int labelStatus);
 }
 
 struct IMAGE_SIZE {

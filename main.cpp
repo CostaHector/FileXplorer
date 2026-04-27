@@ -4,6 +4,7 @@
 #include "FileTool.h"
 #include "PreferenceActions.h"
 #include "MemoryKey.h"
+#include "BehaviorKey.h"
 #include "Configuration.h"
 #include "Logger.h"
 #include "StyleKey.h"
