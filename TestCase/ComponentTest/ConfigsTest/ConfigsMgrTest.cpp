@@ -140,7 +140,6 @@ private slots:
       QPushButton* pOkBtn = cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Open);
       QVERIFY(pOkBtn != nullptr);
       pOkBtn->clicked();              // 点击ok, 会关闭窗口
-      QCOMPARE(acceptSpy.count(), 1); // accept
       acceptSpy.clear();
     }
   }

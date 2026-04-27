@@ -37,6 +37,8 @@ file(GLOB SOURCES
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
     ${PARENT_DIR}/Component/Configs/*.cpp
+    ${PARENT_DIR}/Component/DupImages/*.cpp
+    ${PARENT_DIR}/Component/DupVideos/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
@@ -55,12 +57,13 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Tools/Json/*.cpp
     ${PARENT_DIR}/Tools/PasswordTable/*.cpp
     ${PARENT_DIR}/View/*.cpp
-    ${PARENT_DIR}/View/DupVideos/*.cpp
     # test only module sources
     main_ut.cpp
     ActionsTest/*.cpp
     ComponentTest/*.cpp
     ComponentTest/ConfigsTest/*.cpp
+    ComponentTest/DupImagesTest/*.cpp
+    ComponentTest/DupVideosTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
@@ -79,7 +82,6 @@ file(GLOB SOURCES
     ToolsTest/FileDescriptorTest/*.cpp
     ToolsTest/PasswordTableTest/*.cpp
     ViewTest/*.cpp
-    ViewTest/DupVideosTest/*.cpp
 )
 
 list(LENGTH SOURCES src_cpp_count)
@@ -94,6 +96,8 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
     ${PARENT_DIR}/Component/Configs
+    ${PARENT_DIR}/Component/DupImages
+    ${PARENT_DIR}/Component/DupVideos
     ${PARENT_DIR}/Component/FolderPreview
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
@@ -113,7 +117,6 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Json
     ${PARENT_DIR}/Tools/PasswordTable
     ${PARENT_DIR}/View
-    ${PARENT_DIR}/View/DupVideos
     pubTestTool
     MockTool
 )
@@ -124,6 +127,8 @@ file(GLOB HEADERS
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
     ${PARENT_DIR}/Component/Configs/*.h
+    ${PARENT_DIR}/Component/DupImages/*.h
+    ${PARENT_DIR}/Component/DupVideos/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
@@ -143,7 +148,6 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Json/*.h
     ${PARENT_DIR}/Tools/PasswordTable/*.h
     ${PARENT_DIR}/View/*.h
-    ${PARENT_DIR}/View/DupVideos/*.h
     pubTestTool/*.h
     MockTool/*.h
 )

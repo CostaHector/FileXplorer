@@ -16,7 +16,7 @@ constexpr KV MOVE_TO_HISTORY{"BehaviorKey/MOVE_TO_HISTORY", Var{".\n..\n\\"}, Ge
 constexpr KV COPY_TO_HISTORY{"BehaviorKey/COPY_TO_HISTORY", Var{".\n..\n\\"}, GeneralDataType::Type::MULTI_LINE_STR, GeneralCStrChecker};
 constexpr KV FILESYSTEM_STRUCTURE{"BehaviorKey/FILESYSTEM_STRUCTURE", Var{0}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 16>};
 
-constexpr KV VIDS_LAST_TABLE_NAME{"BehaviorKey/VIDS_LAST_TABLE_NAME", Var{""}, GeneralDataType::Type::PLAIN_STR, GeneralCStrChecker};
+constexpr KV VIDS_LAST_TABLE_NAME{"BehaviorKey/VIDS_LAST_TABLE_NAME", Var{"MOVIES"}, GeneralDataType::Type::PLAIN_STR, GeneralCStrChecker};
 constexpr KV WHERE_CLAUSE_HISTORY{"BehaviorKey/WHERE_CLAUSE_HISTORY", Var{"A\nA&B\nA|B"}, GeneralDataType::Type::MULTI_LINE_STR, GeneralCStrChecker};
 
 constexpr KV BATCH_FILES_NAME_PATTERN{"BehaviorKey/BATCH_FILES_NAME_PATTERN", Var{"Page %03d%1$1$11.html"}, GeneralDataType::Type::PLAIN_STR, GeneralCStrChecker};

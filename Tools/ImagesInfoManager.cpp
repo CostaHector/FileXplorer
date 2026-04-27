@@ -78,16 +78,22 @@ int ImagesInfoManager::ForceReloadImpl() {
 }
 
 RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, const bool bAlsoFindEmpty) const {
+  using namespace PathTool;
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+
+  QString rel2searchItem;
+  QString fileName;
+  const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = folderPath.size();
+
   RedundantImagesList redundantImgs;
   while (it.hasNext()) {
     const QFileInfo imgFi{it.next()};
     const QString fileAbsPath = imgFi.absoluteFilePath();
     const qint64 sz = imgFi.size();
-    if (sz == 0) {
-      if (bAlsoFindEmpty) {
-        redundantImgs.append(REDUNDANT_IMG_INFO{imgFi.fileName(), 0, "", fileAbsPath});
-      }
+    if (bAlsoFindEmpty && sz == 0) {
+      fileName = imgFi.fileName();
+      rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, imgFi.filePath(), fileName.size());
+      redundantImgs.append(REDUNDANT_IMG_INFO{fileName, 0, "", rel2searchItem});
       continue;
     }
     if (!ImgDataStruct().contains(sz)) {
@@ -97,13 +103,22 @@ RedundantImagesList ImagesInfoManager::FindRedunImgs(const QString& folderPath, 
     if (!ImgDataStruct().contains(md5)) {
       continue;
     }
-    redundantImgs.append(REDUNDANT_IMG_INFO{imgFi.fileName(), sz, md5, fileAbsPath});
+    fileName = imgFi.fileName();
+    rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, imgFi.filePath(), fileName.size());
+    redundantImgs.append(REDUNDANT_IMG_INFO{fileName, sz, md5, rel2searchItem});
   }
+  std::sort(redundantImgs.begin(), redundantImgs.end());
   return redundantImgs;
 }
 
-RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty) {
+RedundantImagesList ImagesInfoManager::FindDuplicateImgs(const QString& folderPath, const bool bAlsoFindEmpty) {
+  using namespace PathTool;
   QDirIterator it{folderPath, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+
+  QString rel2searchItem;
+  QString fileName;
+  const int ROOT_PATH_N_WITH_NO_TRAILING_SLASH = folderPath.size();
+
   QMap<qint64, QStringList> sz2AbsPath;
   while (it.hasNext()) {
     const QFileInfo imgFi{it.next()};
@@ -115,7 +130,9 @@ RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAls
     if (it.key() == 0) {
       if (bAlsoFindEmpty) {
         for (const auto& absPath : it.value()) {
-          dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(absPath), 0, "", absPath});
+          fileName = PathTool::fileName(absPath);
+          rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, absPath, fileName.size());
+          dupImgs.append(REDUNDANT_IMG_INFO{fileName, 0, "", rel2searchItem});
         }
       }
       continue;
@@ -131,14 +148,20 @@ RedundantImagesList FindDuplicateImgs(const QString& folderPath, const bool bAls
       if (sameMd5It != hash2FirstDuplicateFile.cend()) {
         if (firstDuplicateFileMd5.find(md5) == firstDuplicateFileMd5.end()) {
           QString fileAbsPath = sameMd5It.value();
-          dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(fileAbsPath), QFile{fileAbsPath}.size(), md5, fileAbsPath});
+          fileName = PathTool::fileName(fileAbsPath);
+          rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fileAbsPath, fileName.size());
+
+          dupImgs.append(REDUNDANT_IMG_INFO{fileName, QFile{fileAbsPath}.size(), md5, rel2searchItem});
           firstDuplicateFileMd5.insert(md5);
         }
-        dupImgs.append(REDUNDANT_IMG_INFO{PathTool::fileName(absPath), QFile{absPath}.size(), md5, absPath});
+        fileName = PathTool::fileName(absPath);
+        rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, absPath, fileName.size());
+        dupImgs.append(REDUNDANT_IMG_INFO{fileName, QFile{absPath}.size(), md5, rel2searchItem});
       } else {
         hash2FirstDuplicateFile[md5] = absPath;
       }
     }
   }
+  std::sort(dupImgs.begin(), dupImgs.end());
   return dupImgs;
 }

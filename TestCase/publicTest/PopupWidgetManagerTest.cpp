@@ -7,7 +7,7 @@
 
 #include "Configuration.h"
 #include "DevicesDrivesTV.h"
-#include "RedundantImageFinder.h"
+#include "DuplicatesImagesFinder.h"
 #include "DuplicateVideosFinder.h"
 #include "TorrentsManagerWidget.h"
 #include "ConfigsMgr.h"
@@ -86,7 +86,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
   void checkable_popup_widget_geometry_state_ok() {
     PopupWidgetManagerTestTemplate<DevicesDrivesTV>("DevicesDrivesTV", true);
     PopupWidgetManagerTestTemplate<DuplicateVideosFinder>("DuplicateVideosFinder", true);
-    PopupWidgetManagerTestTemplate<RedundantImageFinder>("RedundantImageFinder", true);
+    PopupWidgetManagerTestTemplate<DuplicatesImagesFinder>("RedundantImageFinder", true);
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
     PopupWidgetManagerTestTemplate<ConfigsMgr>("ConfigsTable", true);
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);

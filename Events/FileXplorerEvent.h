@@ -12,7 +12,7 @@ class ConfigsMgr;
 class AdvanceRenamer;
 class PropertiesWindow;
 class DuplicateVideosFinder;
-class RedundantImageFinder;
+class DuplicatesImagesFinder;
 class Archiver;
 
 class FileXplorerEvent : public QObject {
@@ -104,7 +104,7 @@ private:
 
   PopupWidgetManager<Archiver>* m_archivePreview{nullptr};
   PopupWidgetManager<DuplicateVideosFinder>* m_duplicateVideosFinder{nullptr};
-  PopupWidgetManager<RedundantImageFinder>* m_redundantImageFinder{nullptr};
+  PopupWidgetManager<DuplicatesImagesFinder>* m_redundantImageFinder{nullptr};
 private:
   bool QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode); // true: keep, false: flatten
 };

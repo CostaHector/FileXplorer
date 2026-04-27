@@ -14,7 +14,7 @@
 #include "MD5Window.h"
 #include "NotificatorMacro.h"
 #include "PropertiesWindow.h"
-#include "RedundantImageFinder.h"
+#include "DuplicatesImagesFinder.h"
 #include "ViewsStackedWidget.h"
 #include "RenameWidget_LongPath.h"
 #include "RenameWidget_ArrangeSection.h"
@@ -445,7 +445,7 @@ void FileXplorerEvent::subscribe() {
         PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
     m_redundantImageFinder = new (std::nothrow)
-        PopupWidgetManager<RedundantImageFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
+        PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
     connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
 
@@ -742,7 +742,7 @@ bool FileXplorerEvent::on_RedunImageFinder(bool bChecked) {
     return true;
   }
   const QString pth = _contentPane->getRootPath();
-  RedundantImageFinder* pRedunImgTemp = m_redundantImageFinder->widget();
+  DuplicatesImagesFinder* pRedunImgTemp = m_redundantImageFinder->widget();
   bool finderRet = pRedunImgTemp->operator()(pth);
   return finderRet;
 }

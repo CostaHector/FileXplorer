@@ -73,7 +73,7 @@
 <context>
     <name>AdvanceRenamer</name>
     <message>
-        <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+26"/>
+        <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+27"/>
         <source>Name Ext Independent</source>
         <translation>名/扩展名独立</translation>
     </message>
@@ -167,7 +167,7 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../../Actions/CastDBActions.cpp" line="+13"/>
+        <location filename="../../Actions/CastDBActions.cpp" line="+11"/>
         <source>Submit All</source>
         <translation>提交全部</translation>
     </message>
@@ -255,7 +255,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../../View/CustomListView.cpp" line="+32"/>
+        <location filename="../../View/CustomListView.cpp" line="+31"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -293,7 +293,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../../View/CustomTableView.cpp" line="+44"/>
+        <location filename="../../View/CustomTableView.cpp" line="+43"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -351,7 +351,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+40"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+39"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -404,7 +404,7 @@
 <context>
     <name>DoubleRowHeader</name>
     <message>
-        <location filename="../../Component/HeaderView/DoubleRowHeader.cpp" line="+10"/>
+        <location filename="../../Component/HeaderView/DoubleRowHeader.cpp" line="+9"/>
         <source>Enable filters for each column</source>
         <translation>允许全列过滤</translation>
     </message>
@@ -463,7 +463,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+276"/>
+        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+275"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -476,7 +476,7 @@
 <context>
     <name>FavoritesTreeView</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+33"/>
+        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+31"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -785,7 +785,7 @@
 <context>
     <name>FileRenameRulerActions</name>
     <message>
-        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+16"/>
+        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+14"/>
         <source>Name Ruler</source>
         <translation>名称标准化</translation>
     </message>
@@ -828,7 +828,7 @@
 <context>
     <name>FileToolTest</name>
     <message>
-        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+147"/>
+        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+148"/>
         <location line="+18"/>
         <location line="+7"/>
         <source>Apply</source>
@@ -845,7 +845,7 @@
 <context>
     <name>HorMenuInHeader</name>
     <message>
-        <location filename="../../Component/HeaderView/HorMenuInHeader.cpp" line="+21"/>
+        <location filename="../../Component/HeaderView/HorMenuInHeader.cpp" line="+20"/>
         <source>Column visibility</source>
         <translation>列可见性</translation>
     </message>
@@ -886,7 +886,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+19"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+20"/>
         <source>Manual play</source>
         <translation>手动播放</translation>
     </message>
@@ -986,7 +986,7 @@
         <translation>随机播放</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>basic mode</source>
         <translation>简洁模式</translation>
     </message>
@@ -1241,7 +1241,7 @@
 <context>
     <name>LoginQryWidget</name>
     <message>
-        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+241"/>
+        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+240"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
@@ -1272,7 +1272,7 @@
 <context>
     <name>MD5Window</name>
     <message>
-        <location filename="../../Component/MD5Window.cpp" line="+26"/>
+        <location filename="../../Component/MD5Window.cpp" line="+27"/>
         <source>First 16 Bytes</source>
         <translation>首16字节</translation>
     </message>
@@ -1295,7 +1295,7 @@
 <context>
     <name>MenuInHeader</name>
     <message>
-        <location filename="../../Component/HeaderView/MenuInHeader.cpp" line="+43"/>
+        <location filename="../../Component/HeaderView/MenuInHeader.cpp" line="+42"/>
         <source>Set default section size</source>
         <translation>设置默认尺寸</translation>
     </message>
@@ -1469,7 +1469,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+22"/>
+        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+21"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1644,7 +1644,7 @@
 <context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../../Model/QAbstractListModelPub.cpp" line="+17"/>
+        <location filename="../../Model/QAbstractListModelPub.cpp" line="+16"/>
         <source>Smooth Transformation</source>
         <translation>平滑图片</translation>
     </message>
@@ -1691,6 +1691,49 @@
         <location line="+27"/>
         <source>Rate</source>
         <translation>评分</translation>
+    </message>
+</context>
+<context>
+    <name>RedundantImageFinderActions</name>
+    <message>
+        <location filename="../../Actions/RedundantImageFinderActions.cpp" line="+9"/>
+        <source>Find by benchmark library</source>
+        <translation>通过基准库查找</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Find by MD5 checksum</source>
+        <translation>通过MD5查找</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Move to Recycle Bin</source>
+        <translation>移动到回收站</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Include zero-byte images</source>
+        <translation>包含零字节图片</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Open benchmark folder</source>
+        <translation>打开基准库文件夹</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Reload benchmark library</source>
+        <translation>重新加载基准库</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Performance mode</source>
+        <translation>性能模式</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Find By Mode</source>
+        <translation>查找模式</translation>
     </message>
 </context>
 <context>
@@ -1821,7 +1864,7 @@
 <context>
     <name>RenameWidget_Insert</name>
     <message>
-        <location filename="../../Component/RenameWidgets/RenameWidget_Insert.cpp" line="+57"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Insert.cpp" line="+56"/>
         <source>Insert string</source>
         <translation>插入字符串</translation>
     </message>
@@ -1914,7 +1957,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../../Component/RibbonMenu.cpp" line="+43"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+44"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -2074,7 +2117,7 @@
 <context>
     <name>ScrollBarPolicyMenu</name>
     <message>
-        <location filename="../../Component/ScrollBarPolicyMenu.cpp" line="+15"/>
+        <location filename="../../Component/ScrollBarPolicyMenu.cpp" line="+14"/>
         <source>As Needed</source>
         <translation>需要时</translation>
     </message>
@@ -2148,7 +2191,7 @@
 <context>
     <name>TextElideModeMenu</name>
     <message>
-        <location filename="../../Component/TextElideModeMenu.cpp" line="+13"/>
+        <location filename="../../Component/TextElideModeMenu.cpp" line="+12"/>
         <source>Elide Left</source>
         <translation>省略左侧</translation>
     </message>
@@ -2280,7 +2323,7 @@
 <context>
     <name>TypeFilterButton</name>
     <message>
-        <location filename="../../Component/TypeFilterButton.cpp" line="+13"/>
+        <location filename="../../Component/TypeFilterButton.cpp" line="+14"/>
         <source>Filter</source>
         <translation>过滤</translation>
     </message>
