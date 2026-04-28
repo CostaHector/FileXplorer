@@ -68,10 +68,11 @@ void QuickWhereClauseDialog::Init() {
       QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
   CHECK_NULLPTR_RETURN_VOID(mDialogButtonBox)
   auto* pOkBtn = mDialogButtonBox->button(QDialogButtonBox::StandardButton::Ok);
-  StyleSheet::UpdateApplyPushButton(pOkBtn);
+  pOkBtn->setIcon(QIcon(":img/SAVED"));
   pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Apply where clause right now.") //
                          .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));
+  StyleSheet::UpdateApplyPushButton(pOkBtn);
 
   m_Layout = new (std::nothrow) QFormLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_Layout);

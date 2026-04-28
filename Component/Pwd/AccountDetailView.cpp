@@ -1,6 +1,7 @@
 #include "AccountDetailView.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
+#include "StyleSheet.h"
 
 AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
   : QDockWidget{parent} {
@@ -20,11 +21,12 @@ AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //
 
   mBtnRecover = new (std::nothrow) QPushButton{tr("Recover"), nullptr};
   CHECK_NULLPTR_RETURN_VOID(mBtnRecover);
-  mBtnApply = new (std::nothrow) QPushButton{tr("Apply"), nullptr};
+  mBtnApply = new (std::nothrow) QPushButton{QIcon(":img/SAVED"), tr("Apply"), nullptr};
   CHECK_NULLPTR_RETURN_VOID(mBtnApply);
   mBtnApply->setShortcut(QKeySequence(Qt::Key_F10));
   mBtnApply->setToolTip(QString("<b>%1 (%2)</b><br/> Apply changes right now.") //
                             .arg(mBtnApply->text(), mBtnApply->shortcut().toString()));
+  StyleSheet::UpdateApplyPushButton(mBtnApply);
 
   mForm = new (std::nothrow) QFormLayout;
   CHECK_NULLPTR_RETURN_VOID(mForm);
@@ -58,24 +60,11 @@ void AccountDetailView::editHappen() {
   }
   mBtnApply->setEnabled(true);
   mBtnRecover->setEnabled(true);
-  static const auto GetApplyButtonStyle = [this]() -> QPalette {
-    QPalette pal = mBtnApply->palette();
-    pal.setColor(QPalette::ButtonText, QColor(30, 144, 255));
-    return pal;
-  };
-  static const QPalette applyPalette = GetApplyButtonStyle();
-  mBtnApply->setPalette(applyPalette);
-  static QFont font = mBtnApply->font();
-  font.setBold(true);
-  mBtnApply->setFont(font);
 }
 
 void AccountDetailView::editNotHappen() {
   mBtnApply->setEnabled(false);
   mBtnRecover->setEnabled(false);
-  static const QPalette defaultPalette;
-  mBtnApply->setPalette(defaultPalette);
-  mBtnApply->setFont(QFont{});
 }
 
 void AccountDetailView::UpdateDisplay(AccountInfo *pAcc) {

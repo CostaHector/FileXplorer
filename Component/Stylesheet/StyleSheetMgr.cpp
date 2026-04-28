@@ -97,8 +97,8 @@ void StyleSheetMgr::subscribe() {
   connect(m_initPreviewWindow, &QAction::triggered, this, &StyleSheetMgr::initStyleSheetPreview);
 
   auto* pApplyChanges = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Apply);
-  pApplyChanges->setShortcut(QKeySequence(Qt::Key::Key_F10));
   pApplyChanges->setIcon(QIcon(":img/SAVED"));
+  pApplyChanges->setShortcut(QKeySequence(Qt::Key::Key_F10));
   StyleSheet::UpdateApplyPushButton(pApplyChanges);
 
   auto* pAbort = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Cancel);

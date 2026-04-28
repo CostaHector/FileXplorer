@@ -55,10 +55,9 @@ ConfigsMgr::ConfigsMgr(QWidget* parent)
 
 void ConfigsMgr::subscribe() {
   if (QPushButton* pOkBtn = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Ok)) {
-    pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
     pOkBtn->setIcon(QIcon(":img/SAVED"));
+    pOkBtn->setShortcut(QKeySequence(Qt::Key::Key_F10));
     StyleSheet::UpdateApplyPushButton(pOkBtn);
-    connect(pOkBtn, &QPushButton::clicked, this, &QDialog::accept);
   }
 
   if (QPushButton* pOpen = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Open)) {
@@ -67,6 +66,8 @@ void ConfigsMgr::subscribe() {
     pOpen->setToolTip("Edit in config file directly");
     connect(pOpen, &QPushButton::clicked, this, &ConfigsMgr::onEditPreferenceSetting);
   }
+
+  connect(m_dlgBtnBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 
   connect(m_searchLineEdit, &QLineEdit::returnPressed, this, &ConfigsMgr::onStartFilter);
   connect(m_searchAction, &QAction::triggered, this, &ConfigsMgr::onStartFilter);
