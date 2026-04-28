@@ -52,6 +52,22 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
   }
 }
 
+void StyleSheetEditDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
+  QStyledItemDelegate::initStyleOption(option, index);
+  if (!index.isValid()) {
+    return;
+  }
+  if (index.column() != mEditableColumn) {
+    return;
+  }
+  const int dataType = index.data(mDataTypeRole).toInt();
+  if (!GeneralDataType::isComboBoxNeededInEditor(dataType)) {
+    return;
+  }
+  const QVariant displayRoleData = index.data(Qt::DisplayRole);
+  option->text = GeneralComboBox::displayText(dataType, displayRoleData);
+}
+
 QWidget *StyleSheetEditDelegate::createLineEditorWithColorDialog(QWidget *editWidget) const {
   QLineEdit *lineEditor = qobject_cast<QLineEdit *>(editWidget);
   if (lineEditor == nullptr) {

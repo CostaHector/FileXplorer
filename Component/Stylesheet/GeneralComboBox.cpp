@@ -21,40 +21,53 @@ GeneralComboBox *GeneralComboBox::create(int generalDataType, QWidget *parent) {
   return nullptr;
 }
 
+QString GeneralComboBox::displayText(int generalDataType, const QVariant &displayRoleData) {
+  GeneralDataType::Type typeE = static_cast<GeneralDataType::Type>(generalDataType);
+  if (GeneralDataType::isComboBoxNeededInStringToEnumEditor(typeE)) {
+    return EnumComboBox::displayText(typeE, displayRoleData);
+  }
+  return displayRoleData.toString();
+}
+
 EnumComboBox::PAIR_TYPE EnumComboBox::GetCandidates(GeneralDataType::Type gDataType) {
   static const T_CANDIDATES_STR_TO_ENUM CANDIDATES_DEFAULT;
   static const QMap<int, T_CANDIDATES_STR_TO_ENUM> CANDIDATES_MAP{
+#define makeEnumPair(keyStr, enumValue) \
+  { \
+    (keyStr + QString::asprintf(" (%d)", static_cast<int>(enumValue))), static_cast<int>(enumValue) \
+  }
       {GeneralDataType::Type::FONT_WEIGHT, //
        {
-           {"Thin", QFont::Weight::Thin},             //
-           {"ExtraLight", QFont::Weight::ExtraLight}, //
-           {"Light", QFont::Weight::Light},           //
-           {"Normal", QFont::Weight::Normal},         //
-           {"Medium", QFont::Weight::Medium},         //
-           {"DemiBold", QFont::Weight::DemiBold},     //
-           {"Bold", QFont::Weight::Bold},             //
-           {"ExtraBold", QFont::Weight::ExtraBold},   //
-           {"Black", QFont::Weight::Black},           //
+           makeEnumPair("Thin", QFont::Weight::Thin),             //
+           makeEnumPair("ExtraLight", QFont::Weight::ExtraLight), //
+           makeEnumPair("Light", QFont::Weight::Light),           //
+           makeEnumPair("Normal", QFont::Weight::Normal),         //
+           makeEnumPair("Medium", QFont::Weight::Medium),         //
+           makeEnumPair("DemiBold", QFont::Weight::DemiBold),     //
+           makeEnumPair("Bold", QFont::Weight::Bold),             //
+           makeEnumPair("ExtraBold", QFont::Weight::ExtraBold),   //
+           makeEnumPair("Black", QFont::Weight::Black),           //
        }},
       {GeneralDataType::Type::FONT_STYLE, //
        {
-           {"StyleNormal", QFont::Style::StyleNormal},   //
-           {"StyleItalic", QFont::Style::StyleItalic},   //
-           {"StyleOblique", QFont::Style::StyleOblique}, //
+           makeEnumPair("StyleNormal", QFont::Style::StyleNormal),   //
+           makeEnumPair("StyleItalic", QFont::Style::StyleItalic),   //
+           makeEnumPair("StyleOblique", QFont::Style::StyleOblique), //
        }},
       {GeneralDataType::Type::RANGE_INT_STYLE_PRESET, //
        {
-           {"WindowsVista", (int) Style::StylePresetE::PRESET_WINDOWS_VISTA}, //
-           {"Windows", (int) Style::StylePresetE::PRESET_WINDOWS},            //
-           {"Fusion", (int) Style::StylePresetE::PRESET_FUSION},              //
-           {"MacOS", (int) Style::StylePresetE::PRESET_MACOS},                //
+           makeEnumPair("WindowsVista", Style::StylePresetE::PRESET_WINDOWS_VISTA), //
+           makeEnumPair("Windows", Style::StylePresetE::PRESET_WINDOWS),            //
+           makeEnumPair("Fusion", Style::StylePresetE::PRESET_FUSION),              //
+           makeEnumPair("MacOS", Style::StylePresetE::PRESET_MACOS),                //
        }},
       {GeneralDataType::Type::RANGE_INT_STYLE_THEME, //
        {
-           {"Light", (int) Style::StyleThemeE::THEME_LIGHT},        //
-           {"Dark", (int) Style::StyleThemeE::THEME_DARK_MOON_FOG}, //
-           {"None", (int) Style::StyleThemeE::THEME_NONE},          //
+           makeEnumPair("Light", Style::StyleThemeE::THEME_LIGHT),        //
+           makeEnumPair("Dark", Style::StyleThemeE::THEME_DARK_MOON_FOG), //
+           makeEnumPair("None", Style::StyleThemeE::THEME_NONE),          //
        }},
+#undef makeEnumPair
   };
 
   static const T_ENUM_TO_CANDIDATES_STR CANDIDATES_DISPLAY_DEFAULT;
@@ -109,68 +122,88 @@ QVariant EnumComboBox::getSetDataVariant() const {
   return it.value();
 }
 
-void EnumComboBox::updateCurrentDisplayString(const QVariant &editRoleData) {
+QString EnumComboBox::getDisplayString(const QVariant &variantData, const T_ENUM_TO_CANDIDATES_STR &pCandidateDisp) {
+  // variantData can from editRole, displyRole
   bool bInt{false};
-  int curEnumInt = editRoleData.toInt(&bInt);
+  int curEnumInt = variantData.toInt(&bInt);
   if (!bInt) {
-    setCurrentText(QString("not number"));
-    return;
+    return "data from model not a number";
   }
-  auto it = mCandidatesDisplay->find(curEnumInt);
-  if (it == mCandidatesDisplay->cend()) {
-    setCurrentText(QString("no string correspond to Enum[%1]").arg(curEnumInt));
-    return;
+  auto it = pCandidateDisp.find(curEnumInt);
+  if (it == pCandidateDisp.cend()) {
+    return QString("no string correspond to Enum[%1]").arg(curEnumInt);
   }
-  setCurrentText(it.value());
+  return it.value();
 }
 
-const QStringList StringComboBox::CANDIDATES_FONT_FAMILY{
-#ifdef _WIN32
-    // Windows平台字体
-    "Microsoft YaHei UI", // 微软雅黑
-    "SimSun",             // 宋体
-    "NSimSun",            // 新宋体
-    "Microsoft JhengHei", // 微软正黑体
-    "Arial",              // 英文无衬线字体
-    "Times New Roman",    // 英文衬线字体
-    "Tahoma",             // Windows系统UI字体
-    "Segoe UI",           // Windows现代UI字体
-    "Calibri",            // Office默认字体
-    "Consolas",           // 等宽字体
-    "Courier New",        // 等宽字体
-    "Verdana",            // 屏幕显示优化字体
-    "Georgia",            // 适合屏幕阅读的衬线字体
-    "Trebuchet MS",       // Web安全字体
-    "Comic Sans MS"       // 手写风格字体
-#else
-    // Linux平台字体
-    "Noto Sans",        // Google跨平台字体
-    "Noto Sans CJK SC", // Noto Sans中文字体
-    "DejaVu Sans",      // 开源无衬线字体
-    "DejaVu Serif",     // 开源衬线字体
-    "Liberation Sans",  // 替换Arial的开源字体
-    "Liberation Serif", // 替换Times New Roman的开源字体
-    "Ubuntu",           // Ubuntu系统默认字体
-    "FreeSans",         // 开源无衬线字体
-    "Droid Sans",       // Android系统字体
-    "Arial",            // 英文无衬线字体
-    "Times New Roman",  // 英文衬线字体
-    "Tahoma",           // 屏幕显示字体
-    "Verdana",          // 屏幕显示优化字体
-    "Courier New",      // 等宽字体
-    "Monospace"         // 通用等宽字体
-#endif
-};
+void EnumComboBox::updateCurrentDisplayString(const QVariant &editRoleData) {
+  const QString editModeDisplayText = getDisplayString(editRoleData, *mCandidatesDisplay);
+  setCurrentText(editModeDisplayText);
+}
+
+QString EnumComboBox::displayText(GeneralDataType::Type gDataType, const QVariant &displayRoleData) {
+  const T_ENUM_TO_CANDIDATES_STR *const candidatesDisplay{GetCandidates(gDataType).second};
+  const QString displayModeDisplayText = getDisplayString(displayRoleData, *candidatesDisplay);
+  return displayModeDisplayText;
+}
 
 StringComboBox::StringComboBox(GeneralDataType::Type gDataType, QWidget *parent)
   : GeneralComboBox{gDataType, parent} {
-  if (gDataType == GeneralDataType::Type::FONT_FAMILY) {
-    mCandidates = &CANDIDATES_FONT_FAMILY;
-  }
+  mCandidates = GetCandidates(gDataType);
   addItems(*mCandidates);
 }
 
 QVariant StringComboBox::getSetDataVariant() const {
   QString rawText = currentText();
   return mCandidates->contains(rawText) ? rawText : "";
+}
+
+const StringComboBox::T_CANDIDATES_STR_LST *StringComboBox::GetCandidates(GeneralDataType::Type gDataType) {
+  static const T_CANDIDATES_STR_LST CANDIDATES_DEFAULT;
+  static const QMap<int, T_CANDIDATES_STR_LST> CANDIDATES_MAP{
+      {GeneralDataType::Type::FONT_FAMILY,
+       {
+#ifdef _WIN32
+           // Windows平台字体
+           "Microsoft YaHei UI", // 微软雅黑
+           "SimSun",             // 宋体
+           "NSimSun",            // 新宋体
+           "Microsoft JhengHei", // 微软正黑体
+           "Arial",              // 英文无衬线字体
+           "Times New Roman",    // 英文衬线字体
+           "Tahoma",             // Windows系统UI字体
+           "Segoe UI",           // Windows现代UI字体
+           "Calibri",            // Office默认字体
+           "Consolas",           // 等宽字体
+           "Courier New",        // 等宽字体
+           "Verdana",            // 屏幕显示优化字体
+           "Georgia",            // 适合屏幕阅读的衬线字体
+           "Trebuchet MS",       // Web安全字体
+           "Comic Sans MS"       // 手写风格字体
+#else
+           // Linux平台字体
+           "Noto Sans",        // Google跨平台字体
+           "Noto Sans CJK SC", // Noto Sans中文字体
+           "DejaVu Sans",      // 开源无衬线字体
+           "DejaVu Serif",     // 开源衬线字体
+           "Liberation Sans",  // 替换Arial的开源字体
+           "Liberation Serif", // 替换Times New Roman的开源字体
+           "Ubuntu",           // Ubuntu系统默认字体
+           "FreeSans",         // 开源无衬线字体
+           "Droid Sans",       // Android系统字体
+           "Arial",            // 英文无衬线字体
+           "Times New Roman",  // 英文衬线字体
+           "Tahoma",           // 屏幕显示字体
+           "Verdana",          // 屏幕显示优化字体
+           "Courier New",      // 等宽字体
+           "Monospace"         // 通用等宽字体
+#endif
+       }},
+  };
+  auto it = CANDIDATES_MAP.find(gDataType);
+  if (it == CANDIDATES_MAP.cend()) {
+    return &CANDIDATES_DEFAULT;
+  } else {
+    return &it.value();
+  }
 }

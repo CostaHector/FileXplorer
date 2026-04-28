@@ -246,15 +246,16 @@ private slots:
     const QModelIndex r7Index3 = srcModel->siblingAtColumn(srcIndexes[7], StyleItemData::EDITABLE_COLUMN);
     const QModelIndex r8Index3 = srcModel->siblingAtColumn(srcIndexes[8], StyleItemData::EDITABLE_COLUMN);
 
-    QVERIFY(StringComboBox::CANDIDATES_FONT_FAMILY.size() > 0);
-    const QMap<QString, int>* mFallbackOkItems = EnumComboBox::GetCandidates(GeneralDataType::Type::PLAIN_INT).first;
-    const QMap<QString, int>* mFontWeightItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_WEIGHT).first;
-    const QMap<QString, int>* mFontStyleItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_STYLE).first;
+    const QStringList* const mFontFamilyItems = StringComboBox::GetCandidates(GeneralDataType::Type::FONT_WEIGHT);
+    const QMap<QString, int>* const mFallbackOkItems = EnumComboBox::GetCandidates(GeneralDataType::Type::PLAIN_INT).first;
+    const QMap<QString, int>* const mFontWeightItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_WEIGHT).first;
+    const QMap<QString, int>* const mFontStyleItems = EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_STYLE).first;
+    QVERIFY(mFontFamilyItems != nullptr);
     QVERIFY(mFallbackOkItems != nullptr);
     QVERIFY(mFontWeightItems != nullptr);
     QVERIFY(mFontStyleItems != nullptr);
 
-    EnumComboBox::GetCandidates(GeneralDataType::Type::FONT_STYLE);
+    QVERIFY(mFontFamilyItems->size() > 0);
     QVERIFY(mFontWeightItems->size() > 0);
     QVERIFY(mFontStyleItems->size() > 0);
 
@@ -288,8 +289,8 @@ private slots:
       QComboBox* fontFamilyCb = qobject_cast<QComboBox*>(fontFamilyStringComboBox);
       QVERIFY(fontFamilyCb != nullptr);
 
-      QCOMPARE(fontFamilyCb->count(), StringComboBox::CANDIDATES_FONT_FAMILY.size());
-      QString newFontFamilyStr = StringComboBox::CANDIDATES_FONT_FAMILY[0];
+      QCOMPARE(fontFamilyCb->count(), mFontFamilyItems->size());
+      QString newFontFamilyStr = (*mFontFamilyItems)[0];
       fontFamilyCb->setCurrentText(newFontFamilyStr);
       delegate->setModelData(fontFamilyCb, srcModel, r1Index3);
 

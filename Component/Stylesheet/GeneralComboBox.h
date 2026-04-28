@@ -12,6 +12,7 @@ public:
   virtual void updateCurrentDisplayString(const QVariant &editRoleData) { setCurrentText(editRoleData.toString()); }
 
   static GeneralComboBox *create(int generalDataType, QWidget *parent);
+  static QString displayText(int generalDataType, const QVariant &displayRoleData);
 
 private:
   GeneralDataType::Type mDataType;
@@ -24,6 +25,7 @@ public:
   QVariant getSetDataVariant() const override;
 
   void updateCurrentDisplayString(const QVariant &editRoleData) override;
+  static QString displayText(GeneralDataType::Type gDataType, const QVariant &displayRoleData);
 
 private:
   using T_CANDIDATES_STR_TO_ENUM = QMap<QString, int>;
@@ -34,6 +36,7 @@ private:
 
   using PAIR_TYPE = std::pair<const T_CANDIDATES_STR_TO_ENUM *, const T_ENUM_TO_CANDIDATES_STR *>;
   static PAIR_TYPE GetCandidates(GeneralDataType::Type gDataType);
+  static QString getDisplayString(const QVariant &variantData, const T_ENUM_TO_CANDIDATES_STR &pCandidateDisp);
 };
 
 class StringComboBox : public GeneralComboBox {
@@ -42,8 +45,10 @@ public:
   QVariant getSetDataVariant() const override;
 
 private:
-  static const QStringList CANDIDATES_FONT_FAMILY;
-  const QStringList *mCandidates;
+  using T_CANDIDATES_STR_LST = QStringList;
+  const T_CANDIDATES_STR_LST *mCandidates{nullptr};
+
+  static const T_CANDIDATES_STR_LST *GetCandidates(GeneralDataType::Type gDataType);
 };
 
 #endif // GENERALCOMBOBOX_H

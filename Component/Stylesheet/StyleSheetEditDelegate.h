@@ -2,12 +2,10 @@
 #define STYLESHEETEDITDELEGATE_H
 
 #include <QStyledItemDelegate>
-#include <QComboBox>
-#include <QMap>
 
 class StyleSheetEditDelegate : public QStyledItemDelegate {
 public:
-  explicit StyleSheetEditDelegate(int dataTypeRole = Qt::ItemDataRole::UserRole, int editableColumn = 0, QObject *parent = nullptr);
+  explicit StyleSheetEditDelegate(int dataTypeRole = Qt::ItemDataRole::UserRole + 1, int editableColumn = 0, QObject *parent = nullptr);
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
@@ -16,6 +14,9 @@ public:
   void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
   void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+protected:
+  void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 
 private:
   QWidget *createLineEditorWithColorDialog(QWidget *editWidget) const;
