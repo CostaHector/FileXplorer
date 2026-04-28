@@ -8,8 +8,10 @@
 #include "SystemContextMenuControl.h"
 
 #include "PopupWidgetManager.h"
+#ifdef PASSVAULT_ENABLED
 #include "SimpleAES.h"
 #include "PasswordBook.h"
+#endif
 
 #include "PreferenceActions.h"
 #include "StyleSheetMgr.h"
@@ -43,10 +45,11 @@ void ExtraEvents::subscribe() {
   auto& leafInst = g_fileLeafActions();
   m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsMgr>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
-
+#ifdef PASSVAULT_ENABLED
   mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "Geometry/PasswordBook"};
   CHECK_NULLPTR_RETURN_VOID(mPwdBook);
   mPwdBook->setWidgetCreator(PasswordBook::Creater);
+#endif
 
   connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::toggled, this, [pParentWidget]() {
     QMessageBox::about(pParentWidget,

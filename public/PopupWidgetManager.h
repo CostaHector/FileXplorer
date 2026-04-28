@@ -41,7 +41,6 @@ class DuplicatesImagesFinder;
 class TorrentsManagerWidget;
 class ConfigsMgr;
 class Archiver;
-class PasswordBook;
 class ResourceMonitorPanel;
 
 extern template class PopupWidgetManager<QWidget>;
@@ -51,6 +50,9 @@ extern template class PopupWidgetManager<DuplicatesImagesFinder>;
 extern template class PopupWidgetManager<TorrentsManagerWidget>;
 extern template class PopupWidgetManager<ConfigsMgr>;
 extern template class PopupWidgetManager<Archiver>;
+#ifdef PASSVAULT_ENABLED
+class PasswordBook;
 extern template class PopupWidgetManager<PasswordBook>;
+#endif
 extern template class PopupWidgetManager<ResourceMonitorPanel>;
 #endif // POPUPWIDGETMANAGER_H

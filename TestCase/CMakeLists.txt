@@ -18,6 +18,14 @@ add_definitions(
     -DUNICODE
     -D_UNICODE
 )
+
+SET(PASSVAULT_ENABLED ON)
+if (PASSVAULT_ENABLED)
+    add_definitions(
+        -DPASSVAULT_ENABLED
+    )
+endif()
+
 message("[${PROJECT_NAME}] Start...")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -44,7 +52,6 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
     ${PARENT_DIR}/Component/Navigation/*.cpp
-    ${PARENT_DIR}/Component/Pwd/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
     ${PARENT_DIR}/Component/Stylesheet/*.cpp
     ${PARENT_DIR}/Component/VideoPlayer/*.cpp
@@ -56,7 +63,6 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Tools/Classify/*.cpp
     ${PARENT_DIR}/Tools/FileDescriptor/*.cpp
     ${PARENT_DIR}/Tools/Json/*.cpp
-    ${PARENT_DIR}/Tools/PasswordTable/*.cpp
     ${PARENT_DIR}/View/*.cpp
     # test only module sources
     main_ut.cpp
@@ -70,7 +76,6 @@ file(GLOB SOURCES
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
     ComponentTest/NavigationTest/*.cpp
-    ComponentTest/PwdTest/*.cpp
     ComponentTest/RenameTest/*.cpp
     ComponentTest/StylesheetTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
@@ -82,7 +87,6 @@ file(GLOB SOURCES
     pubTestTool/*.cpp
     ToolsTest/*.cpp
     ToolsTest/FileDescriptorTest/*.cpp
-    ToolsTest/PasswordTableTest/*.cpp
     ViewTest/*.cpp
 )
 
@@ -105,7 +109,6 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
     ${PARENT_DIR}/Component/Navigation
-    ${PARENT_DIR}/Component/Pwd
     ${PARENT_DIR}/Component/RenameWidgets
     ${PARENT_DIR}/Component/Stylesheet
     ${PARENT_DIR}/Component/VideoPlayer
@@ -118,7 +121,6 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Classify
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
-    ${PARENT_DIR}/Tools/PasswordTable
     ${PARENT_DIR}/View
     pubTestTool
     MockTool
@@ -137,7 +139,6 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
     ${PARENT_DIR}/Component/Navigation/*.h
-    ${PARENT_DIR}/Component/Pwd/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h
     ${PARENT_DIR}/Component/Stylesheet/*.h
     ${PARENT_DIR}/Component/VideoPlayer/*.h
@@ -150,11 +151,23 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Classify/*.h
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
-    ${PARENT_DIR}/Tools/PasswordTable/*.h
     ${PARENT_DIR}/View/*.h
     pubTestTool/*.h
     MockTool/*.h
 )
+
+if (PASSVAULT_ENABLED)
+    file(GLOB SOURCESPassVault
+        ${PARENT_DIR}/Component/PassVault/*.cpp
+        ComponentTest/PassVaultTest/*.cpp
+    )
+    list(APPEND SOURCES ${SOURCESPassVault})
+    list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/Component/PassVault)
+    file(GLOB HEADERSPassVault
+        ${PARENT_DIR}/Component/PassVault/*.h
+    )
+    list(APPEND HEADERS ${HEADERSPassVault})
+endif()
 
 SET(MOCKCPP_SRC_ROOT ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-src)
 SET(FETCH_CONTENT_QUIET OFF)
@@ -251,41 +264,46 @@ if(WIN32)
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
-
-    # 4. OpenSSL configuration for Windows
-    # Install "Win64OpenSSL-3_5_4.msi" to path "C:/Program Files/OpenSSL-Win64"
-    # Copy OpenSSL DLLs to: The OpenSSL binaries (/bin) directory
-    set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-    if(NOT EXISTS ${OPENSSL_ROOT_DIR})
-        message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
-    endif()
-    include_directories("${OPENSSL_ROOT_DIR}/include")
-    link_directories("${OPENSSL_ROOT_DIR}/lib")
-    link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
-        )
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
-        )
-    endif()
 elseif(UNIX AND NOT APPLE)  # Linux
     # 1. ffmpeg
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
-    # 2. openssl
-    find_package(OpenSSL REQUIRED)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+endif()
 
-    # 3. PkgConfig Credential
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
-    include_directories(${LIBSECRET_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBSECRET_LIBRARIES})
+if (PASSVAULT_ENABLED)
+    if(WIN32)
+        # 4. OpenSSL configuration for Windows
+        # Install "Win64OpenSSL-3_5_4.msi" to path "C:/Program Files/OpenSSL-Win64"
+        # Copy OpenSSL DLLs to: The OpenSSL binaries (/bin) directory
+        set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+        if(NOT EXISTS ${OPENSSL_ROOT_DIR})
+            message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
+        endif()
+        include_directories("${OPENSSL_ROOT_DIR}/include")
+        link_directories("${OPENSSL_ROOT_DIR}/lib")
+        link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_link_libraries(${PROJECT_NAME} PRIVATE
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
+            )
+        else()
+            target_link_libraries(${PROJECT_NAME} PRIVATE
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
+            )
+        endif()
+    elseif(UNIX AND NOT APPLE)
+        # 2. openssl
+        find_package(OpenSSL REQUIRED)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+        target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+        # 3. PkgConfig Credential
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+        include_directories(${LIBSECRET_INCLUDE_DIRS})
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBSECRET_LIBRARIES})
+    endif()
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
