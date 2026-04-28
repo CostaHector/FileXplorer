@@ -1,30 +1,30 @@
-#include "StringComboBox.h"
+#include "ComboBoxString.h"
 #include "Logger.h"
 
-StringComboBox::StringComboBox(GeneralDataType::Type gDataType, QWidget *parent)
-  : GeneralComboBox{gDataType, parent} {
+ComboBoxString::ComboBoxString(GeneralDataType::Type gDataType, QWidget *parent)
+  : ComboBoxGeneral{gDataType, parent} {
   mCandidates = GetCandidates(gDataType);
   addItems(*mCandidates);
 }
 
-QVariant StringComboBox::getSetDataEditRoleValue() const {
+QVariant ComboBoxString::getSetDataEditRoleValue() const {
   QString rawText = currentText();
   // 严格检查即将写入的配置
   return mCandidates->contains(rawText) ? rawText : "";
 }
 
-void StringComboBox::updateCurrentTextFromEditRole(const QVariant &editRoleData) {
+void ComboBoxString::updateCurrentTextFromEditRole(const QVariant &editRoleData) {
   const QString editModeDisplayText = getDisplayString(editRoleData, *mCandidates);
-  GeneralComboBox::updateCurrentTextFromEditRole(editModeDisplayText);
+  ComboBoxGeneral::updateCurrentTextFromEditRole(editModeDisplayText);
 }
 
-QString StringComboBox::displayTextFromDisplayRole(GeneralDataType::Type gDataType, const QVariant &displayRoleData) {
+QString ComboBoxString::displayTextFromDisplayRole(GeneralDataType::Type gDataType, const QVariant &displayRoleData) {
   const T_CANDIDATES_STR_LST *const candidatesDisplay{GetCandidates(gDataType)};
   const QString displayModeDisplayText = getDisplayString(displayRoleData, *candidatesDisplay);
   return displayModeDisplayText;
 }
 
-const StringComboBox::T_CANDIDATES_STR_LST *StringComboBox::GetCandidates(GeneralDataType::Type gDataType) {
+const ComboBoxString::T_CANDIDATES_STR_LST *ComboBoxString::GetCandidates(GeneralDataType::Type gDataType) {
   static const T_CANDIDATES_STR_LST CANDIDATES_DEFAULT;
   static const QMap<int, T_CANDIDATES_STR_LST> CANDIDATES_MAP{
       {GeneralDataType::Type::FONT_FAMILY,
@@ -74,7 +74,7 @@ const StringComboBox::T_CANDIDATES_STR_LST *StringComboBox::GetCandidates(Genera
   }
 }
 
-QString StringComboBox::getDisplayString(const QVariant &variantData, const T_CANDIDATES_STR_LST &pCandidateDisp) {
+QString ComboBoxString::getDisplayString(const QVariant &variantData, const T_CANDIDATES_STR_LST &pCandidateDisp) {
   QString curStrFromModel = variantData.toString();
   if (!pCandidateDisp.contains(curStrFromModel)) {
     return QString{"not allowed: data[%1] from model"}.arg(curStrFromModel);

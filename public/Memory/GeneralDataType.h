@@ -29,14 +29,21 @@ enum Type {
   COMBOBOX_NEED_STRING_TO_ENUM_END,
   COMBOBOX_NEED_END = COMBOBOX_NEED_STRING_TO_ENUM_END,
 
-  COLOR = COMBOBOX_NEED_STRING_TO_ENUM_END,
+  LINEDIT_WITH_ACTION_BEGIN = COMBOBOX_NEED_STRING_TO_ENUM_END,
+  COLOR = LINEDIT_WITH_ACTION_BEGIN,
 
   PATH_RELATED_BEGIN = COLOR,
   FILE_PATH,           // resource url or local path
   IMAGE_PATH_OPTIONAL, // can be empty
   FOLDER_PATH,
   PATH_RELATED_END,
+
+  LINEDIT_WITH_ACTION_END = PATH_RELATED_END,
 };
+
+inline constexpr bool isLineEditWithActionNeededInEditor(int dataType) {
+  return GeneralDataType::Type::LINEDIT_WITH_ACTION_BEGIN <= dataType && dataType < GeneralDataType::Type::LINEDIT_WITH_ACTION_END;
+}
 
 inline constexpr bool isPathRelatedType(int dataType) {
   return GeneralDataType::Type::PATH_RELATED_BEGIN <= dataType && dataType < GeneralDataType::Type::PATH_RELATED_END;

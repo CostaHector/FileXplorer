@@ -1,11 +1,11 @@
-#ifndef ENUMCOMBOBOX_H
-#define ENUMCOMBOBOX_H
+#ifndef COMBOBOXENUM_H
+#define COMBOBOXENUM_H
 
-#include "GeneralComboBox.h"
+#include "ComboBoxGeneral.h"
 
-class EnumComboBox : public GeneralComboBox {
+class ComboBoxEnum : public ComboBoxGeneral {
 public:
-  explicit EnumComboBox(GeneralDataType::Type gDataType, QWidget *parent = nullptr);
+  explicit ComboBoxEnum(GeneralDataType::Type gDataType, QWidget *parent = nullptr);
   QVariant getSetDataEditRoleValue() const override;
 
   void updateCurrentTextFromEditRole(const QVariant &editRoleData) override;
@@ -23,4 +23,4 @@ private:
   static QString getDisplayString(const QVariant &variantData, const T_ENUM_TO_CANDIDATES_STR &pCandidateDisp);
 };
 
-#endif // ENUMCOMBOBOX_H
+#endif // COMBOBOXENUM_H

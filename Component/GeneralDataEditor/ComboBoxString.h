@@ -1,11 +1,11 @@
-#ifndef STRINGCOMBOBOX_H
-#define STRINGCOMBOBOX_H
+#ifndef COMBOBOXSTRING_H
+#define COMBOBOXSTRING_H
 
-#include "GeneralComboBox.h"
+#include "ComboBoxGeneral.h"
 
-class StringComboBox : public GeneralComboBox {
+class ComboBoxString : public ComboBoxGeneral {
 public:
-  explicit StringComboBox(GeneralDataType::Type gDataType, QWidget *parent = nullptr);
+  explicit ComboBoxString(GeneralDataType::Type gDataType, QWidget *parent = nullptr);
   QVariant getSetDataEditRoleValue() const override;
 
   void updateCurrentTextFromEditRole(const QVariant &editRoleData) override;
@@ -19,4 +19,4 @@ private:
   static QString getDisplayString(const QVariant &variantData, const T_CANDIDATES_STR_LST &pCandidateDisp);
 };
 
-#endif // STRINGCOMBOBOX_H
+#endif // COMBOBOXSTRING_H

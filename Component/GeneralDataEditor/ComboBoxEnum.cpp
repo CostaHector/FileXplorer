@@ -1,15 +1,15 @@
-#include "EnumComboBox.h"
+#include "ComboBoxEnum.h"
 #include "StyleEnum.h"
 #include "Logger.h"
 #include <QMap>
 
-EnumComboBox::EnumComboBox(GeneralDataType::Type gDataType, QWidget *parent)
-  : GeneralComboBox{gDataType, parent} {
+ComboBoxEnum::ComboBoxEnum(GeneralDataType::Type gDataType, QWidget *parent)
+  : ComboBoxGeneral{gDataType, parent} {
   std::tie(mCandidates, mCandidatesDisplay) = GetCandidates(gDataType);
   addItems(mCandidates->keys());
 }
 
-QVariant EnumComboBox::getSetDataEditRoleValue() const {
+QVariant ComboBoxEnum::getSetDataEditRoleValue() const {
   QString rawText = currentText();
   auto it = mCandidates->find(rawText);
   if (it == mCandidates->cend()) {
@@ -20,18 +20,18 @@ QVariant EnumComboBox::getSetDataEditRoleValue() const {
   return it.value();
 }
 
-void EnumComboBox::updateCurrentTextFromEditRole(const QVariant &editRoleData) {
+void ComboBoxEnum::updateCurrentTextFromEditRole(const QVariant &editRoleData) {
   const QString editModeDisplayText = getDisplayString(editRoleData, *mCandidatesDisplay);
-  GeneralComboBox::updateCurrentTextFromEditRole(editModeDisplayText);
+  ComboBoxGeneral::updateCurrentTextFromEditRole(editModeDisplayText);
 }
 
-QString EnumComboBox::displayTextFromDisplayRole(GeneralDataType::Type gDataType, const QVariant &displayRoleData) {
+QString ComboBoxEnum::displayTextFromDisplayRole(GeneralDataType::Type gDataType, const QVariant &displayRoleData) {
   const T_ENUM_TO_CANDIDATES_STR *const candidatesDisplay{GetCandidates(gDataType).second};
   const QString displayModeDisplayText = getDisplayString(displayRoleData, *candidatesDisplay);
   return displayModeDisplayText;
 }
 
-EnumComboBox::PAIR_TYPE EnumComboBox::GetCandidates(GeneralDataType::Type gDataType) {
+ComboBoxEnum::PAIR_TYPE ComboBoxEnum::GetCandidates(GeneralDataType::Type gDataType) {
   static const T_CANDIDATES_STR_TO_ENUM CANDIDATES_DEFAULT;
   static const QMap<int, T_CANDIDATES_STR_TO_ENUM> CANDIDATES_MAP{
 #define makeEnumPair(keyStr, enumValue) \
@@ -108,7 +108,7 @@ EnumComboBox::PAIR_TYPE EnumComboBox::GetCandidates(GeneralDataType::Type gDataT
   return std::make_pair(str2EnumPtr, enum2StrPtr);
 }
 
-QString EnumComboBox::getDisplayString(const QVariant &variantData, const T_ENUM_TO_CANDIDATES_STR &pCandidateDisp) {
+QString ComboBoxEnum::getDisplayString(const QVariant &variantData, const T_ENUM_TO_CANDIDATES_STR &pCandidateDisp) {
   // variantData can from editRole, displyRole
   bool bInt{false};
   int curEnumInt = variantData.toInt(&bInt);

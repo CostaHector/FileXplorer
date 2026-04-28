@@ -19,12 +19,6 @@ protected:
   void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 
 private:
-  QWidget *createLineEditorWithColorDialog(QWidget *editWidget) const;
-  QWidget *createLineEditorWithFileDialog(QWidget *editWidget) const;
-  QWidget *createLineEditorWithFolderDialog(QWidget *editWidget) const;
-
-  bool setComboBoxModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index, int dataType) const;
-
   const int mDataTypeRole, mEditableColumn;
 };
 #endif // STYLESHEETEDITDELEGATE_H

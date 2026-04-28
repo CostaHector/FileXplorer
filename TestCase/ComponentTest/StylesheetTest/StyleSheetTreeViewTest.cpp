@@ -3,7 +3,7 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "StyleSheetTreeView.h"
-#include "GeneralComboBox.h"
+#include "ComboBoxGeneral.h"
 #include "EndToExposePrivateMember.h"
 
 #include "StyleSheetGetter.h"

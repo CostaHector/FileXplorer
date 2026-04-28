@@ -84,7 +84,6 @@ void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePers
       LOG_E("Cannot find action[%s] int the menus", qPrintable(pAct->text()));
       return;
     }
-    LOG_D("action[%s] memoryKey[%s] changed to[%d]", qPrintable(pAct->text()), qPrintable(memoryKey), defIndNxtTime);
     Configuration().setValue(memoryKey, defIndNxtTime);
   });
 }
