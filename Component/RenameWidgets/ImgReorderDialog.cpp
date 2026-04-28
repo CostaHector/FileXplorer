@@ -22,6 +22,7 @@ ImgReorderDialog::ImgReorderDialog(QWidget* parent) : QDialog(parent) {
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   layout->addWidget(m_buttonBox);
   if (QPushButton* pOkBtn = m_buttonBox->button(QDialogButtonBox::Ok)) {
+    pOkBtn->setIcon(QIcon(":img/SAVED"));
     pOkBtn->setShortcut(Qt::Key_F10);
     pOkBtn->setToolTip(QString("<b>%1 (%2)</b><br/> Finish numerize")  //
                            .arg(pOkBtn->text(), pOkBtn->shortcut().toString()));

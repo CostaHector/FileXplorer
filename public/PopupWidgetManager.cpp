@@ -8,7 +8,6 @@
 #include "TorrentsManagerWidget.h"
 #include "ConfigsMgr.h"
 #include "Archiver.h"
-#include "PasswordBook.h"
 #include "ResourceMonitorPanel.h"
 #include "SizeTool.h"
 #include "Configuration.h"
@@ -23,7 +22,10 @@ template class PopupWidgetManager<DuplicatesImagesFinder>;
 template class PopupWidgetManager<TorrentsManagerWidget>;
 template class PopupWidgetManager<ConfigsMgr>;
 template class PopupWidgetManager<Archiver>;
+#ifdef PASSVAULT_ENABLED
+#include "PasswordBook.h"
 template class PopupWidgetManager<PasswordBook>;
+#endif
 template class PopupWidgetManager<ResourceMonitorPanel>;
 
 template<typename WidgetType>

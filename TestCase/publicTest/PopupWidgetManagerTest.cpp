@@ -12,7 +12,9 @@
 #include "TorrentsManagerWidget.h"
 #include "ConfigsMgr.h"
 #include "Archiver.h"
+#ifdef PASSVAULT_ENABLED
 #include "PasswordBook.h"
+#endif
 #include "ResourceMonitorPanel.h"
 
 class PopupWidgetManagerTest : public PlainTestSuite {
@@ -90,7 +92,9 @@ class PopupWidgetManagerTest : public PlainTestSuite {
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
     PopupWidgetManagerTestTemplate<ConfigsMgr>("ConfigsTable", true);
     PopupWidgetManagerTestTemplate<Archiver>("Archiver", true);
+    #ifdef PASSVAULT_ENABLED
     PopupWidgetManagerTestTemplate<PasswordBook>("PasswordBook", true);
+    #endif
     PopupWidgetManagerTestTemplate<ResourceMonitorPanel>("ResourceMonitorPanel", true);
   }
 

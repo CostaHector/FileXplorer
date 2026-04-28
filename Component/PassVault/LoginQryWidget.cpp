@@ -261,6 +261,10 @@ LoginQryWidget::LoginQryWidget(QWidget* parent)
 
   mDlgBtnBox = new (std::nothrow) QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   CHECK_NULLPTR_RETURN_VOID(mDlgBtnBox);
+  if (QPushButton* pOkBtn = mDlgBtnBox->button(QDialogButtonBox::StandardButton::Ok)) {
+    pOkBtn->setIcon(QIcon(":img/SAVED"));
+    StyleSheet::UpdateApplyPushButton(pOkBtn);
+  }
 
   mMainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(mMainLayout);

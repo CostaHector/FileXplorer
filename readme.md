@@ -58,7 +58,7 @@ void testFFmpeg() {
 }
 ```
 
-### 2. OpenSSL (Required for Password Book Encryption/Decryption)
+### 2. OpenSSL (Required when PASSVAULT_ENABLED=ON)
 OpenSSL is required to support encryption and decryption functionality for the password book feature. Below are the installation steps for Windows and Ubuntu systems:
 
 #### Windows

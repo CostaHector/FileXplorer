@@ -10,6 +10,14 @@ add_definitions(
     -DUNICODE
     -D_UNICODE
 )
+
+SET(PASSVAULT_ENABLED ON)
+if (PASSVAULT_ENABLED)
+    add_definitions(
+        -DPASSVAULT_ENABLED
+    )
+endif()
+
 # on windows platform. MediaInfoDLL.h defined a typdef needed
 message("[${PROJECT_NAME}] Start...")
 
@@ -39,7 +47,6 @@ file(GLOB SOURCES
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
     Component/Navigation/*.cpp
-    Component/Pwd/*.cpp
     Component/RenameWidgets/*.cpp
     Component/Stylesheet/*.cpp
     Component/VideoPlayer/*.cpp
@@ -51,7 +58,6 @@ file(GLOB SOURCES
     Tools/Classify/*.cpp
     Tools/FileDescriptor/*.cpp
     Tools/Json/*.cpp
-    Tools/PasswordTable/*.cpp
     View/*.cpp
     main.cpp
 )
@@ -76,7 +82,6 @@ set(SRV_HEADER_PATH
     Component/HeaderView
     Component/LineEdit
     Component/Navigation
-    Component/Pwd
     Component/RenameWidgets
     Component/Stylesheet
     Component/VideoPlayer
@@ -89,9 +94,7 @@ set(SRV_HEADER_PATH
     Tools/Classify
     Tools/FileDescriptor
     Tools/Json
-    Tools/PasswordTable
     View
-    ./
 )
 
 file(GLOB HEADERS
@@ -108,7 +111,6 @@ file(GLOB HEADERS
     Component/HeaderView/*.h
     Component/LineEdit/*.h
     Component/Navigation/*.h
-    Component/Pwd/*.h
     Component/RenameWidgets/*.h
     Component/Stylesheet/*.h
     Component/VideoPlayer/*.h
@@ -121,7 +123,6 @@ file(GLOB HEADERS
     Tools/Classify/*.h
     Tools/FileDescriptor/*.h
     Tools/Json/*.h
-    Tools/PasswordTable/*.h
     View/*.h
 )
 
@@ -131,6 +132,17 @@ foreach(header_file ${HEADERS})
     message("${header_file}")
 endforeach()
 
+if (PASSVAULT_ENABLED)
+    file(GLOB PassVaultSOURCES
+        Component/PassVault/*.cpp
+    )
+    list(APPEND SOURCES ${PassVaultSOURCES})
+    list(APPEND SRV_HEADER_PATH Component/PassVault)
+    file(GLOB PassVaultHEADERS
+        Component/PassVault/*.h
+    )
+    list(APPEND HEADERS ${PassVaultHEADERS})
+endif()
 
 set(RESOURCES
     "resources/images.qrc"
@@ -196,46 +208,50 @@ if(WIN32)
         "${ffmpegpath}/lib/avcodec.lib"
         "${ffmpegpath}/lib/avutil.lib"
         "${ffmpegpath}/lib/swscale.lib")
-
-    # OpenSSL configuration for Windows
-    # Set OpenSSL paths
-    set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-    if(NOT EXISTS ${OPENSSL_ROOT_DIR})
-        message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
-    endif()
-
-    # Include directories
-    include_directories("${OPENSSL_ROOT_DIR}/include")
-
-    # Library paths
-    link_directories("${OPENSSL_ROOT_DIR}/lib")
-    link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
-
-    # Debug vs Release library selection
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
-        )
-        message(STATUS "Linking with OpenSSL Debug libraries")
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
-            "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
-        )
-        message(STATUS "Linking with OpenSSL Release libraries")
-    endif()
 elseif(UNIX AND NOT APPLE)  # Linux
     target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+endif()
 
-    find_package(OpenSSL REQUIRED)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+if (PASSVAULT_ENABLED)
+    if(WIN32)
+        # OpenSSL configuration for Windows
+        # Set OpenSSL paths
+        set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+        if(NOT EXISTS ${OPENSSL_ROOT_DIR})
+            message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
+        endif()
 
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
-    include_directories(${LIBSECRET_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBSECRET_LIBRARIES})
+        # Include directories
+        include_directories("${OPENSSL_ROOT_DIR}/include")
+
+        # Library paths
+        link_directories("${OPENSSL_ROOT_DIR}/lib")
+        link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
+
+        # Debug vs Release library selection
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_link_libraries(${PROJECT_NAME} PRIVATE
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
+            )
+            message(STATUS "Linking with OpenSSL Debug libraries")
+        else()
+            target_link_libraries(${PROJECT_NAME} PRIVATE
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
+                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
+            )
+            message(STATUS "Linking with OpenSSL Release libraries")
+        endif()
+    elseif(UNIX AND NOT APPLE)  # Linux
+        find_package(OpenSSL REQUIRED)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+        target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+        include_directories(${LIBSECRET_INCLUDE_DIRS})
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBSECRET_LIBRARIES})
+    endif()
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
