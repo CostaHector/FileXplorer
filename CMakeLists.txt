@@ -35,6 +35,7 @@ file(GLOB SOURCES
     Component/DupImages/*.cpp
     Component/DupVideos/*.cpp
     Component/FolderPreview/*.cpp
+    Component/GeneralDataEditor/*.cpp
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
     Component/Navigation/*.cpp
@@ -69,6 +70,7 @@ set(SRV_HEADER_PATH
     Component
     Component/Configs
     Component/FolderPreview
+    Component/GeneralDataEditor
     Component/DupImages
     Component/DupVideos
     Component/HeaderView
@@ -102,6 +104,7 @@ file(GLOB HEADERS
     Component/DupImages/*.h
     Component/DupVideos/*.h
     Component/FolderPreview/*.h
+    Component/GeneralDataEditor/*.h
     Component/HeaderView/*.h
     Component/LineEdit/*.h
     Component/Navigation/*.h

@@ -22,7 +22,6 @@ public:
   QAction* _LOWER_ALL_WORDS{nullptr};
 
   // **File Operation**
-  QAction* _OPEN_THIS_FILE{nullptr};
   QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
 
   // **Studio/Cast/Tags Field Operation**

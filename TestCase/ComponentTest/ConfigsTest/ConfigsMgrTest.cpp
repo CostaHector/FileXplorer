@@ -137,7 +137,7 @@ private slots:
       QCOMPARE(acceptSpy.count(), 0);          // 不会accept
       QVERIFY(enter1PressEvent.isAccepted());  // 被接受, 关闭窗口
 
-      QPushButton* pOkBtn = cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Open);
+      QPushButton* pOkBtn = cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Ok);
       QVERIFY(pOkBtn != nullptr);
       pOkBtn->clicked();              // 点击ok, 会关闭窗口
       acceptSpy.clear();

@@ -49,13 +49,6 @@ JsonActions::JsonActions(QObject* parent) //
                                    .arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
   // **File Operation**
-  _OPEN_THIS_FILE = new (std::nothrow) QAction{QIcon{":/JsonEditor/OPEN_JSON_FILE"}, tr("Open this json file"), this};
-  _OPEN_THIS_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_O));
-  _OPEN_THIS_FILE->setShortcutVisibleInContextMenu(true);
-  _OPEN_THIS_FILE->setToolTip(QString("<b>%1 (%2)</b><br/> Open this json file in system default app.")
-                                  .arg(_OPEN_THIS_FILE->text())
-                                  .arg(_OPEN_THIS_FILE->shortcut().toString()));
-
   _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related files"), this);
   _RENAME_JSON_AND_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected json file(s) and its related file(s) name") //
                                                  .arg(_RENAME_JSON_AND_RELATED_FILES->text())
