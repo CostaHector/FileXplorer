@@ -1,4 +1,5 @@
 #include "ComboBoxString.h"
+#include "StyleEnum.h"
 #include "Logger.h"
 
 ComboBoxString::ComboBoxString(GeneralDataType::Type gDataType, QWidget *parent)
@@ -29,9 +30,9 @@ const ComboBoxString::T_CANDIDATES_STR_LST *ComboBoxString::GetCandidates(Genera
   static const QMap<int, T_CANDIDATES_STR_LST> CANDIDATES_MAP{
       {GeneralDataType::Type::FONT_FAMILY,
        {
+          Style::DEFAULT_FONT_FAMILY,
 #ifdef _WIN32
            // Windows平台字体
-           "Microsoft YaHei UI", // 微软雅黑
            "SimSun",             // 宋体
            "NSimSun",            // 新宋体
            "Microsoft JhengHei", // 微软正黑体
@@ -48,7 +49,6 @@ const ComboBoxString::T_CANDIDATES_STR_LST *ComboBoxString::GetCandidates(Genera
            "Comic Sans MS"       // 手写风格字体
 #else
            // Linux平台字体
-           "Noto Sans",        // Google跨平台字体
            "Noto Sans CJK SC", // Noto Sans中文字体
            "DejaVu Sans",      // 开源无衬线字体
            "DejaVu Serif",     // 开源衬线字体
