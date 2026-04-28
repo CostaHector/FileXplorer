@@ -40,6 +40,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/DupImages/*.cpp
     ${PARENT_DIR}/Component/DupVideos/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
+    ${PARENT_DIR}/Component/GeneralDataEditor/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
     ${PARENT_DIR}/Component/Navigation/*.cpp
@@ -65,6 +66,7 @@ file(GLOB SOURCES
     ComponentTest/DupImagesTest/*.cpp
     ComponentTest/DupVideosTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
+    ComponentTest/GeneralDataEditorTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
     ComponentTest/NavigationTest/*.cpp
@@ -99,6 +101,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/DupImages
     ${PARENT_DIR}/Component/DupVideos
     ${PARENT_DIR}/Component/FolderPreview
+    ${PARENT_DIR}/Component/GeneralDataEditor
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
     ${PARENT_DIR}/Component/Navigation
@@ -130,6 +133,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/DupImages/*.h
     ${PARENT_DIR}/Component/DupVideos/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
+    ${PARENT_DIR}/Component/GeneralDataEditor/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
     ${PARENT_DIR}/Component/Navigation/*.h

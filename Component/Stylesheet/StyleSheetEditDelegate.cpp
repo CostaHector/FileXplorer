@@ -150,7 +150,7 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
       return;
     }
     QVariant editRoleData = index.model()->data(index, Qt::EditRole);
-    comboBox->updateCurrentDisplayString(editRoleData);
+    comboBox->updateCurrentTextFromEditRole(editRoleData);
     return;
   }
   QStyledItemDelegate::setEditorData(editor, index);
@@ -199,6 +199,6 @@ bool StyleSheetEditDelegate::setComboBoxModelData(QWidget *editor, QAbstractItem
     LOG_E("Editor is not a GeneralComboBox for dataType[%d]", dataType);
     return false;
   }
-  QVariant value = comboBox->getSetDataVariant();
-  return model->setData(index, value, Qt::EditRole);
+  QVariant editRoleValue = comboBox->getSetDataEditRoleValue();
+  return model->setData(index, editRoleValue, Qt::EditRole);
 }
