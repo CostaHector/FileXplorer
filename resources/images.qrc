@@ -216,8 +216,6 @@
         <file alias="LIST_MODE">PreferenceIcons/LIST_MODE.png</file>
         <file alias="LIST_VIEW">PreferenceIcons/LIST_VIEW.png</file>
         <file alias="TABLE_VIEW">PreferenceIcons/TABLE_VIEW.png</file>
-        <file alias="LEFT_TO_RIGHT">PreferenceIcons/LEFT_TO_RIGHT.png</file>
-        <file alias="TOP_TO_BOTTOM">PreferenceIcons/TOP_TO_BOTTOM.png</file>
         <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
         <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.svg</file>
         <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
