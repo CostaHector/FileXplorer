@@ -198,7 +198,6 @@
         <file alias="SHIFT_LEFT_BY_STEP">Rename/SHIFT_LEFT_BY_STEP.svg</file>
         <file alias="SHIFT_RIGHT_BY_STEP">Rename/SHIFT_RIGHT_BY_STEP.svg</file>
         <file alias="NOMARLIZE_KEEP_RELATIVE_ORDER">Rename/NOMARLIZE_KEEP_RELATIVE_ORDER.svg</file>
-        <file alias="REGEX">Rename/REGEX.svg</file>
 
         <!--Browser Icon here-->
         <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
@@ -335,7 +334,6 @@
         <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
         <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
         <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
-        <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
         <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
         <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
         <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>

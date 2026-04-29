@@ -47,6 +47,7 @@ file(GLOB SOURCES
     Component/HeaderView/*.cpp
     Component/LineEdit/*.cpp
     Component/Navigation/*.cpp
+    Component/PassVault/*.cpp
     Component/RenameWidgets/*.cpp
     Component/Stylesheet/*.cpp
     Component/VideoPlayer/*.cpp
@@ -82,6 +83,7 @@ set(SRV_HEADER_PATH
     Component/HeaderView
     Component/LineEdit
     Component/Navigation
+    Component/PassVault
     Component/RenameWidgets
     Component/Stylesheet
     Component/VideoPlayer
@@ -111,6 +113,7 @@ file(GLOB HEADERS
     Component/HeaderView/*.h
     Component/LineEdit/*.h
     Component/Navigation/*.h
+    Component/PassVault/*.h
     Component/RenameWidgets/*.h
     Component/Stylesheet/*.h
     Component/VideoPlayer/*.h
@@ -133,15 +136,8 @@ foreach(header_file ${HEADERS})
 endforeach()
 
 if (PASSVAULT_ENABLED)
-    file(GLOB PassVaultSOURCES
-        Component/PassVault/*.cpp
-    )
-    list(APPEND SOURCES ${PassVaultSOURCES})
-    list(APPEND SRV_HEADER_PATH Component/PassVault)
-    file(GLOB PassVaultHEADERS
-        Component/PassVault/*.h
-    )
-    list(APPEND HEADERS ${PassVaultHEADERS})
+    list(APPEND SOURCES Tools/SimpleAES.cpp)
+    list(APPEND HEADERS Tools/SimpleAES.h)
 endif()
 
 set(RESOURCES

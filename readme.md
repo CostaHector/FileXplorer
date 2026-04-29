@@ -88,6 +88,7 @@ Install OpenSSL via the terminal with the following commands:
 ```sh
 sudo apt install -y openssl libssl-dev
 openssl version
+ls /usr/include/openssl/
 ```
 
 ## Core Features

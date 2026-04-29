@@ -112,8 +112,7 @@ void StyleSheetMgr::subscribe() {
 
 void StyleSheetMgr::onApplyChanges() {
   StyleSheetGetter::GetInst().WriteIntoSettings();
-  const PreferenceActions& prefInst = g_PreferenceActions();
-  prefInst.initStyleTheme(false);
+  g_PreferenceActions().initStyleTheme(false);
   accept();
 }
 
@@ -123,7 +122,7 @@ void StyleSheetMgr::onStartFilter() {
 
 void StyleSheetMgr::showEvent(QShowEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  QWidget::showEvent(event);
+  QDialog::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
 }
 

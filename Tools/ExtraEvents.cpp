@@ -45,19 +45,21 @@ void ExtraEvents::subscribe() {
   auto& leafInst = g_fileLeafActions();
   m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsMgr>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
+
 #ifdef PASSVAULT_ENABLED
   mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "Geometry/PasswordBook"};
   CHECK_NULLPTR_RETURN_VOID(mPwdBook);
   mPwdBook->setWidgetCreator(PasswordBook::Creater);
 #endif
 
-  connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::toggled, this, [pParentWidget]() {
-    QMessageBox::about(pParentWidget,
+  connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::triggered, this, []() {
+    QMessageBox::about(nullptr,
                        "FileExplorer",
                        "Version: 62.5.6\n"
                        "Introduction: A minimalism app for image/video/json/folder explorer\n"
                        "Platform-supported: Linux and Win");
   });
+
   m_resMonitor = new (std::nothrow)
       PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget, "Geometry/ResMonitor"};
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);

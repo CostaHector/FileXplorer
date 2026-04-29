@@ -1,12 +1,12 @@
 #include "SimpleAES.h"
 #include "Logger.h"
-#include <QCryptographicHash>
-#include <QMessageAuthenticationCode>
-
+// 未启用PASSVAULT_ENABLED功能时, 将直接存储明文
+#ifdef PASSVAULT_ENABLED
 #include <openssl/err.h>
 #include <openssl/evp.h>
 // #include <openssl/provider.h>
 #include <openssl/rand.h>
+#endif
 /*
 sudo apt install libssl-dev needed
 openssl version
@@ -59,7 +59,10 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
   if (input.isEmpty()) {
     return true;  // 空串无需解密
   }
-
+#ifndef PASSVAULT_ENABLED
+  encryptedResult = input;
+  return true;
+#else
   // 1. 获取随机 IV
   unsigned char iv[12]{0};
   if (m_bUseRandomIV) {
@@ -75,14 +78,14 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
 
   // 3. 加密数据
   int ciphertext_len = input.size() + EVP_CIPHER_block_size(EVP_aes_128_gcm());
-  unsigned char* ciphertext = new unsigned char[ciphertext_len];
+  std::unique_ptr<unsigned char[]> ciphertext(new unsigned char[ciphertext_len]);
 
   int len, total_len = 0;
-  EVP_EncryptUpdate(ctx, ciphertext, &len, reinterpret_cast<const unsigned char*>(input.constData()), input.size());
+  EVP_EncryptUpdate(ctx, ciphertext.get(), &len, reinterpret_cast<const unsigned char*>(input.constData()), input.size());
   total_len = len;
 
   // 4. 最终加密（生成标签）
-  EVP_EncryptFinal_ex(ctx, ciphertext + total_len, &len);
+  EVP_EncryptFinal_ex(ctx, ciphertext.get() + total_len, &len);
   total_len += len;
 
   // 5. 获取16字节标签
@@ -91,12 +94,12 @@ bool SimpleAES::encrypt_GCM_ByteArray(const QByteArray& input, QByteArray& encry
 
   // 6. 组合 IV + 密文 + 标签
   encryptedResult.append(reinterpret_cast<char*>(iv), 12);
-  encryptedResult.append(reinterpret_cast<char*>(ciphertext), total_len);
+  encryptedResult.append(reinterpret_cast<char*>(ciphertext.get()), total_len);
   encryptedResult.append(reinterpret_cast<char*>(tag), 16);
 
-  delete[] ciphertext;
   EVP_CIPHER_CTX_free(ctx);
   return true;
+#endif
 }
 
 bool SimpleAES::encrypt_GCM(const QString& input, QString& encryptedResult) const {
@@ -125,6 +128,10 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
   if (input.isEmpty()) {
     return true;  // 无需解密
   }
+#ifndef PASSVAULT_ENABLED
+  decryptedResult = input;
+  return true;
+#else
 
   // 1. Base64 解码
   QByteArray combined = QByteArray::fromBase64(input);
@@ -155,38 +162,35 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
     return false;
   }
 
-  // 4. 设置预期的GCM标签（关键步骤！）
+  // 4. 设置预期的GCM标签
   EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, tag);
 
   // 5. 解密数据
   int len, total_len = 0;
   int plaintext_len = ciphertext.size() + EVP_CIPHER_block_size(EVP_aes_128_gcm());
-  unsigned char* plaintext = new unsigned char[plaintext_len];
+  std::unique_ptr<unsigned char[]> plaintext(new unsigned char[plaintext_len]);
 
   // 5.1 解密主体数据
-  if (EVP_DecryptUpdate(ctx, plaintext, &len, reinterpret_cast<const unsigned char*>(ciphertext.constData()), ciphertext.size()) != 1) {
+  if (EVP_DecryptUpdate(ctx, plaintext.get(), &len, reinterpret_cast<const unsigned char*>(ciphertext.constData()), ciphertext.size()) != 1) {
     LOG_W("Failed to decrypt data");
-    delete[] plaintext;
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
   total_len = len;
 
   // 5.2 验证标签（如果失败会返回0）
-  if (EVP_DecryptFinal_ex(ctx, plaintext + total_len, &len) != 1) {
+  if (EVP_DecryptFinal_ex(ctx, plaintext.get() + total_len, &len) != 1) {
     LOG_W("GCM tag verification failed");
-    delete[] plaintext;
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
   total_len += len;
 
   // 6. 转换为QString
-  QByteArray tmpBA(reinterpret_cast<const char*>(plaintext), total_len);
+  QByteArray tmpBA(reinterpret_cast<const char*>(plaintext.get()), total_len);
   decryptedResult.swap(tmpBA);
 
   // 7. 清理资源
-  delete[] plaintext;
   EVP_CIPHER_CTX_free(ctx);
 
   // 8. 验证结果
@@ -194,8 +198,8 @@ bool SimpleAES::decrypt_GCM_ByteArray(const QByteArray& input, QByteArray& decry
     LOG_W("Decrypted content is empty");
     return false;
   }
-
   return true;
+#endif
 }
 
 bool SimpleAES::decrypt_GCM(const QString& input, QString& decryptedResult) const {

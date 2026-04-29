@@ -1,105 +1,25 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#000000" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 512.005 512.005" xml:space="preserve">
-<g>
-	<g>
-		<rect x="42.738" width="426.529" height="28.711"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="370.044" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="313.156" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="370.044" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="199.382" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<polygon points="344.973,43.069 344.973,113.763 415.656,113.763 		"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="313.156" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="256.269" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="426.931" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="199.382" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="142.486" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="256.269" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="28.711" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="426.931" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="483.827" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="85.599" width="154.21" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="483.827" width="66.994" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="28.711" width="154.21" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="162.049" y="142.486" width="267.974" height="28.177"/>
-	</g>
-</g>
-<g>
-	<g>
-		<rect x="66.344" y="85.599" width="66.994" height="28.177"/>
-	</g>
-</g>
+<svg fill="#000000" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.005 512.005" xml:space="preserve">
+<g opacity="0.3"><rect x="0" y="0" width="512" height="512" fill="#FFFFFF"/></g>
+<rect x="42.738" width="426.529" height="28.711"/>
+<rect x="162.049" y="370.044" width="267.974" height="28.177"/>
+<rect x="162.049" y="313.156" width="267.974" height="28.177"/>
+<rect x="66.344" y="370.044" width="66.994" height="28.177"/>
+<rect x="162.049" y="199.382" width="267.974" height="28.177"/>
+<polygon points="344.973,43.069 344.973,113.763 415.656,113.763 		"/>
+<rect x="66.344" y="313.156" width="66.994" height="28.177"/>
+<rect x="66.344" y="256.269" width="66.994" height="28.177"/>
+<rect x="162.049" y="426.931" width="267.974" height="28.177"/>
+<rect x="66.344" y="199.382" width="66.994" height="28.177"/>
+<rect x="66.344" y="142.486" width="66.994" height="28.177"/>
+<rect x="162.049" y="256.269" width="267.974" height="28.177"/>
+<rect x="66.344" y="28.711" width="66.994" height="28.177"/>
+<rect x="66.344" y="426.931" width="66.994" height="28.177"/>
+<rect x="162.049" y="483.827" width="267.974" height="28.177"/>
+<rect x="162.049" y="85.599" width="154.21" height="28.177"/>
+<rect x="66.344" y="483.827" width="66.994" height="28.177"/>
+<rect x="162.049" y="28.711" width="154.21" height="28.177"/>
+<rect x="162.049" y="142.486" width="267.974" height="28.177"/>
+<rect x="66.344" y="85.599" width="66.994" height="28.177"/>
 </svg>

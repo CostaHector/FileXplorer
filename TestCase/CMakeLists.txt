@@ -52,6 +52,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
     ${PARENT_DIR}/Component/Navigation/*.cpp
+    ${PARENT_DIR}/Component/PassVault/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
     ${PARENT_DIR}/Component/Stylesheet/*.cpp
     ${PARENT_DIR}/Component/VideoPlayer/*.cpp
@@ -76,6 +77,7 @@ file(GLOB SOURCES
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
     ComponentTest/NavigationTest/*.cpp
+    ComponentTest/PassVaultTest/*.cpp
     ComponentTest/RenameTest/*.cpp
     ComponentTest/StylesheetTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
@@ -109,6 +111,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/LineEdit
     ${PARENT_DIR}/Component/Navigation
+    ${PARENT_DIR}/Component/PassVault
     ${PARENT_DIR}/Component/RenameWidgets
     ${PARENT_DIR}/Component/Stylesheet
     ${PARENT_DIR}/Component/VideoPlayer
@@ -139,6 +142,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
     ${PARENT_DIR}/Component/Navigation/*.h
+    ${PARENT_DIR}/Component/PassVault/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h
     ${PARENT_DIR}/Component/Stylesheet/*.h
     ${PARENT_DIR}/Component/VideoPlayer/*.h
@@ -155,18 +159,9 @@ file(GLOB HEADERS
     pubTestTool/*.h
     MockTool/*.h
 )
-
 if (PASSVAULT_ENABLED)
-    file(GLOB SOURCESPassVault
-        ${PARENT_DIR}/Component/PassVault/*.cpp
-        ComponentTest/PassVaultTest/*.cpp
-    )
-    list(APPEND SOURCES ${SOURCESPassVault})
-    list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/Component/PassVault)
-    file(GLOB HEADERSPassVault
-        ${PARENT_DIR}/Component/PassVault/*.h
-    )
-    list(APPEND HEADERS ${HEADERSPassVault})
+    list(APPEND SOURCES ${PARENT_DIR}/Tools/SimpleAES.cpp)
+    list(APPEND HEADERS ${PARENT_DIR}/Tools/SimpleAES.h)
 endif()
 
 SET(MOCKCPP_SRC_ROOT ${CMAKE_CURRENT_BINARY_DIR}/_deps/mockcpp-src)

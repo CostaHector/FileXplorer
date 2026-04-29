@@ -21,7 +21,6 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
 
   _ABOUT_FILE_EXPLORER = new (std::nothrow) QAction{QIcon(":img/ABOUT"), tr("About")};
   CHECK_NULLPTR_RETURN_VOID(_ABOUT_FILE_EXPLORER);
-  _ABOUT_FILE_EXPLORER->setCheckable(true);
 
   _LANUAGE = new (std::nothrow) QAction{QIcon(":img/LANGUAGE"), "语言/Language", this};
   CHECK_NULLPTR_RETURN_VOID(_LANUAGE);
