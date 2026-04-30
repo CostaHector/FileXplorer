@@ -83,7 +83,8 @@ log "Generating coverage data..."
     --exclude "/usr/local/include/*" \
     --exclude "*/TestCase/*" \
     --exclude "*/unittest/*" \
-    --exclude "*/build/*"
+    --exclude "*/build/*" \
+    --exclude "*/third_party/*"
 
 # 关键修复：检查覆盖率文件是否有效
 if [ ! -s coverage.info ]; then

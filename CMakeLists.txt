@@ -88,7 +88,6 @@ set(SRV_HEADER_PATH
     Component/Stylesheet
     Component/VideoPlayer
     FileOperation
-    lib
     Model
     public
     public/Memory
@@ -96,6 +95,8 @@ set(SRV_HEADER_PATH
     Tools/Classify
     Tools/FileDescriptor
     Tools/Json
+    third_party/ffmpeg/include
+    third_party/mediaInfo/include
     View
 )
 
@@ -118,7 +119,6 @@ file(GLOB HEADERS
     Component/Stylesheet/*.h
     Component/VideoPlayer/*.h
     FileOperation/*.h
-    lib/*.h
     Model/*.h
     public/*.h
     public/Memory/*.h
@@ -126,6 +126,15 @@ file(GLOB HEADERS
     Tools/Classify/*.h
     Tools/FileDescriptor/*.h
     Tools/Json/*.h
+    third_party/ffmpeg/include/libavcodec/*.h
+    third_party/ffmpeg/include/libavdevice/*.h
+    third_party/ffmpeg/include/libavfilter/*.h
+    third_party/ffmpeg/include/libavformat/*.h
+    third_party/ffmpeg/include/libavutil/*.h
+    third_party/ffmpeg/include/libpostproc/*.h
+    third_party/ffmpeg/include/libswresample/*.h
+    third_party/ffmpeg/include/libswscale/*.h
+    third_party/mediaInfo/include/*.h
     View/*.h
 )
 
@@ -188,25 +197,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::MultimediaWidgets
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi)
-
-    target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi mediaInfo)
-    set(ffmpegpath "C:/home/ffmpeg")
-    if(NOT EXISTS ${ffmpegpath})
-        message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack `ffmpeg-7.1.1-full_build-shared.7z` to [${ffmpegpath}].")
-    endif()
-
-    target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        "${ffmpegpath}/lib/avformat.lib"
-        "${ffmpegpath}/lib/avcodec.lib"
-        "${ffmpegpath}/lib/avutil.lib"
-        "${ffmpegpath}/lib/swscale.lib")
-elseif(UNIX AND NOT APPLE)  # Linux
-    target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/lib")
+    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ffmpeg/lib")
 endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
 
 if (PASSVAULT_ENABLED)
     if(WIN32)

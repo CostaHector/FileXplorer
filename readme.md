@@ -4,8 +4,8 @@
 
 FileXplorer is a cross-platform professional file management system engineered for photographers and videographers handling large-scale media files, offering advanced file operations across both Windows and Linux environments.
 
-![FileXplorer dark windows](bin/FileXplorer_Dark.png)
-![FileXplorer dark ubuntu](bin/FileXplorer_Dark_ubuntu.png)
+![FileXplorer dark windows](resources/FileXplorer_Dark.png)
+![FileXplorer dark ubuntu](resources/FileXplorer_Dark_ubuntu.png)
 
 ## Prerequisites:
 
@@ -142,8 +142,8 @@ Fuzzy matching of action names in dropdowns to bypass hierarchical menu navigati
 
 7. UI Themes
 Light/Dark theme support with automatic time-based switching or manual lock;
-![FileXplorer light windows](bin/FileXplorer_Light.png)
-![FileXplorer light ubuntu](bin/FileXplorer_Light_ubuntu.png)
+![FileXplorer light windows](resources/FileXplorer_Light.png)
+![FileXplorer light ubuntu](resources/FileXplorer_Light_ubuntu.png)
 
 
 ## Coding Style
@@ -154,19 +154,8 @@ variable of class data memeber:
 2. only transfer, no ownership, start with "m_" or start with "m" and endwith "_";
 
 ## Devoloping Settings
-we suggest you to do following setting in git bash
 ```md
-git update-index --assume-unchange FileXplorer.pro.user
-git update-index --assume-unchange FileXplorerTest.pro.user
-git update-index --assume-unchange bin/logs_info.log
-
-git update-index --no-assume-unchange FileXplorer.pro.user
-git update-index --no-assume-unchange FileXplorerTest.pro.user
-git update-index --no-assume-unchange bin/logs_info.log
-```
-
-```md
-git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch bin/AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
+git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
 rm -rf .git/refs/original/
 git reflog expire --expire=now --all
 git gc --prune=now --aggressive
@@ -201,7 +190,7 @@ Precondition: add path that contains `[Qt5Core.dll]` says "C:\Qt\5.15.2\mingw81_
 
 Way1: (Recommend)
 
-![Add a shortcut action to system right click context menu](bin/AddThisProgramToSystemContextMenu.png)
+![Add a shortcut action to system right click context menu](resources/AddThisProgramToSystemContextMenu.png)
 
 ```md
 In "File" Tab Widget;
@@ -246,7 +235,7 @@ Define a new action
 
     check the action display item in location context menu 
 
-    icon: /home/ariel/code/FileXplorer/bin/themes/AppIcons/FOLDER_OF_PICTURES.png
+    icon: /home/ariel/code/FileXplorer/resources/themes/AppIcons/FOLDER_OF_PICTURES.png
 
 2. set Commands tab below:
 

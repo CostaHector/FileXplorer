@@ -124,6 +124,8 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Classify
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
+    ${PARENT_DIR}/third_party/ffmpeg/include
+    ${PARENT_DIR}/third_party/mediaInfo/include
     ${PARENT_DIR}/View
     pubTestTool
     MockTool
@@ -155,6 +157,15 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Classify/*.h
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libavcodec/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libavdevice/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libavfilter/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libavformat/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libavutil/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libpostproc/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libswresample/*.h
+    ${PARENT_DIR}/third_party/ffmpeg/include/libswscale/*.h
+    ${PARENT_DIR}/third_party/mediaInfo/include/*.h
     ${PARENT_DIR}/View/*.h
     pubTestTool/*.h
     MockTool/*.h
@@ -234,35 +245,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 if(WIN32)
-    # 1. mediaInfo
-    set(mediaInfoPath "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
-    if (NOT EXISTS ${mediaInfoPath})
-        message(FATAL_ERROR "mediainfo.dll not found at: ${mediaInfoPath}\n.")
-    endif()
-    target_link_directories(${PROJECT_NAME} PRIVATE ${mediaInfoPath})
-    target_link_libraries(${PROJECT_NAME} PRIVATE mediaInfo)
-
-    # 2. APIS need
+    # 1. APIS need
     # Desktop Window Manager API（桌面窗口管理器API）
     # Shell Lightweight Utility API（Shell轻量实用工具API）
     # Process Status API(Windows) cpu/memory usage
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
 
+    # 2. MediaInfo
+    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/lib")
+    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
+
     # 3. unpack "ffmpeg-7.1.1-full_build-shared.7z" to "C:/home/ffmpeg" needed
-    set(ffmpegpath "C:/home/ffmpeg")
-    if(NOT EXISTS ${ffmpegpath})
-        message(FATAL_ERROR "ffmpeg not found at: ${ffmpegpath}\n. Please unpack ffmpeg-7.1.1-full_build-shared.7z to [${ffmpegpath}].")
-    endif()
-    target_include_directories(${PROJECT_NAME} PRIVATE "${ffmpegpath}/include")
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        "${ffmpegpath}/lib/avformat.lib"
-        "${ffmpegpath}/lib/avcodec.lib"
-        "${ffmpegpath}/lib/avutil.lib"
-        "${ffmpegpath}/lib/swscale.lib")
-elseif(UNIX AND NOT APPLE)  # Linux
-    # 1. ffmpeg
-    target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale )
+    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/ffmpeg/lib")
 endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
 
 if (PASSVAULT_ENABLED)
     if(WIN32)
