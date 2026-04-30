@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <svg width="800px" height="800px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    
-    <title>db-row-height</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
+<g opacity="0.2"><rect x="0" y="0" width="64" height="64" fill="#FFFFFF"/></g>    
+<title>db-row-height</title>
+<desc>Created with Sketch.</desc>
 
-</defs>
-    <g id="64px-Line" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="db-row-height">
-
-</g>
+<g id="64px-Line" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
 <path d="M8,5 L8,57 C8,57.553 8.447,58 9,58 L57,58 C57.553,58 58,57.553 58,57 L58,5 C58,4.447 57.553,4 57,4 L9,4 C8.447,4 8,4.447 8,5 L8,5 Z M18,6 L48,6 L48,56 L18,56 L18,6 L18,6 Z M10,6 L16,6 L16,56 L10,56 L10,6 L10,6 Z M56,6 L50,6 L50,56 L56,56 L56,6 L56,6 Z" id="Shape" fill="#000000"></path>
 <path d="M38.293,25.707 L42.586,30 L23.414,30 L27.707,25.707 C27.902,25.512 28,25.256 28,25 C28,24.744 27.902,24.488 27.707,24.293 C27.316,23.902 26.684,23.902 26.293,24.293 L20.294,30.292 C20.201,30.384 20.127,30.495 20.077,30.618 C19.976,30.862 19.976,31.137 20.077,31.382 C20.128,31.505 20.202,31.616 20.294,31.708 L26.293,37.707 C26.684,38.098 27.316,38.098 27.707,37.707 C28.098,37.316 28.098,36.684 27.707,36.293 L23.414,32 L42.586,32 L38.293,36.293 C37.902,36.684 37.902,37.316 38.293,37.707 C38.684,38.098 39.316,38.098 39.707,37.707 L45.706,31.708 C45.799,31.616 45.873,31.505 45.923,31.382 C45.974,31.26 46,31.13 46,31 C46,30.87 45.974,30.74 45.923,30.618 C45.872,30.495 45.798,30.384 45.706,30.292 L39.707,24.293 C39.316,23.902 38.684,23.902 38.293,24.293 C37.902,24.684 37.902,25.316 38.293,25.707 L38.293,25.707 Z" id="Shape" fill="#000000"></path>
-    </g>
+</g>
 </svg>

@@ -67,7 +67,7 @@ struct RMFComponent {
 };
 
 namespace FILE_REL_PATH{
-constexpr char MEDIA_INFO_DLL[] {"../../lib/MediaInfo.dll"};
+constexpr char MEDIA_INFO_DLL[] {"../../third_party/mediaInfo/lib/MediaInfo.dll"};
 const QString& GetVendorsTableFilePath();
 const QString& GetMononymVendorsListFilePath();
 const QString& GetActorsListFilePath();

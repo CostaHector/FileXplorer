@@ -4,7 +4,7 @@
 <context>
     <name>AccountDetailView</name>
     <message>
-        <location filename="../../Component/Pwd/AccountDetailView.cpp" line="+21"/>
+        <location filename="../../Component/PassVault/AccountDetailView.cpp" line="+22"/>
         <source>Recover</source>
         <translation>恢复</translation>
     </message>
@@ -14,7 +14,7 @@
         <translation>应用</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
@@ -412,7 +412,7 @@
 <context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../../Component/Pwd/CSVInputDialog.cpp" line="+20"/>
+        <location filename="../../Component/PassVault/CSVInputDialog.cpp" line="+20"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
@@ -567,9 +567,9 @@
         <translation>关于</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+9"/>
         <source>Usage Monitor</source>
-        <translation>性能监控</translation>
+        <translation>资源监控</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1089,11 +1089,6 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>Open this json file</source>
-        <translation>打开此json文件</translation>
-    </message>
-    <message>
-        <location line="+7"/>
         <source>Rename related files</source>
         <translation>重命名相关</translation>
     </message>
@@ -1249,7 +1244,7 @@
 <context>
     <name>LoginQryWidget</name>
     <message>
-        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+240"/>
+        <location filename="../../Component/PassVault/LoginQryWidget.cpp" line="+240"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
@@ -1553,7 +1548,7 @@
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+9"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+8"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1568,12 +1563,17 @@
         <translation>幻灯片预览</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Float</source>
         <translation>浮动</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+5"/>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <location line="-7"/>
         <source>Minimize</source>
         <translation>最小化</translation>
     </message>
@@ -1599,7 +1599,7 @@
 <context>
     <name>PwdTableEditActions</name>
     <message>
-        <location filename="../../Actions/PwdTableEditActions.cpp" line="+5"/>
+        <location filename="../../Component/PassVault/PwdTableEditActions.cpp" line="+5"/>
         <source>Insert a row</source>
         <translation>插入一行</translation>
     </message>
@@ -1747,7 +1747,7 @@
 <context>
     <name>RegisterWid</name>
     <message>
-        <location filename="../../Component/Pwd/LoginQryWidget.cpp" line="+128"/>
+        <location filename="../../Component/PassVault/LoginQryWidget.cpp" line="+128"/>
         <source>Encryption Key</source>
         <translation>设置密钥</translation>
     </message>

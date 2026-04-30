@@ -36,8 +36,8 @@ class PreviewDockWidget : public QDockWidget {
   QAction* CATEGORY_PRE{nullptr};
   QAction* PROGRESSIVE_LOAD_PRE{nullptr};
   QAction* CAROUSEL_PRE{nullptr};
-  QAction* m_floatingPanel{nullptr};
   QAction* m_minimizePanel{nullptr};
+  QAction* m_floatingPanel{nullptr};
 
   ToolBarWidget* m_titleBar{nullptr};
   EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E> mPreviewTypeIntAction;

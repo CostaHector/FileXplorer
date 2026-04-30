@@ -17,6 +17,7 @@
    id="svg822"
    inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
    sodipodi:docname="repeat-once.svg">
+<g opacity="0.2"><rect x="0" y="0" width="30" height="30" fill="#FFFFFF"/></g>
   <defs
      id="defs816" />
   <sodipodi:namedview
@@ -52,7 +53,8 @@
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <dc:title>
-</dc:title>
+
+</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

@@ -1,6 +1,5 @@
 #include "PreviewDockWidget.h"
 #include "StyleSheet.h"
-#include "ImageTool.h"
 #include "CompoVisKey.h"
 #include "Configuration.h"
 #include "ViewActions.h"
@@ -32,15 +31,15 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   int curPreviewType = getConfig(CompoVisKey::FOLDER_PREVIEW_TYPE).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
-  m_floatingPanel = new QAction{ImageTool::GetBuiltInIcon(QStyle::SP_TitleBarNormalButton), tr("Float"), this};
-  m_floatingPanel->setCheckable(true);
+  m_minimizePanel = new QAction{QIcon{":/FramelessWindow/TITLEBAR_MIN_BUTTON"}, tr("Minimize"), this};
 
-  m_minimizePanel = new QAction{ImageTool::GetBuiltInIcon(QStyle::SP_TitleBarMinButton), tr("Minimize"), this};
+  m_floatingPanel = new QAction{QIcon{":/FramelessWindow/TITLEBAR_NORMAL_BUTTON"}, tr("Float"), this};
+  m_floatingPanel->setCheckable(true);
 
   QAction* originalCloseAction = toggleViewAction();
   originalCloseAction->setCheckable(false);
-  originalCloseAction->setText("close");
-  originalCloseAction->setIcon(ImageTool::GetBuiltInIcon(QStyle::SP_DockWidgetCloseButton));
+  originalCloseAction->setText(tr("Close"));
+  originalCloseAction->setIcon(QIcon{":/FramelessWindow/TITLEBAR_CLOSE_BUTTON"});
 
   m_titleBar = new ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   m_titleBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
@@ -53,8 +52,8 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   m_titleBar->addAction(PROGRESSIVE_LOAD_PRE);
   m_titleBar->addAction(CAROUSEL_PRE);
   m_titleBar->addSeparator();
-  m_titleBar->addAction(m_floatingPanel);
   m_titleBar->addAction(m_minimizePanel);
+  m_titleBar->addAction(m_floatingPanel);
   m_titleBar->addAction(originalCloseAction);
 
   setTitleBarWidget(m_titleBar);

@@ -57,11 +57,6 @@
         <file alias="INCREASING_RATING">Media/INCREASING_RATING.svg</file>
         <file alias="DECREASING_RATING">Media/DECREASING_RATING.svg</file>
 
-        <!--FramelessWindow Icon here-->
-        <file alias="DRAG_DOT">FramelessWindowIcon/DRAG_DOT.svg</file>
-        <file alias="FRAMELESS_WINDOW">FramelessWindowIcon/FRAMELESS_WINDOW.svg</file>
-        <file alias="EXPAND_RIBBON">FramelessWindowIcon/EXPAND_RIBBON.svg</file>
-
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
         <file alias="OPEN_IN_TERMINAL">TopSideToolBarIcons/OPEN_IN_TERMINAL.png</file>
@@ -69,8 +64,6 @@
         <file alias="SHOW_FOLDER_PREVIEW">TopSideToolBarIcons/SHOW_FOLDER_PREVIEW.ico</file>
         <file alias="COMPRESS_ITEM">TopSideToolBarIcons/COMPRESS_ITEM.png</file>
         <file alias="EXTRACT_ITEM">TopSideToolBarIcons/EXTRACT_ITEM.png</file>
-        <file alias="ADD_TO_MOVIE_PLAYLIST">TopSideToolBarIcons/ADD_TO_MOVIE_PLAYLIST.png</file>
-        <file alias="ADD_TO_MUSIC_PLAYLIST">TopSideToolBarIcons/ADD_TO_MUSIC_PLAYLIST.png</file>
         <file alias="ABOUT">TopSideToolBarIcons/ABOUT.svg</file>
         <file alias="SELECT_ALL">TopSideToolBarIcons/SELECT_ALL.ico</file>
         <file alias="SELECT_INVERT">TopSideToolBarIcons/SELECT_INVERT.ico</file>
@@ -78,8 +71,6 @@
         <file alias="SYNC_MODIFICATION_SWITCH">TopSideToolBarIcons/SYNC_MODIFICATION_SWITCH.svg</file>
         <file alias="SYNC_REVERSE_SWITCH">TopSideToolBarIcons/SYNC_REVERSE_SWITCH.svg</file>
         <file alias="SORTING_FILE_FOLDER">TopSideToolBarIcons/SORTING_FILE_FOLDER.png</file>
-        <file alias="ASCENDING_ORDER">TopSideToolBarIcons/ASCENDING_ORDER.png</file>
-        <file alias="DESCENDING_ORDER">TopSideToolBarIcons/DESCENDING_ORDER.png</file>
         <file alias="COLUMN_VISIBILITY">TopSideToolBarIcons/COLUMN_VISIBILITY.svg</file>
         <file alias="HIDE_THIS_COLUMN">TopSideToolBarIcons/HIDE_THIS_COLUMN.svg</file>
         <file alias="QUICK_MULTI_SELECT">TopSideToolBarIcons/QUICK_MULTI_SELECT.svg</file>
@@ -181,15 +172,15 @@
         <file alias="NAME_STR_NUMERIZER_PATH">Rename/NAME_STR_NUMERIZER_PATH.svg</file>
         <file alias="NAME_SECTIONS_ARRANGE">Rename/NAME_SECTIONS_ARRANGE.svg</file>
         <file alias="RENAME_REVERSE_NAMES_LIST">Rename/RENAME_REVERSE_NAMES_LIST.svg</file>
-        <file alias="UNICODE_TO_ASCII_TEXT">Rename/UNICODE_TO_ASCII_TEXT.png</file>
-        <file alias="RENAME_LOWER_CASE">Rename/RENAME_LOWER_CASE.png</file>
-        <file alias="RENAME_UPPER_CASE">Rename/RENAME_UPPER_CASE.png</file>
+        <file alias="UNICODE_TO_ASCII_TEXT">Rename/UNICODE_TO_ASCII_TEXT.svg</file>
+        <file alias="RENAME_LOWER_CASE">Rename/RENAME_LOWER_CASE.svg</file>
+        <file alias="RENAME_UPPER_CASE">Rename/RENAME_UPPER_CASE.svg</file>
         <file alias="CAPITALIZE_KEEP_OTHER">Rename/CAPITALIZE_KEEP_OTHER.svg</file>
         <file alias="CAPITALIZE_LOWER_OTHER">Rename/CAPITALIZE_LOWER_OTHER.svg</file>
         <file alias="RENAME_TOGGLE_CASE">Rename/RENAME_TOGGLE_CASE.svg</file>
         <file alias="NAME_STR_INSERTER_PATH">Rename/NAME_STR_INSERTER_PATH.svg</file>
         <file alias="NAME_STR_DELETER_PATH">Rename/NAME_STR_DELETER_PATH.svg</file>
-        <file alias="NAME_STR_REPLACER_PATH">Rename/Replacer.png</file>
+        <file alias="NAME_STR_REPLACER_PATH">Rename/NAME_STR_REPLACER_PATH.svg</file>
         <file alias="_CONTINUOUS_NUMBERING">Rename/_CONTINUOUS_NUMBERING.svg</file>
         <file alias="NAME_RULER">Rename/NAME_RULER.svg</file>
         <file alias="PREPEND_PARENT_FOLDER_NAMES">Rename/PREPEND_PARENT_FOLDER_NAMES.svg</file>
@@ -198,7 +189,6 @@
         <file alias="SHIFT_LEFT_BY_STEP">Rename/SHIFT_LEFT_BY_STEP.svg</file>
         <file alias="SHIFT_RIGHT_BY_STEP">Rename/SHIFT_RIGHT_BY_STEP.svg</file>
         <file alias="NOMARLIZE_KEEP_RELATIVE_ORDER">Rename/NOMARLIZE_KEEP_RELATIVE_ORDER.svg</file>
-        <file alias="REGEX">Rename/REGEX.svg</file>
 
         <!--Browser Icon here-->
         <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
@@ -226,8 +216,6 @@
         <file alias="LIST_MODE">PreferenceIcons/LIST_MODE.png</file>
         <file alias="LIST_VIEW">PreferenceIcons/LIST_VIEW.png</file>
         <file alias="TABLE_VIEW">PreferenceIcons/TABLE_VIEW.png</file>
-        <file alias="LEFT_TO_RIGHT">PreferenceIcons/LEFT_TO_RIGHT.png</file>
-        <file alias="TOP_TO_BOTTOM">PreferenceIcons/TOP_TO_BOTTOM.png</file>
         <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
         <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.svg</file>
         <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
@@ -316,6 +304,14 @@
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
     </qresource>
 
+    <qresource prefix="/FramelessWindow">
+        <!--FramelessWindow Icon here-->
+        <file alias="EXPAND_RIBBON">FramelessWindow/EXPAND_RIBBON.svg</file>
+        <file alias="TITLEBAR_MIN_BUTTON">FramelessWindow/TITLEBAR_MIN_BUTTON.svg</file>
+        <file alias="TITLEBAR_NORMAL_BUTTON">FramelessWindow/TITLEBAR_NORMAL_BUTTON.svg</file>
+        <file alias="TITLEBAR_CLOSE_BUTTON">FramelessWindow/TITLEBAR_CLOSE_BUTTON.svg</file>
+    </qresource>
+
     <qresource prefix="/JsonEditor">
         <!--JsonEditor Icon here        -->
         <file alias="OPEN_JSON_FILE">JsonEditor/OPEN_JSON_FILE.svg</file>
@@ -335,7 +331,6 @@
         <file alias="AI_LEARN">JsonEditor/AI_LEARN.svg</file>
         <file alias="AUTO_SKIP">JsonEditor/AUTO_SKIP.svg</file>
         <file alias="SAVE_CHANGES">JsonEditor/SAVE_CHANGES.svg</file>
-        <file alias="SKIP_IF">JsonEditor/SKIP_IF.svg</file>
         <file alias="CASE_TITLE">JsonEditor/CASE_TITLE.svg</file>
         <file alias="FORMAT_PAINTER">JsonEditor/FORMAT_PAINTER.svg</file>
         <file alias="TAGS_APPEND">JsonEditor/TAGS_APPEND.svg</file>

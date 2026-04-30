@@ -50,7 +50,7 @@ auto RenameWidget_Replace::InitExtraMemberWidget() -> void {
 
   m_regexCB = new (std::nothrow) QCheckBox{tr("Regex"), this};
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
-  m_regexCB->setIcon(QIcon(":img/REGEX"));
+  m_regexCB->setIcon(QIcon(":img/MATCH_REGEX"));
   m_regexCB->setToolTip("Enable regex");
   m_regexCB->setChecked(getConfig(RenamerKey::REGEX_ENABLED).toBool());
 }

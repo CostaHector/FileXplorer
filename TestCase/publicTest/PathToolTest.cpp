@@ -18,7 +18,7 @@ class PathToolTest : public PlainTestSuite {
     QVERIFY(QFile::exists(libPath));
 
     QString testRootDir = TESTCASE_ROOT_PATH;
-    QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../lib/MediaInfo.dll"));
+    QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../third_party/mediaInfo/lib/MediaInfo.dll"));
     QCOMPARE(libPath, libPath2);
   }
 
