@@ -26,7 +26,7 @@ Step 2: Verify FFmpeg Path Configuration
 Ensure the path containing `ffmpeg.exe` (e.g., `C:/home/ffmpeg/bin`) is added to the system `PATH` variable.  
 One can add it and verify it via the Command Prompt(Run as administrator):
 ```cmd
-setx PATH "C:/home/ffmpeg/bin;%PATH%" /M
+setx PATH "C:\home\ffmpeg\bin;%PATH%" /M
 echo %PATH%|findstr -i "ffmpeg"
 ```
 
@@ -81,6 +81,12 @@ OpenSSL is required to support encryption and decryption functionality for the p
    ```cmd
    cd "C:\Program Files\OpenSSL-Win64\bin"
    openssl version
+   ```
+   Ensure the path containing OpenSSL is added to the system `PATH` variable.  
+   One can add it and verify it via the ANOTHER NEW Command Prompt(Run as administrator):
+   ```cmd
+   setx PATH "C:\Program Files\OpenSSL-Win64\bin;%PATH%" /M
+   echo %PATH%|findstr -i "OpenSSL"
    ```
 
 #### Ubuntu
