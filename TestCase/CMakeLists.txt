@@ -126,6 +126,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Json
     ${PARENT_DIR}/third_party/ffmpeg/include
     ${PARENT_DIR}/third_party/mediaInfo/include
+    ${PARENT_DIR}/third_party/openssl/include
     ${PARENT_DIR}/View
     pubTestTool
     MockTool
@@ -166,6 +167,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/third_party/ffmpeg/include/libswresample/*.h
     ${PARENT_DIR}/third_party/ffmpeg/include/libswscale/*.h
     ${PARENT_DIR}/third_party/mediaInfo/include/*.h
+    ${PARENT_DIR}/third_party/openssl/include/openssl/*.h
     ${PARENT_DIR}/View/*.h
     pubTestTool/*.h
     MockTool/*.h
@@ -245,51 +247,32 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 if(WIN32)
-    # 1. APIS need
+    # Below APIS need:
     # Desktop Window Manager API（桌面窗口管理器API）
     # Shell Lightweight Utility API（Shell轻量实用工具API）
     # Process Status API(Windows) cpu/memory usage
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
 
-    # 2. MediaInfo
+    # MediaInfo
     target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/lib")
     target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
-
-    # 3. unpack "ffmpeg-7.1.1-full_build-shared.7z" to "C:/home/ffmpeg" needed
     target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/ffmpeg/lib")
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
 
 if (PASSVAULT_ENABLED)
     if(WIN32)
-        # 4. OpenSSL configuration for Windows
+        # OpenSSL configuration for Windows
         # Install "Win64OpenSSL-3_5_4.msi" to path "C:/Program Files/OpenSSL-Win64"
         # Copy OpenSSL DLLs to: The OpenSSL binaries (/bin) directory
-        set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-        if(NOT EXISTS ${OPENSSL_ROOT_DIR})
-            message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
-        endif()
-        include_directories("${OPENSSL_ROOT_DIR}/include")
-        link_directories("${OPENSSL_ROOT_DIR}/lib")
-        link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            target_link_libraries(${PROJECT_NAME} PRIVATE
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
-            )
-        else()
-            target_link_libraries(${PROJECT_NAME} PRIVATE
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
-            )
-        endif()
+        target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/openssl/lib")
+        target_link_libraries(${PROJECT_NAME} PRIVATE libssl libcrypto)
     elseif(UNIX AND NOT APPLE)
-        # 2. openssl
+        # openssl
         find_package(OpenSSL REQUIRED)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
         target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
-        # 3. PkgConfig Credential
+        # PkgConfig Credential
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
         include_directories(${LIBSECRET_INCLUDE_DIRS})
