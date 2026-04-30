@@ -1,6 +1,5 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
-#include <chrono>
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
 #include "VideoTestPrecoditionTools.h"

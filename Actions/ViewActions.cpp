@@ -101,8 +101,8 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
 }
 
 ViewActions::~ViewActions() {
-  setConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR, _NAVIGATION_PANE->isChecked());
-  setConfig(CompoVisKey::SHOW_PREVIEW_DOCKER, _PREVIEW_PANEL->isChecked());
+  Configuration().setValue(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, _NAVIGATION_PANE->isChecked());
+  Configuration().setValue(CompoVisKey::SHOW_PREVIEW_DOCKER.name, _PREVIEW_PANEL->isChecked());
 }
 
 ViewActions& g_viewActions() {

@@ -97,6 +97,7 @@ set(SRV_HEADER_PATH
     Tools/Json
     third_party/ffmpeg/include
     third_party/mediaInfo/include
+    third_party/openssl/include
     View
 )
 
@@ -135,6 +136,7 @@ file(GLOB HEADERS
     third_party/ffmpeg/include/libswresample/*.h
     third_party/ffmpeg/include/libswscale/*.h
     third_party/mediaInfo/include/*.h
+    third_party/openssl/include/openssl/*.h
     View/*.h
 )
 
@@ -205,39 +207,12 @@ if(WIN32)
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
 
-if (PASSVAULT_ENABLED)
-    if(WIN32)
-        # OpenSSL configuration for Windows
-        # Set OpenSSL paths
-        set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-        if(NOT EXISTS ${OPENSSL_ROOT_DIR})
-            message(FATAL_ERROR "openssl not found at: ${OPENSSL_ROOT_DIR}\n. Please download `Win64OpenSSL-3_5_1.msi` and install at first.")
-        endif()
-
-        # Include directories
-        include_directories("${OPENSSL_ROOT_DIR}/include")
-
-        # Library paths
-        link_directories("${OPENSSL_ROOT_DIR}/lib")
-        link_directories("${OPENSSL_ROOT_DIR}/lib/VC/x64")
-
-        # Debug vs Release library selection
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            target_link_libraries(${PROJECT_NAME} PRIVATE
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libssl.lib"
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd/libcrypto.lib"
-            )
-            message(STATUS "Linking with OpenSSL Debug libraries")
-        else()
-            target_link_libraries(${PROJECT_NAME} PRIVATE
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib"
-                "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib"
-            )
-            message(STATUS "Linking with OpenSSL Release libraries")
-        endif()
+if(PASSVAULT_ENABLED)
+    if(WIN32)    
+        target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/openssl/lib")
+        target_link_libraries(${PROJECT_NAME} PRIVATE libssl libcrypto)
     elseif(UNIX AND NOT APPLE)  # Linux
         find_package(OpenSSL REQUIRED)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
         target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
         find_package(PkgConfig REQUIRED)
