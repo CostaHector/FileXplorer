@@ -27,6 +27,7 @@ SetDatabaseParmRetType setDupVidDbConnectionName(const QString& newConnectionNam
 
 bool IsFFmpegAvailable() {
   QProcess ffmpeg;
+  // For windows user. Add path of ffmpeg.exe location in system variable 'Path' is required
   ffmpeg.start("ffmpeg", {"-version"});
   return ffmpeg.waitForStarted() && ffmpeg.waitForFinished();
 }
