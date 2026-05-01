@@ -122,14 +122,12 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Classify
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
-    ${PARENT_DIR}/third_party/ffmpeg/include
-    ${PARENT_DIR}/third_party/mediaInfo/include
-    ${PARENT_DIR}/third_party/openssl/include
+    ${PARENT_DIR}/third_party/mediaInfo/include # only MediaInfoDll.h suitable for win and linux.
     ${PARENT_DIR}/View
     pubTestTool
     MockTool
 )
-
+# only for quick access, not for target generation
 file(GLOB HEADERS
     ${PARENT_DIR}/Actions/*.h
     ${PARENT_DIR}/Model/*.h
@@ -250,13 +248,16 @@ if(WIN32)
     # Shell Lightweight Utility API（Shell轻量实用工具API）
     # Process Status API(Windows) cpu/memory usage
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
-
-    # MediaInfo
-    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/bin")
-    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
     target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/ffmpeg/lib")
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
+
+if(WIN32)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/bin")
+    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl mediainfo)
+endif()
 
 if (PASSVAULT_ENABLED)
     if(WIN32)
@@ -266,11 +267,12 @@ if (PASSVAULT_ENABLED)
         target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/openssl/lib")
         target_link_libraries(${PROJECT_NAME} PRIVATE libssl libcrypto)
     elseif(UNIX AND NOT APPLE)
-        # openssl
+        # 2. openssl
         find_package(OpenSSL REQUIRED)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
         target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
-        # PkgConfig Credential
+        # 3. PkgConfig Credential
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
         include_directories(${LIBSECRET_INCLUDE_DIRS})

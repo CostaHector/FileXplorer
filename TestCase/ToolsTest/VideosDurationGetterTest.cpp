@@ -24,8 +24,10 @@ class VideosDurationGetterTest : public PlainTestSuite {
 
     VideoDurationGetter mi;
     QVERIFY(mi.StartToGet());
-    int actualDuration = mi.GetLengthQuick(mp4Dir.absoluteFilePath(vidName));
-    QVERIFY2((std::abs(actualDuration - expectDuration) < EPSILON_MILLIONSECOND), qPrintable(vidName));
+    int actualDurationByMediaInfo = mi.GetLengthQuick(mp4Dir.absoluteFilePath(vidName));
+    int actualDurationByFFMpeg = mi.ReadAVideo(mp4Dir.absoluteFilePath(vidName));
+    QVERIFY2((std::abs(actualDurationByMediaInfo - expectDuration) < EPSILON_MILLIONSECOND), qPrintable(vidName));
+    QVERIFY2((std::abs(actualDurationByFFMpeg - expectDuration) < EPSILON_MILLIONSECOND), qPrintable(vidName));
   }
 
   void test_GetLengthsQuick() {
@@ -41,10 +43,13 @@ class VideosDurationGetterTest : public PlainTestSuite {
 
     VideoDurationGetter mi;
     QVERIFY(mi.StartToGet());
-    QList<int> actualDurations = mi.GetLengthsQuick(vidsAbsPath);
-    QCOMPARE(actualDurations.size(), expectDurations.size());
-    for (int i = 0; i < actualDurations.size(); ++i) {
-      QVERIFY2((std::abs(actualDurations[i] - expectDurations[i]) < EPSILON_MILLIONSECOND), qPrintable(vidsName[i]));
+    QList<int> actualDurationsByMediaInfo = mi.GetLengthsQuick(vidsAbsPath);
+    QList<int> actualDurationsByFFmpeg = mi.ReadVideos(vidsAbsPath);
+    QCOMPARE(actualDurationsByMediaInfo.size(), expectDurations.size());
+    QCOMPARE(actualDurationsByFFmpeg.size(), expectDurations.size());
+    for (int i = 0; i < actualDurationsByMediaInfo.size(); ++i) {
+      QVERIFY2((std::abs(actualDurationsByMediaInfo[i] - expectDurations[i]) < EPSILON_MILLIONSECOND), qPrintable(vidsName[i]));
+      QVERIFY2((std::abs(actualDurationsByFFmpeg[i] - expectDurations[i]) < EPSILON_MILLIONSECOND), qPrintable(vidsName[i]));
     }
   }
 

@@ -60,12 +60,6 @@ file(GLOB SOURCES
     View/*.cpp
     main.cpp
 )
-list(LENGTH SOURCES src_cpp_count)
-message("\n> ${src_cpp_count} file(s) in SOURCES, there are:")
-foreach(srv_file ${SOURCES})
-    message("${srv_file}")
-endforeach()
-
 
 set(SRV_HEADER_PATH
     Actions
@@ -93,12 +87,10 @@ set(SRV_HEADER_PATH
     Tools/Classify
     Tools/FileDescriptor
     Tools/Json
-    third_party/ffmpeg/include
-    third_party/mediaInfo/include
-    third_party/openssl/include
+    third_party/mediaInfo/include # only MediaInfoDll.h suitable for win and linux.
     View
 )
-
+# only for quick access, not for target generation
 file(GLOB HEADERS
     Actions/*.h
     Events/*.h
@@ -138,12 +130,6 @@ file(GLOB HEADERS
     View/*.h
 )
 
-list(LENGTH HEADERS header_cpp_count)
-message("\n> ${header_cpp_count} file(s) in HEADERS, there are:")
-foreach(header_file ${HEADERS})
-    message("${header_file}")
-endforeach()
-
 if (PASSVAULT_ENABLED)
     list(APPEND SOURCES Tools/SimpleAES.cpp)
     list(APPEND HEADERS Tools/SimpleAES.h)
@@ -156,12 +142,6 @@ set(RESOURCES
 file(GLOB TS_FILES
     resources/Translate/*.ts
 )
-
-list(LENGTH TS_FILES ts_files_count)
-message("\n> ${ts_files_count} translation file(s), there are:")
-foreach(ts_file ${TS_FILES})
-    message("${ts_file}")
-endforeach()
 
 qt_add_translation(QM_FILES ${TS_FILES})
 
@@ -199,11 +179,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi)
-    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/bin")
-    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
     target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ffmpeg/lib")
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)
+
+if(WIN32)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/bin")
+    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl mediainfo)
+endif()
+
 
 if(PASSVAULT_ENABLED)
     if(WIN32)    

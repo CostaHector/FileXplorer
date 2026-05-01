@@ -84,3 +84,27 @@ QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) {
   }
   return durationList;
 }
+
+/*
+ * dpkg --print-architecture
+ * makesure it says amd64
+ *
+ * Download following 2 deb files at first from `https://mediaarea.net/en/MediaInfo/Download/Ubuntu`
+ * 1. libzen0v5_0.4.41-1_amd64.xUbuntu_20.04.deb
+ * 2. libmediainfo0v5_26.01-1_amd64.xUbuntu_20.04.deb
+ *
+ * install them
+ * sudo apt install ./libzen0v5_0.4.41-1_amd64.xUbuntu_20.04.deb ./libmediainfo0v5_26.01-1_amd64.xUbuntu_20.04.deb
+ *
+ * ldconfig -p | grep libmediainfo
+ * it should print
+ * /lib/x86_64-linux-gnu/libmediainfo.so.0 -> libmediainfo.so.0.0.0
+ *
+ * create soft link
+ * sudo ln -s /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0 /usr/lib/x86_64-linux-gnu/libmediainfo.so
+ *
+ * now
+ * target_link_libraries(${PROJECT_NAME} PRIVATE dl mediainfo) available in CMakeLists.txt
+ * QLibrary("libmediainfo.so").load() return succeed!
+ */
+

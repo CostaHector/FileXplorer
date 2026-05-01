@@ -2,6 +2,7 @@
 #include <QtTest>
 #include "PlainTestSuite.h"
 #include "ValueChecker.h"
+#include "KV.h"
 
 using namespace ValueChecker;
 
@@ -95,6 +96,33 @@ private slots:
     QVERIFY(!GeneralBoolChecker(QVariant{}));
     QVERIFY(GeneralBoolChecker(true));
     QVERIFY(GeneralBoolChecker(false));
+  }
+
+
+  void toVariant_ok() {
+    bool isOk{false};
+
+    KV floatOk{"floatOk", RawVariant::Var{3.14f}, GeneralDataType::Type::PLAIN_FLOAT, nullptr, nullptr, nullptr, nullptr};
+    float actualFloatValue = floatOk.toVariant().toFloat(&isOk);
+    QVERIFY(isOk);
+    double floatDiff{(double)actualFloatValue - 3.14};
+    QVERIFY(std::abs(floatDiff) < 1E-6);
+
+    isOk = false;
+    KV doubleOk{"doubleOk", RawVariant::Var{3.14}, GeneralDataType::Type::PLAIN_DOUBLE, nullptr, nullptr, nullptr, nullptr};
+    double actualDoubleValue = doubleOk.toVariant().toDouble(&isOk);
+    QVERIFY(isOk);
+    double doubleDiff{actualDoubleValue - 3.14};
+    QVERIFY(std::abs(doubleDiff) < 1E-6);
+
+    KV charOk{"charOk", RawVariant::Var{char{'A'}}, GeneralDataType::Type::PLAIN_CHAR, nullptr, nullptr, nullptr, nullptr};
+    char actualCharValue = charOk.toVariant().value<char>();
+    QCOMPARE(actualCharValue, 'A');
+
+    isOk = false;
+    KV longlongOk{"longlongOk", RawVariant::Var{100LL}, GeneralDataType::Type::PLAIN_LONGLONG, nullptr, nullptr, nullptr, nullptr};
+    long long actualLongLongValue = longlongOk.toVariant().toLongLong(&isOk);
+    QCOMPARE(100, actualLongLongValue);
   }
 };
 
