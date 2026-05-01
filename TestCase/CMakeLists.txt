@@ -127,6 +127,12 @@ set(SRV_HEADER_PATH
     pubTestTool
     MockTool
 )
+
+if(WIN32)
+    list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/third_party/ffmpeg/include)
+    list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/third_party/openssl/include)
+endif()
+
 # only for quick access, not for target generation
 file(GLOB HEADERS
     ${PARENT_DIR}/Actions/*.h

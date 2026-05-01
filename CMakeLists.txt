@@ -87,9 +87,15 @@ set(SRV_HEADER_PATH
     Tools/Classify
     Tools/FileDescriptor
     Tools/Json
-    third_party/mediaInfo/include # only MediaInfoDll.h suitable for win and linux.
+    third_party/mediaInfo/include # only MediaInfoDll.h is suitable for both win and linux.
     View
 )
+
+if(WIN32)
+    list(APPEND SRV_HEADER_PATH third_party/ffmpeg/include)
+    list(APPEND SRV_HEADER_PATH third_party/openssl/include)
+endif()
+
 # only for quick access, not for target generation
 file(GLOB HEADERS
     Actions/*.h
