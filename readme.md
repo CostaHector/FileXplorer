@@ -26,7 +26,7 @@ Step 2: Verify FFmpeg Path Configuration
 Ensure the path containing `ffmpeg.exe` (e.g., `C:/home/ffmpeg/bin`) is added to the system `PATH` variable.  
 One can add it and verify it via the Command Prompt(Run as administrator):
 ```cmd
-setx PATH "C:/home/ffmpeg/bin;%PATH%" /M
+setx PATH "C:\home\ffmpeg\bin;%PATH%" /M
 echo %PATH%|findstr -i "ffmpeg"
 ```
 
@@ -46,19 +46,103 @@ ffmpeg -version
 
 #### Verify FFmpeg Integration
 Run the following C++ code to confirm FFmpeg is properly configured. The output should show FFmpeg version: 3999588 (version number may vary by build):
+
 ```cpp
 #include <QDebug>
 extern "C" {
 #include <libavformat/avformat.h>
 }
 
-void testFFmpeg() {
-    avformat_network_init();
-    qDebug() << "FFmpeg version:" << avformat_version();
+void IsFFmpegInstalledOK() {
+  avformat_network_init();
+  qDebug("FFmpeg version:%u", avformat_version());
+}
+
+```
+
+
+### 2. MediaInfo Library (Required for Media File Information)
+MediaInfo library is required to retrieve detailed metadata from media files. Below are the installation steps for Windows and Ubuntu systems:
+
+#### Windows: already available
+
+#### Ubuntu
+
+1. Verify System Architecture
+Ensure your system is 64-bit (amd64/x86_64) compatible:
+
+`dpkg --print-architecture`
+
+**Expected output: "amd64"**
+
+2. Download MediaInfo Packages
+Download the following .deb packages from the official repository [mediaarea/MediaInfo](https://mediaarea.net/en/MediaInfo/Download):
+
+e.g. Ubuntu 20.04 required following 2 files
+- libmediainfo0	v21.09
+- libzen0	v0.4.39
+
+3. Install the Packages
+
+Install the downloaded packages using apt (this automatically resolves dependencies):
+
+```sh
+sudo apt install ./libzen0v5_0.4.41-1_amd64.xUbuntu_20.04.deb ./libmediainfo0v5_26.01-1_amd64.xUbuntu_20.04.deb
+```
+
+4. Verify Installation
+Confirm the library is correctly installed and accessible:
+```sh
+ldconfig -p | grep libmediainfo
+```
+
+Expected output showing library paths, for example
+```sh
+        libmediainfo.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libmediainfo.so.0
+```
+
+5. Create Symbolic Link
+
+The installation places libraries in /lib/x86_64-linux-gnu/, but the linker typically searches in /usr/lib/x86_64-linux-gnu/.
+
+Create a symbolic link for compatibility:
+```sh
+sudo ln -s /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0 /usr/lib/x86_64-linux-gnu/libmediainfo.so
+ls -la /usr/lib/x86_64-linux-gnu/libmediainfo.so
+```
+
+Should show the symbolic link, for example
+```sh
+        /usr/lib/x86_64-linux-gnu/libmediainfo.so -> /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0
+```
+
+
+#### Verify MediaInfo Integration
+
+After installation, the CMake configuration can simply link against mediainfo:
+```CmakeLists.txt
+if(WIN32)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/bin")
+    target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl mediainfo)
+endif()
+```
+
+To verify the dynamic loading works correctly, run the following test:
+```cpp
+#include <QLibrary>
+bool testMediaInfo() {
+#ifdef _WIN32
+    QLibrary mediainfo("MediaInfo.dll");
+#else
+    QLibrary mediainfo("libmediainfo.so");
+#endif
+    return mediainfo.load(); // should return true
 }
 ```
 
-### 2. OpenSSL (Required when PASSVAULT_ENABLED=ON)
+### 3. OpenSSL (Required when PASSVAULT_ENABLED=ON)
 OpenSSL is required to support encryption and decryption functionality for the password book feature. Below are the installation steps for Windows and Ubuntu systems:
 
 #### Windows
@@ -81,6 +165,12 @@ OpenSSL is required to support encryption and decryption functionality for the p
    ```cmd
    cd "C:\Program Files\OpenSSL-Win64\bin"
    openssl version
+   ```
+   Ensure the path containing OpenSSL is added to the system `PATH` variable.  
+   One can add it and verify it via the ANOTHER NEW Command Prompt(Run as administrator):
+   ```cmd
+   setx PATH "C:\home\ffmpeg\bin;C:\Program Files\OpenSSL-Win64\bin;%PATH%" /M
+   echo %PATH%|findstr -i "OpenSSL"
    ```
 
 #### Ubuntu

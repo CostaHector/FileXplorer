@@ -1,66 +1,28 @@
 #ifndef QMEDIAINFO_H
 #define QMEDIAINFO_H
 
-#ifdef _WIN32
-#include <QLibrary>
+#include <memory>
+#include <QStringList>
 
-// typedef void* (*MEDIAINFO_New)();
-// typedef void (*MEDIAINFO_Delete)(void*);
-// typedef size_t (*MEDIAINFO_Open)(void*, const MediaInfo_Char *);
-// typedef MediaInfo_Char* (*MEDIAINFO_Inform)(void*, long);
-// typedef MediaInfo_Char* (*MEDIAINFO_Get)(void*, int, int, MediaInfo_Char *, int, int);
+namespace MediaInfoDLL {
+class MediaInfo;
+}
 
-#include "MediaInfoDLL.h"
-typedef wchar_t MediaInfo_Char;
 class QMediaInfo {
- public:
-  QMediaInfo() = default;
-  ~QMediaInfo();
-  bool IsLoaded() const;
-
-  bool StartToGet();
-  int VidDurationLengthQuick(const QString& vidAbsPath) const;
-
-  int VidDurationLength(const QString& vidAbsPath) const;
-  QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath) const;
-
-  QString CompleteName() const;
-  QString Filename() const;
-  QString FileExtension() const;
-  QString Title() const;
-  QString TitleMore() const;
-  QString Domain() const;
-  QString Collection() const;
-  QString Season() const;
-  QString Movie() const;
-  QString Description() const;
-  QString Inform() const;
-  QString Duration() const;
-  int DurationLength() const;
-  QString FileSize() const;
-  QString FormatExt() const;
-  QString VideoBitRate() const;
-  QString AudioBitRate() const;
-  QString VideoResolution() const;
-  QString VideoFrameRate() const;
-  QString VideoCodec() const;
-  QString AudioCodec() const;
-  QString AudioLanguages() const;
-  QString SubtitleLanguages() const;
-
+public:
+  static QMediaInfo& GetInst();
   bool Open(const QString& filename);
+  int DurationLengthQuick(const QString& fileAbsPath);
+  QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath);
+  explicit operator bool() const { return isLoadDllOk(); }
 
- private:
-  const MediaInfo_Char* Get(MediaInfo_stream_C streamKind, int streamNumber, MediaInfo_Char* parameter, MediaInfo_info_C infoKind, MediaInfo_info_C searchKind) const;
-  int StreamCount(MediaInfo_stream_C stream) const;
+private:
+  explicit QMediaInfo();
+  QMediaInfo(const QMediaInfo& rhs) = delete;
 
-  QLibrary* pLib{nullptr};
-  void* _pMedia{nullptr};
-
-  MEDIAINFO_Get m_get{nullptr};
-  MEDIAINFO_Open m_open{nullptr};
-  static const MediaInfo_Char m_prop[];
+  bool isLoadDllOk() const { return m_bLoadDllResult; }
+  std::unique_ptr<MediaInfoDLL::MediaInfo> m_mediaInfo;
+  const bool m_bLoadDllResult;
 };
-#endif
 
-#endif  // QMEDIAINFO_H
+#endif // QMEDIAINFO_H

@@ -302,6 +302,9 @@
         <!--Notification icon here-->
         <file alias="LOADING">Notification/LOADING.gif</file>
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
+
+        <file alias="SAVED">pwd/SUCCESS.svg</file>
+        <file alias="NOT_SAVED">pwd/FAILURE.svg</file>
     </qresource>
 
     <qresource prefix="/FramelessWindow">
@@ -437,10 +440,7 @@
         <file alias="EXPORT">pwd/EXPORT.svg</file>
         <file alias="PARSE_ENCRYPT_CSV_FILE">pwd/PARSE_ENCRYPT_CSV_FILE.svg</file>
     </qresource>
-    <qresource prefix="/img">
-        <file alias="SAVED">pwd/SUCCESS.svg</file>
-        <file alias="NOT_SAVED">pwd/FAILURE.svg</file>
-    </qresource>
+
     <qresource prefix="/language">
         <file alias="ZH_CN">Translate/FileXplorer_zh_CN.qm</file>
     </qresource>

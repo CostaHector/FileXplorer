@@ -38,6 +38,7 @@ private slots:
     QCOMPARE(Style::DEFAULT_FONT_FAMILY, ComboBoxString::getDisplayString(editRoleValue, *fontFamilyComboBoxDerivedCandidates));
     QCOMPARE(Style::DEFAULT_FONT_FAMILY, ComboBoxString::getDisplayString(displayRoleValue, *fontFamilyComboBoxDerivedCandidates));
     QCOMPARE(Style::DEFAULT_FONT_FAMILY, ComboBoxString::displayTextFromDisplayRole(GeneralDataType::Type::FONT_FAMILY, displayRoleValue));
+    QCOMPARE(Style::DEFAULT_FONT_FAMILY, ComboBoxGeneral::displayText(GeneralDataType::Type::FONT_FAMILY, displayRoleValue));
 
     // getSetDataEditRoleValue ok
     fontFamilyComboBox->setCurrentText(Style::DEFAULT_FONT_FAMILY);
@@ -104,6 +105,7 @@ private slots:
     QCOMPARE("not allowed: data[NaN] from model", ComboBoxEnum::getDisplayString(editRoleValue, *fontWeightComboBoxDerivedCandidatesDisplay));
     QCOMPARE("not allowed: data[NaN] from model", ComboBoxEnum::getDisplayString(displayRoleValue, *fontWeightComboBoxDerivedCandidatesDisplay));
     QCOMPARE("not allowed: data[NaN] from model", ComboBoxEnum::displayTextFromDisplayRole(GeneralDataType::Type::FONT_WEIGHT, displayRoleValue));
+    QCOMPARE("not allowed: data[NaN] from model", ComboBoxGeneral::displayText(GeneralDataType::Type::FONT_WEIGHT, displayRoleValue));
 
     editRoleValue = QVariant{9999};    // no enum correspond to large number
     displayRoleValue = QVariant{9998}; //
