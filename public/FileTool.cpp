@@ -302,5 +302,6 @@ bool CreateUserPath() {
           qPrintable(SystemPath::WORK_PATH()));
     return false;
   }
+  QDir{}.mkpath(SystemPath::WORK_PATH() + "/CastStudioList");
   return true;
 }
