@@ -182,6 +182,22 @@ QMap<QString, QString> GetGuid2LabelMap() {
   return guid2Label;
 }
 
+inline LPCSTR ToLPCSTR(const QString& qstr) {
+#if defined(UNICODE) || defined(_UNICODE)
+  return qstr.toStdWString().c_str();
+#else
+  return qstr.toStdString().c_str();
+#endif
+}
+
+QString fromLPCSTR(const LPCSTR& mStr) {
+#if defined(UNICODE) || defined(_UNICODE)
+  return QString::fromWCharArray(mStr);
+#else
+  return mStr;
+#endif
+}
+
 bool GetVolumeInfo(const QString& path, QString& volName) {
   TCHAR volumeName[MAX_PATH] = {0};
   TCHAR fileSystemName[MAX_PATH] = {0};
@@ -189,21 +205,21 @@ bool GetVolumeInfo(const QString& path, QString& volName) {
   DWORD maxComponentLength = 0;
   DWORD fileSystemFlags = 0;
 
-  if (!GetVolumeInformation(path.toStdWString().c_str(),                          //
+  if (!GetVolumeInformation(ToLPCSTR(path),                          //
                             volumeName, MAX_PATH,                                 //
                             serialNumber, &maxComponentLength, &fileSystemFlags,  //
                             fileSystemName, MAX_PATH)) {
     LOG_W("Failed to retrieve GUID by path[%s] error:%lu", qPrintable(path), GetLastError());
     return false;
   }
-  volName = QString::fromWCharArray(volumeName);
+  volName = fromLPCSTR(volumeName);
   return true;
 }
 
 bool GetGuidByDrive(const QString& driveStr, QString& guid) {
   const QString& drvPath = QDir::toNativeSeparators(driveStr);
   TCHAR volumeName[MAX_PATH] = {0};
-  if (!GetVolumeNameForVolumeMountPoint(drvPath.toStdWString().c_str(), volumeName, MAX_PATH)) {
+  if (!GetVolumeNameForVolumeMountPoint(ToLPCSTR(drvPath), volumeName, MAX_PATH)) {
     return false;
   }
   guid = ExtractGuidFromVolumeName(volumeName);

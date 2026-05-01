@@ -107,14 +107,14 @@
     #endif
 #endif
 
-/*Test of targets*/
-#if defined(WINDOWS) && defined(UNIX) && defined(MACOS) && defined(MACOSX)
-    #pragma message Multiple platforms???
-#endif
+// /*Test of targets*/
+// #if defined(WINDOWS) && defined(UNIX) && defined(MACOS) && defined(MACOSX)
+//     #pragma message Multiple platforms???
+// #endif
 
-#if !defined(WIN32) && !defined(UNIX) && !defined(MACOS) && !defined(MACOSX)
-    #pragma message No known platforms, assume default
-#endif
+// #if !defined(WIN32) && !defined(UNIX) && !defined(MACOS) && !defined(MACOSX)
+//     #pragma message No known platforms, assume default
+// #endif
 
 /*-------------------------------------------------------------------------*/
 #if defined(_WIN32) || defined(WIN32)

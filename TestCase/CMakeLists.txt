@@ -15,8 +15,6 @@ add_definitions(
     -DTESTCASE_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}"
     -DPARENT_PATH_LEN=${RELATIVE_INDEX_START_AT}
     -DRUNNING_UNIT_TESTS=1
-    -DUNICODE
-    -D_UNICODE
 )
 
 SET(PASSVAULT_ENABLED ON)
@@ -254,7 +252,7 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
 
     # MediaInfo
-    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/lib")
+    target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/mediaInfo/bin")
     target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
     target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/ffmpeg/lib")
 endif()

@@ -7,8 +7,6 @@ string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" PARENT_PATH_LEN)
 add_definitions(
     -DPROJECT_NAME="${PROJECT_NAME}"
     -DPARENT_PATH_LEN=${PARENT_PATH_LEN}
-    -DUNICODE
-    -D_UNICODE
 )
 
 SET(PASSVAULT_ENABLED ON)
@@ -201,7 +199,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi)
-    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/lib")
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/bin")
     target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
     target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ffmpeg/lib")
 endif()

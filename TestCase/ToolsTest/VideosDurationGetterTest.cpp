@@ -3,6 +3,7 @@
 #include "VideoDurationGetter.h"
 #include "PlainTestSuite.h"
 #include "VideoTestPrecoditionTools.h"
+#include "QMediaInfo.h"
 #include "TDir.h"
 
 class VideosDurationGetterTest : public PlainTestSuite {
@@ -69,12 +70,12 @@ class VideosDurationGetterTest : public PlainTestSuite {
 
 #ifdef _WIN32
     // QMediaInfo windows platform only
-    QMediaInfo mi;
-    QVERIFY2(mi.StartToGet(), "Should start succeed");
+    QMediaInfo& mi = QMediaInfo::GetInst();
+    QVERIFY2((bool)mi, "Should start succeed");
     for (int i = 0; i < mp4VidsLst.size(); ++i) {
       const QString& name = mp4VidsLst[i];
       const QString& vidPath = mp4Dir.absoluteFilePath(name);
-      const int duration = mi.VidDurationLengthQuick(vidPath);
+      const int duration = mi.DurationLengthQuick(vidPath);
       // duration should not be zero
       QVERIFY2((duration > 0), qPrintable(name));
       // duration differs value should not large than 1s
@@ -109,11 +110,11 @@ class VideosDurationGetterTest : public PlainTestSuite {
 
 #ifdef _WIN32
     // QMediaInfo windows platform only
-    QMediaInfo mi;
-    QVERIFY2(mi.StartToGet(), "Should start succeed");
+    QMediaInfo& mi = QMediaInfo::GetInst();
+    QVERIFY2((bool)mi, "Should start succeed");
     for (int i = 0; i < mp4AbsPath.size(); ++i) {
       const QString& vidPath = mp4AbsPath[i];
-      const int duration = mi.VidDurationLengthQuick(vidPath);
+      const int duration = mi.DurationLengthQuick(vidPath);
       // duration should not be zero
       QVERIFY2((duration > 0), qPrintable(vidPath));
       // duration differs value should not large than 1s

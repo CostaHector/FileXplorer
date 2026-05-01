@@ -1,5 +1,8 @@
 ﻿#include "VideoDurationGetter.h"
 #include "Logger.h"
+#ifdef _WIN32
+#include "QMediaInfo.h"
+#endif
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -53,7 +56,7 @@ QList<int> VideoDurationGetter::ReadVideos(const QStringList& vidsPath) {
 
 bool VideoDurationGetter::StartToGet() {
 #ifdef _WIN32
-  if (!mi.StartToGet()) {
+  if (!QMediaInfo::GetInst()) {
     LOG_W("Video duration getter is nullptr, cannot get video duration");
     return false;
   }
@@ -72,14 +75,16 @@ QList<int> VideoDurationGetter::GetLengthsQuickStatic(const VideoDurationGetter&
 
 int VideoDurationGetter::GetLengthQuick(const QString& vidPath) const {
 #ifdef _WIN32
-  return mi.VidDurationLengthQuick(vidPath);
+  static auto& inst = QMediaInfo::GetInst();
+  return inst.DurationLengthQuick(vidPath);
 #endif
   return ReadAVideo(vidPath);
 }
 
 QList<int> VideoDurationGetter::GetLengthsQuick(const QStringList& vidsPath) const {
 #ifdef _WIN32
-  return mi.batchVidsDurationLength(vidsPath);
+  static auto& inst = QMediaInfo::GetInst();
+  return inst.batchVidsDurationLength(vidsPath);
 #endif
   return ReadVideos(vidsPath);
 }

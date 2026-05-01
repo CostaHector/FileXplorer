@@ -85,7 +85,7 @@ OpenSSL is required to support encryption and decryption functionality for the p
    Ensure the path containing OpenSSL is added to the system `PATH` variable.  
    One can add it and verify it via the ANOTHER NEW Command Prompt(Run as administrator):
    ```cmd
-   setx PATH "C:\Program Files\OpenSSL-Win64\bin;%PATH%" /M
+   setx PATH "C:\home\ffmpeg\bin;C:\Program Files\OpenSSL-Win64\bin;%PATH%" /M
    echo %PATH%|findstr -i "OpenSSL"
    ```
 

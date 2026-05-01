@@ -59,15 +59,3 @@ QString VidsDurationDisplayString::VideosDurationDetailHtmlTable(const QList<int
 // download 64bit zip DLL	v24.04 (without installer: 7z, zip) from
 // https://mediaarea.net/en/MediaInfo/Download/Windows
 // https://github.com/sylvrec/QMediaInfo
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QCoreApplication>
-int main(int argc, char* argv[]) {
-  QMediaInfo mi;
-  mi.Open("path_2_a_video_here.mp4");
-  QString dur = mi.Duration();
-  int len = mi.DurationLength();
-  LOG_D("duration: %s, length: %d", qPrintable(dur), len);
-  return 0;
-}
-#endif

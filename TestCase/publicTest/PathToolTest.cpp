@@ -14,12 +14,8 @@ class PathToolTest : public PlainTestSuite {
   void test_project_name_from_marco() { QCOMPARE(PROJECT_NAME, QString("FileXplorer")); }
 
   void test_lib_files_path_correct() {
-    QString libPath = GetPathByApplicationDirPath(FILE_REL_PATH::MEDIA_INFO_DLL);
-    QVERIFY(QFile::exists(libPath));
-
-    QString testRootDir = TESTCASE_ROOT_PATH;
-    QString libPath2 = QDir::cleanPath(QDir(testRootDir).absoluteFilePath("../third_party/mediaInfo/lib/MediaInfo.dll"));
-    QCOMPARE(libPath, libPath2);
+    QVERIFY(QDir(TESTCASE_ROOT_PATH).exists("../third_party/mediaInfo"));
+    QVERIFY(QDir(TESTCASE_ROOT_PATH).exists("../third_party/mediaInfo/bin/MediaInfo.dll"));
   }
 
   void test_cast_studio_file_path_exists() {
