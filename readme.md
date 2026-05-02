@@ -75,7 +75,7 @@ Ensure your system is 64-bit (amd64/x86_64) compatible:
 **Expected output: "amd64"**
 
 2. Download MediaInfo Packages
-Download the following .deb packages from the official repository [mediaarea/MediaInfo](https://mediaarea.net/en/MediaInfo/Download):
+Download the following .deb packages from the [official repository](https://mediaarea.net/en/MediaInfo/Download):
 
 e.g. Ubuntu 20.04 required following 2 files
 - libmediainfo0	v21.09
@@ -166,7 +166,7 @@ OpenSSL is required to support encryption and decryption functionality for the p
    cd "C:\Program Files\OpenSSL-Win64\bin"
    openssl version
    ```
-   Ensure the path containing OpenSSL is added to the user or system `Path` variable.  
+   Ensure the path containing `openssl.exe` (e.g., path=`C:\Program Files\OpenSSL-Win64\bin`) is added to the user or system `Path` variable.  
 
 #### Ubuntu
 Install OpenSSL via the terminal with the following commands:
