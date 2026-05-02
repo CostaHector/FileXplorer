@@ -1,51 +1,44 @@
-English | [简体中文](readme_zh_cn.md)
+简体中文 | [English](readme.md)
 
 ![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
 
-# FileXplorer - Ultimate File Management Suite
+# FileXplorer - Ultimate文件管理套件
 
-## Overview
-FileXplorer is a cross-platform professional file management system engineered for photographers and videographers handling large-scale media files, offering advanced file operations across both Windows and Linux environments.
+## 项目概述
+FileXplorer 是一款跨平台专业文件管理系统，专为处理大规模媒体文件的摄影师和摄像师打造，支持在 Windows 和 Linux 环境下进行高级文件操作。
 
 ![FileXplorer dark windows](resources/FileXplorer_Dark.png)
 ![FileXplorer dark ubuntu](resources/FileXplorer_Dark_ubuntu.png)
 
-## Prerequisites for Developers:
+## 开发者环境准备
 
-### 1. FFmpeg/libav (Required for Video Duration Retrieval)
-FFmpeg/libav is required to retrieve video duration information in the application. Below are the installation and configuration steps for Windows and Ubuntu systems:
+### 1. FFmpeg/libav（视频时长获取必需）
+应用内获取视频时长信息需要 FFmpeg/libav 支持，以下是 Windows 和 Ubuntu 系统的安装配置步骤：
 
-#### Windows
-Step 1: Download and Extract FFmpeg
+#### Windows 系统
+**第一步：下载并解压 FFmpeg**
+1. 下载 FFmpeg 动态库包：
+   - 访问 FFmpeg 官方下载页：https://ffmpeg.org/download.html
+   - 在「Windows EXE Files」区域选择 `Windows builds from gyan.dev`
+   - 下载名为 `ffmpeg-7.1.1-full_build-shared.7z` 的压缩包（约 44.4 MiB；兼容的新版本也可使用）
+   - 或从https://github.com/CostaHector/FileXplorerInstaller/releases/tag/third_party_dependency下载
+2. 将下载的 `.7z` 文件解压到自定义目录（例如 `C:/home/ffmpeg`）
 
-1. Download the FFmpeg dynamic library package:
-   - Visit the official FFmpeg download page: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
-   - Under "Windows EXE Files", select `Windows builds from gyan.dev`
-   - Download the package named `ffmpeg-7.1.1-full_build-shared.7z` (approx. 44.4 MiB; newer compatible versions are also acceptable)
-   - Or from [here](https://github.com/CostaHector/FileXplorerInstaller/releases/tag/third_party_dependency)
-2. Extract the downloaded `.7z` file to a custom directory (e.g., `C:/home/ffmpeg`)
+**第二步：验证 FFmpeg 路径配置**
+确保包含 `ffmpeg.exe` 的路径（例如 `path=C:/home/ffmpeg/bin`）已添加到用户或系统 `Path` 环境变量中。
 
-Step 2: Verify FFmpeg Path Configuration
+**第三步：关闭命令提示符**
 
-Ensure the path containing `ffmpeg.exe` (e.g., path=`C:/home/ffmpeg/bin`) is added to the user or system `Path` variable.  
-
-Step 3: Quit Command Prompt
-
-#### Ubuntu
-
-Install FFmpeg Dependencies
-
-Install the required FFmpeg development libraries and binaries via apt:
-
+#### Ubuntu 系统
+通过 apt 安装 FFmpeg 依赖库和二进制文件：
 ```sh
 sudo apt install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
 sudo apt install ffmpeg
 ffmpeg -version
 ```
 
-#### Verify FFmpeg Integration
-Run the following C++ code to confirm FFmpeg is properly configured. The output should show FFmpeg version: 3999588 (version number may vary by build):
-
+#### 验证 FFmpeg 集成
+运行以下 C++ 代码确认 FFmpeg 配置正确，输出应显示 FFmpeg 版本号（例如 3999588，具体版本可能因构建而异）：
 ```cpp
 #include <QDebug>
 extern "C" {
@@ -56,70 +49,56 @@ void IsFFmpegInstalledOK() {
   avformat_network_init();
   qDebug("FFmpeg version:%u", avformat_version());
 }
-
 ```
 
+### 2. MediaInfo 库（媒体文件信息获取必需）
+获取媒体文件详细元数据需要 MediaInfo 库支持，以下是 Windows 和 Ubuntu 系统的安装步骤：
 
-### 2. MediaInfo Library (Required for Media File Information)
-MediaInfo library is required to retrieve detailed metadata from media files. Below are the installation steps for Windows and Ubuntu systems:
+#### Windows 系统
+已预置，无需额外操作。
 
-#### Windows: already available
+#### Ubuntu 系统
+1. **验证系统架构**
+   确保系统为 64 位（amd64/x86_64）兼容：
+   `dpkg --print-architecture`
+   **预期输出：`"amd64"`**
 
-#### Ubuntu
+2. **下载 MediaInfo 包**
+   从官方仓库 https://mediaarea.net/en/MediaInfo/Download 下载以下 `.deb` 包：
+   例如 Ubuntu 20.04 需要以下 2 个文件：
+   - libmediainfo0 v21.09
+   - libzen0 v0.4.39
 
-1. Verify System Architecture
-Ensure your system is 64-bit (amd64/x86_64) compatible:
+3. **安装包**
+   使用 apt 安装下载的包（自动解决依赖）：
+   ```sh
+   sudo apt install ./libzen0v5_0.4.41-1_amd64.xUbuntu_20.04.deb ./libmediainfo0v5_26.01-1_amd64.xUbuntu_20.04.deb
+   ```
 
-`dpkg --print-architecture`
+4. **验证安装**
+   确认库已正确安装并可访问：
+   ```sh
+   ldconfig -p | grep libmediainfo
+   ```
+   预期输出显示库路径，例如：
+   ```sh
+   libmediainfo.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libmediainfo.so.0
+   ```
 
-**Expected output: "amd64"**
+5. **创建符号链接**
+   安装会将库放在 `/lib/x86_64-linux-gnu/` 目录，但链接器通常搜索 `/usr/lib/x86_64-linux-gnu/` 目录，创建兼容性符号链接：
+   ```sh
+   sudo ln -s /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0 /usr/lib/x86_64-linux-gnu/libmediainfo.so
+   ls -la /usr/lib/x86_64-linux-gnu/libmediainfo.so
+   ```
+   应显示符号链接，例如：
+   ```sh
+   /usr/lib/x86_64-linux-gnu/libmediainfo.so -> /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0
+   ```
 
-2. Download MediaInfo Packages
-Download the following .deb packages from the official repository [mediaarea/MediaInfo](https://mediaarea.net/en/MediaInfo/Download):
-
-e.g. Ubuntu 20.04 required following 2 files
-- libmediainfo0	v21.09
-- libzen0	v0.4.39
-
-3. Install the Packages
-
-Install the downloaded packages using apt (this automatically resolves dependencies):
-
-```sh
-sudo apt install ./libzen0v5_0.4.41-1_amd64.xUbuntu_20.04.deb ./libmediainfo0v5_26.01-1_amd64.xUbuntu_20.04.deb
-```
-
-4. Verify Installation
-Confirm the library is correctly installed and accessible:
-```sh
-ldconfig -p | grep libmediainfo
-```
-
-Expected output showing library paths, for example
-```sh
-        libmediainfo.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libmediainfo.so.0
-```
-
-5. Create Symbolic Link
-
-The installation places libraries in /lib/x86_64-linux-gnu/, but the linker typically searches in /usr/lib/x86_64-linux-gnu/.
-
-Create a symbolic link for compatibility:
-```sh
-sudo ln -s /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0 /usr/lib/x86_64-linux-gnu/libmediainfo.so
-ls -la /usr/lib/x86_64-linux-gnu/libmediainfo.so
-```
-
-Should show the symbolic link, for example
-```sh
-        /usr/lib/x86_64-linux-gnu/libmediainfo.so -> /lib/x86_64-linux-gnu/libmediainfo.so.0.0.0
-```
-
-
-#### Verify MediaInfo Integration
-
-After installation, the CMake configuration can simply link against mediainfo:
-```CmakeLists.txt
+#### 验证 MediaInfo 集成
+安装后，CMake 配置可直接链接 mediainfo：
+```cmake
 if(WIN32)
     target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mediaInfo/bin")
     target_link_libraries(${PROJECT_NAME} PRIVATE MediaInfo)
@@ -128,7 +107,7 @@ elseif(UNIX AND NOT APPLE)
 endif()
 ```
 
-To verify the dynamic loading works correctly, run the following test:
+验证动态加载是否正常，运行以下测试：
 ```cpp
 #include <QLibrary>
 bool testMediaInfo() {
@@ -137,100 +116,82 @@ bool testMediaInfo() {
 #else
     QLibrary mediainfo("libmediainfo.so");
 #endif
-    return mediainfo.load(); // should return true
+    return mediainfo.load(); // 应返回 true
 }
 ```
 
-### 3. OpenSSL (Required when PASSVAULT_ENABLED=ON)
-OpenSSL is required to support encryption and decryption functionality for the password book feature. Below are the installation steps for Windows and Ubuntu systems:
+### 3. OpenSSL（启用 PASSVAULT 时必需）
+密码本功能的加密解密需要 OpenSSL 支持，以下是 Windows 和 Ubuntu 系统的安装步骤：
 
-#### Windows
-1. **Download OpenSSL Installer**
-   Visit the official Win32/Win64 OpenSSL download page:  
+#### Windows 系统
+1. **下载 OpenSSL 安装程序**
+   访问官方 Win32/Win64 OpenSSL 下载页：
    https://slproweb.com/products/Win32OpenSSL.html
-   
-   - Select the `Win64 OpenSSL v3.5.1` package (**non-Light version**)
-   - Download the installer file: `Win64OpenSSL-3_5_1.msi` (approx. 281 MiB)
-   - or from [here](https://github.com/CostaHector/FileXplorerInstaller/releases/tag/third_party_dependency)
+   - 选择 `Win64 OpenSSL v3.5.1` 包（**非 Light 版本**）
+   - 下载安装文件：`Win64OpenSSL-3_5_1.msi`（约 281 MiB）
+   - 或从https://github.com/CostaHector/FileXplorerInstaller/releases/tag/third_party_dependency下载
 
-2. **Install OpenSSL**
-   - Run the downloaded `.msi` installer
-   - Use the default installation path: `C:\Program Files\OpenSSL-Win64` (recommended for easy management)
-   - During installation, select the option:  
-     `Copy OpenSSL DLLs to → The OpenSSL binaries (/bin) directory`
-   - Complete the installation wizard with default settings
+2. **安装 OpenSSL**
+   - 运行下载的 `.msi` 安装程序
+   - 使用默认安装路径：`C:\Program Files\OpenSSL-Win64`（推荐，便于管理）
+   - 安装过程中选择选项：`Copy OpenSSL DLLs to → The OpenSSL binaries (/bin) directory`
+   - 按默认设置完成安装向导
 
-3. **Verify Installation**
-   Open Command Prompt (CMD) and execute the following commands to confirm successful installation:
+3. **验证安装**
+   打开命令提示符（CMD）执行以下命令确认安装成功：
    ```cmd
    cd "C:\Program Files\OpenSSL-Win64\bin"
    openssl version
    ```
-   Ensure the path containing OpenSSL is added to the user or system `Path` variable.  
+   确保包含 OpenSSL 的路径已添加到用户或系统 `Path` 环境变量中。
 
-#### Ubuntu
-Install OpenSSL via the terminal with the following commands:
+#### Ubuntu 系统
+通过终端安装 OpenSSL：
 ```sh
 sudo apt install -y openssl libssl-dev
 openssl version
 ls /usr/include/openssl/
 ```
 
-## Core Features
+## 核心功能
 
-1. File/Folder Preview & ‌Sidebar Navigation‌
+1. **文件/文件夹预览与侧边栏导航**
+   - （1）无需打开文件夹即可分类预览其内容；
+   - （2）选中任意文件夹即可在右侧预览面板查看其项目；
+   - （3）支持配置文件类型过滤器和自定义默认显示顺序；
+   - （4）支持同时拖拽收藏多个文件夹；
+   - （5）提供自动（按字母/路径）和手动排序选项；
+   - （6）所有书签配置持久保存到本地设置文件；
 
-        (1). Enables categorized preview of folder contents without opening them;
+2. **文件批量重命名操作（带预览窗口）**
+   - （1）基础字符串操作（添加/删除/替换），支持正则表达式（例如 `"wifi"` → `"Wi-Fi"`）；
+   - （2）大小写转换：大写/小写/标题大小写/句子大小写/交替大小写；
+   - （3）按分隔符拆分字符串并重新排序片段（例如 `"Marvel - S01E02 - 2012"` → `"Marvel - 2012 - S01E02"`）；
+   - （4）序列编号，支持自定义模式和起始值（例如 `"Trip - Scenery - %d"`，起始值=3）；
 
-        (2). Simply select any folder to view its items in the right-side preview pane;
+3. **多路径同步**
+   自动将源文件夹的操作镜像到指定的镜像文件夹；
 
-        (3). Configurable file type filters and customizable default display order
+4. **深度搜索功能**
+   支持按文件名、内容或组合条件搜索文件/文件夹；
 
-        (4). Supports drag-and-drop bookmarking for multiple folders simultaneously;
+5. **无障碍访问**
+   下拉菜单中模糊匹配操作名称，跳过层级菜单导航；
 
-        (5). Provides both automatic (alphabetical/path-based) and manual sorting options;
+6. **高级功能**
+   - （1）**图片去重**：预览检测到的重复项，删除前手动确认；
+   - （2）**视频去重**：比较文件名、大小、时长和部分哈希（前 XX MB）；
+   - （3）**一键分类**：将相关图片/视频/文档分组到文件夹，支持撤销；
+   - （4）**视频元数据导出**：保存到 MOVIES 表（文件名/大小/时长/MD5），通过 VIDEOS 视图管理；
+   - （5）**审计追踪**：文件变更后手动/定时更新 MOVIES 表，记录修改次数；
+   - （6）**文件对比**：快速 MD5/大小检查用于身份验证；
 
-        (6). All bookmark configurations persist to local settings file;
-
-2. File Batch Renaming Operations (with Preview Window)
-
-        (1). Basic string operations (add/delete/replace) with regex support (e.g. "wifi" → "Wi-Fi");
-
-        (2). Case conversion: UPPERCASE/lowercase/Title Case/Sentence case/tOgGlE cAsE;
-
-        (3). Columnize strings by delimiter and reorder segments (e.g. "Marvel - S01E02 - 2012" → "Marvel - 2012 - S01E02");
-
-        (4). Sequential numbering with customizable patterns/start values (e.g. "Trip - Scenery - %d", start=3);
-
-3. Multi-path Synchronization
-Automatically mirrors operations from source folder to designated mirror folders;
-
-4. Deep Search Functionality
-File/folder search by: filename, content, or combined criteria;
-
-5. Accessibility
-Fuzzy matching of action names in dropdowns to bypass hierarchical menu navigation;
-
-6. Advanced Features:
-
-        (1)‌. Image Deduplication‌: Preview detected duplicates for manual confirmation before deletion;
-
-        (2)‌. ‌Video Deduplication‌: Compares filename, size, duration, and partial hash (first XX MB);
-
-        (3)‌. ‌‌One-click Categorization‌: Group related images/videos/documents into folders with undo support;
-
-        (4)‌. ‌‌Video Metadata Export‌: Saves to MOVIES table (filename/size/duration/MD5) with VIDEOS view for management;
-
-        (5)‌. ‌‌Audit Trail‌: Manual/scheduled updates to MOVIES table after file changes, logging modification counts;
-
-        (6)‌. ‌‌File Comparison‌: Quick MD5/size checks for identity verification
-
-7. UI Themes
-Light/Dark theme support with automatic time-based switching or manual lock;
+7. **UI 主题**
+   支持浅色/深色主题，可自动按时间切换或手动锁定；
 ![FileXplorer light windows](resources/FileXplorer_Light.png)
 ![FileXplorer light ubuntu](resources/FileXplorer_Light_ubuntu.png)
 
-## Devoloping Settings
+## 开发设置
 ```md
 git filter-branch --force --index-filter   "git rm --cached --ignore-unmatch AKA_PERFORMERS.txt"   --prune-empty --tag-name-filter cat -- --all  
 rm -rf .git/refs/original/
@@ -245,122 +206,101 @@ git push -u origin fileXplor:master -f
 git remote add origin git@github.com:CostaHector/FileXplorer.git
 ```
 
-## New Feature
-1. Logs Control
+## 新功能
+1. **日志控制**
 
-### Log Control
-Interactive function:
-1. Open latest log file
-2. Open logs folder
-3. Set log level(default: error), Attention:
-    - This log level only control release edition.
-4. Aging log file if size >= 20MiB
+### 日志控制
+交互功能：
+1. 打开最新日志文件
+2. 打开日志文件夹
+3. 设置日志级别（默认：error），注意：
+   - 此日志级别仅控制发布版本。
+4. 日志文件超过 20MiB 时自动老化
 
-a log line example:
+日志行示例：
 > `hh:mm:ss.zzz E functionName msg [fileName:fileNo]`
 
-## Add this application to file system context menu
+## 添加应用到文件系统右键菜单
 
-### For windows user
+### Windows 用户
+前提：将包含 `[Qt5Core.dll]` 的路径（例如 `"C:\Qt\5.15.2\mingw81_64\bin"`）添加到系统变量 Path 中。
 
-Precondition: add path that contains `[Qt5Core.dll]` says "C:\Qt\5.15.2\mingw81_64\bin" to system variable path.
-
-Way1: (Recommend)
-
-![Add a shortcut action to system right click context menu](resources/AddThisProgramToSystemContextMenu.png)
-
+**方法 1：（推荐）**
+!resources/AddThisProgramToSystemContextMenu.png
 ```md
-In "File" Tab Widget;
-
-Click "System Menu/Add";
-
-In the popup UAC Window click allow this app to make changes;
-
+在「文件」标签页控件中；
+点击「系统菜单/添加」；
+在弹出的 UAC 窗口中点击允许此应用进行更改；
 ```
 
-Way2: 
+**方法 2：**
 ```md
-Open regedit;
-
-Into following path `Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`;
-
-New a key "FileXplorer" under "shell";
-
-New a key "command" under "FileXplorer";
-
-Modify command (Default) value data to following string;
-
+打开注册表编辑器（regedit）；
+进入路径 `Computer\HKEY_CLASSES_ROOT\Directory\Background\shell\`；
+在「shell」下新建键「FileXplorer」；
+在「FileXplorer」下新建键「command」；
+修改「command」的（默认）值为以下字符串：
 `"C:\home\aria\code\FileXplorer\build\Desktop_Qt_5_15_2_MinGW_64_bit-Release\FileXplorer.exe" "%V"`
 ```
 
-### for Ubuntu user
-using fma-config-tool
+### Ubuntu 用户
+使用 fma-config-tool：
 ```sh
 sudo apt install nautilus-actions
 fma-config-tool
 ```
+在菜单栏「FileManager Action Configuration Tool」中，取消勾选以下操作：
+> 首选项 > 运行时首选项 > Nautilus 菜单布局 > 创建根目录「FileManager-Actions」菜单
 
-in menu bar "FileManager Action Configuration Tool", uncheck following action
+定义新操作：
+1. 设置「操作」标签页如下：
+   - 勾选在选择上下文菜单中显示该操作；
+   - 勾选在位置上下文菜单中显示该操作；
+   - 图标：`/home/ariel/code/FileXplorer/resources/themes/AppIcons/FOLDER_OF_PICTURES.png`
+2. 设置「命令」标签页如下：
+   - 路径：`/home/ariel/code/FileXplorer/build/Desktop_Qt_5_15_2_GCC_64bit-Release/FileXplorer`
+   - 参数：`"%d"`
 
-> Preference > Runtime Preference > Nautilus menu layout > Create a root "FileManager-Actions" menu
+保存项目树。
 
-Define a new action
-
-1. set Action tab below:
-
-    check the action display item in selection context menu 
-
-    check the action display item in location context menu 
-
-    icon: /home/ariel/code/FileXplorer/resources/themes/AppIcons/FOLDER_OF_PICTURES.png
-
-2. set Commands tab below:
-
-    Path: /home/ariel/code/FileXplorer/build/Desktop_Qt_5_15_2_GCC_64bit-Release/FileXplorer
-
-    Parameter: "%d"
-
-save the items tree
-
-## Coverage report in linux
+## Linux 覆盖率报告
 ```bash
 cmake --build /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug --target all
-cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;/usr/bin/lcov --capture --directory . --output-file coverage.info --exclude "/home/ariel/Qt/*" --exclude "/usr/include/*" --exclude "/usr/local/include/*" --exclude "*/TestCase/*" --exclude "*/unittest/*"        --exclude "*/build/*"
+cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;/usr/bin/lcov --capture --directory . --output-file coverage.info --exclude "/home/ariel/Qt/*" --exclude "/usr/include/*" --exclude "/usr/local/include/*" --exclude "*/TestCase/*" --exclude "*/unittest/*" --exclude "*/build/*"
 cd /home/ariel/code/FileXplorer/build/FileXplorerTest_Desktop_Qt_5_15_2_GCC_64bit-Debug;genhtml coverage.info --output-directory coverage_report
 cd /home/ariel/code/FileXplorer
 
-
-# if some file was removed. remove its related files like {*.gcda, *.gcno, *.o, *.html}
+# 如果某些文件已被移除，删除相关文件如 {*.gcda, *.gcno, *.o, *.html}
 find ./ -name "RemovedFileName*" -print
 find ./ -name "RemovedFileName*" -delete
 ```
 
-## Update translate files is needed
-
+## 更新翻译文件（如需）
 ```bash
-cd path_to_project
-# windows
+cd 项目路径
+# Windows 系统
 C:/Qt/5.15.2/mingw81_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./resources/Translate/FileXplorer_zh_CN.ts
 C:/Qt/5.15.2/mingw81_64/bin/linguist ./resources/Translate/FileXplorer_zh_CN.ts
 C:/Qt/5.15.2/mingw81_64/bin/lrelease ./resources/Translate/FileXplorer_zh_CN.ts -qm ./resources/Translate/FileXplorer_zh_CN.qm
-# linux
+# Linux 系统
 /home/ariel/Qt/5.15.2/gcc_64/bin/lupdate . -no-obsolete -recursive -locations relative -ts ./resources/Translate/FileXplorer_zh_CN.ts
 /home/ariel/Qt/5.15.2/gcc_64/bin/linguist ./resources/Translate/FileXplorer_zh_CN.ts
 /home/ariel/Qt/5.15.2/gcc_64/bin/lrelease ./resources/Translate/FileXplorer_zh_CN.ts -qm ./resources/Translate/FileXplorer_zh_CN.qm
 ```
 
-## Font type and size
-Copy file "msyh.ttc" "msyhbd.ttc" from `C:\Windows\Fonts`.
-
+## 字体类型与大小
+从 `C:\Windows\Fonts` 复制文件 `"msyh.ttc"` `"msyhbd.ttc"`：
 ```bash
 sudo mkdir -p /usr/share/fonts/microsoft
 sudo cp msyh.ttc msyhbd.ttc /usr/share/fonts/microsoft/
 sudo fc-cache -fv
 ```
 
-## sqlite db browser recommend
+## 推荐 SQLite 数据库浏览器
+```sh
 sudo apt update
 sudo apt install sqlitebrowser
+```
 
 ## Snippets
 Edir/Preference/TextEditor/Snippets

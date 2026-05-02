@@ -169,6 +169,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     ${HEADERS}
     ${QM_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/readme.md
+    ${CMAKE_CURRENT_SOURCE_DIR}/readme_zh_cn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/gencov.sh
 )
 
