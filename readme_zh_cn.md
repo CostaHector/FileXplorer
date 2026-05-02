@@ -64,7 +64,7 @@ void IsFFmpegInstalledOK() {
    **预期输出：`"amd64"`**
 
 2. **下载 MediaInfo 包**
-   从官方仓库 https://mediaarea.net/en/MediaInfo/Download 下载以下 `.deb` 包：
+   从[官方仓库](https://mediaarea.net/en/MediaInfo/Download)下载以下 `.deb` 包：
    例如 Ubuntu 20.04 需要以下 2 个文件：
    - libmediainfo0 v21.09
    - libzen0 v0.4.39
@@ -143,7 +143,7 @@ bool testMediaInfo() {
    cd "C:\Program Files\OpenSSL-Win64\bin"
    openssl version
    ```
-   确保包含 OpenSSL 的路径已添加到用户或系统 `Path` 环境变量中。
+   确保包含 openssl.exe 的路径已添加到用户或系统 `Path` 环境变量中。
 
 #### Ubuntu 系统
 通过终端安装 OpenSSL：
