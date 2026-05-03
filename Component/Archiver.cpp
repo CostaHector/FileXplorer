@@ -15,7 +15,7 @@ Archiver::Archiver(QWidget* parent) : QMainWindow{parent} {
   CHECK_NULLPTR_RETURN_VOID(m_itemsTable);
   m_archiverModel = new (std::nothrow) ArchiverModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_archiverModel);
-  m_thumbnailViewer = new (std::nothrow) ThumbnailImageViewer{"AchiveImagePreview", this};
+  m_thumbnailViewer = new (std::nothrow) ByteArrayImageViewer{"AchiveImagePreview", this};
   CHECK_NULLPTR_RETURN_VOID(m_thumbnailViewer);
 
   m_itemsTable->setModel(m_archiverModel);
@@ -77,7 +77,7 @@ void Archiver::closeEvent(QCloseEvent* event) {
 void Archiver::subscribe() {
   connect(m_itemsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &Archiver::onSelectNewItemRow);
   connect(m_ImageSizeScale, &QSlider::valueChanged, this, &Archiver::onSilderChangedUpdateImageScaledIndex);
-  connect(m_thumbnailViewer, &ThumbnailImageViewer::onImageScaledIndexChanged, this, &Archiver::setSliderValueAndLabelDisplayText);
+  connect(m_thumbnailViewer, &ImageViewer::onImageScaledIndexChanged, this, &Archiver::setSliderValueAndLabelDisplayText);
 }
 
 bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex& /* previous */) {
@@ -87,10 +87,11 @@ bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex&
   }
   int newRow = current.row();
   const QString& name = m_archiverModel->GetRelativeName(newRow);
+  const QString& formatStr = PathTool::GetFormatInHar(name);
   const QByteArray& dataByteArray = m_archiverModel->GetByteArrayData(newRow);
   ChangeWindowTitle(name, dataByteArray.size());
-  if (ThumbnailImageViewer::IsFileImage(name)) {
-    m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray); // only update for images
+  if (ImageViewer::IsFileImage(name)) {
+    m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray, formatStr); // only update for images
   }
   return true;
 }

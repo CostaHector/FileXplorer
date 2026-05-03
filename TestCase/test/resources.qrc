@@ -4,6 +4,7 @@
     </qresource>
     <qresource prefix="/image_test">
         <file alias="resolution_ratio">resolution_ratio.png</file>
+        <file alias="sample_Blink_WhiteBlackRed">sample_Blink_WhiteBlackRed.gif</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="BACKGROUND_IMAGE_TABLEVIEW">BACKGROUND_IMAGE_TABLEVIEW.svg</file>

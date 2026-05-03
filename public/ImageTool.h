@@ -3,6 +3,7 @@
 
 #include <QFileIconProvider>
 #include <QStyle>
+class QBuffer;
 
 namespace ImageTool {
 bool IsFileAbsPathImage(const QString& fileAbsPath);
@@ -21,6 +22,9 @@ QIcon GetBuiltInIcon(QStyle::StandardPixmap spE);
 
 const QIcon& GetCheckResultIcon(bool bPass);
 const QPixmap& GetLabelStatusPixmap(int labelStatus);
+
+QSize GetImageDimensionPixel(const QString& imgFilePath);
+QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat);
 }
 
 struct IMAGE_SIZE {

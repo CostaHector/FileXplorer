@@ -2,10 +2,10 @@
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "Logger.h"
+#include <QFileInfo>
 #include <QFile>
 #include <QDir>
 #include <QIODevice>
-#include <QTextStream>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -20,9 +20,7 @@ const QMap<QString, QString> HarFiles::SUPPORTED_MIMETYPES = {{"image/webp", ".w
                                                               {"video/mp4", ".mp4"}, //
                                                               };
 
-HarFiles::HarFiles() {}
-
-QString GetPathStem(const QString& url) {
+QString GetPathItemName(const QString& url) {
   const int slashIndex = url.lastIndexOf('/');
 
   const QString noRootPath = url.mid(slashIndex + 1);  // if slashIndex = -1, also ok
@@ -118,10 +116,10 @@ bool HarFiles::operator()(const QString& harAbsPath) {
       return false;
     }
     const QString& url = reqHash["url"].toString();
-    const QString& fileBasename = GetPathStem(url);
+    const QString& fileBasename = GetPathItemName(url);
     const QString& extension = SUPPORTED_MIMETYPES.contains(mimetype) ? SUPPORTED_MIMETYPES[mimetype] : "";
     const QString dstFileName = fileBasename + extension;
-    LOG_D("fileStem[%25s%-6s], url: %64s", qPrintable(fileBasename), qPrintable(extension), qPrintable(url));
+    LOG_D("fileItem[%25s%-6s], url: %64s", qPrintable(fileBasename), qPrintable(extension), qPrintable(url));
     if (!contentHash.contains("text")) {
       LOG_W("key[response/content/%s] not exist in reqHash", "text");
       continue;

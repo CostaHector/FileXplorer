@@ -3,7 +3,7 @@
 #include "ArchiveFiles.h"
 #include "ArchiverModel.h"
 #include "CustomTableView.h"
-#include "ThumbnailImageViewer.h"
+#include "ByteArrayImageViewer.h"
 #include <QMainWindow>
 #include <QSplitter>
 #include <QSlider>
@@ -29,7 +29,7 @@ class Archiver : public QMainWindow {
   QSplitter* m_splitter{nullptr};
   CustomTableView* m_itemsTable{nullptr};
   ArchiverModel* m_archiverModel{nullptr};
-  ThumbnailImageViewer* m_thumbnailViewer{nullptr};
+  ByteArrayImageViewer* m_thumbnailViewer{nullptr};
 
   QLabel* m_ImageSizeHint{nullptr};
   QSlider* m_ImageSizeScale{nullptr};

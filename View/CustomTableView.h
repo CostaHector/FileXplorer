@@ -38,6 +38,7 @@ class CustomTableView : public QTableView {
 
   void registerProxyModel(QSortFilterProxyModel* proxyModelInDerived);
   QModelIndexList selectedRowsSource() const;
+  QList<int> selectedRowsSourceInt() const;
 
  private:
   void AddItselfAction2Menu();

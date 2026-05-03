@@ -47,7 +47,9 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/DupVideos/*.cpp
     ${PARENT_DIR}/Component/FolderPreview/*.cpp
     ${PARENT_DIR}/Component/GeneralDataEditor/*.cpp
+    ${PARENT_DIR}/Component/Har/*.cpp
     ${PARENT_DIR}/Component/HeaderView/*.cpp
+    ${PARENT_DIR}/Component/ImageView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
     ${PARENT_DIR}/Component/Navigation/*.cpp
     ${PARENT_DIR}/Component/PassVault/*.cpp
@@ -72,7 +74,9 @@ file(GLOB SOURCES
     ComponentTest/DupVideosTest/*.cpp
     ComponentTest/FolderPreviewTest/*.cpp
     ComponentTest/GeneralDataEditorTest/*.cpp
+    ComponentTest/HarTest/*.cpp
     ComponentTest/HeaderViewTest/*.cpp
+    ComponentTest/ImageViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
     ComponentTest/NavigationTest/*.cpp
     ComponentTest/PassVaultTest/*.cpp
@@ -106,7 +110,9 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/DupVideos
     ${PARENT_DIR}/Component/FolderPreview
     ${PARENT_DIR}/Component/GeneralDataEditor
+    ${PARENT_DIR}/Component/Har
     ${PARENT_DIR}/Component/HeaderView
+    ${PARENT_DIR}/Component/ImageView
     ${PARENT_DIR}/Component/LineEdit
     ${PARENT_DIR}/Component/Navigation
     ${PARENT_DIR}/Component/PassVault
@@ -144,7 +150,9 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/DupVideos/*.h
     ${PARENT_DIR}/Component/FolderPreview/*.h
     ${PARENT_DIR}/Component/GeneralDataEditor/*.h
+    ${PARENT_DIR}/Component/Har/*.h
     ${PARENT_DIR}/Component/HeaderView/*.h
+    ${PARENT_DIR}/Component/ImageView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
     ${PARENT_DIR}/Component/Navigation/*.h
     ${PARENT_DIR}/Component/PassVault/*.h
@@ -160,16 +168,6 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Classify/*.h
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libavcodec/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libavdevice/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libavfilter/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libavformat/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libavutil/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libpostproc/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libswresample/*.h
-    ${PARENT_DIR}/third_party/ffmpeg/include/libswscale/*.h
-    ${PARENT_DIR}/third_party/mediaInfo/include/*.h
-    ${PARENT_DIR}/third_party/openssl/include/openssl/*.h
     ${PARENT_DIR}/View/*.h
     pubTestTool/*.h
     MockTool/*.h

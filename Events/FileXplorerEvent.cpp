@@ -27,7 +27,7 @@
 #include "RenameWidget_SwapFileNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
 #include "DuplicateVideosFinder.h"
-#include "HarTableView.h"
+#include "HarMgr.h"
 
 #include "ItemsUnpacker.h"
 #include "ArchiveFiles.h"
@@ -874,11 +874,10 @@ bool FileXplorerEvent::on_HarView() {
     LOG_WARN_NP("Har file not exist", fileAbsPath);
     return false;
   }
-  auto* harTableview = new (std::nothrow) HarTableView{_contentPane};
-  CHECK_NULLPTR_RETURN_FALSE(harTableview);
-  harTableview->operator()(fileAbsPath);
-  harTableview->raise();
-  harTableview->show();
+  HarMgr* harMgr = new (std::nothrow) HarMgr;
+  CHECK_NULLPTR_RETURN_FALSE(harMgr);
+  harMgr->OpenHar(fileAbsPath);
+  harMgr->show();
   return true;
 }
 

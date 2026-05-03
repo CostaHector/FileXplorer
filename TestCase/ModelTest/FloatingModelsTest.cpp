@@ -7,7 +7,7 @@
 #include "EndToExposePrivateMember.h"
 #include "TDir.h"
 #include "ImageTestPrecoditionTools.h"
-#include "CastBrowserHelper.h"
+#include "ImageTool.h"
 
 class FloatingModelsTest : public PlainTestSuite {
   Q_OBJECT
@@ -152,7 +152,7 @@ class FloatingModelsTest : public PlainTestSuite {
     const QString notExistImage{"inexist_images.webp"};
     {
       // read from file ok
-      QCOMPARE(CastBrowserHelper::GetImageSize(validImage), sourceSvgSize);
+      QCOMPARE(ImageTool::GetImageDimensionPixel(validImage), sourceSvgSize);
     }
 
     ImgsModel imgModel{"ImgsListView_ImgsModel"};

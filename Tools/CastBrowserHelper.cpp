@@ -7,10 +7,10 @@
 #include "PublicVariable.h"
 #include "StringTool.h"
 #include "ImageTool.h"
-#include <QBuffer>
+
 #include <QDir>
 #include <QSqlField>
-#include <QImageReader>
+#include <QDateTime>
 
 QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
   QString fullHtmlContents;
@@ -33,16 +33,8 @@ const QString HTML_IMG_WIDTH_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt=
 const QString HTML_IMG_HEIGHT_TEMPLATE{R"(<a href="file:///%1"><img src="%1" alt="%2" height="%3"></a>)"};
 const QString VID_LINK_TEMPLATE{R"(<a href="file:///%1" title="%1" style="cursor:pointer">&#9654;%2</a>)"};
 
-QSize GetImageSize(const QString& filePath) {
-  QImageReader reader{filePath};
-  if (!reader.canRead()) {
-    return {};
-  }
-  return reader.size();
-}
-
 QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altText, const QSize& ICON_SIZE) {
-  const auto realSize = GetImageSize(imagePath);
+  const auto realSize = ImageTool::GetImageDimensionPixel(imagePath);
   if (realSize.isNull()) {
     return HTML_IMG_WIDTH_TEMPLATE.arg("").arg(altText).arg(0);
   }

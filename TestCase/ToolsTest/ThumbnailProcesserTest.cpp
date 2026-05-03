@@ -9,7 +9,7 @@
 #include "EndToExposePrivateMember.h"
 #include "VideoTestPrecoditionTools.h"
 #include "ImageTestPrecoditionTools.h"
-#include "CastBrowserHelper.h"
+#include "ImageTool.h"
 
 #define MP4_33_VID_BASE_NAME "Big Buck Bunny (Project Peach) Official Trailer (2008, The Blender Foundation) 720p 33s"
 #define FLV_10_VID_BASE_NAME "Big Buck Bunny SampleVideo_360x240_1mb 10s"
@@ -83,14 +83,14 @@ private slots:
       QCOMPARE(tp.CreateThumbnailImages(validVideosPath, 2, 2, 720, true), 2);
       QVERIFY(dir.exists(MP4_33_VID_BASE_NAME " 22.jpg"));
       QVERIFY(dir.exists(FLV_10_VID_BASE_NAME " 22.jpg"));
-      QCOMPARE(CastBrowserHelper::GetImageSize(dir.absoluteFilePath(MP4_33_VID_BASE_NAME " 22.jpg")).width(), 720 * 2);
+      QCOMPARE(ImageTool::GetImageDimensionPixel(dir.absoluteFilePath(MP4_33_VID_BASE_NAME " 22.jpg")).width(), 720 * 2);
     }
 
     {
       QCOMPARE(tp.CreateThumbnailImages(validVideosPath, 1, 3, 480, false), 2);
       QVERIFY(dir.exists(MP4_33_VID_BASE_NAME " 13.png"));
       QVERIFY(dir.exists(FLV_10_VID_BASE_NAME " 13.png"));
-      QCOMPARE(CastBrowserHelper::GetImageSize(dir.absoluteFilePath(FLV_10_VID_BASE_NAME " 13.png")).width(), 480 * 3);
+      QCOMPARE(ImageTool::GetImageDimensionPixel(dir.absoluteFilePath(FLV_10_VID_BASE_NAME " 13.png")).width(), 480 * 3);
     }
   }
 

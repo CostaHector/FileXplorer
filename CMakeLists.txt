@@ -42,7 +42,9 @@ file(GLOB SOURCES
     Component/DupVideos/*.cpp
     Component/FolderPreview/*.cpp
     Component/GeneralDataEditor/*.cpp
+    Component/Har/*.cpp
     Component/HeaderView/*.cpp
+    Component/ImageView/*.cpp
     Component/LineEdit/*.cpp
     Component/Navigation/*.cpp
     Component/PassVault/*.cpp
@@ -72,7 +74,9 @@ set(SRV_HEADER_PATH
     Component/GeneralDataEditor
     Component/DupImages
     Component/DupVideos
+    Component/Har
     Component/HeaderView
+    Component/ImageView
     Component/LineEdit
     Component/Navigation
     Component/PassVault
@@ -108,7 +112,9 @@ file(GLOB HEADERS
     Component/DupVideos/*.h
     Component/FolderPreview/*.h
     Component/GeneralDataEditor/*.h
+    Component/Har/*.h
     Component/HeaderView/*.h
+    Component/ImageView/*.h
     Component/LineEdit/*.h
     Component/Navigation/*.h
     Component/PassVault/*.h
@@ -123,16 +129,6 @@ file(GLOB HEADERS
     Tools/Classify/*.h
     Tools/FileDescriptor/*.h
     Tools/Json/*.h
-    third_party/ffmpeg/include/libavcodec/*.h
-    third_party/ffmpeg/include/libavdevice/*.h
-    third_party/ffmpeg/include/libavfilter/*.h
-    third_party/ffmpeg/include/libavformat/*.h
-    third_party/ffmpeg/include/libavutil/*.h
-    third_party/ffmpeg/include/libpostproc/*.h
-    third_party/ffmpeg/include/libswresample/*.h
-    third_party/ffmpeg/include/libswscale/*.h
-    third_party/mediaInfo/include/*.h
-    third_party/openssl/include/openssl/*.h
     View/*.h
 )
 
