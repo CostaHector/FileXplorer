@@ -851,6 +851,14 @@
     </message>
 </context>
 <context>
+    <name>HarTableView</name>
+    <message>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+26"/>
+        <source>Export Selections to</source>
+        <translation>导出选中</translation>
+    </message>
+</context>
+<context>
     <name>HorMenuInHeader</name>
     <message>
         <location filename="../../Component/HeaderView/HorMenuInHeader.cpp" line="+20"/>
@@ -2222,17 +2230,17 @@
 <context>
     <name>ThumbnailImageViewer</name>
     <message>
-        <location filename="../../Component/ThumbnailImageViewer.cpp" line="+299"/>
+        <location filename="../../Component/ImageView/ThumbnailImageViewer.cpp" line="+111"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+1"/>
         <source>Reveal in explorer</source>
         <translation>在资源管理器中显示</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+1"/>
         <source>Copy file name</source>
         <translation>复制文件名称</translation>
     </message>
