@@ -8,78 +8,69 @@
 
 #include "TDir.h"
 
-#include <QDirIterator>
-
 class HarModelTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void initTestCase() {
-    HarFilesMocker::mockHarFiles().clear();
-  }
-  void cleanupTestCase() {
-    HarFilesMocker::mockHarFiles().clear();
-  }
+public:
+private slots:
+  void init() { HarFilesMocker::mockHarFiles().clear(); }
+  void cleanupTestCase() { HarFilesMocker::mockHarFiles().clear(); }
 
   void initialize_ok() {
     HarModel hm;
     QCOMPARE(hm.rowCount(), 0);
-    QCOMPARE(hm.columnCount(), 4);  // 验证列数
+    QCOMPARE(hm.columnCount(), 4);
+
     QCOMPARE(hm.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString(), "Name");
-    QCOMPARE(hm.headerData(1024, Qt::Horizontal, Qt::DisplayRole).toInt(), 1024 + 1);  // will not overflow
+    QCOMPARE(hm.headerData(1024, Qt::Horizontal, Qt::DisplayRole).toInt(), 1024 + 1); // will not overflow
 
     QCOMPARE(hm.headerData(0, Qt::Vertical, Qt::DisplayRole).toInt(), 0 + 1);
-    QCOMPARE(hm.headerData(1024, Qt::Vertical, Qt::DisplayRole).toInt(), 1024 + 1);  // will not overflow
-    QCOMPARE(hm.headerData(0, Qt::Vertical, Qt::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
+    QCOMPARE(hm.headerData(1024, Qt::Vertical, Qt::DisplayRole).toInt(), 1024 + 1); // will not overflow
+    QCOMPARE(hm.headerData(0, Qt::Vertical, Qt::TextAlignmentRole).toInt(), (int) Qt::AlignRight);
 
     QVERIFY(hm.data(QModelIndex{}, Qt::DisplayRole).isNull());
     QVERIFY(hm.flags(QModelIndex{}) & Qt::ItemIsSelectable);
   }
 
   void setRootPath_ok() {
-    // 准备模拟数据
     HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
-    mockFiles.mHarItems = {{"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"},
-                           {"image.png", QByteArray("PNG content"), "image/png", "http://example.com/image"}};
+    mockFiles.mHarItems = {
+        {"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"},   //
+        {"image.png", QByteArray("PNG content"), "image/png", "http://example.com/image"}, //
+    };
 
-    // 调用 setRootPath
     HarModel hm;
     QCOMPARE(hm.setRootPath("test.har"), 2);
     QCOMPARE(hm.rowCount(), 2);
 
-    // 验证数据是否正确加载
     QCOMPARE(hm.data(hm.index(0, 0), Qt::DisplayRole).toString(), "file1.txt");
     QCOMPARE(hm.data(hm.index(1, 0), Qt::DisplayRole).toString(), "image.png");
-    // 垂直表头（行号）
+
     QCOMPARE(hm.headerData(0, Qt::Vertical, Qt::DisplayRole).toInt(), 1);
     QCOMPARE(hm.headerData(1, Qt::Vertical, Qt::DisplayRole).toInt(), 2);
 
-    mockFiles.mHarItems = {{"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"},
-                           {"image.png", QByteArray("PNG content"), "image/png", "http://example.com/image"},
-                           {"new added one.svg", QByteArray("svg content"), "image/svg", "http://example.com/image"}};
+    mockFiles.mHarItems = {
+        {"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"},           //
+        {"image.png", QByteArray("PNG content"), "image/png", "http://example.com/image"},         //
+        {"new added one.svg", QByteArray("svg content"), "image/svg", "http://example.com/image"}, //
+    };
     QCOMPARE(hm.setRootPath("new test.har"), 3);
     QCOMPARE(hm.rowCount(), 3);
-
-    // 清理模拟数据
-    mockFiles.clear();
   }
 
   void data_retrieve_ok() {
-    // 准备模拟数据
     HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
     mockFiles.mHarItems = {{"document.pdf", QByteArray("PDF content"), "application/pdf", "http://example.com/doc"}};
     HarModel hm;
     hm.setRootPath("test.har");
 
-    // 验证各列数据
     QModelIndex idx = hm.index(0, 0);
     QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "document.pdf");
-    QCOMPARE(hm.data(idx, Qt::DecorationRole).isValid(), true);  // 图标
+    QCOMPARE(hm.data(idx, Qt::DecorationRole).isValid(), true); // 图标
     QCOMPARE(hm.data(idx, Qt::ForegroundRole).isNull(), true);
-    QCOMPARE(hm.data(idx, Qt::TextAlignmentRole).toInt(), (int)Qt::AlignLeft);
+    QCOMPARE(hm.data(idx, Qt::TextAlignmentRole).toInt(), (int) Qt::AlignLeft);
 
     idx = hm.index(0, 1);
-    QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "0'0'0'11");  // "PDF content" 11字节
+    QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "0'0'0'11"); // "PDF content" 11字节
 
     idx = hm.index(0, 2);
     QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "application/pdf");
@@ -96,23 +87,20 @@ class HarModelTest : public PlainTestSuite {
     }
 
     {
-      // 验证无效索引处理
-      QModelIndex invalidIndex = hm.index(5, 0);  // 超出范围
+      // out of bound index
+      QModelIndex invalidIndex = hm.index(5, 0);
       QVERIFY(!hm.data(invalidIndex, Qt::DisplayRole).isValid());
-      invalidIndex = hm.index(0, 5);  // 无效列
+      invalidIndex = hm.index(0, 5);
       QVERIFY(!hm.data(invalidIndex, Qt::DisplayRole).isValid());
     }
-    // 清理模拟数据
-    mockFiles.clear();
   }
 
   void save_to_local_ok() {
     TDir tDir;
     QVERIFY(tDir.IsValid());
 
-    // 准备模拟数据
     HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
-    mockFiles.mHarItems = {{"file1.txt", QByteArray("Content in file1"), "text/plain", ""},  //
+    mockFiles.mHarItems = {{"file1.txt", QByteArray("Content in file1"), "text/plain", ""}, //
                            {"image.png", QByteArray("Content in image"), "image/png", ""}};
 
     HarModel hm;
@@ -120,24 +108,21 @@ class HarModelTest : public PlainTestSuite {
 
     QVERIFY(!tDir.fileExists("file1.txt"));
     QVERIFY(!tDir.fileExists("image.png"));
-    // 选择第一行保存
+
     QList<int> selectedRows = {0, 1};
     int result = hm.SaveToLocal(tDir.path(), selectedRows);
     QCOMPARE(result, 2);
 
-    // 验证文件已保存
     QVERIFY(tDir.fileExists("file1.txt"));
     QVERIFY(tDir.fileExists("image.png"));
     QVERIFY(tDir.checkFileContents("file1.txt", {"Content in file1"}));
     QVERIFY(tDir.checkFileContents("image.png", {"Content in image"}));
 
-    { // 非法路径
+    {
+      // save to invalid path
       QCOMPARE(hm.SaveToLocal("path/to/inexists/path", selectedRows), -1);
       QCOMPARE(hm.SaveToLocal("path/to/inexists/path", {}), 0); // empty set<int>
     }
-
-    // 清理模拟数据
-    mockFiles.mHarItems.clear();
   }
 };
 

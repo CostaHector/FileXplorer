@@ -8,9 +8,10 @@ using namespace ::PathTool;
 class PathToolTest : public PlainTestSuite {
   Q_OBJECT
 
- public:
-  PathToolTest() : PlainTestSuite{} {}
- private slots:
+public:
+  PathToolTest()
+    : PlainTestSuite{} {}
+private slots:
   void test_project_name_from_marco() { QCOMPARE(PROJECT_NAME, QString("FileXplorer")); }
 
   void test_lib_files_path_correct() {
@@ -72,9 +73,9 @@ class PathToolTest : public PlainTestSuite {
   }
 
   void test_longestCommonPrefix_3_path() {
-    const QStringList paths{"E:/py/NameStandardlizeTestFolder/New Folder 20231020222814/New Text Document 20231125234056.txt",  //
-                            "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt",                            //
-                            "E:/py/NameStandardlizeTestFolder/New Folder 20231020222814"};                                      //
+    const QStringList paths{"E:/py/NameStandardlizeTestFolder/New Folder 20231020222814/New Text Document 20231125234056.txt", //
+                            "E:/py/NameStandardlizeTestFolder/New Text Document 20231020222955.txt",                           //
+                            "E:/py/NameStandardlizeTestFolder/New Folder 20231020222814"};                                     //
     const QString expectPrepath = "E:/py/NameStandardlizeTestFolder";
     const QString actualPrepath = longestCommonPrefix(paths);
     QCOMPARE(actualPrepath, expectPrepath);
@@ -128,15 +129,15 @@ class PathToolTest : public PlainTestSuite {
 
   void test_commonprefix_basic() {
     const QStringList paths{
-        "E:/Chris Pine/Monday/12",    //
-        "E:/Chris Pine/Feb/12",       //
-        "E:/Chris Pine/Decemeber/13"  //
+        "E:/Chris Pine/Monday/12",   //
+        "E:/Chris Pine/Feb/12",      //
+        "E:/Chris Pine/Decemeber/13" //
     };
     const QString expectPrepath = "E:/Chris Pine";
     const QStringList expectRels{
-        "Monday/12",    //
-        "Feb/12",       //
-        "Decemeber/13"  //
+        "Monday/12",   //
+        "Feb/12",      //
+        "Decemeber/13" //
     };
     QString prepath;
     QStringList rels;
@@ -146,17 +147,17 @@ class PathToolTest : public PlainTestSuite {
 
   void test_commonprefixFusion() {
     const QStringList paths{
-        "E:/Hemsworth Chris/0303/12",  //
-        "E:/Hemsworth Liam/0303/12",   //
-        "E:/Hemsworth Luke/0303/12",   //
-        "E:/Hemsworth Daniel/0303/13"  //
+        "E:/Hemsworth Chris/0303/12", //
+        "E:/Hemsworth Liam/0303/12",  //
+        "E:/Hemsworth Luke/0303/12",  //
+        "E:/Hemsworth Daniel/0303/13" //
     };
     const QString expectPrepath = "E:";
     const QStringList expectRels{
-        "Hemsworth Chris/0303/12",   //
-        "Hemsworth Liam/0303/12",    //
-        "Hemsworth Luke/0303/12",    //
-        "Hemsworth Daniel/0303/13",  //
+        "Hemsworth Chris/0303/12",  //
+        "Hemsworth Liam/0303/12",   //
+        "Hemsworth Luke/0303/12",   //
+        "Hemsworth Daniel/0303/13", //
     };
     QString prepath;
     QStringList rels;
@@ -211,7 +212,7 @@ class PathToolTest : public PlainTestSuite {
 
   void test_GetBaseName_folder() {
     QCOMPARE(GetBaseName("C:/home/folder"), "folder");
-    QCOMPARE(GetBaseName("C:/home/any movie name folder sc.1 - performer 1, performer 2"),  //
+    QCOMPARE(GetBaseName("C:/home/any movie name folder sc.1 - performer 1, performer 2"), //
              "any movie name folder sc.1 - performer 1, performer 2");
   }
 
@@ -230,8 +231,7 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
     QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
     QCOMPARE(GetBaseNameExt("a"), std::make_pair(QString("a"), QString("")));
-    QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"),
-             std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
+    QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"), std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));
   }
 
   void test_GetBaseNameExt_Scene01() {
@@ -284,27 +284,27 @@ class PathToolTest : public PlainTestSuite {
   void test_RMFComponent_and_Decompose() {
     RMFComponent median;
 
-    median = RMFComponent::FromPath("D.mp4");  // 0 slash 无需不考虑, 因为不会有"a.mp4", 这样的绝对路径
+    median = RMFComponent::FromPath("D.mp4"); // 0 slash 无需不考虑, 因为不会有"a.mp4", 这样的绝对路径
     QCOMPARE(median.joinItself(), "D.mp4");
     QCOMPARE(median.joinParentPathItself(), "");
 
-    median = RMFComponent::FromPath("C:/D.mp4");  // 1 slash
+    median = RMFComponent::FromPath("C:/D.mp4"); // 1 slash
     QCOMPARE(median.joinItself(), "C:/D.mp4");
     QCOMPARE(median.joinParentPathItself(), "C:/");
 
-    median = RMFComponent::FromPath("C:/A/C.mp4");  // 2 slash
+    median = RMFComponent::FromPath("C:/A/C.mp4"); // 2 slash
     QCOMPARE(median.joinItself(), "C:/A/C.mp4");
     QCOMPARE(median.joinParentPathItself(), "C:/A");
 
-    median = RMFComponent::FromPath("C:/long/enough/a.mp4");  // 3 slash
+    median = RMFComponent::FromPath("C:/long/enough/a.mp4"); // 3 slash
     QCOMPARE(median.joinItself(), "C:/long/enough/a.mp4");
     QCOMPARE(median.joinParentPathItself(), "C:/long/enough");
 
-    median = RMFComponent::FromPath("/a.mp4");  // 1 slash
+    median = RMFComponent::FromPath("/a.mp4"); // 1 slash
     QCOMPARE(median.joinItself(), "/a.mp4");
     QCOMPARE(median.joinParentPathItself(), "/");
 
-    median = RMFComponent::FromPath("/tmp/a.mp4");  // 2 slash
+    median = RMFComponent::FromPath("/tmp/a.mp4"); // 2 slash
     QCOMPARE(median.joinItself(), "/tmp/a.mp4");
     QCOMPARE(median.joinParentPathItself(), "/tmp");
 
@@ -335,7 +335,7 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(join("", "/home/to/path"), "/home/to/path");
   }
 
-  void test_Basic() {  //
+  void test_Basic() { //
     // not contains special word, last 3 part
     QCOMPARE("123", PathTool::GetEffectiveName("123"));
     QCOMPARE("B/C.ext", PathTool::GetEffectiveName("C:/A/B/C.ext"));
@@ -356,6 +356,15 @@ class PathToolTest : public PlainTestSuite {
     QCOMPARE(PathTool::GetDotFileExtension("AAA.z01"), ".z01");
     QCOMPARE(PathTool::GetDotFileExtension("AAA.torrent"), ".torrent");
     QCOMPARE(PathTool::GetDotFileExtension("AAA.ntorrent"), ""); // should return empty
+  }
+
+  void GetFormatInHar_ok() {
+    QCOMPARE(PathTool::GetFormatInHar("AAA.mp4"), "mp4");
+    QCOMPARE(PathTool::GetFormatInHar("AAA.json"), "json");
+    QCOMPARE(PathTool::GetFormatInHar("image/png"), "png");
+    QCOMPARE(PathTool::GetFormatInHar("path/to/image/png"), "png");
+    QCOMPARE(PathTool::GetFormatInHar("path/to/image.png"), "png");
+    QCOMPARE(PathTool::GetFormatInHar("image"), "");
   }
 
   void fileExtension_1Char_test() {

@@ -155,6 +155,7 @@ QString longestCommonPrefix(const QStringList& strs);
 QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 
+QString GetFormatInHar(const QString& path);
 QString GetDotFileExtension(const QString& path);
 QString GetAsteriskDotFileExtension(const QString& path);
 }  // namespace PathTool

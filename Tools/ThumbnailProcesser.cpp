@@ -4,7 +4,8 @@
 #include "NotificatorMacro.h"
 #include "VideoDurationGetter.h"
 #include "UndoRedo.h"
-#include "CastBrowserHelper.h"
+#include "ImageTool.h"
+
 #include <QDirIterator>
 #include <QRegularExpression>
 #include <utility>
@@ -125,7 +126,7 @@ bool ThumbnailProcesser::RenameThumbnailGeneratedByPotPlayer(const QString& path
       continue;
     }
 
-    const int imgWidth = CastBrowserHelper::GetImageSize(oldImgPath).width();
+    const int imgWidth = ImageTool::GetImageDimensionPixel(oldImgPath).width();
     if (imgWidth % 360 != 0 && imgWidth % 480 != 0) { // width invalid
       continue;
     }

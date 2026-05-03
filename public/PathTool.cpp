@@ -357,7 +357,25 @@ QString longestCommonPrefix(const QStringList& strs) {
   return slashIndex == -1 ? prefix : prefix.left(slashIndex);
 }
 
-// contains dot itself
+// e.g. gif, webp
+QString GetFormatInHar(const QString& path) {
+  const int lastIndexOfDot = path.lastIndexOf('.');
+  const int lastIndexOfSlash = path.lastIndexOf('/');
+  int lastIndex = -1;
+  if (lastIndexOfDot == -1) {
+    lastIndex = lastIndexOfSlash;
+  } else if (lastIndexOfSlash == -1) {
+    lastIndex = lastIndexOfDot;
+  } else {
+    lastIndex = std::max(lastIndexOfDot, lastIndexOfSlash);
+  }
+  if (lastIndex == -1 || lastIndex + 8 < path.size()) {
+    return {};
+  }
+  return path.mid(lastIndex + 1);
+}
+
+// contains dot itself, e.g. .gif, .webp
 QString GetDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.'); // .torrent
   if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {
@@ -366,6 +384,7 @@ QString GetDotFileExtension(const QString& path) {
   return path.mid(lastIndexOfDot);
 }
 
+// contains dot itself, e.g. *.gif, *.webp
 QString GetAsteriskDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.');
   if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {

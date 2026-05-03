@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QPixmapCache>
 #include <QBuffer>
+#include <QImageReader>
 
 namespace ImageTool {
 bool IsFileAbsPathImage(const QString& fileAbsPath) {
@@ -106,6 +107,19 @@ const QPixmap& GetLabelStatusPixmap(int labelStatus) {
        QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
   const int clampResult = std::max(0, std::min(1, labelStatus));
   return labelSavedStatusPxp[clampResult];
+}
+
+QSize GetImageDimensionPixel(const QString& imgFilePath) {
+  QImageReader reader{imgFilePath};
+  if (!reader.canRead()) {
+    return {};
+  }
+  return reader.size();
+}
+
+QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat) {
+  QImageReader imgReader{pBuff, noDotFormat.toUtf8()};
+  return imgReader.size();
 }
 
 } // namespace ImageTool

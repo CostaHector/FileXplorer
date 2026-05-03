@@ -185,13 +185,13 @@ void HarFilesTest::test_EmptyHarFile() {
 
 void HarFilesTest::test_GetPathStem() {
   // 测试各种URL格式
-  QCOMPARE(GetPathStem("https://example.com/image.jpg"), "image");
-  QCOMPARE(GetPathStem("https://example.com/path/to/image.png"), "image");
-  QCOMPARE(GetPathStem("https://example.com/image.with.dots.jpeg"), "image.with.dots");
-  QCOMPARE(GetPathStem("https://example.com/no_extension"), "no_extension");
-  QCOMPARE(GetPathStem("https://example.com/long.extension"), "long.extension");  // 扩展名长度>5
-  QCOMPARE(GetPathStem("relative/path/file.txt"), "file");
-  QCOMPARE(GetPathStem("filename-only"), "filename-only");
+  QCOMPARE(GetPathItemName("https://example.com/image.jpg"), "image");
+  QCOMPARE(GetPathItemName("https://example.com/path/to/image.png"), "image");
+  QCOMPARE(GetPathItemName("https://example.com/image.with.dots.jpeg"), "image.with.dots");
+  QCOMPARE(GetPathItemName("https://example.com/no_extension"), "no_extension");
+  QCOMPARE(GetPathItemName("https://example.com/long.extension"), "long.extension");  // 扩展名长度>5
+  QCOMPARE(GetPathItemName("relative/path/file.txt"), "file");
+  QCOMPARE(GetPathItemName("filename-only"), "filename-only");
 }
 
 void HarFilesTest::test_EncodingTypes() {

@@ -3,8 +3,6 @@
 
 #include <QString>
 #include <QMap>
-#include <QSet>
-#include <QFileInfo>
 
 struct HAR_FILE_ITEM {
   QString name;
@@ -13,10 +11,11 @@ struct HAR_FILE_ITEM {
   QString url;
 };
 
-QString GetPathStem(const QString& url);
+class QFileInfo;
+
+QString GetPathItemName(const QString& url);
 class HarFiles {
 public:
-  HarFiles();
   void init();
   int size() const {return mHarItems.size();}
   bool empty() const {return mHarItems.isEmpty();}

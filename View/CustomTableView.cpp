@@ -282,3 +282,16 @@ QModelIndexList CustomTableView::selectedRowsSource() const {
   }
   return srcIndexes;
 }
+
+QList<int> CustomTableView::selectedRowsSourceInt() const {
+  const QModelIndexList& indexes{selectedRowsSource()};
+
+  QList<int> rows;
+  rows.reserve(indexes.size());
+
+  for (const QModelIndex& ind : indexes) {
+    rows.push_back(ind.row());
+  }
+
+  return rows;
+}

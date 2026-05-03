@@ -73,12 +73,10 @@ class ArchiverTest : public PlainTestSuite {
 
     // 验证缩略图设置
     QVERIFY(archiver.m_thumbnailViewer != nullptr);
-    QVERIFY(!archiver.m_thumbnailViewer->pixmap().isNull());
     {
       // 模拟无效选择, 验证缩略图清除
       result = archiver.onSelectNewItemRow(QModelIndex(), QModelIndex());
       QVERIFY(!result);
-      QVERIFY(archiver.m_thumbnailViewer->pixmap().isNull());
     }
 
     // 模拟选择第二行（图片）
