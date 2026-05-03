@@ -64,8 +64,6 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   m_layout->addWidget(m_dlgBtnBox);
   setLayout(m_layout);
 
-  seeChanges();
-
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
   setWindowTitle("StyleSheet Manager");
   setWindowIcon(QIcon{":/styles/STYLESHEET_MGR"});
@@ -89,6 +87,7 @@ void StyleSheetMgr::initStyleSheetPreview() {
     m_effectSpiltter->addWidget(m_effectDarkPreviewer);
   }
   m_spiltter->addWidget(m_effectSpiltter);
+  seeChanges();
 }
 
 void StyleSheetMgr::subscribe() {
