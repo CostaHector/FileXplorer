@@ -54,8 +54,8 @@ ImageViewer::~ImageViewer() {
   if (mPMovie) {
     mPMovie->stop();
   }
-  Configuration().setValue(m_memoryKeyName + "/GEOMETRY", saveGeometry());
-  IMAGE_SIZE::SaveInitialScaledSize(m_memoryKeyName, mCurIconScaledSizeIndex);
+  Configuration().setValue(GetName() + "/GEOMETRY", saveGeometry());
+  IMAGE_SIZE::SaveInitialScaledSize(GetName(), mCurIconScaledSizeIndex);
 }
 
 void ImageViewer::showEvent(QShowEvent* event) {
@@ -170,12 +170,11 @@ QPixmap ImageViewer::GetPixmap(QString& winTitle) const {
     return {};
   }
   const QSize oldSz{pm.size()};
-  if (!oldSz.isValid() || oldSz.width() <= 0 && oldSz.height() <= 0) {
+  if (!oldSz.isValid() || oldSz.width() <= 0 || oldSz.height() <= 0) {
     return {};
   }
 
-  const qint64 bytesOcuppied{GetImageFileSize()};
-  const Qt::TransformationMode transformMode{bytesOcuppied < 10 * 1024 * 1024 ? Qt::SmoothTransformation : Qt::FastTransformation};
+  const Qt::TransformationMode transformMode{GetImageFileSize() < 10 * 1024 * 1024 ? Qt::SmoothTransformation : Qt::FastTransformation};
   const QSize dstSz{getDestSize(oldSz)};
   pm = pm.scaled(dstSz, Qt::IgnoreAspectRatio, transformMode);
 
@@ -189,7 +188,7 @@ std::unique_ptr<QMovie> ImageViewer::GetMovie(QString& winTitle) const {
   if (!preloaderAnimation || !preloaderAnimation->isValid()) {
     return nullptr;
   }
-  if (!oldSz.isValid() || oldSz.width() <= 0 && oldSz.height() <= 0) {
+  if (!oldSz.isValid() || oldSz.width() <= 0 || oldSz.height() <= 0) {
     return nullptr;
   }
   const QSize dstSz{getDestSize(oldSz)};
@@ -208,8 +207,8 @@ std::unique_ptr<QMovie> ImageViewer::GetMovie(QString& winTitle) const {
 }
 
 void ImageViewer::ReadSetting() {
-  if (Configuration().contains(m_memoryKeyName + "/GEOMETRY")) {
-    restoreGeometry(Configuration().value(m_memoryKeyName + "/GEOMETRY").toByteArray());
+  if (Configuration().contains(GetName() + "/GEOMETRY")) {
+    restoreGeometry(Configuration().value(GetName() + "/GEOMETRY").toByteArray());
   } else {
     setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
@@ -223,4 +222,8 @@ bool ImageViewer::setIconSizeScaledIndex(int newScaledIndex) {
   mHeight = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconScaledSizeIndex].height();
   mWidth = IMAGE_SIZE::ICON_SIZE_CANDIDATES[mCurIconScaledSizeIndex].width();
   return true;
+}
+
+bool ImageViewer::isCurImageGif() const {
+  return ImageTool::IsGifFile('.' + mNoDotFormat);
 }

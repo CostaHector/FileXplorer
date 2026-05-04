@@ -38,24 +38,21 @@ void ThumbnailImageViewer::subscribe() {
   connect(mNavigateIntoSub, &QAction::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
 }
 
-QString ThumbnailImageViewer::FromPath::GetImageAbsPath() const { //
-  return PathTool::join(parentPath, rel2image);
+QString ThumbnailImageViewer::GetImageAbsPath() const { //
+  return PathTool::join(mParentPath, mRel2Image);
 }
 
 bool ThumbnailImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img) {
-  mDataFromPath = FromPath{parentPath, rel2Img, QFile(PathTool::join(parentPath, rel2Img)).size()};
+  mParentPath = parentPath;
+  mRel2Image = rel2Img;
+  setFormatAndImgSizeBytes(PathTool::GetFormatInHar(mRel2Image), QFile{GetImageAbsPath()}.size());
   return UpdatePixmapAndTitle();
 }
 
-bool ThumbnailImageViewer::isCurImageGif() const {
-  return ImageTool::IsGifFile(mDataFromPath.rel2image);
-}
-
 QPixmap ThumbnailImageViewer::GetPixmapCore() const {
-  const QString imageAbsPath = mDataFromPath.GetImageAbsPath();
-  const QString formatStr = PathTool::GetFormatInHar(imageAbsPath);
+  const QString imageAbsPath = GetImageAbsPath();
   QPixmap pm;
-  if (!pm.load(imageAbsPath, formatStr.toStdString().c_str())) {
+  if (!pm.load(imageAbsPath, mNoDotFormat.toStdString().c_str())) {
     LOG_W("Image load from path[%s] failed", qPrintable(imageAbsPath));
     return {};
   }
@@ -63,44 +60,43 @@ QPixmap ThumbnailImageViewer::GetPixmapCore() const {
 }
 
 std::unique_ptr<QMovie> ThumbnailImageViewer::GetMovieCore(QSize& movieSize) const {
-  const QString imageAbsPath = mDataFromPath.GetImageAbsPath();
-  const QString formatStr = PathTool::GetFormatInHar(imageAbsPath);
+  const QString imageAbsPath = GetImageAbsPath();
   movieSize = ImageTool::GetImageDimensionPixel(imageAbsPath);
-  return std::unique_ptr<QMovie>{new (std::nothrow) QMovie{imageAbsPath, formatStr.toUtf8()}};
+  return std::unique_ptr<QMovie>{new (std::nothrow) QMovie{imageAbsPath, mNoDotFormat.toUtf8()}};
 }
 
 bool ThumbnailImageViewer::NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction) {
-  mImgIt(mDataFromPath.parentPath);
+  mImgIt(mParentPath);
 
   QString newImageName;
   switch (direction) {
     case FolderNxtAndLastIterator::NaviDirection::PREV:
-      newImageName = mImgIt.last(mDataFromPath.parentPath, mDataFromPath.rel2image);
+      newImageName = mImgIt.last(mParentPath, mRel2Image);
       break;
     case FolderNxtAndLastIterator::NaviDirection::NEXT:
     default:
-      newImageName = mImgIt.next(mDataFromPath.parentPath, mDataFromPath.rel2image);
+      newImageName = mImgIt.next(mParentPath, mRel2Image);
       break;
   }
 
-  if (newImageName == mDataFromPath.rel2image) {
-    LOG_D("No need navigate, remains[%s]", qPrintable(mDataFromPath.rel2image));
+  if (newImageName == mRel2Image) {
+    LOG_D("No need navigate, remains[%s]", qPrintable(mRel2Image));
     return true;
   }
-  return setPixmapByAbsFilePath(mDataFromPath.parentPath, newImageName);
+  return setPixmapByAbsFilePath(mParentPath, newImageName);
 }
 
 QString ThumbnailImageViewer::GetPathInfoInWinTitle() const {
   QString pathInfo;
-  pathInfo += mDataFromPath.rel2image;
+  pathInfo += mRel2Image;
   pathInfo += " under: ";
-  pathInfo += mDataFromPath.parentPath;
+  pathInfo += mParentPath;
   return pathInfo;
 }
 
 void ThumbnailImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
   mImgIt.setIncludingSubDirectory(bInclude);
-  mImgIt(mDataFromPath.parentPath, true); // force refresh images in folder structure
+  mImgIt(mParentPath, true); // force refresh images in folder structure
 }
 
 void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
@@ -116,9 +112,9 @@ void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
     _REVEAL_IN_FILE_EXPLORER->setShortcutVisibleInContextMenu(true);
     _COPY_FILE_NAME->setShortcutVisibleInContextMenu(true);
 
-    connect(_OPEN_IN_SYSTEM_APPLICATION, &QAction::triggered, this, [this]() { FileTool::OpenLocalFileUsingDesktopService(mDataFromPath.GetImageAbsPath()); });
-    connect(_REVEAL_IN_FILE_EXPLORER, &QAction::triggered, this, [this]() { FileTool::RevealInSystemExplorer(mDataFromPath.GetImageAbsPath()); });
-    connect(_COPY_FILE_NAME, &QAction::triggered, this, [this]() { FileTool::CopyTextToSystemClipboard(mDataFromPath.GetImageAbsPath()); });
+    connect(_OPEN_IN_SYSTEM_APPLICATION, &QAction::triggered, this, [this]() { FileTool::OpenLocalFileUsingDesktopService(GetImageAbsPath()); });
+    connect(_REVEAL_IN_FILE_EXPLORER, &QAction::triggered, this, [this]() { FileTool::RevealInSystemExplorer(GetImageAbsPath()); });
+    connect(_COPY_FILE_NAME, &QAction::triggered, this, [this]() { FileTool::CopyTextToSystemClipboard(GetImageAbsPath()); });
   }
   CHECK_NULLPTR_RETURN_VOID(mMenu);
   mMenu->popup(mapToGlobal(pos));

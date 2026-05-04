@@ -26,30 +26,15 @@ public slots:
 private:
   void subscribe();
 
-  qint64 GetImageFileSize() const override { return mDataFromPath.imageBytes; }
-  bool isCurImageGif() const override;
-
   QPixmap GetPixmapCore() const override;
   std::unique_ptr<QMovie> GetMovieCore(QSize& movieSize) const override;
   QString GetPathInfoInWinTitle() const override;
 
   bool NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction = FolderNxtAndLastIterator::NaviDirection::NEXT);
+  QString GetImageAbsPath() const;
 
-  struct FromPath {
-    QString parentPath;
-    QString rel2image;
-    qint64 imageBytes;
-    bool operator==(const FromPath& rhs) const { return parentPath == rhs.parentPath && rel2image == rhs.rel2image && imageBytes == rhs.imageBytes; }
-
-    QString GetImageAbsPath() const;
-    void clear() {
-      parentPath.clear();
-      rel2image.clear();
-      imageBytes = 0;
-    }
-  };
-
-  FromPath mDataFromPath;
+  QString mParentPath;
+  QString mRel2Image;
   FolderNxtAndLastIterator mImgIt{FolderNxtAndLastIterator::GetInstsNaviImages(false)};
 
   QToolBar* mNaviToolBar{nullptr};

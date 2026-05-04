@@ -115,27 +115,27 @@ private slots:
     QVERIFY(!viewer.mImgIt.IsIncludingSubDirectory());
 
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, pngName));
-    QCOMPARE(viewer.mDataFromPath.rel2image, pngName);
+    QCOMPARE(viewer.mRel2Image, pngName);
 
     // next, prev return to itself
     {
       viewer.m_nextButton->triggered();
-      QVERIFY(viewer.mDataFromPath.rel2image != pngName);
+      QVERIFY(viewer.mRel2Image != pngName);
 
       viewer.m_prevButton->triggered();
-      QCOMPARE(viewer.mDataFromPath.rel2image, pngName);
+      QCOMPARE(viewer.mRel2Image, pngName);
     }
 
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, gifName));
-    QCOMPARE(viewer.mDataFromPath.rel2image, gifName);
+    QCOMPARE(viewer.mRel2Image, gifName);
 
     // prev, next return to itself
     {
       QVERIFY(viewer.NavigateImagePrevious());
-      QVERIFY(viewer.mDataFromPath.rel2image != gifName);
+      QVERIFY(viewer.mRel2Image != gifName);
 
       QVERIFY(viewer.NavigateImageNext());
-      QCOMPARE(viewer.mDataFromPath.rel2image, gifName);
+      QCOMPARE(viewer.mRel2Image, gifName);
     }
 
     viewer.mNavigateIntoSub->toggle();

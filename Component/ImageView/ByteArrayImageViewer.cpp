@@ -2,25 +2,20 @@
 #include "ImageTool.h"
 #include "Logger.h"
 #include <QBuffer>
-#include <QImageReader>
 
-bool ByteArrayImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& formatStr) {
+bool ByteArrayImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat) {
   mDataFromArchive = dataByteArray;
-  mFormatStr = formatStr;
+  setFormatAndImgSizeBytes(noDotFormat, mDataFromArchive.size());
   return UpdatePixmapAndTitle();
 }
 
 QPixmap ByteArrayImageViewer::GetPixmapCore() const {
   QPixmap pixmap;
-  if (!pixmap.loadFromData(mDataFromArchive, mFormatStr.toStdString().c_str())) {
+  if (!pixmap.loadFromData(mDataFromArchive, mNoDotFormat.toStdString().c_str())) {
     LOG_W("Image load from bytearray failed");
     return {};
   }
   return pixmap;
-}
-
-bool ByteArrayImageViewer::isCurImageGif() const {
-  return ImageTool::IsGifFile('.' + mFormatStr);
 }
 
 std::unique_ptr<QMovie> ByteArrayImageViewer::GetMovieCore(QSize& movieSize) const {
@@ -30,15 +25,14 @@ std::unique_ptr<QMovie> ByteArrayImageViewer::GetMovieCore(QSize& movieSize) con
     return nullptr;
   }
 
-  QImageReader imgReader{buffer.get(), mFormatStr.toUtf8()};
-  movieSize = imgReader.size();
+  movieSize = ImageTool::GetImageDimensionPixel(buffer.get(), mNoDotFormat);
   buffer->seek(0);
 
   std::unique_ptr<QMovie> upMovie{new (std::nothrow) QMovie};
   if (!upMovie) {
     return nullptr;
   }
-  upMovie->setFormat(mFormatStr.toUtf8());
+  upMovie->setFormat(mNoDotFormat.toUtf8());
 
   QBuffer* pTemp{buffer.release()};
   upMovie->setDevice(pTemp);

@@ -66,7 +66,7 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
     m_pathActionGroups = new (std::nothrow) QActionGroup{this};
     CHECK_NULLPTR_RETURN_VOID(m_pathActionGroups);
     m_pathActionGroups->addAction(pDesktop);
-    m_pathActionGroups->addAction(pDesktop);
+    m_pathActionGroups->addAction(pDocument);
     m_pathActionGroups->addAction(pDownloads);
     m_pathActionGroups->addAction(pPictures);
     m_pathActionGroups->addAction(pVideos);
