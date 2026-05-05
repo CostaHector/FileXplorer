@@ -34,6 +34,7 @@ class ImgReorderListModel : public QAbstractListModelPub {
  private:
   void initOccupiedRows(int n) const;
   void updateOccupiedRows() const;
+  static QList<int> GetNewNamesNumero(const ImgReorderDataLst& imgs);
 
   ImgReorderDataLst m_imgs;
   mutable QSet<int> m_occupiedRows;

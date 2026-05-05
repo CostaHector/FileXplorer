@@ -76,6 +76,23 @@ bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& valu
   return true;
 }
 
+QList<int> ImgReorderListModel::GetNewNamesNumero(const ImgReorderDataLst& imgs) {
+  const int N = imgs.size();
+  std::unique_ptr<int[]> old2New{new (std::nothrow) int[N]{0}};
+  for (int i = 0; i < N; ++i) {
+    old2New[imgs[i].number] = i;
+  }
+
+  QList<int> newNamesNumero;
+  newNamesNumero.reserve(N);
+
+  for (int i = 0; i < N; ++i) {
+    newNamesNumero.push_back(old2New[i]);
+  }
+
+  return newNamesNumero;
+}
+
 QStringList ImgReorderListModel::getOrderedNames() const {
   const int N{m_imgs.size()};
   if (N == 0) {
@@ -83,11 +100,17 @@ QStringList ImgReorderListModel::getOrderedNames() const {
   }
   const int maxVal = m_startNo + N - 1;
   const int fieldWidth{RenameHelper::GetDigitsCount(maxVal)};
+
   QStringList newNames;
   newNames.reserve(N);
-  for (const ImgReorderDataType& imgsInfo : m_imgs) {
-    newNames.push_back(RenameHelper::GetNameWithPatternIndex(m_baseName, m_namePattern, imgsInfo.number + m_startNo, fieldWidth));
+
+  QList<int> newNamesNumero{GetNewNamesNumero(m_imgs)};
+  for (int i = 0; i < N; ++i) {
+    int actualNewIndex = newNamesNumero[i] + m_startNo;
+    QString newFileName = RenameHelper::GetNameWithPatternIndex(m_baseName, m_namePattern, actualNewIndex, fieldWidth);
+    newNames.push_back(newFileName);
   }
+
   return newNames;
 }
 
