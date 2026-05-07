@@ -30,7 +30,7 @@ ImgVidOthInFolderPreviewer::ImgVidOthInFolderPreviewer(const QString& memoryName
   _IMG_ACT->setCheckable(true);
   _IMG_ACT->setChecked(m_bImgVisible);
 
-  _VID_ACT = new (std::nothrow) QAction{QIcon{":img/VIDEO"}, GetActionText(PREVIEW_ITEM_TYPE::VID, 0), this};
+  _VID_ACT = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"}, GetActionText(PREVIEW_ITEM_TYPE::VID, 0), this};
   CHECK_NULLPTR_RETURN_VOID(_VID_ACT)
   _VID_ACT->setToolTip("Video(s) file count");
   _VID_ACT->setCheckable(true);

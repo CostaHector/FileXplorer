@@ -7,25 +7,37 @@
 #include <QPixmap>
 #include <QMenu>
 
+void SetNavigateButtonNeedTransparent(QToolBar* toolBar, QAction* pAct) {
+  CHECK_NULLPTR_RETURN_VOID(toolBar);
+  CHECK_NULLPTR_RETURN_VOID(pAct);
+  if (QWidget *widget = toolBar->widgetForAction(pAct)) {
+    widget->setProperty("needTransparentFlag", true);
+  }
+}
+
 ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent) //
   : ImageViewer{memoryKeyName, parent} {
   mNaviToolBar = new QToolBar{"Navi toolbar", this};
   CHECK_NULLPTR_RETURN_VOID(mNaviToolBar);
+  mNaviToolBar->setProperty("needTransparentFlag", true);
 
-  mNavigateIntoSub = mNaviToolBar->addAction("Navigate Into Subdirectory");
+  mNavigateIntoSub = mNaviToolBar->addAction(QIcon{":img/INCLUDEING_SUBDIRS"}, "Navigate Into Subdirectory");
   CHECK_NULLPTR_RETURN_VOID(mNavigateIntoSub);
   mNavigateIntoSub->setCheckable(true);
   mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
+  SetNavigateButtonNeedTransparent(mNaviToolBar, mNavigateIntoSub);
 
-  m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "");
+  m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "<");
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
   m_prevButton->setShortcut(QKeySequence(Qt::Key_Left));
   m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
+  SetNavigateButtonNeedTransparent(mNaviToolBar, m_prevButton);
 
-  m_nextButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_NEXT"}, "");
+  m_nextButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_NEXT"}, ">");
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
   m_nextButton->setShortcut(QKeySequence(Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
+  SetNavigateButtonNeedTransparent(mNaviToolBar, m_nextButton);
 
   subscribe();
 }

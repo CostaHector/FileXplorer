@@ -93,15 +93,13 @@
 
         <!--FILTER_TYPE icon here-->
         <file alias="FILE">FILTER_TYPE/FILE.svg</file>
-        <file alias="FOLDER">FILTER_TYPE/FOLDER.png</file>
-        <file alias="HIDDEN">FILTER_TYPE/HIDDEN.png</file>
+        <file alias="FOLDER">FILTER_TYPE/FOLDER.svg</file>
+        <file alias="HIDDEN">FILTER_TYPE/HIDDEN.svg</file>
         <file alias="NO_DOT">FILTER_TYPE/NO_DOT.svg</file>
         <file alias="NO_DOT_DOT">FILTER_TYPE/NO_DOT_DOT.svg</file>
-        <file alias="IMAGE">FILTER_TYPE/IMAGE.png</file>
-        <file alias="PLAIN_TEXT">FILTER_TYPE/PLAIN_TEXT.ico</file>
-        <file alias="VIDEO">FILTER_TYPE/VIDEO.png</file>
-        <file alias="EXE">FILTER_TYPE/EXE.png</file>
-        <file alias="COMPRESSED">FILTER_TYPE/COMPRESSED.webp</file>
+        <file alias="IMAGE">FILTER_TYPE/IMAGE.svg</file>
+        <file alias="COMPRESSED">FILTER_TYPE/COMPRESSED.svg</file>
+        <file alias="INCLUDEING_SUBDIRS">FILTER_TYPE/INCLUDEING_SUBDIRS.svg</file>
 
         <!--FileOperation here-->
         <file alias="COPY_ITEM">FileOperation/COPY_ITEM.svg</file>

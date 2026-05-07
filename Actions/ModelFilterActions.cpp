@@ -69,7 +69,7 @@ ModelFilterActions::ModelFilterActions(ModelFilterE modelE, QObject* parent) //
 
   if (modelE == ModelFilterE::ADVANCE_SEARCH) {
     const bool isIncludingSubdirectory{Configuration().value(GetMemoryKeyName(SearchKey::INCLUDING_SUBDIRECTORIES.name), SearchKey::INCLUDING_SUBDIRECTORIES.toVariant()).toBool()};
-    INCLUDING_SUBDIRECTORIES         = new (std::nothrow) QAction{"Including Subdirs", this};
+    INCLUDING_SUBDIRECTORIES         = new (std::nothrow) QAction{QIcon{":img/INCLUDEING_SUBDIRS"}, "Including Subdirs", this};
     INCLUDING_SUBDIRECTORIES->setCheckable(true);
     INCLUDING_SUBDIRECTORIES->setChecked(isIncludingSubdirectory);
     INCLUDING_SUBDIRECTORIES->setToolTip("Penetrate inside items under all subdirectories as well .\n"
