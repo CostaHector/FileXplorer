@@ -123,7 +123,7 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
 bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   QFile fi{fileName};
   if (!fi.open(QIODevice::WriteOnly)) {
-    LOG_W("Open [%s] to write failed. fill will not update.", qPrintable(fileName));
+    LOG_W("Open [%s] to write failed. file will not update.", qPrintable(fileName));
     return false;
   }
   QTextStream stream(&fi);
@@ -131,6 +131,17 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   stream << ba;
   stream.flush();
   fi.close();
+  return true;
+}
+
+bool FileByteArrayWriter(const QString& fileName, const QByteArray& ba) {
+  QFile dstFi{fileName};
+  if (!dstFi.open(QIODevice::WriteOnly)) {
+    LOG_W("Open [%s] to write failed. file will not update.", qPrintable(fileName));
+    return false;
+  }
+  dstFi.write(ba);
+  dstFi.close();
   return true;
 }
 

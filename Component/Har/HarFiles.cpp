@@ -151,22 +151,18 @@ int HarFiles::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
   if (dstRootpath.isEmpty()) {
     dstRootpath = QFileInfo(mHarFilePath).absolutePath();
   }
-  if (!QFileInfo(dstRootpath).isDir()) {
+  const QDir dstDir{dstRootpath};
+  if (!dstDir.exists()) {
     LOG_W("destination path[%s] not exists", qPrintable(dstRootpath));
     return -1;
   }
   int fileWriteCnt = 0;
-  const QDir dstDir(dstRootpath);
   for (const int& rowIndex : selectedRows) {
     const HAR_FILE_ITEM& item = mHarItems[rowIndex];
     const QString& dstAbsFilePath = dstDir.absoluteFilePath(item.name);
-    QFile dstFi{dstAbsFilePath};
-    if (!dstFi.open(QIODevice::WriteOnly)) {
-      LOG_W("open file[%s] for write failed", qPrintable(dstAbsFilePath));
+    if (!FileTool::FileByteArrayWriter(dstAbsFilePath, item.content)) {
       continue;
     }
-    dstFi.write(item.content);
-    dstFi.close();
     ++fileWriteCnt;
     LOG_D("%3d. file[%s] write succeed", fileWriteCnt + 1, qPrintable(dstAbsFilePath));
   }
