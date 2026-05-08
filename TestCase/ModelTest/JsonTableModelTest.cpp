@@ -68,7 +68,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(mTDir.createEntries(nodes), nodes.size());
 
     bool readAok = false;
-    QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+    QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
 
     GlobalMockObject::reset();
     actorHelper.init();
@@ -517,11 +517,11 @@ class JsonTableModelTest : public PlainTestSuite {
     // above operation should not write into files
     {
       bool readAok = false;
-      QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+      QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
       QVERIFY(readAok);
 
       bool readBok = false;
-      QCOMPARE(FileTool::TextReader(mTDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
+      QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
       QVERIFY(readBok);
     }
 

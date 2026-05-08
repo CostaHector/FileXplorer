@@ -56,18 +56,21 @@ bool HarFiles::IsHarFile(const QFileInfo& fi) {
 }
 
 bool HarFiles::operator()(const QString& harAbsPath) {
-  LOG_D("parse har file[%s] start...", qPrintable(harAbsPath));
   init();
+  LOG_D("parse har file[%s] start...", qPrintable(harAbsPath));
   mHarFilePath = harAbsPath;
-  const QString& jsonStr = FileTool::TextReader(harAbsPath);
-  if (jsonStr.isEmpty()) {
+  const QByteArray& jsonByteArray = FileTool::ByteArrayReader(harAbsPath);
+  if (jsonByteArray.isEmpty()) {
     return false;
   }
+  return ParseFilesInJsonByteArray(jsonByteArray);
+}
 
+bool HarFiles::ParseFilesInJsonByteArray(const QByteArray& jsonByteArray) {
   QJsonParseError jsonErr;
-  QJsonDocument json_doc = QJsonDocument::fromJson(jsonStr.toUtf8(), &jsonErr);
+  QJsonDocument json_doc = QJsonDocument::fromJson(jsonByteArray, &jsonErr);
   if (jsonErr.error != QJsonParseError::NoError) {
-    LOG_W("Error parse json string %d char(s): %s", jsonStr.size(), qPrintable(jsonErr.errorString()));
+    LOG_W("Error parse json string %d char(s): %s", jsonByteArray.size(), qPrintable(jsonErr.errorString()));
     return {};
   }
   const QJsonObject& rootObj = json_doc.object();
@@ -160,7 +163,7 @@ int HarFiles::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
   for (const int& rowIndex : selectedRows) {
     const HAR_FILE_ITEM& item = mHarItems[rowIndex];
     const QString& dstAbsFilePath = dstDir.absoluteFilePath(item.name);
-    if (!FileTool::FileByteArrayWriter(dstAbsFilePath, item.content)) {
+    if (!FileTool::ByteArrayBinaryWriter(dstAbsFilePath, item.content)) {
       continue;
     }
     ++fileWriteCnt;

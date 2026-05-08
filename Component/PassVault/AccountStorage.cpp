@@ -63,7 +63,7 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
     contentNeedDumped.swap(fullPlainCSVContents);
   }
 
-  bool saveRes = FileTool::TextWriter(writeIntoPath, contentNeedDumped, QIODevice::WriteOnly | QIODevice::Text);
+  bool saveRes = FileTool::StringTextWriter(writeIntoPath, contentNeedDumped, QIODevice::WriteOnly | QIODevice::Text);
   if (!saveRes) {
     qCritical("Open file[%s] to write failed", qPrintable(writeIntoPath));
     return false;
@@ -76,7 +76,7 @@ bool AccountStorage::SaveAccounts(bool bEncrypt) const {
 
 bool AccountStorage::ParseEncryptCsvFile(const QString& encryptCsvFilePath, QString& plainCsvFileContent){
   bool bReadOk{false};
-  QString encryptedContents = FileTool::TextReader(encryptCsvFilePath, &bReadOk);
+  QString encryptedContents = FileTool::StringTextReader(encryptCsvFilePath, &bReadOk);
   if (!bReadOk) {
     LOG_W("Open file to read failed", qPrintable(encryptCsvFilePath));
     return false;

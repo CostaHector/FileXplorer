@@ -9,6 +9,8 @@ public:
 
 public slots:
   bool setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat);
+  static QPixmap GetPixmapCoreStatic(const QByteArray& rawData, const char* noDotFormat);
+  static std::unique_ptr<QMovie> GetMovieCoreStatic(QByteArray& rawData, const QString& noDotFormat, QSize& movieSize);
 
 private:
   QPixmap GetPixmapCore() const override;

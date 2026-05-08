@@ -60,11 +60,11 @@ QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr, bool* bP
 
 bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth) {
   const QByteArray& byteArray = SerializedJsonDict2ByteArray(dict);
-  return FileTool::ByteArrayWriter(jsonFilePth, byteArray);
+  return FileTool::ByteArrayTextWriter(jsonFilePth, byteArray);
 }
 
 QVariantHash MovieJsonLoader(const QString& jsonFilePth) {
-  const QString& json_string = FileTool::TextReader(jsonFilePth);
+  const QString& json_string = FileTool::StringTextReader(jsonFilePth);
   return DeserializedJsonStr2Dict(json_string);
 }
 

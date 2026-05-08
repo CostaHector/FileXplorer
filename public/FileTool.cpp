@@ -57,7 +57,7 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   return buffer;
 }
 
-QString TextReader(const QString& textPath, bool* bReadOk) {
+QString StringTextReader(const QString& textPath, bool* bReadOk) {
   QFile file(textPath);
   if (!file.exists()) {
     LOG_D("File[%s] not found", qPrintable(textPath));
@@ -105,7 +105,7 @@ QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk) {
   return baFile.readAll();
 }
 
-bool TextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
+bool StringTextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
   QFile fi{fileName};
   if (!fi.open(openMode)) {
     LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int) openMode);
@@ -120,7 +120,7 @@ bool TextWriter(const QString& fileName, const QString& content, const QIODevice
   return true;
 }
 
-bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
+bool ByteArrayTextWriter(const QString& fileName, const QByteArray& ba) {
   QFile fi{fileName};
   if (!fi.open(QIODevice::WriteOnly)) {
     LOG_W("Open [%s] to write failed. file will not update.", qPrintable(fileName));
@@ -134,7 +134,7 @@ bool ByteArrayWriter(const QString& fileName, const QByteArray& ba) {
   return true;
 }
 
-bool FileByteArrayWriter(const QString& fileName, const QByteArray& ba) {
+bool ByteArrayBinaryWriter(const QString& fileName, const QByteArray& ba) {
   QFile dstFi{fileName};
   if (!dstFi.open(QIODevice::WriteOnly)) {
     LOG_W("Open [%s] to write failed. file will not update.", qPrintable(fileName));
