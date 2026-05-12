@@ -1,5 +1,4 @@
 #include "CastDBView.h"
-
 #include "CastDBActions.h"
 #include "FdBasedDb.h"
 #include "JsonHelper.h"

@@ -19,6 +19,9 @@ class CustomListView : public QListView {
 
   void InitListView();
 
+signals:
+  void onUseThumbnailAsDecorationRoleChanged(bool bEnableUse);
+
  protected:
   void contextMenuEvent(QContextMenuEvent* event) override;
   void wheelEvent(QWheelEvent* event) override;
@@ -46,6 +49,7 @@ class CustomListView : public QListView {
   QAction* _WRAPPING_ACTIONS{nullptr};
   QAction* _UNIFORM_ITEM_SIZES{nullptr};
 
+  QAction* _THUMBNAIL_AS_DECORATION{nullptr};
   IconSizeMenu* _ICON_SIZE_MENU{nullptr};
   TextElideModeMenu* _TEXT_ELIDE_MODE_MENU{nullptr};
   AddableMenu* m_menu{nullptr};

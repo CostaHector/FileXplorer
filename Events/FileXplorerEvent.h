@@ -36,7 +36,8 @@ private:
 
   bool on_BatchNewFilesOrFolders(bool isFolder = false);
 
-  bool on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, bool skipIfExist = true);
+  bool on_CreateVideoStoryBoard(int dimensionX, int dimensionY, int widthPx, bool skipIfExist = true);
+  bool on_CreateThumbnailForAPath(bool skipIfExist);
   bool on_RenameThumbnailImages(bool skipIfExist);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
 

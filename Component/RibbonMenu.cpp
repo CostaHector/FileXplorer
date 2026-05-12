@@ -383,7 +383,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   nameRulerToolButton->setDefaultAction(arrangeIns._NAME_RULER);
 
   auto& thumbInst = g_ThumbnailProcessActions();
-  auto* thumbnailTb = thumbInst.GetThumbnailToolbar();
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar{"Leaf Arrange Files"}};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
@@ -400,7 +399,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(thumbnailTb);
+  archiveVidsTB->addAction(thumbInst.CREATE_THUMBNAIL_FOR_A_PATH);
+  archiveVidsTB->addWidget(thumbInst.GetThumbnailToolbar(archiveVidsTB));
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   return archiveVidsTB;
 }

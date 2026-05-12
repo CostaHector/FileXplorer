@@ -3,7 +3,9 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "Configuration.h"
+#include "Logger.h"
 #include <QApplication>
+#include <QDir>
 #include <QPixmapCache>
 #include <QBuffer>
 #include <QImageReader>
@@ -120,6 +122,64 @@ QSize GetImageDimensionPixel(const QString& imgFilePath) {
 QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat) {
   QImageReader imgReader{pBuff, noDotFormat.toUtf8()};
   return imgReader.size();
+}
+
+int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist) {
+  int thumbnailCrtCnt{0};
+  QDir dir{folderPath, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  QDir subFolderDir{"", "", QDir::SortFlag::Name, QDir::Filter::Files};
+  subFolderDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  for (const QString& folderName : dir.entryList()) {
+    subFolderDir.setPath(dir.absoluteFilePath(folderName));
+    QStringList imgs = subFolderDir.entryList();
+    if (imgs.isEmpty()) {
+      continue;
+    }
+    StringTool::ImgsSortNameLengthFirst(imgs);
+    QString imgNameInSubFolder = imgs.front();
+    QString imgAbsPath = subFolderDir.absoluteFilePath(imgNameInSubFolder);
+    thumbnailCrtCnt += CreateThumbnail(imgAbsPath, bSkipIfExist);
+  }
+  return thumbnailCrtCnt;
+}
+
+bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
+  const QString dirName{PathTool::dirName(imgAbsPath)};
+  QString dirPath;
+  const QString srcName = PathTool::GetPrepathAndFileName(imgAbsPath, dirPath);
+  if (!srcName.startsWith(dirName)) { // avoid create useless image
+    return false;
+  }
+  const QString thumbnailPath = PathTool::GetThumbnailDecorationImgPath(dirPath, dirName);
+
+  if (bSkipIfExist && QFile::exists(thumbnailPath)) {
+    return true;
+  }
+
+  if (!QFile::exists(imgAbsPath)) {
+    LOG_W("Image file does not exist: %s", qPrintable(imgAbsPath));
+    return false;
+  }
+
+  QImage image(imgAbsPath);
+  if (image.isNull()) {
+    LOG_W("Failed to load image (possibly corrupted): %s", qPrintable(imgAbsPath));
+    return false;
+  }
+
+  QImage scaledImage{image.width() >= image.height() ?                                        //
+                         image.scaledToWidth(EXPECT_THUMBNAIL_SIDE, Qt::SmoothTransformation) //
+                                                     :                                        //
+                         image.scaledToHeight(EXPECT_THUMBNAIL_SIDE, Qt::SmoothTransformation)};
+  if (scaledImage.format() != QImage::Format_RGB888) {
+    scaledImage = scaledImage.convertToFormat(QImage::Format_RGB888);
+  }
+  if (!scaledImage.save(thumbnailPath, "JPG", 80)) {
+    LOG_W("Failed to save thumbnail: %s", qPrintable(thumbnailPath));
+    return false;
+  }
+
+  return true;
 }
 
 } // namespace ImageTool

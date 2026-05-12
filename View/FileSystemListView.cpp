@@ -51,6 +51,8 @@ void FileSystemListView::subscribe() {
   addActions(FileOpActs::GetInst().SELECTION_RIBBONS->actions());
   addActions(FileOpActs::GetInst().DELETE_ACTIONS->actions());
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
+
+  connect(this, &FileSystemListView::onUseThumbnailAsDecorationRoleChanged, _fsModel, &FileSystemModel::setThumbnailAsDecoration);
 }
 
 void FileSystemListView::dropEvent(QDropEvent* event) {

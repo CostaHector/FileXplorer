@@ -25,6 +25,10 @@ const QPixmap& GetLabelStatusPixmap(int labelStatus);
 
 QSize GetImageDimensionPixel(const QString& imgFilePath);
 QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat);
+
+int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist=true);
+bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist=true);
+constexpr int EXPECT_THUMBNAIL_SIDE = 256;
 }
 
 struct IMAGE_SIZE {

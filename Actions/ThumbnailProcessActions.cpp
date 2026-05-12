@@ -5,6 +5,9 @@
 #include "Configuration.h"
 
 ThumbnailProcessActions::ThumbnailProcessActions(QObject* /*parent*/) {
+  CREATE_THUMBNAIL_FOR_A_PATH = new (std::nothrow) QAction(QIcon(":img/THUMBNAIL"), tr("Create thumbnail"), this);
+  CREATE_THUMBNAIL_FOR_A_PATH->setToolTip("Create thumbnails for all folder(s) in current view");
+
   _CREATE_1_BY_1_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_1_BY_1"), tr("Create 1x1 thumbnail"), this);
   _CREATE_1_BY_1_THUMBNAIL->setToolTip("Create a thumbnail for video(s), each image width:720px");
   _CREATE_2_BY_2_THUMBNAIL = new (std::nothrow) QAction(QIcon(":img/THUMBNAILS_2_BY_2"), tr("Create 2x2 thumbnail"), this);

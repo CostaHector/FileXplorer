@@ -225,6 +225,14 @@ QString GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   return fullpath.mid(lastIndexOfSlash + 1);
 }
 
+QString GetThumbnailDecorationImgPath(QString dirPath, const QString& dirName) {
+  dirPath.reserve(dirPath.size() + 40);
+  dirPath += "/";
+  dirPath += dirName;
+  dirPath += "_tn.jpg";
+  return dirPath;
+}
+
 QString Path2Join(const QString& a, const QString& b) {
   QString ans;
   ans.reserve(a.size() + 1 + b.size());

@@ -4,7 +4,7 @@
 #include "ArchiveFilesActions.h"
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 #include "ViewTypeTool.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
@@ -241,7 +241,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   // Non-FileSystemView: open in QDesktopService;
 
   if (fi.isFile()) {
-    if (ThumbnailImageViewer::IsFileImage(fi)) {
+    if (FileImageViewer::IsFileImage(fi)) {
       return FileTool::OpenLocalImageFile(absItemPath);
     } else if (ArchiveFilesReader::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);

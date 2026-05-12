@@ -1,5 +1,5 @@
-#ifndef THUMBNAILIMAGEVIEWER_H
-#define THUMBNAILIMAGEVIEWER_H
+#ifndef FILEIMAGEVIEWER_H
+#define FILEIMAGEVIEWER_H
 
 #include <QToolBar>
 #include <QAction>
@@ -9,10 +9,10 @@
 
 class QMenu;
 
-class ThumbnailImageViewer : public ImageViewer {
+class FileImageViewer : public ImageViewer {
   Q_OBJECT
 public:
-  explicit ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent = nullptr);
+  explicit FileImageViewer(const QString& memoryKeyName, QWidget* parent = nullptr);
 
 public slots:
   bool setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img);
@@ -45,4 +45,4 @@ private:
   QMenu* mMenu{nullptr};
 };
 
-#endif // THUMBNAILIMAGEVIEWER_H
+#endif // FILEIMAGEVIEWER_H

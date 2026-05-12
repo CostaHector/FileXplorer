@@ -1,4 +1,4 @@
-﻿#include "ThumbnailProcesser.h"
+﻿#include "VideoStoryboard.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
@@ -17,29 +17,28 @@
 #include <QProcess>
 #include <QThread>
 
-const QList<int> ThumbnailProcesser::mAllowedPixelList{360, 480, 720, 1080};
-constexpr int ThumbnailProcesser::SAMPLE_PERIOD_MIN; // [1, 300)
+constexpr int VideoStoryboard::SAMPLE_PERIOD_MIN; // [1, 300)
 
-bool ThumbnailProcesser::IsDimensionXValid(int dimensionX) {
+bool VideoStoryboard::IsDimensionXValid(int dimensionX) {
   static constexpr int DIMENSION_X_MIN{1}, DIMENSION_X_MAX{10 + 1}; // [1, 10+1)
   return DIMENSION_X_MIN <= dimensionX && dimensionX <= DIMENSION_X_MAX;
 }
 
-bool ThumbnailProcesser::IsDimensionYValid(int dimensionY) {
+bool VideoStoryboard::IsDimensionYValid(int dimensionY) {
   static constexpr int DIMENSION_Y_MIN{1}, DIMENSION_Y_MAX{10 + 1}; // [1, 10+1)
   return DIMENSION_Y_MIN <= dimensionY && dimensionY <= DIMENSION_Y_MAX;
 }
 
-bool ThumbnailProcesser::IsWidthPixelAllowed(int widthPixel) {
-  static const QSet<int> mAllowedPixelSet{mAllowedPixelList.begin(), mAllowedPixelList.cend()};
+bool VideoStoryboard::IsWidthPixelAllowed(int widthPixel) {
+  static const QSet<int> mAllowedPixelSet{360, 480, 720, 1080};
   return mAllowedPixelSet.contains(widthPixel);
 }
 
-bool ThumbnailProcesser::IsSamplePeriodAllowed(int samplePeriod) {
+bool VideoStoryboard::IsSamplePeriodAllowed(int samplePeriod) {
   return samplePeriod >= SAMPLE_PERIOD_MIN;
 }
 
-bool ThumbnailProcesser::CheckParameters(int dimensionX, int dimensionY, int widthPixel) {
+bool VideoStoryboard::CheckParameters(int dimensionX, int dimensionY, int widthPixel) {
   if (!IsDimensionXValid(dimensionX)) {
     LOG_INFO_P("Dimension of row invalid", "%d", dimensionX);
     return false;
@@ -55,11 +54,11 @@ bool ThumbnailProcesser::CheckParameters(int dimensionX, int dimensionY, int wid
   return true;
 }
 
-ThumbnailProcesser::ThumbnailProcesser(bool skipIfImgAlreadyExist) //
+VideoStoryboard::VideoStoryboard(bool skipIfImgAlreadyExist) //
   : mSkipImageIfAlreadyExist{skipIfImgAlreadyExist}                //
 {}
 
-bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
+bool VideoStoryboard::IsImageAnThumbnail(const QString& imgAbsPath) {
   QString imgBaseName;
   QString ext;
   std::tie(imgBaseName, ext) = PathTool::GetBaseNameExt(imgAbsPath);
@@ -80,7 +79,7 @@ bool ThumbnailProcesser::IsImageAnThumbnail(const QString& imgAbsPath) {
   return true;
 }
 
-bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) {
+bool VideoStoryboard::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) {
   static const QRegularExpression THUMBNAIL_TWODIGIT_PATTERN{R"( \d\d$)"};
   QRegularExpressionMatch ret;
   if (!(ret = THUMBNAIL_TWODIGIT_PATTERN.match(imgBaseName)).hasMatch()) {
@@ -105,7 +104,7 @@ bool ThumbnailProcesser::IsImageNameLooksLikeThumbnail(const QString& imgBaseNam
   return false;
 }
 
-bool ThumbnailProcesser::RenameThumbnailGeneratedByPotPlayer(const QString& path) const {
+bool VideoStoryboard::RenameVideoStoryBoardCreatedByPotPlayer(const QString& path) const {
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds;
 
@@ -155,7 +154,7 @@ bool ThumbnailProcesser::RenameThumbnailGeneratedByPotPlayer(const QString& path
   return undoRedo.Do(cmds);
 }
 
-int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg) const {
+int VideoStoryboard::Create(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg) const {
   if (files.isEmpty()) {
     return 0;
   }
@@ -258,7 +257,7 @@ int ThumbnailProcesser::CreateThumbnailImages(const QStringList& files, int dime
   return succeedCnt;
 }
 
-std::pair<int, int> ThumbnailProcesser::GetThumbnailDimension(const QString& imgBaseName) {
+std::pair<int, int> VideoStoryboard::GetThumbnailDimension(const QString& imgBaseName) {
   if (imgBaseName.size() < 2) {
     return {-1, -1};
   }
@@ -267,7 +266,7 @@ std::pair<int, int> ThumbnailProcesser::GetThumbnailDimension(const QString& img
   return {row, column};
 }
 
-int ThumbnailProcesser::operator()(const QString& rootPath, int beg, int end) {
+int VideoStoryboard::ExtractFrames(const QString& rootPath, int beg, int end) const {
   mErrImg.clear();
   mExtractImagesCnt = 0;
   mRewriteImagesCnt = 0;

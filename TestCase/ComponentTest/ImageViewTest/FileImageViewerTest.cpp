@@ -5,7 +5,7 @@
 
 #include "Configuration.h"
 #include "BeginToExposePrivateMember.h"
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 #include "EndToExposePrivateMember.h"
 #include "ImageTool.h"
 #include "MouseKeyboardEventHelper.h"
@@ -23,7 +23,7 @@ USING_MOCKCPP_NS
 
 using namespace MouseKeyboardEventHelper;
 
-class ThumbnailImageViewerTest : public PlainTestSuite {
+class FileImageViewerTest : public PlainTestSuite {
   Q_OBJECT
 public:
   const QString parentPath = TESTCASE_ROOT_PATH "/test";
@@ -52,7 +52,7 @@ private slots:
   void default_constructor_ok() { //
     // should not crash down
     IMAGE_SIZE::SaveInitialScaledSize("ThumbnailImageViewer_default_ok", 1);
-    ThumbnailImageViewer viewer("ThumbnailImageViewer_default_ok");
+    FileImageViewer viewer("ThumbnailImageViewer_default_ok");
     QCOMPARE(viewer.GetName(), "ThumbnailImageViewer_default_ok");
     // 验证默认值
     QCOMPARE(viewer.GetCurImageSizeScale(), 1);
@@ -83,7 +83,7 @@ private slots:
   }
 
   void setPixmapByAbsFilePath_ok() {
-    ThumbnailImageViewer viewer{"ThumbnailImageViewer"};
+    FileImageViewer viewer{"ThumbnailImageViewer"};
     QVERIFY(!viewer.isCurImageGif());
 
     QVERIFY(!viewer.setPixmapByAbsFilePath(QByteArray{}, "jpg"));
@@ -109,7 +109,7 @@ private slots:
   }
 
   void img_Navigate_ok() {
-    ThumbnailImageViewer viewer{"ThumbnailImageViewer_Navigate_ok"};
+    FileImageViewer viewer{"ThumbnailImageViewer_Navigate_ok"};
     // not including subdirectory
     QVERIFY(!viewer.mNavigateIntoSub->isChecked());
     QVERIFY(!viewer.mImgIt.IsIncludingSubDirectory());
@@ -147,7 +147,7 @@ private slots:
   }
 
   void onCustomContextMenuRequested_ok() {
-    ThumbnailImageViewer viewer{"ThumbnailImageViewer_menu_ok"};
+    FileImageViewer viewer{"ThumbnailImageViewer_menu_ok"};
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, gifName));
 
     QVERIFY(viewer.mMenu == nullptr);
@@ -176,7 +176,7 @@ private slots:
   }
 
   void keyPressEvent_ok() {
-    ThumbnailImageViewer viewer{"ThumbnailImageViewer_keyPressEvent_ok"};
+    FileImageViewer viewer{"ThumbnailImageViewer_keyPressEvent_ok"};
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, pngName));
 
     QKeyEvent ignoredKey{QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier};
@@ -223,7 +223,7 @@ private slots:
   }
 
   void getDestSize_ok() {
-    ThumbnailImageViewer viewer("ThumbnailImageViewer_getDestSize");
+    FileImageViewer viewer("ThumbnailImageViewer_getDestSize");
     QSize beforeSz{800, 600};
     {
       viewer.mWidth = 8; // modify to test scaledByWidth
@@ -245,13 +245,13 @@ private slots:
   }
 
   void wheelEvent_zoom_in_out_ok() {
-    ThumbnailImageViewer viewer("ThumbnailImageViewer_wheelEvent_ok");
+    FileImageViewer viewer("ThumbnailImageViewer_wheelEvent_ok");
 
     viewer.setIconSizeScaledIndex(5);
     const QPoint downAngelDelta{0, 8 * 15};
     const QPoint upAngelDelta{0, -8 * 15};
 
-    QSignalSpy spy(&viewer, &ThumbnailImageViewer::onImageScaledIndexChanged);
+    QSignalSpy spy(&viewer, &FileImageViewer::onImageScaledIndexChanged);
     { // +1 accept
       QVERIFY(SendWheelEvent(viewer, downAngelDelta, Qt::KeyboardModifier::ControlModifier, true));
       QCOMPARE(viewer.GetCurImageSizeScale(), 6);
@@ -289,5 +289,5 @@ private slots:
   }
 };
 
-#include "ThumbnailImageViewerTest.moc"
-REGISTER_TEST(ThumbnailImageViewerTest, false)
+#include "FileImageViewerTest.moc"
+REGISTER_TEST(FileImageViewerTest, false)

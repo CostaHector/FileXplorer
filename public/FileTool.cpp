@@ -5,7 +5,7 @@
 #include "PathKey.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 
 #include <QAction>
 #include <QDir>
@@ -162,7 +162,7 @@ bool OpenLocalImageFile(const QString& localFilePath) {
     LOG_WARN_P("Cannot open", "File[%s] not exist.", qPrintable(localFilePath));
     return false;
   }
-  auto* pImageViewer = new (std::nothrow) ThumbnailImageViewer{"IMAGE_VIEWER"};
+  auto* pImageViewer = new (std::nothrow) FileImageViewer{"IMAGE_VIEWER"};
   QString prepath, name;
   name = PathTool::GetPrepathAndFileName(localFilePath, prepath);
   bool openResult = pImageViewer->setPixmapByAbsFilePath(prepath, name);

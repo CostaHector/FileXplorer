@@ -21,6 +21,8 @@ class ThumbnailProcessActions : public QObject {
  public:
   explicit ThumbnailProcessActions(QObject* parent = nullptr);
 
+  QAction* CREATE_THUMBNAIL_FOR_A_PATH{nullptr};
+
   QAction* _CREATE_1_BY_1_THUMBNAIL{nullptr};
   QAction* _CREATE_2_BY_2_THUMBNAIL{nullptr};
   QAction* _CREATE_3_BY_3_THUMBNAIL{nullptr};

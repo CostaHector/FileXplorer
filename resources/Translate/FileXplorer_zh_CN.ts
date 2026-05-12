@@ -289,6 +289,11 @@
         <source>Uniform items sizes</source>
         <translation>统一项大小</translation>
     </message>
+    <message>
+        <location line="+6"/>
+        <source>Use thumbnail as decoration</source>
+        <translation>使用缩略图装饰</translation>
+    </message>
 </context>
 <context>
     <name>CustomTableView</name>
@@ -547,6 +552,24 @@
         <location line="+7"/>
         <source>Save Now</source>
         <translation>立即保存</translation>
+    </message>
+</context>
+<context>
+    <name>FileImageViewer</name>
+    <message>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+119"/>
+        <source>Open in system application</source>
+        <translation>用系统应用打开</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reveal in explorer</source>
+        <translation>在资源管理器中显示</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy file name</source>
+        <translation>复制文件名称</translation>
     </message>
 </context>
 <context>
@@ -2228,27 +2251,14 @@
     </message>
 </context>
 <context>
-    <name>ThumbnailImageViewer</name>
-    <message>
-        <location filename="../../Component/ImageView/ThumbnailImageViewer.cpp" line="+111"/>
-        <source>Open in system application</source>
-        <translation>用系统应用打开</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Reveal in explorer</source>
-        <translation>在资源管理器中显示</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Copy file name</source>
-        <translation>复制文件名称</translation>
-    </message>
-</context>
-<context>
     <name>ThumbnailProcessActions</name>
     <message>
         <location filename="../../Actions/ThumbnailProcessActions.cpp" line="+8"/>
+        <source>Create thumbnail</source>
+        <translation>创建缩略图</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Create 1x1 thumbnail</source>
         <translation>创建1x1缩略图</translation>
     </message>

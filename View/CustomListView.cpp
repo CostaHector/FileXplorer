@@ -62,6 +62,11 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
     _UNIFORM_ITEM_SIZES->setCheckable(true);
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "/UNIFORM_ITEM_SIZES", false).toBool());
     _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
+
+    _THUMBNAIL_AS_DECORATION = new (std::nothrow) QAction{QIcon{":img/THUMBNAIL"}, CustomListView::tr("Use thumbnail as decoration"), this};
+    CHECK_NULLPTR_RETURN_VOID(_THUMBNAIL_AS_DECORATION);
+    _THUMBNAIL_AS_DECORATION->setCheckable(true);
+    _THUMBNAIL_AS_DECORATION->setChecked(false);
   }
 
   m_menu = new (std::nothrow) AddableMenu{GetName() + "_menu", this};
@@ -81,6 +86,8 @@ void CustomListView::SubscribePublicActions() {
   connect(_RESIZED_MODE_ADJUST, &QAction::toggled, this, &CustomListView::onResizeModeToggled);
   connect(_WRAPPING_ACTIONS, &QAction::toggled, this, &CustomListView::onWrapingToggled);
   connect(_UNIFORM_ITEM_SIZES, &QAction::toggled, this, &CustomListView::onUniformItemSizedToggled);
+
+  connect(_THUMBNAIL_AS_DECORATION, &QAction::toggled, this, &CustomListView::onUseThumbnailAsDecorationRoleChanged);
 }
 
 CustomListView::~CustomListView() {
@@ -146,6 +153,7 @@ void CustomListView::AddItselfAction2Menu() {
   m_menu->addAction(_RESIZED_MODE_ADJUST);
   m_menu->addAction(_WRAPPING_ACTIONS);
   m_menu->addAction(_UNIFORM_ITEM_SIZES);
+  m_menu->addAction(_THUMBNAIL_AS_DECORATION);
 }
 
 void CustomListView::onFlowOrientationChanged(const bool bLeft2Right) {

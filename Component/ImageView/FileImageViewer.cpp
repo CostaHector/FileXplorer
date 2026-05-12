@@ -1,4 +1,4 @@
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "FileTool.h"
@@ -15,7 +15,7 @@ void SetNavigateButtonNeedTransparent(QToolBar* toolBar, QAction* pAct) {
   }
 }
 
-ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent) //
+FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) //
   : ImageViewer{memoryKeyName, parent} {
   mNaviToolBar = new QToolBar{"Navi toolbar", this};
   CHECK_NULLPTR_RETURN_VOID(mNaviToolBar);
@@ -42,26 +42,26 @@ ThumbnailImageViewer::ThumbnailImageViewer(const QString& memoryKeyName, QWidget
   subscribe();
 }
 
-void ThumbnailImageViewer::subscribe() {
-  connect(GetLabel(), &QLabel::customContextMenuRequested, this, &ThumbnailImageViewer::onCustomContextMenuRequested);
+void FileImageViewer::subscribe() {
+  connect(GetLabel(), &QLabel::customContextMenuRequested, this, &FileImageViewer::onCustomContextMenuRequested);
 
-  connect(m_prevButton, &QAction::triggered, this, &ThumbnailImageViewer::NavigateImagePrevious);
-  connect(m_nextButton, &QAction::triggered, this, &ThumbnailImageViewer::NavigateImageNext);
-  connect(mNavigateIntoSub, &QAction::toggled, this, &ThumbnailImageViewer::NavigateIntoSubdirectoryChanged);
+  connect(m_prevButton, &QAction::triggered, this, &FileImageViewer::NavigateImagePrevious);
+  connect(m_nextButton, &QAction::triggered, this, &FileImageViewer::NavigateImageNext);
+  connect(mNavigateIntoSub, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
 }
 
-QString ThumbnailImageViewer::GetImageAbsPath() const { //
+QString FileImageViewer::GetImageAbsPath() const { //
   return PathTool::join(mParentPath, mRel2Image);
 }
 
-bool ThumbnailImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img) {
+bool FileImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img) {
   mParentPath = parentPath;
   mRel2Image = rel2Img;
   setFormatAndImgSizeBytes(PathTool::GetFormatInHar(mRel2Image), QFile{GetImageAbsPath()}.size());
   return UpdatePixmapAndTitle();
 }
 
-QPixmap ThumbnailImageViewer::GetPixmapCore() const {
+QPixmap FileImageViewer::GetPixmapCore() const {
   const QString imageAbsPath = GetImageAbsPath();
   QPixmap pm;
   if (!pm.load(imageAbsPath, mNoDotFormat.toStdString().c_str())) {
@@ -71,13 +71,13 @@ QPixmap ThumbnailImageViewer::GetPixmapCore() const {
   return pm;
 }
 
-std::unique_ptr<QMovie> ThumbnailImageViewer::GetMovieCore(QSize& movieSize) const {
+std::unique_ptr<QMovie> FileImageViewer::GetMovieCore(QSize& movieSize) const {
   const QString imageAbsPath = GetImageAbsPath();
   movieSize = ImageTool::GetImageDimensionPixel(imageAbsPath);
   return std::unique_ptr<QMovie>{new (std::nothrow) QMovie{imageAbsPath, mNoDotFormat.toUtf8()}};
 }
 
-bool ThumbnailImageViewer::NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction) {
+bool FileImageViewer::NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction) {
   mImgIt(mParentPath);
 
   QString newImageName;
@@ -98,7 +98,7 @@ bool ThumbnailImageViewer::NavigateImageCore(FolderNxtAndLastIterator::NaviDirec
   return setPixmapByAbsFilePath(mParentPath, newImageName);
 }
 
-QString ThumbnailImageViewer::GetPathInfoInWinTitle() const {
+QString FileImageViewer::GetPathInfoInWinTitle() const {
   QString pathInfo;
   pathInfo += mRel2Image;
   pathInfo += " under: ";
@@ -106,12 +106,12 @@ QString ThumbnailImageViewer::GetPathInfoInWinTitle() const {
   return pathInfo;
 }
 
-void ThumbnailImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
+void FileImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
   mImgIt.setIncludingSubDirectory(bInclude);
   mImgIt(mParentPath, true); // force refresh images in folder structure
 }
 
-void ThumbnailImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
+void FileImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
   if (mMenu == nullptr) {
     mMenu = new (std::nothrow) QMenu{"Image viewer system menu", nullptr};
     CHECK_NULLPTR_RETURN_VOID(mMenu);
