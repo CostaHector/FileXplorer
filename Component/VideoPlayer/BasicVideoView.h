@@ -18,8 +18,6 @@
 class BasicVideoView : public QWidget {
   Q_OBJECT
 public:
-  friend class VideoView;
-
   explicit BasicVideoView(bool bBasicMode, QWidget* parent = nullptr);
   virtual ~BasicVideoView();
 
@@ -34,6 +32,7 @@ public:
   int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
+  void movePauseBtnToCenter();
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -42,7 +41,7 @@ signals:
   void userMousePressOrKeyPressHappened();
 
 protected:
-  bool eventFilter(QObject *watched, QEvent *event);
+  bool eventFilter(QObject *watched, QEvent *event) override;
   void resizeEvent(QResizeEvent* e) override;
   QMediaPlayer* GetPlayer() { return mPlayer; }
   const QMediaPlayer* GetPlayer() const { return mPlayer; }
@@ -55,7 +54,6 @@ private:
   void onPauseActionToggled(bool pauseChecked);
   void onStateChanged(QMediaPlayer::State state);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
-  void movePauseBtnToCenter();
   static bool SetMediaCore(BasicVideoView* self, const QString& mediaAbsPath);
   static bool PlayCore(QMediaPlayer* mediaPlayer);
   static bool DeviatePositionCore(QMediaPlayer* mPlayer, int deviationInSeconds);
@@ -76,13 +74,8 @@ private:
   ClickableSlider* mProgressSlider{nullptr}; // 进度控制块
   QLabel* mCurrentTimeLabel{nullptr};        // 当前播放的时间点
   QLabel* mDurationLabel{nullptr};           // 视频文件时长
-  VolumeWidget* mVolumeWid{nullptr};         // 音量控制组件
 
   QVBoxLayout* mLeftLayout{nullptr}; // 左侧布局
-
-  void setPlaybackTriggerMode(VideoPlayTool::PlaybackTriggerMode newTriggerMode) { mPlaybackTriggerMode = newTriggerMode; }
-  VideoPlayTool::PlaybackTriggerMode GetPlayTriggerMode() const { return mPlaybackTriggerMode; }
-  VideoPlayTool::PlaybackTriggerMode mPlaybackTriggerMode{VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE};
 
   TFuncFullScreenToggleCallback mFullScreenCallback;
 

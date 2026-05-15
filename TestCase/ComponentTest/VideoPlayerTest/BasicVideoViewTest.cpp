@@ -3,8 +3,10 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "BasicVideoView.h"
+#include "VideoPlayerActions.h"
 #include "EndToExposePrivateMember.h"
 
+#include "VideoPlayTool.h"
 #include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include "RateHelper.h"
@@ -81,6 +83,9 @@ class BasicVideoViewTest : public PlainTestSuite {
 
   void playAVideo_trigger_disabled_ok() {
     setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
+    VideoPlayerActions::GetInst().mPlaybackTrigger_DISABLED->setChecked(true);
+    QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::DISABLED);
+
     const QString existVideoPath{__FILE__};
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
@@ -134,6 +139,8 @@ class BasicVideoViewTest : public PlainTestSuite {
 
   void playAVideo_trigger_manual_ok() {
     setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::MANUAL);
+    VideoPlayerActions::GetInst().mPlaybackTrigger_MANUAL->setChecked(true);
+    QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::MANUAL);
 
     MOCKER(BasicVideoView::SetMediaCore).expects(exactly(2)).will(returnValue(true));
     MOCKER(BasicVideoView::PlayCore).expects(exactly(2)).will(returnValue(true));
@@ -323,22 +330,22 @@ class BasicVideoViewTest : public PlainTestSuite {
   void onMediaStatusChanged_ok() {
     // EndOfMedia -> play Next
     BasicVideoView basicVideoView{false, nullptr};
-    basicVideoView.mVideoWidget->mPlaybackMode_CurrentItemOnce->setChecked(true);
+    VideoPlayerActions::GetInst().mPlaybackMode_CurrentItemOnce->setChecked(true);
 
     QSignalSpy reqPlayNextOneMediaSpy{&basicVideoView, &BasicVideoView::reqPlayNextOneMedia};
 
     // CurrentItemOnce, 不发送
-    QCOMPARE(basicVideoView.mVideoWidget->GetPlaybackMode(), QMediaPlaylist::PlaybackMode::CurrentItemOnce);
+    QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackMode(), QMediaPlaylist::PlaybackMode::CurrentItemOnce);
     basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
     QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
 
     // 发送
-    basicVideoView.mVideoWidget->mPlaybackMode_Loop->setChecked(true);
+    VideoPlayerActions::GetInst().mPlaybackMode_Loop->setChecked(true);
     basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
     QCOMPARE(reqPlayNextOneMediaSpy.count(), 1);
     reqPlayNextOneMediaSpy.takeLast();
 
-    basicVideoView.mVideoWidget->mPlaybackMode_Sequential->setChecked(true);
+    VideoPlayerActions::GetInst().mPlaybackMode_Sequential->setChecked(true);
     basicVideoView.onMediaStatusChanged(QMediaPlayer::MediaStatus::EndOfMedia);
     QCOMPARE(reqPlayNextOneMediaSpy.count(), 1);
     reqPlayNextOneMediaSpy.takeLast();

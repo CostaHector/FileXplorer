@@ -55,7 +55,7 @@ short nextLevelInLinearScale(short target) {
 constexpr int VolumeWidget::MIN_VOLUME, VolumeWidget::MAX_VOLUME;
 
 VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
-  const bool bMuteVolume = getConfig(VideoPlayerKey::MUTE).toBool();
+  const bool bMuteVolume = GetInitIsMuted();
   mMuteAct = DualIconCheckableAction::CreateMuteAction(this, bMuteVolume);
 
   mMuteBtn = new QToolButton{this};
@@ -83,6 +83,15 @@ VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : Q
 VolumeWidget::~VolumeWidget() {
   setConfig(VideoPlayerKey::MUTE, isMuted());
   setConfig(VideoPlayerKey::VOLUME, volumeVal());
+}
+
+qreal VolumeWidget::GetInitVolumeValLog() {
+  int sliderValue = getConfig(VideoPlayerKey::VOLUME).toInt();
+  return VolumeValLogCore(sliderValue);
+}
+
+bool VolumeWidget::GetInitIsMuted() {
+  return getConfig(VideoPlayerKey::MUTE).toBool();
 }
 
 void VolumeWidget::onMouseEventProcessor(const int sliderValue) {

@@ -7,32 +7,26 @@
 #include "FileTool.h"
 #include "RateHelper.h"
 #include "RateActions.h"
+#include "VideoPlayerActions.h"
 #include "PathTool.h"
+#include "VideoPlayTool.h"
 #include <QFile>
 #include <QResizeEvent>
 
-BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{parent} {
+BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
+  : QWidget{parent} {
   mProgressSlider = new (std::nothrow) ClickableSlider{Qt::Orientation::Horizontal, this};
   mProgressSlider->setRange(0, 0);
   mProgressSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   mProgressSlider->setSingleStep(10 * 1000); // 10 second
 
-  mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
-  mVolumeWid->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  mPlayer = new (std::nothrow) QMediaPlayer{this};                             // never swap these 2 lines, must desctruct first
-  mVideoWidget = new (std::nothrow) InteractiveVideoWidget{bBasicMode, this};  // never swap these 2 lines, must desctruct behind player
-  mPlayer->setVolume(mVolumeWid->volumeValLog());
-  mPlayer->setMuted(mVolumeWid->isMuted());
+  mPlayer = new (std::nothrow) QMediaPlayer{this};                            // never swap these 2 lines, must desctruct first
+  mVideoWidget = new (std::nothrow) InteractiveVideoWidget{bBasicMode, this}; // never swap these 2 lines, must desctruct behind player
+  mPlayer->setVolume(VolumeWidget::GetInitVolumeValLog());
+  mPlayer->setMuted(VolumeWidget::GetInitIsMuted());
   mPlayer->setVideoOutput(mVideoWidget);
 
-  MenuToolButton* playbackTriggerModeBtn = mVideoWidget->GetPlaybackTriggerModelMenuToolButton(this);
-  playbackTriggerModeBtn->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
-  setPlaybackTriggerMode(mVideoWidget->GetPlaybackTriggerMode());
-
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
-  mFunctionCtrlBar->addWidget(playbackTriggerModeBtn);
-  mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mSelectVideoFileAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mPauseAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mStopAct);
@@ -44,7 +38,6 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent) : QWidget{paren
   mCurrentTimeLabel = mFunctionCtrlBar->addString("00:00:00");
   mFunctionCtrlBar->addString("/");
   mDurationLabel = mFunctionCtrlBar->addString("00:00:00");
-  mFunctionCtrlBar->addWidget(mVolumeWid);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mBasicModeAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mHideToolBarAct);
@@ -106,10 +99,10 @@ void BasicVideoView::subscribe() {
   // 播放过程中滑动块位置增加, 更新当前时间点标签, 更新滑动块的当前时间
   connect(&mProgressSliderUpdateTimer, &QTimer::timeout, this, &BasicVideoView::onUpdateProgressSliderPosition);
 
-  connect(mVolumeWid, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
-  connect(mVolumeWid, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
-  connect(mVideoWidget->mVolumePlus, &QAction::triggered, mVolumeWid, &VolumeWidget::reqLogVolumeIncrease);
-  connect(mVideoWidget->mVolumeMinus, &QAction::triggered, mVolumeWid, &VolumeWidget::reqLogVolumeDecrease);
+  connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
+  connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
+  connect(VideoPlayerActions::GetInst().mVolumePlus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeIncrease);
+  connect(VideoPlayerActions::GetInst().mVolumeMinus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeDecrease);
 
   connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &BasicVideoView::onError);
 
@@ -123,8 +116,6 @@ void BasicVideoView::subscribe() {
   connect(mVideoWidget->mBasicModeAct, &QAction::toggled, this, &BasicVideoView::reqFunctionModeChange);
 
   connect(mVideoWidget->mHideToolBarAct, &QAction::toggled, this, &BasicVideoView::onChangeToolBarVisibility);
-
-  connect(mVideoWidget, &InteractiveVideoWidget::playbackTriggerModeChanged, this, &BasicVideoView::setPlaybackTriggerMode);
 
   connect(mVideoWidget, &InteractiveVideoWidget::layoutVisibilityChanged, this, &BasicVideoView::movePauseBtnToCenter);
 
@@ -155,15 +146,15 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
   setWindowTitle(mCurrentPlayingMediaPath);
 
   using namespace VideoPlayTool;
-  const PlaybackTriggerMode playTriggerMode{forcePlayInstantly ? PlaybackTriggerMode::AUTO : GetPlayTriggerMode()};
+  const PlaybackTriggerMode playTriggerMode{forcePlayInstantly ? PlaybackTriggerMode::AUTO : VideoPlayerActions::GetInst().GetPlaybackTriggerMode()};
   switch (playTriggerMode) {
-    case VideoPlayTool::PlaybackTriggerMode::MANUAL: {  // 仅仅设置
+    case VideoPlayTool::PlaybackTriggerMode::MANUAL: { // 仅仅设置
       SetMediaCore(this, filePath);
       mVideoWidget->updatePauseActionState(true);
       movePauseBtnToCenter();
       break;
     }
-    case VideoPlayTool::PlaybackTriggerMode::AUTO: {  // 设置+播放
+    case VideoPlayTool::PlaybackTriggerMode::AUTO: { // 设置+播放
       SetMediaCore(this, filePath);
       if (!mVideoWidget->updatePauseActionState(false)) {
         // mPauseAct状态无需更新时, 需要重新播放
@@ -177,7 +168,7 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
       break;
     }
     default: {
-      LOG_W("playTriggerMode[%d] invalid, forcePlayInstantly[%d], should never ran into here", (int)playTriggerMode, forcePlayInstantly);
+      LOG_W("playTriggerMode[%d] invalid, forcePlayInstantly[%d], should never ran into here", (int) playTriggerMode, forcePlayInstantly);
       break;
     }
   }
@@ -245,7 +236,7 @@ int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) con
     return 0;
   }
   RateActions* rateActions = mVideoWidget->GetRateActions();
-  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr);  // no need modal widget
+  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
 }
 
 int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
@@ -258,7 +249,7 @@ int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
     LOG_WARN_P("Cannot adjust rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
     return 0;
   }
-  return RateHelper::AdjustRateMovieRecursively(sameLevelPath, delta);  // no need widget
+  return RateHelper::AdjustRateMovieRecursively(sameLevelPath, delta); // no need widget
 }
 
 bool BasicVideoView::deviatePositionPrevious() {
@@ -271,7 +262,7 @@ bool BasicVideoView::deviatePositionNext() {
 
 bool BasicVideoView::DeviatePositionCore(QMediaPlayer* mPlayer, int deviationInSeconds) {
   CHECK_NULLPTR_RETURN_FALSE(mPlayer);
-  qint64 newPosition = std::max((qint64)0, GetPositionCore(mPlayer) + deviationInSeconds * 1000);
+  qint64 newPosition = std::max((qint64) 0, GetPositionCore(mPlayer) + deviationInSeconds * 1000);
   return SetPositionCore(mPlayer, newPosition);
 }
 
@@ -282,7 +273,7 @@ bool BasicVideoView::SetPositionCore(QMediaPlayer* mPlayer, int newPosition) {
 }
 
 qint64 BasicVideoView::GetPositionCore(QMediaPlayer* mPlayer) {
-  CHECK_NULLPTR_RETURN_INT(mPlayer, (qint64)0);
+  CHECK_NULLPTR_RETURN_INT(mPlayer, (qint64) 0);
   return mPlayer->position();
 }
 
@@ -301,7 +292,7 @@ int BasicVideoView::onAudioAvailableChanged(bool available) const {
   return volValue;
 }
 
-void BasicVideoView::setMediaWithStatus(const QString &filePath, QIODevice *stream) {
+void BasicVideoView::setMediaWithStatus(const QString& filePath, QIODevice* stream) {
   CHECK_NULLPTR_RETURN_VOID(mPlayer);
   mIsMediaCleared = filePath.isEmpty();
   mPlayer->setMedia(QUrl::fromLocalFile(filePath), stream);
@@ -367,14 +358,14 @@ void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
 
 void BasicVideoView::onMediaStatusChanged(QMediaPlayer::MediaStatus status) {
   if (status == QMediaPlayer::MediaStatus::EndOfMedia) {
-    const QMediaPlaylist::PlaybackMode curPlaybackMode{mVideoWidget->GetPlaybackMode()};
+    const QMediaPlaylist::PlaybackMode curPlaybackMode{VideoPlayerActions::GetInst().GetPlaybackMode()};
     if (curPlaybackMode != QMediaPlaylist::PlaybackMode::CurrentItemOnce) {
       emit reqPlayNextOneMedia();
     }
   }
 }
 
-bool BasicVideoView::eventFilter(QObject *watched, QEvent *event) {
+bool BasicVideoView::eventFilter(QObject* watched, QEvent* event) {
   if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::KeyPress) {
     emit userMousePressOrKeyPressHappened();
   }
@@ -387,7 +378,7 @@ void BasicVideoView::resizeEvent(QResizeEvent* e) {
 }
 
 void BasicVideoView::movePauseBtnToCenter() {
-  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2,  //
+  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2, //
                            mVideoWidget->height() / 2 - mPauseShieldButton->height() / 2);
 }
 

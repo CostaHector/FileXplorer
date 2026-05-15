@@ -6,7 +6,7 @@
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
-#include "ThumbnailProcessActions.h"
+#include "ThumbnailActions.h"
 #include "TSFilesMerger.h"
 
 #include "Archiver.h"
@@ -162,7 +162,7 @@ bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
   const QString rootPath = _contentPane->getRootPath();
   VideoStoryboard tp{skipIfExist};
   bool renameResult = tp.RenameVideoStoryBoardCreatedByPotPlayer(rootPath);
-  LOG_OE_NP(renameResult, "Rename thumbnail under", rootPath);
+  LOG_OE_NP(renameResult, "Rename thumbnail under path", rootPath);
   return true;
 }
 
@@ -338,65 +338,18 @@ void FileXplorerEvent::subsribeCompress() {
 }
 
 void FileXplorerEvent::subscribeThumbnailActions() {
-  auto& ins = g_ThumbnailProcessActions();
-  connect(ins._CREATE_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* createThumbnailAct) {
-    auto it = ins.mCreateThumbnailDimension.find(createThumbnailAct);
-    if (it == ins.mCreateThumbnailDimension.cend()) {
-      LOG_W("create thumbnail action[%p] not support", createThumbnailAct);
-      return;
-    }
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    int dimensionX = it->x, dimensionY = it->y, widthPixel = it->width;
-    on_CreateVideoStoryBoard(dimensionX, dimensionY, widthPixel, bSkipExist);
-  });
+  auto& ins = ThumbnailActions::GetInst();
+  connect(&ins, &ThumbnailActions::crtVideoStoryBoard, this, &FileXplorerEvent::on_CreateVideoStoryBoard);
+  connect(&ins, &ThumbnailActions::extractFrames, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
 
   connect(ins._RENAME_THUMBNAILS_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
     on_RenameThumbnailImages(bSkipExist);
   });
 
   connect(ins.CREATE_THUMBNAIL_FOR_A_PATH, &QAction::triggered, this, [this, &ins]() {
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
     on_CreateThumbnailForAPath(bSkipExist);
-  });
-
-  connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
-    auto it = ins.mExtractThumbnailRange.find(extractThumbnailAct);
-    if (it == ins.mExtractThumbnailRange.cend()) {
-      LOG_W("extract thumbnail action[%p] not support", extractThumbnailAct);
-      return;
-    }
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    const int startIndex = it->startIndex, endIndex = it->endIndex;
-    on_ExtractImagesFromThumbnail(startIndex, endIndex, bSkipExist);
-  });
-
-  connect(ins._CUSTOM_RANGE_IMGS, &QAction::triggered, this, [this, &ins]() {
-    bool ok = false;
-    const QString input = QInputDialog::getText(this->_contentPane,
-                                                "Extract image range",                //
-                                                "Enter range (e.g., 1,3; 1,4; 1,7):", //
-                                                QLineEdit::Normal,
-                                                "0,9",
-                                                &ok); //
-    if (!ok || input.isEmpty()) {
-      LOG_INFO_P("[Skip] User canceled or invalid input", "input[%s]", qPrintable(input));
-      return;
-    }
-    static const QRegularExpression regex(R"(^\d,\d$)");
-    QRegularExpressionMatch match = regex.match(input);
-    if (!match.hasMatch()) {
-      LOG_WARN_NP("Invalid Range Format", input);
-      return;
-    }
-    const int beg = match.captured(1).toInt();
-    const int end = match.captured(2).toInt();
-    if (beg < 0 || end < beg) {
-      LOG_WARN_P("Invalid range", "Ensure 0 < beg <= end but[%s]", qPrintable(input));
-      return;
-    }
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    on_ExtractImagesFromThumbnail(beg, end, bSkipExist);
   });
 }
 

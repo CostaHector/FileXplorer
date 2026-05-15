@@ -25,11 +25,13 @@ public:
 
   bool isMuted() const { return mMuteAct->isChecked(); }
   int volumeVal() const { return mVolumeSlider->value(); }
-  short volumeValLogx100Int() const { return VolumeIterate::linearValue2LogValue(volumeVal()); }
-  qreal volumeValLog() const { return (qreal)volumeValLogx100Int() / VolumeIterate::ENLARGE_TIMES; }
+  short volumeValLogx100Int() const { return VolumeValLogCore(volumeVal()) * VolumeIterate::ENLARGE_TIMES; }
+  qreal volumeValLog() const { return VolumeValLogCore(volumeVal()); }
   bool reqLogVolumeIncrease() {return reqLogVolumeChange(true);}
   bool reqLogVolumeDecrease() {return reqLogVolumeChange(false);}
 
+  static qreal GetInitVolumeValLog();
+  static bool GetInitIsMuted();
 signals:
   void mutedStateToggled(bool bMute);
   void sliderVolumeChanged(int volumeVal); // pass it to device(log scale)
@@ -38,6 +40,9 @@ private:
   void onMouseEventProcessor(const int sliderValue);
   bool reqLogVolumeChange(bool bIncrease);
   QString GetLabelText() const;
+  static qreal VolumeValLogCore(int sliderValue) {
+    return (qreal)VolumeIterate::linearValue2LogValue(sliderValue) / VolumeIterate::ENLARGE_TIMES;
+  }
 
   QAction* mMuteAct{nullptr};              // 静音按钮
   QToolButton* mMuteBtn{nullptr};          // 静音按钮

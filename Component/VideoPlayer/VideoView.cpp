@@ -1,5 +1,6 @@
 #include "VideoView.h"
 #include "Logger.h"
+#include "VideoPlayerActions.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
@@ -8,7 +9,6 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
   mBasicVideoView = new (std::nothrow) BasicVideoView{bBasicMode, this};
 
   const InteractiveVideoWidget& inst = *mBasicVideoView->GetVideoWidget();
-  const QMediaPlaylist::PlaybackMode initPlaybackMode{inst.GetPlaybackMode()};
   mExtendedFunctionCtrlBar = inst.GetExtendedFunctionCtrlBar(this);
 
   mExtendLeftWidget = new (std::nothrow) QWidget{this};
@@ -19,7 +19,7 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
   mExtendLeftLayout->setContentsMargins(0, 0, 0, 0);
 
   mVideoList = new (std::nothrow) VideoTableView{this};
-  mVideoList->setPlaybackMode(initPlaybackMode);
+  mVideoList->setPlaybackMode(VideoPlayerActions::GetInst().GetPlaybackMode());
   if (const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget()) {
     if (!inst->isShowVideoListView()) {
       mVideoList->setHidden(true);
@@ -60,7 +60,7 @@ void VideoView::subscribe() {
   connect(inst, &InteractiveVideoWidget::newFolderSelectedChangedByUser, this, &VideoView::PlayAPath);
   connect(mVideoList, &VideoTableView::reqPlayMedia, mBasicVideoView, &BasicVideoView::PlayAVideo);
 
-  connect(inst, &InteractiveVideoWidget::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);
+  connect(&VideoPlayerActions::GetInst(), &VideoPlayerActions::playbackModeChanged, mVideoList, &VideoTableView::setPlaybackMode);
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
 
   connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);

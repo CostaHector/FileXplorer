@@ -925,22 +925,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+20"/>
-        <source>Manual play</source>
-        <translation>手动播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Auto play</source>
-        <translation>自动播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Disabled play</source>
-        <translation>禁止播放</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+21"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -975,16 +960,6 @@
         <translation>下一视频</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>+Volume</source>
-        <translation>增大音量</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>-Volume</source>
-        <translation>减少音量</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>show frames</source>
         <translation>帧图组</translation>
@@ -1001,31 +976,6 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>current item once</source>
-        <translation>单播</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>current item in loop</source>
-        <translation>单曲循环</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sequential</source>
-        <translation>顺序播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>loop</source>
-        <translation>列表循环</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>random</source>
-        <translation>随机播放</translation>
-    </message>
-    <message>
-        <location line="+24"/>
         <source>basic mode</source>
         <translation>简洁模式</translation>
     </message>
@@ -1045,24 +995,9 @@
         <translation>禁用自动隐藏</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Playerback mode</source>
-        <translation>播放模式</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Player Menu</source>
         <translation>播放器菜单</translation>
-    </message>
-    <message>
-        <location line="+61"/>
-        <source>Playback Mode</source>
-        <translation>播放模式</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Play Trigger Mode</source>
-        <translation>触发方式</translation>
     </message>
 </context>
 <context>
@@ -1579,7 +1514,7 @@
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+8"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+10"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1594,7 +1529,7 @@
         <translation>幻灯片预览</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+18"/>
         <source>Float</source>
         <translation>浮动</translation>
     </message>
@@ -2251,61 +2186,61 @@
     </message>
 </context>
 <context>
-    <name>ThumbnailProcessActions</name>
+    <name>ThumbnailActions</name>
     <message>
-        <location filename="../../Actions/ThumbnailProcessActions.cpp" line="+8"/>
+        <location filename="../../Actions/ThumbnailActions.cpp" line="+26"/>
         <source>Create thumbnail</source>
         <translation>创建缩略图</translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>Skip extract if already exist</source>
+        <translation>不覆盖</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Create 1x1 thumbnail</source>
         <translation>创建1x1缩略图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Create 2x2 thumbnail</source>
         <translation>创建2x2缩略图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Create 3x3 thumbnail</source>
         <translation>创建3x3缩略图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Create 4x4 thumbnail</source>
         <translation>创建4x4缩略图</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+6"/>
         <source>Rename thumbnails</source>
-        <translation>刷新缩略图名称</translation>
+        <translation>重命名缩略图</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+5"/>
         <source>Thumbnail Extractor</source>
-        <translation>创建缩略图</translation>
+        <translation>缩略图提取</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Extract [0, 2) imgs</source>
         <translation>提取前2张图片</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Extract [0, 4) imgs</source>
         <translation>提取前4张图片</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <source>Extract [b, e) imgs</source>
-        <translation>提取区间范围内图片</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Skip extract if already exist</source>
-        <translation>若缩略图以存在则跳过提取</translation>
+        <translation>提取指定区间范围内图片</translation>
     </message>
 </context>
 <context>
@@ -2352,6 +2287,69 @@
         <location filename="../../Component/TypeFilterButton.cpp" line="+14"/>
         <source>Filter</source>
         <translation>过滤</translation>
+    </message>
+</context>
+<context>
+    <name>VideoPlayerActions</name>
+    <message>
+        <location filename="../../Component/VideoPlayer/VideoPlayerActions.cpp" line="+15"/>
+        <source>Manual play</source>
+        <translation>手动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Auto play</source>
+        <translation>自动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Disabled play</source>
+        <translation>禁止播放</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>current item once</source>
+        <translation>单播</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>current item in loop</source>
+        <translation>单曲循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>sequential</source>
+        <translation>顺序播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>loop</source>
+        <translation>列表循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>random</source>
+        <translation>随机播放</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>+Volume</source>
+        <translation>增大音量</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-Volume</source>
+        <translation>减少音量</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Playback Mode</source>
+        <translation>播放模式</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Play Trigger Mode</source>
+        <translation>触发方式</translation>
     </message>
 </context>
 <context>

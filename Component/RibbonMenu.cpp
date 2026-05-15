@@ -14,7 +14,7 @@
 #include "SceneInPageActions.h"
 #include "SyncFileSystemModificationActions.h"
 #include "ViewActions.h"
-#include "ThumbnailProcessActions.h"
+#include "ThumbnailActions.h"
 #include "LogActions.h"
 #include "RateActions.h"
 #include "RibbonCastDB.h"
@@ -382,8 +382,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(arrangeIns._NAME_RULER);
 
-  auto& thumbInst = g_ThumbnailProcessActions();
-
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar{"Leaf Arrange Files"}};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
   archiveVidsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
@@ -399,8 +397,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addAction(thumbInst.CREATE_THUMBNAIL_FOR_A_PATH);
-  archiveVidsTB->addWidget(thumbInst.GetThumbnailToolbar(archiveVidsTB));
+  archiveVidsTB->addWidget(ThumbnailActions::GetInst().GetCreateThumbnailToolbar(archiveVidsTB));
+  archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   return archiveVidsTB;
 }
