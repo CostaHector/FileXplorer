@@ -17,7 +17,7 @@ class FolderNxtAndLastIterator {
   static FolderNxtAndLastIterator GetInstsNaviFolders();
   static FolderNxtAndLastIterator GetInstsNaviImages(bool bIncludingSubDir);
 
-  bool operator()(const QString& parentPath, bool bFalse = false);
+  bool operator()(const QString& parentPath, bool bForce = false);
   bool operator()(const QString& parentPath, const QStringList& itemsList);
 
   QString next(const QString& parentPath, const QString& curItemName) { return lastNextCore(parentPath, curItemName, NaviDirection::NEXT); }
@@ -28,8 +28,9 @@ class FolderNxtAndLastIterator {
 
  private:
   QString lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction = NaviDirection::NEXT);
+  QString GetDestinationPath(const QString& parentPath, const QString& curItemName, NaviDirection direction) const;
   QString m_lastTimeParentPath;
-  QStringList sameLevelPaths;
+  QStringList mSameLevelPaths;
 
   const QStringList mNameFilters;
   const QDir::Filters mDirFilters;

@@ -14,30 +14,35 @@ FolderNxtAndLastIterator FolderNxtAndLastIterator::GetInstsNaviImages(bool bIncl
 }
 
 FolderNxtAndLastIterator::FolderNxtAndLastIterator(const QStringList& nameFilters, QDir::Filters dirFilters, bool bIncludingSubDir)
-    : mNameFilters{nameFilters}, mDirFilters{dirFilters}, mIncludingSubDirectory{bIncludingSubDir} {}
+  : mNameFilters{nameFilters}
+  , mDirFilters{dirFilters}
+  , mIncludingSubDirectory{bIncludingSubDir} {}
 
-bool FolderNxtAndLastIterator::operator()(const QString& parentPath, bool bFalse) {
-  if (!bFalse && (!m_lastTimeParentPath.isEmpty() && m_lastTimeParentPath == parentPath)) {
+bool FolderNxtAndLastIterator::operator()(const QString& parentPath, bool bForce) {
+  if (!QFile::exists(parentPath)) {
+    return false;
+  }
+  if (!bForce && (!m_lastTimeParentPath.isEmpty() && m_lastTimeParentPath == parentPath)) {
     // not first time && parentPath unchange => no update
     return false;
   }
   // first time || parentPath changed => update needed
   m_lastTimeParentPath = parentPath;
 
-  sameLevelPaths.clear();
+  mSameLevelPaths.clear();
   if (mIncludingSubDirectory) {
     const int PRE_LEN_END_WITH_SLASH = parentPath.size() + 1;
     // parentPath="C:/home", it.next()="C:/home/to/a.txt", return: "to/a.txt"
     QDirIterator it{parentPath, mNameFilters, mDirFilters, QDirIterator::IteratorFlag::Subdirectories};
     while (it.hasNext()) {
-      sameLevelPaths.push_back(it.next().mid(PRE_LEN_END_WITH_SLASH));
+      mSameLevelPaths.push_back(it.next().mid(PRE_LEN_END_WITH_SLASH));
     }
-    std::sort(sameLevelPaths.begin(), sameLevelPaths.end());
+    std::sort(mSameLevelPaths.begin(), mSameLevelPaths.end());
   } else {
     QDir dir{parentPath};
-    sameLevelPaths = dir.entryList(mNameFilters, mDirFilters, QDir::SortFlag::Name | QDir::SortFlag::DirsFirst);
+    mSameLevelPaths = dir.entryList(mNameFilters, mDirFilters, QDir::SortFlag::Name | QDir::SortFlag::DirsFirst);
   }
-  LOG_D("Parent folder[%s] contains %d item(s)", qPrintable(parentPath), sameLevelPaths.size());
+  LOG_D("Parent folder[%s] contains %d item(s)", qPrintable(parentPath), mSameLevelPaths.size());
   return true;
 }
 
@@ -48,14 +53,13 @@ bool FolderNxtAndLastIterator::operator()(const QString& parentPath, const QStri
   }
   // first time || parentPath changed => update needed
   m_lastTimeParentPath = parentPath;
-  sameLevelPaths = itemsList;
+  mSameLevelPaths = itemsList;
   return true;
 }
 
-QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction) {
-  operator()(parentPath);
-  QStringList::const_iterator beg = sameLevelPaths.cbegin();
-  QStringList::const_iterator end = sameLevelPaths.cend();
+QString FolderNxtAndLastIterator::GetDestinationPath(const QString& parentPath, const QString& curItemName, NaviDirection direction) const {
+  QStringList::const_iterator beg = mSameLevelPaths.cbegin();
+  QStringList::const_iterator end = mSameLevelPaths.cend();
   if (beg == end) {
     LOG_D("parent folder(%s) contains nothing", qPrintable(parentPath));
     return "";
@@ -79,4 +83,15 @@ QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const 
     }
     return *(it - 1);
   }
+}
+
+QString FolderNxtAndLastIterator::lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction) {
+  operator()(parentPath, false);
+  QString destinationPath = GetDestinationPath(parentPath, curItemName, direction);
+  if (!destinationPath.isEmpty() && !QFile::exists(destinationPath)) {
+    // Some folder in parent path being removed, need refresh existed folders nowss.
+    this->operator()(m_lastTimeParentPath, true);
+    destinationPath = GetDestinationPath(parentPath, curItemName, direction);
+  }
+  return destinationPath;
 }
