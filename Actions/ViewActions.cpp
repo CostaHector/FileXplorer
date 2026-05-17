@@ -32,41 +32,48 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _LIST_VIEW->setShortcutVisibleInContextMenu(true);
   _LIST_VIEW->setToolTip(QString("Displays items by using large thumbnails. (%1)").arg(_LIST_VIEW->shortcut().toString()));
   _LIST_VIEW->setCheckable(true);
+  _LIST_VIEW->setChecked(ViewTypeTool::DEFAULT_VIEW_TYPE == ViewTypeTool::ViewType::LIST);
 
   _TABLE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_6));
   _TABLE_VIEW->setShortcutVisibleInContextMenu(true);
   _TABLE_VIEW->setToolTip(QString("Displays information about each in the window. (%1)").arg(_TABLE_VIEW->shortcut().toString()));
   _TABLE_VIEW->setCheckable(true);
-  _TABLE_VIEW->setChecked(true);
+  _TABLE_VIEW->setChecked(ViewTypeTool::DEFAULT_VIEW_TYPE == ViewTypeTool::ViewType::TABLE);
 
   _TREE_VIEW->setShortcutVisibleInContextMenu(true);
   _TREE_VIEW->setToolTip(QString("Display files and folders achitecures. (%1)").arg(_TREE_VIEW->shortcut().toString()));
   _TREE_VIEW->setCheckable(true);
+  _TREE_VIEW->setChecked(ViewTypeTool::DEFAULT_VIEW_TYPE == ViewTypeTool::ViewType::TREE);
 
   _ADVANCE_SEARCH_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F));
   _ADVANCE_SEARCH_VIEW->setShortcutVisibleInContextMenu(true);
   _ADVANCE_SEARCH_VIEW->setToolTip(QString("Show advanced search window. (%1)").arg(_ADVANCE_SEARCH_VIEW->shortcut().toString()));
   _ADVANCE_SEARCH_VIEW->setCheckable(true);
+  _ADVANCE_SEARCH_VIEW->setChecked(false);
 
   _MOVIE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_7));
   _MOVIE_VIEW->setShortcutVisibleInContextMenu(true);
   _MOVIE_VIEW->setToolTip(QString("Movie dictionary view aka Database view. (%1)").arg(_MOVIE_VIEW->shortcut().toString()));
   _MOVIE_VIEW->setCheckable(true);
+  _MOVIE_VIEW->setChecked(false);
 
   _CAST_VIEW->setShortcutVisibleInContextMenu(true);
   _CAST_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_8));
   _CAST_VIEW->setToolTip(QString("Show Cast database. (%1)").arg(_CAST_VIEW->shortcut().toString()));
   _CAST_VIEW->setCheckable(true);
+  _CAST_VIEW->setChecked(false);
 
   _SCENE_VIEW->setShortcutVisibleInContextMenu(true);
   _SCENE_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_9));
   _SCENE_VIEW->setToolTip(QString("Show video scenes in page table. (%1)").arg(_SCENE_VIEW->shortcut().toString()));
   _SCENE_VIEW->setCheckable(true);
+  _SCENE_VIEW->setChecked(false);
 
   _JSON_VIEW->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_0));
   _JSON_VIEW->setShortcutVisibleInContextMenu(true);
   _JSON_VIEW->setToolTip(QString("Show Json editor tableview. (%1)").arg(_JSON_VIEW->shortcut().toString()));
   _JSON_VIEW->setCheckable(true);
+  _JSON_VIEW->setChecked(false);
 
   _VIEW_BACK_TO = new (std::nothrow) QAction(QIcon{":img/_VIEW_BACK_TO"}, tr("View Back"), this);
   _VIEW_BACK_TO->setToolTip(QString("<b>%1 (Ctrl+Mouse BackButton)</b><br/> back to last view type.").arg(_VIEW_BACK_TO->text()));

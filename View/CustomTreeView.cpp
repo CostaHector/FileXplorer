@@ -2,11 +2,13 @@
 #include "ViewHelper.h"
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
+#include "StyleKey.h"
 #include "Configuration.h"
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "ViewItemDelegate.h"
 #include <QSortFilterProxyModel>
+#include <QPainter>
 
 #include "RowHeightRegistry.h"
 extern template struct RowHeightRegistry<CustomTreeView>;
@@ -137,6 +139,19 @@ void CustomTreeView::contextMenuEvent(QContextMenuEvent* event) {
   return;
 }
 
+void CustomTreeView::paintEvent(QPaintEvent* event) {
+  CHECK_NULLPTR_RETURN_VOID(event);
+  if (m_defaultShowBackgroundImage) {
+    const QImage& bgImg = StyleKey::GetBgImage();
+    if (!bgImg.isNull()) {
+      QWidget* pViewport = viewport();
+      QPainter painter{pViewport};
+      painter.drawImage(0, 0, bgImg);
+    }
+  }
+  QTreeView::paintEvent(event);
+}
+
 void CustomTreeView::registerProxyModel(QSortFilterProxyModel* proxyModelInDerived) {
   CHECK_NULLPTR_RETURN_VOID(proxyModelInDerived);
   _proxyModel = proxyModelInDerived;
@@ -213,6 +228,10 @@ bool CustomTreeView::ShowOrHideColumnCore() {
   return true;
 }
 
+void CustomTreeView::onStyleChanged() {
+  viewport()->update();
+}
+
 void CustomTreeView::InitTreeView() {  //
   initExclusivePreferenceSetting();
   if (m_defaultExpandAll) {
@@ -222,6 +241,11 @@ void CustomTreeView::InitTreeView() {  //
   ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
+
+  if (m_defaultShowBackgroundImage) {
+    using namespace StyleKey;
+    connect(&Notifier::instance(), &Notifier::styleChanged, this, &CustomTreeView::onStyleChanged);
+  }
 }
 
 int CustomTreeView::rowHeight() const {

@@ -26,7 +26,7 @@ enum class ViewType {
   VIEW_TYPE_BUTT,
 };
 
-static constexpr ViewType DEFAULT_VIEW_TYPE = ViewType::TABLE;
+constexpr ViewType DEFAULT_VIEW_TYPE = ViewType::TABLE;
 
 enum class ViewTypeMask {
 #define VIEW_TYPE_ITEM(enu, val) enu = 1 << val,

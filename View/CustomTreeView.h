@@ -29,7 +29,8 @@ class CustomTreeView : public QTreeView {
  protected:
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
-  bool m_defaultExpandAll{false};
+  bool m_defaultExpandAll{false}, m_defaultShowBackgroundImage{false};
+  void paintEvent(QPaintEvent *event) override;
 
   void registerProxyModel(QSortFilterProxyModel* proxyModelInDerived);
   QModelIndexList selectedRowsSource() const;
@@ -38,6 +39,7 @@ class CustomTreeView : public QTreeView {
   void AddItselfAction2Menu();
   void SubscribeHeaderActions();
   bool ShowOrHideColumnCore();
+  void onStyleChanged();
 
   const QString m_name;
   const QString m_showHorizontalHeaderKey;
