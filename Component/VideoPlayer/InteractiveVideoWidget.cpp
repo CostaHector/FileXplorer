@@ -17,6 +17,9 @@
 
 InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent) : QVideoWidget{parent} {
   mGrabFrame = new QAction{QIcon{":/VideoPlayer/GRAB_FRAME"}, tr("Grab a Frame"), this};
+  mGrabFrame->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_E));
+  mGrabFrame->setToolTip(QString{"<b>%1 (%2)</b><br/>Grab the frame at current position"}//
+                               .arg(mGrabFrame->text(), mGrabFrame->shortcut().toString()));
 
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, true);
 
