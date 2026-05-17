@@ -27,6 +27,8 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mPlayer->setVideoOutput(mVideoWidget);
 
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
+  mFunctionCtrlBar->addAction(mVideoWidget->mGrabFrame);
+  mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mSelectVideoFileAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mPauseAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mStopAct);
@@ -83,6 +85,8 @@ BasicVideoView::~BasicVideoView() {
 
 void BasicVideoView::subscribe() {
   connect(this, &BasicVideoView::userMousePressOrKeyPressHappened, mVideoWidget, &InteractiveVideoWidget::onUserMouseClickOrKeyPressEvent);
+
+  connect(mVideoWidget->mGrabFrame, &QAction::triggered, this, &BasicVideoView::onGrabCurrentFrame);
 
   connect(mVideoWidget->mPauseAct, &QAction::toggled, this, &BasicVideoView::onPauseActionToggled);
   connect(mVideoWidget->mStopAct, &QAction::triggered, this, &BasicVideoView::onStopPlaying);
@@ -322,6 +326,17 @@ void BasicVideoView::onStopPlaying() {
     mPlayer->stop();
     SetMediaCore(this, "");
   }
+}
+
+bool BasicVideoView::onGrabCurrentFrame() {
+  int positionInSecond = mPlayer->position() / 1000;
+  if (positionInSecond < 0) {
+    return false;
+  }
+  const int cnt = ImageTool::GrabFramesFromVideos({mCurrentPlayingMediaPath}, positionInSecond, ImageTool::DEFAULT_INTERVAL_SECOND, 1, false);
+  const bool bSucceed{cnt > 0};
+  LOG_OE_P(bSucceed, "Grab frame", "At position %d(s)\n%s", positionInSecond, qPrintable(mCurrentPlayingMediaPath));
+  return bSucceed;
 }
 
 void BasicVideoView::onPauseActionToggled(bool pauseChecked) {

@@ -4,6 +4,9 @@
 #include "PublicVariable.h"
 #include "Configuration.h"
 #include "Logger.h"
+#include "DataFormatter.h"
+
+#include <QProcess>
 #include <QApplication>
 #include <QDir>
 #include <QPixmapCache>
@@ -180,6 +183,49 @@ bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
   }
 
   return true;
+}
+
+int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {
+  if (videosAbsPath.isEmpty()) {
+    return 0;
+  }
+
+  int succeedCnt{0};
+  for (const QString& vidAbsPath : videosAbsPath) {
+    if (!QFile::exists(vidAbsPath)) {
+      LOG_D("video[%s] not exist", qPrintable(vidAbsPath));
+      continue;
+    }
+
+    QStringList args{"-y", "-i", vidAbsPath};
+    args.reserve(20);
+
+    bool bNeedGrab{false};
+    for (int i = 0; i < framesCount; ++i) {
+      const int position = startPositionSecond + i * intervalSecond;
+      const QString destOutputImgPath{PathTool::GetFileNameExtRemoved(vidAbsPath) + " " + QString::number(position) + ".jpg"};
+      if (bSkipIfExist && QFile::exists(destOutputImgPath)) {
+        continue;
+      }
+      args << "-ss" << DataFormatter::formatDurationISO(position * 1000);
+      args << "-skip_frame" << "nokey";
+      args << "-frames:v" << "1";
+      args << "-q:v" << "2";
+      args << destOutputImgPath;
+      bNeedGrab = true;
+    }
+    if (!bNeedGrab) {
+      LOG_D("no need grab frames from video[%s]", qPrintable(vidAbsPath));
+      continue;
+    }
+
+    if (QProcess::execute("ffmpeg", args) != 0) {
+      LOG_D("Grab frames from video[%s] failed", qPrintable(vidAbsPath));
+      continue;
+    }
+    ++succeedCnt;
+  }
+  return succeedCnt;
 }
 
 } // namespace ImageTool

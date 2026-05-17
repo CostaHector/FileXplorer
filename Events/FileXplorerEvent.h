@@ -40,6 +40,7 @@ private:
   bool on_CreateThumbnailForAPath(bool skipIfExist);
   bool on_RenameThumbnailImages(bool skipIfExist);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
+  bool on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist);
 
   bool onRateMovie(int newRate) const;
   bool onRateMoviesRecursively(bool bOverrideForce) const;

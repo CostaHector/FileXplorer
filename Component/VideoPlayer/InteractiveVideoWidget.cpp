@@ -16,6 +16,8 @@
 #include <QFileDialog>
 
 InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent) : QVideoWidget{parent} {
+  mGrabFrame = new QAction{QIcon{":/VideoPlayer/GRAB_FRAME"}, tr("Grab a Frame"), this};
+
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, true);
 
   mStopAct = new QAction{QIcon{":/VideoPlayer/STOP_VIDEO"}, tr("stop"), this};
@@ -65,6 +67,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addAction(mFullScreenAct);
   mContextMenu->addAction(mHideToolBarAct);
   mContextMenu->addAction(mShowVideoList);
+  mContextMenu->addAction(mGrabFrame);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mPauseAct);
   mContextMenu->addAction(mStopAct);

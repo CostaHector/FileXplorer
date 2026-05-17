@@ -50,6 +50,7 @@ private:
   bool onSelectAFolder();
   void tryStartAutoHideTimer();
 
+  QAction* mGrabFrame{nullptr};                                        // 抓取当前帧
   QAction* mPauseAct{nullptr};                                         // 通用暂停/继续动作
   QAction* mStopAct{nullptr};                                          // 停止播放
   QAction *mSeekBackwardAct{nullptr}, *mSeekForwardAct{nullptr};       // 快退10s, 快进10s

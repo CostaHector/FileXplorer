@@ -51,6 +51,7 @@ private:
   void emitFullScreenModeReq(bool bFullScreen);
   void onDurationChanged(qint64 duration);
   bool onUpdateProgressSliderPosition();
+  bool onGrabCurrentFrame();
   void onPauseActionToggled(bool pauseChecked);
   void onStateChanged(QMediaPlayer::State state);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);

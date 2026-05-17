@@ -209,6 +209,29 @@ bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skip
   return true;
 }
 
+bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  QStringList videoFiles;
+  videoFiles.reserve(mixedFiles.size());
+  for (const QString& filePath: mixedFiles) {
+    if (!TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(filePath))) {
+      continue;
+    }
+    videoFiles.push_back(filePath);
+  }
+  if (videoFiles.isEmpty()) {
+    LOG_INFO_NP("Skip grab frames", "No video selected");
+    return true;
+  }
+  const int cnt = ImageTool::GrabFramesFromVideos(videoFiles, startPositionSecond, intervalSecond, framesCount, bSkipIfExist);
+  LOG_OK_P("Grab frames", "%d videos frame grabbed", cnt);
+  return true;
+}
+
+
 bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
 
@@ -340,9 +363,10 @@ void FileXplorerEvent::subsribeCompress() {
 void FileXplorerEvent::subscribeThumbnailActions() {
   auto& ins = ThumbnailActions::GetInst();
   connect(&ins, &ThumbnailActions::crtVideoStoryBoard, this, &FileXplorerEvent::on_CreateVideoStoryBoard);
-  connect(&ins, &ThumbnailActions::extractFrames, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
+  connect(&ins, &ThumbnailActions::extractImages, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
+  connect(&ins, &ThumbnailActions::grabFrames, this, &FileXplorerEvent::on_GrabFramesFromVideos);
 
-  connect(ins._RENAME_THUMBNAILS_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
+  connect(ins._RENAME_STORYBOARD_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
     const bool bSkipExist = ins.isSkipIfAlreadyExist();
     on_RenameThumbnailImages(bSkipExist);
   });

@@ -874,6 +874,40 @@
     </message>
 </context>
 <context>
+    <name>GrabFramesDialog</name>
+    <message>
+        <location filename="../../Component/VideoPlayer/GrabFramesDialog.cpp" line="+11"/>
+        <location line="+5"/>
+        <source> s</source>
+        <translation> 秒</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source> cnt</source>
+        <translation> 张</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Start Position:</source>
+        <translation>起始位置:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Interval:</source>
+        <translation>抽样间隔:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Count:</source>
+        <translation>抽样数量:</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Grab Frames Settings</source>
+        <translation>抓取多帧设置</translation>
+    </message>
+</context>
+<context>
     <name>HarTableView</name>
     <message>
         <location filename="../../Component/Har/HarTableView.cpp" line="+26"/>
@@ -2188,44 +2222,54 @@
 <context>
     <name>ThumbnailActions</name>
     <message>
-        <location filename="../../Actions/ThumbnailActions.cpp" line="+26"/>
+        <location filename="../../Actions/ThumbnailActions.cpp" line="+28"/>
         <source>Create thumbnail</source>
         <translation>创建缩略图</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Skip extract if already exist</source>
-        <translation>不覆盖</translation>
+        <source>Skip if already exist</source>
+        <translation>跳过已存在</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Create 1x1 thumbnail</source>
+        <location line="+4"/>
+        <source>Grab a Frame</source>
+        <translation>抓取一帧</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Frames</source>
+        <translation>抓取多帧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Create 1x1 StoryBoard</source>
         <translation>创建1x1缩略图</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Create 2x2 thumbnail</source>
+        <source>Create 2x2 StoryBoard</source>
         <translation>创建2x2缩略图</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Create 3x3 thumbnail</source>
+        <source>Create 3x3 StoryBoard</source>
         <translation>创建3x3缩略图</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Create 4x4 thumbnail</source>
+        <source>Create 4x4 StoryBoard</source>
         <translation>创建4x4缩略图</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Rename thumbnails</source>
-        <translation>重命名缩略图</translation>
+        <source>Update storyboard name</source>
+        <translation>更新故事板文件名</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Thumbnail Extractor</source>
-        <translation>缩略图提取</translation>
+        <source>Extract [0, 1) imgs</source>
+        <translation>提取首张图片</translation>
     </message>
     <message>
         <location line="+6"/>

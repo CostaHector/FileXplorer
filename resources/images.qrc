@@ -53,10 +53,11 @@
         <file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
         <file alias="LIKE">Media/LIKE.svg</file>
         <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
-        <file alias="RENAME_THUMBNAILS">Media/RENAME_THUMBNAILS.svg</file>
+        <file alias="RENAME_STORYBOARD">Media/RENAME_STORYBOARD.svg</file>
         <file alias="IMAGE_NOT_FOUND">Media/IMAGE_NOT_FOUND.svg</file>
         <file alias="INCREASING_RATING">Media/INCREASING_RATING.svg</file>
         <file alias="DECREASING_RATING">Media/DECREASING_RATING.svg</file>
+        <file alias="SKIP_IF_EXIST">Media/SKIP_IF_EXIST.svg</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
@@ -362,6 +363,7 @@
         <file alias="VOLUME_PLUS">VideoPlayer/VOLUME_PLUS.svg</file>
         <file alias="VOLUME_MINUS">VideoPlayer/VOLUME_MINUS.svg</file>
         <file alias="GRAB_FRAME">VideoPlayer/GRAB_FRAME.svg</file>
+        <file alias="GRAB_FRAMES">VideoPlayer/GRAB_FRAMES.svg</file>
         <file alias="MARK_HOT_SCENE_POSITION">VideoPlayer/MARK_HOT_SCENE_POSITION.svg</file>
         <file alias="VOLUME_UNMUTE">VideoPlayer/VOLUME_UNMUTE.svg</file>
         <file alias="VOLUME_MUTE">VideoPlayer/VOLUME_MUTE.svg</file>
