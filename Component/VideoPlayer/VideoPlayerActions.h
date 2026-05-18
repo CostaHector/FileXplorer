@@ -43,8 +43,7 @@ private:
 
   QAction                         // 播放触发模式
       *mPlaybackTrigger_MANUAL,   // 播放触发模式-手动播放
-      *mPlaybackTrigger_AUTO,     // 播放触发模式-自动播放
-      *mPlaybackTrigger_DISABLED; // 播放触发模式-禁用播放
+      *mPlaybackTrigger_AUTO;     // 播放触发模式-自动播放
 
   QAction                                        // 播放模式
       *mPlaybackMode_CurrentItemOnce{nullptr},   // 播放模式-单曲

@@ -62,7 +62,6 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
 
   mProgressSliderUpdateTimer.setInterval(1 * 1000); // refresh frequency: 1Hz
   mProgressSliderUpdateTimer.setSingleShot(false);
-  QTimer::singleShot(0, this, [this]() { movePauseBtnToCenter(); });
 
   mProgressSlider->installEventFilter(this);
   mVideoWidget->installEventFilter(this);
@@ -137,13 +136,9 @@ void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
 }
 
 bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly) {
-  if (!bPauseButtonCenterInit) {
-    bPauseButtonCenterInit = true;
-    movePauseBtnToCenter();
-  }
-  mCurrentPlayingMediaPath = "";
-  setWindowTitle(mCurrentPlayingMediaPath);
   if (!QFile::exists(filePath)) {
+    mCurrentPlayingMediaPath = "";
+    setWindowTitle("");
     return false;
   }
   mCurrentPlayingMediaPath = filePath;
@@ -153,9 +148,7 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
   const PlaybackTriggerMode playTriggerMode{forcePlayInstantly ? PlaybackTriggerMode::AUTO : VideoPlayerActions::GetInst().GetPlaybackTriggerMode()};
   switch (playTriggerMode) {
     case VideoPlayTool::PlaybackTriggerMode::MANUAL: { // 仅仅设置
-      SetMediaCore(this, filePath);
       mVideoWidget->updatePauseActionState(true);
-      movePauseBtnToCenter();
       break;
     }
     case VideoPlayTool::PlaybackTriggerMode::AUTO: { // 设置+播放
@@ -164,11 +157,6 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
         // mPauseAct状态无需更新时, 需要重新播放
         PlayCore(this->mPlayer);
       }
-      break;
-    }
-    case VideoPlayTool::PlaybackTriggerMode::DISABLED: {
-      mVideoWidget->updatePauseActionState(true);
-      movePauseBtnToCenter();
       break;
     }
     default: {
@@ -298,8 +286,11 @@ int BasicVideoView::onAudioAvailableChanged(bool available) const {
 
 void BasicVideoView::setMediaWithStatus(const QString& filePath, QIODevice* stream) {
   CHECK_NULLPTR_RETURN_VOID(mPlayer);
-  mIsMediaCleared = filePath.isEmpty();
-  mPlayer->setMedia(QUrl::fromLocalFile(filePath), stream);
+  if (filePath.isEmpty()) {
+    mPlayer->setMedia(QMediaContent{}, stream);
+  } else {
+    mPlayer->setMedia(QUrl::fromLocalFile(filePath), stream);
+  }
 }
 
 void BasicVideoView::onDurationChanged(qint64 duration) {
@@ -320,7 +311,7 @@ bool BasicVideoView::onUpdateProgressSliderPosition() {
 void BasicVideoView::onStopPlaying() {
   CHECK_NULLPTR_RETURN_VOID(mPlayer);
   if (!mVideoWidget->mPauseAct->isChecked()) {
-    mVideoWidget->mPauseAct->toggle();
+    mVideoWidget->mPauseAct->setChecked(true);
   }
   if (mPlayer->state() != QMediaPlayer::StoppedState) {
     mPlayer->stop();
@@ -344,7 +335,7 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
   if (pauseChecked) {
     mPlayer->pause();
   } else {
-    if (mIsMediaCleared) {
+    if (mPlayer->media().isNull()) {
       const QString pth = GetCurrentPlayingMediaPath();
       if (!QFile::exists(pth)) {
         return;

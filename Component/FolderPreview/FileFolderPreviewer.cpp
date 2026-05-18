@@ -41,10 +41,10 @@ void FileFolderPreviewer::SaveSettings() {
 }
 
 void FileFolderPreviewer::StopVideoPlay() {
-  if (mDetailsPane) {
+  if (mDetailsPane != nullptr) {
     mDetailsPane->onStopPlaying();
   }
-  if (mImgVidOtherPane) {
+  if (mImgVidOtherPane != nullptr) {
     mImgVidOtherPane->onStopPlaying();
   }
 }

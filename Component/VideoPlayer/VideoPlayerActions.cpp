@@ -16,13 +16,10 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
   mPlaybackTrigger_MANUAL->setCheckable(true);
   mPlaybackTrigger_AUTO = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_AUTO"}, tr("Auto play"), this};
   mPlaybackTrigger_AUTO->setCheckable(true);
-  mPlaybackTrigger_DISABLED = new QAction{QIcon{":/VideoPlayer/PLAY_TRIGGER_DISABLED"}, tr("Disabled play"), this};
-  mPlaybackTrigger_DISABLED->setCheckable(true);
   {
     using namespace VideoPlayTool;
     mPlaybackTriggerIntAction.init({{mPlaybackTrigger_MANUAL, PlaybackTriggerMode::MANUAL}, //
-                                    {mPlaybackTrigger_AUTO, PlaybackTriggerMode::AUTO},     //
-                                    {mPlaybackTrigger_DISABLED, PlaybackTriggerMode::DISABLED}},
+                                    {mPlaybackTrigger_AUTO, PlaybackTriggerMode::AUTO}},
                                    DEFAULT_PLAYBACK_TRIGGER_MODE,
                                    QActionGroup::ExclusionPolicy::Exclusive);
     const int playbackTriggerModeInt = getConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE).toInt();

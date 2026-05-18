@@ -82,8 +82,6 @@ private:
 
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
-  bool bPauseButtonCenterInit = false;
-  bool mIsMediaCleared{false};
 
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };

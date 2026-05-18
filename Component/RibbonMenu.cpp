@@ -399,9 +399,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   {
     auto& inst = ThumbnailActions::GetInst();
-    archiveVidsTB->addAction(inst._SKIP_IF_ALREADY_EXIST);
     archiveVidsTB->addWidget(inst.GetThumbnailFrameTools(archiveVidsTB));
     archiveVidsTB->addWidget(inst.GetStoryBoardToolbar(archiveVidsTB));
+    archiveVidsTB->addAction(inst._SKIP_IF_ALREADY_EXIST);
   }
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);

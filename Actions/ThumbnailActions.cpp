@@ -3,6 +3,7 @@
 #include "NotificatorMacro.h"
 #include "MenuToolButton.h"
 #include "ImageTool.h"
+#include "StyleSheet.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "GrabFramesDialog.h"
@@ -158,6 +159,7 @@ QWidget* ThumbnailActions::GetThumbnailFrameTools(QWidget* parent) {
   frameTB->addAction(GRAB_A_FRAME);
   frameTB->addAction(GRAB_FRAMES_ADVANCE);
   frameTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});
+  SetLayoutAlightment(frameTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return frameTB;
 }
 
@@ -194,5 +196,6 @@ QWidget* ThumbnailActions::GetStoryBoardToolbar(QWidget* parent) {
     extractTB->InitDefaultActionFromQSetting(BehaviorKey::EXTRACT_CHOICE, true);
     storyBoardTB->addWidget(extractTB);
   }
+  SetLayoutAlightment(storyBoardTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return storyBoardTB;
 }

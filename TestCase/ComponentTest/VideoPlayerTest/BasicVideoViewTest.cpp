@@ -27,9 +27,11 @@ class BasicVideoViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
   const QString mExistVidPath{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4")};
+  const QString mExistVidPath_NewName{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s_NewName.mp4")};
  private slots:
   void initTestCase() {  //
     QVERIFY(QFile::exists(mExistVidPath));
+    QVERIFY(!QFile::exists(mExistVidPath_NewName));
   }
 
   void init() { GlobalMockObject::reset(); }
@@ -81,60 +83,38 @@ class BasicVideoViewTest : public PlainTestSuite {
     reqFullscreenModeChangeSpy.clear();
   }
 
-  void playAVideo_trigger_disabled_ok() {
-    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
-    VideoPlayerActions::GetInst().mPlaybackTrigger_DISABLED->setChecked(true);
-    QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::DISABLED);
+  void onStopPlaying_release_file_ok() {
+    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::AUTO);
+    VideoPlayerActions::GetInst().mPlaybackTrigger_AUTO->setChecked(true);
+    QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::AUTO);
 
-    const QString existVideoPath{__FILE__};
-    MOCKER(BasicVideoView::SetMediaCore).expects(exactly(1)).will(returnValue(true));
-    MOCKER(BasicVideoView::PlayCore).expects(exactly(1)).will(returnValue(true));
-    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(existVideoPath)).will(returnValue(true));
-
+    // 初始状态: 处于暂停状态+无媒体
     BasicVideoView basicVideoView{true, nullptr};
-    QVERIFY(!basicVideoView.bPauseButtonCenterInit);
+    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), true);
+
     // 文件不存在
     QVERIFY(!basicVideoView.PlayAVideo("path/to/InexistsMediaFile.mp4", true));
-    QVERIFY(basicVideoView.bPauseButtonCenterInit);
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), true);
 
-    // 禁用触发: 非强制不可触发(暂停状态) setMedia:0 play:0
-    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, false));
-    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
-    basicVideoView.mVideoWidget->mOpenInSystemApplication->trigger();  // time: 1
-
-    // 禁用触发: 强制播放(非暂停状态) setMedia:1 play:1
-    QVERIFY(basicVideoView.PlayAVideo(existVideoPath, true));
-    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), existVideoPath);
-    basicVideoView.reqPlayInSystemApplication();  // time: 2
-
-    // 停止播放 mStopAct -> onStopPlaying 清理设置的media, 解除占用, 同时设置暂停按钮选中
-    emit basicVideoView.mVideoWidget->mStopAct->triggered();
-    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
-  }
-
-  void onStopPlaying_release_file_ok() {
-    setConfig(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, (int)VideoPlayTool::PlaybackTriggerMode::DISABLED);
-
-    BasicVideoView basicVideoView{true, nullptr};
-    QCOMPARE(basicVideoView.mIsMediaCleared, false);
-    basicVideoView.PlayAVideo(mExistVidPath, true);
+    // 自动播放+非强制: 文件被占用, 仅windows下占用句柄导致无法重命名
+    QVERIFY(basicVideoView.PlayAVideo(mExistVidPath, false));
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), mExistVidPath);
-
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
     QCOMPARE(basicVideoView.mPlayer->media().isNull(), false);
 
+    // 停止, 进入暂停状态: 允许重命名
     emit basicVideoView.mVideoWidget->mStopAct->triggered();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
     QCOMPARE(basicVideoView.mPlayer->mediaStatus(), QMediaPlayer::MediaStatus::NoMedia);
-    QCOMPARE(basicVideoView.mIsMediaCleared, true);
+    QVERIFY(QFile::rename(mExistVidPath, mExistVidPath_NewName));
+    QVERIFY(QFile::rename(mExistVidPath_NewName, mExistVidPath));
 
+    // 停止后: 可以继续播放, 文件被占用, 仅windows下占用句柄导致无法重命名
     basicVideoView.mVideoWidget->mPauseAct->toggle();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
     QVERIFY(basicVideoView.mPlayer->mediaStatus() != QMediaPlayer::MediaStatus::NoMedia);
-    QCOMPARE(basicVideoView.mIsMediaCleared, false);
   }
 
   void playAVideo_trigger_manual_ok() {
@@ -146,23 +126,29 @@ class BasicVideoViewTest : public PlainTestSuite {
     MOCKER(BasicVideoView::PlayCore).expects(exactly(2)).will(returnValue(true));
 
     BasicVideoView basicVideoView{false, nullptr};
-    QVERIFY(!basicVideoView.bPauseButtonCenterInit);
+    QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), true);
+
     // 文件不存在
     QVERIFY(!basicVideoView.PlayAVideo("path/to/InexistsMediaFile.mp4", true));
-    QVERIFY(basicVideoView.bPauseButtonCenterInit);
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), true);
 
-    // 手动触发: 非强制, setMedia:1, PlayCore:0
+    // 非强制, setMedia:0, PlayCore:0
     QVERIFY(basicVideoView.PlayAVideo(__FILE__, false));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), true);
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
-    // 手动触发 mPauseAct -> onPauseActionToggled -> PlayCore:1
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), true);
+
+    // 点击暂停按钮, 进入播放状态, mPauseAct -> onPauseActionToggled -> setMedia:1, PlayCore:1
     basicVideoView.mVideoWidget->mPauseAct->toggle();
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), false);
 
-    // 禁用触发: 强制可播放 setMedia:1, PlayCore:1
+    // 强制播放 setMedia:1, PlayCore:1
     QVERIFY(basicVideoView.PlayAVideo(__FILE__, true));
     QCOMPARE(basicVideoView.mVideoWidget->mPauseAct->isChecked(), false);
+    QCOMPARE(basicVideoView.mPlayer->media().isNull(), false);
   }
 
   void emitFullScreenModeReq_ok() {

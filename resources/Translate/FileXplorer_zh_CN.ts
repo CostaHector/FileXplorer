@@ -356,7 +356,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+39"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+41"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -959,7 +959,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+21"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+26"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -1009,7 +1009,12 @@
         <translation>用系统应用打开</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-20"/>
+        <source>Grab a Frame</source>
+        <translation>抓取一帧</translation>
+    </message>
+    <message>
+        <location line="+27"/>
         <source>basic mode</source>
         <translation>简洁模式</translation>
     </message>
@@ -2346,14 +2351,9 @@
         <translation>自动播放</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Disabled play</source>
-        <translation>禁止播放</translation>
-    </message>
-    <message>
-        <location line="+14"/>
+        <location line="+13"/>
         <source>current item once</source>
-        <translation>单播</translation>
+        <translation>单次</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2472,7 +2472,7 @@
         <translation>JSON视图</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+56"/>
         <source>View Back</source>
         <translation>上一个视图</translation>
     </message>
