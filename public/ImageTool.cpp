@@ -97,8 +97,10 @@ QIcon GetBuiltInIcon(QStyle::StandardPixmap spE) {
 #ifdef RUNNING_UNIT_TESTS
   return {};
 #endif
-  static const QStyle* pStyle = QApplication::style();
-  return pStyle->standardIcon(spE);
+  if (const QStyle* pStyle = QApplication::style()) {
+    return pStyle->standardIcon(spE);
+  }
+  return {};
 }
 
 const QIcon& GetCheckResultIcon(bool bPass) {

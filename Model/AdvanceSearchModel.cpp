@@ -110,6 +110,9 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
     } else if (mCopyIndexes.contains(rootPath(), r)) {
       static const QIcon COPY_ICON{":img/COPY_ITEM"};
       return COPY_ICON;
+    } else if (item.m_Type.isEmpty()) {
+      static const QIcon dirIcon = ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DirIcon); // or ":img/FOLDER"
+      return dirIcon;
     } else {
       return ImageTool::GetIconFromCached('*' + item.m_Type);
     }
