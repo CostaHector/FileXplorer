@@ -26,6 +26,7 @@
 #include "RenameWidget_Replace.h"
 #include "RenameWidget_SwapFileNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
+#include "RenameWidget_Digit2Alpha.h"
 #include "DuplicateVideosFinder.h"
 #include "HarMgr.h"
 
@@ -500,6 +501,10 @@ void FileXplorerEvent::subscribe() {
     connect(renameInst._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
       RenameWidget_PrependParentFolderName pPrependName{_contentPane};
       on_Rename(pPrependName);
+    });
+    connect(renameInst._DIGIT_CHAR_REPLACE_TO_ALPHA, &QAction::triggered, this, [this]() -> void {
+      RenameWidget_Digit2Alpha pDigitReplacedByAlpha{_contentPane};
+      on_Rename(pDigitReplacedByAlpha);
     });
   }
 

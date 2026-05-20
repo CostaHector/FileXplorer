@@ -3,6 +3,22 @@
 #include <QRegularExpression>
 
 namespace RenameHelper {
+
+QStringList SpecialDigitReplace2Char(const QStringList& replaceeList) {
+  if (replaceeList.isEmpty()) {
+    return {};
+  }
+  QStringList replacedLst;
+  replacedLst.reserve(replaceeList.size());
+  for (QString s : replaceeList) {
+    s.replace(QChar{'4'}, 'a');
+    s.replace(QChar{'0'}, 'o');
+    s.replace(QChar{'1'}, 'i');
+    replacedLst.append(std::move(s));
+  }
+  return replacedLst;
+}
+
 QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldString, const QString& newString, bool regexEnable) {
   if (replaceeList.isEmpty()) {
     return {};

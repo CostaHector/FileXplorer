@@ -182,6 +182,7 @@
         <file alias="NAME_STR_DELETER_PATH">Rename/NAME_STR_DELETER_PATH.svg</file>
         <file alias="NAME_STR_REPLACER_PATH">Rename/NAME_STR_REPLACER_PATH.svg</file>
         <file alias="_CONTINUOUS_NUMBERING">Rename/_CONTINUOUS_NUMBERING.svg</file>
+        <file alias="DIGIT_2_ALPHA">Rename/DIGIT_2_ALPHA.svg</file>
         <file alias="NAME_RULER">Rename/NAME_RULER.svg</file>
         <file alias="PREPEND_PARENT_FOLDER_NAMES">Rename/PREPEND_PARENT_FOLDER_NAMES.svg</file>
         <file alias="COMMAND_PREVIEW">Rename/COMMAND_PREVIEW.svg</file>

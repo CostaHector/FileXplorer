@@ -11,6 +11,7 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _CONTINUOUS_NUMBERING = new (std::nothrow) QAction(QIcon(":img/_CONTINUOUS_NUMBERING"), tr("Name Continous"), this);
   _CONVERT_UNICODE_TO_ASCII = new (std::nothrow) QAction(QIcon(":img/UNICODE_TO_ASCII_TEXT"), tr("Unicode Char to ASCII"), this);
   _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{QIcon{":img/PREPEND_PARENT_FOLDER_NAMES"}, tr("Prepend parent folder names"), this};
+  _DIGIT_CHAR_REPLACE_TO_ALPHA = new (std::nothrow) QAction{QIcon{":img/DIGIT_2_ALPHA"}, tr("Digit 2 Alpha"), this};
   RENAME_RIBBONS = Get_Rename_Actions();
 
   _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), tr("Uppercase"), this);
@@ -82,6 +83,9 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   _PREPEND_PARENT_FOLDER_NAMES->setToolTip(
         QString("<b>%1 (%2)</b><br/> Prepend parent folder name to files under user selected folders").arg(_PREPEND_PARENT_FOLDER_NAMES->text(), _PREPEND_PARENT_FOLDER_NAMES->shortcut().toString()));
 
+  _DIGIT_CHAR_REPLACE_TO_ALPHA->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Replace 4:a, 0:o, and, 1:i").arg(_DIGIT_CHAR_REPLACE_TO_ALPHA->text(), _DIGIT_CHAR_REPLACE_TO_ALPHA->shortcut().toString()));
+
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(_NUMERIZER);
   actionGroup->addAction(_SECTIONS_ARRANGE);
@@ -93,6 +97,7 @@ auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
   actionGroup->addAction(_CONTINUOUS_NUMBERING);
   actionGroup->addAction(_CONVERT_UNICODE_TO_ASCII);
   actionGroup->addAction(_PREPEND_PARENT_FOLDER_NAMES);
+  actionGroup->addAction(_DIGIT_CHAR_REPLACE_TO_ALPHA);
   actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
   foreach(QAction* act, actionGroup->actions()) {
     act->setCheckable(false);

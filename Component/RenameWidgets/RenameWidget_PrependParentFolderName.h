@@ -5,7 +5,7 @@
 class RenameWidget_PrependParentFolderName : public AdvanceRenamer {
   Q_OBJECT
  public:
-  explicit RenameWidget_PrependParentFolderName(QWidget* parent = nullptr);
+  using AdvanceRenamer::AdvanceRenamer;
   void initExclusiveSetting() override;
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;

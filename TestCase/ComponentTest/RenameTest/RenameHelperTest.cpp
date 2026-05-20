@@ -7,8 +7,17 @@ using namespace RenameHelper;
 class RenameHelperTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  RenameHelperTest() : PlainTestSuite{} {}
+  using PlainTestSuite::PlainTestSuite;
 private slots:
+  void SpecialDigitReplace2Char_ok() {
+    QStringList replaceeList{"l0ve",
+                             "ne1ghbor",
+                             "h4rd w0rk"};
+    QStringList expectList{"love", "neighbor", "hard work"};
+    QStringList ansLst = SpecialDigitReplace2Char(replaceeList);
+    QCOMPARE(ansLst, expectList);
+  }
+
   void test_ReplaceRename_invalid_regex_failed() {
     QStringList replaceeList;
     replaceeList << "AAAAAAA"
@@ -280,4 +289,4 @@ private slots:
 };
 
 #include "RenameHelperTest.moc"
-REGISTER_TEST(RenameHelperTest, false)
+REGISTER_TEST(RenameHelperTest, true)
