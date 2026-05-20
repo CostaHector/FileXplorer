@@ -12,7 +12,7 @@ namespace JsonKey {
 
 #define JSON_FILE_KEY_MAPPING                                                                                                                                                                       \
   JSON_KEY_ITEM(Name, 1, QString{}, QString{}, /*              */ GeneralDataType::Type::PLAIN_STR, /*      */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \
-  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /* */ GeneralDataType::Type::PLAIN_STR, /*      */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst, DataFormatter::writeJsonObjectSortedStrLst) \
+  JSON_KEY_ITEM(Cast, 2, QStringList{}, SortedUniqStrLst{}, /* */ GeneralDataType::Type::COMMA_SEPERATED_STR_LIST, /*      */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initCastSortedLst, DataFormatter::writeJsonObjectSortedStrLst) \
   JSON_KEY_ITEM(Studio, 3, QString{}, QString{}, /*            */ GeneralDataType::Type::PLAIN_STR, /*      */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initStudioQString, DataFormatter::writeJsonObjectQString) \
   JSON_KEY_ITEM(Tags, 4, QStringList{}, SortedUniqStrLst{}, /* */ GeneralDataType::Type::PLAIN_STR, /*      */ DataFormatter::formatSortedLst, DataFormatter::writeSortedLst, DataFormatter::initSortedLst, DataFormatter::writeJsonObjectSortedStrLst) \
   JSON_KEY_ITEM(Uploaded, 5, QString{}, QString{}, /*          */ GeneralDataType::Type::PLAIN_STR, /*      */ DataFormatter::formatDefault, DataFormatter::writeQString, DataFormatter::initQString, DataFormatter::writeJsonObjectQString) \

@@ -25,8 +25,6 @@ class SceneStyleDelegate : public QStyledItemDelegate {
   static void drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating);
 
   RatingStateMachine mRateMachine;
-  static constexpr QColor GRAY_AND_HALF_TRANS{0, 0, 0, 150};
-  static constexpr QColor YELLOW_COLOR{255, 200, 0, 220};
 };
 
 #endif  // SCENESTYLEDELEGATE_H
