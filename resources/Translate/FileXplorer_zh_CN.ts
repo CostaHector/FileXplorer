@@ -1815,6 +1815,11 @@
         <translation>附带父文件夹名称</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>Digit 2 Alpha</source>
+        <translation>数值字符替换</translation>
+    </message>
+    <message>
         <location line="+3"/>
         <source>Uppercase</source>
         <translation>纯大写</translation>
@@ -2227,7 +2232,7 @@
 <context>
     <name>ThumbnailActions</name>
     <message>
-        <location filename="../../Actions/ThumbnailActions.cpp" line="+28"/>
+        <location filename="../../Actions/ThumbnailActions.cpp" line="+29"/>
         <source>Create thumbnail</source>
         <translation>创建缩略图</translation>
     </message>
