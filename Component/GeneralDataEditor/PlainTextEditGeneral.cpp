@@ -24,5 +24,5 @@ int PlainTextEditGeneral::linesCount(int generalDataType, const QVariant &displa
   if (!GeneralDataType::isPlainTextEditNeededInEditor(typeE)) {
     return -1;
   }
-  return displayRoleData.toString().count('\n') + 1;
+  return displayRoleData.isNull() ? 0 : displayRoleData.toString().count('\n') + 1;
 }
