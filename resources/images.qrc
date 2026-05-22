@@ -149,7 +149,7 @@
         <file alias="FOLDER_OF_PICTURES">LeftSideToolBarIcons/FOLDER_OF_PICTURES.ico</file>
         <file alias="FOLDER_OF_VIDEOS">LeftSideToolBarIcons/FOLDER_OF_VIDEOS.ico</file>
         <file alias="FOLDER_OF_DRIVES">LeftSideToolBarIcons/FOLDER_OF_DRIVES.ico</file>
-        <file alias="FOLDER_OF_FAVORITE">LeftSideToolBarIcons/FOLDER_OF_FAVORITE.ico</file>
+        <file alias="ROAMING_DATA">LeftSideToolBarIcons/ROAMING_DATA.svg</file>
         <file alias="PIN">LeftSideToolBarIcons/PIN.svg</file>
         <file alias="UNPIN">LeftSideToolBarIcons/UNPIN.svg</file>
         <file alias="EXPAND_SIDEBAR">LeftSideToolBarIcons/EXPAND_SIDEBAR.svg</file>

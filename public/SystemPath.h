@@ -48,11 +48,35 @@ inline const QString& PRODUCTION_STUDIOS_DATABASE() {
   return path;
 }
 
-const QString& GetVendorsTableFilePath();
-const QString& GetMononymVendorsListFilePath();
-const QString& GetActorsListFilePath();
-const QString& GetMononymActorsListFilePath();
-const QString& GetActorsAliasListFilePath();
+inline const QString& GetLogFileAbsPath() {
+  static QString logFilePath = SystemPath::LocalPath() + "/logs_info.log";
+  return logFilePath;
+}
+
+inline const QString& GetVendorsTableFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/VENDORS.txt";
+  return path;
+}
+
+inline const QString& GetMononymVendorsListFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/MONONYM_VENDORS.txt";
+  return path;
+}
+
+inline const QString& GetActorsListFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/ACTORS_LIST.txt";
+  return path;
+}
+
+inline const QString& GetMononymActorsListFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/MONONYM_ACTORS_LIST.txt";
+  return path;
+}
+
+inline const QString& GetActorsAliasListFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/ACTORS_ALIAS_LIST.txt";
+  return path;
+}
 
 QString GetPathByApplicationDirPath(const QString& relativePath);
 const QString& TORRENT_EDITOR_PROG_PATH();

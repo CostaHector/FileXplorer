@@ -68,31 +68,6 @@ const QString& CastStudioListPath() {
   return path;
 }
 
-const QString& GetVendorsTableFilePath() {
-  static const QString path = SystemPath::CastStudioListPath() + "/VENDORS.txt";
-  return path;
-}
-
-const QString& GetMononymVendorsListFilePath() {
-  static const QString path = SystemPath::CastStudioListPath() + "/MONONYM_VENDORS.txt";
-  return path;
-}
-
-const QString& GetActorsListFilePath() {
-  static const QString path = SystemPath::CastStudioListPath() + "/ACTORS_LIST.txt";
-  return path;
-}
-
-const QString& GetMononymActorsListFilePath() {
-  static const QString path = SystemPath::CastStudioListPath() + "/MONONYM_ACTORS_LIST.txt";
-  return path;
-}
-
-const QString& GetActorsAliasListFilePath() {
-  static const QString path = SystemPath::CastStudioListPath() + "/ACTORS_ALIAS_LIST.txt";
-  return path;
-}
-
 QString GetPathByApplicationDirPath(const QString& relativePath) {
   static const QDir appDir{QCoreApplication::applicationDirPath()};
   // QFileInfo{"."}.absoluteFilePath() may be same as appDir.

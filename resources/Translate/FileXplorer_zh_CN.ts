@@ -859,7 +859,7 @@
 <context>
     <name>FileToolTest</name>
     <message>
-        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+148"/>
+        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+126"/>
         <location line="+18"/>
         <location line="+7"/>
         <source>Apply</source>
@@ -1201,7 +1201,7 @@
 <context>
     <name>LogActions</name>
     <message>
-        <location filename="../../Actions/LogActions.cpp" line="+10"/>
+        <location filename="../../Actions/LogActions.cpp" line="+11"/>
         <source>Open logs file</source>
         <translation>打开日志文件</translation>
     </message>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Favorites</source>
-        <translation>收藏</translation>
+        <source>RoamingData</source>
+        <translation>漫游数据</translation>
     </message>
 </context>
 <context>
@@ -1967,7 +1967,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+65"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>

@@ -14,12 +14,6 @@
 std::unique_ptr<FILE, decltype(Logger::CloseLogFile)*> Logger::mLogFILEStreamUniquePtr{nullptr, CloseLogFile};
 LOG_LVL_E Logger::m_autoFflushLevel = LOG_LVL_E::W;
 LOG_LVL_E Logger::m_printLevel = LOG_LVL_E::D;
-constexpr char Logger::CONSTANT_LOG_FILE_NAME[];
-
-const QString& Logger::GetLogFileAbsPath() {
-  static QString logFilePath = SystemPath::LocalPath() + "/" + CONSTANT_LOG_FILE_NAME;
-  return logFilePath;
-}
 
 FILE* Logger::SwitchLogToALocalFile(const QString& logFileAbsPath) {
   QByteArray logOutputToPath = logFileAbsPath.toLocal8Bit();
@@ -42,13 +36,13 @@ FILE* Logger::GetFILEStream() {
 #ifdef QT_DEBUG // in debug mode, output to std flow
   return stdout;
 #else // otherwise, output to append to local file
-  return SwitchLogToALocalFile(GetLogFileAbsPath());
+  return SwitchLogToALocalFile(SystemPath::GetLogFileAbsPath());
 #endif
 }
 
 bool Logger::CloseLogFile(FILE* pFile) {
   if (pFile == nullptr || pFile == stdout || pFile == stderr) return false;
-  LOG_I("Local log file[%s] opened before closing now...", qPrintable(GetLogFileAbsPath()));
+  LOG_I("Local log file[%s] opened before closing now...", qPrintable(SystemPath::GetLogFileAbsPath()));
   fflush(pFile);
   fclose(pFile);
   return true;
@@ -104,7 +98,7 @@ bool Logger::AgingLogFiles(const QString& logFileAbsPath, const int AGING_FILE_A
 
 bool Logger::OpenLogFile() {
   fflush(Logger::out());
-  const QString& logAbsPath = GetLogFileAbsPath();
+  const QString& logAbsPath = SystemPath::GetLogFileAbsPath();
   if (!QFile::exists(logAbsPath)) {
     LOG_W("log file[%s] not exist", qPrintable(logAbsPath));
     return false;
@@ -113,7 +107,7 @@ bool Logger::OpenLogFile() {
 }
 
 bool Logger::OpenLogFolder() {
-  const QString& logAbsPath = GetLogFileAbsPath();
+  const QString& logAbsPath = SystemPath::GetLogFileAbsPath();
   const QString logsFolderPath = QFileInfo{logAbsPath}.absolutePath();
   if (!QFile::exists(logsFolderPath)) {
     LOG_W("log file located in folder[%s] not exist", qPrintable(logsFolderPath));

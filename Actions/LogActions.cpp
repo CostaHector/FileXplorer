@@ -4,6 +4,7 @@
 #include "MenuToolButton.h"
 #include "PublicMacro.h"
 #include "Logger.h"
+#include "SystemPath.h"
 #include <QHash>
 
 LogActions::LogActions(QObject* parent) : QObject{parent} {
@@ -77,7 +78,7 @@ LogActions::LogActions(QObject* parent) : QObject{parent} {
 
   connect(_LOG_FILE, &QAction::triggered, &Logger::OpenLogFile);
   connect(_LOG_FOLDER, &QAction::triggered, &Logger::OpenLogFolder);
-  connect(_LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(Logger::GetLogFileAbsPath()); });
+  connect(_LOG_ROTATION, &QAction::triggered, []() { Logger::AgingLogFiles(SystemPath::GetLogFileAbsPath()); });
   connect(_LOG_PRINT_LEVEL_AG, &QActionGroup::triggered, this, [](QAction* pAct) {
     auto it = LOG_PRINT_LVL_ACTION_2_ENUM.find(pAct);
     if (it != LOG_PRINT_LVL_ACTION_2_ENUM.cend()) {
