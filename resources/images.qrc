@@ -26,7 +26,7 @@
         <file alias="LOG_LEVEL_PARTIAL_FAILED">Log/LOG_LEVEL_PARTIAL_FAILED.svg</file>
 
         <!--Media icon here-->
-        <file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.png</file>
+        <file alias="DUPLICATE_IMAGES_FINDER">Media/DUPLICATE_IMAGES_FINDER.svg</file>
         <file alias="DUPLICATE_IMAGES_BY_BENCHMARK_DICTIONARY">Media/DUPLICATE_IMAGES_BY_BENCHMARK_DICTIONARY.svg</file>
         <file alias="DUPLICATE_IMAGES_BY_MD5">Media/DUPLICATE_IMAGES_BY_MD5.svg</file>
         <file alias="LOW_RESOLUTION_IMGS_RMV">Media/LOW_RESOLUTION_IMGS_RMV.svg</file>
@@ -58,6 +58,8 @@
         <file alias="INCREASING_RATING">Media/INCREASING_RATING.svg</file>
         <file alias="DECREASING_RATING">Media/DECREASING_RATING.svg</file>
         <file alias="SKIP_IF_EXIST">Media/SKIP_IF_EXIST.svg</file>
+        <file alias="CREATE_MULTI_PAR">Media/CREATE_MULTI_PAR.svg</file>
+        <file alias="VERIFY_INTEGRITY">Media/VERIFY_INTEGRITY.svg</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>

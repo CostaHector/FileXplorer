@@ -23,6 +23,7 @@ public:
 private:
   void subsribeCompress();
   void subscribeThumbnailActions();
+  void subscribeMultiPar();
 
   void on_Rename(AdvanceRenamer& renameWid);
 
@@ -41,6 +42,9 @@ private:
   bool on_RenameThumbnailImages(bool skipIfExist);
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
   bool on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist);
+
+  bool on_createFilePar2();
+  bool on_verifyFileByPar2();
 
   bool onRateMovie(int newRate) const;
   bool onRateMoviesRecursively(bool bOverrideForce) const;

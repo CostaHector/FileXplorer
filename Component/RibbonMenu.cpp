@@ -15,6 +15,7 @@
 #include "SyncFileSystemModificationActions.h"
 #include "ViewActions.h"
 #include "ThumbnailActions.h"
+#include "MultiPar2Actions.h"
 #include "LogActions.h"
 #include "RateActions.h"
 #include "RibbonCastDB.h"
@@ -398,6 +399,8 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   }
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
+  archiveVidsTB->addSeparator();
+  archiveVidsTB->addWidget(MultiPar2Actions::GetInst().GetToolBar(archiveVidsTB));
   return archiveVidsTB;
 }
 

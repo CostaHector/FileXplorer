@@ -80,6 +80,8 @@ inline const QString& GetActorsAliasListFilePath() {
 
 QString GetPathByApplicationDirPath(const QString& relativePath);
 const QString& TORRENT_EDITOR_PROG_PATH();
+
+QString MULTI_PAR_PROG_PATH();
 } // namespace SystemPath
 
 #endif // SYSTEMPATH_H

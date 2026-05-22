@@ -1462,6 +1462,19 @@
     </message>
 </context>
 <context>
+    <name>MultiPar2Actions</name>
+    <message>
+        <location filename="../../Actions/MultiPar2Actions.cpp" line="+14"/>
+        <source>Create Par2</source>
+        <translation>创建Par2冗余</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Verify Integrity</source>
+        <translation>校验完整性</translation>
+    </message>
+</context>
+<context>
     <name>NavigationAndAddressBar</name>
     <message>
         <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+59"/>
@@ -1975,7 +1988,7 @@
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../../Component/RibbonMenu.cpp" line="+44"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+45"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>

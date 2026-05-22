@@ -40,6 +40,9 @@
 #include "ViewTypeTool.h"
 #include "VideoStoryboard.h"
 
+#include "MultiPar2Actions.h"
+#include "MultiParTools.h"
+
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
@@ -217,7 +220,7 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
   const QStringList mixedFiles = FsmSelectedItems();
   QStringList videoFiles;
   videoFiles.reserve(mixedFiles.size());
-  for (const QString& filePath: mixedFiles) {
+  for (const QString& filePath : mixedFiles) {
     if (!TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(filePath))) {
       continue;
     }
@@ -232,6 +235,28 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
   return true;
 }
 
+bool FileXplorerEvent::on_createFilePar2() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  bool bSucceed{false}, crtCnt{0};
+  std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2(mixedFiles);
+  LOG_OE_P(bSucceed, "Create par2", "%d par2 file for %d selection(s) ok", crtCnt, mixedFiles.size());
+  return bSucceed;
+}
+
+bool FileXplorerEvent::on_verifyFileByPar2() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  bool bSucceed{false};
+  int needRecoverCnt{0};
+  std::tie(bSucceed, needRecoverCnt) = MultiParTools::VerifyPar2(mixedFiles);
+  LOG_OE_P(bSucceed, "Need Recover", "%d in %d selection(s) need recover", needRecoverCnt, mixedFiles.size());
+  return bSucceed;
+}
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
@@ -378,9 +403,16 @@ void FileXplorerEvent::subscribeThumbnailActions() {
   });
 }
 
+void FileXplorerEvent::subscribeMultiPar() {
+  MultiPar2Actions& inst = MultiPar2Actions::GetInst();
+  connect(inst._CREATE_PAR2_FILES, &QAction::triggered, this, &FileXplorerEvent::on_createFilePar2);
+  connect(inst._VERIFY_IF_NEED_RECOVERY, &QAction::triggered, this, &FileXplorerEvent::on_verifyFileByPar2);
+}
+
 void FileXplorerEvent::subscribe() {
   subsribeCompress();
   subscribeThumbnailActions();
+  subscribeMultiPar();
 
   {
     auto& fileOpInst = FileOpActs::GetInst();
