@@ -1,49 +1,8 @@
 ﻿#include "PathTool.h"
-#include "Logger.h"
-#include <QCoreApplication>
 #include <QDir>
-#include <QDirIterator>
-#include <QFileInfo>
 #include <QSet>
 
 namespace PathTool{
-
-namespace FILE_REL_PATH {
-const QString& GetVendorsTableFilePath() {
-  static const QString path = QDir::homePath() + "/" PROJECT_NAME "/CastStudioList/VENDORS.txt";
-  return path;
-}
-
-const QString& GetMononymVendorsListFilePath() {
-  static const QString path = QDir::homePath() + "/" PROJECT_NAME "/CastStudioList/MONONYM_VENDORS.txt";
-  return path;
-}
-
-const QString& GetActorsListFilePath() {
-  static const QString path = QDir::homePath() + "/" PROJECT_NAME "/CastStudioList/ACTORS_LIST.txt";
-  return path;
-}
-
-const QString& GetMononymActorsListFilePath() {
-  static const QString path = QDir::homePath() + "/" PROJECT_NAME "/CastStudioList/MONONYM_ACTORS_LIST.txt";
-  return path;
-}
-
-const QString& GetActorsAliasListFilePath() {
-  static const QString path = QDir::homePath() + "/" PROJECT_NAME "/CastStudioList/ACTORS_ALIAS_LIST.txt";
-  return path;
-}
-}
-
-
-QString GetPathByApplicationDirPath(const QString& relativePath) {
-  static const QDir appDir{QCoreApplication::applicationDirPath()};
-  // QFileInfo{"."}.absoluteFilePath() may be same as appDir.
-  // "." can be modified by QDir::setCurrent("newpwd"),
-  // while appDir is not influenced by setCurrent. it reamins exe file path.
-  return QDir::cleanPath(appDir.absoluteFilePath(relativePath));
-}
-
 QString linkPath(const QString& localPath) {
 #ifdef _WIN32
   return "file:///" + localPath;  // file:///C:/to/path

@@ -2,6 +2,7 @@
 #include "FileXplorer.h"
 #include "ExtraEvents.h"
 #include "FileTool.h"
+#include "SystemPath.h"
 #include "PreferenceActions.h"
 #include "MemoryKey.h"
 #include "BehaviorKey.h"
@@ -14,7 +15,7 @@
 #ifdef RUN_MAIN_FILE
 
 int main(int argc, char* argv[]) {
-  if (!CreateUserPath()) {
+  if (!SystemPath::initDirectory()) {
     return -1;
   }
   if (argc > 1) {

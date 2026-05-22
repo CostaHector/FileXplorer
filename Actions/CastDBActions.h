@@ -9,6 +9,8 @@
 class CastDBActions : public QObject {
   Q_OBJECT
  public:
+  static CastDBActions& GetInst();
+
   explicit CastDBActions(QObject* parent = nullptr);
 
   QAction* _MODEL_SUBMIT_ALL{nullptr};
@@ -28,19 +30,14 @@ class CastDBActions : public QObject {
 
   QAction* SYNC_SELECTED_RECORDS_IMGS_FROM_DISK{nullptr};
   QAction* SYNC_ALL_RECORDS_IMGS_FROM_DISK{nullptr};
-  QActionGroup* _SYNC_IMGS_OP{nullptr};
 
   QAction* SYNC_SELECTED_RECORDS_VIDS_FROM_DB{nullptr};
   QAction* SYNC_ALL_RECORDS_VIDS_FROM_DB{nullptr};
-  QActionGroup* _SYNC_VIDS_OP{nullptr};
-
-  QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
 
   QAction* DUMP_SELECTED_RECORDS_INTO_PSON_FILE{nullptr};
   QAction* DUMP_ALL_RECORDS_INTO_PSON_FILE{nullptr};
-  QActionGroup* EXPORT_OP{nullptr};
-};
 
-CastDBActions& g_castAct();
+  QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
+};
 
 #endif  // CASTDBACTIONS_H

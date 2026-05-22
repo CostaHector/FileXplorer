@@ -9,6 +9,7 @@
 
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "SystemPath.h"
 
 #include <QLineEdit>
 #include <QColorDialog>
@@ -81,7 +82,7 @@ private slots:
     QList<QAction *> acts = fileLineEdit->actions();
     QCOMPARE(acts.size(), 1);
 
-    const QString parmOpenedPath{SystemPath::HOME_PATH() + "/Pictures"};
+    const QString parmOpenedPath{SystemPath::HomePath() + "/Pictures"};
     QString *expectSelectedFilter{nullptr};
     const QFileDialog::Options parmOptions{QFileDialog::Option::DontUseNativeDialog};
     QString backSlashPath = QString{__FILE__}.replace('/', '\\');
@@ -112,7 +113,7 @@ private slots:
     QList<QAction *> acts = folderLineEdit->actions();
     QCOMPARE(acts.size(), 1);
 
-    const QString parmOpenedPath{SystemPath::HOME_PATH()};
+    const QString parmOpenedPath{SystemPath::HomePath()};
     const QFileDialog::Options parmOptions{QFileDialog::Option::DontUseNativeDialog | QFileDialog::Option::ShowDirsOnly};
     QString selectedFolder{QFileInfo{__FILE__}.absolutePath()};
     QString backSlashPath = selectedFolder.replace('/', '\\');

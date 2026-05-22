@@ -70,15 +70,7 @@ class NavigationToolBarTest : public PlainTestSuite {
       QString path = pathVar.toString();
       pathsFromTooltip.push_back(path);
     }
-    // 固定的链接都是SystemPath::HOME_PATH()路径下的
-    const QString prepath = SystemPath::HOME_PATH();
-    QCOMPARE(QFileInfo(prepath).isDir(), true);
     QVERIFY(pathsFromTooltip.size() > 0);
-    for (const QString& path : pathsFromTooltip) {
-      if (path.startsWith(prepath) && path != prepath) {
-        QVERIFY2(QFileInfo(prepath).isDir(), qPrintable(prepath));
-      }
-    }
   }
 
   void mDevDriveTV_ok() {

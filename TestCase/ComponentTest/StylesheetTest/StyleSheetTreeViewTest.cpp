@@ -11,8 +11,8 @@
 #include "StyleSheetGetter.h"
 #include "Configuration.h"
 #include "InputDialogHelper.h"
-#include "PublicVariable.h"
 #include "PathTool.h"
+#include "SystemPath.h"
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QColorDialog>
@@ -216,7 +216,7 @@ private slots:
     auto r3 = r->appendRow(StyleTreeNode::create(StyleItemData{"3FontStyleComboBoxEnum", QFont::Style::StyleItalic, QFont::Style::StyleNormal, GeneralDataType::Type::FONT_STYLE}));
     auto r4 = r->appendRow(StyleTreeNode::create(StyleItemData{"4FontForegroundColorLineEditAndAction", "#FF0000", "#FF00FF", GeneralDataType::Type::COLOR}));
     auto r5 = r->appendRow(StyleTreeNode::create(StyleItemData{"5BackgroundImageFileLineEditAndAction", ":DefImg0", ":CurImg0", GeneralDataType::Type::IMAGE_PATH_OPTIONAL}));
-    auto r6 = r->appendRow(StyleTreeNode::create(StyleItemData{"6FolderLineEditAndAction", SystemPath::HOME_PATH(), SystemPath::HOME_PATH(), GeneralDataType::Type::FOLDER_PATH}));
+    auto r6 = r->appendRow(StyleTreeNode::create(StyleItemData{"6FolderLineEditAndAction", SystemPath::HomePath(), SystemPath::HomePath(), GeneralDataType::Type::FOLDER_PATH}));
     auto r7 = r->appendRow(StyleTreeNode::create(StyleItemData{"7PlainTextEdit", "line0\nline1", "line0\nline1", GeneralDataType::Type::MULTI_LINE_STR}));
     auto r8 = r->appendRow(StyleTreeNode::create(StyleItemData{"8Group"}));
 

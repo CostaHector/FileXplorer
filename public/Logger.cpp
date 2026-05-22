@@ -3,8 +3,8 @@
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
+#include "SystemPath.h"
 #include "FileTool.h"
-#include "PublicVariable.h"
 
 #include <QFileInfo>
 #include <QFile>
@@ -17,7 +17,7 @@ LOG_LVL_E Logger::m_printLevel = LOG_LVL_E::D;
 constexpr char Logger::CONSTANT_LOG_FILE_NAME[];
 
 const QString& Logger::GetLogFileAbsPath() {
-  static QString logFilePath = QDir::homePath() + "/" + PROJECT_NAME + "/" + CONSTANT_LOG_FILE_NAME;
+  static QString logFilePath = SystemPath::LocalPath() + "/" + CONSTANT_LOG_FILE_NAME;
   return logFilePath;
 }
 

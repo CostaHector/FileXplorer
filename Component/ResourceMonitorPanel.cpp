@@ -1,7 +1,7 @@
 #include "ResourceMonitorPanel.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "ResourceMonitor.h"
 #include "FileLeafAction.h"
 #include "StyleSheet.h"
@@ -14,7 +14,8 @@ QByteArray UsageReport::toByteArray() const {
   return content;
 }
 
-ResourceMonitorPanel::ResourceMonitorPanel(QWidget* parent) : QWidget{parent} {
+ResourceMonitorPanel::ResourceMonitorPanel(QWidget* parent)
+  : QWidget{parent} {
   {
     mInterval = new (std::nothrow) QSlider{Qt::Orientation::Horizontal, this};
     mInterval->setMinimum(0);
@@ -119,6 +120,14 @@ void ResourceMonitorPanel::Subscribe() {
   connect(mCpuSwitch, &QCheckBox::toggled, mCpuChartView, &QChartView::setVisible);
   connect(mMemorySwitch, &QCheckBox::toggled, mMemoryChartView, &QChartView::setVisible);
   connect(mExportBtn, &QPushButton::clicked, this, &ResourceMonitorPanel::onExportUsageToLocalFile);
+  connect(cpuSeries, &QLineSeries::hovered, this, [this](const QPointF& point, bool bShow) {
+    QString tooltip = QString::asprintf("Time: %d s\nCpu: %.2f %%", (int) point.x(), point.y());
+    QToolTip::showText(QCursor::pos(), tooltip, mCpuChartView);
+  });
+  connect(memorySeries, &QLineSeries::hovered, this, [this](const QPointF& point, bool bShow) {
+    QString tooltip = QString::asprintf("Time: %d s\nMemory: %d kB", (int) point.x(), (int) point.y());
+    QToolTip::showText(QCursor::pos(), tooltip, mMemoryChartView);
+  });
 }
 
 void ResourceMonitorPanel::InitReportFileName() {
@@ -184,7 +193,7 @@ void ResourceMonitorPanel::onTimeout() {
     if (m_lastCpuTime != 0) { // m_lastCpuTime should not be empty
       quint64 cpuDelta = currentCpuTime - m_lastCpuTime;
       static const int numCores = ResourceMonitor::GetNumbersCore();
-      static const quint64 maxCpuTime = GetInterval() * numCores;  // max cpu available time in ms
+      static const quint64 maxCpuTime = GetInterval() * numCores; // max cpu available time in ms
       if (maxCpuTime > 0) {
         cpuUsageRate = (static_cast<float>(cpuDelta) / maxCpuTime) * 100;
       }
@@ -207,7 +216,7 @@ void ResourceMonitorPanel::onTimeout() {
 
 bool ResourceMonitorPanel::onExportUsageToLocalFile() {
   FillReportFileEndTime();
-  QString cpuMemoryCsvFile = SystemPath::HOME_PATH();
+  QString cpuMemoryCsvFile = SystemPath::HomePath();
   cpuMemoryCsvFile += "/Downloads/";
   cpuMemoryCsvFile += mExportCSVName;
   QFileDialog::saveFileContent(mUsageReports, cpuMemoryCsvFile);

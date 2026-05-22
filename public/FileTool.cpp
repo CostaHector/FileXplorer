@@ -1,5 +1,5 @@
 ﻿#include "FileTool.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "PathTool.h"
 #include "ImageTool.h"
 #include "PathKey.h"
@@ -239,9 +239,9 @@ bool OpenLocalTorrentFile(const QString& localFilePath) {
   // set debug path as follows:
   // C:\home\aria\code\torrent-file-editor\build\Debug
   // the program name will be like torrent-file-editor.exe for windows or torrent-file-editor for linux.
-  static const QString torrentEditorPath {PathTool::GetPathByApplicationDirPath(PathTool::FILE_REL_PATH::TORRENT_EDITOR_PROG_PATH)};
+  static const QString torrentEditorPath{SystemPath::TORRENT_EDITOR_PROG_PATH()};
   // Otherwise download torrent-file-editor-1.0.0-x64.exe and place it in userpath directly
-  // static const QString torrentEditorPath{SystemPath::HOME_PATH() + "/torrent-file-editor-1.0.0-x64.exe"};
+  // static const QString torrentEditorPath{SystemPath::HomePath() + "/torrent-file-editor-1.0.0-x64.exe"};
   if (!QFile::exists(torrentEditorPath)) {
     LOG_D("torrent editor[%s] not exist", qPrintable(torrentEditorPath));
     return false;
@@ -301,18 +301,5 @@ bool LoadCNLanguagePack(QTranslator& translator, QString qmName) {
   }
   LOG_D("Load language[%s] pack succeed", qPrintable(qmName));
   QCoreApplication::installTranslator(&translator);
-  return true;
-}
-
-bool CreateUserPath() {
-  if (QFile::exists(SystemPath::WORK_PATH())) {
-    return true;
-  }
-  if (!QDir{}.mkpath(SystemPath::WORK_PATH())) {
-    LOG_C("Create path[%s] failed. Database file of CastView and MovieView cannot located in this path",
-          qPrintable(SystemPath::WORK_PATH()));
-    return false;
-  }
-  QDir{}.mkpath(SystemPath::WORK_PATH() + "/CastStudioList");
   return true;
 }

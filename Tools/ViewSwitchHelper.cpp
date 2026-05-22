@@ -3,6 +3,7 @@
 #include "NavigationToolBar.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"
+#include "SystemPath.h"
 #include "ViewTypeTool.h"
 using namespace ViewTypeTool;
 

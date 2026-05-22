@@ -1,7 +1,12 @@
 #include "PlainTestSuite.h"
+#include "SystemPath.h"
 #include <QtTest/QtTest>
 
 int main(int argc, char* argv[]) {
+  if (!SystemPath::initDirectory()) {
+    return -1;
+  }
+
   QApplication app(argc, argv);
 
   QVector<TestCaseHelper>& sharedSuite = PlainTestSuite::sharedSuite();

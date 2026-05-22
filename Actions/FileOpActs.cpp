@@ -388,7 +388,6 @@ QToolBar* FileOpActs::GetFolderOperationModeTb(QWidget* parent) {
   folderOperationModeTB->addActions(CUT_COPY_PASTE->actions());
   folderOperationModeTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   folderOperationModeTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  folderOperationModeTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(folderOperationModeTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return folderOperationModeTB;
 }
@@ -400,7 +399,6 @@ QToolBar* FileOpActs::GetCutCopyPasteTb(QWidget* parent) {
   cutCopyPaste->addActions(mFileStructureIntAction.getActionEnumAscendingList());
   cutCopyPaste->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   cutCopyPaste->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  cutCopyPaste->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(cutCopyPaste->layout(), Qt::AlignmentFlag::AlignLeft);
   return cutCopyPaste;
 }

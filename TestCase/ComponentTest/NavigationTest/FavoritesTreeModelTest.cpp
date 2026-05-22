@@ -6,7 +6,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include "Configuration.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 
 #include <QMimeData>
 
@@ -38,7 +38,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(model.filePath({}), "");
       QCOMPARE(model.filePath(model.index(0, 0, {})), "");
       QCOMPARE(model.filePath(model.index(1, 0, {})), "");
-      QCOMPARE(model.filePath(model.index(2, 0, {})), SystemPath::HOME_PATH() + "/code");
+      QCOMPARE(model.filePath(model.index(2, 0, {})), SystemPath::HomePath() + "/code");
 
       QVERIFY(model.addPath("random name", "path/to/random name", nullptr) != nullptr);
       QCOMPARE(model.rowCount({}), 4);  // count(root)=3+1
@@ -619,8 +619,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
 
     QList<QUrl> urls;
     urls.push_back(QUrl());  // non
-    urls.push_back(QUrl::fromLocalFile(SystemPath::HOME_PATH()));
-    urls.push_back(QUrl::fromLocalFile(SystemPath::STARRED_PATH()));
+    urls.push_back(QUrl::fromLocalFile(SystemPath::HomePath()));
+    urls.push_back(QUrl::fromLocalFile(SystemPath::LocalPath()));
     urls.push_back(QUrl::fromLocalFile(urlPath));  // file
     QMimeData mimeData;
     mimeData.setUrls(urls);
@@ -629,8 +629,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QVERIFY(model.canDropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
     QVERIFY(model.dropMimeData(&mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
 
-    QCOMPARE(model.index(0, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::HOME_PATH());
-    QCOMPARE(model.index(1, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::STARRED_PATH());
+    QCOMPARE(model.index(0, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::HomePath());
+    QCOMPARE(model.index(1, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), SystemPath::LocalPath());
     QCOMPARE(model.index(2, 0, rootIndex).data(FavoriteItemData::Role::FULL_PATH_ROLE).toString(), expectParentPath);
 
     QCOMPARE(model.rowCount(), 3);

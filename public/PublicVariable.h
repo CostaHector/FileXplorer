@@ -9,58 +9,6 @@ typedef std::function<bool(QString, bool)> T_IntoNewPath;
 typedef std::function<bool(QString)> T_on_searchTextChanged;
 typedef std::function<bool(QString)> T_on_searchEnterKey;
 
-namespace SystemPath {
-const QString& HOME_PATH();
-
-inline const QString& WORK_PATH() {
-  static const QString path = HOME_PATH() + "/" + PROJECT_NAME;
-  return path;
-}
-
-inline const QString& STARRED_PATH() {
-  static const QString path = HOME_PATH() + "/Documents";
-  return path;
-}
-
-inline const QString& VIDS_DATABASE() {
-  static const QString path = WORK_PATH() + "/VIDS_DATABASE.db";
-  return path;
-}
-
-inline QString MovieDBConnection() {
-  return "DBMOVIE_CONNECT";
-}
-
-inline const QString& AI_MEDIA_DUP_DATABASE() {
-  static const QString path = WORK_PATH() + "/DUPLICATES_DB.db";
-  return path;
-}
-
-inline const QString& RECYCLE_BIN_DATABASE() {
-  static const QString path = WORK_PATH() + "/RECYCLE_BIN_DATABASE.db";
-  return path;
-}
-
-inline const QString& PEFORMERS_DATABASE() {
-  static const QString path = WORK_PATH() + "/PERFORMERS_DATABASE.db";
-  return path;
-}
-
-inline QString CastDBConnection() {
-  return "CAST_CONNECTION";
-}
-
-inline const QString& TORRENTS_DATABASE() {
-  static const QString path = WORK_PATH() + "/TORRENTS_DATABASE.db";
-  return path;
-}
-
-inline const QString& PRODUCTION_STUDIOS_DATABASE() {
-  static const QString path = WORK_PATH() + "/PRODUCTION_STUDIOS_DATABASE.db";
-  return path;
-}
-}
-
 namespace DB_TABLE {
 const QString MOVIES = "MOVIES";
 const QString PERFORMERS = "PERFORMERS";

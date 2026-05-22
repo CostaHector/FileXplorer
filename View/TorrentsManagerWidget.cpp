@@ -1,5 +1,6 @@
 #include "TorrentsManagerWidget.h"
 #include "PublicVariable.h"
+#include "SystemPath.h"
 #include "PathKey.h"
 #include "SizeTool.h"
 #include "Configuration.h"

@@ -29,7 +29,6 @@ QToolBar* ArchiveFilesActions::GetArchiveTooBar(QWidget* parent) {
   compressToolBar->setOrientation(Qt::Orientation::Vertical);
   compressToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   compressToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  compressToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   return compressToolBar;
 }
 

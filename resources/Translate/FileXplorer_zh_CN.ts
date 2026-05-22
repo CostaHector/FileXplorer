@@ -167,7 +167,7 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../../Actions/CastDBActions.cpp" line="+11"/>
+        <location filename="../../Actions/CastDBActions.cpp" line="+16"/>
         <source>Submit All</source>
         <translation>提交全部</translation>
     </message>
@@ -224,20 +224,20 @@
     <message>
         <location line="+6"/>
         <source>Sync all imgs field</source>
-        <translation>更新imgs字段(所有行)</translation>
+        <translation>更新所有imgs字段</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Sync vids field</source>
         <translation>更新vids字段</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Sync all vids field</source>
-        <translation>更新vids字段(所有行)</translation>
+        <translation>更新所有vids字段</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Open Database</source>
         <translation>用本地应用打开数据库</translation>
     </message>
@@ -249,7 +249,7 @@
     <message>
         <location line="+6"/>
         <source>Dump all records</source>
-        <translation>写入变更到pson(所有行)</translation>
+        <translation>写入所有变更到pson</translation>
     </message>
 </context>
 <context>
@@ -476,7 +476,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+275"/>
+        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+276"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -816,7 +816,7 @@
 <context>
     <name>FileRenameRulerActions</name>
     <message>
-        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+14"/>
+        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+15"/>
         <source>Name Ruler</source>
         <translation>名称标准化</translation>
     </message>
@@ -959,7 +959,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+26"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+27"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -1477,7 +1477,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+21"/>
+        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+22"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -2300,7 +2300,7 @@
 <context>
     <name>TorrDBAction</name>
     <message>
-        <location filename="../../Actions/TorrDBAction.cpp" line="+7"/>
+        <location filename="../../Actions/TorrDBAction.cpp" line="+8"/>
         <source>&amp;Open with Sys App</source>
         <translation>用系统应用打开(&amp;O)</translation>
     </message>

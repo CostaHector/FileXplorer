@@ -6,7 +6,7 @@
 #include "VideoPlayerActions.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "VideoPlayerKey.h"
 #include "PathKey.h"
 #include "Configuration.h"
@@ -299,7 +299,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
   void selectAFile_ok() {
     setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, "invalid path");
-    const QString openPath{SystemPath::HOME_PATH()};
+    const QString openPath{SystemPath::HomePath()};
 
     InteractiveVideoWidget videoWid;
     QSignalSpy selectAFileSpy{&videoWid, &InteractiveVideoWidget::newFileSelectedByUser};
@@ -326,7 +326,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
   void selectAFolder_ok() {
     setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, "invalid path");
-    const QString openPath{SystemPath::HOME_PATH()};
+    const QString openPath{SystemPath::HomePath()};
 
     InteractiveVideoWidget videoWid;
     QSignalSpy selectAFolderSpy{&videoWid, &InteractiveVideoWidget::newFolderSelectedChangedByUser};

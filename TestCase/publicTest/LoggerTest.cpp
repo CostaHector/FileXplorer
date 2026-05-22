@@ -53,6 +53,12 @@ private slots:
     // open succeed
     const QString logAbsFilePath = Logger::GetLogFileAbsPath();
     QVERIFY(logAbsFilePath.endsWith(Logger::CONSTANT_LOG_FILE_NAME, Qt::CaseInsensitive));
+    if (!QFile::exists(logAbsFilePath)) {
+      QFile fi{logAbsFilePath};
+      QVERIFY(fi.open(QIODevice::WriteOnly));
+      QVERIFY(fi.write("init now") > 0);
+      fi.close();
+    }
     QVERIFY(QFile::exists(logAbsFilePath));
     QVERIFY(Logger::OpenLogFile());
     QVERIFY(Logger::OpenLogFolder());

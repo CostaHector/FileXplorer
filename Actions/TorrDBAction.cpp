@@ -1,6 +1,7 @@
 #include "TorrDBAction.h"
 #include <QMenu>
 #include "PublicVariable.h"
+#include "SystemPath.h"
 
 TorrDBAction::TorrDBAction(QObject* parent)
     : QObject{parent},

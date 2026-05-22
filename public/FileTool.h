@@ -29,5 +29,4 @@ QString ChooseCopyDestination(QString defaultPath, QWidget* parent = nullptr);
 QString MoveToNewPathAutoUpdateActionText(const QString& first_path, QActionGroup* oldAG);
 
 bool LoadCNLanguagePack(QTranslator& translator, QString qmName="");
-bool CreateUserPath();
 #endif  // FILETOOL_H

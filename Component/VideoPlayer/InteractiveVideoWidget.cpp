@@ -6,6 +6,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
+#include "SystemPath.h"
 #include "Logger.h"
 #include "VideoPlayerKey.h"
 #include "PathKey.h"
@@ -159,7 +160,7 @@ void InteractiveVideoWidget::onQuitFullScreenMode() {
 bool InteractiveVideoWidget::onSelectAFile() {
   QString defaultOpenPathLocatedIn = getConfig(PathKey::VIDEO_PLAYER_OPEN_PATH).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
-    defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
+    defaultOpenPathLocatedIn = SystemPath::HomePath();
   }
   static const QString filterStr = "Video Files (" + TYPE_FILTER::VIDEO_TYPE_SET.join(" ") + ")";
   QString fileSelected = QFileDialog::getOpenFileName(this,
@@ -176,7 +177,7 @@ bool InteractiveVideoWidget::onSelectAFile() {
 bool InteractiveVideoWidget::onSelectAFolder() {
   QString defaultOpenPathLocatedIn = getConfig(PathKey::VIDEO_PLAYER_OPEN_PATH).toString();
   if (!QFile::exists(defaultOpenPathLocatedIn)) {
-    defaultOpenPathLocatedIn = SystemPath::HOME_PATH();
+    defaultOpenPathLocatedIn = SystemPath::HomePath();
   }
   const QString dirSelected = QFileDialog::getExistingDirectory(this,
                                                                 "Select a media folder",  //

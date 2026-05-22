@@ -7,6 +7,7 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "StringTool.h"
+#include "SystemPath.h"
 #include "TableFields.h"
 #include "QuickWhereClauseHelper.h"
 #include "PathTool.h"
@@ -40,9 +41,11 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
   CHECK_NULLPTR_RETURN_VOID(_castModel);
 
   {
-    auto& inst = g_castAct();
-    QList<QAction*> exclusiveActs{inst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, inst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK,
-                                  inst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE};
+    auto& inst = CastDBActions::GetInst();
+    QList<QAction*> exclusiveActs{inst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, //
+                                  inst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK, //
+                                  inst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, //
+    };
     PushFrontExclusiveActions(exclusiveActs);
   }
 
@@ -57,7 +60,7 @@ CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* cas
 void CastDBView::subscribe() {
   connect(_castDbSearchBar, &CastDatabaseSearchToolBar::whereClauseChanged, _castModel, &CastDbModel::SetFilterAndSelect);
 
-  static auto& castInst = g_castAct();
+  CastDBActions& castInst = CastDBActions::GetInst();
   connect(castInst._MODEL_SUBMIT_ALL, &QAction::triggered, this, &CastDBView::onModelSubmitAll);
   connect(castInst._MODEL_REPOPULATE, &QAction::triggered, this, &CastDBView::onModelRepopulate);
   connect(castInst.APPEND_FROM_MULTILINES_INPUT, &QAction::triggered, this, &CastDBView::onAppendCasts);

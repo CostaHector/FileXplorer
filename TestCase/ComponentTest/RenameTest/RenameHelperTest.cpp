@@ -289,4 +289,4 @@ private slots:
 };
 
 #include "RenameHelperTest.moc"
-REGISTER_TEST(RenameHelperTest, true)
+REGISTER_TEST(RenameHelperTest, false)

@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "JsonRenameRegex.h"
+#include "SystemPath.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "FileTool.h"

@@ -1,7 +1,7 @@
 #include "StudiosManager.h"
 
 #include "PathTool.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "JsonRenameRegex.h"
 #include "PublicMacro.h"
 #include "JsonKey.h"
@@ -27,8 +27,7 @@ bool StudiosManager::isHypenIndexValidReverse(const QString& sentence, int& hype
 
 StudiosManager::StudiosManager() {
 #ifndef RUNNING_UNIT_TESTS
-  using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetVendorsTableFilePath(), GetMononymVendorsListFilePath());
+  InitializeImpl(SystemPath::GetVendorsTableFilePath(), SystemPath::GetMononymVendorsListFilePath());
 #endif
 }
 

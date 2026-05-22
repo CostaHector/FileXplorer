@@ -62,19 +62,6 @@ struct RMFComponent {
   static RMFComponent FromPath(const QString& input);
 };
 
-namespace FILE_REL_PATH {
-const QString& GetVendorsTableFilePath();
-const QString& GetMononymVendorsListFilePath();
-const QString& GetActorsListFilePath();
-const QString& GetMononymActorsListFilePath();
-const QString& GetActorsAliasListFilePath();
-#ifdef _WIN32
-constexpr char TORRENT_EDITOR_PROG_PATH[]{"../../../torrent-file-editor/build/Debug/torrent-file-editor.exe"};
-#else
-constexpr char TORRENT_EDITOR_PROG_PATH[]{"../../../torrent-file-editor/build/Debug/torrent-file-editor"};
-#endif
-} // namespace FILE_REL_PATH
-
 constexpr char PATH_SEP_CHAR = '/';
 constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
 
@@ -86,7 +73,6 @@ inline QString GetWinStdPath(const QString& path) {
 #endif
   return path;
 }
-QString GetPathByApplicationDirPath(const QString& relativePath);
 
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
