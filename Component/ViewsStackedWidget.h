@@ -98,7 +98,7 @@ class ViewsStackedWidget : public QStackedWidget {
     int row;
     int col;
   };
-  QMap<QString, Anchor> m_anchorTags;
+  QMap<QString, Anchor> m_anchorTags[(int)ViewTypeTool::ViewType::VIEW_TYPE_BUTT];
 
   NavigationAndAddressBar* _addressBar{nullptr};
   FileSystemModel* m_fsModel{nullptr};

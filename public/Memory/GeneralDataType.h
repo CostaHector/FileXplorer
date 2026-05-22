@@ -7,7 +7,6 @@ enum Type {
   ERROR_TYPE = 0,
   GROUP,
   PLAIN_STR,
-  MULTI_LINE_STR,
   PLAIN_BOOL,
   PLAIN_CHAR,
   PLAIN_INT,
@@ -16,7 +15,12 @@ enum Type {
   PLAIN_FLOAT,
   PLAIN_DOUBLE,
 
-  COMBOBOX_NEED_BEGIN,
+  PLAINTEXTEDIT_NEED_BEGIN = PLAIN_DOUBLE,
+  MULTI_LINE_STR = PLAINTEXTEDIT_NEED_BEGIN,
+  COMMA_SEPERATED_STR_LIST,
+  PLAINTEXTEDIT_NEED_END,
+
+  COMBOBOX_NEED_BEGIN = PLAINTEXTEDIT_NEED_END,
 
   COMBOBOX_NEED_STRING_BEGIN = COMBOBOX_NEED_BEGIN,
   FONT_FAMILY = COMBOBOX_NEED_BEGIN,
@@ -63,7 +67,7 @@ inline constexpr bool isComboBoxNeededInStringToEnumEditor(int dataType) {
 }
 
 inline constexpr bool isPlainTextEditNeededInEditor(int dataType) {
-  return dataType == MULTI_LINE_STR;
+  return GeneralDataType::Type::PLAINTEXTEDIT_NEED_BEGIN <= dataType && dataType < GeneralDataType::Type::PLAINTEXTEDIT_NEED_END;
 }
 
 } // namespace GeneralDataType

@@ -195,7 +195,7 @@ bool TDir::checkFileContentsAtPath(const QString& absFilePath, const QSet<QStrin
   }
 
   bool isReadOk = false;
-  const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+  const QString contents = FileTool::StringTextReader(absFilePath, &isReadOk);
   if (!isReadOk) {
     LOG_E("Read file[%s] failed", qPrintable(absFilePath));
     return false;
@@ -226,7 +226,7 @@ QStringList TDir::FilesContentsSnapshotAtPath(const QStringList& filesAbsPath) {
   contentsList.reserve(filesAbsPath.size());
   for (const QString& absFilePath : filesAbsPath) {
     bool isReadOk = false;
-    const QString contents = FileTool::TextReader(absFilePath, &isReadOk);
+    const QString contents = FileTool::StringTextReader(absFilePath, &isReadOk);
     if (!isReadOk) {
       LOG_E("Read file[%s] failed", qPrintable(absFilePath));
     }

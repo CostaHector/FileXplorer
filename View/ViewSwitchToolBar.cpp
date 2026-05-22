@@ -20,7 +20,6 @@ ViewSwitchToolBar::ViewSwitchToolBar(const QString& title, QWidget* parent) : QT
   addActions(mViewTypeIntAction.getActionEnumAscendingList());  // action sorted in user specified sequence
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   setOrientation(Qt::Orientation::Horizontal);
-  setStyleSheet("QToolBar { max-width: 256px; }");
   setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
 
   subscribe();

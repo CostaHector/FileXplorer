@@ -3,9 +3,6 @@
 #include "RenameHelper.h"
 #include "SpacerWidget.h"
 
-RenameWidget_PrependParentFolderName::RenameWidget_PrependParentFolderName(QWidget* parent)  //
-  : AdvanceRenamer{parent} {}
-
 void RenameWidget_PrependParentFolderName::initExclusiveSetting() {
   m_recursiveCB->setEnabled(true);
   m_recursiveCB->setChecked(true);
@@ -22,7 +19,9 @@ QToolBar* RenameWidget_PrependParentFolderName::InitControlTB() {
   CHECK_NULLPTR_RETURN_NULLPTR(prependTb);
   auto* pSpacer = SpacerWidget::GetSpacerWidget(prependTb, Qt::Orientation::Horizontal);
   prependTb->addWidget(pSpacer);
+  prependTb->addWidget(m_nameExtIndependent);
   prependTb->addWidget(m_recursiveCB);
+  prependTb->addWidget(regexValidLabel);
   return prependTb;
 }
 

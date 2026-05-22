@@ -1,14 +1,6 @@
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
-<g>
-	<polygon style="fill:#FFFFFF;" points="5.5,27.5 5.5,2.5 18.793,2.5 24.5,8.207 24.5,27.5 	"></polygon>
-	<g>
-		<path style="fill:#788B9C;" d="M18.586,3L24,8.414V27H6V3H18.586 M19,2H5v26h20V8L19,2L19,2z"></path>
-	</g>
-</g>
-<g>
-	<polygon style="fill:#FFFFFF;" points="18.5,8.5 18.5,2.5 18.793,2.5 24.5,8.207 24.5,8.5 	"></polygon>
-	<g>
-		<path style="fill:#788B9C;" d="M19,3.414L23.586,8H19V3.414 M19,2h-1v7h7V8L19,2L19,2z"></path>
-	</g>
-</g>
+<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.2"><rect x="0" y="0" width="48" height="48" fill="#FFFFFF"/></g>
+<path fill="none" stroke="#000000" stroke-width="2px" d="M39.5,15.5h-9a2,2,0,0,1-2-2v-9h-18a2,2,0,0,0-2,2v35a2,2,0,0,0,2,2h27a2,2,0,0,0,2-2Z"/>
+<line stroke="#000000" stroke-width="2px" x1="28.5" y1="4.5" x2="39.5" y2="15.5"/>
 </svg>

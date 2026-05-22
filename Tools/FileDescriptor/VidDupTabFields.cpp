@@ -1,5 +1,5 @@
 #include "VidDupTabFields.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "Logger.h"
 #include <QFileInfo>
 #include <QSet>

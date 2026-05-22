@@ -18,6 +18,7 @@
 #include "TableFields.h"
 #include "ScenesListModel.h"
 
+#include "SystemPath.h"
 #include "BehaviorKey.h"
 #include "PathKey.h"
 #include "Configuration.h"

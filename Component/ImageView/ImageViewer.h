@@ -37,6 +37,13 @@ protected:
   std::unique_ptr<QMovie> GetMovie(QString& winTitle) const;
   const QLabel* GetLabel() const { return mLabel; }
 
+  void setFormatAndImgSizeBytes(const QString& noDotFormat, const qint64& imgSizeBytes) {
+    mNoDotFormat = noDotFormat;
+    mImgSizeBytes = imgSizeBytes;
+  }
+  QString mNoDotFormat; // file extension without prefix dot
+  qint64 mImgSizeBytes{0};
+
 private:
   void subscribe();
   void ReadSetting();
@@ -45,10 +52,11 @@ private:
   QString GetResolutionAndSizeInWinTitle(const QSize& oldSz, const QSize& dstSz) const;
   virtual QString GetPathInfoInWinTitle() const { return ""; }
   virtual QPixmap GetPixmapCore() const = 0;
-  virtual bool isCurImageGif() const = 0;
 
   virtual std::unique_ptr<QMovie> GetMovieCore(QSize& movieSize) const = 0;
-  virtual qint64 GetImageFileSize() const = 0;
+
+  bool isCurImageGif() const;
+  qint64 GetImageFileSize() const { return mImgSizeBytes; }
 
   int mCurIconScaledSizeIndex = 1;
   int mWidth = 404, mHeight = 250;

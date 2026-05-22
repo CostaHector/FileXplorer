@@ -1,10 +1,8 @@
 #include "SceneStyleDelegate.h"
 #include "PublicMacro.h"
 #include "ScenesListModel.h"
+#include "ColorTools.h"
 #include <QPainter>
-
-constexpr QColor SceneStyleDelegate::GRAY_AND_HALF_TRANS;
-constexpr QColor SceneStyleDelegate::YELLOW_COLOR;
 
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_VOID(option);
@@ -44,7 +42,7 @@ void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentR
   CHECK_NULLPTR_RETURN_VOID(painter);
   currentRateTextRect.setHeight(RateHelper::RATING_BAR_HEIGHT);
   currentRateTextRect.setWidth(RateHelper::RATING_BAR_X);
-  painter->fillRect(currentRateTextRect, GRAY_AND_HALF_TRANS); // gray and half transparent
+  painter->fillRect(currentRateTextRect, ColorTools::GRAY_AND_HALF_TRANS); // gray and half transparent
   painter->setPen(Qt::white);
   painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));
 }
@@ -52,14 +50,14 @@ void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentR
 void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) {
   CHECK_NULLPTR_RETURN_VOID(painter);
   // 绘制半透明背景层
-  painter->fillRect(rect, GRAY_AND_HALF_TRANS); // gray and half transparent
+  painter->fillRect(rect, ColorTools::GRAY_AND_HALF_TRANS); // gray and half transparent
   const int EACH_LINE_WIDTH{rect.width() / 10};
 
   // 黄色 评分条
   QRect hoverRectBar{rect};
   hoverRectBar.setWidth(hoverRating * EACH_LINE_WIDTH);
-  painter->setBrush(YELLOW_COLOR);
-  painter->fillRect(hoverRectBar, YELLOW_COLOR);
+  painter->setBrush(ColorTools::YELLOW_COLOR);
+  painter->fillRect(hoverRectBar, ColorTools::YELLOW_COLOR);
 
   const int EACH_BAR_TOP{hoverRectBar.top()};
   const int EACH_BAR_BOTTOM{hoverRectBar.bottom()};

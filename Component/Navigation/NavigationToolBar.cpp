@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "SizeChangeAnimation.h"
+#include "SystemPath.h"
 #include "ImageTool.h"
 #include <QDir>
 
@@ -42,35 +43,35 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
     auto* pDownloads = addAction(QIcon(":img/FOLDER_OF_DOWNLOADS"), tr("Downloads"));
     auto* pPictures = addAction(QIcon(":img/FOLDER_OF_PICTURES"), tr("Pictures"));
     auto* pVideos = addAction(QIcon(":img/FOLDER_OF_VIDEOS"), tr("Videos"));
-    auto* pFavorite = addAction(QIcon(":img/FOLDER_OF_FAVORITE"), tr("Favorites"));
+    auto* pRoamingDataFolder = addAction(QIcon(":img/ROAMING_DATA"), tr("RoamingData"));
     CHECK_NULLPTR_RETURN_VOID(pDesktop)
     CHECK_NULLPTR_RETURN_VOID(pDocument)
     CHECK_NULLPTR_RETURN_VOID(pDownloads)
     CHECK_NULLPTR_RETURN_VOID(pPictures)
     CHECK_NULLPTR_RETURN_VOID(pVideos)
-    CHECK_NULLPTR_RETURN_VOID(pFavorite)
-    pDesktop->setData(SystemPath::HOME_PATH() + "/Desktop");
-    pDocument->setData(SystemPath::HOME_PATH() + "/Documents");
-    pDownloads->setData(SystemPath::HOME_PATH() + "/Downloads");
-    pPictures->setData(SystemPath::HOME_PATH() + "/Pictures");
-    pVideos->setData(SystemPath::HOME_PATH() + "/Videos");
-    pFavorite->setData(SystemPath::HOME_PATH() + "/Documents");
+    CHECK_NULLPTR_RETURN_VOID(pRoamingDataFolder)
+    pDesktop->setData(SystemPath::HomePath() + "/Desktop");
+    pDocument->setData(SystemPath::HomePath() + "/Documents");
+    pDownloads->setData(SystemPath::HomePath() + "/Downloads");
+    pPictures->setData(SystemPath::HomePath() + "/Pictures");
+    pVideos->setData(SystemPath::HomePath() + "/Videos");
+    pRoamingDataFolder->setData(SystemPath::RoamingPath());
     pDesktop->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDesktop->text(), pDesktop->data().toString()));
     pDocument->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDocument->text(), pDocument->data().toString()));
     pDownloads->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pDownloads->text(), pDownloads->data().toString()));
     pPictures->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pPictures->text(), pPictures->data().toString()));
     pVideos->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pVideos->text(), pVideos->data().toString()));
-    pFavorite->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pFavorite->text(), pFavorite->data().toString()));
+    pRoamingDataFolder->setToolTip(QString{"<b>%1</b><br/> %2"}.arg(pRoamingDataFolder->text(), pRoamingDataFolder->data().toString()));
     addSeparator();
 
     m_pathActionGroups = new (std::nothrow) QActionGroup{this};
     CHECK_NULLPTR_RETURN_VOID(m_pathActionGroups);
     m_pathActionGroups->addAction(pDesktop);
-    m_pathActionGroups->addAction(pDesktop);
+    m_pathActionGroups->addAction(pDocument);
     m_pathActionGroups->addAction(pDownloads);
     m_pathActionGroups->addAction(pPictures);
     m_pathActionGroups->addAction(pVideos);
-    m_pathActionGroups->addAction(pFavorite);
+    m_pathActionGroups->addAction(pRoamingDataFolder);
 
     // 3. all volumes
     const QIcon diskIcon = ImageTool::GetBuiltInIcon(QStyle::StandardPixmap::SP_DriveHDIcon);

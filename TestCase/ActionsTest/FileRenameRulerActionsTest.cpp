@@ -12,6 +12,7 @@
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"
+#include "SystemPath.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -45,9 +46,9 @@ class FileRenameRulerActionsTest : public PlainTestSuite {
         .stubs()                                        //
         .with(spy(mFileNameEdit))                       //
         .will(invoke(invokeOpenLocalFileUsingDesktopService));
-    MOCKER(PathTool::FILE_REL_PATH::GetVendorsTableFilePath).stubs().will(returnValue(mStudiosListFile));
-    MOCKER(PathTool::FILE_REL_PATH::GetActorsListFilePath).stubs().will(returnValue(mActorsListFile));
-    MOCKER(PathTool::FILE_REL_PATH::GetActorsAliasListFilePath).stubs().will(returnValue(mActorsAliasListFile));
+    MOCKER(SystemPath::GetVendorsTableFilePath).stubs().will(returnValue(mStudiosListFile));
+    MOCKER(SystemPath::GetActorsListFilePath).stubs().will(returnValue(mActorsListFile));
+    MOCKER(SystemPath::GetActorsAliasListFilePath).stubs().will(returnValue(mActorsAliasListFile));
 
     QVERIFY(mTDir.IsValid());
     QCOMPARE(mTDir.createEntries(mFileNodes), mFileNodes.size());

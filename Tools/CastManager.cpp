@@ -1,6 +1,7 @@
 #include "CastManager.h"
 #include "JsonRenameRegex.h"
 #include "PublicMacro.h"
+#include "SystemPath.h"
 #include "PathTool.h"
 #include "JsonKey.h"
 #include "JsonHelper.h"
@@ -13,8 +14,7 @@ template class SingletonManager<CastManager, CAST_MGR_DATA_T>;
 
 CastManager::CastManager() {
 #ifndef RUNNING_UNIT_TESTS
-  using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetActorsListFilePath(), GetMononymActorsListFilePath());
+  InitializeImpl(SystemPath::GetActorsListFilePath(), SystemPath::GetMononymActorsListFilePath());
 #endif
 }
 

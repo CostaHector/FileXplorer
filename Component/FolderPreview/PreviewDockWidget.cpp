@@ -3,31 +3,34 @@
 #include "CompoVisKey.h"
 #include "Configuration.h"
 #include "ViewActions.h"
+#include "VideoPlayerActions.h"
 
-PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::WindowFlags flags) : QDockWidget{title, parent, flags} {
+PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::WindowFlags flags)
+  : QDockWidget{title, parent, flags} {
   CATEGORY_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CATEGORY"), tr("Category Preview"), this};
   CATEGORY_PRE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_P));
-  CATEGORY_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through 3 QListViews and Items that group file by type(IMAGE/VIDEO/OTHER)")  //
+  CATEGORY_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through 3 QListViews and Items that group file by type(IMAGE/VIDEO/OTHER)") //
                                .arg(CATEGORY_PRE->text(), CATEGORY_PRE->shortcut().toString()));
   CATEGORY_PRE->setCheckable(true);
 
   PROGRESSIVE_LOAD_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_PROGRESSIVE_LOAD"), tr("Progressive Load Preview"), this};
-  PROGRESSIVE_LOAD_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QTextBrowser(images count dynamic expansion).")  //
+  PROGRESSIVE_LOAD_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QTextBrowser(images count dynamic expansion).") //
                                        .arg(PROGRESSIVE_LOAD_PRE->text(), PROGRESSIVE_LOAD_PRE->shortcut().toString()));
   PROGRESSIVE_LOAD_PRE->setCheckable(true);
 
   CAROUSEL_PRE = new (std::nothrow) QAction{QIcon(":img/FOLDER_PREVIEW_CAROUSEL"), tr("Carousel Preview"), this};
-  CAROUSEL_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QLabels(Slidershow and a periodic timer).")  //
+  CAROUSEL_PRE->setToolTip(QString("<b>%1 (%2)</b><br/> Through QLabels(Slidershow and a periodic timer).") //
                                .arg(CAROUSEL_PRE->text(), CAROUSEL_PRE->shortcut().toString()));
   CAROUSEL_PRE->setCheckable(true);
 
   QAction* SHOW_OR_HIDE_PREVIEW = g_viewActions()._PREVIEW_PANEL;
 
   using namespace PreviewTypeTool;
-  mPreviewTypeIntAction.init({{CATEGORY_PRE, PREVIEW_TYPE_E::CATEGORY},                         //
-                              {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD},         //
-                              {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},                        //
-                             DEFULT_PREVIEW_TYPE_E, QActionGroup::ExclusionPolicy::Exclusive);  //
+  mPreviewTypeIntAction.init({{CATEGORY_PRE, PREVIEW_TYPE_E::CATEGORY},                 //
+                              {PROGRESSIVE_LOAD_PRE, PREVIEW_TYPE_E::PROGRESSIVE_LOAD}, //
+                              {CAROUSEL_PRE, PREVIEW_TYPE_E::CAROUSEL}},                //
+                             DEFULT_PREVIEW_TYPE_E,
+                             QActionGroup::ExclusionPolicy::Exclusive); //
   int curPreviewType = getConfig(CompoVisKey::FOLDER_PREVIEW_TYPE).toInt();
   mPreviewTypeIntAction.setCheckedIfActionExist(curPreviewType);
 
@@ -44,7 +47,12 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
   m_titleBar = new ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   m_titleBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
   m_windowsTitleLabel = m_titleBar->addString("Preview");
-  m_titleBar->addStretch(1);
+  {
+    auto& inst = VideoPlayerActions::GetInst();
+    m_titleBar->addWidget(inst.GetPlaybackTriggerModelMenuToolButton(m_titleBar));
+    m_titleBar->addWidget(inst.GetPlaybackModeMenuToolButton(m_titleBar));
+    m_titleBar->addWidget(inst.GetInitedVolumeWid(m_titleBar), 1);
+  }
   m_titleBar->addSeparator();
   m_titleBar->addAction(SHOW_OR_HIDE_PREVIEW);
   m_titleBar->addSeparator();
@@ -61,7 +69,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
 }
 
 PreviewDockWidget::~PreviewDockWidget() {
-  setConfig(CompoVisKey::FOLDER_PREVIEW_TYPE, (int)GetCurrentPreviewType());
+  setConfig(CompoVisKey::FOLDER_PREVIEW_TYPE, (int) GetCurrentPreviewType());
 }
 
 void PreviewDockWidget::showEvent(QShowEvent* event) {

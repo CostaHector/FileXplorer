@@ -10,6 +10,8 @@ class FileSystemTreeView : public CustomTreeView {
   void subscribe();
 
  protected:
+  void initExclusivePreferenceSetting() override;
+
   void dropEvent(QDropEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;

@@ -1,5 +1,5 @@
-#ifndef THUMBNAILIMAGEVIEWER_H
-#define THUMBNAILIMAGEVIEWER_H
+#ifndef FILEIMAGEVIEWER_H
+#define FILEIMAGEVIEWER_H
 
 #include <QToolBar>
 #include <QAction>
@@ -9,10 +9,10 @@
 
 class QMenu;
 
-class ThumbnailImageViewer : public ImageViewer {
+class FileImageViewer : public ImageViewer {
   Q_OBJECT
 public:
-  explicit ThumbnailImageViewer(const QString& memoryKeyName, QWidget* parent = nullptr);
+  explicit FileImageViewer(const QString& memoryKeyName, QWidget* parent = nullptr);
 
 public slots:
   bool setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img);
@@ -26,30 +26,15 @@ public slots:
 private:
   void subscribe();
 
-  qint64 GetImageFileSize() const override { return mDataFromPath.imageBytes; }
-  bool isCurImageGif() const override;
-
   QPixmap GetPixmapCore() const override;
   std::unique_ptr<QMovie> GetMovieCore(QSize& movieSize) const override;
   QString GetPathInfoInWinTitle() const override;
 
   bool NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction = FolderNxtAndLastIterator::NaviDirection::NEXT);
+  QString GetImageAbsPath() const;
 
-  struct FromPath {
-    QString parentPath;
-    QString rel2image;
-    qint64 imageBytes;
-    bool operator==(const FromPath& rhs) const { return parentPath == rhs.parentPath && rel2image == rhs.rel2image && imageBytes == rhs.imageBytes; }
-
-    QString GetImageAbsPath() const;
-    void clear() {
-      parentPath.clear();
-      rel2image.clear();
-      imageBytes = 0;
-    }
-  };
-
-  FromPath mDataFromPath;
+  QString mParentPath;
+  QString mRel2Image;
   FolderNxtAndLastIterator mImgIt{FolderNxtAndLastIterator::GetInstsNaviImages(false)};
 
   QToolBar* mNaviToolBar{nullptr};
@@ -60,4 +45,4 @@ private:
   QMenu* mMenu{nullptr};
 };
 
-#endif // THUMBNAILIMAGEVIEWER_H
+#endif // FILEIMAGEVIEWER_H

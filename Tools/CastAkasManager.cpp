@@ -2,7 +2,7 @@
 #include "CastPsonFileHelper.h"
 #include "TableFields.h"
 #include "PathTool.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "PublicMacro.h"
 #include "StringTool.h"
 #include <QTextStream>
@@ -14,8 +14,7 @@ template class SingletonManager<CastAkasManager, CAST_AKA_MGR_DATA_T>;
 
 CastAkasManager::CastAkasManager() {
 #ifndef RUNNING_UNIT_TESTS
-  using namespace PathTool::FILE_REL_PATH;
-  InitializeImpl(GetActorsAliasListFilePath(), "");
+  InitializeImpl(SystemPath::GetActorsAliasListFilePath(), "");
 #endif
 }
 

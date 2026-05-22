@@ -1,6 +1,6 @@
 #include "MouseKeyboardEventHelper.h"
 #include "BeginToExposePrivateMember.h"
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 #include "CustomListView.h"
 #include "CustomTableView.h"
 #include "EndToExposePrivateMember.h"
@@ -20,7 +20,7 @@ bool SendWheelEvent(WidgetType& wid, const QPoint& angleDelta, Qt::KeyboardModif
 }
 
 // 显式实例化定义
-template bool SendWheelEvent<ThumbnailImageViewer>(ThumbnailImageViewer& wid,
+template bool SendWheelEvent<FileImageViewer>(FileImageViewer& wid,
                                                    const QPoint& angleDelta,
                                                    Qt::KeyboardModifiers modifiers,
                                                    bool bNeedAccepted);

@@ -5,6 +5,7 @@
 #include "CastAkasManager.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "SystemPath.h"
 #include <QUrl>
 #include <QFile>
 #include <tuple>
@@ -44,7 +45,7 @@ FileRenameRulerActions::FileRenameRulerActions(QObject* parent) : QObject{parent
 }
 
 bool FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
-  const QString fileAbsPath = PathTool::GetPathByApplicationDirPath(rel2File);
+  const QString fileAbsPath = SystemPath::GetPathByApplicationDirPath(rel2File);
   const bool openResult = FileTool::OpenLocalFileUsingDesktopService(fileAbsPath);
   if (!openResult) {
     LOG_WARN_NP("Cannot Edit", fileAbsPath);
@@ -55,16 +56,13 @@ bool FileRenameRulerActions::onEditLocalFile(const QString& rel2File) {
 }
 
 bool FileRenameRulerActions::onEditStudiosListFile() {
-  using namespace PathTool::FILE_REL_PATH;
-  return onEditLocalFile(GetVendorsTableFilePath());
+  return onEditLocalFile(SystemPath::GetVendorsTableFilePath());
 }
 bool FileRenameRulerActions::onEditActorsListFile() {
-  using namespace PathTool::FILE_REL_PATH;
-  return onEditLocalFile(GetActorsListFilePath());
+  return onEditLocalFile(SystemPath::GetActorsListFilePath());
 }
 bool FileRenameRulerActions::onEditActorsAliasListFile() {
-  using namespace PathTool::FILE_REL_PATH;
-  return onEditLocalFile(GetActorsAliasListFilePath());
+  return onEditLocalFile(SystemPath::GetActorsAliasListFilePath());
 }
 int FileRenameRulerActions::onReloadStudiosListFile() {
   StudiosManager& psm = StudiosManager::getInst();

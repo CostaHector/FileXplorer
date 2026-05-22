@@ -1,13 +1,5 @@
 ﻿#include "PublicVariable.h"
-#include <QDir>
 #include <QSet>
-
-namespace SystemPath {
-const QString& HOME_PATH() {
-  static const QString path = QDir::homePath();
-  return path;
-}
-} // namespace SystemPath
 
 namespace TYPE_FILTER {
 

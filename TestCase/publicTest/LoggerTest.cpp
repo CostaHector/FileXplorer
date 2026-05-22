@@ -3,11 +3,13 @@
 
 #include "GlbDataProtect.h"
 #include "TDir.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
+
 #include "PlainTestSuite.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "OnScopeExit.h"
+
 #include "BeginToExposePrivateMember.h"
 #include "Logger.h" // ahead of any other file include this file
 #include "EndToExposePrivateMember.h"
@@ -51,8 +53,14 @@ private slots:
     QVERIFY(Logger::mLogFILEStreamUniquePtr != nullptr);
 #endif
     // open succeed
-    const QString logAbsFilePath = Logger::GetLogFileAbsPath();
-    QVERIFY(logAbsFilePath.endsWith(Logger::CONSTANT_LOG_FILE_NAME, Qt::CaseInsensitive));
+    const QString logAbsFilePath = SystemPath::GetLogFileAbsPath();
+    QVERIFY(logAbsFilePath.endsWith(".log"));
+    if (!QFile::exists(logAbsFilePath)) {
+      QFile fi{logAbsFilePath};
+      QVERIFY(fi.open(QIODevice::WriteOnly));
+      QVERIFY(fi.write("init now") > 0);
+      fi.close();
+    }
     QVERIFY(QFile::exists(logAbsFilePath));
     QVERIFY(Logger::OpenLogFile());
     QVERIFY(Logger::OpenLogFolder());

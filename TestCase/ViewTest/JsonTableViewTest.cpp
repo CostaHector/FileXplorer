@@ -220,7 +220,7 @@ class JsonTableViewTest : public PlainTestSuite {
     jsonView.pWidgetInCellMock = &lineEditCell;
     jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Cast), "", Qt::EditRole);
     QCOMPARE(jsonView.onAppendFromSelection(false), 2);
-    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
+    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans\nHenry Cavill");
     jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Cast), "", Qt::EditRole);
 
     // only 2 unique UPPERCASE words ok
@@ -228,7 +228,7 @@ class JsonTableViewTest : public PlainTestSuite {
     lineEditCell.selectAll();
     jsonView.pWidgetInCellMock = &lineEditCell;
     QCOMPARE(jsonView.onAppendFromSelection(true), 2);
-    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Alvaro Morata,Michael Fassbender");
+    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Alvaro Morata\nMichael Fassbender");
     jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Cast), "", Qt::EditRole);
 
     jsonView.pWidgetInCellMock = &plainTextEditCell;
@@ -332,7 +332,7 @@ class JsonTableViewTest : public PlainTestSuite {
     jsonModel.setData(jsonModel.index(0, JSON_KEY_E::Cast), "Henry Cavill, Chris Evans, Henry Cavill", Qt::EditRole);
     jsonView.selectRow(0);
     QCOMPARE(jsonView.onFormatCast(), 1);
-    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
+    QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans\nHenry Cavill");
     jsonView.close();
   }
 
@@ -397,8 +397,8 @@ class JsonTableViewTest : public PlainTestSuite {
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans,Henry Cavill");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
-      QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
-      QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Henry Cavill");
+      QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans\nHenry Cavill");
+      QCOMPARE(jsonModel.index(1, JSON_KEY_E::Cast).data().toString(), "Chris Evans\nHenry Cavill");
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 2);
       QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Henry Cavill");
@@ -428,7 +428,7 @@ class JsonTableViewTest : public PlainTestSuite {
       jsonView.selectRow(0);
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Chris Evans,Michael Fassbender");
       QCOMPARE(jsonView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 1);
-      QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans,Michael Fassbender");
+      QCOMPARE(jsonModel.index(0, JSON_KEY_E::Cast).data().toString(), "Chris Evans\nMichael Fassbender");
 
       jsonView.selectRow(1);
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Henry Cavill");

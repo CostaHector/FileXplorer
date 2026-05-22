@@ -167,7 +167,7 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../../Actions/CastDBActions.cpp" line="+11"/>
+        <location filename="../../Actions/CastDBActions.cpp" line="+16"/>
         <source>Submit All</source>
         <translation>提交全部</translation>
     </message>
@@ -224,20 +224,20 @@
     <message>
         <location line="+6"/>
         <source>Sync all imgs field</source>
-        <translation>更新imgs字段(所有行)</translation>
+        <translation>更新所有imgs字段</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Sync vids field</source>
         <translation>更新vids字段</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Sync all vids field</source>
-        <translation>更新vids字段(所有行)</translation>
+        <translation>更新所有vids字段</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Open Database</source>
         <translation>用本地应用打开数据库</translation>
     </message>
@@ -249,7 +249,7 @@
     <message>
         <location line="+6"/>
         <source>Dump all records</source>
-        <translation>写入变更到pson(所有行)</translation>
+        <translation>写入所有变更到pson</translation>
     </message>
 </context>
 <context>
@@ -288,6 +288,11 @@
         <location line="+5"/>
         <source>Uniform items sizes</source>
         <translation>统一项大小</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Use thumbnail as decoration</source>
+        <translation>使用缩略图装饰</translation>
     </message>
 </context>
 <context>
@@ -351,7 +356,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+39"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+41"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -471,7 +476,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+275"/>
+        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+276"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -547,6 +552,24 @@
         <location line="+7"/>
         <source>Save Now</source>
         <translation>立即保存</translation>
+    </message>
+</context>
+<context>
+    <name>FileImageViewer</name>
+    <message>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+119"/>
+        <source>Open in system application</source>
+        <translation>用系统应用打开</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reveal in explorer</source>
+        <translation>在资源管理器中显示</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy file name</source>
+        <translation>复制文件名称</translation>
     </message>
 </context>
 <context>
@@ -793,7 +816,7 @@
 <context>
     <name>FileRenameRulerActions</name>
     <message>
-        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+14"/>
+        <location filename="../../Actions/FileRenameRulerActions.cpp" line="+15"/>
         <source>Name Ruler</source>
         <translation>名称标准化</translation>
     </message>
@@ -836,7 +859,7 @@
 <context>
     <name>FileToolTest</name>
     <message>
-        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+148"/>
+        <location filename="../../TestCase/publicTest/FileToolTest.cpp" line="+126"/>
         <location line="+18"/>
         <location line="+7"/>
         <source>Apply</source>
@@ -848,6 +871,48 @@
         <location line="+7"/>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+</context>
+<context>
+    <name>GrabFramesDialog</name>
+    <message>
+        <location filename="../../Component/VideoPlayer/GrabFramesDialog.cpp" line="+11"/>
+        <location line="+5"/>
+        <source> s</source>
+        <translation> 秒</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source> cnt</source>
+        <translation> 张</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Start Position:</source>
+        <translation>起始位置:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Interval:</source>
+        <translation>抽样间隔:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Count:</source>
+        <translation>抽样数量:</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Grab Frames Settings</source>
+        <translation>抓取多帧设置</translation>
+    </message>
+</context>
+<context>
+    <name>HarTableView</name>
+    <message>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+26"/>
+        <source>Export Selections to</source>
+        <translation>导出选中</translation>
     </message>
 </context>
 <context>
@@ -894,22 +959,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+20"/>
-        <source>Manual play</source>
-        <translation>手动播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Auto play</source>
-        <translation>自动播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Disabled play</source>
-        <translation>禁止播放</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+27"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -944,16 +994,6 @@
         <translation>下一视频</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>+Volume</source>
-        <translation>增大音量</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>-Volume</source>
-        <translation>减少音量</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>show frames</source>
         <translation>帧图组</translation>
@@ -969,32 +1009,12 @@
         <translation>用系统应用打开</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>current item once</source>
-        <translation>单播</translation>
+        <location line="-20"/>
+        <source>Grab a Frame</source>
+        <translation>抓取一帧</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>current item in loop</source>
-        <translation>单曲循环</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sequential</source>
-        <translation>顺序播放</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>loop</source>
-        <translation>列表循环</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>random</source>
-        <translation>随机播放</translation>
-    </message>
-    <message>
-        <location line="+24"/>
+        <location line="+27"/>
         <source>basic mode</source>
         <translation>简洁模式</translation>
     </message>
@@ -1014,24 +1034,9 @@
         <translation>禁用自动隐藏</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Playerback mode</source>
-        <translation>播放模式</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Player Menu</source>
         <translation>播放器菜单</translation>
-    </message>
-    <message>
-        <location line="+61"/>
-        <source>Playback Mode</source>
-        <translation>播放模式</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Play Trigger Mode</source>
-        <translation>触发方式</translation>
     </message>
 </context>
 <context>
@@ -1196,7 +1201,7 @@
 <context>
     <name>LogActions</name>
     <message>
-        <location filename="../../Actions/LogActions.cpp" line="+10"/>
+        <location filename="../../Actions/LogActions.cpp" line="+11"/>
         <source>Open logs file</source>
         <translation>打开日志文件</translation>
     </message>
@@ -1472,7 +1477,7 @@
 <context>
     <name>NavigationToolBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+21"/>
+        <location filename="../../Component/Navigation/NavigationToolBar.cpp" line="+22"/>
         <source>Expand sidebar</source>
         <translation>展开侧边栏</translation>
     </message>
@@ -1508,8 +1513,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Favorites</source>
-        <translation>收藏</translation>
+        <source>RoamingData</source>
+        <translation>漫游数据</translation>
     </message>
 </context>
 <context>
@@ -1548,7 +1553,7 @@
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+8"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+10"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1563,7 +1568,7 @@
         <translation>幻灯片预览</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+18"/>
         <source>Float</source>
         <translation>浮动</translation>
     </message>
@@ -1810,6 +1815,11 @@
         <translation>附带父文件夹名称</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>Digit 2 Alpha</source>
+        <translation>数值字符替换</translation>
+    </message>
+    <message>
         <location line="+3"/>
         <source>Uppercase</source>
         <translation>纯大写</translation>
@@ -1957,7 +1967,7 @@
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+65"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2220,80 +2230,77 @@
     </message>
 </context>
 <context>
-    <name>ThumbnailImageViewer</name>
+    <name>ThumbnailActions</name>
     <message>
-        <location filename="../../Component/ThumbnailImageViewer.cpp" line="+299"/>
-        <source>Open in system application</source>
-        <translation>用系统应用打开</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Reveal in explorer</source>
-        <translation>在资源管理器中显示</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Copy file name</source>
-        <translation>复制文件名称</translation>
-    </message>
-</context>
-<context>
-    <name>ThumbnailProcessActions</name>
-    <message>
-        <location filename="../../Actions/ThumbnailProcessActions.cpp" line="+8"/>
-        <source>Create 1x1 thumbnail</source>
-        <translation>创建1x1缩略图</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Create 2x2 thumbnail</source>
-        <translation>创建2x2缩略图</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Create 3x3 thumbnail</source>
-        <translation>创建3x3缩略图</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Create 4x4 thumbnail</source>
-        <translation>创建4x4缩略图</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Rename thumbnails</source>
-        <translation>刷新缩略图名称</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Thumbnail Extractor</source>
+        <location filename="../../Actions/ThumbnailActions.cpp" line="+29"/>
+        <source>Create thumbnail</source>
         <translation>创建缩略图</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
+        <source>Skip if already exist</source>
+        <translation>跳过已存在</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Grab a Frame</source>
+        <translation>抓取一帧</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Grab Frames</source>
+        <translation>抓取多帧</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Create 1x1 StoryBoard</source>
+        <translation>创建1x1缩略图</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Create 2x2 StoryBoard</source>
+        <translation>创建2x2缩略图</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Create 3x3 StoryBoard</source>
+        <translation>创建3x3缩略图</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Create 4x4 StoryBoard</source>
+        <translation>创建4x4缩略图</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Update storyboard name</source>
+        <translation>更新故事板文件名</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Extract [0, 1) imgs</source>
+        <translation>提取首张图片</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Extract [0, 2) imgs</source>
         <translation>提取前2张图片</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Extract [0, 4) imgs</source>
         <translation>提取前4张图片</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <source>Extract [b, e) imgs</source>
-        <translation>提取区间范围内图片</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Skip extract if already exist</source>
-        <translation>若缩略图以存在则跳过提取</translation>
+        <translation>提取指定区间范围内图片</translation>
     </message>
 </context>
 <context>
     <name>TorrDBAction</name>
     <message>
-        <location filename="../../Actions/TorrDBAction.cpp" line="+7"/>
+        <location filename="../../Actions/TorrDBAction.cpp" line="+8"/>
         <source>&amp;Open with Sys App</source>
         <translation>用系统应用打开(&amp;O)</translation>
     </message>
@@ -2334,6 +2341,64 @@
         <location filename="../../Component/TypeFilterButton.cpp" line="+14"/>
         <source>Filter</source>
         <translation>过滤</translation>
+    </message>
+</context>
+<context>
+    <name>VideoPlayerActions</name>
+    <message>
+        <location filename="../../Component/VideoPlayer/VideoPlayerActions.cpp" line="+15"/>
+        <source>Manual play</source>
+        <translation>手动播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Auto play</source>
+        <translation>自动播放</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>current item once</source>
+        <translation>单次</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>current item in loop</source>
+        <translation>单曲循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>sequential</source>
+        <translation>顺序播放</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>loop</source>
+        <translation>列表循环</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>random</source>
+        <translation>随机播放</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>+Volume</source>
+        <translation>增大音量</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-Volume</source>
+        <translation>减少音量</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Playback Mode</source>
+        <translation>播放模式</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Play Trigger Mode</source>
+        <translation>触发方式</translation>
     </message>
 </context>
 <context>
@@ -2412,7 +2477,7 @@
         <translation>JSON视图</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+56"/>
         <source>View Back</source>
         <translation>上一个视图</translation>
     </message>

@@ -9,6 +9,7 @@
 #include "EndToExposePrivateMember.h"
 #include "PathTool.h"
 #include "StudioActorManagerTestHelper.h"
+#include "SystemPath.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -37,11 +38,10 @@ class StudiosManagerTest : public PlainTestSuite {
   }
 
   void InitializeImpl_ok() {
-    using namespace PathTool::FILE_REL_PATH;
     studioMgr.InitializeImpl("inexist studio list file.txt");
     QVERIFY2(studioMgr.count() == 0, "read from inexist file should return 0 items");
 
-    studioMgr.InitializeImpl(GetVendorsTableFilePath(), GetMononymVendorsListFilePath());
+    studioMgr.InitializeImpl(SystemPath::GetVendorsTableFilePath(), SystemPath::GetMononymVendorsListFilePath());
     QVERIFY2(studioMgr.count() == 0, "read from empty file should return 0 items");
   }
 

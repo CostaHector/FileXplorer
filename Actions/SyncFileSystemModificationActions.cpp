@@ -31,7 +31,6 @@ QToolBar* SyncFileSystemModificationActions::GetSyncSwitchToolbar(QWidget* paren
   QToolBar* syncSwTb = new (std::nothrow) QToolBar{"Sync Switch", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(syncSwTb)
   syncSwTb->addAction(_SYNC_MOD_SWITCH);
-  syncSwTb->setStyleSheet("QToolBar { max-width: 256px; }");
   syncSwTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return syncSwTb;
 }
@@ -54,7 +53,6 @@ QToolBar* SyncFileSystemModificationActions::GetSyncPathToolbar(QWidget* parent)
   syncTb->addWidget(_BASIC_PATH);
   syncTb->addWidget(_SYNC_TO_PATH);
   syncTb->setOrientation(Qt::Orientation::Vertical);
-  syncTb->setStyleSheet("QToolBar { max-width: 512px; }");
   syncTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   syncTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   SetLayoutAlightment(syncTb->layout(), Qt::AlignmentFlag::AlignLeft);

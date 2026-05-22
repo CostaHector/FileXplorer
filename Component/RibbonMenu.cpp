@@ -14,7 +14,7 @@
 #include "SceneInPageActions.h"
 #include "SyncFileSystemModificationActions.h"
 #include "ViewActions.h"
-#include "ThumbnailProcessActions.h"
+#include "ThumbnailActions.h"
 #include "LogActions.h"
 #include "RateActions.h"
 #include "RibbonCastDB.h"
@@ -156,7 +156,6 @@ QToolBar* RibbonMenu::LeafHome() const {
     openItemsTB->addActions(fileOpInst.OPEN_AG->actions());
     openItemsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     openItemsTB->setOrientation(Qt::Orientation::Vertical);
-    openItemsTB->setStyleSheet("QToolBar { max-width: 256px; }");
     openItemsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
     SetLayoutAlightment(openItemsTB->layout(), Qt::AlignmentFlag::AlignLeft);
   }
@@ -174,7 +173,6 @@ QToolBar* RibbonMenu::LeafHome() const {
     propertiesTB->addAction(g_rightClickActions()._CALC_MD5_ACT);
     propertiesTB->addAction(g_rightClickActions()._PROPERTIES);
     propertiesTB->setOrientation(Qt::Orientation::Vertical);
-    propertiesTB->setStyleSheet("QToolBar { max-width: 256px; }");
     propertiesTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
     propertiesTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     SetLayoutAlightment(propertiesTB->layout(), Qt::AlignmentFlag::AlignLeft);
@@ -230,7 +228,6 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     archievePreviewToolBar->addAction(g_AchiveFilesActions().ARCHIVE_PREVIEW);
     archievePreviewToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-    archievePreviewToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   }
 
   QToolBar* selectionToolBar = new (std::nothrow) QToolBar{"Selection", leafHomeWid};
@@ -240,7 +237,6 @@ QToolBar* RibbonMenu::LeafHome() const {
     selectionToolBar->setOrientation(Qt::Orientation::Vertical);
     selectionToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     selectionToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-    selectionToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
     SetLayoutAlightment(selectionToolBar->layout(), Qt::AlignmentFlag::AlignLeft);
   }
 
@@ -260,7 +256,6 @@ QToolBar* RibbonMenu::LeafHome() const {
   {
     advanceSearchToolBar->addAction(g_viewActions()._ADVANCE_SEARCH_VIEW);
     advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-    advanceSearchToolBar->setStyleSheet("QToolBar { max-width: 256px; }");
   }
 
   leafHomeWid->setToolTip("Home Leaf ToolBar");
@@ -356,7 +351,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   CHECK_NULLPTR_RETURN_NULLPTR(folderRmv);
   folderRmv->setOrientation(Qt::Orientation::Vertical);
   folderRmv->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  folderRmv->setStyleSheet("QToolBar { max-width: 256px; }");
   folderRmv->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   folderRmv->addAction(fileOpAgInst._RMV_EMPTY_FOLDER);
   folderRmv->addAction(fileOpAgInst._RMV_01_FILE_FOLDER);
@@ -367,7 +361,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   CHECK_NULLPTR_RETURN_NULLPTR(mediaDupFinder);
   mediaDupFinder->setOrientation(Qt::Orientation::Vertical);
   mediaDupFinder->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  mediaDupFinder->setStyleSheet("QToolBar { max-width: 256px; }");
   mediaDupFinder->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   mediaDupFinder->addAction(fileOpAgInst._DUPLICATE_IMAGES_FINDER);
   mediaDupFinder->addAction(fileOpAgInst._LOW_RESOLUTION_IMGS_RMV);
@@ -381,9 +374,6 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
                                                                        IMAGE_SIZE::TABS_ICON_IN_MENU_16);
   CHECK_NULLPTR_RETURN_NULLPTR(nameRulerToolButton);
   nameRulerToolButton->setDefaultAction(arrangeIns._NAME_RULER);
-
-  auto& thumbInst = g_ThumbnailProcessActions();
-  auto* thumbnailTb = thumbInst.GetThumbnailToolbar();
 
   QToolBar* archiveVidsTB{new (std::nothrow) QToolBar{"Leaf Arrange Files"}};
   CHECK_NULLPTR_RETURN_NULLPTR(archiveVidsTB);
@@ -400,7 +390,13 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addWidget(mediaDupFinder);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(thumbnailTb);
+  {
+    auto& inst = ThumbnailActions::GetInst();
+    archiveVidsTB->addWidget(inst.GetThumbnailFrameTools(archiveVidsTB));
+    archiveVidsTB->addWidget(inst.GetStoryBoardToolbar(archiveVidsTB));
+    archiveVidsTB->addAction(inst._SKIP_IF_ALREADY_EXIST);
+  }
+  archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   return archiveVidsTB;
 }

@@ -14,7 +14,7 @@ public:
     // return index(rootPath());
     return mRootIndex = QFileSystemModel::setRootPath(path);
   }
-
+  void setThumbnailAsDecoration(bool bEnableUse);
   void BindLogger(CustomStatusBar* logger) const;
 
   QString fullInfo(const QModelIndex& curIndex) const;
@@ -103,6 +103,7 @@ private:
   SelectionsRangeHelper mCutIndexes, mCopyIndexes;
   QModelIndex m_draggedHoverIndex;
   QModelIndex mRootIndex;
+  bool m_bThumbnailAsDecoration{false};
 };
 
 #endif // FILESYSTEMMODEL_H

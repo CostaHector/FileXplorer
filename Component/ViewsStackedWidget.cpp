@@ -4,7 +4,7 @@
 #include "ArchiveFilesActions.h"
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
-#include "ThumbnailImageViewer.h"
+#include "FileImageViewer.h"
 #include "ViewTypeTool.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
@@ -241,7 +241,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   // Non-FileSystemView: open in QDesktopService;
 
   if (fi.isFile()) {
-    if (ThumbnailImageViewer::IsFileImage(fi)) {
+    if (FileImageViewer::IsFileImage(fi)) {
       return FileTool::OpenLocalImageFile(absItemPath);
     } else if (ArchiveFilesReader::isQZFile(fi)) {
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
@@ -284,7 +284,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
       parentPth += '/';
     }
 #endif
-    m_anchorTags.insert(parentPth, {current.row(), current.column()});
+    m_anchorTags[(int)vt].insert(parentPth, {current.row(), current.column()});
   }
 
   if (_previewFolder != nullptr && !_previewFolder->isHidden()) {
@@ -346,18 +346,21 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
 }
 
 bool ViewsStackedWidget::onAfterDirectoryLoaded(const QString& loadedPath) {
-  if (!m_anchorTags.contains(loadedPath)) {
+  const ViewTypeTool::ViewType vt = GetVt();
+  if (!m_anchorTags[(int)vt].contains(loadedPath)) {
     return false;
   }
-  const QModelIndex rootIndex = m_fsTableView->rootIndex();
-  const QModelIndex anchorInd = m_fsModel->index(m_anchorTags[loadedPath].row, m_anchorTags[loadedPath].col, rootIndex);
+  auto* pView = GetCurView();
+  const QModelIndex rootIndex = pView->rootIndex();
+  const Anchor& anchor = m_anchorTags[(int)vt][loadedPath];
+  const QModelIndex anchorInd = m_fsModel->index(anchor.row, anchor.col, rootIndex);
   if (!anchorInd.isValid()) {
     LOG_D("anchorTags[%s] invalid. cancel scroll", qPrintable(loadedPath));
-    m_anchorTags.remove(loadedPath);
+    m_anchorTags[(int)vt].remove(loadedPath);
     return false;
   }
-  m_fsTableView->setCurrentIndex(anchorInd);
-  m_fsTableView->scrollTo(anchorInd);
+  pView->setCurrentIndex(anchorInd);
+  pView->scrollTo(anchorInd);
   return true;
 }
 

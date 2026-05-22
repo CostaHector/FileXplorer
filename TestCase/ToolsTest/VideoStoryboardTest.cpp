@@ -5,7 +5,7 @@
 #include "Logger.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "ThumbnailProcesser.h"
+#include "VideoStoryboard.h"
 #include "EndToExposePrivateMember.h"
 #include "VideoTestPrecoditionTools.h"
 #include "ImageTestPrecoditionTools.h"
@@ -30,7 +30,7 @@ bool ColorsApproximatelyEqual(quint32 actualColor, quint32 expectColor, int tole
   return approEqual;
 }
 
-class ThumbnailProcesserTest : public PlainTestSuite {
+class VideoStoryboardTest : public PlainTestSuite {
   Q_OBJECT
 public:
   QDir dir{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
@@ -52,42 +52,42 @@ private slots:
   }
 
   void test_CheckParameters() {
-    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1, 360));
-    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1, 480));
-    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1, 720));
-    QVERIFY(ThumbnailProcesser::CheckParameters(1, 1, 1080));
+    QVERIFY(VideoStoryboard::CheckParameters(1, 1, 360));
+    QVERIFY(VideoStoryboard::CheckParameters(1, 1, 480));
+    QVERIFY(VideoStoryboard::CheckParameters(1, 1, 720));
+    QVERIFY(VideoStoryboard::CheckParameters(1, 1, 1080));
 
-    QVERIFY(ThumbnailProcesser::CheckParameters(3, 4, 360));
-    QVERIFY(ThumbnailProcesser::CheckParameters(6, 8, 480));
-    QVERIFY(ThumbnailProcesser::CheckParameters(2, 9, 720));
-    QVERIFY(ThumbnailProcesser::CheckParameters(9, 4, 1080));
+    QVERIFY(VideoStoryboard::CheckParameters(3, 4, 360));
+    QVERIFY(VideoStoryboard::CheckParameters(6, 8, 480));
+    QVERIFY(VideoStoryboard::CheckParameters(2, 9, 720));
+    QVERIFY(VideoStoryboard::CheckParameters(9, 4, 1080));
 
-    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9, 360));
-    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9, 480));
-    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9, 720));
-    QVERIFY(ThumbnailProcesser::CheckParameters(9, 9, 1080));
+    QVERIFY(VideoStoryboard::CheckParameters(9, 9, 360));
+    QVERIFY(VideoStoryboard::CheckParameters(9, 9, 480));
+    QVERIFY(VideoStoryboard::CheckParameters(9, 9, 720));
+    QVERIFY(VideoStoryboard::CheckParameters(9, 9, 1080));
   }
 
   void test_not_video_need_to_create_thumbnail_imgs() {
     QStringList invalidVideosPath{"", "inexist file", __FILE__};
-    ThumbnailProcesser tp{true};
-    QCOMPARE(tp.CreateThumbnailImages(invalidVideosPath, 2, 2, 720), 0);
+    VideoStoryboard tp{true};
+    QCOMPARE(tp.Create(invalidVideosPath, 2, 2, 720), 0);
   }
 
   void test_2_videos_need_to_create_thumbnail_imgs() {
     QStringList validVideosPath{"",                                                //
                                 dir.absoluteFilePath(MP4_33_VID_BASE_NAME ".mp4"), //
                                 dir.absoluteFilePath(FLV_10_VID_BASE_NAME ".flv")};
-    ThumbnailProcesser tp{true};
+    VideoStoryboard tp{true};
     {
-      QCOMPARE(tp.CreateThumbnailImages(validVideosPath, 2, 2, 720, true), 2);
+      QCOMPARE(tp.Create(validVideosPath, 2, 2, 720, true), 2);
       QVERIFY(dir.exists(MP4_33_VID_BASE_NAME " 22.jpg"));
       QVERIFY(dir.exists(FLV_10_VID_BASE_NAME " 22.jpg"));
       QCOMPARE(ImageTool::GetImageDimensionPixel(dir.absoluteFilePath(MP4_33_VID_BASE_NAME " 22.jpg")).width(), 720 * 2);
     }
 
     {
-      QCOMPARE(tp.CreateThumbnailImages(validVideosPath, 1, 3, 480, false), 2);
+      QCOMPARE(tp.Create(validVideosPath, 1, 3, 480, false), 2);
       QVERIFY(dir.exists(MP4_33_VID_BASE_NAME " 13.png"));
       QVERIFY(dir.exists(FLV_10_VID_BASE_NAME " 13.png"));
       QCOMPARE(ImageTool::GetImageDimensionPixel(dir.absoluteFilePath(FLV_10_VID_BASE_NAME " 13.png")).width(), 480 * 3);
@@ -109,8 +109,8 @@ private slots:
     QVERIFY(bGenOk);
     QVERIFY(vidBa.size() > 0);
 
-    ThumbnailProcesser itp4{true};
-    QCOMPARE(itp4.CreateThumbnailImages(QStringList{mkvPath}, 3, 1, MKV_WIDTH, false), 1);
+    VideoStoryboard itp4{true};
+    QCOMPARE(itp4.Create(QStringList{mkvPath}, 3, 1, MKV_WIDTH, false), 1);
     const QString thumbnailImgPath = tDir.itemPath(MKV_SEGEMENTS_BASE_NAME " 31.png");
     const QImage thumbnailImg{thumbnailImgPath};
     QVERIFY(!thumbnailImg.isNull());
@@ -125,28 +125,28 @@ private slots:
 #undef MKV_SEGEMENTS_BASE_NAME
 
   void test_IsImageNameLooksLikeThumbnail_ok() {
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 22"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 33"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 44"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 22"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 33"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 44"));
 
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 21"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 31"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 41"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 51"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 61"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 71"));
-    QVERIFY(ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 81"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 21"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 31"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 41"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 51"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 61"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 71"));
+    QVERIFY(VideoStoryboard::IsImageNameLooksLikeThumbnail("image 81"));
   }
 
   void test_IsImageNameLooksLikeThumbnail_no() {
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 00"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 11"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 12"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 13"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 14"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 23"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image 24"));
-    QVERIFY(!ThumbnailProcesser::IsImageNameLooksLikeThumbnail("image thumbnail"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 00"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 11"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 12"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 13"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 14"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 23"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image 24"));
+    QVERIFY(!VideoStoryboard::IsImageNameLooksLikeThumbnail("image thumbnail"));
   }
 
   void test_CutThumbnails9ImgsOk() {
@@ -157,21 +157,21 @@ private slots:
     QVERIFY(tDir.fileExists("Images 33.png"));
 
     {
-      ThumbnailProcesser itp{true};
-      int extractedImgsOut9 = itp(rootpath, 0, 9);
+      VideoStoryboard itp{true};
+      int extractedImgsOut9 = itp.ExtractFrames(rootpath, 0, 9);
 
       QCOMPARE(extractedImgsOut9, 9);
       QVERIFY(itp.mErrImg.isEmpty());
 
-      int extractedImgsOut0 = itp(rootpath, 0, 1);
+      int extractedImgsOut0 = itp.ExtractFrames(rootpath, 0, 1);
       QCOMPARE(extractedImgsOut0, 0);
       QCOMPARE(itp.mRewriteImagesCnt, 0);
       QVERIFY(itp.mErrImg.isEmpty()); // 1 skip
     }
 
     {
-      ThumbnailProcesser itp3{false};
-      int extractedImgsOut1 = itp3(rootpath, 0, 4);
+      VideoStoryboard itp3{false};
+      int extractedImgsOut1 = itp3.ExtractFrames(rootpath, 0, 4);
       QCOMPARE(extractedImgsOut1, 4); // 4 extract alse rewrite
       QCOMPARE(itp3.mRewriteImagesCnt, 4);
       QCOMPARE(itp3.mErrImg.size(), 4); // 4 rewrite msg
@@ -202,8 +202,8 @@ private slots:
     QCOMPARE(tDir.createEntries(nodes), nodes.size());
 
     // not skip
-    ThumbnailProcesser it{false};
-    QVERIFY(it.RenameThumbnailGeneratedByPotPlayer(tDir.path()));
+    VideoStoryboard it{false};
+    QVERIFY(it.RenameVideoStoryBoardCreatedByPotPlayer(tDir.path()));
 
     const QSet<QString> expectSnapShots{
         "a need.mp4",
@@ -224,11 +224,11 @@ private slots:
   }
 };
 
-constexpr int ThumbnailProcesserTest::MKV_WIDTH;
-constexpr int ThumbnailProcesserTest::MKV_HEIGHT;
+constexpr int VideoStoryboardTest::MKV_WIDTH;
+constexpr int VideoStoryboardTest::MKV_HEIGHT;
 
 #undef FLV_10_VID_BASE_NAME
 #undef MP4_33_VID_BASE_NAME
 
-#include "ThumbnailProcesserTest.moc"
-REGISTER_TEST(ThumbnailProcesserTest, false)
+#include "VideoStoryboardTest.moc"
+REGISTER_TEST(VideoStoryboardTest, false)

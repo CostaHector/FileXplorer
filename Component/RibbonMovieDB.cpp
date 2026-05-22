@@ -23,7 +23,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_extraFunctionTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_extraFunctionTB->setOrientation(Qt::Orientation::Vertical);
   m_extraFunctionTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  m_extraFunctionTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_extraFunctionTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_functionsTB = new (std::nothrow) QToolBar{"Function", this};
@@ -34,7 +33,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_functionsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_functionsTB->setOrientation(Qt::Orientation::Vertical);
   m_functionsTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  m_functionsTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_functionsTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_studioTB = new (std::nothrow) QToolBar("Studio Edit Toolbar", this);
@@ -51,7 +49,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_castEditTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_castEditTB->setOrientation(Qt::Orientation::Vertical);
   m_castEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  m_castEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_castEditTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_tagsEditTB = new (std::nothrow) QToolBar{"Tags Edit Toolbar", this};
@@ -62,7 +59,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_tagsEditTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_tagsEditTB->setOrientation(Qt::Orientation::Vertical);
   m_tagsEditTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  m_tagsEditTB->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(m_tagsEditTB->layout(), Qt::AlignmentFlag::AlignLeft);
 
   m_dbViewHideShowTB = new (std::nothrow) QToolBar{"Show/Hide Database View", this};
@@ -73,7 +69,6 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_dbViewHideShowTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   m_dbViewHideShowTB->setOrientation(Qt::Orientation::Vertical);
   m_dbViewHideShowTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
-  m_dbViewHideShowTB->setStyleSheet("QToolBar { max-width: 256px; }");
 
   addWidget(m_dbViewHideShowTB);
   addSeparator();

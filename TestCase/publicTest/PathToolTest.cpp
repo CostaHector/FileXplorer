@@ -3,6 +3,7 @@
 
 #include "PlainTestSuite.h"
 #include "PathTool.h"
+#include "SystemPath.h"
 
 using namespace ::PathTool;
 class PathToolTest : public PlainTestSuite {
@@ -12,7 +13,30 @@ public:
   PathToolTest()
     : PlainTestSuite{} {}
 private slots:
-  void test_project_name_from_marco() { QCOMPARE(PROJECT_NAME, QString("FileXplorer")); }
+  void project_name_from_marco() { QCOMPARE(PROJECT_NAME, QString("FileXplorer")); }
+
+  void CreateUserPath_ok() {  // UserPath is Service Running Precondition
+    QCOMPARE(SystemPath::initDirectory(), true);
+
+    const QString homePath = SystemPath::HomePath();
+    QCOMPARE(QFileInfo{homePath}.isDir(), true);
+
+    const QString localPath = SystemPath::LocalPath();
+    QCOMPARE(QFileInfo{localPath}.isDir(), true);
+
+    const QString roamPath = SystemPath::RoamingPath();
+    QCOMPARE(QFileInfo{roamPath}.isDir(), true);
+
+    auto IsPathStringValid = [roamPath](const QString& path) -> bool {  // we do not assume path existence here
+      return path.startsWith(roamPath) && path.size() > roamPath.size();
+    };
+    QVERIFY(IsPathStringValid(SystemPath::VIDS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::AI_MEDIA_DUP_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::RECYCLE_BIN_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::PEFORMERS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::TORRENTS_DATABASE()));
+    QVERIFY(IsPathStringValid(SystemPath::PRODUCTION_STUDIOS_DATABASE()));
+  }
 
   void test_lib_files_path_correct() {
     QVERIFY(QDir(TESTCASE_ROOT_PATH).exists("../third_party/mediaInfo"));
@@ -26,13 +50,13 @@ private slots:
     //       Actors.txt
     //       ActorsAlias.txt
     // - ThisProject
-    using namespace FILE_REL_PATH;
-    QString perfPath = GetActorsListFilePath();
-    QVERIFY(QFile::exists(perfPath));
-    QString stdStudioPath = GetVendorsTableFilePath();
-    QVERIFY(QFile::exists(stdStudioPath));
-    QString akaPath = GetActorsAliasListFilePath();
-    QVERIFY(QFile::exists(akaPath));
+    const QString pre{SystemPath::CastStudioListPath() + "/"};
+    QString perfPath = SystemPath::GetActorsListFilePath();
+    QString stdStudioPath = SystemPath::GetVendorsTableFilePath();
+    QString akaPath = SystemPath::GetActorsAliasListFilePath();
+    QVERIFY(perfPath.startsWith(pre));
+    QVERIFY(stdStudioPath.startsWith(pre));
+    QVERIFY(akaPath.startsWith(pre));
   }
 
   void test_GetWinStdPath() {

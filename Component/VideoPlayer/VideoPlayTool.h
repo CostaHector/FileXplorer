@@ -2,7 +2,7 @@
 #define PLAYMODECONTROL_H
 
 namespace VideoPlayTool {
-enum class PlaybackTriggerMode { MANUAL = 0, AUTO = 1, DISABLED = 2 };
+enum class PlaybackTriggerMode { MANUAL = 0, AUTO = 1 };
 constexpr PlaybackTriggerMode DEFAULT_PLAYBACK_TRIGGER_MODE{VideoPlayTool::PlaybackTriggerMode::MANUAL};
 } // namespace VideoPlayTool
 

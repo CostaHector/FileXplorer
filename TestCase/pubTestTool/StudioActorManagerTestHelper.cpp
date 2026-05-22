@@ -4,6 +4,7 @@
 #include "StudiosManager.h"
 #include "CastManager.h"
 #include "EndToExposePrivateMember.h"
+#include "SystemPath.h"
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
 #include <mockcpp/MockObject.h>
@@ -34,9 +35,8 @@ ActorManagerTestHelper::ActorManagerTestHelper(TDir& tDir, const QString& fileNa
     : StudioActorManagerTestHelper{tDir, fileName, blackFileName} {}
 
 void ActorManagerTestHelper::mock() {
-  using namespace PathTool::FILE_REL_PATH;
-  MOCKER(GetActorsListFilePath).stubs().will(returnValue(mFileAbsPath));
-  MOCKER(GetMononymActorsListFilePath).stubs().will(returnValue(mBlackFileAbsPath));
+  MOCKER(SystemPath::GetActorsListFilePath).stubs().will(returnValue(mFileAbsPath));
+  MOCKER(SystemPath::GetMononymActorsListFilePath).stubs().will(returnValue(mBlackFileAbsPath));
 }
 
 int ActorManagerTestHelper::reload() {
@@ -47,17 +47,15 @@ int ActorManagerTestHelper::reload() {
 void ActorManagerTestHelper::init() {
   mock();
   CastManager& actorMgr = CastManager::getInst();
-  using namespace PathTool::FILE_REL_PATH;
-  actorMgr.InitializeImpl(GetActorsListFilePath(), GetMononymActorsListFilePath());
+  actorMgr.InitializeImpl(SystemPath::GetActorsListFilePath(), SystemPath::GetMononymActorsListFilePath());
 }
 
 StudioManagerTestHelper::StudioManagerTestHelper(TDir& tDir, const QString& fileName, const QString& blackFileName)
     : StudioActorManagerTestHelper{tDir, fileName, blackFileName} {}
 
 void StudioManagerTestHelper::mock() {
-  using namespace PathTool::FILE_REL_PATH;
-  MOCKER(GetVendorsTableFilePath).stubs().will(returnValue(mFileAbsPath));
-  MOCKER(GetMononymVendorsListFilePath).stubs().will(returnValue(mBlackFileAbsPath));
+  MOCKER(SystemPath::GetVendorsTableFilePath).stubs().will(returnValue(mFileAbsPath));
+  MOCKER(SystemPath::GetMononymVendorsListFilePath).stubs().will(returnValue(mBlackFileAbsPath));
 }
 
 int StudioManagerTestHelper::reload() {
@@ -68,6 +66,5 @@ int StudioManagerTestHelper::reload() {
 void StudioManagerTestHelper::init() {
   mock();
   StudiosManager& studioMgr = StudiosManager::getInst();
-  using namespace PathTool::FILE_REL_PATH;
-  studioMgr.InitializeImpl(GetVendorsTableFilePath(), GetMononymVendorsListFilePath());
+  studioMgr.InitializeImpl(SystemPath::GetVendorsTableFilePath(), SystemPath::GetMononymVendorsListFilePath());
 }

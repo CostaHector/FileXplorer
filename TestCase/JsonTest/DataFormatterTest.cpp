@@ -217,7 +217,7 @@ class DataFormatterTest : public PlainTestSuite {
       QStringList expectSortedLst{"A", "B", "C"};
       SortedUniqStrLst vals{rawLst};
       QCOMPARE("A,B,C", vals.join());
-      QCOMPARE(formatSortedLst(vals), vals.join());
+      QCOMPARE("A\nB\nC", formatSortedLst(vals));
     }
 
     {

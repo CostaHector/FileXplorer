@@ -5,6 +5,11 @@
 #include <QMenu>
 #include <QActionGroup>
 
+CastDBActions& CastDBActions::GetInst() {
+  static CastDBActions CastManagerActIns;
+  return CastManagerActIns;
+}
+
 CastDBActions::CastDBActions(QObject* parent)  //
     : QObject{parent}                          //
 {
@@ -57,24 +62,16 @@ CastDBActions::CastDBActions(QObject* parent)  //
   SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->setToolTip(
       QString{"<b>%1 (%2)</b><br/> Sync selected record(s) Imgs field from disk"}  //
           .arg(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->text(), SYNC_SELECTED_RECORDS_IMGS_FROM_DISK->shortcut().toString()));
-  SYNC_ALL_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{tr("Sync all imgs field"), this};
+  SYNC_ALL_RECORDS_IMGS_FROM_DISK = new (std::nothrow) QAction{QIcon{":img/SYNC_FROM_DISK"}, tr("Sync all imgs field"), this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_IMGS_FROM_DISK);
   SYNC_ALL_RECORDS_IMGS_FROM_DISK->setToolTip("Sync all record(s) Imgs field from disk");
-  _SYNC_IMGS_OP = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(_SYNC_IMGS_OP);
-  _SYNC_IMGS_OP->addAction(SYNC_SELECTED_RECORDS_IMGS_FROM_DISK);
-  _SYNC_IMGS_OP->addAction(SYNC_ALL_RECORDS_IMGS_FROM_DISK);
 
   SYNC_SELECTED_RECORDS_VIDS_FROM_DB = new (std::nothrow) QAction{QIcon{":img/SYNC_FROM_DB"}, tr("Sync vids field"), this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
   SYNC_SELECTED_RECORDS_VIDS_FROM_DB->setToolTip("Sync selected record(s) Vids field from db");
-  SYNC_ALL_RECORDS_VIDS_FROM_DB = new (std::nothrow) QAction{tr("Sync all vids field"), this};
+  SYNC_ALL_RECORDS_VIDS_FROM_DB = new (std::nothrow) QAction{QIcon{":img/SYNC_FROM_DB"}, tr("Sync all vids field"), this};
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_VIDS_FROM_DB);
   SYNC_ALL_RECORDS_VIDS_FROM_DB->setToolTip("Sync all record(s) Vids field from db");
-  _SYNC_VIDS_OP = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(_SYNC_VIDS_OP);
-  _SYNC_VIDS_OP->addAction(SYNC_SELECTED_RECORDS_VIDS_FROM_DB);
-  _SYNC_VIDS_OP->addAction(SYNC_ALL_RECORDS_VIDS_FROM_DB);
 
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("Open Database"), this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
@@ -89,13 +86,9 @@ CastDBActions::CastDBActions(QObject* parent)  //
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(
       QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}  //
           .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
-  DUMP_ALL_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{tr("Dump all records"), this};
+  DUMP_ALL_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, tr("Dump all records"), this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_ALL_RECORDS_INTO_PSON_FILE);
   DUMP_ALL_RECORDS_INTO_PSON_FILE->setToolTip("Dump all records to its pson file");
-  EXPORT_OP = new (std::nothrow) QActionGroup(this);
-  CHECK_NULLPTR_RETURN_VOID(EXPORT_OP);
-  EXPORT_OP->addAction(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  EXPORT_OP->addAction(DUMP_ALL_RECORDS_INTO_PSON_FILE);
 }
 
 QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* parent) {
@@ -109,9 +102,4 @@ QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* parent) {
   tb->setDefaultAction(APPEND_FROM_MULTILINES_INPUT);
   tb->setMenu(menu);
   return tb;
-}
-
-CastDBActions& g_castAct() {
-  static CastDBActions CastManagerActIns;
-  return CastManagerActIns;
 }

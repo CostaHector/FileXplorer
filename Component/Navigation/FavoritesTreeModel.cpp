@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
+#include "SystemPath.h"
 #include <QMimeData>
 #include <QUrl>
 #include <QFileInfo>
@@ -273,14 +274,14 @@ FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& pat
 void FavoritesTreeModel::addInitialFavoritesGroup() {
   // initial configs
   FavTreeNode* workGroup = addGroup(tr("Work"), nullptr);
-  addPath("Documents", SystemPath::HOME_PATH() + "/Documents", workGroup);
-  addPath("Project Configurations", SystemPath::HOME_PATH(), workGroup);
+  addPath("Documents", SystemPath::HomePath() + "/Documents", workGroup);
+  addPath("Project Configurations", SystemPath::HomePath(), workGroup);
 
   FavTreeNode* lifeGroup = addGroup(tr("Life"), nullptr);
-  addPath("Pictures", SystemPath::HOME_PATH() + "/Pictures", lifeGroup);
-  addPath("Videos", SystemPath::HOME_PATH() + "/Videos", lifeGroup);
+  addPath("Pictures", SystemPath::HomePath() + "/Pictures", lifeGroup);
+  addPath("Videos", SystemPath::HomePath() + "/Videos", lifeGroup);
 
-  addPath("Code", SystemPath::HOME_PATH() + "/code", nullptr);
+  addPath("Code", SystemPath::HomePath() + "/code", nullptr);
 }
 
 void FavoritesTreeModel::saveToSettings() {

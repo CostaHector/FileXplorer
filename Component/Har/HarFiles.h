@@ -26,6 +26,8 @@ public:
   static bool IsHarFile(const QFileInfo& fi);
   void clear() {mHarItems.clear();}
 private:
+  bool ParseFilesInJsonByteArray(const QByteArray& jsonByteArray);
+
   QString mHarFilePath;
   QList<HAR_FILE_ITEM> mHarItems;
   static const QMap<QString, QString> SUPPORTED_MIMETYPES;

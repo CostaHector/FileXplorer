@@ -31,9 +31,13 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 
-  auto* delegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Detail, this};
-  CHECK_NULLPTR_RETURN_VOID(delegator);
-  setItemDelegateForColumn(JSON_KEY_E::Detail, delegator);
+  auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Detail, this};
+  CHECK_NULLPTR_RETURN_VOID(detailColumnDelegator);
+  setItemDelegateForColumn(JSON_KEY_E::Detail, detailColumnDelegator);
+
+  auto* castColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Cast, this};
+  CHECK_NULLPTR_RETURN_VOID(castColumnDelegator);
+  setItemDelegateForColumn(JSON_KEY_E::Cast, castColumnDelegator);
 
   {
     auto& jsonInst = g_JsonActions();

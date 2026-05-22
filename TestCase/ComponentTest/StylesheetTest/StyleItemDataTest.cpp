@@ -5,7 +5,7 @@
 #include "StyleItemData.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "Configuration.h"
 #include <QHash>
 
@@ -16,7 +16,7 @@ public:
   const QString curFilePath{curFile.absoluteFilePath()};
   const QString curFolderPath{curFile.absolutePath()};
   const QString otherFilePath{Configuration().fileName()};
-  const QString otherFolderPath{SystemPath::HOME_PATH()};
+  const QString otherFolderPath{SystemPath::HomePath()};
 
 private slots:
   void initTestCase() { //

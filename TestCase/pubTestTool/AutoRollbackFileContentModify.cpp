@@ -12,7 +12,7 @@ AutoRollbackFileContentModify::~AutoRollbackFileContentModify() {
   if (!mNeedRollback) {
     return;
   }
-  const bool bRollbackResult = FileTool::ByteArrayWriter(mAbsFilePath, mOriginContents.toUtf8());
+  const bool bRollbackResult = FileTool::ByteArrayTextWriter(mAbsFilePath, mOriginContents.toUtf8());
   if (!bRollbackResult) {
     LOG_W("Rollback file[%s] contents failed", qPrintable(mAbsFilePath));
   }
@@ -24,7 +24,7 @@ bool AutoRollbackFileContentModify::Execute() {
     return false;
   }
   bool bReadOk = false;
-  QString content = FileTool::TextReader(mAbsFilePath, &bReadOk);
+  QString content = FileTool::StringTextReader(mAbsFilePath, &bReadOk);
   if (!bReadOk) {
     LOG_W("Read Content from file[%s] failed", qPrintable(mAbsFilePath));
     return false;
@@ -36,11 +36,11 @@ bool AutoRollbackFileContentModify::Execute() {
     case Mode::ReplaceMode: {
       QString tempStr = mOriginContents;
       tempStr.replace(mReplaceeStr, mReplacerStr);
-      bSuccess = FileTool::ByteArrayWriter(mAbsFilePath, tempStr.toUtf8());
+      bSuccess = FileTool::ByteArrayTextWriter(mAbsFilePath, tempStr.toUtf8());
       break;
     }
     case Mode::FullReplaceMode: {
-      bSuccess = FileTool::ByteArrayWriter(mAbsFilePath, mNewContents.toUtf8());
+      bSuccess = FileTool::ByteArrayTextWriter(mAbsFilePath, mNewContents.toUtf8());
       break;
     }
     default:

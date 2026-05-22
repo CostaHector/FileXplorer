@@ -64,8 +64,6 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   m_layout->addWidget(m_dlgBtnBox);
   setLayout(m_layout);
 
-  seeChanges();
-
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
   setWindowTitle("StyleSheet Manager");
   setWindowIcon(QIcon{":/styles/STYLESHEET_MGR"});
@@ -89,6 +87,7 @@ void StyleSheetMgr::initStyleSheetPreview() {
     m_effectSpiltter->addWidget(m_effectDarkPreviewer);
   }
   m_spiltter->addWidget(m_effectSpiltter);
+  seeChanges();
 }
 
 void StyleSheetMgr::subscribe() {
@@ -298,7 +297,7 @@ QWidget* StyleSheetMgr::GetEffectPreviewer() {
     pStdTableModel->setItem(0, 0, new QStandardItem(QIcon{":img/FILE"}, "table(0,0)"));
     pStdTableModel->setItem(0, 1, new QStandardItem(QIcon{":img/VIDEO"}, "table(0,1)"));
     pStdTableModel->setItem(1, 0, new QStandardItem(QIcon{":img/IMAGE"}, "table(1,0)"));
-    pStdTableModel->setItem(1, 1, new QStandardItem(QIcon{":img/PLAIN_TEXT"}, "table(1,1)"));
+    pStdTableModel->setItem(1, 1, new QStandardItem(QIcon{":img/COMPRESSED"}, "table(1,1)"));
     pTableView->setModel(pStdTableModel);
     listTableTreeLayout->addWidget(pTableView);
 

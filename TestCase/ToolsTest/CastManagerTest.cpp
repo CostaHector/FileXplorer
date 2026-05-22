@@ -46,7 +46,6 @@ class CastManagerTest : public PlainTestSuite {
  private slots:
   void initTestCase() {
     GlobalMockObject::reset();
-    using namespace PathTool::FILE_REL_PATH;
 
     QVERIFY(mTDir.IsValid());
     QCOMPARE(mTDir.createEntries(gNodeEntries), gNodeEntries.size());

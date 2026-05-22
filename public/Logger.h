@@ -29,7 +29,6 @@ public:
     static FILE* pLogStream = GetFILEStream(); // cross unit compile protection!
     return pLogStream; // alway valid pointer here
   }
-  static const QString& GetLogFileAbsPath();
   static LOG_LVL_E m_printLevel; // log which level below this will mute
   static LOG_LVL_E m_autoFflushLevel; // log which level not below this will flush into file instantly
 
@@ -43,7 +42,6 @@ private:
   static FILE* GetFILEStream();
   static bool CloseLogFile(FILE* pFile);
   static std::unique_ptr<FILE, decltype(Logger::CloseLogFile)*> mLogFILEStreamUniquePtr;
-  static constexpr char CONSTANT_LOG_FILE_NAME[] = "logs_info.log";
 };
 
 #include <stdio.h>

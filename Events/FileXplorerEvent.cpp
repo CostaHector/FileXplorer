@@ -6,7 +6,7 @@
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
 #include "ViewActions.h"
-#include "ThumbnailProcessActions.h"
+#include "ThumbnailActions.h"
 #include "TSFilesMerger.h"
 
 #include "Archiver.h"
@@ -26,6 +26,7 @@
 #include "RenameWidget_Replace.h"
 #include "RenameWidget_SwapFileNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
+#include "RenameWidget_Digit2Alpha.h"
 #include "DuplicateVideosFinder.h"
 #include "HarMgr.h"
 
@@ -37,7 +38,7 @@
 #include "FilesNameBatchStandardizer.h"
 #include "PlayVideo.h"
 #include "ViewTypeTool.h"
-#include "ThumbnailProcesser.h"
+#include "VideoStoryboard.h"
 
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
@@ -66,7 +67,8 @@
 
 using namespace ViewTypeTool;
 
-FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger) : QObject{view} {  //
+FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger)
+  : QObject{view} { //
   CHECK_NULLPTR_RETURN_VOID(view)
   CHECK_NULLPTR_RETURN_VOID(view->m_fsModel)
   CHECK_NULLPTR_RETURN_VOID(logger)
@@ -77,7 +79,7 @@ FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* lo
   m_clipboard = QApplication::clipboard();
 }
 
-bool FileXplorerEvent::on_NewTextFile() {  // not effect by selection;
+bool FileXplorerEvent::on_NewTextFile() { // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
@@ -100,7 +102,7 @@ bool FileXplorerEvent::on_NewJsonFile() {
   return CreateFileFolderHelper::NewJsonFile(createIn, basedOnFileNames) >= 0;
 }
 
-bool FileXplorerEvent::on_NewFolder() {  // not effect by selection;
+bool FileXplorerEvent::on_NewFolder() { // not effect by selection;
   if (!__CanNewItem()) {
     return false;
   }
@@ -124,12 +126,10 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   const QString folderDefName{getConfig(BehaviorKey::BATCH_FOLDERS_NAME_PATTERN).toString()};
   const QString fileDefName{getConfig(BehaviorKey::BATCH_FILES_NAME_PATTERN).toString()};
   const QString defNamePattern{isFolder ? folderDefName : fileDefName};
-  const QString userInputRule =
-      QInputDialog::getText(_contentPane, title, "Rule Pattern: C-style Format String$StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
+  const QString userInputRule = QInputDialog::getText(_contentPane, title, "Rule Pattern: C-style Format String$StartIndex$EndIndex", QLineEdit::Normal, defNamePattern);
   const QStringList& userInputLst = userInputRule.split('$');
   if (userInputLst.size() != 3) {
-    LOG_WARN_P("[Error] Invalid Rule pattern", "Rule pattern[%s] should contains 3 parts seperated by '$', but there are %d parts",
-               qPrintable(userInputRule), userInputLst.size());
+    LOG_WARN_P("[Error] Invalid Rule pattern", "Rule pattern[%s] should contains 3 parts seperated by '$', but there are %d parts", qPrintable(userInputRule), userInputLst.size());
     return false;
   }
   const QString& namePattern = userInputLst[0];
@@ -140,7 +140,7 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
-bool FileXplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
+bool FileXplorerEvent::on_CreateVideoStoryBoard(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
   }
@@ -149,8 +149,8 @@ bool FileXplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, 
     LOG_INFO_NP("Skip nothing selected", "selected some video(s) first");
     return true;
   }
-  ThumbnailProcesser tp{skipIfExist};
-  const int cnt = tp.CreateThumbnailImages(selectedFiles, dimensionX, dimensionY, widthPx, true);
+  VideoStoryboard tp{skipIfExist};
+  const int cnt = tp.Create(selectedFiles, dimensionX, dimensionY, widthPx, true);
   if (cnt <= 0) {
     LOG_ERR_NP("Create thumbnail failed", "see details in log");
     return false;
@@ -161,10 +161,21 @@ bool FileXplorerEvent::on_CreateThumbnailImages(int dimensionX, int dimensionY, 
 
 bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
   const QString rootPath = _contentPane->getRootPath();
-  ThumbnailProcesser tp{skipIfExist};
-  bool renameResult = tp.RenameThumbnailGeneratedByPotPlayer(rootPath);
-  LOG_OE_NP(renameResult, "Rename thumbnail under", rootPath);
+  VideoStoryboard tp{skipIfExist};
+  bool renameResult = tp.RenameVideoStoryBoardCreatedByPotPlayer(rootPath);
+  LOG_OE_NP(renameResult, "Rename thumbnail under path", rootPath);
   return true;
+}
+
+bool FileXplorerEvent::on_CreateThumbnailForAPath(bool skipIfExist) {
+  if (!__CanNewItem()) {
+    LOG_INFO_NP("Abort", "Cannot new item here");
+    return false;
+  }
+  const QString currentPath = _fileSysModel->rootPath();
+  const int thumnailCreatedCnt = ImageTool::CreateThumbnailForAPath(currentPath, skipIfExist);
+  LOG_OK_P("[Ok] Create", "%d thumbnail(s) from path[%s]", thumnailCreatedCnt, qPrintable(currentPath));
+  return thumnailCreatedCnt >= 0;
 }
 
 bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist) {
@@ -185,8 +196,8 @@ bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skip
       return true;
     }
   }
-  ThumbnailProcesser tp{skipIfExist};
-  int extractedOutCnt = tp(currentPath, beg, end);
+  VideoStoryboard tp{skipIfExist};
+  int extractedOutCnt = tp.ExtractFrames(currentPath, beg, end);
   if (!tp.mErrImg.isEmpty()) {
     LOG_INFO_P("Extract Failed", "%d images, as follows:\n%s", extractedOutCnt, qPrintable(tp.mErrImg.join('\n')));
     return false;
@@ -199,15 +210,38 @@ bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skip
   return true;
 }
 
+bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  QStringList videoFiles;
+  videoFiles.reserve(mixedFiles.size());
+  for (const QString& filePath: mixedFiles) {
+    if (!TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(filePath))) {
+      continue;
+    }
+    videoFiles.push_back(filePath);
+  }
+  if (videoFiles.isEmpty()) {
+    LOG_INFO_NP("Skip grab frames", "No video selected");
+    return true;
+  }
+  const int cnt = ImageTool::GrabFramesFromVideos(videoFiles, startPositionSecond, intervalSecond, framesCount, bSkipIfExist);
+  LOG_OK_P("Grab frames", "%d videos frame grabbed", cnt);
+  return true;
+}
+
+
 bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
 
   if (paths.isEmpty()) {
-    return true;  // selection some row first
+    return true; // selection some row first
   }
   int succeedCnt = 0;
   for (const QString& path : paths) {
-    succeedCnt += (int)RateHelper::RateMovie(path, newRate);
+    succeedCnt += (int) RateHelper::RateMovie(path, newRate);
   }
 
   LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
@@ -224,11 +258,11 @@ bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
   const QStringList& paths = _contentPane->getFilePaths();
 
   if (paths.isEmpty()) {
-    return true;  // selection some row first
+    return true; // selection some row first
   }
   int succeedCnt = 0;
   for (const QString& path : paths) {
-    succeedCnt += (int)RateHelper::AdjustRateMovie(path, delta);
+    succeedCnt += (int) RateHelper::AdjustRateMovie(path, delta);
   }
 
   LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been adjust[%d]", succeedCnt, delta);
@@ -240,7 +274,7 @@ bool FileXplorerEvent::onAdjustRateMoviesRecursively(int delta) const {
   return RateHelper::AdjustRateMovieRecursively(rootPath, delta) > 0;
 }
 
-QStringList FileXplorerEvent::FsmSelectedItems() const {  // for file-systemmodel only
+QStringList FileXplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
   if (!ViewTypeTool::isFSView(vt)) {
     return {};
@@ -306,7 +340,7 @@ bool FileXplorerEvent::on_properties() const {
     pW->show();
     pW->operator()(items);
     return true;
-  } else if (ViewTypeTool::IsMatch(vt, (int)ViewTypeMask::MOVIE)) {
+  } else if (ViewTypeTool::IsMatch(vt, (int) ViewTypeMask::MOVIE)) {
     pW = new PropertiesWindow(this->_contentPane);
     pW->show();
     const QList<qint64>& fileSizes{_contentPane->m_movieView->GetSelectionFileSizes()};
@@ -328,59 +362,19 @@ void FileXplorerEvent::subsribeCompress() {
 }
 
 void FileXplorerEvent::subscribeThumbnailActions() {
-  auto& ins = g_ThumbnailProcessActions();
-  connect(ins._CREATE_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* createThumbnailAct) {
-    auto it = ins.mCreateThumbnailDimension.find(createThumbnailAct);
-    if (it == ins.mCreateThumbnailDimension.cend()) {
-      LOG_W("create thumbnail action[%p] not support", createThumbnailAct);
-      return;
-    }
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    int dimensionX = it->x, dimensionY = it->y, widthPixel = it->width;
-    on_CreateThumbnailImages(dimensionX, dimensionY, widthPixel, bSkipExist);
-  });
+  auto& ins = ThumbnailActions::GetInst();
+  connect(&ins, &ThumbnailActions::crtVideoStoryBoard, this, &FileXplorerEvent::on_CreateVideoStoryBoard);
+  connect(&ins, &ThumbnailActions::extractImages, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
+  connect(&ins, &ThumbnailActions::grabFrames, this, &FileXplorerEvent::on_GrabFramesFromVideos);
 
-  connect(ins._RENAME_THUMBNAILS_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
+  connect(ins._RENAME_STORYBOARD_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
     on_RenameThumbnailImages(bSkipExist);
   });
 
-  connect(ins._EXTRACT_THUMBNAIL_AG, &QActionGroup::triggered, this, [this, &ins](QAction* extractThumbnailAct) {
-    auto it = ins.mExtractThumbnailRange.find(extractThumbnailAct);
-    if (it == ins.mExtractThumbnailRange.cend()) {
-      LOG_W("extract thumbnail action[%p] not support", extractThumbnailAct);
-      return;
-    }
-    const bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    const int startIndex = it->startIndex, endIndex = it->endIndex;
-    on_ExtractImagesFromThumbnail(startIndex, endIndex, bSkipExist);
-  });
-
-  connect(ins._CUSTOM_RANGE_IMGS, &QAction::triggered, this, [this, &ins]() {
-    bool ok = false;
-    const QString input = QInputDialog::getText(this->_contentPane,
-                                                "Extract image range",                 //
-                                                "Enter range (e.g., 1,3; 1,4; 1,7):",  //
-                                                QLineEdit::Normal, "0,9",
-                                                &ok);  //
-    if (!ok || input.isEmpty()) {
-      LOG_INFO_P("[Skip] User canceled or invalid input", "input[%s]", qPrintable(input));
-      return;
-    }
-    static const QRegularExpression regex(R"(^\d,\d$)");
-    QRegularExpressionMatch match = regex.match(input);
-    if (!match.hasMatch()) {
-      LOG_WARN_NP("Invalid Range Format", input);
-      return;
-    }
-    const int beg = match.captured(1).toInt();
-    const int end = match.captured(2).toInt();
-    if (beg < 0 || end < beg) {
-      LOG_WARN_P("Invalid range", "Ensure 0 < beg <= end but[%s]", qPrintable(input));
-      return;
-    }
-    bool bSkipExist = ins._SKIP_IF_ALREADY_EXIST->isChecked();
-    on_ExtractImagesFromThumbnail(beg, end, bSkipExist);
+  connect(ins.CREATE_THUMBNAIL_FOR_A_PATH, &QAction::triggered, this, [this, &ins]() {
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
+    on_CreateThumbnailForAPath(bSkipExist);
   });
 }
 
@@ -402,14 +396,10 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
     connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
 
-    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane,
-            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
-    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane,
-            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
-    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane,
-            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
-    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane,
-            [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
+    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
+    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
+    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
+    connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
 
     connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileXplorerEvent::on_moveToTrashBin);
     connect(fileOpInst.DELETE_PERMANENTLY, &QAction::triggered, this, &FileXplorerEvent::on_deletePermanently);
@@ -441,11 +431,9 @@ void FileXplorerEvent::subscribe() {
     });
     connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
 
-    m_duplicateVideosFinder = new (std::nothrow)
-        PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
+    m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
-    m_redundantImageFinder = new (std::nothrow)
-        PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
+    m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
     connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
 
@@ -514,6 +502,10 @@ void FileXplorerEvent::subscribe() {
       RenameWidget_PrependParentFolderName pPrependName{_contentPane};
       on_Rename(pPrependName);
     });
+    connect(renameInst._DIGIT_CHAR_REPLACE_TO_ALPHA, &QAction::triggered, this, [this]() -> void {
+      RenameWidget_Digit2Alpha pDigitReplacedByAlpha{_contentPane};
+      on_Rename(pDigitReplacedByAlpha);
+    });
   }
 
   {
@@ -551,16 +543,16 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
 
   const bool bPathSwichedAwayFirst{preNames.size() > 100};
   if (bPathSwichedAwayFirst) {
-    _fileSysModel->setRootPath("");  // switch to another path
+    _fileSysModel->setRootPath(""); // switch to another path
   }
   renameWid.init();
   renameWid.setModal(true);
   renameWid.InitTextEditContent(currentPath, preNames);
-  if (renameWid.exec() != QDialog::Accepted) {  // don't mixed with renameWid.show(); (even it can operate on former widget)
+  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
   }
   if (bPathSwichedAwayFirst) {
-    _fileSysModel->setRootPath(currentPath);  // switch to another path
+    _fileSysModel->setRootPath(currentPath); // switch to another path
   }
 }
 
@@ -627,7 +619,7 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
   process.setProgram("gnome-terminal");
   args << QString("--working-directory=%1").arg(pth);
   process.setArguments(args);
-  return process.startDetached();  // Start the process in detached mode instead of start
+  return process.startDetached(); // Start the process in detached mode instead of start
 #endif
 }
 
@@ -935,8 +927,7 @@ bool FileXplorerEvent::on_Merge(const bool isReverse) {
     return false;
   }
 
-  static const auto GetMergeFromToPath = [](const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2,
-                                            bool isReverse) -> std::pair<QString, QString> {
+  static const auto GetMergeFromToPath = [](const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2, bool isReverse) -> std::pair<QString, QString> {
     QString fromPath{fsm->filePath(ind1)};
     QString toPath{fsm->filePath(ind2)};
     const bool shouldSwap = (ind1.row() < ind2.row()) ? isReverse : !isReverse;
@@ -1120,11 +1111,10 @@ bool FileXplorerEvent::on_FileClassify() {
   ItemsPacker classfier;
   classfier(currentPath);
 
-  auto* p = Notificator::progress(LOG_LVL_E::I, "File Classify",
-                                  QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(classfier.CommandsCnt()));
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Classify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(classfier.CommandsCnt()));
   CHECK_NULLPTR_RETURN_FALSE(p);
 
-  _fileSysModel->setRootPath("");  // switch to another path
+  _fileSysModel->setRootPath(""); // switch to another path
   bool classifyResult = classfier.StartToRearrange();
   if (!classifyResult) {
     p->setProgressFailed();
@@ -1165,8 +1155,7 @@ bool FileXplorerEvent::on_FileUnclassify() {
   ItemsUnpacker unclassfier;
   unclassfier(currentPath);
 
-  auto* p = Notificator::progress(LOG_LVL_E::I, "File Unclassify",
-                                  QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(unclassfier.CommandsCnt()));
+  auto* p = Notificator::progress(LOG_LVL_E::I, "File Unclassify", QString{"Start in path[%1] command(s) count[%2]"}.arg(currentPath).arg(unclassfier.CommandsCnt()));
   CHECK_NULLPTR_RETURN_FALSE(p);
 
   bool unclassifyResult = unclassfier.StartToRearrange();
@@ -1193,8 +1182,7 @@ bool FileXplorerEvent::on_RemoveDuplicateImages() {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return false;
   }
-  if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") !=
-      QMessageBox::StandardButton::Yes) {
+  if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") != QMessageBox::StandardButton::Yes) {
     LOG_OK_NP("[Skip] User Cancel remove duplicate images", "return");
     return false;
   }
@@ -1247,8 +1235,7 @@ bool FileXplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, Q
     LOG_WARN_NP("[Abort] Current View type not support Move/Copy to", ViewTypeTool::c_str(vt));
     return false;
   }
-  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{
-      {Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
+  static const QMap<Qt::DropAction, QString> DROP_ACTION_2_STR{{Qt::DropAction::CopyAction, "COPY"}, {Qt::DropAction::MoveAction, "MOVE"}, {Qt::DropAction::IgnoreAction, "IGNORE"}};
   const QString& pOperationNameStr = DROP_ACTION_2_STR.value(dropAct, "IGNORE");
   auto* view = _contentPane->GetCurView();
   if (!view->selectionModel()->hasSelection()) {
@@ -1299,8 +1286,7 @@ void FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
 }
 
 bool FileXplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {
-  auto* msgBox = new (std::nothrow)
-      QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
+  auto* msgBox = new (std::nothrow) QMessageBox(QMessageBox::Icon::Information, QString("Keep or Flatten System Structure?"), "Keep file system structure or flatten");
   msgBox->setWindowIcon(QIcon(":img/PASTE_ITEM"));
   msgBox->setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Apply);
 

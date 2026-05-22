@@ -42,12 +42,8 @@ struct RMFComponent {
   QString middlePart;
   QString fileName;
 
-  QString joinItself() const {
-    return join(rootPart, middlePart, fileName);
-  }
-  QString joinParentPathItself() const {
-    return joinParentPath(rootPart, middlePart);
-  }
+  QString joinItself() const { return join(rootPart, middlePart, fileName); }
+  QString joinParentPathItself() const { return joinParentPath(rootPart, middlePart); }
   static QString join(QString root, const QString& middle, const QString& file) {
     root.reserve(root.size() + middle.size() + file.size());
     root += middle;
@@ -57,7 +53,7 @@ struct RMFComponent {
   static QString joinParentPath(QString root, const QString& middle) {
     root += middle;
     int n = root.size();
-    if (n > 2 && root[n-1] == '/' && root[n-2] != ':') {
+    if (n > 2 && root[n - 1] == '/' && root[n - 2] != ':') {
       root.chop(1);
     }
     return root;
@@ -66,21 +62,8 @@ struct RMFComponent {
   static RMFComponent FromPath(const QString& input);
 };
 
-namespace FILE_REL_PATH{
-const QString& GetVendorsTableFilePath();
-const QString& GetMononymVendorsListFilePath();
-const QString& GetActorsListFilePath();
-const QString& GetMononymActorsListFilePath();
-const QString& GetActorsAliasListFilePath();
-#ifdef _WIN32
-constexpr char TORRENT_EDITOR_PROG_PATH[]{"../../../torrent-file-editor/build/Debug/torrent-file-editor.exe"};
-#else
-constexpr char TORRENT_EDITOR_PROG_PATH[]{"../../../torrent-file-editor/build/Debug/torrent-file-editor"};
-#endif
-}
-
 constexpr char PATH_SEP_CHAR = '/';
-constexpr int EXTENSION_MAX_LENGTH = 5;  // ".json"
+constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
 
 inline QString GetWinStdPath(const QString& path) {
 #ifdef _WIN32
@@ -90,7 +73,6 @@ inline QString GetWinStdPath(const QString& path) {
 #endif
   return path;
 }
-QString GetPathByApplicationDirPath(const QString& relativePath);
 
 QString linkPath(const QString& localPath);
 QString localPath(const QString& linkPath);
@@ -98,7 +80,7 @@ QString sysPath(QString fullPath);
 QString normPath(QString fullPath);
 QString absolutePath(QString fullPath);
 QString relativePath(const QString& fullPath, const int rootpathLen = 0);
-QString forSearchPath(const QString& fullPath);  // get QString for database index last three sectors
+QString forSearchPath(const QString& fullPath); // get QString for database index last three sectors
 
 // rootPath/Any/Relative/Path/File = > Path
 // rootPath/Relative/File = > Relative
@@ -132,6 +114,7 @@ QString GetFileNameExtRemoved(QString&& fileName);
 QString FileExtReplacedWithJson(QString fileName);
 QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName);
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath);
+QString GetThumbnailDecorationImgPath(QString dirPath, const QString& dirName);
 
 QString Path2Join(const QString& a, const QString& b);
 QString GetEffectiveName(const QString& itemPath);
@@ -148,7 +131,7 @@ inline bool isLinuxRootOrWinEmpty(const QString& path) {
 #endif
 }
 
-bool isRootOrEmpty(const QString& path);          // strict
+bool isRootOrEmpty(const QString& path); // strict
 
 QString longestCommonPrefix(const QStringList& strs);
 
@@ -158,5 +141,5 @@ std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList);
 QString GetFormatInHar(const QString& path);
 QString GetDotFileExtension(const QString& path);
 QString GetAsteriskDotFileExtension(const QString& path);
-}  // namespace PathTool
-#endif  // PATHTOOL_H
+} // namespace PathTool
+#endif // PATHTOOL_H

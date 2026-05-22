@@ -21,7 +21,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mSyncCacheFileSystemTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mSyncCacheFileSystemTb->setOrientation(Qt::Orientation::Vertical);
   mSyncCacheFileSystemTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mSyncCacheFileSystemTb->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mSyncCacheFileSystemTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
   mFieldCaseOperTb = new (std::nothrow) QToolBar{"Field case Control", this};
@@ -32,7 +31,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mFieldCaseOperTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mFieldCaseOperTb->setOrientation(Qt::Orientation::Vertical);
   mFieldCaseOperTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mFieldCaseOperTb->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mFieldCaseOperTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
   mInitFormatStudioCastField = new (std::nothrow) QToolBar{"Init/Hint/Format studio/cast", this};
@@ -43,7 +41,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mInitFormatStudioCastField->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mInitFormatStudioCastField->setOrientation(Qt::Orientation::Vertical);
   mInitFormatStudioCastField->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mInitFormatStudioCastField->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mInitFormatStudioCastField->layout(), Qt::AlignmentFlag::AlignLeft);
 
   mInferStudioCastFromSelection = new (std::nothrow) QToolBar{"Infer studio/cast", this};
@@ -54,7 +51,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mInferStudioCastFromSelection->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mInferStudioCastFromSelection->setOrientation(Qt::Orientation::Vertical);
   mInferStudioCastFromSelection->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mInferStudioCastFromSelection->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mInferStudioCastFromSelection->layout(), Qt::AlignmentFlag::AlignLeft);
 
   mStudioMenu = new (std::nothrow) MenuToolButton{inst.m_studioOperationList,
@@ -87,7 +83,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mUpdateFieldTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   mUpdateFieldTb->setOrientation(Qt::Orientation::Vertical);
   mUpdateFieldTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
-  mUpdateFieldTb->setStyleSheet("QToolBar { max-width: 256px; }");
   SetLayoutAlightment(mUpdateFieldTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
   addAction(g_viewActions()._JSON_VIEW);

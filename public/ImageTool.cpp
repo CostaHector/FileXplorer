@@ -3,7 +3,12 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "Configuration.h"
+#include "Logger.h"
+#include "DataFormatter.h"
+
+#include <QProcess>
 #include <QApplication>
+#include <QDir>
 #include <QPixmapCache>
 #include <QBuffer>
 #include <QImageReader>
@@ -92,8 +97,10 @@ QIcon GetBuiltInIcon(QStyle::StandardPixmap spE) {
 #ifdef RUNNING_UNIT_TESTS
   return {};
 #endif
-  static const QStyle* pStyle = QApplication::style();
-  return pStyle->standardIcon(spE);
+  if (const QStyle* pStyle = QApplication::style()) {
+    return pStyle->standardIcon(spE);
+  }
+  return {};
 }
 
 const QIcon& GetCheckResultIcon(bool bPass) {
@@ -120,6 +127,107 @@ QSize GetImageDimensionPixel(const QString& imgFilePath) {
 QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat) {
   QImageReader imgReader{pBuff, noDotFormat.toUtf8()};
   return imgReader.size();
+}
+
+int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist) {
+  int thumbnailCrtCnt{0};
+  QDir dir{folderPath, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  QDir subFolderDir{"", "", QDir::SortFlag::Name, QDir::Filter::Files};
+  subFolderDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  for (const QString& folderName : dir.entryList()) {
+    subFolderDir.setPath(dir.absoluteFilePath(folderName));
+    QStringList imgs = subFolderDir.entryList();
+    if (imgs.isEmpty()) {
+      continue;
+    }
+    StringTool::ImgsSortNameLengthFirst(imgs);
+    QString imgNameInSubFolder = imgs.front();
+    QString imgAbsPath = subFolderDir.absoluteFilePath(imgNameInSubFolder);
+    thumbnailCrtCnt += CreateThumbnail(imgAbsPath, bSkipIfExist);
+  }
+  return thumbnailCrtCnt;
+}
+
+bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
+  const QString dirName{PathTool::dirName(imgAbsPath)};
+  QString dirPath;
+  const QString srcName = PathTool::GetPrepathAndFileName(imgAbsPath, dirPath);
+  if (!srcName.startsWith(dirName)) { // avoid create useless image
+    return false;
+  }
+  const QString thumbnailPath = PathTool::GetThumbnailDecorationImgPath(dirPath, dirName);
+
+  if (bSkipIfExist && QFile::exists(thumbnailPath)) {
+    return true;
+  }
+
+  if (!QFile::exists(imgAbsPath)) {
+    LOG_W("Image file does not exist: %s", qPrintable(imgAbsPath));
+    return false;
+  }
+
+  QImage image(imgAbsPath);
+  if (image.isNull()) {
+    LOG_W("Failed to load image (possibly corrupted): %s", qPrintable(imgAbsPath));
+    return false;
+  }
+
+  QImage scaledImage{image.width() >= image.height() ?                                        //
+                         image.scaledToWidth(EXPECT_THUMBNAIL_SIDE, Qt::SmoothTransformation) //
+                                                     :                                        //
+                         image.scaledToHeight(EXPECT_THUMBNAIL_SIDE, Qt::SmoothTransformation)};
+  if (scaledImage.format() != QImage::Format_RGB888) {
+    scaledImage = scaledImage.convertToFormat(QImage::Format_RGB888);
+  }
+  if (!scaledImage.save(thumbnailPath, "JPG", 80)) {
+    LOG_W("Failed to save thumbnail: %s", qPrintable(thumbnailPath));
+    return false;
+  }
+
+  return true;
+}
+
+int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {
+  if (videosAbsPath.isEmpty()) {
+    return 0;
+  }
+
+  int succeedCnt{0};
+  for (const QString& vidAbsPath : videosAbsPath) {
+    if (!QFile::exists(vidAbsPath)) {
+      LOG_D("video[%s] not exist", qPrintable(vidAbsPath));
+      continue;
+    }
+
+    QStringList args{"-y", "-i", vidAbsPath};
+    args.reserve(20);
+
+    bool bNeedGrab{false};
+    for (int i = 0; i < framesCount; ++i) {
+      const int position = startPositionSecond + i * intervalSecond;
+      const QString destOutputImgPath{PathTool::GetFileNameExtRemoved(vidAbsPath) + " " + QString::number(position) + ".jpg"};
+      if (bSkipIfExist && QFile::exists(destOutputImgPath)) {
+        continue;
+      }
+      args << "-ss" << DataFormatter::formatDurationISO(position * 1000);
+      args << "-skip_frame" << "nokey";
+      args << "-frames:v" << "1";
+      args << "-q:v" << "2";
+      args << destOutputImgPath;
+      bNeedGrab = true;
+    }
+    if (!bNeedGrab) {
+      LOG_D("no need grab frames from video[%s]", qPrintable(vidAbsPath));
+      continue;
+    }
+
+    if (QProcess::execute("ffmpeg", args) != 0) {
+      LOG_D("Grab frames from video[%s] failed", qPrintable(vidAbsPath));
+      continue;
+    }
+    ++succeedCnt;
+  }
+  return succeedCnt;
 }
 
 } // namespace ImageTool

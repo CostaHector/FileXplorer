@@ -7,9 +7,24 @@
 #include <QApplication>
 #include <QStyle>
 
-FileSystemModel::FileSystemModel(QObject* parent) : QFileSystemModel{parent} {
+FileSystemModel::FileSystemModel(QObject* parent)
+  : QFileSystemModel{parent} {
   setReadOnly(true);
   connect(this, &FileSystemModel::directoryLoaded, this, &FileSystemModel::whenDirectoryLoaded);
+}
+
+void FileSystemModel::setThumbnailAsDecoration(bool bEnableUse) {
+  if (m_bThumbnailAsDecoration == bEnableUse) {
+    return;
+  }
+  m_bThumbnailAsDecoration = bEnableUse;
+  const int ROW_CNT = rowCount();
+  static const int COL_CNT = columnCount();
+  if (ROW_CNT <= 0 || COL_CNT <= 0) {
+    return;
+  }
+  emit dataChanged(index(0, 0), index(ROW_CNT - 1, 0), {Qt::DecorationRole});
+  emit layoutChanged();
 }
 
 void FileSystemModel::BindLogger(CustomStatusBar* pLogger) const {
@@ -18,21 +33,21 @@ void FileSystemModel::BindLogger(CustomStatusBar* pLogger) const {
 }
 
 QString FileSystemModel::fullInfo(const QModelIndex& curIndex) const {
-  return data(curIndex.siblingAtColumn(MainKey::Name)).toString()    //
-         + '\t'                                                      //
-         + data(curIndex.siblingAtColumn(MainKey::Size)).toString()  //
-         + '\t'                                                      //
+  return data(curIndex.siblingAtColumn(MainKey::Name)).toString()   //
+         + '\t'                                                     //
+         + data(curIndex.siblingAtColumn(MainKey::Size)).toString() //
+         + '\t'                                                     //
          + rootPath();
 }
 
 bool FileSystemModel::canDrop(const QModelIndex& targetDropIndex) const {
-  return targetDropIndex.isValid() ? fileInfo(targetDropIndex).isDir() : !PathTool::isLinuxRootOrWinEmpty(rootPath());
+  return targetDropIndex.isValid() ? isDir(targetDropIndex) : !PathTool::isLinuxRootOrWinEmpty(rootPath());
 }
 
 Qt::ItemFlags FileSystemModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags defaultFlags = QFileSystemModel::flags(index);
   defaultFlags |= Qt::ItemIsDragEnabled;
-  if (fileInfo(index).isDir()) {
+  if (isDir(index)) {
     defaultFlags |= Qt::ItemIsDropEnabled;
   }
   return defaultFlags;
@@ -79,11 +94,11 @@ bool FileSystemModel::canDropMimeData(const QMimeData* data, Qt::DropAction acti
     return false;
   }
   // model does not know its view type, we need to find targetDropIndex manually
-  QModelIndex targetDropIndex;  // by default: drop in parent
+  QModelIndex targetDropIndex; // by default: drop in parent
   if (parent.isValid()) {
-    if (row >= 0 && column >= 0) {  // table view: parent as root,row/column
+    if (row >= 0 && column >= 0) { // table view: parent as root,row/column
       targetDropIndex = index(row, column, parent);
-    } else {  // list/tree view:
+    } else { // list/tree view:
       targetDropIndex = parent;
     }
   }
@@ -117,6 +132,11 @@ QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
     } else if (mCopyIndexes.contains(rootPath(), index.row())) {
       static const QIcon COPY_ICON{":img/COPY_ITEM"};
       return COPY_ICON;
+    } else if (m_bThumbnailAsDecoration && isDir(index)) {
+      const QString decorationImgPath = PathTool::GetThumbnailDecorationImgPath(filePath(index), fileName(index));
+      if (QFile::exists(decorationImgPath)) {
+        return QPixmap(decorationImgPath);
+      }
     }
   }
   return QFileSystemModel::data(index, role);

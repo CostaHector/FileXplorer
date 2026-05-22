@@ -53,6 +53,10 @@ void FileSystemTreeView::subscribe() {
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }
 
+void FileSystemTreeView::initExclusivePreferenceSetting() {
+  CustomTreeView::m_defaultShowBackgroundImage = true;
+}
+
 void FileSystemTreeView::dropEvent(QDropEvent* event) {
   View::dropEventCore(this, _fsModel, event);
 }

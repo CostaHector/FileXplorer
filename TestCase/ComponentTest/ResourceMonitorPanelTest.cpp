@@ -142,4 +142,4 @@ private slots:
 };
 
 #include "ResourceMonitorPanelTest.moc"
-REGISTER_TEST(ResourceMonitorPanelTest, false)
+REGISTER_TEST(ResourceMonitorPanelTest, true)

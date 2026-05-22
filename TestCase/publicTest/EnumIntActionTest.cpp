@@ -89,7 +89,7 @@ class EnumIntActionTest : public PlainTestSuite {
  private slots:
   void enum_in_action_exclusive() {
     EnumIntActionChecker<ViewTypeTool::ViewType>(  //
-        ViewTypeTool::ViewType::TABLE,             //
+        ViewTypeTool::ViewType::TREE,             //
         ViewTypeTool::ViewType::SEARCH,            //
         ViewTypeTool::DEFAULT_VIEW_TYPE,           //
         QActionGroup::ExclusionPolicy::Exclusive);

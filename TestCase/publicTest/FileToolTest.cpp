@@ -66,7 +66,7 @@ class FileToolTest : public PlainTestSuite {
   void file_read_write_ok() {
     const QString inexistFileTextPath{"any random inexists path.txt"};
     QCOMPARE(FileTool::GetLastNLinesOfFile(inexistFileTextPath, 10), "");
-    QCOMPARE(FileTool::TextReader(inexistFileTextPath), "");
+    QCOMPARE(FileTool::StringTextReader(inexistFileTextPath), "");
 
     TDir tDir;
     tDir.touch("randomTextFile.txt", "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
@@ -82,40 +82,18 @@ class FileToolTest : public PlainTestSuite {
     QCOMPARE(last5ba, "5\n6\n7\n8\n9");
 
     QCOMPARE(QFile::exists(textFileAbsPath), true);  // file already exist. not override with OpenModeFlag::NewOnly
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+    QCOMPARE(FileTool::StringTextWriter(textFileAbsPath,
                                   "Cannot override",  //
                                   QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::NewOnly),
              false);
     QByteArray lastAllba = FileTool::GetLastNLinesOfFile(textFileAbsPath, 100);
     QCOMPARE(lastAllba, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 
-    QCOMPARE(FileTool::TextWriter(textFileAbsPath,
+    QCOMPARE(FileTool::StringTextWriter(textFileAbsPath,
                                   "Can only override",  //
                                   QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::ExistingOnly),
              true);
-    QCOMPARE(FileTool::TextReader(textFileAbsPath), "Can only override");
-  }
-
-  void CreateUserPath_ok() {  // UserPath is Service Running Precondition
-    QCOMPARE(CreateUserPath(), true);
-
-    const QString homePath = SystemPath::HOME_PATH();
-    QCOMPARE(QFileInfo{homePath}.isDir(), true);
-
-    const QString workPath = SystemPath::WORK_PATH();
-    QCOMPARE(QFileInfo{workPath}.isDir(), true);
-
-    // cross-compile unit protection test: should not crash down
-    auto IsPathStringValid = [homePath](const QString& path) {  // we do not assume path existence here
-      return path.startsWith(homePath) && path.size() > homePath.size();
-    };
-    QVERIFY(IsPathStringValid(SystemPath::STARRED_PATH()));
-    QVERIFY(IsPathStringValid(SystemPath::VIDS_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::AI_MEDIA_DUP_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::RECYCLE_BIN_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::PEFORMERS_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::TORRENTS_DATABASE()));
-    QVERIFY(IsPathStringValid(SystemPath::PRODUCTION_STUDIOS_DATABASE()));
+    QCOMPARE(FileTool::StringTextReader(textFileAbsPath), "Can only override");
   }
 
   void ChooseCopyDestination_ok() {
@@ -179,14 +157,14 @@ class FileToolTest : public PlainTestSuite {
   void execpt_branch_ok() {
     const QString inexistFilePath{"inexist/path/inexistFilePath.txt"};
     bool bReadOk{true};
-    QCOMPARE(FileTool::TextReader(inexistFilePath, &bReadOk), "");
+    QCOMPARE(FileTool::StringTextReader(inexistFilePath, &bReadOk), "");
     QVERIFY(!bReadOk);
 
     bReadOk = true;
     QCOMPARE(FileTool::ByteArrayReader(inexistFilePath, &bReadOk), "");
     QVERIFY(!bReadOk);
 
-    QVERIFY(!FileTool::ByteArrayWriter(inexistFilePath, "Contents in QByteArray"));
+    QVERIFY(!FileTool::ByteArrayTextWriter(inexistFilePath, "Contents in QByteArray"));
 
     QVERIFY(!FileTool::OpenLocalFile(inexistFilePath));
     QVERIFY(!FileTool::OpenLocalImageFile(inexistFilePath));

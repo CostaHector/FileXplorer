@@ -3,9 +3,10 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "InteractiveVideoWidget.h"
+#include "VideoPlayerActions.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PublicVariable.h"
+#include "SystemPath.h"
 #include "VideoPlayerKey.h"
 #include "PathKey.h"
 #include "Configuration.h"
@@ -40,24 +41,23 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
       QWidget* extToolBarHide = videoWid.GetExtendedFunctionCtrlBar(&videoWid);
       QVERIFY(extToolBarHide != nullptr);
       QCOMPARE(extToolBarHide->isHidden(), true);
+      QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackMode(), VideoPlayerActions::DEFAULT_PLAYBACK_MODE);
+      QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE);
 
-      QCOMPARE(videoWid.GetPlaybackMode(), InteractiveVideoWidget::DEFAULT_PLAYBACK_MODE);
-      QCOMPARE(videoWid.GetPlaybackTriggerMode(), VideoPlayTool::DEFAULT_PLAYBACK_TRIGGER_MODE);
+      QToolButton* playbackBtn = VideoPlayerActions::GetInst().GetPlaybackModeMenuToolButton(&videoWid);
+      QToolButton* playbackTriggerBtn = VideoPlayerActions::GetInst().GetPlaybackTriggerModelMenuToolButton(&videoWid);
 
-      QToolButton* playbackBtn = videoWid.GetPlaybackModelMenuToolButton(&videoWid);
-      QToolButton* playbackTriggerBtn = videoWid.GetPlaybackTriggerModelMenuToolButton(&videoWid);
+      QSignalSpy spy1{&VideoPlayerActions::GetInst(), &VideoPlayerActions::playbackModeChanged};
+      QSignalSpy spy2{&VideoPlayerActions::GetInst(), &VideoPlayerActions::playbackTriggerModeChanged};
 
-      QSignalSpy spy1{&videoWid, &InteractiveVideoWidget::playbackModeChanged};
-      QSignalSpy spy2{&videoWid, &InteractiveVideoWidget::playbackTriggerModeChanged};
+      VideoPlayerActions::GetInst().mPlaybackMode_Loop->setChecked(true);
+      VideoPlayerActions::GetInst().mPlaybackTrigger_AUTO->setChecked(true);
 
-      videoWid.mPlaybackMode_Loop->setChecked(true);
-      videoWid.mPlaybackTrigger_AUTO->setChecked(true);
+      emit playbackBtn->triggered(VideoPlayerActions::GetInst().mPlaybackMode_Loop);
+      emit playbackTriggerBtn->triggered(VideoPlayerActions::GetInst().mPlaybackTrigger_AUTO);
 
-      emit playbackBtn->triggered(videoWid.mPlaybackMode_Loop);
-      emit playbackTriggerBtn->triggered(videoWid.mPlaybackTrigger_AUTO);
-
-      videoWid.onPlaybackModeTriggered(videoWid.mPlaybackTrigger_AUTO);
-      videoWid.onPlaybackTriggerModeTriggered(videoWid.mPlaybackMode_Loop);
+      VideoPlayerActions::GetInst().onPlaybackModeTriggered(VideoPlayerActions::GetInst().mPlaybackTrigger_AUTO);
+      VideoPlayerActions::GetInst().onPlaybackTriggerModeTriggered(VideoPlayerActions::GetInst().mPlaybackMode_Loop);
       QCOMPARE(spy1.count(), 1);
       QCOMPARE(spy2.count(), 1);
     }
@@ -72,8 +72,8 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
     {
       InteractiveVideoWidget videoWid{false, nullptr};
-      QCOMPARE(videoWid.GetPlaybackMode(), QMediaPlaylist::PlaybackMode::Loop);
-      QCOMPARE(videoWid.GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::AUTO);
+      QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackMode(), QMediaPlaylist::PlaybackMode::Loop);
+      QCOMPARE(VideoPlayerActions::GetInst().GetPlaybackTriggerMode(), VideoPlayTool::PlaybackTriggerMode::AUTO);
       videoWid.contextMenuEvent(nullptr);  // no crash happened
       QVERIFY(videoWid.mContextMenu != nullptr);
       QCOMPARE(InteractiveVideoWidget::GetFocusCore(nullptr), false);
@@ -299,7 +299,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
   void selectAFile_ok() {
     setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, "invalid path");
-    const QString openPath{SystemPath::HOME_PATH()};
+    const QString openPath{SystemPath::HomePath()};
 
     InteractiveVideoWidget videoWid;
     QSignalSpy selectAFileSpy{&videoWid, &InteractiveVideoWidget::newFileSelectedByUser};
@@ -326,7 +326,7 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
 
   void selectAFolder_ok() {
     setConfig(PathKey::VIDEO_PLAYER_OPEN_PATH, "invalid path");
-    const QString openPath{SystemPath::HOME_PATH()};
+    const QString openPath{SystemPath::HomePath()};
 
     InteractiveVideoWidget videoWid;
     QSignalSpy selectAFolderSpy{&videoWid, &InteractiveVideoWidget::newFolderSelectedChangedByUser};

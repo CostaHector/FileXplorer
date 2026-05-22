@@ -71,7 +71,7 @@ bool JsonPr::WriteIntoFiles() const {
     return false;
   }
   const QByteArray& ba{GetJsonBA()};
-  bool writeResult{FileTool::ByteArrayWriter(jsonPath, ba)};
+  bool writeResult{FileTool::ByteArrayTextWriter(jsonPath, ba)};
   if (writeResult) {
     hintCast.clear();
     hintStudio.clear();

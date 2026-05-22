@@ -12,6 +12,8 @@ message("relativeIndexStartAt=${RELATIVE_INDEX_START_AT}")
 
 add_definitions(
     -DPROJECT_NAME="FileXplorer"
+    -DAPPLICATION_NAME="FileXplorerTestOnly"
+    -DORGANIZATION_NAME="Costa"
     -DTESTCASE_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}"
     -DPARENT_PATH_LEN=${RELATIVE_INDEX_START_AT}
     -DRUNNING_UNIT_TESTS=1

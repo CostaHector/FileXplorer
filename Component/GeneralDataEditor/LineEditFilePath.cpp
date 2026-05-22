@@ -1,5 +1,6 @@
 #include "LineEditFilePath.h"
 #include "PublicVariable.h"
+#include "SystemPath.h"
 #include "NotificatorMacro.h"
 #include <QFileDialog>
 
@@ -52,11 +53,11 @@ const QString& LineEditFilePath::GetCaption(GeneralDataType::Type gDataType) {
 const QString& LineEditFilePath::GetDialogDefaultLocation(GeneralDataType::Type gDataType) {
   switch (gDataType) {
     case GeneralDataType::Type::IMAGE_PATH_OPTIONAL: {
-      static const QString dialogImageDefaultLocation{SystemPath::HOME_PATH() + "/Pictures"};
+      static const QString dialogImageDefaultLocation{SystemPath::HomePath() + "/Pictures"};
       return dialogImageDefaultLocation;
     }
     default:
-      static const QString dialogDefaultLocation{SystemPath::HOME_PATH()};
+      static const QString dialogDefaultLocation{SystemPath::HomePath()};
       return dialogDefaultLocation;
   }
 }

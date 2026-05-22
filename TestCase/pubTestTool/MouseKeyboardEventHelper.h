@@ -1,7 +1,7 @@
 #ifndef MOUSEKEYBOARDEVENTHELPER_H
 #define MOUSEKEYBOARDEVENTHELPER_H
 #include <QWidget>
-class ThumbnailImageViewer;
+class FileImageViewer;
 class ClickableTextBrowser;
 class CustomListView;
 class CustomTableView;
@@ -13,8 +13,8 @@ bool SendWheelEvent(WidgetType& wid, const QPoint& angleDelta,
                     bool bNeedAccepted = true);
 
 
-extern template bool SendWheelEvent<ThumbnailImageViewer>(
-    ThumbnailImageViewer& wid, const QPoint& angleDelta,
+extern template bool SendWheelEvent<FileImageViewer>(
+    FileImageViewer& wid, const QPoint& angleDelta,
     Qt::KeyboardModifiers modifiers, bool bNeedAccepted);
 
 extern template bool SendWheelEvent<ClickableTextBrowser>(

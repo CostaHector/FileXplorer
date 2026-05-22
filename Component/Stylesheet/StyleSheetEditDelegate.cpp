@@ -8,6 +8,8 @@
 #include "PathTool.h"
 #include "ComboBoxGeneral.h"
 #include "LineEditGeneral.h"
+#include "PlainTextEditGeneral.h"
+#include "ColorTools.h"
 
 #include <QPlainTextEdit>
 #include <QLineEdit>
@@ -15,6 +17,7 @@
 #include <QColor>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QPainter>
 
 StyleSheetEditDelegate::StyleSheetEditDelegate(int dataTypeRole, int editableColumn, QObject *parent)
   : QStyledItemDelegate(parent)
@@ -34,7 +37,7 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
     return LineEditGeneral::create(dataType, parent);
   }
   if (GeneralDataType::isPlainTextEditNeededInEditor(dataType)) {
-    return new QPlainTextEdit{parent};
+    return PlainTextEditGeneral::create(dataType, parent);
   }
 
   return QStyledItemDelegate::createEditor(parent, option, index);
@@ -49,11 +52,31 @@ void StyleSheetEditDelegate::initStyleOption(QStyleOptionViewItem *option, const
     return;
   }
   const int dataType = index.data(mDataTypeRole).toInt();
-  if (!GeneralDataType::isComboBoxNeededInEditor(dataType)) {
+  const QVariant displayRoleData = index.data(Qt::DisplayRole);
+  if (GeneralDataType::isComboBoxNeededInEditor(dataType)) {
+    option->text = ComboBoxGeneral::displayText(dataType, displayRoleData);
     return;
   }
-  const QVariant displayRoleData = index.data(Qt::DisplayRole);
-  option->text = ComboBoxGeneral::displayText(dataType, displayRoleData);
+}
+
+void StyleSheetEditDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
+  CHECK_NULLPTR_RETURN_VOID(painter);
+  // 1. plot basic image and text
+  QStyledItemDelegate::paint(painter, option, index);
+
+  if (index.column() != mEditableColumn) {
+    return;
+  }
+  const int dataType = index.data(mDataTypeRole).toInt();
+  if (dataType == GeneralDataType::Type::COMMA_SEPERATED_STR_LIST) {
+    QRect currentRateTextRect = option.rect;
+    currentRateTextRect.setHeight(20);
+    currentRateTextRect.setWidth(20);
+    painter->fillRect(currentRateTextRect, ColorTools::GRAY_AND_HALF_TRANS);
+    painter->setPen(Qt::white);
+    const int cnt = PlainTextEditGeneral::linesCount(dataType, index.model()->data(index, Qt::DisplayRole));
+    painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(cnt));
+  }
 }
 
 // 从模型中获取指定索引（index）的数据，并将其设置到编辑器中，以便用户可以看到当前值并进行编辑。
@@ -70,6 +93,16 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
     }
     QVariant editRoleData = index.model()->data(index, Qt::EditRole);
     comboBox->updateCurrentTextFromEditRole(editRoleData);
+    return;
+  }
+  if (GeneralDataType::isPlainTextEditNeededInEditor(dataType)) {
+    PlainTextEditGeneral *plainTextEdit = dynamic_cast<PlainTextEditGeneral *>(editor);
+    if (!plainTextEdit) {
+      LOG_E("Editor is not a QPlainTextEdit for dataType[%d]", dataType);
+      return;
+    }
+    QVariant editRoleData = index.model()->data(index, Qt::EditRole);
+    plainTextEdit->updateCurrentTextFromEditRole(editRoleData);
     return;
   }
   QStyledItemDelegate::setEditorData(editor, index);
@@ -103,14 +136,13 @@ void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
     return;
   }
   if (GeneralDataType::isPlainTextEditNeededInEditor(dataType)) {
-    QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>(editor);
+    PlainTextEditGeneral *plainTextEdit = dynamic_cast<PlainTextEditGeneral *>(editor);
     if (!plainTextEdit) {
       LOG_E("Editor is not a QPlainTextEdit for dataType[%d]", dataType);
       return;
     }
-    QString rawText = plainTextEdit->toPlainText();
-    bool setResult = model->setData(index, rawText, Qt::EditRole);
-    LOG_OE_P(setResult, "setModelData", "dataType[%d], index[(%d, %d)]", dataType, index.row(), index.column());
+    const QString editRoleValue = plainTextEdit->getSetDataEditRoleValue();
+    model->setData(index, editRoleValue, Qt::EditRole); // no need checking here
     return;
   }
   QStyledItemDelegate::setModelData(editor, model, index);

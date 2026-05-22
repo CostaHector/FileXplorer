@@ -5,12 +5,17 @@
 #include "VideoView.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
 #include <QSignalSpy>
 
 class VideoViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
+  void init() { //
+    Configuration().clear();
+  }
+
   void registerFullScreenToggleCallback_ok() {
     VideoView videoView{false, nullptr};
     QVERIFY(videoView.GetBasicVideoView() != nullptr);

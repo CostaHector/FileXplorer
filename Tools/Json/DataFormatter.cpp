@@ -255,7 +255,7 @@ QString formatFloat2Prec(float value) {  //
 }
 
 const QString& formatSortedLst(const SortedUniqStrLst& container) {
-  return container.join();
+  return container.joinToShowInACell();
 }
 
 QString formatQStringLst(const QStringList& container) {

@@ -48,14 +48,14 @@ class JsonTableModelTest : public PlainTestSuite {
 
   void CheckModelData(JsonTableModel& model) {
     QCOMPARE(model.data(model.index(0, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
-    QCOMPARE(model.data(model.index(0, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast A 1,Empty Cast A 2");
+    QCOMPARE(model.data(model.index(0, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast A 1\nEmpty Cast A 2");
     QCOMPARE(model.data(model.index(0, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio A");
     QCOMPARE(model.data(model.index(0, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag A");
     QCOMPARE(model.data(model.index(0, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just a json example.");
     QCOMPARE(model.data(model.index(0, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:36");  // 36000ms
 
     QCOMPARE(model.data(model.index(1, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - B rank - XX YY and ZZ DD EE");
-    QCOMPARE(model.data(model.index(1, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast B 1,Empty Cast B 2");
+    QCOMPARE(model.data(model.index(1, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast B 1\nEmpty Cast B 2");
     QCOMPARE(model.data(model.index(1, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio B");
     QCOMPARE(model.data(model.index(1, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag B");
     QCOMPARE(model.data(model.index(1, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just b json example.");
@@ -68,7 +68,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(mTDir.createEntries(nodes), nodes.size());
 
     bool readAok = false;
-    QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+    QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
 
     GlobalMockObject::reset();
     actorHelper.init();
@@ -268,7 +268,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.HintCastAndStudio({ind}, "Real Madrid - decoration - Cristiano Ronaldo, Leite Kaka"), 2);  // both cast abd studio hint succeed
     QCOMPARE(ind.siblingAtColumn(JsonKey::Studio).data(Qt::DisplayRole).toString(), "RealMadrid");
     QVERIFY(jtm.data(ind.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::ForegroundRole) != QColor{Qt::GlobalColor::darkRed});
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "Cristiano Ronaldo,Leite Kaka");
+    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "Cristiano Ronaldo\nLeite Kaka");
     jtm.SetStudio({ind}, "");
     jtm.SetCastOrTags({ind}, JsonKey::Cast, "");
     jtm.SetCastOrTags({ind}, JsonKey::Tags, "");
@@ -441,8 +441,8 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 2);
       QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 2);
       QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString(), "Marvel");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans,Michael Fassbender");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic,Documentary");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
 
       // set again, skip unchange
       QCOMPARE(jtm.SetStudio(valid2Indexes, "Marvel"), 0);
@@ -470,8 +470,8 @@ class JsonTableModelTest : public PlainTestSuite {
 
       QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 2);
       QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 2);
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans,Michael Fassbender");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic,Documentary");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
 
       // unchange
       QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 0);  // affect none
@@ -481,8 +481,8 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender,Xander"), 2);  // affect 2 rows
       QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic,Comedy"), 2);
       QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(),
-               "Chris Evans,Michael Fassbender,Xander");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy,Comic,Documentary");
+               "Chris Evans\nMichael Fassbender\nXander");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy\nComic\nDocumentary");
     }
 
     mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
@@ -517,11 +517,11 @@ class JsonTableModelTest : public PlainTestSuite {
     // above operation should not write into files
     {
       bool readAok = false;
-      QCOMPARE(FileTool::TextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
+      QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
       QVERIFY(readAok);
 
       bool readBok = false;
-      QCOMPARE(FileTool::TextReader(mTDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
+      QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("b.json"), &readBok), JSON_CONTENTS_B_RANK_IN_MODEL);
       QVERIFY(readBok);
     }
 
@@ -720,7 +720,7 @@ class JsonTableModelTest : public PlainTestSuite {
 
     // 1. format cast ok
     QCOMPARE(jtm.FormatCast(valid2Indexes), 2);
-    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans,Xander");
+    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nXander");
     QVERIFY(jtm.mCachedJsons != mCachedJsonsBackup);
 
     // 2. SyncFieldNameByJsonBaseName ok
