@@ -569,6 +569,7 @@ This project incorporates the following open-source software:
 * **[FFmpeg](https://ffmpeg.org/)** (Licensed under LGPL v2.1/v3) - Used under the terms of the LGPL. FFmpeg is a trademark of Fabrice Bellard, et al.
 * **[OpenSSL](https://www.openssl.org/)** (Licensed under Apache License 2.0) - Used under the terms of the Apache License 2.0.
 * **[MediaInfo](https://mediaarea.net/en/MediaInfo)** (Licensed under Simplified BSD License) - Used under the terms of the Simplified BSD License.
+* **[MultiPar](https://github.com/Yutaka-Sawada/MultiPar)**
 
 This software is licensed under the [GNU General Public License v3.0](LICENSE). 
 (If you chose MIT, change this line to: *This software is licensed under the [MIT License](LICENSE).*)
