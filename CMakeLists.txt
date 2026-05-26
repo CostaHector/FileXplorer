@@ -48,6 +48,7 @@ file(GLOB SOURCES
     Component/HeaderView/*.cpp
     Component/ImageView/*.cpp
     Component/LineEdit/*.cpp
+    Component/MultiPar/*.cpp
     Component/Navigation/*.cpp
     Component/PassVault/*.cpp
     Component/RenameWidgets/*.cpp
@@ -80,6 +81,7 @@ set(SRV_HEADER_PATH
     Component/HeaderView
     Component/ImageView
     Component/LineEdit
+    Component/MultiPar
     Component/Navigation
     Component/PassVault
     Component/RenameWidgets
@@ -118,6 +120,7 @@ file(GLOB HEADERS
     Component/HeaderView/*.h
     Component/ImageView/*.h
     Component/LineEdit/*.h
+    Component/MultiPar/*.h
     Component/Navigation/*.h
     Component/PassVault/*.h
     Component/RenameWidgets/*.h

@@ -87,7 +87,7 @@ int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode
 
     static const QStringList specialFolders{"VIDEO_TS", "videos", "vids"};  // < 10MiB
     for (const QString& specialFolderName : specialFolders) {
-      const QString& specialPath = PathTool::join(mPlayPath, specialFolderName);
+      const QString& specialPath = PathTool::Path2Join(mPlayPath, specialFolderName);
       if (!QFile::exists(specialPath)) {
         continue;
       }

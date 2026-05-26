@@ -102,10 +102,13 @@ void BasicVideoView::subscribe() {
   // 播放过程中滑动块位置增加, 更新当前时间点标签, 更新滑动块的当前时间
   connect(&mProgressSliderUpdateTimer, &QTimer::timeout, this, &BasicVideoView::onUpdateProgressSliderPosition);
 
+#ifndef RUNNING_UNIT_TESTS
+  // mVolumeWid may get free in other component
   connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
   connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
   connect(VideoPlayerActions::GetInst().mVolumePlus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeIncrease);
   connect(VideoPlayerActions::GetInst().mVolumeMinus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeDecrease);
+#endif
 
   connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &BasicVideoView::onError);
 

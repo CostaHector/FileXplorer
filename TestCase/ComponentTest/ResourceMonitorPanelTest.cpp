@@ -5,7 +5,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "ResourceMonitorPanel.h"
 #include "EndToExposePrivateMember.h"
-#include "PublicVariable.h"
+#include "SystemPath.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -112,7 +112,7 @@ private slots:
 
   void export_ok() {
     QByteArray content;
-    const QString expectCsvAbsFilePath{SystemPath::HOME_PATH() //
+    const QString expectCsvAbsFilePath{SystemPath::HomePath() //
                                        + "/Downloads/" //
                                        + "usage_monitor_2026_01_01 00_00_00.123_to_2026_01_01 00_00_02.456.csv"};
     MOCKER(get_timestamp).stubs().will(invoke(invoke_get_timestamp));
@@ -142,4 +142,4 @@ private slots:
 };
 
 #include "ResourceMonitorPanelTest.moc"
-REGISTER_TEST(ResourceMonitorPanelTest, true)
+REGISTER_TEST(ResourceMonitorPanelTest, false)

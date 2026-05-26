@@ -159,7 +159,7 @@ private slots:
     searchAct->trigger();
 
     searchLe->setText("Varane");
-    cfgTbl.onStartFilter();
+    cfgTbl.onStartFilter("Varane");
   }
 };
 

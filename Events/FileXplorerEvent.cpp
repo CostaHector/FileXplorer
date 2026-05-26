@@ -40,12 +40,15 @@
 #include "ViewTypeTool.h"
 #include "VideoStoryboard.h"
 
+#include "MultiPar2Actions.h"
+#include "MultiParTools.h"
+#include "MultiParDialog.h"
+
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
-#include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 #include "CreateFileFolderHelper.h"
@@ -53,7 +56,6 @@
 #include "RateActions.h"
 #include "RateHelper.h"
 #include "RecycleCfmDlg.h"
-#include "StyleSheetGetter.h"
 #include "RowHeightRegistry.h"
 
 #include <QApplication>
@@ -217,7 +219,7 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
   const QStringList mixedFiles = FsmSelectedItems();
   QStringList videoFiles;
   videoFiles.reserve(mixedFiles.size());
-  for (const QString& filePath: mixedFiles) {
+  for (const QString& filePath : mixedFiles) {
     if (!TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(filePath))) {
       continue;
     }
@@ -232,6 +234,31 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
   return true;
 }
 
+bool FileXplorerEvent::on_createFilePar2() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  bool bSucceed{false}, crtCnt{0};
+  std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2(mixedFiles);
+  LOG_OE_P(bSucceed, "Create par2", "%d par2 file for %d selection(s) ok", crtCnt, mixedFiles.size());
+  return bSucceed;
+}
+
+bool FileXplorerEvent::on_verifyFileByPar2() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  const QStringList mixedFiles = FsmSelectedItems();
+  using namespace MultiParTools;
+  std::pair<bool, ParVerifyInfomationList> bSucceed2VryInfo = VerifyFiles(mixedFiles);
+  LOG_OE_P(bSucceed2VryInfo.first, //
+           "Verify result", "%d in %d selection(s) verified ok", //
+           bSucceed2VryInfo.second.size(), mixedFiles.size());
+  MultiParDialog dlg{std::move(bSucceed2VryInfo.second)};
+  dlg.exec();
+  return bSucceed2VryInfo.first;
+}
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
@@ -378,9 +405,16 @@ void FileXplorerEvent::subscribeThumbnailActions() {
   });
 }
 
+void FileXplorerEvent::subscribeMultiPar() {
+  MultiPar2Actions& inst = MultiPar2Actions::GetInst();
+  connect(inst._CREATE_PAR2_FILES, &QAction::triggered, this, &FileXplorerEvent::on_createFilePar2);
+  connect(inst._VERIFY_IF_NEED_RECOVERY, &QAction::triggered, this, &FileXplorerEvent::on_verifyFileByPar2);
+}
+
 void FileXplorerEvent::subscribe() {
   subsribeCompress();
   subscribeThumbnailActions();
+  subscribeMultiPar();
 
   {
     auto& fileOpInst = FileOpActs::GetInst();
@@ -655,7 +689,7 @@ bool FileXplorerEvent::on_compress() {
     return false;
   }
   const QString archiveFileName{PathTool::GetBaseName(workPath) + ".qz"};
-  const QString archiveAbsFilePath{PathTool::join(workPath, archiveFileName)};
+  const QString archiveAbsFilePath{PathTool::Path2Join(workPath, archiveFileName)};
   ArchiveFilesWriter af;
   bool comRet = af.CompressNow(workPath, fileNames, archiveAbsFilePath, false);
   LOG_OE_P(comRet, "Compressed result", "%d items into %s", fileNames.size(), qPrintable(archiveAbsFilePath));

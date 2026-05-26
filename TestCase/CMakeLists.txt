@@ -53,6 +53,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Component/HeaderView/*.cpp
     ${PARENT_DIR}/Component/ImageView/*.cpp
     ${PARENT_DIR}/Component/LineEdit/*.cpp
+    ${PARENT_DIR}/Component/MultiPar/*.cpp
     ${PARENT_DIR}/Component/Navigation/*.cpp
     ${PARENT_DIR}/Component/PassVault/*.cpp
     ${PARENT_DIR}/Component/RenameWidgets/*.cpp
@@ -80,6 +81,7 @@ file(GLOB SOURCES
     ComponentTest/HeaderViewTest/*.cpp
     ComponentTest/ImageViewTest/*.cpp
     ComponentTest/LineEditTest/*.cpp
+    ComponentTest/MultiParTest/*.cpp
     ComponentTest/NavigationTest/*.cpp
     ComponentTest/PassVaultTest/*.cpp
     ComponentTest/RenameTest/*.cpp
@@ -116,6 +118,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Component/HeaderView
     ${PARENT_DIR}/Component/ImageView
     ${PARENT_DIR}/Component/LineEdit
+    ${PARENT_DIR}/Component/MultiPar
     ${PARENT_DIR}/Component/Navigation
     ${PARENT_DIR}/Component/PassVault
     ${PARENT_DIR}/Component/RenameWidgets
@@ -156,6 +159,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Component/HeaderView/*.h
     ${PARENT_DIR}/Component/ImageView/*.h
     ${PARENT_DIR}/Component/LineEdit/*.h
+    ${PARENT_DIR}/Component/MultiPar/*.h
     ${PARENT_DIR}/Component/Navigation/*.h
     ${PARENT_DIR}/Component/PassVault/*.h
     ${PARENT_DIR}/Component/RenameWidgets/*.h

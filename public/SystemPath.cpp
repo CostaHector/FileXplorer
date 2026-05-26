@@ -77,15 +77,42 @@ QString GetPathByApplicationDirPath(const QString& relativePath) {
 }
 
 const QString& TORRENT_EDITOR_PROG_PATH() {
-  constexpr char TORRENT_EDITOR_PROG_REL_PATH[]{
+  // project/build/version/exeFile
+  // project/TestProject/build/version/exeFile
+  // torrent-file-editor/build/version/exeFile
+  constexpr char torrentEditorProgRelPath[]{
+#ifdef RUNNING_UNIT_TESTS
+  "../"
+#else
+  ""
+#endif
 #ifdef _WIN32
       "../../../torrent-file-editor/build/Debug/torrent-file-editor.exe"
 #else
       "../../../torrent-file-editor/build/Debug/torrent-file-editor"
 #endif
   };
-  static const QString torrentEditorProg{GetPathByApplicationDirPath(TORRENT_EDITOR_PROG_REL_PATH)};
+  static const QString torrentEditorProg{GetPathByApplicationDirPath(torrentEditorProgRelPath)};
   return torrentEditorProg;
+}
+
+QString MULTI_PAR_PROG_PATH() {
+#ifndef _WIN32
+  return "";
+#endif
+  // project/build/version/exeFile
+  // project/third_party
+  // project/TestProject/build/version/exeFile
+  static const QString multiParProgPath{GetPathByApplicationDirPath(
+#ifdef RUNNING_UNIT_TESTS
+      "../"
+#else
+      ""
+#endif
+      "../../third_party/multipar/par2j.exe"
+      )
+  };
+  return multiParProgPath;
 }
 
 } // namespace SystemPath

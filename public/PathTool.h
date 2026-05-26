@@ -119,7 +119,6 @@ QString GetThumbnailDecorationImgPath(QString dirPath, const QString& dirName);
 QString Path2Join(const QString& a, const QString& b);
 QString GetEffectiveName(const QString& itemPath);
 
-QString join(const QString& prefix, const QString& relative);
 QString driver(const QString& fullPath);
 QString StrCommonPrefix(const QString& path1, const QString& path2);
 

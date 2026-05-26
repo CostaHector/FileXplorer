@@ -197,7 +197,9 @@ QString Path2Join(const QString& a, const QString& b) {
   ans.reserve(a.size() + 1 + b.size());
   if (!a.isEmpty()) {
     ans += a;
-    ans += '/';
+    if (a.back() != '/') {
+      ans += '/';
+    }
   }
   return ans += b;
 }
@@ -243,19 +245,6 @@ QString GetEffectiveName(const QString& itemPath) {
   return itemPath.section('/', -2, -1);
 }
 
-QString join(const QString& prefix, const QString& relative) {
-  if (prefix.isEmpty()) {
-    return relative;
-  }
-  if (relative.isEmpty()) {
-    return prefix;
-  }
-  if (!prefix.isEmpty() && prefix.back() == '/') {
-    // C:/ a
-    return prefix + relative;
-  }
-  return prefix + '/' + relative;
-}
 QString driver(const QString& fullPath) {
 #ifdef _WIN32
   int colonIndex = fullPath.indexOf(':');

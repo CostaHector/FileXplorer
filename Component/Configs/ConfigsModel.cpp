@@ -1,8 +1,6 @@
 ﻿#include "ConfigsModel.h"
-#include "PublicVariable.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "PathTool.h"
 #include "ImageTool.h"
 #include <QIcon>
 
@@ -25,7 +23,7 @@ QVariant ConfigsModel::headerData(int section, Qt::Orientation orientation, int 
     }
   }
   if (role == Qt::DisplayRole) {
-    if (orientation == Qt::Orientation::Horizontal) {
+    if (0 <= section && section < columnCount() && orientation == Qt::Orientation::Horizontal) {
       return ConfigsModel::CONFIGS_TABLE_HEADER[section];
     }
     return section + 1;

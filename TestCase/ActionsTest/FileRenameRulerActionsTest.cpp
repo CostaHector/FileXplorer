@@ -8,7 +8,6 @@
 #include "CastAkasManager.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PathTool.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
 #include "TDir.h"
