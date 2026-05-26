@@ -11,7 +11,7 @@ MultiPar2Actions& MultiPar2Actions::GetInst() {
 
 MultiPar2Actions::MultiPar2Actions(QObject* parent)
   : QObject{parent} {
-  _CREATE_PAR2_FILES = new QAction{QIcon{":img/CREATE_MULTI_PAR"}, tr("Create Par2"), this};
+  _CREATE_PAR2_FILES = new QAction{QIcon{":img/CREATE_MULTI_PAR2"}, tr("Create Par2"), this};
   _VERIFY_IF_NEED_RECOVERY = new QAction{QIcon{":img/VERIFY_INTEGRITY"}, tr("Verify Integrity"), this};
 }
 

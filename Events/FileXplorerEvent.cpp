@@ -42,13 +42,13 @@
 
 #include "MultiPar2Actions.h"
 #include "MultiParTools.h"
+#include "MultiParDialog.h"
 
 #include "PopupWidgetManager.h"
 #include "FileTool.h"
 #include "MemoryKey.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
-#include "StyleSheet.h"
 #include "UndoRedo.h"
 #include "ComplexOperation.h"
 #include "CreateFileFolderHelper.h"
@@ -56,7 +56,6 @@
 #include "RateActions.h"
 #include "RateHelper.h"
 #include "RecycleCfmDlg.h"
-#include "StyleSheetGetter.h"
 #include "RowHeightRegistry.h"
 
 #include <QApplication>
@@ -251,11 +250,14 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
     return false;
   }
   const QStringList mixedFiles = FsmSelectedItems();
-  bool bSucceed{false};
-  int needRecoverCnt{0};
-  std::tie(bSucceed, needRecoverCnt) = MultiParTools::VerifyPar2(mixedFiles);
-  LOG_OE_P(bSucceed, "Need Recover", "%d in %d selection(s) need recover", needRecoverCnt, mixedFiles.size());
-  return bSucceed;
+  using namespace MultiParTools;
+  std::pair<bool, ParVerifyInfomationList> bSucceed2VryInfo = VerifyFiles(mixedFiles);
+  LOG_OE_P(bSucceed2VryInfo.first, //
+           "Verify result", "%d in %d selection(s) verified ok", //
+           bSucceed2VryInfo.second.size(), mixedFiles.size());
+  MultiParDialog dlg{std::move(bSucceed2VryInfo.second)};
+  dlg.exec();
+  return bSucceed2VryInfo.first;
 }
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
@@ -687,7 +689,7 @@ bool FileXplorerEvent::on_compress() {
     return false;
   }
   const QString archiveFileName{PathTool::GetBaseName(workPath) + ".qz"};
-  const QString archiveAbsFilePath{PathTool::join(workPath, archiveFileName)};
+  const QString archiveAbsFilePath{PathTool::Path2Join(workPath, archiveFileName)};
   ArchiveFilesWriter af;
   bool comRet = af.CompressNow(workPath, fileNames, archiveAbsFilePath, false);
   LOG_OE_P(comRet, "Compressed result", "%d items into %s", fileNames.size(), qPrintable(archiveAbsFilePath));

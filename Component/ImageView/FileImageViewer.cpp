@@ -51,7 +51,7 @@ void FileImageViewer::subscribe() {
 }
 
 QString FileImageViewer::GetImageAbsPath() const { //
-  return PathTool::join(mParentPath, mRel2Image);
+  return PathTool::Path2Join(mParentPath, mRel2Image);
 }
 
 bool FileImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img) {

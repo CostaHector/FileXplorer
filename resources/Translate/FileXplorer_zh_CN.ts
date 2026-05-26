@@ -936,17 +936,7 @@
 <context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
-        <source>Shift right 100</source>
-        <translation>命名编号右移100</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Shift left 100</source>
-        <translation>命名编号左移100</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+16"/>
         <source>Normalize keep relative order</source>
         <translation>保持相对顺序规范化命名到0基</translation>
     </message>
@@ -1464,7 +1454,7 @@
 <context>
     <name>MultiPar2Actions</name>
     <message>
-        <location filename="../../Actions/MultiPar2Actions.cpp" line="+14"/>
+        <location filename="../../Component/MultiPar/MultiPar2Actions.cpp" line="+14"/>
         <source>Create Par2</source>
         <translation>创建Par2冗余</translation>
     </message>
@@ -1472,6 +1462,49 @@
         <location line="+1"/>
         <source>Verify Integrity</source>
         <translation>校验完整性</translation>
+    </message>
+</context>
+<context>
+    <name>MultiParDialog</name>
+    <message>
+        <location filename="../../Component/MultiPar/MultiParDialog.cpp" line="+40"/>
+        <source>See CLI output</source>
+        <translation>查看CLI输出</translation>
+    </message>
+</context>
+<context>
+    <name>MultiParView</name>
+    <message>
+        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+24"/>
+        <source>Repair Broken File</source>
+        <translation>修复损坏文件</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sync PAR2 Built-in Source File List</source>
+        <translation>同步PAR2内置源文件列表</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Recover Source File Name</source>
+        <translation>恢复源文件名称</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Process Old/New PAR2 Names and Re-verify</source>
+        <translation>处理新/旧PAR2文件名称并重校验</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>Confirm Recovery Source File Name?</source>
+        <translation>确认恢复源文件名称吗?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Recover source file names using the built-in source name list from PAR2.
+You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
+        <translation>使用PAR2内置源文件列表去恢复源文件名称.
+或许你需要的是&apos;同步PAR2内置源文件列表&apos;.</translation>
     </message>
 </context>
 <context>
@@ -2245,7 +2278,7 @@
 <context>
     <name>ThumbnailActions</name>
     <message>
-        <location filename="../../Actions/ThumbnailActions.cpp" line="+29"/>
+        <location filename="../../Actions/ThumbnailActions.cpp" line="+28"/>
         <source>Create thumbnail</source>
         <translation>创建缩略图</translation>
     </message>

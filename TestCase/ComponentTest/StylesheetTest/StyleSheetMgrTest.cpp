@@ -33,7 +33,7 @@ private slots:
     mgr.showEvent(&eventShow);
 
     QVERIFY(mgr.m_searchLineEdit != nullptr);
-    QVERIFY(mgr.m_startSearchAct != nullptr);
+    QVERIFY(mgr.m_searchAction != nullptr);
     QVERIFY(mgr.m_styleSheetView != nullptr);
 
     mgr.m_searchLineEdit->setText("Kaka");
@@ -41,11 +41,11 @@ private slots:
     QCOMPARE(mgr.m_styleSheetView->curFilter(), "Kaka");
 
     mgr.m_searchLineEdit->setText("Cristinao Ronaldo");
-    mgr.m_startSearchAct->trigger();
+    mgr.m_searchAction->trigger();
     QCOMPARE(mgr.m_styleSheetView->curFilter(), "Cristinao Ronaldo");
 
     mgr.m_searchLineEdit->setText("Varane");
-    mgr.onStartFilter();
+    mgr.onStartFilter("Varane");
     QCOMPARE(mgr.m_styleSheetView->curFilter(), "Varane");
   }
 

@@ -27,18 +27,12 @@
 #include <QRadioButton>
 
 StyleSheetMgr::StyleSheetMgr(QWidget* parent)
-  : QDialog{parent} {
-  m_searchLineEdit = new QLineEdit{this};
-  {
-    m_startSearchAct = m_searchLineEdit->addAction(QIcon(":img/FILE_SYSTEM_FILTER"), QLineEdit::LeadingPosition);
-    m_searchLineEdit->setClearButtonEnabled(true);
-    m_searchLineEdit->setPlaceholderText("Search items here");
-  }
+  : DialogWithSearchLine{parent} {
 
   const bool autoInitPreviewWindowWhenStartup = Configuration().value("INIT_PREVIEW_WINDOW_WHEN_STARTUP", true).toBool();
 
   QToolBar* ctrlTb = new QToolBar{"Control Toolbar", this};
-  ctrlTb->addWidget(m_searchLineEdit);
+  ctrlTb->addWidget(GetSearchLineEdit());
   m_autoInitPreviewWindow = ctrlTb->addAction("Auto Init Preview");
   m_autoInitPreviewWindow->setCheckable(true);
   m_autoInitPreviewWindow->setChecked(autoInitPreviewWindowWhenStartup);
@@ -64,7 +58,6 @@ StyleSheetMgr::StyleSheetMgr(QWidget* parent)
   m_layout->addWidget(m_dlgBtnBox);
   setLayout(m_layout);
 
-  setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
   setWindowTitle("StyleSheet Manager");
   setWindowIcon(QIcon{":/styles/STYLESHEET_MGR"});
   subscribe();
@@ -91,8 +84,6 @@ void StyleSheetMgr::initStyleSheetPreview() {
 }
 
 void StyleSheetMgr::subscribe() {
-  connect(m_searchLineEdit, &QLineEdit::returnPressed, this, &StyleSheetMgr::onStartFilter);
-  connect(m_startSearchAct, &QAction::triggered, this, &StyleSheetMgr::onStartFilter);
   connect(m_initPreviewWindow, &QAction::triggered, this, &StyleSheetMgr::initStyleSheetPreview);
 
   auto* pApplyChanges = m_dlgBtnBox->button(QDialogButtonBox::StandardButton::Apply);
@@ -115,14 +106,8 @@ void StyleSheetMgr::onApplyChanges() {
   accept();
 }
 
-void StyleSheetMgr::onStartFilter() {
-  m_styleSheetView->setFilter(m_searchLineEdit->text());
-}
-
-void StyleSheetMgr::showEvent(QShowEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  QDialog::showEvent(event);
-  StyleSheet::UpdateTitleBar(this);
+void StyleSheetMgr::onStartFilter(const QString& searchText) {
+  m_styleSheetView->setFilter(searchText);
 }
 
 QWidget* StyleSheetMgr::GetEffectPreviewer() {

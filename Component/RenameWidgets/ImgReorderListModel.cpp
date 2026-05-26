@@ -50,32 +50,6 @@ QVariant ImgReorderListModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (!index.isValid()) {
-    return false;
-  }
-  if (role != Qt::EditRole) {
-    return false;
-  }
-  const int beforeNumber = m_imgs[index.row()].number;
-  bool bIsInt{false};
-  const int newNumber{value.toInt(&bIsInt)};
-  if (!bIsInt) {
-    return false;
-  }
-  if (newNumber == beforeNumber) {
-    return false;
-  }
-  if (m_occupiedRows.contains(newNumber)) {
-    LOG_D("number[%d] is occupied", newNumber);
-    return false;
-  }
-  m_occupiedRows.remove(beforeNumber);
-  m_occupiedRows.insert(newNumber);
-  m_imgs[index.row()].number = newNumber;
-  return true;
-}
-
 QList<int> ImgReorderListModel::GetNewNamesNumero(const ImgReorderDataLst& imgs) {
   const int N = imgs.size();
   std::unique_ptr<int[]> old2New{new (std::nothrow) int[N]{0}};
@@ -181,30 +155,6 @@ bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction act
 
 Qt::DropActions ImgReorderListModel::supportedDropActions() const {
   return Qt::MoveAction;
-}
-
-bool ImgReorderListModel::onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step) {
-  if (indexes.isEmpty() || step == 0) {
-    return false;
-  }
-  QList<int> selectedRows;
-  selectedRows.reserve(indexes.size());
-  for (const QModelIndex& ind : indexes) {
-    selectedRows.push_back(ind.row());
-  }
-  bool bNeedShift{false};
-  ImgReorderDataLst newImages;
-  std::tie(bNeedShift, newImages) = BatchShiftSelectedRowsByStep(m_imgs, selectedRows, step);
-  if (!bNeedShift) {
-    return false;
-  }
-
-  beginResetModel();
-  m_imgs.swap(newImages);
-  endResetModel();
-
-  updateOccupiedRows();
-  return true;
 }
 
 bool ImgReorderListModel::onNormalizeKeepRelativeOrder() {

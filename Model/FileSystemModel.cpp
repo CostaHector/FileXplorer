@@ -138,6 +138,14 @@ QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
         return QPixmap(decorationImgPath);
       }
     }
+    // if (QFileSystemModel::data(index, Qt::DisplayRole).toString() == "MultiPar.exe") {
+    //   QVariant var = QFileSystemModel::data(index, role);
+    //   if (var.canConvert<QIcon>()) {
+    //     QIcon icon = var.value<QIcon>();
+    //     QPixmap pixmap = icon.pixmap(64, 64);
+    //     pixmap.save("MultiParExe.ico", "ico");
+    //   }
+    // }
   }
   return QFileSystemModel::data(index, role);
 }

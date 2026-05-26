@@ -8,7 +8,6 @@
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "StyleKey.h"
 #include <QApplication>
 
 #define RUN_MAIN_FILE 1

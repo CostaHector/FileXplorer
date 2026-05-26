@@ -2,7 +2,6 @@
 #define CONFIGSMODEL_H
 
 #include <QAbstractTableModel>
-#include "MemoryKey.h"
 #include "BehaviorKey.h"
 #include "PathKey.h"
 #include "RedunImgFinderKey.h"

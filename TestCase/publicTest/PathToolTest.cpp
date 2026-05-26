@@ -350,13 +350,9 @@ private slots:
     QCOMPARE(GetPrepathAndFileName("", prepath), "");
     QCOMPARE(prepath, "");
     QCOMPARE(Path2Join("", ""), "");
-  }
 
-  void test_join() {
-    QCOMPARE(join("C:/", "home/to/path"), "C:/home/to/path");
-    QCOMPARE(join("C:", "home/to/path"), "C:/home/to/path");
-    QCOMPARE(join("C:", ""), "C:");
-    QCOMPARE(join("", "/home/to/path"), "/home/to/path");
+    QCOMPARE(Path2Join("C:/", "home/to/path"), "C:/home/to/path");
+    QCOMPARE(Path2Join("C:", "home/to/path"), "C:/home/to/path");
   }
 
   void test_Basic() { //

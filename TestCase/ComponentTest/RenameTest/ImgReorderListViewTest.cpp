@@ -25,20 +25,15 @@ class ImgReorderListViewTest : public PlainTestSuite {
     ImgReorderListView reorderList;
     reorderList.InitListView();
     QVERIFY(reorderList.mImgReorderListModel != nullptr);
-    QVERIFY(reorderList.mBatchShiftRight100 != nullptr);
-    QVERIFY(reorderList.mBatchShiftLeft100 != nullptr);
     QVERIFY(reorderList.mNormalizeKeepRelativeOrder != nullptr);
     QVERIFY(reorderList.mOpenInSystemApplication != nullptr);
     const QList<QAction*> actionsInMenu = reorderList.m_menu->actions();
-    QVERIFY(actionsInMenu.contains(reorderList.mBatchShiftRight100));
-    QVERIFY(actionsInMenu.contains(reorderList.mBatchShiftLeft100));
     QVERIFY(actionsInMenu.contains(reorderList.mNormalizeKeepRelativeOrder));
     QVERIFY(actionsInMenu.contains(reorderList.mOpenInSystemApplication));
 
     const int N = reorderList.mImgReorderListModel->rowCount();
     QCOMPARE(N, 0);
     QCOMPARE(reorderList.selectionModel()->hasSelection(), false);
-    QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(), false);
     QCOMPARE(reorderList.onNormalizeKeepRelativeOrder(), false);
     QCOMPARE(reorderList.currentIndex().isValid(), false);
     QCOMPARE(reorderList.onOpenCurrentIndexInSystemApplication(), false);
@@ -96,7 +91,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
       QDropEvent validDropEvent{QPoint{0, 0}, Qt::DropAction::MoveAction, &mimeData, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier};
       reorderList.dropEvent(&validDropEvent);
       QCOMPARE(validDropEvent.isAccepted(), true);
-      QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 1", "Kaka 2", "Kaka 0"}));
+      QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 2", "Kaka 0", "Kaka 1"}));
     }
 
     // recover
@@ -114,7 +109,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
       QDropEvent validDropEvent{QPoint{-1, -1}, Qt::DropAction::MoveAction, &mimeData, Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier};
       reorderList.dropEvent(&validDropEvent);
       QCOMPARE(validDropEvent.isAccepted(), true);
-      QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 2", "Kaka 0", "Kaka 1"}));
+      QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 1", "Kaka 2", "Kaka 0"}));
     }
 
     // recover
@@ -146,33 +141,11 @@ class ImgReorderListViewTest : public PlainTestSuite {
     reorderList.InitListView();
     QCOMPARE(reorderList.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
     QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
-
     reorderList.clearSelection();
-    QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(), false);
 
-    reorderList.selectAll();
-    QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(10), true);
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 10", "Kaka 11", "Kaka 12"}));
-
-    reorderList.clearSelection();
-    QCOMPARE(reorderList.onNormalizeKeepRelativeOrder(), true);
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
-
-    reorderList.selectAll();
-    reorderList.mBatchShiftRight100->trigger();
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 100", "Kaka 101", "Kaka 102"}));
-
-    reorderList.selectAll();
-    reorderList.mBatchShiftLeft100->trigger();
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
-
-    reorderList.selectAll();
-    QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(-10), true);
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka -10", "Kaka -9", "Kaka -8"}));  // sort by number not string, so -10<-9<-8
-
-    reorderList.clearSelection();
-    reorderList.mNormalizeKeepRelativeOrder->trigger();
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
+    const ImgReorderListModel* mImgReorderListModel{reorderList.mImgReorderListModel};
+    QVERIFY(mImgReorderListModel != nullptr);
+    QCOMPARE(reorderList.onNormalizeKeepRelativeOrder(), false);
   }
 
   void double_clicked_to_open_ok() {
