@@ -19,7 +19,7 @@ struct ParVerifyInfomation {
   QString getPar2FileAbsPath() const { return m_par2FileName.isEmpty() ? "" : m_prePath + m_par2FileName; }
 
   bool isTrustable() const noexcept { return (int) m_statusE < (int) Par2StatusE::NEED_VERIFY_AGAIN; }
-  bool isNeedRepair() const { return m_statusE != Par2StatusE::ALL_FILES_COMPLETE; };
+  bool isNeedRepair() const { return m_statusE != Par2StatusE::ALL_FILES_COMPLETE; }
   bool isRepairable() const { return m_statusE == Par2StatusE::ALL_FILES_COMPLETE || m_statusE == Par2StatusE::READY_TO_REPAIR || m_statusE == Par2StatusE::READY_TO_RENAME;}
   bool isNeedReverify() const { return m_statusE == Par2StatusE::READY_TO_RENAME || m_statusE == Par2StatusE::NEED_VERIFY_AGAIN; }
 

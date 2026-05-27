@@ -37,7 +37,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mShowFrames->setCheckable(true);
   mShowFrames->setChecked(false);
 
-  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("open in system application"), this};
+  mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("Open in System Application"), this};
 
   const bool bShowVideoList{Configuration().value("VideoView/ShowVideoList", true).toBool()};
   mShowVideoList = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_LIST"}, tr("show list"), this};

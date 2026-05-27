@@ -116,7 +116,7 @@ void FileImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
     mMenu = new (std::nothrow) QMenu{"Image viewer system menu", nullptr};
     CHECK_NULLPTR_RETURN_VOID(mMenu);
 
-    _OPEN_IN_SYSTEM_APPLICATION = mMenu->addAction(QIcon{":img/LARGE"}, tr("Open in system application"));
+    _OPEN_IN_SYSTEM_APPLICATION = mMenu->addAction(QIcon{":img/SYSTEM_APPLICATION"}, tr("Open in system application"));
     _REVEAL_IN_FILE_EXPLORER = mMenu->addAction(QIcon{":img/REVEAL_IN_EXPLORER"}, tr("Reveal in explorer"));
     _COPY_FILE_NAME = mMenu->addAction(QIcon{":img/COPY_TEXT"}, tr("Copy file name"));
 

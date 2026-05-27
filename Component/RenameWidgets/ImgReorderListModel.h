@@ -29,7 +29,6 @@ class ImgReorderListModel : public QAbstractListModelPub {
 
   bool onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step=100);
   bool onNormalizeKeepRelativeOrder();
-  bool onOpenFileInSystemApplication(const QModelIndex& ind);
 
  private:
   void initOccupiedRows(int n) const;

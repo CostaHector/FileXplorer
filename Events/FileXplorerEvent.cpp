@@ -235,10 +235,16 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
 }
 
 bool FileXplorerEvent::on_createFilePar2() {
-  if (!__CanNewItem()) {
+  auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::IsCreatePar2Avail(vt)) {
+    LOG_INFO_NP("[Abort] Current view not support Create Par2", ViewTypeTool::c_str(vt));
     return false;
   }
-  const QStringList mixedFiles = FsmSelectedItems();
+  const QStringList mixedFiles = _contentPane->getFilePaths();
+  if (mixedFiles.isEmpty()) {
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false;
+  }
   bool bSucceed{false}, crtCnt{0};
   std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2(mixedFiles);
   LOG_OE_P(bSucceed, "Create par2", "%d par2 file for %d selection(s) ok", crtCnt, mixedFiles.size());
@@ -250,6 +256,10 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
     return false;
   }
   const QStringList mixedFiles = FsmSelectedItems();
+  if (mixedFiles.isEmpty()) {
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false;
+  }
   using namespace MultiParTools;
   std::pair<bool, ParVerifyInfomationList> bSucceed2VryInfo = VerifyFiles(mixedFiles);
   LOG_OE_P(bSucceed2VryInfo.first, //
@@ -264,9 +274,9 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
   const QStringList& paths = _contentPane->getFilePaths();
-
   if (paths.isEmpty()) {
-    return true; // selection some row first
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false; // selection some row first
   }
   int succeedCnt = 0;
   for (const QString& path : paths) {
@@ -287,7 +297,8 @@ bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
   const QStringList& paths = _contentPane->getFilePaths();
 
   if (paths.isEmpty()) {
-    return true; // selection some row first
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false;
   }
   int succeedCnt = 0;
   for (const QString& path : paths) {

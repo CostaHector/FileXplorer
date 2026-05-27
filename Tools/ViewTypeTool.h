@@ -41,7 +41,8 @@ constexpr ViewTypeMaskInt VIEWS_USE_FILE_SYSTEM_SEARCHBAR { FS_VIEWS_MASK | (1 <
 constexpr ViewTypeMaskInt CHROME_SEARCH_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::CAST) | (1 << (int)ViewType::JSON)};
 constexpr ViewTypeMaskInt OPEN_IN_TERMINAL_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::CAST)};
 constexpr ViewTypeMaskInt DECOMPRESS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH)};
-constexpr ViewTypeMaskInt PLAY_VIDEOS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH)| (1 << (int)ViewType::MOVIE)};
+constexpr ViewTypeMaskInt PLAY_VIDEOS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::MOVIE)};
+constexpr ViewTypeMaskInt CREATE_PAR2_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::SCENE)};
 }
 
 inline bool IsMatch(ViewType vt, ViewTypeMaskInt candidates) { // ViewTypeMask
@@ -70,6 +71,10 @@ inline bool IsDecompressHereAvail(ViewType vt) {
 
 inline bool IsOpenVideosAvail(ViewType vt) {
   return IsMatch(vt, ViewTypeUtils::PLAY_VIDEOS_MASK);
+}
+
+inline bool IsCreatePar2Avail(ViewType vt) {
+  return IsMatch(vt, ViewTypeUtils::CREATE_PAR2_MASK);
 }
 
 inline const char* c_str(ViewType viewType) {

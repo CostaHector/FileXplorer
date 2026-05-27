@@ -206,21 +206,13 @@
         <file alias="HASH_ALGORITHM">Browser/HASH_ALGORITHM.svg</file>
 
         <!--PreferenceIcons icon here-->
-        <file alias="BACKGROUND_IMAGE_PATH">PreferenceIcons/BACKGROUND_IMAGE_PATH.ico</file>
-        <file alias="SMALL">PreferenceIcons/SMALL.png</file>
-        <file alias="MEDIUM">PreferenceIcons/MEDIUM.png</file>
-        <file alias="LARGE">PreferenceIcons/LARGE.png</file>
-        <file alias="EXTRA_LARGE">PreferenceIcons/EXTRA_LARGE.png</file>
+        <file alias="SYSTEM_APPLICATION">PreferenceIcons/SYSTEM_APPLICATION.svg</file>
         <file alias="FONT_SIZE">PreferenceIcons/FONT_SIZE.svg</file>
         <file alias="DRAG_DROP">PreferenceIcons/DRAG_DROP.svg</file>
         <file alias="NO_DRAG_DROP">PreferenceIcons/NO_DRAG_DROP.svg</file>
         <file alias="DRAG_DROP_INTERNAL_MOVE">PreferenceIcons/DRAG_DROP_INTERNAL_MOVE.svg</file>
         <file alias="VIEW_GRID_ON">PreferenceIcons/VIEW_GRID_ON.svg</file>
-        <file alias="ICON_MODE">PreferenceIcons/ICON_MODE.png</file>
-        <file alias="LIST_MODE">PreferenceIcons/LIST_MODE.png</file>
-        <file alias="LIST_VIEW">PreferenceIcons/LIST_VIEW.png</file>
-        <file alias="TABLE_VIEW">PreferenceIcons/TABLE_VIEW.png</file>
-        <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.png</file>
+        <file alias="VIDEO_DURATION">PreferenceIcons/VIDEO_DURATION.svg</file>
         <file alias="FILE_SIZE">PreferenceIcons/FILE_SIZE.svg</file>
         <file alias="LOAD_A_PATH">PreferenceIcons/LOAD_A_PATH.svg</file>
 

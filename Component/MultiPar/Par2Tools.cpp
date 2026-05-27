@@ -140,7 +140,7 @@ Par2Info ParsePar2File(const QString &par2FileAbsPath) {
             continue;
           }
           oldFileNames.append(fileName);
-          LOG_D("resolve built-in file[%s]", fileName.toUtf8().constData());
+          LOG_D("resolve built-in file[%s]", qPrintable(fileName));
 
           // 达到声明数量则停止解析, 获取oldFileNames元素优先于sourceFileCount
           if (oldFileNames.count() == sourceFileCount) {

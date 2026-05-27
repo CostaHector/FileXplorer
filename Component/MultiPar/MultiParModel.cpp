@@ -82,6 +82,20 @@ const QByteArray* MultiParModel::GetCliOutput(const QModelIndex& srcIndex) const
   return &(mVerifyInfoList[srcIndex.row()].m_verifyOutput);
 }
 
+QString MultiParModel::GetFrontSourceFile(const QModelIndex& srcIndex) const {
+  if (!srcIndex.isValid()) {
+    return {};
+  }
+  return mVerifyInfoList[srcIndex.row()].getFirstSrcFileAbsPath();
+}
+
+QString MultiParModel::GetPar2FileAbsPath(const QModelIndex& srcIndex) const {
+  if (!srcIndex.isValid()) {
+    return {};
+  }
+  return mVerifyInfoList[srcIndex.row()].getPar2FileAbsPath();
+}
+
 void MultiParModel::EmitInfoChanged(const QModelIndex& ind) {
   emit dataChanged(ind.siblingAtColumn(0),                    //
                    ind.siblingAtColumn(GetLastColumnIndex()), //
