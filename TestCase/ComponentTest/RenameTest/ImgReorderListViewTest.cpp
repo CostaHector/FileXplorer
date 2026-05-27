@@ -6,6 +6,7 @@
 #include "EndToExposePrivateMember.h"
 #include "FileTool.h"
 #include "Configuration.h"
+#include "InputDialogHelper.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -17,8 +18,8 @@ class ImgReorderListViewTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
-  void initTestCase() { GlobalMockObject::reset(); }
-  void cleanupTestCase() { GlobalMockObject::verify(); }
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
 
   void default_ok() {
     Configuration().clear();
@@ -27,6 +28,7 @@ class ImgReorderListViewTest : public PlainTestSuite {
     QVERIFY(reorderList.mImgReorderListModel != nullptr);
     QVERIFY(reorderList.mBatchShiftRight100 != nullptr);
     QVERIFY(reorderList.mBatchShiftLeft100 != nullptr);
+    QVERIFY(reorderList.mBatchShiftCustomUnit != nullptr);
     QVERIFY(reorderList.mNormalizeKeepRelativeOrder != nullptr);
     QVERIFY(reorderList.mOpenInSystemApplication != nullptr);
     const QList<QAction*> actionsInMenu = reorderList.m_menu->actions();
@@ -171,9 +173,21 @@ class ImgReorderListViewTest : public PlainTestSuite {
     reorderList.mBatchShiftLeft100->trigger();
     QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka 0", "Kaka 1", "Kaka 2"}));
 
-    reorderList.selectAll();
-    QCOMPARE(reorderList.onBatchShiftSelectedRowsByStep(-10), true);
-    QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka -10", "Kaka -9", "Kaka -8"}));  // sort by number not string, so -10<-9<-8
+    {
+      reorderList.selectAll();
+      constexpr int userInputShiftValue = -10;
+      const std::pair<bool, int> cancel0{false, 7};
+      const std::pair<bool, int> accept1{true, userInputShiftValue};
+      MOCKER(InputDialogHelper::GetIntWithInitial)                                                                                 //
+          .expects(exactly(2))                                                                                                     //
+          .with(any(), any(), any(), eq(0), eq((int)-10000), eq((int)10000), eq(1))  //
+          .will(returnValue(cancel0))                                                                                              // user cancelled
+          .then(returnValue(accept1));                                                                                             //
+
+      QVERIFY(!reorderList.onBatchShiftCustomUnit()); // cancel
+      QVERIFY(reorderList.onBatchShiftCustomUnit()); // accept
+      QCOMPARE(reorderList.getOrderedNames(), (QStringList{"Kaka -10", "Kaka -9", "Kaka -8"}));  // sort by number not string, so -10<-9<-8
+    }
 
     reorderList.clearSelection();
     reorderList.mNormalizeKeepRelativeOrder->trigger();

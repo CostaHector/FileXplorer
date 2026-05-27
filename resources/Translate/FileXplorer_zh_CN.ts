@@ -944,24 +944,29 @@
 <context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
-        <source>Shift right 100</source>
-        <translation>编号右移100单位</translation>
+        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+18"/>
+        <source>Move Right by 100</source>
+        <translation>编号右移100</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Shift left 100</source>
-        <translation>编号左移100单位</translation>
+        <source>Move Left by 100</source>
+        <translation>编号左移100</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>Move by Custom Step</source>
+        <translation>编号移动自定义数值</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Normalize keep relative order</source>
         <translation>保持相对顺序规范化命名到0基</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>open in system application</source>
-        <translation>用系统应用打开</translation>
+        <source>Open in System Application</source>
+        <translation>在系统应用中打开</translation>
     </message>
 </context>
 <context>
@@ -1007,17 +1012,17 @@
         <translation>帧图组</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+4"/>
+        <source>Open in System Application</source>
+        <translation>在系统应用中打开</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>show list</source>
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="-3"/>
-        <source>open in system application</source>
-        <translation>用系统应用打开</translation>
-    </message>
-    <message>
-        <location line="-20"/>
+        <location line="-23"/>
         <source>Grab a Frame</source>
         <translation>抓取一帧</translation>
     </message>
@@ -1493,7 +1498,7 @@
 <context>
     <name>MultiParView</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+24"/>
+        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+25"/>
         <source>Repair Broken File</source>
         <translation>修复损坏文件</translation>
     </message>
@@ -1503,17 +1508,22 @@
         <translation>同步PAR2内置源文件列表</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Recover Source File Name</source>
         <translation>恢复源文件名称</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-1"/>
         <source>Process Old/New PAR2 Names and Re-verify</source>
         <translation>处理新/旧PAR2文件名称并重校验</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+2"/>
+        <source>Open in System Application</source>
+        <translation>在系统应用中打开</translation>
+    </message>
+    <message>
+        <location line="+57"/>
         <source>Confirm Recovery Source File Name?</source>
         <translation>确认恢复源文件名称吗?</translation>
     </message>
@@ -2455,7 +2465,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>减少音量</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+19"/>
         <source>Playback Mode</source>
         <translation>播放模式</translation>
     </message>

@@ -1,6 +1,7 @@
 #include "MultiParView.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+#include "FileTool.h"
 #include <QMessageBox>
 
 MultiParView::MultiParView(ParVerifyInfomationList &&resultList, const QString &instName, QWidget *parent)
@@ -23,10 +24,18 @@ MultiParView::MultiParView(ParVerifyInfomationList &&resultList, const QString &
   {
     m_repairBrokenFile = new QAction{QIcon{":img/REPAIR"}, tr("Repair Broken File"), this};
     m_syncBuiltInSrcFileListInPar2 = new QAction{QIcon{":img/RENAME"}, tr("Sync PAR2 Built-in Source File List"), this};
-    m_repairMissnamedFile = new QAction{QIcon{":img/REVERT"}, tr("Recover Source File Name"), this};
     m_processOldNewPar2NameThenReverify = new QAction{QIcon{":img/REFRESH_THIS_PATH"}, tr("Process Old/New PAR2 Names and Re-verify"), this};
+    m_repairMissnamedFile = new QAction{QIcon{":img/REVERT"}, tr("Recover Source File Name"), this};
+    m_openCurrentFile = new QAction{QIcon{":img/SYSTEM_APPLICATION"}, tr("Open in System Application"), this};
 
-    PushFrontExclusiveActions({m_repairBrokenFile, m_syncBuiltInSrcFileListInPar2, m_repairMissnamedFile, m_processOldNewPar2NameThenReverify});
+    QList<QAction *> exclusiveActs{
+        m_repairBrokenFile,                  //
+        m_syncBuiltInSrcFileListInPar2,      //
+        m_processOldNewPar2NameThenReverify, //
+        m_repairMissnamedFile,               //
+        m_openCurrentFile,                   //
+    };
+    PushFrontExclusiveActions(exclusiveActs);
   }
 
   subscribe();
@@ -37,6 +46,8 @@ void MultiParView::setFilter(const QString &filter) {
 }
 
 void MultiParView::subscribe() {
+  connect(this, &QTableView::doubleClicked, this, &MultiParView::onOpenFileInSystemApplication);
+  connect(m_openCurrentFile, &QAction::triggered, this, &MultiParView::onOpenFileInSystemApplication);
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &MultiParView::onSelectionChange);
 
   connect(m_repairBrokenFile, &QAction::triggered, this, &MultiParView::onRepairBrokenFile);
@@ -104,4 +115,19 @@ void MultiParView::onSelectionChange(const QModelIndex &proIndex) {
     return;
   }
   emit showCliOutputReq(*pCliOutput);
+}
+
+bool MultiParView::onOpenFileInSystemApplication() const {
+  const QModelIndex &proIndex{currentIndex()};
+  if (!proIndex.isValid()) {
+    return false;
+  }
+  QModelIndex srcIndex = mSortFilterProxy->mapToSource(proIndex);
+  QString filePath;
+  if (MultiParKey::isPar2Column(srcIndex.column())) {
+    filePath = mMultiParModel->GetPar2FileAbsPath(srcIndex);
+  } else {
+    filePath = mMultiParModel->GetFrontSourceFile(srcIndex);
+  }
+  return FileTool::OpenLocalFileUsingDesktopService(filePath);
 }

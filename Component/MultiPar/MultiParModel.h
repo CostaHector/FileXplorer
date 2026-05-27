@@ -14,6 +14,8 @@ public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   const QByteArray* GetCliOutput(const QModelIndex& srcIndex) const;
+  QString GetFrontSourceFile(const QModelIndex& srcIndex) const;
+  QString GetPar2FileAbsPath(const QModelIndex& srcIndex) const;
 
   int repairBrokenFile(const QModelIndexList& srcIndexes, const ParVerifyInfomation::Par2StatusE par2Status = ParVerifyInfomation::Par2StatusE::READY_TO_REPAIR);
   int syncBuiltInSrcFileListInPar2(const QModelIndexList& srcIndexes);

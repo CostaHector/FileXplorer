@@ -27,6 +27,11 @@ constexpr const char* TABLE_HOR_HEADERS[COLUMNS_CNT_BUTT]{
     MULTI_PAR_KEY_MAPPING
 #undef MULTI_PAR_KEY_ITEM
 };
+
+inline bool isPar2Column(int column) {
+  return column == ColumnE::PAR2_FILE || column == ColumnE::VOL_PAR2_FILES;
+}
+
 }
 
 #endif // MULTIPARKEY_H

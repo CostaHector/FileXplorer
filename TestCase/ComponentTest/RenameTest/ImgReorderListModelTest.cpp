@@ -140,7 +140,6 @@ private slots:
     QCOMPARE(reorderModel.mimeTypes().count(), 1);
     QCOMPARE(reorderModel.getOrderedNames().isEmpty(), true);
     QCOMPARE(reorderModel.filePath({}), "");
-    QCOMPARE(reorderModel.onOpenFileInSystemApplication({}), false);
 
     QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);
     QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);
@@ -186,9 +185,6 @@ private slots:
     QCOMPARE(reorderModel.filePath(ricardoIndex), "/Ricardo Leite.jpg");
     QCOMPARE(reorderModel.filePath(cr7Index), "/Cristiano Ronaldo.txt");
     QCOMPARE(reorderModel.filePath(lewanIndex), "/Robert Lewandowski.png");
-    MOCKER(FileTool::OpenLocalFileUsingDesktopService).expects(exactly(2)).with(eq(QString{"/Ricardo Leite.jpg"})).will(returnValue(false)).then(returnValue(true));
-    QCOMPARE(reorderModel.onOpenFileInSystemApplication(ricardoIndex), false); // at first assume filePath not exist
-    QCOMPARE(reorderModel.onOpenFileInSystemApplication(ricardoIndex), true);  // then assume filePath exist
 
     QCOMPARE(reorderModel.data(ricardoIndex, Qt::DisplayRole).toInt(), 0);
     QCOMPARE(reorderModel.data(ricardoIndex, Qt::EditRole).toInt(), 0);

@@ -51,6 +51,9 @@ private slots:
 
     QCOMPARE(model.headerData(0, Qt::Vertical, Qt::TextAlignmentRole).toInt(), int(Qt::AlignRight));
     model.headerData(0, Qt::Horizontal, Qt::TextAlignmentRole).toInt();
+
+    QCOMPARE(model.GetFrontSourceFile(QModelIndex{}), "");
+    QCOMPARE(model.GetPar2FileAbsPath(QModelIndex{}), "");
   }
 
   void data_retrieve_ok() {
@@ -78,6 +81,9 @@ private slots:
     QCOMPARE(model.index(0, MultiParKey::ColumnE::DAMAGED_CNT).data(Qt::DisplayRole).toInt(), allFilesComplete.m_damagedCount);
     QCOMPARE(model.index(0, MultiParKey::ColumnE::MISSING_CNT).data(Qt::DisplayRole).toInt(), allFilesComplete.m_missingCount);
     QCOMPARE(model.index(0, MultiParKey::ColumnE::PRE_PATH).data(Qt::DisplayRole).toString(), allFilesComplete.m_prePath);
+
+    QCOMPARE(model.GetFrontSourceFile(model.index(0,0)), allFilesComplete.getFirstSrcFileAbsPath());
+    QCOMPARE(model.GetPar2FileAbsPath(model.index(0,0)), allFilesComplete.getPar2FileAbsPath());
 
     QCOMPARE(model.index(0, MultiParKey::ColumnE::SOURCE_FILES).data(Qt::DecorationRole).isValid(), true);
     QCOMPARE(model.index(0, MultiParKey::ColumnE::PAR2_FILE).data(Qt::DecorationRole).isValid(), true);

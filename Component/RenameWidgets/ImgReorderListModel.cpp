@@ -3,7 +3,6 @@
 #include "Logger.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
-#include "FileTool.h"
 #include <QMimeData>
 
 constexpr const char* ImgReorderListModel::MIME_TYPE;
@@ -237,13 +236,6 @@ bool ImgReorderListModel::onNormalizeKeepRelativeOrder() {
 
   initOccupiedRows(m_imgs.size());
   return true;
-}
-
-bool ImgReorderListModel::onOpenFileInSystemApplication(const QModelIndex& ind) {
-  if (!ind.isValid()) {
-    return false;
-  }
-  return FileTool::OpenLocalFileUsingDesktopService(filePath(ind));
 }
 
 void ImgReorderListModel::initOccupiedRows(int n) const {

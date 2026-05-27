@@ -21,11 +21,13 @@ private:
   int onSyncPar2FileName();
   int onFixMisnamedFile();
   int onProcessOldNewPar2NamesThenReverify();
+  bool onOpenFileInSystemApplication() const;
 
   QAction* m_repairBrokenFile{nullptr};
   QAction* m_syncBuiltInSrcFileListInPar2{nullptr};
   QAction* m_repairMissnamedFile{nullptr};
   QAction* m_processOldNewPar2NameThenReverify{nullptr};
+  QAction* m_openCurrentFile{nullptr};
 
   MultiParModel* mMultiParModel{nullptr};
   QSortFilterProxyModel* mSortFilterProxy{nullptr};
