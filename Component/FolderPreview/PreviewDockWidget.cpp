@@ -51,7 +51,8 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
     auto& inst = VideoPlayerActions::GetInst();
     m_titleBar->addWidget(inst.GetPlaybackTriggerModelMenuToolButton(m_titleBar));
     m_titleBar->addWidget(inst.GetPlaybackModeMenuToolButton(m_titleBar));
-    m_titleBar->addWidget(inst.GetInitedVolumeWid(m_titleBar), 1);
+    m_volumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
+    m_titleBar->addWidget(m_volumeWid, 1);
   }
   m_titleBar->addSeparator();
   m_titleBar->addAction(SHOW_OR_HIDE_PREVIEW);
@@ -103,4 +104,7 @@ void PreviewDockWidget::subscribe() {
   connect(mPreviewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, &PreviewDockWidget::onPreviewTypeActionToggled);
   connect(m_floatingPanel, &QAction::toggled, this, &QDockWidget::setFloating);
   connect(m_minimizePanel, &QAction::triggered, this, &QWidget::showMinimized);
+
+  connect(VideoPlayerActions::GetInst().mVolumePlus, &QAction::triggered, m_volumeWid, &VolumeWidget::reqLogVolumeIncrease);
+  connect(VideoPlayerActions::GetInst().mVolumeMinus, &QAction::triggered, m_volumeWid, &VolumeWidget::reqLogVolumeDecrease);
 }

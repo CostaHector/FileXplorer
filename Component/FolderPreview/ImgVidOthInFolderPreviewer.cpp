@@ -165,6 +165,11 @@ void ImgVidOthInFolderPreviewer::subscribe() {
   mVidTv->registerFullScreenToggleCallback(std::bind(&ImgVidOthInFolderPreviewer::onReqFullscreenModeChange, this, std::placeholders::_1));
 }
 
+void ImgVidOthInFolderPreviewer::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
+  CHECK_FALSE_RETURN_VOID(pVolumeWidget);
+  mVidTv->RegisterVolumeWidget(pVolumeWidget);
+}
+
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
   m_bImgVisible = checked;
   if (mImgTv == nullptr) {

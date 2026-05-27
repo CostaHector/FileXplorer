@@ -16,6 +16,7 @@ class DetailPreview : public FullScreenableSplitter {
 
   void onStopPlaying();
   void UpdateWhenSelectAFile(const QString& pth);
+  void RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
  protected:
   QWidget* GetFullScreenableWidget() const override {

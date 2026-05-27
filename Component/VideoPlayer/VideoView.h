@@ -30,6 +30,7 @@ public:
   void onChangeToolBarVisibility(bool bHide);
   void onChangeListVisibility(bool visibility);
   bool registerFullScreenToggleCallback(TFuncFullScreenToggleCallback funcCallback);
+  bool RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
 protected:
   QSize sizeHint() const override { return {480, 360}; }

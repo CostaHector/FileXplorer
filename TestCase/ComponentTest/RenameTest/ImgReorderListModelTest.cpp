@@ -107,6 +107,7 @@ private slots:
         {"c", 2},
         {"e", 4},
     };
+    UpdateNewNumberByPositionAfterDragAndDrop(imgs);
     QCOMPARE(ImgReorderListModel::GetNewNamesNumero(imgs), (QList<int>{0, 2, 4, 1, 5, 3}));
 
     imgs = ImgReorderDataLst{
@@ -117,6 +118,7 @@ private slots:
         {"d", 3},
         {"f", 5},
     };
+    UpdateNewNumberByPositionAfterDragAndDrop(imgs);
     QCOMPARE(ImgReorderListModel::GetNewNamesNumero(imgs), (QList<int>{0, 1, 3, 4, 2, 5}));
 
     imgs = ImgReorderDataLst{
@@ -124,6 +126,7 @@ private slots:
         {"c", 2},
         {"b", 1},
     };
+    UpdateNewNumberByPositionAfterDragAndDrop(imgs);
     QCOMPARE(ImgReorderListModel::GetNewNamesNumero(imgs), (QList<int>{0, 2, 1}));
   }
 
@@ -139,6 +142,8 @@ private slots:
     QCOMPARE(reorderModel.filePath({}), "");
     QCOMPARE(reorderModel.onOpenFileInSystemApplication({}), false);
 
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);
     QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), false);
 
     QCOMPARE(reorderModel.mimeData({}), nullptr);
@@ -232,6 +237,107 @@ private slots:
     // clear all rows
     QCOMPARE(reorderModel.setImagesToReorder(QStringList{}, QString{}, 0, " (%1)"), true);
     QCOMPARE(reorderModel.rowCount(), 0);
+  }
+
+  void setData_ok() {
+    const QStringList filesMixedWithImages{"/Ricardo Leite.jpg", "/Cristiano Ronaldo.png"};
+    const QString baseName{"Kaka"};
+    const int startNo{90};
+    const QString namePattern{" %1"};
+
+    ImgReorderListModel reorderModel{"ImgReorderList"};
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
+    QCOMPARE(reorderModel.rowCount(), 2);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 91"}));
+    QModelIndex kakaIndex{reorderModel.index(0)};
+    QModelIndex cr7Index{reorderModel.index(1)};
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1}));
+
+    // invalid index
+    QCOMPARE(reorderModel.setData({}, 157, Qt::EditRole), false);
+    // role not accept
+    QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::DisplayRole), false);
+    // not number
+    QCOMPARE(reorderModel.setData(kakaIndex, "Not number", Qt::EditRole), false);
+    // value not change
+    QCOMPARE(reorderModel.setData(kakaIndex, 0, Qt::EditRole), false);
+    // value already occupied(0, 1)
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1}));
+    QCOMPARE(reorderModel.setData(kakaIndex, 1, Qt::EditRole), false);
+    // value changed ok
+    QCOMPARE(reorderModel.setData(kakaIndex, 2, Qt::EditRole), true);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 1}));
+    QCOMPARE(reorderModel.data(kakaIndex, Qt::EditRole).toInt(), 2);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 91"}));
+
+    // value not change
+    QCOMPARE(reorderModel.setData(cr7Index, 1, Qt::EditRole), false);
+    // value changed ok
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 1}));
+    QCOMPARE(reorderModel.setData(cr7Index, 0, Qt::EditRole), true);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 0}));
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 90"}));
+
+    // value changed ok
+    QCOMPARE(reorderModel.setData(cr7Index, 3, Qt::EditRole), true);
+    QCOMPARE(reorderModel.data(cr7Index, Qt::EditRole).toInt(), 3);
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{2, 3}));
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 92", "Kaka 93"}));
+  }
+
+  void onBatchShiftSelectedRowsByStep_ok() {
+    const QStringList filesMixedWithImages{"/Ricardo Leite.jpg", "/Cristiano Ronaldo.txt", "/Robert Lewandowski.png"};
+    const QString baseName{"Kaka"};
+    const int startNo{80};
+    const QString namePattern{" %1"};
+
+    ImgReorderListModel reorderModel{"ImgReorderList"};
+    QCOMPARE(reorderModel.setImagesToReorder(filesMixedWithImages, baseName, startNo, namePattern), true);
+    QCOMPARE(reorderModel.rowCount(), 3);
+    QCOMPARE(reorderModel.m_baseName, baseName);
+    QCOMPARE(reorderModel.m_startNo, 80);
+    QCOMPARE(reorderModel.m_namePattern, namePattern);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 80", "Kaka 81", "Kaka 82"}));
+    QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), false); // no need normalize
+
+    QModelIndex kakaIndex = reorderModel.index(0);
+    QModelIndex cr7Index = reorderModel.index(1);
+    QModelIndex lewanIndex = reorderModel.index(2);
+
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({}, 5), false);                      // no selection
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({QModelIndex{}}, 0), false);         // no step
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({kakaIndex, lewanIndex}, 0), false); // no step
+
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{0, 1, 2}));
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({kakaIndex, lewanIndex}, 10), true);
+    // 0 1 2
+    // 10 from 0, 1, 12 from 2
+    // 10, 1, 12
+    // 90, 81, 92
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 81", "Kaka 92"}));
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{10, 1, 12}));
+
+    // 10 from 0 (index1), 1 (index0), 12 from 2 (index2)
+    // 10 from 0, -9 from 1, 2 from 2
+    // 10, -9, 2
+    // 90, 71, 82
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({reorderModel.index(0), reorderModel.index(2)}, -10), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 71", "Kaka 82"}));
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{10, -9, 2}));
+
+    // 10 from 0 (index2), -9 from 1 (index0), 2 from 2 (index1)
+    // 10 from 0, 1, 12 from 2
+    // 10, 1, 12
+    // 90, 81, 92
+    QCOMPARE(reorderModel.onBatchShiftSelectedRowsByStep({reorderModel.index(0), reorderModel.index(1)}, 10), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 90", "Kaka 81", "Kaka 92"}));
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{10, 1, 12}));
+
+    // 10 from 0, 1 from 1, 12 from 2
+    // 1, 0, 2
+    QCOMPARE(reorderModel.onNormalizeKeepRelativeOrder(), true);
+    QCOMPARE(reorderModel.getOrderedNames(), (QStringList{"Kaka 81", "Kaka 80", "Kaka 82"})); // (0,1,2) + start no 80
+    QCOMPARE(reorderModel.m_occupiedRows, (QSet<int>{1, 0, 2}));
   }
 };
 

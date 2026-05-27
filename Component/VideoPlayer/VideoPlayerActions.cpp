@@ -53,7 +53,6 @@ VideoPlayerActions::VideoPlayerActions(QObject* parent)
 
   mVolumePlus = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VOLUME_PLUS"}, tr("+Volume"), this};
   mVolumeMinus = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VOLUME_MINUS"}, tr("-Volume"), this};
-  mVolumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, nullptr}; // 加入到布局后, 所有权移交给布局所在widget
 
   connect(mPlaybackModeIntAction.getActionGroup(),
           &QActionGroup::triggered, //
@@ -87,14 +86,6 @@ MenuToolButton* VideoPlayerActions::GetPlaybackTriggerModelMenuToolButton(QWidge
   playbackTriggerModeToolButton->SetCaption(QIcon{":/VideoPlayer/PLAY_TRIGGER_MODE"}, tr("Play Trigger Mode"), "Change Playback Trigger Mode");
   playbackTriggerModeToolButton->InitDefaultActionFromQSetting(VideoPlayerKey::PLAYBACK_TRIGGER_MODE, true);
   return playbackTriggerModeToolButton;
-}
-
-VolumeWidget* VideoPlayerActions::GetInitedVolumeWid(QWidget* notNullParent) {
-  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
-  if (mVolumeWid->parent() == nullptr) {
-    mVolumeWid->setParent(notNullParent);
-  }
-  return mVolumeWid;
 }
 
 QMediaPlaylist::PlaybackMode VideoPlayerActions::GetPlaybackMode() const {

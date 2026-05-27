@@ -12,21 +12,22 @@ ImgReorderListView::ImgReorderListView(QWidget* parent)
   setDropIndicatorShown(true);
   setDragDropMode(QAbstractItemView::DragDrop);
 
+  mBatchShiftRight100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_RIGHT_BY_STEP"}, tr("Shift right 100"), this};
+  mBatchShiftLeft100 = new (std::nothrow) QAction{QIcon{":img/SHIFT_LEFT_BY_STEP"}, tr("Shift left 100"), this};
   mNormalizeKeepRelativeOrder = new (std::nothrow)
       QAction{QIcon{":img/NOMARLIZE_KEEP_RELATIVE_ORDER"}, tr("Normalize keep relative order"), this};
   mOpenInSystemApplication = new (std::nothrow) QAction{QIcon{":img/LARGE"}, tr("open in system application"), this};
 
-  QList<QAction*> acts{mNormalizeKeepRelativeOrder, NewSeperatorAction(this), mOpenInSystemApplication};
+  QList<QAction*> acts{mBatchShiftRight100, mBatchShiftLeft100, mNormalizeKeepRelativeOrder, mOpenInSystemApplication};
   PushFrontExclusiveActions(acts);
   PushBackExclusiveActions(mImgReorderListModel->GetExcusiveActions());
 
   connect(this, &QListView::doubleClicked, mImgReorderListModel, &ImgReorderListModel::onOpenFileInSystemApplication);
   connect(this, &QListView::iconSizeChanged, mImgReorderListModel, &QAbstractListModelPub::onIconSizeChange);
+  connect(mBatchShiftRight100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(100); });
+  connect(mBatchShiftLeft100, &QAction::triggered, this, [this]() { onBatchShiftSelectedRowsByStep(-100); });
   connect(mNormalizeKeepRelativeOrder, &QAction::triggered, this, &ImgReorderListView::onNormalizeKeepRelativeOrder);
   connect(mOpenInSystemApplication, &QAction::triggered, this, &ImgReorderListView::onOpenCurrentIndexInSystemApplication);
-
-  setWindowIcon(QIcon{":img/RENAME_REORDER_LISTVIEW"});
-  setWindowTitle("Drag to reorder images names");
 }
 
 bool ImgReorderListView::setImagesToReorder(const QStringList& imgs, const QString& baseName, int startIndex, const QString& namePattern) {
@@ -35,6 +36,14 @@ bool ImgReorderListView::setImagesToReorder(const QStringList& imgs, const QStri
 
 QStringList ImgReorderListView::getOrderedNames() const {
   return mImgReorderListModel->getOrderedNames();
+}
+
+bool ImgReorderListView::onBatchShiftSelectedRowsByStep(int step) {
+  const QModelIndexList& indexes = selectedIndexes();
+  if (indexes.isEmpty()) {
+    return false;
+  }
+  return mImgReorderListModel->onBatchShiftSelectedRowsByStep(indexes, step);
 }
 
 bool ImgReorderListView::onNormalizeKeepRelativeOrder() {

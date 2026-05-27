@@ -7,14 +7,18 @@
 constexpr int CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL;  // ms
 
 CurrentRowPreviewer::CurrentRowPreviewer(QWidget* parent)  //
-  : QStackedWidget{parent},                  //
-  m_parentDocker{parent}, m_nextFolderTimer{this}                   //
+  : QStackedWidget{parent}, m_parentDocker{parent}, m_nextFolderTimer{this}                   //
 {
   if (!isTimerDisabled()) {
     m_nextFolderTimer.setInterval(CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL);
     m_nextFolderTimer.setSingleShot(true);
     connect(&m_nextFolderTimer, &QTimer::timeout, this, &CurrentRowPreviewer::UpdatePreview);
   }
+}
+
+void CurrentRowPreviewer::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
+  CHECK_NULLPTR_RETURN_VOID(pVolumeWidget);
+  _volumeWidgetInDocker = pVolumeWidget;
 }
 
 void CurrentRowPreviewer::UpdatePreview() {
@@ -88,7 +92,8 @@ bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E 
   switch (previewType) {
     case PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY: {
       m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", this};
-      CHECK_NULLPTR_RETURN_FALSE(m_fileFolderPreviewStackedWid)
+      CHECK_NULLPTR_RETURN_FALSE(m_fileFolderPreviewStackedWid);
+      m_fileFolderPreviewStackedWid->RegisterVolumeWidget(_volumeWidgetInDocker);
       AddView(previewType, m_fileFolderPreviewStackedWid);
       break;
     }

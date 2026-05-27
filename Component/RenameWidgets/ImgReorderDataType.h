@@ -4,15 +4,21 @@
 #include <QString>
 
 struct ImgReorderDataType {
+  ImgReorderDataType(const QString& fullPath_, int oldNumber_): fullPath{fullPath_}, oldNumber{oldNumber_}, newNumber{oldNumber_}{}
   QString fullPath;
-  int number;  // index
+  int oldNumber; // don't modify me
+  int newNumber;
   ImgReorderDataType& operator+=(int step) {
-    number += step;
+    newNumber += step;
     return *this;
   }
-  bool operator==(const ImgReorderDataType& rhs) const { return number == rhs.number; }
+  QString displayString() const {
+    if (newNumber == oldNumber) { return QString::number(newNumber); }
+    return QString::asprintf("%d from %d", newNumber, oldNumber);
+  }
+  bool operator==(const ImgReorderDataType& rhs) const { return newNumber == rhs.newNumber; }
   bool operator!=(const ImgReorderDataType& rhs) const { return !(*this == rhs); }
-  bool operator<(const ImgReorderDataType& rhs) const { return number < rhs.number; }
+  bool operator<(const ImgReorderDataType& rhs) const { return newNumber < rhs.newNumber; }
 };
 
 using ImgReorderDataLst = QList<ImgReorderDataType>;

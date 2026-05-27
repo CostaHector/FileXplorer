@@ -14,8 +14,9 @@ class ImgReorderListModel : public QAbstractListModelPub {
   QString filePath(const QModelIndex& ind) const;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override { return m_imgs.size(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   Qt::ItemFlags flags(const QModelIndex& index) const override {
-    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsDragEnabled | Qt::ItemFlag::ItemIsDropEnabled;
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsDragEnabled | Qt::ItemFlag::ItemIsDropEnabled | Qt::ItemFlag::ItemIsEditable;
   }
 
   QStringList mimeTypes() const override { return {MIME_TYPE}; }
@@ -26,6 +27,7 @@ class ImgReorderListModel : public QAbstractListModelPub {
   QStringList getOrderedNames() const;
   static constexpr const char* MIME_TYPE = "application/x-imgreorder-rows";
 
+  bool onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step=100);
   bool onNormalizeKeepRelativeOrder();
   bool onOpenFileInSystemApplication(const QModelIndex& ind);
 
@@ -41,6 +43,7 @@ class ImgReorderListModel : public QAbstractListModelPub {
   QString m_namePattern;
 };
 
+void UpdateNewNumberByPositionAfterDragAndDrop(ImgReorderDataLst& newDataList);
 std::pair<bool, ImgReorderDataLst> BatchShiftSelectedRowsByStep(const ImgReorderDataLst& datas, const QList<int>& selectedRows, int step);
 std::pair<bool, ImgReorderDataLst> NormalizeKeepRelativeOrder(const ImgReorderDataLst& datas);
 
