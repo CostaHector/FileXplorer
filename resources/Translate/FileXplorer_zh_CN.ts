@@ -934,9 +934,27 @@
     </message>
 </context>
 <context>
+    <name>ImgReorderDialog</name>
+    <message>
+        <location filename="../../Component/RenameWidgets/ImgReorderDialog.cpp" line="+37"/>
+        <source>Drag to reorder images names</source>
+        <translation>拖拽进行文件的批量重命名</translation>
+    </message>
+</context>
+<context>
     <name>ImgReorderListView</name>
     <message>
-        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+16"/>
+        <location filename="../../Component/RenameWidgets/ImgReorderListView.cpp" line="+15"/>
+        <source>Shift right 100</source>
+        <translation>编号右移100单位</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Shift left 100</source>
+        <translation>编号左移100单位</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Normalize keep relative order</source>
         <translation>保持相对顺序规范化命名到0基</translation>
     </message>

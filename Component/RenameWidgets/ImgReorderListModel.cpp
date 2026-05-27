@@ -42,19 +42,49 @@ QVariant ImgReorderListModel::data(const QModelIndex& index, int role) const {
     return {};
   }
   int row = index.row();
-  if (role == Qt::DisplayRole || role == Qt::EditRole) {
-    return m_imgs[row].number;
-  } else if (role == Qt::DecorationRole) {
+  if (role == Qt::DisplayRole) {
+    return m_imgs[row].displayString();
+  } else if (role == Qt::EditRole) {
+    return m_imgs[row].newNumber;
+  }else if (role == Qt::DecorationRole) {
     return GetDecorationPixmap(m_imgs[row].fullPath);
   }
   return {};
 }
 
+bool ImgReorderListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (!index.isValid()) {
+    return false;
+  }
+  if (role != Qt::EditRole) {
+    return false;
+  }
+  const int curRow = index.row();
+  const int beforeNumber = m_imgs[curRow].newNumber;
+  bool bIsInt{false};
+  const int newNumber{value.toInt(&bIsInt)};
+  if (!bIsInt) {
+    return false;
+  }
+  if (newNumber == beforeNumber) {
+    return false;
+  }
+  if (m_occupiedRows.contains(newNumber)) {
+    LOG_D("number[%d] is occupied", newNumber);
+    return false;
+  }
+  m_occupiedRows.remove(beforeNumber);
+  m_occupiedRows.insert(newNumber);
+  m_imgs[curRow].newNumber = newNumber;
+  emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+  return true;
+}
+
 QList<int> ImgReorderListModel::GetNewNamesNumero(const ImgReorderDataLst& imgs) {
   const int N = imgs.size();
   std::unique_ptr<int[]> old2New{new (std::nothrow) int[N]{0}};
-  for (int i = 0; i < N; ++i) {
-    old2New[imgs[i].number] = i;
+  for (const auto& imgOrderInfo : imgs) {
+    old2New[imgOrderInfo.oldNumber] = imgOrderInfo.newNumber;
   }
 
   QList<int> newNamesNumero;
@@ -115,6 +145,12 @@ QMimeData* ImgReorderListModel::mimeData(const QModelIndexList& indexes) const {
   return mimeData;
 }
 
+void UpdateNewNumberByPositionAfterDragAndDrop(ImgReorderDataLst& newDataList) {
+  for (int iNewIndex = 0; iNewIndex < newDataList.size(); ++iNewIndex) {
+    newDataList[iNewIndex].newNumber = iNewIndex;
+  }
+}
+
 bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) {
   if (data == nullptr || !data->hasFormat(MIME_TYPE)) {
     return false;
@@ -147,14 +183,40 @@ bool ImgReorderListModel::dropMimeData(const QMimeData* data, Qt::DropAction act
   if (!moveResult.first) {
     return false;  // no need move
   }
+  ImgReorderDataLst& newDataList = moveResult.second;
+  UpdateNewNumberByPositionAfterDragAndDrop(newDataList);
   beginResetModel();
-  m_imgs.swap(moveResult.second);
+  m_imgs.swap(newDataList);
   endResetModel();
   return true;
 }
 
 Qt::DropActions ImgReorderListModel::supportedDropActions() const {
   return Qt::MoveAction;
+}
+
+bool ImgReorderListModel::onBatchShiftSelectedRowsByStep(const QModelIndexList& indexes, int step) {
+  if (indexes.isEmpty() || step == 0) {
+    return false;
+  }
+  QList<int> selectedRows;
+  selectedRows.reserve(indexes.size());
+  for (const QModelIndex& ind : indexes) {
+    selectedRows.push_back(ind.row());
+  }
+  bool bNeedShift{false};
+  ImgReorderDataLst newImages;
+  std::tie(bNeedShift, newImages) = BatchShiftSelectedRowsByStep(m_imgs, selectedRows, step);
+  if (!bNeedShift) {
+    return false;
+  }
+
+  beginResetModel();
+  m_imgs.swap(newImages);
+  endResetModel();
+
+  updateOccupiedRows();
+  return true;
 }
 
 bool ImgReorderListModel::onNormalizeKeepRelativeOrder() {
@@ -194,7 +256,7 @@ void ImgReorderListModel::initOccupiedRows(int n) const {
 void ImgReorderListModel::updateOccupiedRows() const {
   m_occupiedRows.clear();
   for (const ImgReorderDataType& ele : m_imgs) {
-    m_occupiedRows.insert(ele.number);
+    m_occupiedRows.insert(ele.newNumber);
   }
 }
 
@@ -224,19 +286,19 @@ std::pair<bool, ImgReorderDataLst> NormalizeKeepRelativeOrder(const ImgReorderDa
   if (datas.isEmpty()) {
     return {false, {}};
   }
-  if (datas.front().number == 0 && datas.back().number == datas.size() - 1) {
+  if (datas.front().newNumber == 0 && datas.back().newNumber == datas.size() - 1) {
     // Already Normalized
     return {false, {}};
   }
 
   QHash<int, int> valueToRank;
   for (int i = 0; i < datas.size(); ++i) {
-    valueToRank[datas[i].number] = i;
+    valueToRank[datas[i].newNumber] = i;
   }
 
   ImgReorderDataLst newDatas(datas);
   for (int i = 0; i < datas.size(); ++i) {
-    newDatas[i].number = valueToRank[newDatas[i].number];
+    newDatas[i].newNumber = valueToRank[newDatas[i].newNumber];
   }
   return {true, newDatas};
 }
