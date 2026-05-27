@@ -5,6 +5,7 @@
 #include "EnumIntAction.h"
 #include "PreviewTypeTool.h"
 #include "ToolBarWidget.h"
+#include "VolumeWidget.h"
 #include <QLabel>
 
 extern template struct EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E>;
@@ -16,6 +17,7 @@ class PreviewDockWidget : public QDockWidget {
   ~PreviewDockWidget();
 
   PreviewTypeTool::PREVIEW_TYPE_E GetCurrentPreviewType() const;
+  VolumeWidget* GetVolumeWidget() { return m_volumeWid; }
 
  signals:
   void previewTypeChanged(PreviewTypeTool::PREVIEW_TYPE_E previewType);
@@ -39,6 +41,7 @@ class PreviewDockWidget : public QDockWidget {
   QAction* m_minimizePanel{nullptr};
   QAction* m_floatingPanel{nullptr};
 
+  VolumeWidget* m_volumeWid{nullptr};
   ToolBarWidget* m_titleBar{nullptr};
   EnumIntAction<PreviewTypeTool::PREVIEW_TYPE_E> mPreviewTypeIntAction;
 };

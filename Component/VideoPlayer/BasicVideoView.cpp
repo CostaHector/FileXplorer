@@ -82,6 +82,18 @@ BasicVideoView::~BasicVideoView() {
   // }
 }
 
+bool BasicVideoView::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
+  CHECK_NULLPTR_RETURN_FALSE(pVolumeWidget)
+  if (mIsVolumeWidgetRegistered) {
+    LOG_W("Already registered, cannot register again");
+    return false;
+  }
+  mIsVolumeWidgetRegistered = true;
+  connect(pVolumeWidget, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
+  connect(pVolumeWidget, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
+  return true;
+}
+
 void BasicVideoView::subscribe() {
   connect(this, &BasicVideoView::userMousePressOrKeyPressHappened, mVideoWidget, &InteractiveVideoWidget::onUserMouseClickOrKeyPressEvent);
 
@@ -101,14 +113,6 @@ void BasicVideoView::subscribe() {
   mProgressSlider->regMouseEventProcessor(std::bind(&QMediaPlayer::setPosition, mPlayer, std::placeholders::_1));
   // 播放过程中滑动块位置增加, 更新当前时间点标签, 更新滑动块的当前时间
   connect(&mProgressSliderUpdateTimer, &QTimer::timeout, this, &BasicVideoView::onUpdateProgressSliderPosition);
-
-#ifndef RUNNING_UNIT_TESTS
-  // mVolumeWid may get free in other component
-  connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
-  connect(VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
-  connect(VideoPlayerActions::GetInst().mVolumePlus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeIncrease);
-  connect(VideoPlayerActions::GetInst().mVolumeMinus, &QAction::triggered, VideoPlayerActions::GetInst().mVolumeWid, &VolumeWidget::reqLogVolumeDecrease);
-#endif
 
   connect(mPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &BasicVideoView::onError);
 

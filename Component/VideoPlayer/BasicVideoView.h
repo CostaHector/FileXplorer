@@ -33,6 +33,7 @@ public:
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
   void movePauseBtnToCenter();
+  bool RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -83,6 +84,7 @@ private:
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
 
+  bool mIsVolumeWidgetRegistered{false};
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };
 #endif // BASICVIDEOVIEW_H

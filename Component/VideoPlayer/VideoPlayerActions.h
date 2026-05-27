@@ -19,13 +19,11 @@ public:
 
   MenuToolButton* GetPlaybackModeMenuToolButton(QWidget* notNullParent) const;
   MenuToolButton* GetPlaybackTriggerModelMenuToolButton(QWidget* notNullParent) const;
-  VolumeWidget* GetInitedVolumeWid(QWidget* notNullParent);
 
   QMediaPlaylist::PlaybackMode GetPlaybackMode() const;
   VideoPlayTool::PlaybackTriggerMode GetPlaybackTriggerMode() const;
 
   QAction *mVolumePlus{nullptr}, *mVolumeMinus{nullptr}; // 增加音量, 减少音量
-  VolumeWidget* mVolumeWid{nullptr};                     // 音量控制组件
 
 signals:
   void playbackModeChanged(QMediaPlaylist::PlaybackMode newPlaybackMode);

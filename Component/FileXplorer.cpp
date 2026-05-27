@@ -54,6 +54,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this}; // docker
   m_previewHtmlDock->setWidget(m_previewFolder);
   m_previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
+  m_previewFolder->RegisterVolumeWidget(m_previewHtmlDock->GetVolumeWidget());
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
 
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);

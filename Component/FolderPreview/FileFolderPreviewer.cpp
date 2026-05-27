@@ -94,3 +94,9 @@ void FileFolderPreviewer::operator()(const QString& name,
   BeforeDisplayAFolder();
   mImgVidOtherPane->operator()(name, jsonAbsFilePath, imgPthLst, vidsLst);
 }
+
+void FileFolderPreviewer::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
+  CHECK_NULLPTR_RETURN_VOID(pVolumeWidget);
+  mDetailsPane->RegisterVolumeWidget(pVolumeWidget);
+  mImgVidOtherPane->RegisterVolumeWidget(pVolumeWidget);
+}

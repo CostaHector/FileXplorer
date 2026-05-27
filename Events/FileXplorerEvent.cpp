@@ -255,8 +255,10 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
   LOG_OE_P(bSucceed2VryInfo.first, //
            "Verify result", "%d in %d selection(s) verified ok", //
            bSucceed2VryInfo.second.size(), mixedFiles.size());
-  MultiParDialog dlg{std::move(bSucceed2VryInfo.second)};
-  dlg.exec();
+  if (!bSucceed2VryInfo.second.isEmpty()) {
+    MultiParDialog dlg{std::move(bSucceed2VryInfo.second)};
+    dlg.exec();
+  }
   return bSucceed2VryInfo.first;
 }
 
