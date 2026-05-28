@@ -46,10 +46,10 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mFunctionCtrlBar->addAction(mVideoWidget->mFullScreenAct);
 
   mPauseShieldButton = new (std::nothrow) QToolButton{this};
-  mPauseShieldButton->setObjectName("VideoPlayerPauseShieldButton");
   mPauseShieldButton->setDefaultAction(mVideoWidget->mPauseAct);
-  mPauseShieldButton->setMinimumSize(64, 64);
+  mPauseShieldButton->setMinimumSize(16, 16);
   mPauseShieldButton->setAutoRaise(true);
+  mPauseShieldButton->setProperty("needTransparentFlag", true);
 
   mLeftLayout = new (std::nothrow) QVBoxLayout{this};
   mLeftLayout->addWidget(mVideoWidget);

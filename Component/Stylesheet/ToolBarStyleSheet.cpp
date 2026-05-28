@@ -53,6 +53,10 @@ QToolBar QToolButton[needTransparentFlag] {
   background: transparent;
 }
 
+QToolButton[needTransparentFlag] {
+  background: transparent;
+}
+
 QToolBar QLineEdit {
     margin: 0px;
     border: 1px solid #CCEBFF;
