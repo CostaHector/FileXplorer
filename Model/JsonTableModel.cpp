@@ -6,6 +6,7 @@
 #include "CastManager.h"
 #include "PathTool.h"
 #include "GeneralDataType.h"
+#include <QIcon>
 #include <QBrush>
 #include <QDir>
 #include <QDirIterator>
@@ -29,10 +30,7 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
     }
   } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
     if (item.m_ContentFixed) {
-      static const QPixmap CONTENTS_FIXED_IMG{[]() {
-        QPixmap pixmap{":/JsonEditor/ANCHOR_DROP"};
-        return pixmap.scaledToHeight(32);
-      }()};
+      static const QIcon CONTENTS_FIXED_IMG{":/JsonEditor/ANCHOR_DROP"};
       return CONTENTS_FIXED_IMG;
     }
   } else if (role == Qt::ForegroundRole) {

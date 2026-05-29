@@ -47,7 +47,6 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
 
   mPauseShieldButton = new (std::nothrow) QToolButton{this};
   mPauseShieldButton->setDefaultAction(mVideoWidget->mPauseAct);
-  mPauseShieldButton->setMinimumSize(16, 16);
   mPauseShieldButton->setAutoRaise(true);
   mPauseShieldButton->setProperty("needTransparentFlag", true);
 
