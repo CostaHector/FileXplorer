@@ -102,30 +102,16 @@ void MultiPar2Actions::subscribe() {
   connect(_CREATE_PAR2_FILES_CUSTOM, &QAction::triggered, this, &MultiPar2Actions::EmitCreatePar2ReqCustom);
 }
 
-QWidget* MultiPar2Actions::GetToolBar(QWidget* parent) {
-  // ":img/CREATE_MULTI_PAR2"
+QWidget* MultiPar2Actions::GetCreatePar2ToolButton(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
-  QToolBar* tb = new QToolBar{"MultiPar Toolbar", parent};
-  CHECK_NULLPTR_RETURN_NULLPTR(tb);
-  tb->setOrientation(Qt::Orientation::Vertical);
-
-  MenuToolButton* crtPar2Button{nullptr};
-  {
-    QList<QAction*> dropdownActions{_CREATE_PAR2_FILES_10, _CREATE_PAR2_FILES_15, _CREATE_PAR2_FILES_20, _CREATE_PAR2_FILES_CUSTOM, _CREATE_PAR2_FILES_AUTOMATIC};
-    crtPar2Button = new (std::nothrow) MenuToolButton(dropdownActions,                               //
-                                                      QToolButton::MenuButtonPopup,                  //
-                                                      Qt::ToolButtonStyle::ToolButtonTextBesideIcon, //
-                                                      IMAGE_SIZE::TABS_ICON_IN_MENU_24,              //
-                                                      tb);
-    CHECK_NULLPTR_RETURN_NULLPTR(crtPar2Button);
-    crtPar2Button->SetCaption(QIcon{":img/CREATE_MULTI_PAR2"}, tr("Create Par2"));
-    crtPar2Button->InitDefaultActionFromQSetting(MultiPar2MemoryKey::LAST_TIME_CREATE_PAR2_TERIGGERED_ACTION, true);
-  }
-
-  tb->addWidget(crtPar2Button);
-  tb->addAction(_VERIFY_IF_NEED_RECOVERY);
-  tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  tb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
-  SetLayoutAlightment(tb->layout(), Qt::AlignLeft);
-  return tb;
+  QList<QAction*> dropdownActions{_CREATE_PAR2_FILES_10, _CREATE_PAR2_FILES_15, _CREATE_PAR2_FILES_20, _CREATE_PAR2_FILES_CUSTOM, _CREATE_PAR2_FILES_AUTOMATIC};
+  MenuToolButton* crtPar2Button = new (std::nothrow) MenuToolButton(dropdownActions,                              //
+                                                                    QToolButton::MenuButtonPopup,                 //
+                                                                    Qt::ToolButtonStyle::ToolButtonTextUnderIcon, //
+                                                                    IMAGE_SIZE::TABS_ICON_IN_MENU_36,             //
+                                                                    parent);
+  CHECK_NULLPTR_RETURN_NULLPTR(crtPar2Button);
+  crtPar2Button->SetCaption(QIcon{":img/CREATE_MULTI_PAR2"}, tr("Create Par2"));
+  crtPar2Button->InitDefaultActionFromQSetting(MultiPar2MemoryKey::LAST_TIME_CREATE_PAR2_TERIGGERED_ACTION, true);
+  return crtPar2Button;
 }

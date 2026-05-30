@@ -10,7 +10,7 @@ public:
   static MultiPar2Actions& GetInst();
   explicit MultiPar2Actions(QObject* parent = nullptr);
 
-  QWidget* GetToolBar(QWidget* parent);
+  QWidget* GetCreatePar2ToolButton(QWidget* parent);
 
   QAction* _CREATE_PAR2_FILES_AUTOMATIC{nullptr};
   QAction* _VERIFY_IF_NEED_RECOVERY{nullptr};

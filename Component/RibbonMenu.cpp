@@ -400,7 +400,11 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
   archiveVidsTB->addSeparator();
-  archiveVidsTB->addWidget(MultiPar2Actions::GetInst().GetToolBar(archiveVidsTB));
+  {
+    auto& inst = MultiPar2Actions::GetInst();
+    archiveVidsTB->addWidget(inst.GetCreatePar2ToolButton(archiveVidsTB));
+    archiveVidsTB->addAction(inst._VERIFY_IF_NEED_RECOVERY);
+  }
   return archiveVidsTB;
 }
 
