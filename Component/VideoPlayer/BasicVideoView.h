@@ -2,13 +2,13 @@
 #define BASICVIDEOVIEW_H
 
 #include <QWidget>
-#include <QLabel>
 #include <QVideoWidget>
 #include <QMediaPlayer>
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QTimer>
+#include "AutoHideLabel.h"
 #include "ClickableSlider.h"
 #include "MenuToolButton.h"
 #include "VolumeWidget.h"
@@ -32,7 +32,6 @@ public:
   int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
-  void movePauseBtnToCenter();
   bool RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
 signals:
@@ -42,8 +41,7 @@ signals:
   void userMousePressOrKeyPressHappened();
 
 protected:
-  bool eventFilter(QObject *watched, QEvent *event) override;
-  void resizeEvent(QResizeEvent* e) override;
+  bool eventFilter(QObject* watched, QEvent* event) override;
   QMediaPlayer* GetPlayer() { return mPlayer; }
   const QMediaPlayer* GetPlayer() const { return mPlayer; }
 
@@ -66,16 +64,16 @@ private:
   bool reqPlayInSystemApplication() const;
   QMediaPlayer::Error onError(QMediaPlayer::Error error) const;
   int onAudioAvailableChanged(bool available) const;
-  void setMediaWithStatus(const QString &filePath, QIODevice *stream = nullptr);
+  void setMediaWithStatus(const QString& filePath, QIODevice* stream = nullptr);
 
   QMediaPlayer* mPlayer{nullptr};
   InteractiveVideoWidget* mVideoWidget{nullptr}; // 播放显示框
 
-  ToolBarWidget* mFunctionCtrlBar{nullptr};  // 功能控制条
-  QToolButton* mPauseShieldButton{nullptr};  // 暂停遮罩画面
-  ClickableSlider* mProgressSlider{nullptr}; // 进度控制块
-  QLabel* mCurrentTimeLabel{nullptr};        // 当前播放的时间点
-  QLabel* mDurationLabel{nullptr};           // 视频文件时长
+  ToolBarWidget* mFunctionCtrlBar{nullptr};    // 功能控制条
+  AutoHideLabel* mOperationStatusLbl{nullptr}; // 操作状态标签
+  ClickableSlider* mProgressSlider{nullptr};   // 进度控制块
+  QLabel* mCurrentTimeLabel{nullptr};          // 当前播放的时间点
+  QLabel* mDurationLabel{nullptr};             // 视频文件时长
 
   QVBoxLayout* mLeftLayout{nullptr}; // 左侧布局
 

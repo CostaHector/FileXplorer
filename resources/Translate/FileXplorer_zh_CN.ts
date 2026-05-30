@@ -1477,12 +1477,18 @@
 <context>
     <name>MultiPar2Actions</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiPar2Actions.cpp" line="+14"/>
+        <location filename="../../Component/MultiPar/MultiPar2Actions.cpp" line="+20"/>
+        <location line="+92"/>
         <source>Create Par2</source>
         <translation>创建Par2冗余</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-76"/>
+        <source>Create Par2 (Custom)</source>
+        <translation>创建Par2冗余(自定义)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Verify Integrity</source>
         <translation>校验完整性</translation>
     </message>

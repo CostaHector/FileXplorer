@@ -11,7 +11,7 @@
 #include "PathTool.h"
 #include "VideoPlayTool.h"
 #include <QFile>
-#include <QResizeEvent>
+#include <QEvent>
 
 BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   : QWidget{parent} {
@@ -45,10 +45,8 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mFunctionCtrlBar->addAction(mVideoWidget->mHideToolBarAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mFullScreenAct);
 
-  mPauseShieldButton = new (std::nothrow) QToolButton{this};
-  mPauseShieldButton->setDefaultAction(mVideoWidget->mPauseAct);
-  mPauseShieldButton->setAutoRaise(true);
-  mPauseShieldButton->setProperty("needTransparentFlag", true);
+  mOperationStatusLbl = new (std::nothrow) AutoHideLabel{this};
+  mOperationStatusLbl->setProperty("LabelInVideoWidget", true);
 
   mLeftLayout = new (std::nothrow) QVBoxLayout{this};
   mLeftLayout->addWidget(mVideoWidget);
@@ -88,8 +86,14 @@ bool BasicVideoView::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
     return false;
   }
   mIsVolumeWidgetRegistered = true;
-  connect(pVolumeWidget, &VolumeWidget::mutedStateToggled, mPlayer, &QMediaPlayer::setMuted);
-  connect(pVolumeWidget, &VolumeWidget::sliderVolumeChanged, mPlayer, &QMediaPlayer::setVolume);
+  connect(pVolumeWidget, &VolumeWidget::mutedStateToggled, this, [this](bool bMute){
+    mOperationStatusLbl->setAutoHideText(bMute ? "Mute" : "Unmute");
+    mPlayer->setMuted(bMute);
+  });
+  connect(pVolumeWidget, &VolumeWidget::sliderVolumeChanged, this, [this](int volumeVal){
+    mOperationStatusLbl->setAutoHideText(QString::asprintf("Volume: %d", volumeVal));
+    mPlayer->setVolume(volumeVal);
+  });
   return true;
 }
 
@@ -126,8 +130,6 @@ void BasicVideoView::subscribe() {
 
   connect(mVideoWidget->mHideToolBarAct, &QAction::toggled, this, &BasicVideoView::onChangeToolBarVisibility);
 
-  connect(mVideoWidget, &InteractiveVideoWidget::layoutVisibilityChanged, this, &BasicVideoView::movePauseBtnToCenter);
-
   RateActions* rateActions = mVideoWidget->GetRateActions();
   connect(rateActions, &RateActions::RateMovieReq, this, &BasicVideoView::rateCurrentVideo);
   connect(rateActions, &RateActions::RateMovieRecursivelyReq, this, &BasicVideoView::rateAllVideoSameLevelAsCurrentVideo);
@@ -136,9 +138,8 @@ void BasicVideoView::subscribe() {
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
-  LOG_OK_P("Fullscreen Mode Changed", "bFullScreen:%d", bFullScreen);
+  mOperationStatusLbl->setAutoHideText(QString::asprintf("Fullscreen mode changed to: %d", bFullScreen));
   emit reqFullscreenModeChange(bFullScreen);
-  movePauseBtnToCenter();
 }
 
 bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly) {
@@ -176,7 +177,6 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
 void BasicVideoView::onChangeToolBarVisibility(bool bHide) {
   if (mFunctionCtrlBar->isHidden() != bHide) {
     mFunctionCtrlBar->setVisible(!bHide);
-    movePauseBtnToCenter();
   }
 }
 
@@ -251,10 +251,12 @@ int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
 }
 
 bool BasicVideoView::deviatePositionPrevious() {
+  mOperationStatusLbl->setAutoHideText("-10s");
   return DeviatePositionCore(mPlayer, -10);
 }
 
 bool BasicVideoView::deviatePositionNext() {
+  mOperationStatusLbl->setAutoHideText("+10s");
   return DeviatePositionCore(mPlayer, 10);
 }
 
@@ -344,6 +346,7 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
     if (mPlayer->media().isNull()) {
       const QString pth = GetCurrentPlayingMediaPath();
       if (!QFile::exists(pth)) {
+        mOperationStatusLbl->setAutoHideText("Media inexist");
         return;
       }
       setMediaWithStatus(pth);
@@ -353,18 +356,26 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
 }
 
 void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
-  if (state == QMediaPlayer::PausedState) {
-    mPauseShieldButton->raise();
-    mPauseShieldButton->setVisible(true);
-  } else {
-    mPauseShieldButton->lower();
-    mPauseShieldButton->setVisible(false);
-  }
-
-  if (state == QMediaPlayer::PlayingState) {
-    mProgressSliderUpdateTimer.start();
-  } else {
-    mProgressSliderUpdateTimer.stop();
+  switch (state) {
+    case QMediaPlayer::StoppedState: {
+      mProgressSliderUpdateTimer.stop();
+      mOperationStatusLbl->setAutoHideText("Stopped");
+      break;
+    }
+    case QMediaPlayer::PlayingState: {
+      mProgressSliderUpdateTimer.start();
+      mOperationStatusLbl->setAutoHideText("Playing");
+      break;
+    }
+    case QMediaPlayer::PausedState: {
+      mProgressSliderUpdateTimer.stop();
+      mOperationStatusLbl->setAutoHideText("Paused");
+      break;
+    }
+    default: {
+      mOperationStatusLbl->setAutoHideText("Unknown");
+      break;
+    }
   }
 }
 
@@ -382,16 +393,6 @@ bool BasicVideoView::eventFilter(QObject* watched, QEvent* event) {
     emit userMousePressOrKeyPressHappened();
   }
   return QWidget::eventFilter(watched, event);
-}
-
-void BasicVideoView::resizeEvent(QResizeEvent* e) {
-  CHECK_NULLPTR_RETURN_VOID(e);
-  movePauseBtnToCenter();
-}
-
-void BasicVideoView::movePauseBtnToCenter() {
-  mPauseShieldButton->move(mVideoWidget->width() / 2 - mPauseShieldButton->width() / 2, //
-                           mVideoWidget->height() / 2 - mPauseShieldButton->height() / 2);
 }
 
 bool BasicVideoView::SetMediaCore(BasicVideoView* self, const QString& mediaAbsPath) {

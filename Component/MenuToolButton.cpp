@@ -61,7 +61,7 @@ void MenuToolButton::InitDefaultActionFromQSetting(const KV& kv, bool enablePers
     LOG_W("No menu attached to tool button or No action attached to Menu");
     return;
   }
-  const auto& actsList = pMenu->actions();
+  const QList<QAction*>& actsList = pMenu->actions();
   if (actsList.isEmpty()) {
     LOG_W("No action in QMenu at all");
     return;

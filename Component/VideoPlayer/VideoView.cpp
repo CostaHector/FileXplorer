@@ -84,14 +84,12 @@ void VideoView::onStopPlaying() {
 void VideoView::onChangeToolBarVisibility(bool bHide) {
   if (mExtendedFunctionCtrlBar->isHidden() != bHide) {
     mExtendedFunctionCtrlBar->setVisible(!bHide);
-    mBasicVideoView->movePauseBtnToCenter();
   }
 }
 
 void VideoView::onChangeListVisibility(bool visibility) {
   if (mVideoList->isHidden() == visibility) {
     mVideoList->setVisible(visibility);
-    mBasicVideoView->movePauseBtnToCenter();
   }
 }
 

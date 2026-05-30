@@ -234,7 +234,7 @@ bool FileXplorerEvent::on_GrabFramesFromVideos(int startPositionSecond, int inte
   return true;
 }
 
-bool FileXplorerEvent::on_createFilePar2() {
+bool FileXplorerEvent::on_createFilePar2(int rateOfRedundancy) {
   auto vt = _contentPane->GetVt();
   if (!ViewTypeTool::IsCreatePar2Avail(vt)) {
     LOG_INFO_NP("[Abort] Current view not support Create Par2", ViewTypeTool::c_str(vt));
@@ -246,8 +246,8 @@ bool FileXplorerEvent::on_createFilePar2() {
     return false;
   }
   bool bSucceed{false}, crtCnt{0};
-  std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2(mixedFiles);
-  LOG_OE_P(bSucceed, "Create par2", "%d par2 file for %d selection(s) ok", crtCnt, mixedFiles.size());
+  std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2(mixedFiles, rateOfRedundancy);
+  LOG_OE_P(bSucceed, "Create par2", "%d par2 file(redundancy: %d) for %d selection(s) ok", crtCnt, rateOfRedundancy, mixedFiles.size());
   return bSucceed;
 }
 
@@ -420,7 +420,7 @@ void FileXplorerEvent::subscribeThumbnailActions() {
 
 void FileXplorerEvent::subscribeMultiPar() {
   MultiPar2Actions& inst = MultiPar2Actions::GetInst();
-  connect(inst._CREATE_PAR2_FILES, &QAction::triggered, this, &FileXplorerEvent::on_createFilePar2);
+  connect(&inst, &MultiPar2Actions::createPar2Req, this, &FileXplorerEvent::on_createFilePar2);
   connect(inst._VERIFY_IF_NEED_RECOVERY, &QAction::triggered, this, &FileXplorerEvent::on_verifyFileByPar2);
 }
 

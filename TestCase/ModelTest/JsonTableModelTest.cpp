@@ -283,7 +283,7 @@ class JsonTableModelTest : public PlainTestSuite {
     {
       QVariant pixmapVar = jtm.data(ind, Qt::DecorationRole);
       QVERIFY(pixmapVar.isValid());
-      QVERIFY(pixmapVar.canConvert<QPixmap>());
+      QVERIFY(pixmapVar.canConvert<QIcon>());
     }
     QCOMPARE(jtm.InitCastAndStudio({ind}), 0);
     jtm.SetStudio({ind}, "");

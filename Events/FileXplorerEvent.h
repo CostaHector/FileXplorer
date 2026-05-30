@@ -43,7 +43,7 @@ private:
   bool on_ExtractImagesFromThumbnail(int beg, int end, bool skipIfExist = true);
   bool on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist);
 
-  bool on_createFilePar2();
+  bool on_createFilePar2(int rateOfRedundancy);
   bool on_verifyFileByPar2();
 
   bool onRateMovie(int newRate) const;
