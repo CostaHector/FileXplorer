@@ -57,10 +57,13 @@
         <file alias="INCREASING_RATING">Media/INCREASING_RATING.svg</file>
         <file alias="DECREASING_RATING">Media/DECREASING_RATING.svg</file>
         <file alias="SKIP_IF_EXIST">Media/SKIP_IF_EXIST.svg</file>
-        <file alias="CREATE_MULTI_PAR2">Media/CREATE_MULTI_PAR2.svg</file>
         <file alias="VERIFY_INTEGRITY">Media/VERIFY_INTEGRITY.svg</file>
         <file alias="QUESTION">Media/QUESTION.svg</file>
         <file alias="REPAIR">Media/REPAIR.svg</file>
+        <file alias="RATE_OF_REDUNDANCY">Media/RATE_OF_REDUNDANCY.svg</file>
+        <file alias="RATE_OF_REDUNDANCY_10">Media/RATE_OF_REDUNDANCY_10.svg</file>
+        <file alias="RATE_OF_REDUNDANCY_15">Media/RATE_OF_REDUNDANCY_15.svg</file>
+        <file alias="RATE_OF_REDUNDANCY_20">Media/RATE_OF_REDUNDANCY_20.svg</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>

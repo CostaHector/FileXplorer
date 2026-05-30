@@ -16,9 +16,11 @@ MultiPar2Actions& MultiPar2Actions::GetInst() {
   return inst;
 }
 
-QAction* MultiPar2Actions::newCreateAction(int rateOfRedundancy) {
-  QAction* createParFile = new QAction{QIcon{":img/CREATE_MULTI_PAR2"}, tr("Create Par2") + QString::asprintf(" (%d%%)", rateOfRedundancy), this};
-  createParFile->setToolTip(QString::asprintf("Create Par2 for a file with rate of redundancy %d%%", rateOfRedundancy));
+QAction* MultiPar2Actions::newCreatePar2Action(int rateOfRedundancy) {
+  QAction* createParFile = new QAction{QIcon{":img/RATE_OF_REDUNDANCY_" + QString::number(rateOfRedundancy)}, //
+                                       tr("Create PAR2 (%1%)").arg(rateOfRedundancy),                         //
+                                       this};
+  createParFile->setToolTip(QString{"Generate PAR2 recovery files at %1% redundancy"}.arg(rateOfRedundancy));
   createParFile->setProperty("RateOfRedundancy", rateOfRedundancy);
   CREATE_PAR2_AG->addAction(createParFile);
   return createParFile;
@@ -28,69 +30,76 @@ MultiPar2Actions::MultiPar2Actions(QObject* parent)
   : QObject{parent} {
   CREATE_PAR2_AG = new QActionGroup{this};
 
-  _CREATE_PAR2_FILES_10 = newCreateAction(10);
-  _CREATE_PAR2_FILES_20 = newCreateAction(20);
-  _CREATE_PAR2_FILES_30 = newCreateAction(30);
-  _CREATE_PAR2_FILES_40 = newCreateAction(40);
+  _CREATE_PAR2_FILES_10 = newCreatePar2Action(10);
+  _CREATE_PAR2_FILES_15 = newCreatePar2Action(15);
+  _CREATE_PAR2_FILES_20 = newCreatePar2Action(20);
 
-  _CREATE_PAR2_FILES_CUSTOM = new QAction{tr("Create Par2 (Custom)"), this};
-  _CREATE_PAR2_FILES_CUSTOM->setToolTip("Create Par2 for a file with custom rate of redundancy");
+  _CREATE_PAR2_FILES_CUSTOM = new QAction{QIcon{":img/RENAME"}, tr("Create PAR2 (Custom)"), this};
+  _CREATE_PAR2_FILES_CUSTOM->setToolTip(tr("Generate PAR2 files with user-defined redundancy"));
+
+  _CREATE_PAR2_FILES_AUTOMATIC = new QAction{QIcon{":img/RATE_OF_REDUNDANCY"}, tr("Create PAR2 (Automatic)"), this};
+  _CREATE_PAR2_FILES_AUTOMATIC->setToolTip(tr("Generate PAR2 files using redundancy determined by rates value in json"));
 
   _VERIFY_IF_NEED_RECOVERY = new QAction{QIcon{":img/VERIFY_INTEGRITY"}, tr("Verify Integrity"), this};
+  _VERIFY_IF_NEED_RECOVERY->setToolTip(tr("Check file integrity and verify recovery data"));
 
   subscribe();
 }
 
-void MultiPar2Actions::EmitCreatePar2Req(const QAction* pCreatePar2Act) {
-  CHECK_FALSE_RETURN_VOID(pCreatePar2Act);
+bool MultiPar2Actions::EmitCreatePar2Req(const QAction* pCreatePar2Act) {
+  CHECK_NULLPTR_RETURN_FALSE(pCreatePar2Act);
   QVariant rateOfRedundancyVar = pCreatePar2Act->property("RateOfRedundancy");
   if (!rateOfRedundancyVar.isValid()) {
-    LOG_E("Rate of redundancy property invalid");
-    return;
+    LOG_E("Invalid redundancy rate property");
+    return false;
   }
   bool isOk{false};
   const int rateOfRedundancy = rateOfRedundancyVar.toInt(&isOk);
   if (!isOk) {
-    LOG_E("Rate of redundancy variant invalid");
-    return;
+    LOG_E("Failed to convert redundancy rate value");
+    return false;
   }
   if (!MultiParKey::isRateOfRedundancyValid(rateOfRedundancy)) {
-    LOG_E("Rate of redundancy[%d] out of range", rateOfRedundancy);
-    return;
+    LOG_E("Redundancy rate %d out of valid range [%d, %d]", rateOfRedundancy, MultiParKey::RATE_OF_REDUNDANCY_MIN, MultiParKey::RATE_OF_REDUNDANCY_MAX);
+    return false;
   }
   emit createPar2Req(rateOfRedundancy);
+  return true;
 }
 
-void MultiPar2Actions::EmitCreatePar2CustomReq() {
-  const QString label{QString::asprintf("%d<=Rate of Redundancy<=%d", MultiParKey::RATE_OF_REDUNDANCY_MIN, MultiParKey::RATE_OF_REDUNDANCY_MAX)};
-  static constexpr int RATE_OF_DEDUNDANCY_STEP = 1;
+bool MultiPar2Actions::EmitCreatePar2ReqCustom() {
+  static const QString title{tr("Set Redundancy Rate")};
+  static const QString label = tr("Redundancy Rate [%1, %2]").arg(MultiParKey::RATE_OF_REDUNDANCY_MIN).arg(MultiParKey::RATE_OF_REDUNDANCY_MAX);
+
+  static constexpr int RATE_STEP = 1;
   bool bUserAccept{false};
-  const int oldRateOfRedundancy{getConfig(MultiPar2MemoryKey::CUSTOM_RATE_OF_REDUNDANCY).toInt()};
+  const int oldRateOfRedundancy = getConfig(MultiPar2MemoryKey::CUSTOM_RATE_OF_REDUNDANCY).toInt();
   int newRateOfRedundancy{-1};
-  std::tie(bUserAccept, newRateOfRedundancy) = InputDialogHelper::GetIntWithInitial(nullptr,
-                                                                                 "Input rate of redundancy",          //
-                                                                                 label,                               //
-                                                                                 oldRateOfRedundancy,                    //
-                                                                                 MultiParKey::RATE_OF_REDUNDANCY_MIN, //
-                                                                                 MultiParKey::RATE_OF_REDUNDANCY_MAX, //
-                                                                                 RATE_OF_DEDUNDANCY_STEP);
+
+  std::tie(bUserAccept, newRateOfRedundancy)
+      = InputDialogHelper::GetIntWithInitial(nullptr, title, label, oldRateOfRedundancy, MultiParKey::RATE_OF_REDUNDANCY_MIN, MultiParKey::RATE_OF_REDUNDANCY_MAX, RATE_STEP);
+
   if (!bUserAccept) {
-    LOG_INFO_NP("Skip", "User cancelled input rate of redundancy");
-    return;
+    LOG_INFO_NP("Operation cancelled", "User declined to set redundancy rate");
+    return false;
   }
+
   if (!MultiParKey::isRateOfRedundancyValid(newRateOfRedundancy)) {
-    LOG_E("Rate of redundancy[%d] out of range", newRateOfRedundancy);
-    return;
+    LOG_E("Invalid redundancy rate: %d", newRateOfRedundancy);
+    return false;
   }
+
   if (newRateOfRedundancy != oldRateOfRedundancy) {
     setConfig(MultiPar2MemoryKey::CUSTOM_RATE_OF_REDUNDANCY, newRateOfRedundancy);
   }
+
   emit createPar2Req(newRateOfRedundancy);
+  return true;
 }
 
 void MultiPar2Actions::subscribe() {
   connect(CREATE_PAR2_AG, &QActionGroup::triggered, this, &MultiPar2Actions::EmitCreatePar2Req);
-  connect(_CREATE_PAR2_FILES_CUSTOM, &QAction::triggered, this, &MultiPar2Actions::EmitCreatePar2CustomReq);
+  connect(_CREATE_PAR2_FILES_CUSTOM, &QAction::triggered, this, &MultiPar2Actions::EmitCreatePar2ReqCustom);
 }
 
 QWidget* MultiPar2Actions::GetToolBar(QWidget* parent) {
@@ -102,9 +111,9 @@ QWidget* MultiPar2Actions::GetToolBar(QWidget* parent) {
 
   MenuToolButton* crtPar2Button{nullptr};
   {
-    QList<QAction*> dropdownActions{_CREATE_PAR2_FILES_10, _CREATE_PAR2_FILES_20, _CREATE_PAR2_FILES_30, _CREATE_PAR2_FILES_40, _CREATE_PAR2_FILES_CUSTOM};
+    QList<QAction*> dropdownActions{_CREATE_PAR2_FILES_10, _CREATE_PAR2_FILES_15, _CREATE_PAR2_FILES_20, _CREATE_PAR2_FILES_CUSTOM, _CREATE_PAR2_FILES_AUTOMATIC};
     crtPar2Button = new (std::nothrow) MenuToolButton(dropdownActions,                               //
-                                                      QToolButton::MenuButtonPopup,                     //
+                                                      QToolButton::MenuButtonPopup,                  //
                                                       Qt::ToolButtonStyle::ToolButtonTextBesideIcon, //
                                                       IMAGE_SIZE::TABS_ICON_IN_MENU_24,              //
                                                       tb);

@@ -251,6 +251,23 @@ bool FileXplorerEvent::on_createFilePar2(int rateOfRedundancy) {
   return bSucceed;
 }
 
+bool FileXplorerEvent::on_createFilePar2Automatic() {
+  auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::IsCreatePar2Avail(vt)) {
+    LOG_INFO_NP("[Abort] Current view not support Create Par2", ViewTypeTool::c_str(vt));
+    return false;
+  }
+  const QStringList mixedFiles = _contentPane->getFilePaths();
+  if (mixedFiles.isEmpty()) {
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false;
+  }
+  bool bSucceed{false}, crtCnt{0};
+  std::tie(bSucceed, crtCnt) = MultiParTools::CreatePar2Automatic(mixedFiles);
+  LOG_OE_P(bSucceed, "Create par2", "%d par2 file for %d selection(s) ok", crtCnt, mixedFiles.size());
+  return bSucceed;
+}
+
 bool FileXplorerEvent::on_verifyFileByPar2() {
   if (!__CanNewItem()) {
     return false;
@@ -421,6 +438,7 @@ void FileXplorerEvent::subscribeThumbnailActions() {
 void FileXplorerEvent::subscribeMultiPar() {
   MultiPar2Actions& inst = MultiPar2Actions::GetInst();
   connect(&inst, &MultiPar2Actions::createPar2Req, this, &FileXplorerEvent::on_createFilePar2);
+  connect(inst._CREATE_PAR2_FILES_AUTOMATIC, &QAction::triggered, this, &FileXplorerEvent::on_createFilePar2Automatic);
   connect(inst._VERIFY_IF_NEED_RECOVERY, &QAction::triggered, this, &FileXplorerEvent::on_verifyFileByPar2);
 }
 

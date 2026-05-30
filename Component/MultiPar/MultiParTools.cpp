@@ -2,7 +2,8 @@
 #include "SystemPath.h"
 #include "Logger.h"
 #include "Par2Tools.h"
-
+#include "PathTool.h"
+#include "JsonHelper.h"
 #include <QRegularExpression>
 #include <QFile>
 #include <QFileInfo>
@@ -25,6 +26,48 @@ bool IsMultiPar2Available(const QString& multiParPath) {
     return false;
   }
   return true;
+}
+
+int GetRateOfRedundancyFromRate(int rate) {
+  switch (rate) {
+    case 7:
+      return 8;
+    case 8:
+      return 10;
+    case 9:
+      return 15;
+    case 10:
+      return 20;
+    default:
+      return 5;
+  }
+}
+
+std::pair<bool, int> CreatePar2Automatic(const QStringList& filesAbsPath) {
+  if (filesAbsPath.isEmpty()) {
+    return {true, 0};
+  }
+
+  QMap<int, QStringList> rateOfRedundancyGroup;
+  for (const QString& vidPath: filesAbsPath) {
+    const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(vidPath)};
+    const int scoreValue{JsonHelper::GetRateFromJsonFile(jsonCorrespondVideo, 0)};
+    const int rateOfRedundancy{GetRateOfRedundancyFromRate(scoreValue)};
+    rateOfRedundancyGroup[rateOfRedundancy].push_back(vidPath);
+  }
+
+  int par2CreatedCnt{0};
+  for (auto it = rateOfRedundancyGroup.cbegin(); it != rateOfRedundancyGroup.cend(); ++it) {
+    bool isBatchSucceed{false};
+    int batchPar2CreatedCnt{0};
+    std::tie(isBatchSucceed, batchPar2CreatedCnt) = CreatePar2(it.value(), it.key());
+    if (!isBatchSucceed) {
+      LOG_E("Failed to create PAR2 for redundancy %d%%", it.key());
+      return {false, par2CreatedCnt};
+    }
+    par2CreatedCnt += batchPar2CreatedCnt;
+  }
+  return {true, par2CreatedCnt};
 }
 
 std::pair<bool, int> CreatePar2(const QStringList& filesAbsPath, int rateOfRedundancy) {

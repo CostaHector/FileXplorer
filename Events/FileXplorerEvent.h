@@ -44,6 +44,7 @@ private:
   bool on_GrabFramesFromVideos(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist);
 
   bool on_createFilePar2(int rateOfRedundancy);
+  bool on_createFilePar2Automatic();
   bool on_verifyFileByPar2();
 
   bool onRateMovie(int newRate) const;

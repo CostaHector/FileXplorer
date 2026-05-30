@@ -1477,18 +1477,52 @@
 <context>
     <name>MultiPar2Actions</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiPar2Actions.cpp" line="+20"/>
-        <location line="+92"/>
+        <location filename="../../Component/MultiPar/MultiPar2Actions.cpp" line="+21"/>
+        <source>Create PAR2 (%1%)</source>
+        <translation>创建PAR2(%1%)</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Create PAR2 (Custom)</source>
+        <translation>创建PAR2(自定义)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Generate PAR2 files with user-defined redundancy</source>
+        <translation>使用自定义冗余度创建文件的PAR2</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Create PAR2 (Automatic)</source>
+        <translation>创建PAR2(自动)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Generate PAR2 files using redundancy determined by rates value in json</source>
+        <translation>使用json评分数值对应的冗余度创建文件的PAR2</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Check file integrity and verify recovery data</source>
+        <translation>检查文件的完整性并给出修复入口</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Set Redundancy Rate</source>
+        <translation>指定冗余度</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Redundancy Rate [%1, %2]</source>
+        <translation>冗余度区间[%1, %2]</translation>
+    </message>
+    <message>
+        <location line="+48"/>
         <source>Create Par2</source>
         <translation>创建Par2冗余</translation>
     </message>
     <message>
         <location line="-76"/>
-        <source>Create Par2 (Custom)</source>
-        <translation>创建Par2冗余(自定义)</translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Verify Integrity</source>
         <translation>校验完整性</translation>
     </message>

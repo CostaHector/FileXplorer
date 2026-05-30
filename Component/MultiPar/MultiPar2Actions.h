@@ -9,7 +9,10 @@ class MultiPar2Actions : public QObject {
 public:
   static MultiPar2Actions& GetInst();
   explicit MultiPar2Actions(QObject* parent = nullptr);
+
   QWidget* GetToolBar(QWidget* parent);
+
+  QAction* _CREATE_PAR2_FILES_AUTOMATIC{nullptr};
   QAction* _VERIFY_IF_NEED_RECOVERY{nullptr};
 
 signals:
@@ -17,15 +20,14 @@ signals:
 
 private:
   void subscribe();
-  QAction* newCreateAction(int rateOfRedundancy);
-  void EmitCreatePar2Req(const QAction* pCreatePar2Act);
-  void EmitCreatePar2CustomReq();
+  QAction* newCreatePar2Action(int rateOfRedundancy);
+  bool EmitCreatePar2Req(const QAction* pCreatePar2Act);
+  bool EmitCreatePar2ReqCustom();
 
   QAction                              //
       *_CREATE_PAR2_FILES_10{nullptr}, //
-      *_CREATE_PAR2_FILES_20{nullptr}, //
-      *_CREATE_PAR2_FILES_30{nullptr}, //
-      *_CREATE_PAR2_FILES_40{nullptr}; //
+      *_CREATE_PAR2_FILES_15{nullptr}, //
+      *_CREATE_PAR2_FILES_20{nullptr}; //
   QActionGroup* CREATE_PAR2_AG{nullptr};
 
   QAction* _CREATE_PAR2_FILES_CUSTOM{nullptr};
