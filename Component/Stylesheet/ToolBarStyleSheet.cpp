@@ -11,6 +11,11 @@ QString ToolBarStyleSheet::GetStyleSheet(Style::StyleThemeE styleE) const {
 QLabel {
     background-color: %1;
 }
+
+QLabel[LabelInVideoWidget] {
+    color: #0000FF;
+}
+
 /* For Custom Status Bar Message Label Only. 0: normal, 1: abnormal */
 QLabel#statusMessageLabel[alertLevel="0"] {
     font-weight: normal;
@@ -50,6 +55,10 @@ QToolBar[needTransparentFlag] {
 }
 
 QToolBar QToolButton[needTransparentFlag] {
+  background: transparent;
+}
+
+QToolButton[needTransparentFlag] {
   background: transparent;
 }
 

@@ -6,11 +6,15 @@
 
 namespace MultiParTools {
 int clampRedundancy(int rateOfRedundancy);
-
 bool IsMultiPar2Available(const QString& multiParPath);
+
+int GetRateOfRedundancyFromRate(int rate);
 std::pair<bool, int> CreatePar2(const QStringList& filesAbsPath, int rateOfRedundancy = 10);
+std::pair<bool, int> CreatePar2Automatic(const QStringList& filesAbsPath);
+
 std::pair<bool, ParVerifyInfomationList> VerifyFiles(const QStringList& filesAbsPath);
 ParVerifyInfomation VerifyAFile(const QString& multiParPath, const QString& parFileAbsPath);
+
 enum class RepairResultE {
   CANNOT_REPAIR = -2,
   NEED_MORE_TO_REPAIR = -1,

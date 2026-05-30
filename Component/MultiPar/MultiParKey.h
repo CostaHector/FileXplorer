@@ -32,6 +32,10 @@ inline bool isPar2Column(int column) {
   return column == ColumnE::PAR2_FILE || column == ColumnE::VOL_PAR2_FILES;
 }
 
+constexpr int RATE_OF_REDUNDANCY_MIN = 1, RATE_OF_REDUNDANCY_MAX = 100;
+inline bool isRateOfRedundancyValid(int rateOfRedundancy) {
+  return RATE_OF_REDUNDANCY_MIN <= rateOfRedundancy && rateOfRedundancy <= RATE_OF_REDUNDANCY_MAX;
+}
 }
 
 #endif // MULTIPARKEY_H

@@ -204,6 +204,15 @@ Repaired successfully
     QCOMPARE(clampRedundancy(105), 100);
   }
 
+  void GetRateOfRedundancyFromRate_ok() {
+    QCOMPARE(GetRateOfRedundancyFromRate(0), 5);
+    QCOMPARE(GetRateOfRedundancyFromRate(7), 8);
+    QCOMPARE(GetRateOfRedundancyFromRate(8), 10);
+    QCOMPARE(GetRateOfRedundancyFromRate(9), 15);
+    QCOMPARE(GetRateOfRedundancyFromRate(10), 20);
+    QCOMPARE(GetRateOfRedundancyFromRate(100), 5);
+  }
+
   void CreatePar2_ok() {
     bool bSucceed{false};
     int bCount{0};
@@ -212,8 +221,19 @@ Repaired successfully
     QVERIFY(bSucceed);
     QCOMPARE(bCount, 0);
 
+    std::tie(bSucceed, bCount) = CreatePar2Automatic(QStringList{});
+    QVERIFY(bSucceed);
+    QCOMPARE(bCount, 0);
+
     std::tie(bSucceed, bCount) = CreatePar2(QStringList{mTDir.itemPath(m_mediaFileName)}, 10);
 #ifndef _WIN32
+    {
+      QVERIFY(!bSucceed);
+      QCOMPARE(bCount, 0);
+      QVERIFY(!mTDir.fileExists(m_mediaPar2FileName));
+    }
+    // no json exist. no par2.exe available
+    std::tie(bSucceed, bCount) = CreatePar2Automatic(QStringList{mTDir.itemPath(m_mediaFileName)});
     {
       QVERIFY(!bSucceed);
       QCOMPARE(bCount, 0);
@@ -234,6 +254,14 @@ Repaired successfully
       QCOMPARE(bCount, 1);
       QVERIFY(mTDir.fileExists(m_mediaPar2FileName));
     }
+    // no json exist and .par2 already exist.
+    std::tie(bSucceed, bCount) = CreatePar2Automatic(QStringList{mTDir.itemPath(m_mediaFileName)});
+    {
+      QVERIFY(bSucceed);
+      QCOMPARE(bCount, 0);
+      QVERIFY(mTDir.fileExists(m_mediaPar2FileName));
+    }
+
 
     ParVerifyInfomation info;
     {

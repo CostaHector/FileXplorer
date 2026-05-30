@@ -35,11 +35,6 @@ QDockWidget::separator {
     height: 0px;
 }
 
-#VideoPlayerPauseShieldButton {
-    background: #CCFFFFFF;
-    border: none;
-}
-
 QStatusBar {
     background-color: %7;
 }

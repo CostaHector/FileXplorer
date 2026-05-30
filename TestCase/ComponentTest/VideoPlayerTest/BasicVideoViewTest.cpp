@@ -196,20 +196,11 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.onAudioAvailableChanged(true), 98);  // floor(99*99/100)=floor(9801)=98
 
     basicVideoView.onStateChanged(QMediaPlayer::State::PausedState);
-    QCOMPARE(basicVideoView.mPauseShieldButton->isHidden(), false);
 
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), "");
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(5), false);                 // curMedia empty
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(0), true);                  // delta = 0
     QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(0), 0);  // delta = 0
-
-    // PauseBtn在VideoWidget上层
-    const QObjectList& children = basicVideoView.children();
-    const int levelOfVideoWidget = children.indexOf(basicVideoView.mVideoWidget);
-    const int levelOfPauseBtnWidget = children.indexOf(basicVideoView.mPauseShieldButton);
-    QVERIFY(levelOfVideoWidget != -1);
-    QVERIFY(levelOfPauseBtnWidget != -1);
-    QVERIFY(levelOfPauseBtnWidget > levelOfVideoWidget);
   }
 
   void mProgressSliderUpdateTimer_ok() {
@@ -344,14 +335,6 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
     emit basicVideoView.mPlayer->mediaStatusChanged(QMediaPlayer::MediaStatus::LoadedMedia);
     QCOMPARE(reqPlayNextOneMediaSpy.count(), 0);
-  }
-
-  void resizeEvent_ok() {
-    BasicVideoView basicVideoView{false, nullptr};
-    basicVideoView.resizeEvent(nullptr);
-
-    QResizeEvent resizeEvent{QSize{480, 360}, QSize{360, 270}};
-    basicVideoView.resizeEvent(&resizeEvent);
   }
 
   void eventFilter_ok() {
