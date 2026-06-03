@@ -21,7 +21,6 @@ bool FullScreenableSplitter::onReqFullscreenModeChange(bool bFullScreen) {
   QWidget* subWidget = GetFullScreenableWidget();
   CHECK_NULLPTR_RETURN_FALSE(subWidget);
   if (bFullScreen) {
-    Configuration().setValue(GetMemoryName() + "/STATE", mBeforeFullScreenState = saveState());
     mVideoViewOriginalIndex = indexOf(subWidget);
 
     mFullScreenWindow = new (std::nothrow) QWidget;
@@ -37,7 +36,6 @@ bool FullScreenableSplitter::onReqFullscreenModeChange(bool bFullScreen) {
   if (mFullScreenWindow != nullptr) {
     subWidget->setParent(nullptr);
     insertWidget(mVideoViewOriginalIndex, subWidget);
-    restoreState(mBeforeFullScreenState);
     CleanTempFullScreenWindow();
   }
   return true;

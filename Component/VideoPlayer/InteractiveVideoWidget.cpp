@@ -154,7 +154,6 @@ void InteractiveVideoWidget::onIntoFullScreenMode() {
 
 void InteractiveVideoWidget::onQuitFullScreenMode() {
   mLongTimeNoClickTimer.stop();
-  changeAllToolbarVisibility(true);
 }
 
 bool InteractiveVideoWidget::onSelectAFile() {

@@ -169,12 +169,11 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
     layoutVisibilityChangedSpy.takeLast();
 
-    // 退出全屏
+    // 退出全屏, 不影响toolbar和播放列表可见性
     basicVideoView.mVideoWidget->mFullScreenAct->toggle();
     QCOMPARE(reqFullscreenModeChangeSpy.count(), 1);
     QCOMPARE(reqFullscreenModeChangeSpy.takeLast(), (QVariantList{false}));
-    QCOMPARE(layoutVisibilityChangedSpy.count(), 1);  // 立刻发送
-    layoutVisibilityChangedSpy.takeLast();
+    QCOMPARE(layoutVisibilityChangedSpy.count(), 0);
   }
 
   void not_crash_ok() {

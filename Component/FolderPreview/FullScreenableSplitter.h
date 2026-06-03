@@ -21,7 +21,6 @@ class FullScreenableSplitter : public QSplitter {
 
   const QString mMemorySplitterStateName;
   QWidget* mFullScreenWindow{nullptr};
-  QByteArray mBeforeFullScreenState;
   int mVideoViewOriginalIndex{0};
 };
 
