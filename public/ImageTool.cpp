@@ -43,6 +43,9 @@ QIcon GetIconFromCached(const QString& starDotExt) {
 }
 
 QPixmap GetPixmapFromCached(const QString& fileAbsPath, int expectWidth, int expectHeight, bool bSmooth) {
+  if (fileAbsPath.isEmpty()) {
+    return {};
+  }
   QPixmap pm;
   const QString imgKey{StringTool::PathJoinPixmapSize(fileAbsPath, expectWidth, expectHeight, bSmooth)};
   if (QPixmapCache::find(imgKey, &pm)) {
@@ -148,27 +151,19 @@ int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist) {
   return thumbnailCrtCnt;
 }
 
-bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
-  const QString dirName{PathTool::dirName(imgAbsPath)};
-  QString dirPath;
-  const QString srcName = PathTool::GetPrepathAndFileName(imgAbsPath, dirPath);
-  if (!srcName.startsWith(dirName)) { // avoid create useless image
-    return false;
-  }
-  const QString thumbnailPath = PathTool::GetThumbnailDecorationImgPath(dirPath, dirName);
-
-  if (bSkipIfExist && QFile::exists(thumbnailPath)) {
+bool CreateThumbnailCore(const QString& srcImgAbsPath, const QString& dstThumbnailAbsPath, bool bSkipIfExist) {
+  if (bSkipIfExist && QFile::exists(dstThumbnailAbsPath)) {
     return true;
   }
 
-  if (!QFile::exists(imgAbsPath)) {
-    LOG_W("Image file does not exist: %s", qPrintable(imgAbsPath));
+  if (!QFile::exists(srcImgAbsPath)) {
+    LOG_W("Image file does not exist: %s", qPrintable(srcImgAbsPath));
     return false;
   }
 
-  QImage image(imgAbsPath);
+  QImage image{srcImgAbsPath};
   if (image.isNull()) {
-    LOG_W("Failed to load image (possibly corrupted): %s", qPrintable(imgAbsPath));
+    LOG_W("Failed to load image (possibly corrupted): %s", qPrintable(srcImgAbsPath));
     return false;
   }
 
@@ -179,12 +174,23 @@ bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
   if (scaledImage.format() != QImage::Format_RGB888) {
     scaledImage = scaledImage.convertToFormat(QImage::Format_RGB888);
   }
-  if (!scaledImage.save(thumbnailPath, "JPG", 80)) {
-    LOG_W("Failed to save thumbnail: %s", qPrintable(thumbnailPath));
+  if (!scaledImage.save(dstThumbnailAbsPath, "JPG", 80)) {
+    LOG_W("Failed to save thumbnail: %s", qPrintable(dstThumbnailAbsPath));
     return false;
   }
 
   return true;
+}
+
+bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
+  const QString dirName{PathTool::dirName(imgAbsPath)};
+  QString dirPath;
+  const QString srcName = PathTool::GetPrepathAndFileName(imgAbsPath, dirPath);
+  if (!srcName.startsWith(dirName)) { // avoid create useless image
+    return false;
+  }
+  const QString thumbnailPath = PathTool::GetThumbnailDecorationImgPathFromFolder(dirPath, dirName);
+  return CreateThumbnailCore(imgAbsPath, thumbnailPath, bSkipIfExist);
 }
 
 int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {

@@ -28,7 +28,7 @@ VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientati
 
   addWidget(mExtendLeftWidget);
   addWidget(mVideoList);
-  setContentsMargins(0, 0, 0, 0);
+  setContentsMargins(1, 0, 1, 0);
 
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_VIEW"});
   setWindowTitle("Video Player");

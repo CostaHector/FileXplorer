@@ -4,12 +4,12 @@
 #include "BeginToExposePrivateMember.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"
+#include "SceneInPageActions.h"
 #include "EndToExposePrivateMember.h"
 
 #include "Configuration.h"
 #include "TDir.h"
 #include "JsonKey.h"
-#include "SceneInPageActions.h"
 #include "ImageTestPrecoditionTools.h"
 #include "JsonHelper.h"
 #include "UndoRedo.h"
@@ -84,7 +84,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void init() {
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     sceneAct._BY_MOVIE_PATH->setChecked(true);
     sceneAct._REVERSE_RESULT->setChecked(false);  // by name ascending chris -> henry
     GlobalMockObject::reset();
@@ -129,7 +129,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void update_json_update_scene_slot_ok() {
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
@@ -169,7 +169,7 @@ class SceneListViewTest : public PlainTestSuite {
     {
       // 3.2 update json, update scn, scn file generated ok
       sceneModel.setRootPath(tDir.path());
-      SceneInPageActions& sceneActInst = g_SceneInPageActions();
+      SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
       emit sceneActInst._UPDATE_JSON->triggered();
       emit sceneActInst._UPDATE_SCN->triggered();
       QVERIFY(QFile::exists(scnAbsPath));
@@ -190,7 +190,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void toggle_connection_and_init_ok() {
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     SceneInfo::SaveInitialSortRole(SceneInfo::Role::RATE_ROLE);
     SceneInfo::SaveSortOrderReverse(true);
     QCOMPARE(sceneAct.GetSortRangeCurrentPageOnly(), false);  // global
@@ -226,7 +226,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void select_scene_slot_interact_with_sort_ok() {
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
@@ -310,7 +310,7 @@ class SceneListViewTest : public PlainTestSuite {
 
   void onRenameSceneAndRelated_ok() {
     // 按页排序
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     sceneAct._SORT_RANGE_PAGE_BY_PAGE->setChecked(true);
 
     MOCKER(RecycleCfmDlg::recycleQuestion)  //
@@ -364,7 +364,7 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void delegate_ok() {
-    SceneInPageActions& sceneAct = g_SceneInPageActions();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     sceneAct._BY_RATE->setChecked(true);
     sceneAct._REVERSE_RESULT->setChecked(false);  // by rate ascending
 

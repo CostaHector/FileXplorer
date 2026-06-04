@@ -263,24 +263,23 @@ class InteractiveVideoWidgetTest : public PlainTestSuite {
       QVERIFY(videoWid.mLongTimeNoClickTimer.isActive());  // 重新启动定时器
     }
 
-    // 退出全屏模式将强制显示工具栏和视频文件列表
+    // 退出全屏模式不改变可见性, 只停用定时器
     {
       QCOMPARE(videoWid.mFullScreenAct->isChecked(), true);
       videoWid.mFullScreenAct->toggle();
       QCOMPARE(videoWid.mFullScreenAct->isChecked(), false);
-      QCOMPARE(layoutVisibilityChangedSpy.count(), 1);
-      layoutVisibilityChangedSpy.takeLast();
       QCOMPARE(videoWid.mHideToolBarAct->isChecked(), false);
-      QCOMPARE(videoWid.mShowVideoList->isChecked(), true);
-      QVERIFY(!videoWid.mLongTimeNoClickTimer.isActive());  // 停用定时器
+      QCOMPARE(videoWid.mShowVideoList->isChecked(), false);
+      QCOMPARE(layoutVisibilityChangedSpy.count(), 0);
+      QVERIFY(!videoWid.mLongTimeNoClickTimer.isActive());
     }
 
-    // 预制: 隐藏工具栏和视频文件列表
+    // 预制: 隐藏工具栏, 显示视频文件列表, 停用定时器
     {
-      videoWid.mHideToolBarAct->toggle();
-      videoWid.mShowVideoList->toggle();
-      QCOMPARE(videoWid.mHideToolBarAct->isChecked(), true);
-      QCOMPARE(videoWid.mShowVideoList->isChecked(), false);
+      videoWid.mHideToolBarAct->setChecked(true);
+      videoWid.mShowVideoList->setChecked(false);
+      videoWid.mLongTimeNoClickTimer.stop();
+      layoutVisibilityChangedSpy.clear();
     }
 
     // 右键点击事件, 强制显示工具栏, 不修改视频文件列表, b.非全屏模式下不会重新启动定时器

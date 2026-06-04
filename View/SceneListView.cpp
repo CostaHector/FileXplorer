@@ -66,6 +66,7 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
 
   QList<QAction*> exclusiveActions{
+      SceneInPageActions::GetInst()._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
       _RENAME_SCENE_RELATED_FILES_REPLACE,   //
       _RENAME_SCENE_RELATED_FILES_INSERT,    //
       _RENAME_SCENE_RELATED_FILES_NUMERIZE,  //
@@ -105,7 +106,7 @@ void SceneListView::subscribe() {
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
   connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
-  SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
   {
     // initial signal-slot connection
     toggleSortRequestImplementer(sceneActInst.GetSortRangeCurrentPageOnly());
@@ -115,6 +116,8 @@ void SceneListView::subscribe() {
   connect(&sceneActInst, &SceneInPageActions::disableImageDecorationChanged, _sceneModel, &ScenesListModel::onDisableImageDecorationChanged);
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
+  connect(sceneActInst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS, &QAction::triggered, this, &SceneListView::onCreateFrontImageThumbnail);
+  connect(sceneActInst._INCLUDEING_SUBDIRECTORIES, &QAction::toggled, _sceneModel, &ScenesListModel::onSubdirectoriesToggled);
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
@@ -128,7 +131,7 @@ void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
     SceneInPageActions::disconnect(mSortOrderReverseConn);
   }
 
-  const SceneInPageActions& sceneActInst = g_SceneInPageActions();
+  const SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
   if (bPageByPage) {  // locally
     if (!_sceneSortProxyModel->isSortProxyInited()) {
       const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
@@ -171,7 +174,8 @@ void SceneListView::setRootPath(const QString& rootPath) {
       return;
     }
   }
-  _sceneModel->setRootPath(rootPath);
+  const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
+  _sceneModel->setRootPath(rootPath, false, bSubdirectories);
 }
 
 int SceneListView::onUpdateJsonFiles() {
@@ -211,6 +215,18 @@ int SceneListView::onUpdateScnFiles() {
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
   _sceneModel->setRootPath(workPath, true);
   return scnFileCnt;
+}
+
+int SceneListView::onCreateFrontImageThumbnail() {
+  const QModelIndexList& srcIndexes = selectedRowsSource();
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Skip create thumbnail", "no item selected");
+    return 0;
+  }
+  using namespace SceneInfoManager;
+  const int tnFileCnt = _sceneModel->createFrontImageThumbnail(srcIndexes, true);
+  LOG_OE_P(tnFileCnt >= 0, "Json related image thumbnail updated", "count: %d", tnFileCnt);
+  return tnFileCnt;
 }
 
 int SceneListView::onClearScnFiles() {

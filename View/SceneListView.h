@@ -26,6 +26,7 @@ class SceneListView : public CustomListView {
   void setRootPath(const QString& rootPath);
   int onUpdateJsonFiles();
   int onUpdateScnFiles();
+  int onCreateFrontImageThumbnail();
   int onClearScnFiles();
   void subscribe();
   bool onOpenCorrespondingFolder();

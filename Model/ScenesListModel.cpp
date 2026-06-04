@@ -5,22 +5,23 @@
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
 #include "StringTool.h"
+#include "ImageTool.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
 #include <QDir>
 #include <QBrush>
 
-ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object)  //
-    : QAbstractListModelPub{listViewName, object} {
+ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object) //
+  : QAbstractListModelPub{listViewName, object} {
   m_bDisableImage = getConfig(SceneKey::DISABLE_IMAGE_DECORATION).toBool();
 
   const int perPageCnt{getConfig(SceneKey::CNT_EACH_PAGE).toInt()};
   mPagedData.initPerPageCnt(perPageCnt);
-  mPagedData.registerCallback(                                                         //
-      std::bind(&ScenesListModel::beginResetModel, this),                              //
-      std::bind(&ScenesListModel::endResetModel, this),                                //
-      std::bind(&ScenesListModel::EmitPagesCountChanged, this, std::placeholders::_1)  //
+  mPagedData.registerCallback(                                                        //
+      std::bind(&ScenesListModel::beginResetModel, this),                             //
+      std::bind(&ScenesListModel::endResetModel, this),                               //
+      std::bind(&ScenesListModel::EmitPagesCountChanged, this, std::placeholders::_1) //
   );
 }
 
@@ -47,7 +48,6 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
     return {};
   }
-  int rc = rowCount();
   int i = -1;
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
@@ -61,8 +61,11 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
       if (m_bDisableImage) {
         return {};
       }
-      const QString imgAbsPath{item.imgs.isEmpty() ? ":img/IMAGE_NOT_FOUND" : item.GetFirstImageAbsPath(mRootPath)};
-      return GetDecorationPixmap(imgAbsPath);
+      QPixmap pm = GetDecorationPixmap(item.GetThumbnailImageAbsPath(mRootPath));
+      if (pm.isNull()) {
+        pm = GetDecorationPixmap(":img/IMAGE_NOT_FOUND");
+      }
+      return pm;
     }
     case Qt::ItemDataRole::BackgroundRole: {
       if (item.vidName.isEmpty()) {
@@ -118,11 +121,15 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
   const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
   const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
 
-  LOG_OE_P(bothUpdatedOk, "Rate Modify",
-           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]",  //
+  LOG_OE_P(bothUpdatedOk,
+           "Rate Modify",
+           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]", //
            qPrintable(eleRel2Scn),
-           qPrintable(eleBaseName),  //
-           beforeRate, newRate, bScnUpdatedOk, bJsonUpdatedOk);
+           qPrintable(eleBaseName), //
+           beforeRate,
+           newRate,
+           bScnUpdatedOk,
+           bJsonUpdatedOk);
   return bothUpdatedOk;
 }
 
@@ -174,13 +181,14 @@ QString ScenesListModel::absolutePath(const QModelIndex& index) const {
   return mPagedData[i].GetAbsolutePath(mRootPath);
 }
 
-bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce) {
+bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, const bool bSubdirectories) {
   if (mRootPath == rootPath && !bForce) {
     LOG_D("Scene ignore set same root path");
     return false;
   }
   mRootPath = rootPath;
-  const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath)};
+
+  const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath, bSubdirectories)};
   mPagedData.setData(newEntryList);
   return true;
 }
@@ -251,6 +259,53 @@ bool ScenesListModel::onDisableImageDecorationChanged(bool bDisabled) {
   m_bDisableImage = bDisabled;
   emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole});
   return true;
+}
+
+bool ScenesListModel::onSubdirectoriesToggled(bool bSubdirectories) {
+  return setRootPath(rootPath(), true, bSubdirectories);
+}
+
+int ScenesListModel::createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist) {
+  QList<QModelIndex> changedIndexes;
+  for (const QModelIndex& index : indexes) {
+    int i = -1;
+    if (!mPagedData.isLocalIndexValid(index, i)) {
+      LOG_W("index out of range");
+      continue;
+    }
+    const SceneInfo& item = mPagedData[i];
+    QString frontImagePath = item.GetFirstImageAbsPath(mRootPath);
+    if (frontImagePath.isEmpty()) {
+      continue;
+    }
+    QString dstImagePath = item.GetThumbnailImageAbsPath(mRootPath);
+    if (!ImageTool::CreateThumbnailCore(frontImagePath, dstImagePath, bSkipIfExist)) {
+      continue;
+    }
+    changedIndexes.push_back(index);
+  }
+
+  if (changedIndexes.isEmpty()) {
+    return 0;
+  }
+
+  if (changedIndexes.size() * 2 >= rowCount()) {
+    // 超过半数变更, 直接全量更新
+    beginResetModel();
+    endResetModel();
+  } else {
+    // 部分重新生成
+    using namespace ModelTools;
+    const QList<int> sortedAndUnqiueRows = GetSortedUniqueRowsFromIndexes(changedIndexes);
+    const QList<FRONT_BACK_ROW_NUMBER_PAIR> fbPairs = MergeList2SectionsRange(sortedAndUnqiueRows);
+    for (const FRONT_BACK_ROW_NUMBER_PAIR& pr : fbPairs) {
+      if (0 <= pr.first && pr.first <= pr.second) {
+        emit dataChanged(index(pr.first), index(pr.second), {Qt::ItemDataRole::DecorationRole});
+      }
+    }
+  }
+
+  return changedIndexes.size();
 }
 
 int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {

@@ -76,9 +76,9 @@ int QAbstractTableModelPub::onRowsRemoved(const QModelIndexList& indexes, ModelT
     return 0;
   }
   // 获取有效行
-  QList<int> validRows = ModelTools::GetIndexesRows(indexes);
+  QList<int> validRows = ModelTools::GetSortedUniqueRowsFromIndexes(indexes);
   // 合并行号到区间
-  QList<std::pair<int, int>> ranges = ModelTools::MergeList2SectionsRange(validRows);
+  QList<ModelTools::FRONT_BACK_ROW_NUMBER_PAIR> ranges = ModelTools::MergeList2SectionsRange(validRows);
   // 倒序删行区间
   {
     for (auto it = ranges.rbegin(); it != ranges.rend(); ++it) {

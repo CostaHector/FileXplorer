@@ -148,16 +148,28 @@ void ThumbnailActions::emitCustomFramesRange() {
   emit extractImages(startIndex, endIndex, isSkipIfAlreadyExist());
 }
 
+QWidget* ThumbnailActions::GetThumbnailCreateTools(QWidget* parent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(parent);
+  QToolBar* crtTB = new (std::nothrow) QToolBar{"Thumbnail/Create Tools", parent};
+  CHECK_NULLPTR_RETURN_NULLPTR(crtTB);
+  crtTB->setOrientation(Qt::Orientation::Vertical);
+  crtTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  crtTB->addAction(_SKIP_IF_ALREADY_EXIST);
+  crtTB->addAction(CREATE_THUMBNAIL_FOR_A_PATH);
+  crtTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
+  SetLayoutAlightment(crtTB->layout(), Qt::AlignmentFlag::AlignLeft);
+  return crtTB;
+}
+
 QWidget* ThumbnailActions::GetThumbnailFrameTools(QWidget* parent) {
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   QToolBar* frameTB = new (std::nothrow) QToolBar{"Thumbnail/Frame Tools", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(frameTB);
   frameTB->setOrientation(Qt::Orientation::Vertical);
   frameTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  frameTB->addAction(CREATE_THUMBNAIL_FOR_A_PATH);
   frameTB->addAction(GRAB_A_FRAME);
   frameTB->addAction(GRAB_FRAMES_ADVANCE);
-  frameTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16});
+  frameTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
   SetLayoutAlightment(frameTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return frameTB;
 }

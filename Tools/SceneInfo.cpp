@@ -33,8 +33,15 @@ QString SceneInfo::GetAbsolutePath(const QString& rootPath) const {
   return rootPath + rel2scn;
 }
 
+QString SceneInfo::GetThumbnailImageAbsPath(const QString& rootPath) const {
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + PathTool::THUMBNAIL_IMAGE_SUFFIX);
+}
+
 QString SceneInfo::GetFirstImageAbsPath(const QString& rootPath) const {
-  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, (imgs.isEmpty() ? "" : imgs.front()));
+  if (imgs.isEmpty()) {
+    return "";
+  }
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgs.front());
 }
 
 QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
@@ -172,8 +179,16 @@ void SceneInfo::SaveDisableImageDecoration(bool bDisable) {
   setConfig(SceneKey::DISABLE_IMAGE_DECORATION, bDisable);
 }
 
+bool SceneInfo::GetIncludeScnInSubdirectories() {
+  return getConfig(SceneKey::INCLUDEING_SCN_IN_SUBDIRECTORIES).toBool();
+}
+
+void SceneInfo::SaveIncludeScnInSubdirectories(bool bIncludeScnInSubdirectory) {
+  setConfig(SceneKey::INCLUDEING_SCN_IN_SUBDIRECTORIES, bIncludeScnInSubdirectory);
+}
+
 namespace SceneHelper {
-SceneInfoList GetScnsLstFromPath(const QString& path) {
+SceneInfoList GetScnsLstFromPath(const QString& path, bool bSubdirectories) {
   if (!QFileInfo(path).isDir()) {
     LOG_D("path[%s] is not a directory", qPrintable(path));
     return {};
@@ -182,7 +197,8 @@ SceneInfoList GetScnsLstFromPath(const QString& path) {
 
   SceneInfoList scnTotals;
   int scnFilesCnt = 0;
-  QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
+  const QDirIterator::IteratorFlag iteratorFlag{bSubdirectories ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags};
+  QDirIterator jsonIt(path, {"*.scn"}, QDir::Filter::Files, iteratorFlag);
   while (jsonIt.hasNext()) {
     const QString& scnFullPath{jsonIt.next()};
     const QString& rel2JsonFile = PathTool::GetRelPathFromRootRelName(PATH_N, scnFullPath);

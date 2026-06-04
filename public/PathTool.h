@@ -114,7 +114,8 @@ QString GetFileNameExtRemoved(QString&& fileName);
 QString FileExtReplacedWithJson(QString fileName);
 QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName);
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath);
-QString GetThumbnailDecorationImgPath(QString dirPath, const QString& dirName);
+QString GetThumbnailDecorationImgPathFromFolder(QString dirPath, const QString& dirName);
+constexpr const char* THUMBNAIL_IMAGE_SUFFIX{"_tn.jpg"};
 
 QString Path2Join(const QString& a, const QString& b);
 QString GetEffectiveName(const QString& itemPath);

@@ -28,6 +28,7 @@ struct SceneInfo {
   };
 
   QString GetAbsolutePath(const QString& rootPath) const;
+  QString GetThumbnailImageAbsPath(const QString& rootPath) const;
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoAbsPath(const QString& rootPath) const;
@@ -60,6 +61,8 @@ struct SceneInfo {
   static void SaveSortOrderReverse(bool bReverse);
   static bool GetInitialDisableImageDecoration();
   static void SaveDisableImageDecoration(bool bDisable);
+  static bool GetIncludeScnInSubdirectories();
+  static void SaveIncludeScnInSubdirectories(bool bIncludeScnInSubdirectory);
 
   static constexpr int SORT_COLUMN = 0;
   static constexpr Role DEF_SORT_ROLE = REL_PATH_ROLE;
@@ -75,7 +78,7 @@ inline QDataStream& operator>>(QDataStream& is, SceneInfo& item) {
 
 namespace SceneHelper {
 SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel);
-SceneInfoList GetScnsLstFromPath(const QString& path);
+SceneInfoList GetScnsLstFromPath(const QString& path, bool bSubdirectories = true);
 bool SaveScenesListToBinaryFile(const QString& scnAbsFilePath, const SceneInfoList& scenes);
 
 bool UpdateNameWithNewRate(const QString& scnFilePath, const QString& specifiedName, int newRate);

@@ -7,8 +7,10 @@
 namespace ModelTools {
 using FuncRangeRemoveCallback = std::function<void(int, int)>;
 using FuncRangeListRemoveCallback = std::function<void(const QList<std::pair<int, int>>&)>;
-QList<int> GetIndexesRows(const QModelIndexList& indexes);
-QList<std::pair<int, int>> MergeList2SectionsRange(const QList<int>& rows);
+QList<int> GetSortedUniqueRowsFromIndexes(const QModelIndexList& indexes);
+
+using FRONT_BACK_ROW_NUMBER_PAIR = std::pair<int, int>;
+QList<FRONT_BACK_ROW_NUMBER_PAIR> MergeList2SectionsRange(const QList<int>& sortedAndUnqiueRows);
 }
 
 #endif  // MODELTOOLS_H

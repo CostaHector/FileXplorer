@@ -30,6 +30,7 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   using namespace MOVIE_TABLE;
   m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(Name)));
   m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  m_whereCB->setCurrentIndex(0);
 
   QCompleter* pCompleter = new (std::nothrow) QCompleter{this};
   CHECK_NULLPTR_RETURN_VOID(pCompleter);
