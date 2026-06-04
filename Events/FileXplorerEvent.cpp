@@ -585,8 +585,8 @@ void FileXplorerEvent::subscribe() {
     auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
     connect(&rateInst, &RateActions::RateMovieReq, this, &FileXplorerEvent::onRateMovie);
     connect(&rateInst, &RateActions::RateMovieRecursivelyReq, this, &FileXplorerEvent::onRateMoviesRecursively);
-    connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &FileXplorerEvent::onRateMovie);
-    connect(&rateInst, &RateActions::AdjustRateMovieRecursivelyReq, this, &FileXplorerEvent::onRateMoviesRecursively);
+    connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &FileXplorerEvent::onAdjustRateMovie);
+    connect(&rateInst, &RateActions::AdjustRateMovieRecursivelyReq, this, &FileXplorerEvent::onAdjustRateMoviesRecursively);
   }
 }
 
