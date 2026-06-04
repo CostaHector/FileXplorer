@@ -52,7 +52,7 @@ private slots:
     QCOMPARE(mTb->mViewRD.undoStack.top(), ViewTypeTool::DEFAULT_VIEW_TYPE);
     QCOMPARE(mTb->mViewRD.redoStack.size(), 0);
 
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     QToolButton* specificButton = qobject_cast<QToolButton*>(mTb->widgetForAction(viewInst._LIST_VIEW)); // 以_LIST_VIEW为例
     QVERIFY(specificButton != nullptr);
 
@@ -90,7 +90,7 @@ private slots:
 
   void test_emit_action_directly_will_also_emit_2_signals_at_one_time_normal() {
     // both 2 signals: 1) undo stack+1 and 2) view Switched happen
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     viewInst._TABLE_VIEW->setChecked(true);
 
     QSignalSpy spyActionTriggered(mTb, &QToolBar::actionTriggered);
@@ -109,7 +109,7 @@ private slots:
     QCOMPARE(mTb->mViewRD.redoStack.size(), 0);
 
     // Expect: cannot undo at all, skip all service logic and undo/redo stack proces
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     viewInst._VIEW_BACK_TO->setChecked(true);
     emit viewInst._VIEW_BACK_TO->triggered(true);
 
@@ -125,7 +125,7 @@ private slots:
     QCOMPARE(mTb->mViewRD.redoStack.size(), 0);
 
     // Expect: cannot redo at all, skip all service logic and undo/redo stack proces
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     viewInst._VIEW_FORWARD_TO->setChecked(true);
     emit viewInst._VIEW_FORWARD_TO->triggered(true);
 

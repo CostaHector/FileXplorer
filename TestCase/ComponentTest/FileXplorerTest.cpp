@@ -82,7 +82,7 @@ class FileXplorerTest : public PlainTestSuite {
     QCOMPARE(getConfig(CompoVisKey::SHOW_PREVIEW_DOCKER).toBool(), true);
     QCOMPARE(getConfig(CompoVisKey::FOLDER_PREVIEW_TYPE).toInt(), ((int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
 
-    auto& viewActInst = g_viewActions();
+    auto& viewActInst = ViewActions::GetInst();
     viewActInst._TABLE_VIEW->setChecked(true);
 
     // no configuration

@@ -7,7 +7,7 @@
 #include "ViewActions.h"
 
 ViewSwitchToolBar::ViewSwitchToolBar(const QString& title, QWidget* parent) : QToolBar{title, parent} {
-  auto& inst = g_viewActions();
+  auto& inst = ViewActions::GetInst();
   mViewTypeIntAction.init({{inst._LIST_VIEW, ViewTypeTool::ViewType::LIST},
                            {inst._TABLE_VIEW, ViewTypeTool::ViewType::TABLE},
                            {inst._TREE_VIEW, ViewTypeTool::ViewType::TREE},
@@ -32,7 +32,7 @@ ViewTypeTool::ViewType ViewSwitchToolBar::GetCurViewType() const {
 void ViewSwitchToolBar::subscribe() {
   connect(mViewTypeIntAction.getActionGroup(), &QActionGroup::triggered, this, &ViewSwitchToolBar::onViewTypeActionTriggered);
 
-  auto& viewInst = g_viewActions();
+  auto& viewInst = ViewActions::GetInst();
   connect(viewInst._VIEW_BACK_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewNavigateBackward);
   connect(viewInst._VIEW_FORWARD_TO, &QAction::triggered, this, &ViewSwitchToolBar::onViewNavigateForward);
 }

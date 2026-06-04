@@ -45,7 +45,7 @@ RibbonMenu::RibbonMenu(QWidget* parent)
     addTab(m_leafFile, tr("&FILE"));
     addTab(m_leafHome, tr("&HOME"));
     addTab(m_leafView, tr("&VIEW"));
-    const auto& viewIns = g_viewActions();
+    const auto& viewIns = ViewActions::GetInst();
     using namespace ViewTypeTool;
     std::fill(mViewType2LeafTabIndex, mViewType2LeafTabIndex + (int) ViewType::VIEW_TYPE_BUTT, -1);
     mViewType2LeafTabIndex[(int) ViewType::MOVIE] = addTab(m_leafMovie, "&" + viewIns._MOVIE_VIEW->text());
@@ -153,7 +153,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* openItemsTB = new (std::nothrow) QToolBar{"Open", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(openItemsTB);
   {
-    openItemsTB->addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
+    openItemsTB->addAction(ViewActions::GetInst()._SYS_VIDEO_PLAYERS);
     openItemsTB->addActions(fileOpInst.OPEN_AG->actions());
     openItemsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     openItemsTB->setOrientation(Qt::Orientation::Vertical);
@@ -255,7 +255,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   QToolBar* advanceSearchToolBar = new (std::nothrow) QToolBar("AdvanceSearch");
   CHECK_NULLPTR_RETURN_NULLPTR(advanceSearchToolBar);
   {
-    advanceSearchToolBar->addAction(g_viewActions()._ADVANCE_SEARCH_VIEW);
+    advanceSearchToolBar->addAction(ViewActions::GetInst()._ADVANCE_SEARCH_VIEW);
     advanceSearchToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   }
 
@@ -288,7 +288,7 @@ QToolBar* RibbonMenu::LeafView() const {
   auto* leafViewWid = new (std::nothrow) QToolBar{"Leaf View"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafViewWid);
 
-  auto& viewInst = g_viewActions();
+  auto& viewInst = ViewActions::GetInst();
   leafViewWid->setToolTip("View Leaf");
   leafViewWid->addAction(viewInst._NAVIGATION_PANE);
   leafViewWid->addSeparator();
@@ -329,7 +329,7 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
 
   auto& ag = SceneInPageActions::GetInst();
 
-  sceneTB->addAction(g_viewActions()._SCENE_VIEW);
+  sceneTB->addAction(ViewActions::GetInst()._SCENE_VIEW);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._UPDATE_JSON);
   sceneTB->addAction(ag._UPDATE_SCN);

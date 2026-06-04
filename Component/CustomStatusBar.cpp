@@ -15,7 +15,7 @@ CustomStatusBar::CustomStatusBar(QWidget* parent)  //
   }
   mLabelsLst[MSG]->setObjectName("statusMessageLabel");
 
-  auto& viewInst = g_viewActions();
+  auto& viewInst = ViewActions::GetInst();
   addAction(viewInst._VIEW_BACK_TO);
   addAction(viewInst._VIEW_FORWARD_TO);
 

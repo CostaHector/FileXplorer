@@ -266,6 +266,15 @@ bool isRootOrEmpty(const QString& path) {
   return path.isEmpty() || path == "/" || QDir(path).isRoot();
 }
 
+bool isPathAtShallowDepth(const QString& path) {
+#ifdef _WIN32
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
+#else
+  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
+#endif
+  return path.count('/') < NEAR_ROOT_PATH_LIMIT;
+}
+
 QStringList GetRels(int prefixLen, const QStringList& lAbsPathList) {
   // "/home/rel2entry", "/home", prefixLen = 4
   const int rel2EntryN = prefixLen + 1;

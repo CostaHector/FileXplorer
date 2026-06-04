@@ -40,7 +40,7 @@ private slots:
     QCOMPARE(hists, (QStringList{"world", "hello"}));
   }
 
-  void test_TrimEachElementAndRemoveEmpty() {
+  void TrimEachElementAndRemoveEmpty_ok() {
     QStringList keywords {
         "  \t",
         "",
@@ -54,7 +54,7 @@ private slots:
     QCOMPARE(keywords, (QStringList{"Chris Hemsworth", "Chris Hemsworth", "Chris Evans", "Chris Evans"}));
   }
 
-  void test_SearchHistoryListProc(){
+  void SearchHistoryListProc_ok(){
     QStringList hists {
         "  \t",
         "",
@@ -66,6 +66,11 @@ private slots:
     };
     SearchHistoryListProc(hists);
     QCOMPARE(hists, (QStringList{"Chris Hemsworth", "Chris Evans"}));
+  }
+
+  void PathJoinPixmapSize_ok() {
+    QCOMPARE(PathJoinPixmapSize("a.jpg", 64, 128, true), "a.jpg_64x128_1");
+    QCOMPARE(PathJoinPixmapSize("b.jpg", 128, 64, false), "b.jpg_128x64_0");
   }
 };
 

@@ -33,7 +33,7 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
   {
     QList<QAction*> exclusiveActs;
     exclusiveActs.reserve(15);
-    exclusiveActs.push_back(g_viewActions()._SYS_VIDEO_PLAYERS);
+    exclusiveActs.push_back(ViewActions::GetInst()._SYS_VIDEO_PLAYERS);
     exclusiveActs += FileOpActs::GetInst().OPEN_AG->actions();
     exclusiveActs += FileOpActs::GetInst().COPY_PATH_AG->actions();
     PushFrontExclusiveActions(exclusiveActs);

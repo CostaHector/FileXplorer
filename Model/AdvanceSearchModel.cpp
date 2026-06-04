@@ -4,7 +4,7 @@
 #include "ImageTool.h"
 #include "PublicVariable.h"
 #include "DataFormatter.h"
-#include <QMessageBox>
+#include "InputDialogHelper.h"
 
 void AdvanceSearchModel::updateSearchResultList() {
   using namespace FilePropertyHelper;
@@ -50,21 +50,19 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
     LOG_WARN_NP("[Abort]Search under inexist path", stdPath);
     return false;
   }
-  if (queryWhenSearchUnderLargeDirectory && stdPath.count('/') < 2) {              // C:/A
-    auto retBtn = QMessageBox::warning(nullptr, "Confirm search(May cause lag)?",  //
-                                       "A Large Directory: " + stdPath,            //
-                                       QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel);
-    if (retBtn != QMessageBox::StandardButton::Yes) {
-      LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
-      return false;
-    }
+  const bool bSkipProceed{queryWhenSearchUnderLargeDirectory         //
+                          && PathTool::isPathAtShallowDepth(stdPath) //
+                          && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{}, "Confirm search(May cause lag)?", QString{"A Large Directory:  under [%1]"}.arg(stdPath), "")};
+  if (bSkipProceed) { // C:/A
+    LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
+    return false;
   }
   return true;
 }
 
 void AdvanceSearchModel::setRootPath(const QString& path) {
   ClearCopyAndCutDict();
-  if (!checkPathNeed(path, true)) {  // first time
+  if (!checkPathNeed(path, true)) { // first time
     return;
   }
   if (m_rootPath == path) {
@@ -81,7 +79,7 @@ void AdvanceSearchModel::setFilter(QDir::Filters newFilters) {
     return;
   }
   updateSearchResultList();
-  LOG_D("setFilter: %d", (int)m_filters);
+  LOG_D("setFilter: %d", (int) m_filters);
 }
 
 QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
@@ -97,10 +95,10 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole) {
     switch (index.column()) {
 #define SEARCH_OUT_FILE_INFO_KEY_ITEM(enu, enumVal, VariableType, formatter) \
-  case FilePropertyHelper::enu:                                              \
-    return formatter(item.m_##enu);          //
-      SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN  //
-#undef SEARCH_OUT_FILE_INFO_KEY_ITEM         //
+  case FilePropertyHelper::enu: \
+    return formatter(item.m_##enu);         //
+      SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN //
+#undef SEARCH_OUT_FILE_INFO_KEY_ITEM        //
           default : return {};
     }
   } else if (role == Qt::DecorationRole && index.column() == PropColumnE::Name) {

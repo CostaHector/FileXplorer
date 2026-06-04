@@ -23,7 +23,7 @@ PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::
                                .arg(CAROUSEL_PRE->text(), CAROUSEL_PRE->shortcut().toString()));
   CAROUSEL_PRE->setCheckable(true);
 
-  QAction* SHOW_OR_HIDE_PREVIEW = g_viewActions()._PREVIEW_PANEL;
+  QAction* SHOW_OR_HIDE_PREVIEW = ViewActions::GetInst()._PREVIEW_PANEL;
 
   using namespace PreviewTypeTool;
   mPreviewTypeIntAction.init({{CATEGORY_PRE, PREVIEW_TYPE_E::CATEGORY},                 //

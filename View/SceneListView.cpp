@@ -11,6 +11,7 @@
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "RecycleCfmDlg.h"
+#include "InputDialogHelper.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -19,11 +20,14 @@
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
-                             QWidget* parent)     //
-    : CustomListView{"SCENES_TABLE", parent},     //
-      _sceneModel{sceneModel},                    //
-      _sceneSortProxyModel{sceneSortProxyModel},  //
-      _scenePageControl{scenePageControl}         //
+                             QWidget* parent) //
+  : CustomListView{"SCENES_TABLE", parent}
+  , //
+  _sceneModel{sceneModel}
+  , //
+  _sceneSortProxyModel{sceneSortProxyModel}
+  ,                                   //
+  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
@@ -38,27 +42,24 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   _RENAME_SCENE_RELATED_FILES_REPLACE = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related(replace)"), this);
   _RENAME_SCENE_RELATED_FILES_REPLACE->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_REPLACE->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by replacing a substring in the file names.")  //
-          .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->text())
-          .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->shortcut().toString()));
+  _RENAME_SCENE_RELATED_FILES_REPLACE->setToolTip(QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by replacing a substring in the file names.") //
+                                                      .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->text())
+                                                      .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->shortcut().toString()));
 
   _RENAME_SCENE_RELATED_FILES_INSERT = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("Rename related(Insert)"), this);
   _RENAME_SCENE_RELATED_FILES_INSERT->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_INSERT->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by inserting a string into the file names.")  //
-          .arg(_RENAME_SCENE_RELATED_FILES_INSERT->text())
-          .arg(_RENAME_SCENE_RELATED_FILES_INSERT->shortcut().toString()));
+  _RENAME_SCENE_RELATED_FILES_INSERT->setToolTip(QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by inserting a string into the file names.") //
+                                                     .arg(_RENAME_SCENE_RELATED_FILES_INSERT->text())
+                                                     .arg(_RENAME_SCENE_RELATED_FILES_INSERT->shortcut().toString()));
 
   _RENAME_SCENE_RELATED_FILES_NUMERIZE = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"), this);
   _RENAME_SCENE_RELATED_FILES_NUMERIZE->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setToolTip(QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.")
-                                                       .arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->text())
-                                                       .arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->shortcut().toString()));
+  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.").arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->text()).arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->shortcut().toString()));
 
   _RECYCLE_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
   CHECK_NULLPTR_RETURN_VOID(_RECYCLE_SCENE_RELATED_FILES)
-  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin")  //
+  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin") //
                                                .arg(_RECYCLE_SCENE_RELATED_FILES->text())
                                                .arg(_RECYCLE_SCENE_RELATED_FILES->shortcut().toString()));
 
@@ -67,11 +68,11 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   QList<QAction*> exclusiveActions{
       SceneInPageActions::GetInst()._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
-      _RENAME_SCENE_RELATED_FILES_REPLACE,   //
-      _RENAME_SCENE_RELATED_FILES_INSERT,    //
-      _RENAME_SCENE_RELATED_FILES_NUMERIZE,  //
-      _RECYCLE_SCENE_RELATED_FILES,          //
-      _OPEN_CORRESPONDING_FOLDER,            //
+      _RENAME_SCENE_RELATED_FILES_REPLACE,  //
+      _RENAME_SCENE_RELATED_FILES_INSERT,   //
+      _RENAME_SCENE_RELATED_FILES_NUMERIZE, //
+      _RECYCLE_SCENE_RELATED_FILES,         //
+      _OPEN_CORRESPONDING_FOLDER,           //
   };
   PushFrontExclusiveActions(exclusiveActions);
   PushBackExclusiveActions(_sceneModel->GetExcusiveActions());
@@ -81,6 +82,13 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   // setMouseTracking(true);
   // setAttribute(Qt::WA_Hover, true);
   // viewport()->setMouseTracking(true);
+}
+
+SceneListView::~SceneListView() {
+  const auto& inst = SceneInPageActions::GetInst();
+  SceneInfo::SaveInitialSortRole(inst.GetSortRole());
+  SceneInfo::SaveSortOrderReverse(inst.GetSortOrderReverse());
+  SceneInfo::SaveIncludeScnInSubdirectories(inst.GetbSubdirectories());
 }
 
 bool SceneListView::onOpenCorrespondingFolder() {
@@ -132,47 +140,45 @@ void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
   }
 
   const SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
-  if (bPageByPage) {  // locally
+  if (bPageByPage) { // locally
     if (!_sceneSortProxyModel->isSortProxyInited()) {
       const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
       const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
       _sceneSortProxyModel->initSortSetting(initSortRole, bOrderReverse);
     }
     mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortRole);
-    mSortOrderReverseConn =
-        connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortOrder);
-  } else {  // globally
+    mSortOrderReverseConn = connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortOrder);
+  } else { // globally
     if (!_sceneModel->isSortProxyInited()) {
       const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
       const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
       _sceneModel->initSortSetting(initSortRole, bOrderReverse);
     }
     mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneModel, &ScenesListModel::setSortDimension);
-    mSortOrderReverseConn =
-        connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
+    mSortOrderReverseConn = connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
   }
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  if (IsPathAtShallowDepth(rootPath)) {  // Potential large directory
-    LOG_D("Root path[%s] may contain a large number of items", qPrintable(rootPath));
-    const QString cfmTitle = "Large Directory Warning - Performance Impact";
-    const QString hintMsg =
-        "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-        "Loading it could cause performance issues.\n\n"
-        "Directory: " +
-        rootPath + "\n\n Do you want to proceed?";
-    QMessageBox::StandardButton retBtn;
+  const bool bNeedSkip{
 #ifdef RUNNING_UNIT_TESTS
-    retBtn = SceneListViewMocker::MockSetRootPathQuery() ? QMessageBox::StandardButton::Yes : QMessageBox::StandardButton::No;
+      false
 #else
-    retBtn = QMessageBox::warning(this, cfmTitle, hintMsg, QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No,
-                                  QMessageBox::StandardButton::No);
+      PathTool::isPathAtShallowDepth(rootPath)
+      && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question,
+                                            QIcon{},
+                                            "Large Directory Warning - Performance Impact",
+                                            "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
+                                            "Loading it could cause performance issues.\n\n"
+                                            "Directory: "
+                                                + rootPath + "\n\n Do you want to proceed?",
+                                            "")
 #endif
-    if (retBtn != QMessageBox::StandardButton::Yes) {
-      LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
-      return;
-    }
+  };
+  if (bNeedSkip) {
+    // Potential large directory
+    LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
+    return;
   }
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
   _sceneModel->setRootPath(rootPath, false, bSubdirectories);
@@ -180,7 +186,7 @@ void SceneListView::setRootPath(const QString& rootPath) {
 
 int SceneListView::onUpdateJsonFiles() {
   const QString workPath = _sceneModel->rootPath();
-  if (IsPathAtShallowDepth(workPath)) {
+  if (PathTool::isPathAtShallowDepth(workPath)) {
     LOG_ERR_P("Update aborted",
               "Path [%s] is too close to root directory. "
               "System files may get accidentally modified at this level.",
@@ -192,18 +198,18 @@ int SceneListView::onUpdateJsonFiles() {
   ScnMgr scnMgr;
   Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated",
-           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]",  //
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
            cnt.m_jsonUpdatedCnt,
-           cnt.m_jsonUsedCnt,  //
+           cnt.m_jsonUsedCnt, //
            cnt.m_ImgNameKeyFieldUpdatedCnt,
-           cnt.m_VidNameKeyFieldUpdatedCnt,  //
+           cnt.m_VidNameKeyFieldUpdatedCnt, //
            qPrintable(workPath));
   return cnt.m_jsonUpdatedCnt;
 }
 
 int SceneListView::onUpdateScnFiles() {
   const QString workPath = _sceneModel->rootPath();
-  if (IsPathAtShallowDepth(workPath)) {
+  if (PathTool::isPathAtShallowDepth(workPath)) {
     LOG_ERR_P("Update aborted",
               "Path [%s] is too close to root directory. "
               "System files may get accidentally modified at this level.",
@@ -256,15 +262,6 @@ void SceneListView::initExclusivePreferenceSetting() {
   CustomListView::m_defaultWrapping = true;
 }
 
-bool SceneListView::IsPathAtShallowDepth(const QString& path) {
-#ifdef _WIN32
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // windows path start with disk letter
-#else
-  static constexpr int NEAR_ROOT_PATH_LIMIT = 2;  // linux path start with '/'
-#endif
-  return path.count('/') < NEAR_ROOT_PATH_LIMIT;
-}
-
 QModelIndexList SceneListView::selectedRowsSource() const {
   const QModelIndexList& proIndexes = selectedIndexes();
   QModelIndexList srcIndexes;
@@ -279,7 +276,7 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::MouseButton::LeftButton) {
     const QPoint pos = event->pos();
-    const QModelIndex proIndex = indexAt(pos);  // here no need use mapToSource
+    const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
     if (mLastClickedIndex != proIndex) {
       onClickEvent(proIndex);
     }

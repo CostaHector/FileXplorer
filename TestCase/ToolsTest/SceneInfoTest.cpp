@@ -19,12 +19,20 @@ class SceneInfoTest : public PlainTestSuite {
   }
 
   void basic_memeber_test() {
+    const SceneInfo noImgInfolhs{"/", "Britain", QStringList{}, "vid", 100, 99, "2000"};
+    QCOMPARE(noImgInfolhs.GetAbsolutePath("Path/to/Root"), "Path/to/Root/");
+    QCOMPARE(noImgInfolhs.GetFirstImageAbsPath("Path/to/Root"), "");
+    QCOMPARE(noImgInfolhs.GetThumbnailImageAbsPath("Path/to/Root"), "Path/to/Root/Britain_tn.jpg");
+
     const SceneInfo lhs{"", "Britain", {"img1", "img2"}, "vid", 100, 99, "2000"};
     const SceneInfo lhs_pretend_deep_copy{lhs};
     QCOMPARE(lhs, lhs_pretend_deep_copy);
 
     const SceneInfo rhs{"/", "Britain", {"img1", "img2"}, "vid", 100, 99, "2000"};
     QVERIFY(lhs < rhs);  // rel2scn differ
+    QCOMPARE(rhs.GetAbsolutePath("Path/to/Root"), "Path/to/Root/");
+    QCOMPARE(rhs.GetFirstImageAbsPath("Path/to/Root"), "Path/to/Root/img1");
+    QCOMPARE(rhs.GetThumbnailImageAbsPath("Path/to/Root"), "Path/to/Root/Britain_tn.jpg");
 
     const SceneInfo rhs2{"", "America", {"img1", "img2"}, "vid", 100, 99, "2000"};
     QVERIFY(!(lhs < rhs2));  // rel2scn equal, but name differ

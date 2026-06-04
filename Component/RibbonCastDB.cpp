@@ -28,7 +28,7 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
 
   auto* castAppendToolbutton = inst.GetAppendCastToolButton(this);
 
-  addAction(g_viewActions()._CAST_VIEW);
+  addAction(ViewActions::GetInst()._CAST_VIEW);
   addSeparator();
   addAction(inst._MODEL_SUBMIT_ALL);
   addAction(inst._MODEL_REPOPULATE);

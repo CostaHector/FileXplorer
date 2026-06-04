@@ -111,12 +111,6 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   subscribe();
 }
 
-SceneInPageActions::~SceneInPageActions() {
-  SceneInfo::SaveInitialSortRole(GetSortRole());
-  SceneInfo::SaveSortOrderReverse(GetSortOrderReverse());
-  SceneInfo::SaveIncludeScnInSubdirectories(GetbSubdirectories());
-}
-
 void SceneInPageActions::subscribe() {
   connect(_SORT_RANGE_PAGE_BY_PAGE, &QAction::toggled, this, &SceneInPageActions::sortImplementerChanged);
   connect(_DISABLE_IMAGE_DECORATION, &QAction::toggled, this, &SceneInPageActions::onDisableImageDecorationToggled);
