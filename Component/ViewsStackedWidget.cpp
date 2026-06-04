@@ -247,7 +247,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       emit g_AchiveFilesActions().ARCHIVE_PREVIEW->toggled(true);
       return true;
     } else if (HarFiles::IsHarFile(fi)) {
-      g_viewActions()._HAR_VIEW->trigger();
+      ViewActions::GetInst()._HAR_VIEW->trigger();
       return true;
     } else if (FileTool::IsTorrentFile(absItemPath)) {
       return FileTool::OpenLocalTorrentFile(absItemPath);
@@ -258,8 +258,8 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       return onActionAndViewNavigate(absItemPath, true);
     }
     if (ViewTypeTool::IsMatch(vt, (int)ViewTypeTool::ViewTypeMask::CAST)) {
-      g_viewActions()._TABLE_VIEW->setChecked(true);  // 1) undo stack+1; 2) view Switched happen
-      g_viewActions()._TABLE_VIEW->trigger();
+      ViewActions::GetInst()._TABLE_VIEW->setChecked(true);  // 1) undo stack+1; 2) view Switched happen
+      ViewActions::GetInst()._TABLE_VIEW->trigger();
       return onActionAndViewNavigate(absItemPath, true);
     }
   }

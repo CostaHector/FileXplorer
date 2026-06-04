@@ -25,9 +25,8 @@ const QPixmap& GetLabelStatusPixmap(int labelStatus);
 QSize GetImageDimensionPixel(const QString& imgFilePath);
 QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat);
 
-int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist = true);
+int CreateThumbnailForAllDirectFoldersUnder(const QString& folderPath, bool bSkipIfExist = true);
 bool CreateThumbnailCore(const QString& srcImgAbsPath, const QString& dstThumbnailAbsPath, bool bSkipIfExist = true);
-bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist = true);
 constexpr int EXPECT_THUMBNAIL_SIDE = 256;
 
 constexpr int DEFAULT_START_POSITION_SECOND = 5, DEFAULT_INTERVAL_SECOND = 5, DEFAULT_FRAMES_COUNT = 1;

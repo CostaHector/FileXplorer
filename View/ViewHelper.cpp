@@ -25,7 +25,7 @@ bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton m
         return false;
     }
   } else if (mods == Qt::KeyboardModifier::ControlModifier) {
-    static auto& viewInst = g_viewActions();
+    static auto& viewInst = ViewActions::GetInst();
     switch (mousebutton) {
       case Qt::MouseButton::BackButton:
         emit viewInst._VIEW_BACK_TO->triggered(false);

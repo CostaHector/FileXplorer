@@ -2,6 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "RecycleCfmDlg.h"
+#include "InputDialogHelper.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -33,13 +34,13 @@ class RecycleCfmDlgTest : public PlainTestSuite {
 
     auto detailMsgChecker = GetCheckFunc("file1", "");
 
-    MOCKER(RecycleCfmDlg::YesOrCancelBox)                                                                                                     //
+    MOCKER(InputDialogHelper::YesOrCancelBox)                                                                                                     //
         .expects(exactly(2))                                                                                                                  //
         .with(QMessageBox::Icon::Question, any(), checkWith(recycleTitleChecker), checkWith(recycleMsgChecker), checkWith(detailMsgChecker))  //
         .will(returnValue(false))                                                                                                             //
         .then(returnValue(true))                                                                                                              //
         .id("0");
-    MOCKER(RecycleCfmDlg::YesOrCancelBox)                                                                                                  //
+    MOCKER(InputDialogHelper::YesOrCancelBox)                                                                                                  //
         .expects(exactly(2))                                                                                                               //
         .with(QMessageBox::Icon::Warning, any(), checkWith(deleteTitleChecker), checkWith(deleteMsgChecker), checkWith(detailMsgChecker))  //
         .after("0")                                                                                                                        //

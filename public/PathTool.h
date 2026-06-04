@@ -133,6 +133,8 @@ inline bool isLinuxRootOrWinEmpty(const QString& path) {
 
 bool isRootOrEmpty(const QString& path); // strict
 
+bool isPathAtShallowDepth(const QString& path);
+
 QString longestCommonPrefix(const QStringList& strs);
 
 QStringList GetRels(int prefixLen, const QStringList& lAbsPathList);

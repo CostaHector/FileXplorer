@@ -63,7 +63,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
 
   m_dbViewHideShowTB = new (std::nothrow) QToolBar{"Show/Hide Database View", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbViewHideShowTB);
-  m_dbViewHideShowTB->addAction(g_viewActions()._MOVIE_VIEW);
+  m_dbViewHideShowTB->addAction(ViewActions::GetInst()._MOVIE_VIEW);
   m_dbViewHideShowTB->addSeparator();
   m_dbViewHideShowTB->addAction(g_torrActions().SHOW_TORRENTS_MANAGER);
   m_dbViewHideShowTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);

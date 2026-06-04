@@ -25,7 +25,7 @@ void AdvanceSearchTableView::subscribe() {
   auto& fileOpInst = FileOpActs::GetInst();
   connect(fileOpInst._FORCE_RESEARCH, &QAction::triggered, _sourceModel, &AdvanceSearchModel::forceRefresh);
 
-  addAction(g_viewActions()._SYS_VIDEO_PLAYERS);
+  addAction(ViewActions::GetInst()._SYS_VIDEO_PLAYERS);
   addActions(fileOpInst.OPEN_AG->actions());
   addActions(fileOpInst.COPY_PATH_AG->actions());
   addActions(fileOpInst.CUT_COPY_PASTE->actions());

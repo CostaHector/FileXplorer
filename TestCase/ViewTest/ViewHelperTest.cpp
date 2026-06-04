@@ -18,7 +18,7 @@ class ViewHelperTest : public PlainTestSuite {
     QSignalSpy backToSpy{addressInst._BACK_TO, &QAction::triggered};
     QSignalSpy forwardToSpy{addressInst._FORWARD_TO, &QAction::triggered};
 
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     QSignalSpy viewBackToSpy{viewInst._VIEW_BACK_TO, &QAction::triggered};
     QSignalSpy viewForwardToSpy{viewInst._VIEW_FORWARD_TO, &QAction::triggered};
 

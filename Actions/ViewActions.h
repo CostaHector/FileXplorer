@@ -9,8 +9,7 @@
 class ViewActions : public QObject {
   Q_OBJECT
 public:
-  friend ViewActions& g_viewActions();
-  ~ViewActions();
+  static ViewActions& GetInst();
 
   QAction* _NAVIGATION_PANE{nullptr};
 
@@ -38,7 +37,5 @@ public:
 private:
   explicit ViewActions(QObject* parent = nullptr);
 };
-
-ViewActions& g_viewActions();
 
 #endif  // VIEWACTIONS_H

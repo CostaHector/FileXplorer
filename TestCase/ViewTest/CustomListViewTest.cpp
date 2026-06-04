@@ -93,7 +93,7 @@ class CustomListViewTest : public PlainTestSuite {
 
     {
       auto& addressInst = g_addressBarActions();
-      auto& viewInst = g_viewActions();
+      auto& viewInst = ViewActions::GetInst();
 
       QSignalSpy backAddressSpy(addressInst._BACK_TO, &QAction::triggered);
       QSignalSpy forwardAddressSpy(addressInst._FORWARD_TO, &QAction::triggered);

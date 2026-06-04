@@ -85,7 +85,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mUpdateFieldTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(mUpdateFieldTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  addAction(g_viewActions()._JSON_VIEW);
+  addAction(ViewActions::GetInst()._JSON_VIEW);
   addSeparator();
   addAction(inst._SAVE_CURRENT_CHANGES);
   addSeparator();

@@ -15,6 +15,7 @@
 #include "UndoRedo.h"
 #include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
+#include "PathTool.h"
 
 #include <QSignalSpy>
 #include <mockcpp/mokc.h>
@@ -95,7 +96,6 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void cleanupTestCase() {  //
-    SceneListViewMocker::MockSetRootPathQuery() = true;
     Configuration().clear();
   }
 
@@ -120,12 +120,12 @@ class SceneListViewTest : public PlainTestSuite {
 
   void IsPathAtShallowDepth_ok() {
     // test including /home/path/ and "C:/home/to" 2 platform should both ok
-    QVERIFY(!SceneListView::IsPathAtShallowDepth(tDir.path()));
+    QVERIFY(!PathTool::isPathAtShallowDepth(tDir.path()));
 
-    QVERIFY(SceneListView::IsPathAtShallowDepth("/"));
-    QVERIFY(SceneListView::IsPathAtShallowDepth("C:/"));
-    QVERIFY(!SceneListView::IsPathAtShallowDepth("/home/user"));
-    QVERIFY(!SceneListView::IsPathAtShallowDepth("C:/Users/Public/Documents"));
+    QVERIFY(PathTool::isPathAtShallowDepth("/"));
+    QVERIFY(PathTool::isPathAtShallowDepth("C:/"));
+    QVERIFY(!PathTool::isPathAtShallowDepth("/home/user"));
+    QVERIFY(!PathTool::isPathAtShallowDepth("C:/Users/Public/Documents"));
   }
 
   void update_json_update_scene_slot_ok() {
@@ -137,17 +137,7 @@ class SceneListViewTest : public PlainTestSuite {
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
-    {
-      // 1. setRootPath on an rootPath "/", _sceneModel->rootPath() should not change
-      SceneListViewMocker::MockSetRootPathQuery() = false;
-      sceneView.setRootPath("/");
-      QVERIFY(sceneModel.rootPath() != "/");
-      sceneView.setRootPath("C:/home");
-      QVERIFY(sceneModel.rootPath() != "C:/home");
-    }
-
     {  // 2. setRootPath on a test directory ok
-      SceneListViewMocker::MockSetRootPathQuery() = true;
       sceneView.setRootPath(tDir.path());
       QCOMPARE(sceneModel.rootPath(), tDir.path());
       QCOMPARE(sceneModel.rowCount(), 0);
@@ -291,7 +281,6 @@ class SceneListViewTest : public PlainTestSuite {
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     QVERIFY(QFile::exists(scnAbsPath));
-    SceneListViewMocker::MockSetRootPathQuery() = true;
     sceneView.setRootPath(tDir.path());
     QCOMPARE(sceneModel.rowCount(), 2);
 
@@ -324,7 +313,6 @@ class SceneListViewTest : public PlainTestSuite {
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     QVERIFY(QFile::exists(scnAbsPath));
-    SceneListViewMocker::MockSetRootPathQuery() = true;
     sceneView.setRootPath(tDir.path());
     QCOMPARE(sceneModel.rowCount(), 2);
 

@@ -10,7 +10,7 @@ QList<QAction*> GetRightClickMenuActions(QWidget* parent) {
   CHECK_NULLPTR_RETURN_INT(parent, {});
 
   QList<QAction*> actions;
-  actions.push_back(g_viewActions()._SYS_VIDEO_PLAYERS);
+  actions.push_back(ViewActions::GetInst()._SYS_VIDEO_PLAYERS);
   actions += FileOpActs::GetInst().OPEN_AG->actions();
   actions.push_back(NewSeperatorAction(parent));
 

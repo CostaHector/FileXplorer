@@ -132,21 +132,27 @@ QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat) {
   return imgReader.size();
 }
 
-int CreateThumbnailForAPath(const QString& folderPath, bool bSkipIfExist) {
+int CreateThumbnailForAllDirectFoldersUnder(const QString& folderPath, bool bSkipIfExist) {
   int thumbnailCrtCnt{0};
   QDir dir{folderPath, "", QDir::SortFlag::Name, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   QDir subFolderDir{"", "", QDir::SortFlag::Name, QDir::Filter::Files};
   subFolderDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   for (const QString& folderName : dir.entryList()) {
-    subFolderDir.setPath(dir.absoluteFilePath(folderName));
+    const QString dirPath{dir.absoluteFilePath(folderName)};
+    subFolderDir.setPath(dirPath);
     QStringList imgs = subFolderDir.entryList();
     if (imgs.isEmpty()) {
       continue;
     }
     StringTool::ImgsSortNameLengthFirst(imgs);
-    QString imgNameInSubFolder = imgs.front();
-    QString imgAbsPath = subFolderDir.absoluteFilePath(imgNameInSubFolder);
-    thumbnailCrtCnt += CreateThumbnail(imgAbsPath, bSkipIfExist);
+    const QString imgNameInSubFolder{imgs.front()};
+    if (!imgNameInSubFolder.startsWith(folderName)) {
+       // avoid create useless image
+      continue;
+    }
+    const QString srcImgAbsPath{subFolderDir.absoluteFilePath(imgNameInSubFolder)};
+    const QString dstImgAbsPath{PathTool::GetThumbnailDecorationImgPathFromFolder(dirPath, folderName)};
+    thumbnailCrtCnt += CreateThumbnailCore(srcImgAbsPath, dstImgAbsPath, bSkipIfExist);
   }
   return thumbnailCrtCnt;
 }
@@ -180,17 +186,6 @@ bool CreateThumbnailCore(const QString& srcImgAbsPath, const QString& dstThumbna
   }
 
   return true;
-}
-
-bool CreateThumbnail(const QString& imgAbsPath, bool bSkipIfExist) {
-  const QString dirName{PathTool::dirName(imgAbsPath)};
-  QString dirPath;
-  const QString srcName = PathTool::GetPrepathAndFileName(imgAbsPath, dirPath);
-  if (!srcName.startsWith(dirName)) { // avoid create useless image
-    return false;
-  }
-  const QString thumbnailPath = PathTool::GetThumbnailDecorationImgPathFromFolder(dirPath, dirName);
-  return CreateThumbnailCore(imgAbsPath, thumbnailPath, bSkipIfExist);
 }
 
 int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {

@@ -4,8 +4,10 @@
 #include "ViewTypeTool.h"
 #include "ViewActions.h"
 
+#include "FileOpActs.h"
 #include "PathKey.h"
 #include "CompoVisKey.h"
+#include "BehaviorKey.h"
 #include "SizeTool.h"
 #include "Configuration.h"
 
@@ -71,6 +73,10 @@ void FileXplorer::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   Configuration().setValue("FileXplorer/Geometry", saveGeometry());
   setConfig(PathKey::STARTUP_PATH, m_fsPanel->m_fsModel->rootPath());
+  setConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR, ViewActions::GetInst()._NAVIGATION_PANE->isChecked());
+  setConfig(CompoVisKey::SHOW_PREVIEW_DOCKER, ViewActions::GetInst()._PREVIEW_PANEL->isChecked());
+  setConfig(BehaviorKey::FILESYSTEM_STRUCTURE, (int)FileOpActs::GetInst().GetCurFileStructurePolicy());
+
   m_previewFolder->saveSizeHint();
   QMainWindow::closeEvent(event);
 }
@@ -133,7 +139,7 @@ void FileXplorer::InitComponentVisibility() {
 }
 
 void FileXplorer::subscribe() {
-  auto& vA = g_viewActions();
+  auto& vA = ViewActions::GetInst();
   connect(vA._NAVIGATION_PANE, &QAction::toggled, m_naviSideBarDock, &QWidget::setVisible);
   connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
 

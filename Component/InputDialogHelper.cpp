@@ -17,4 +17,16 @@ std::pair<bool, int> GetIntWithInitial(QWidget *parent, const QString &title, co
   return {bAccept, newValue};
 }
 
+bool YesOrCancelBox(QMessageBox::Icon iconType, const QIcon& winIcon, const QString& title, const QString& text, const QString& informativeText) {
+  QMessageBox msgBox;
+  msgBox.setIcon(iconType);
+  msgBox.setWindowIcon(winIcon);
+  msgBox.setWindowTitle(title);
+  msgBox.setText(text);
+  msgBox.setInformativeText(informativeText);
+  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+  return msgBox.exec() == QMessageBox::Yes;
+}
+
 }

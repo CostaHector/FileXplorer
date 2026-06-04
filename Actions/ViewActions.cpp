@@ -3,6 +3,11 @@
 #include "CompoVisKey.h"
 #include "Configuration.h"
 
+ViewActions& ViewActions::GetInst() {
+  static ViewActions ins;
+  return ins;
+}
+
 ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   using namespace ViewTypeTool;
 
@@ -105,14 +110,4 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _ROW_HEIGHT->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                   "Configure tableview/treeview row height")
                               .arg(_ROW_HEIGHT->text(), _ROW_HEIGHT->shortcut().toString()));
-}
-
-ViewActions::~ViewActions() {
-  Configuration().setValue(CompoVisKey::SHOW_NAVIGATION_SIDEBAR.name, _NAVIGATION_PANE->isChecked());
-  Configuration().setValue(CompoVisKey::SHOW_PREVIEW_DOCKER.name, _PREVIEW_PANEL->isChecked());
-}
-
-ViewActions& g_viewActions() {
-  static ViewActions ins;
-  return ins;
 }

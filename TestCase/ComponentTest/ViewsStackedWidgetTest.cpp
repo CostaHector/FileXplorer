@@ -423,7 +423,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       }
 
       {
-        QSignalSpy harViewSpy{g_viewActions()._HAR_VIEW, &QAction::triggered};
+        QSignalSpy harViewSpy{ViewActions::GetInst()._HAR_VIEW, &QAction::triggered};
         m_fsPanel.on_cellDoubleClicked(harIndex);
         QCOMPARE(harViewSpy.count(), 1);
         QCOMPARE(harViewSpy.takeLast(), (QVariantList{false}));
@@ -471,7 +471,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
         QVERIFY(castDb.IsTableEmpty(tableName));
         QCOMPARE(castDb.LoadFromPsonFile(imageHostPath), 1);
       }
-      g_viewActions()._SCENE_VIEW->setChecked(true);
+      ViewActions::GetInst()._SCENE_VIEW->setChecked(true);
       m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::CAST);
       QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::CAST);
       QCOMPARE(m_fsPanel.m_castDbModel->rowCount(), 1);
@@ -481,7 +481,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QModelIndex kakaRateInCastModel = m_fsPanel.m_castDbModel->index(0, PERFORMER_DB_HEADER_KEY::Rate);
       QCOMPARE(kakaRateInCastModel.data(Qt::DisplayRole).toInt(), 10);
 
-      QSignalSpy tableViewSpy{g_viewActions()._TABLE_VIEW, &QAction::toggled};
+      QSignalSpy tableViewSpy{ViewActions::GetInst()._TABLE_VIEW, &QAction::toggled};
       QCOMPARE(m_fsPanel.on_cellDoubleClicked(kakaNameInCastModel), true);
       QCOMPARE(tableViewSpy.count(), 1);
       QCOMPARE(tableViewSpy.takeLast(), (QVariantList{true}));

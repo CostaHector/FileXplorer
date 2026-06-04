@@ -30,6 +30,7 @@
 #include "DuplicateVideosFinder.h"
 #include "HarMgr.h"
 
+#include "InputDialogHelper.h"
 #include "ItemsUnpacker.h"
 #include "ArchiveFiles.h"
 #include "ItemsPacker.h"
@@ -175,7 +176,7 @@ bool FileXplorerEvent::on_CreateThumbnailForAPath(bool skipIfExist) {
     return false;
   }
   const QString currentPath = _fileSysModel->rootPath();
-  const int thumnailCreatedCnt = ImageTool::CreateThumbnailForAPath(currentPath, skipIfExist);
+  const int thumnailCreatedCnt = ImageTool::CreateThumbnailForAllDirectFoldersUnder(currentPath, skipIfExist);
   LOG_OK_P("[Ok] Create", "%d thumbnail(s) from path[%s]", thumnailCreatedCnt, qPrintable(currentPath));
   return thumnailCreatedCnt >= 0;
 }
@@ -185,18 +186,16 @@ bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skip
     return false;
   }
   const QString currentPath = _fileSysModel->rootPath();
-  if (currentPath.count('/') < 3) {
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Icon::Question);
-    msgBox.setWindowIcon(QIcon(":img/THUMBNAIL_EXTRACTOR_B_E"));
-    msgBox.setWindowTitle("Extract images out of thumbnail Confirm (lag may cause)?");
-    msgBox.setText(QString("All images(s) under [%1] will be extract out!").arg(currentPath));
-    msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    if (msgBox.exec() != QMessageBox::Ok) {
-      LOG_INFO_NP("[Skip] User cancel", "will not extract images out of thumbnail");
-      return true;
-    }
+
+  const bool bSkipProceed{PathTool::isPathAtShallowDepth(currentPath)
+                          && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question,
+                                                                QIcon{":img/THUMBNAIL_EXTRACTOR_B_E"},
+                                                                "Extract images out of thumbnail Confirm (lag may cause)?",
+                                                                QString("All images(s) under [%1] will be extract out!").arg(currentPath),
+                                                                "")};
+  if (bSkipProceed) {
+    LOG_INFO_NP("[Skip] User cancel", "will not extract images out of thumbnail");
+    return true;
   }
   VideoStoryboard tp{skipIfExist};
   int extractedOutCnt = tp.ExtractFrames(currentPath, beg, end);
@@ -280,8 +279,10 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
   using namespace MultiParTools;
   std::pair<bool, ParVerifyInfomationList> bSucceed2VryInfo = VerifyFiles(mixedFiles);
   LOG_OE_P(bSucceed2VryInfo.first, //
-           "Verify result", "%d in %d selection(s) verified ok", //
-           bSucceed2VryInfo.second.size(), mixedFiles.size());
+           "Verify result",
+           "%d in %d selection(s) verified ok", //
+           bSucceed2VryInfo.second.size(),
+           mixedFiles.size());
   if (!bSucceed2VryInfo.second.isEmpty()) {
     MultiParDialog dlg{std::move(bSucceed2VryInfo.second)};
     dlg.exec();
@@ -574,7 +575,7 @@ void FileXplorerEvent::subscribe() {
   }
 
   {
-    auto& viewInst = g_viewActions();
+    auto& viewInst = ViewActions::GetInst();
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileXplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileXplorerEvent::on_PlayVideo);
     connect(viewInst._ROW_HEIGHT, &QAction::triggered, this, &FileXplorerEvent::on_RowHeightChanged);
@@ -1127,15 +1128,13 @@ bool FileXplorerEvent::on_NameStandardize() {
     LOG_ERR_NP("currentPath is root or empty", currentPath);
     return false;
   }
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Icon::Warning);
-  msgBox.setWindowIcon(QIcon(":img/NAME_RULER"));
-  msgBox.setWindowTitle("Confirm Name Standardlizer?");
-  msgBox.setText(QString{"All item(s) under [%1] will be <b>RENAMED RECURSIVELY</b>!"}.arg(currentPath));
-  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-  msgBox.setDefaultButton(QMessageBox::Ok);
-  if (msgBox.exec() != QMessageBox::Ok) {
-    LOG_INFO_NP("[Skip] User cancel", "return");
+
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
+                                         QIcon{":img/NAME_RULER"},
+                                         "Confirm Name Standardlizer?",
+                                         QString{"All item(s) under [%1] will be <b>RENAMED RECURSIVELY</b>!"}.arg(currentPath),
+                                         "")) {
+    LOG_INFO_NP("[Skip] User cancel", "will not rename at all");
     return true;
   }
   auto* p = Notificator::progress(LOG_LVL_E::I, "Name standardlize", QString{"Start in path[%1]"}.arg(currentPath));
@@ -1161,15 +1160,8 @@ bool FileXplorerEvent::on_FileClassify() {
     return false;
   }
 
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Icon::Warning);
-  msgBox.setWindowIcon(QIcon{":img/PACK_FOLDERS"});
-  msgBox.setWindowTitle("Confirm File Classify?");
-  msgBox.setText(QString{"All item(s) under [%1] will be classfied!"}.arg(currentPath));
-  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-  msgBox.setDefaultButton(QMessageBox::Ok);
-  if (msgBox.exec() != QMessageBox::Ok) {
-    LOG_INFO_NP("[Skip] User cancel", "return");
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning, QIcon{":img/PACK_FOLDERS"}, "Confirm File Classify?", QString{"All item(s) under [%1] will be classfied!"}.arg(currentPath), "")) {
+    LOG_INFO_NP("[Skip] User cancel", "will not classfy files");
     return true;
   }
 
@@ -1203,15 +1195,12 @@ bool FileXplorerEvent::on_FileUnclassify() {
     return false;
   }
 
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Icon::Warning);
-  msgBox.setWindowIcon(QIcon(":img/UNPACK_FOLDERS"));
-  msgBox.setWindowTitle("Unpile Confirm (lag may cause)?");
-  msgBox.setText(QString("All item(s) under [%1] will be unpile out!").arg(currentPath));
-  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-  msgBox.setDefaultButton(QMessageBox::Ok);
-  if (msgBox.exec() != QMessageBox::Ok) {
-    LOG_INFO_NP("[Skip] User cancel", "Skip unpile");
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
+                                         QIcon{":img/UNPACK_FOLDERS"},
+                                         "Unpile Confirm (lag may cause)?",
+                                         QString("All item(s) under [%1] will be unpile out!").arg(currentPath),
+                                         "")) {
+    LOG_INFO_NP("[Skip] User cancel", "will not unpile");
     return true;
   }
 
@@ -1247,9 +1236,13 @@ bool FileXplorerEvent::on_RemoveDuplicateImages() {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return false;
   }
-  if (QMessageBox::question(_contentPane, "Confirm remove duplicate images?", "Images that differ in resolution will be delete") != QMessageBox::StandardButton::Yes) {
-    LOG_OK_NP("[Skip] User Cancel remove duplicate images", "return");
-    return false;
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
+                                         QIcon{},
+                                         "Delete lower-resolution images?",
+                                         QString{"Lower-resolution duplicates will be deleted.\nFolder:\n%1"}.arg(currentPath),
+                                         "")) {
+    LOG_INFO_NP("[Skip] User cancelled", "lower-resolution images not removed");
+    return true;
   }
   int removedCnt = LowResImgsRemover()(currentPath);
   LOG_OK_P("Remove duplicate image(s) Finished", "count: %d", removedCnt);
@@ -1274,15 +1267,13 @@ bool FileXplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
     LOG_OK_NP("Skip", "Nothing to remove");
     return true;
   }
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Icon::Warning);
-  msgBox.setWindowTitle(QString("Confirm %1 command(s)?").arg(cmdCnt));
-  msgBox.setText("Remove Redundant folder");
-  msgBox.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
-  msgBox.setDefaultButton(QMessageBox::StandardButton::No);
-  msgBox.setDetailedText(QString(remover));
-  if (msgBox.exec() != QMessageBox::StandardButton::Yes) {
-    LOG_INFO_NP("[Skip] User cancel remove redundant item", "return");
+
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
+                                         QIcon{},
+                                         QString{"Confirm %1 command(s)?"}.arg(cmdCnt),
+                                         QString{"Remove Redundant folder\nFolder:\n%1"}.arg(currentPath),
+                                         QString(remover))) {
+    LOG_INFO_NP("[Skip] User cancelled", "redundant item will not remove");
     return true;
   }
   bool rmvResult = remover.Exec();

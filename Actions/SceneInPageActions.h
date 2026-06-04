@@ -15,7 +15,6 @@ class SceneInPageActions : public QObject {
   static SceneInPageActions& GetInst();
 
   explicit SceneInPageActions(QObject* parent = nullptr);
-  ~SceneInPageActions();
 
   QWidget* GetOrderToolBar(QWidget* parent);
 

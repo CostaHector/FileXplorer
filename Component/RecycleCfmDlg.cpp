@@ -1,20 +1,10 @@
 #include "RecycleCfmDlg.h"
+#include "InputDialogHelper.h"
+
 #include <QMessageBox>
 #include <QIcon>
 
 namespace RecycleCfmDlg {
-
-bool YesOrCancelBox(QMessageBox::Icon iconType, const QIcon& winIcon, const QString& title, const QString& text, const QString& InformativeText) {
-  QMessageBox msgBox;
-  msgBox.setIcon(iconType);
-  msgBox.setWindowIcon(winIcon);
-  msgBox.setWindowTitle(title);
-  msgBox.setText(text);
-  msgBox.setInformativeText(InformativeText);
-  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
-  msgBox.setDefaultButton(QMessageBox::Cancel);
-  return msgBox.exec() == QMessageBox::Yes;
-}
 
 bool recycleQuestion(const QString& locatedIn, const QStringList& files, bool bDeletePermanently) {
   QString recycleMsg;
@@ -34,11 +24,12 @@ bool recycleQuestion(const QString& locatedIn, const QStringList& files, bool bD
   } else {
     recycleDetailMsg += files.join('\n');
   }
-  return YesOrCancelBox(bDeletePermanently ? QMessageBox::Icon::Warning : QMessageBox::Icon::Question,                  //
-                        bDeletePermanently ? QIcon(":img/DELETE_ITEMS_PERMANENTLY") : QIcon(":img/MOVE_TO_TRASH_BIN"),  //
-                        bDeletePermanently ? "Permanently Delete Files" : "Move to Recycle Bin",                        //
-                        recycleMsg,                                                                                     //
-                        recycleDetailMsg);
+  return InputDialogHelper::YesOrCancelBox(                                                          //
+      bDeletePermanently ? QMessageBox::Icon::Warning : QMessageBox::Icon::Question,                 //
+      bDeletePermanently ? QIcon(":img/DELETE_ITEMS_PERMANENTLY") : QIcon(":img/MOVE_TO_TRASH_BIN"), //
+      bDeletePermanently ? "Permanently Delete Files" : "Move to Recycle Bin",                       //
+      recycleMsg,                                                                                    //
+      recycleDetailMsg);
 }
 
-}  // namespace RecycleCfmDlg
+} // namespace RecycleCfmDlg

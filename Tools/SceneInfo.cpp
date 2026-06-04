@@ -160,6 +160,7 @@ SceneInfo::Role SceneInfo::GetInitialSortRole() {
 }
 
 void SceneInfo::SaveInitialSortRole(Role sortRole) {
+  // never use setConfig in static object destructor
   setConfig(SceneKey::SORT_BY_ROLE, (int)sortRole);
 }
 

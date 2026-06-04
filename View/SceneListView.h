@@ -8,13 +8,6 @@
 
 class ScenesListModel;
 
-namespace SceneListViewMocker {
-inline bool& MockSetRootPathQuery() {
-  static bool bConfirm = false;
-  return bConfirm;
-}
-}  // namespace SceneListViewMocker
-
 class SceneListView : public CustomListView {
   Q_OBJECT
  public:
@@ -22,6 +15,7 @@ class SceneListView : public CustomListView {
                          SceneSortProxyModel* sceneSortProxyModel,
                          ScenePageControl* scenePageControl,
                          QWidget* parent = nullptr);
+  ~SceneListView();
 
   void setRootPath(const QString& rootPath);
   int onUpdateJsonFiles();
@@ -50,7 +44,6 @@ class SceneListView : public CustomListView {
  private:
   void initExclusivePreferenceSetting() override;
 
-  static bool IsPathAtShallowDepth(const QString& path);
   QModelIndexList selectedRowsSource() const;
 
   QAction* _RENAME_SCENE_RELATED_FILES_REPLACE{nullptr};
