@@ -2,12 +2,12 @@
 #include <QDir>
 #include <QSet>
 
-namespace PathTool{
+namespace PathTool {
 QString linkPath(const QString& localPath) {
 #ifdef _WIN32
-  return "file:///" + localPath;  // file:///C:/to/path
+  return "file:///" + localPath; // file:///C:/to/path
 #else
-  return "file://" + localPath;  // file:///home/to/path
+  return "file://" + localPath; // file:///home/to/path
 #endif
 }
 
@@ -50,7 +50,7 @@ QString absolutePath(QString input) {
   // /home => /. for unix rootPath lastIndexOfSlash == 0
   // C:/home => C:/. for windows driver lastIndexOfSlash >= 1 and [lastIndexOfSlash-1]=':'
   // home/to => plain path
-  const int parentPathEndIndex{(lastIndexOfSlash == 0 || (lastIndexOfSlash >= 1 && input[lastIndexOfSlash - 1] == ':'))  //
+  const int parentPathEndIndex{(lastIndexOfSlash == 0 || (lastIndexOfSlash >= 1 && input[lastIndexOfSlash - 1] == ':')) //
                                    ? lastIndexOfSlash + 1
                                    : lastIndexOfSlash};
   return input.left(parentPathEndIndex);
@@ -112,25 +112,25 @@ bool HasLetter(const QString& fullpath, int startIdx) {
 BASE_NAME_2_DOT_EXT GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
-      || lastIndexOfExtDot == -1                                     // hello world
-      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()  // ok. say when
-      || !HasLetter(fullpath, lastIndexOfExtDot + 1))                // sc. 01
+  if (lastIndexOfExtDot <= lastIndexOfSlash                         // Kris./nice shoes
+      || lastIndexOfExtDot == -1                                    // hello world
+      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size() // ok. say when
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))               // sc. 01
   {
-    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1),  // base
-                          "");                                 // extension
+    return std::make_pair(fullpath.mid(lastIndexOfSlash + 1), // base
+                          "");                                // extension
   }
-  return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1),  // base
-                        fullpath.mid(lastIndexOfExtDot));                                              // extension
+  return std::make_pair(fullpath.mid(lastIndexOfSlash + 1, lastIndexOfExtDot - lastIndexOfSlash - 1), // base
+                        fullpath.mid(lastIndexOfExtDot));                                             // extension
 }
 
 QString GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash                          // Kris./nice shoes
-      || lastIndexOfExtDot == -1                                     // hello world
-      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size()  // ok. say when
-      || !HasLetter(fullpath, lastIndexOfExtDot + 1))                // sc. 01
+  if (lastIndexOfExtDot <= lastIndexOfSlash                         // Kris./nice shoes
+      || lastIndexOfExtDot == -1                                    // hello world
+      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size() // ok. say when
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))               // sc. 01
   {
     return fullpath.mid(lastIndexOfSlash + 1);
   }
@@ -184,11 +184,11 @@ QString GetPrepathAndFileName(const QString& fullpath, QString& prepath) {
   return fullpath.mid(lastIndexOfSlash + 1);
 }
 
-QString GetThumbnailDecorationImgPath(QString dirPath, const QString& dirName) {
+QString GetThumbnailDecorationImgPathFromFolder(QString dirPath, const QString& dirName) {
   dirPath.reserve(dirPath.size() + 40);
   dirPath += "/";
   dirPath += dirName;
-  dirPath += "_tn.jpg";
+  dirPath += THUMBNAIL_IMAGE_SUFFIX;
   return dirPath;
 }
 
@@ -205,17 +205,17 @@ QString Path2Join(const QString& a, const QString& b) {
 }
 
 RMFComponent RMFComponent::FromPath(const QString& input) {
-  const int lastSlashIndex = input.lastIndexOf('/');  // 找到最后一个/的位置
+  const int lastSlashIndex = input.lastIndexOf('/'); // 找到最后一个/的位置
   if (lastSlashIndex == -1) {
     // C.mp4 => "", "", "C.mp4"
     return {"", "", input};
   }
-  const int secondTolastSlashIndex = input.lastIndexOf('/', lastSlashIndex - 1);  // 找到倒数第二个/的位置
+  const int secondTolastSlashIndex = input.lastIndexOf('/', lastSlashIndex - 1); // 找到倒数第二个/的位置
   if (secondTolastSlashIndex == -1) {
     // C:/C.mp4 => "", "C:/", "C.mp4"
     return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
   }
-  const int thirdToLastSlashIndex = input.lastIndexOf('/', secondTolastSlashIndex - 1);  // 找到倒数第三个/的位置
+  const int thirdToLastSlashIndex = input.lastIndexOf('/', secondTolastSlashIndex - 1); // 找到倒数第三个/的位置
   if (thirdToLastSlashIndex == -1) {
     // C:/A/B.mp4 => "", "C:/A/", "B.mp4"
     return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
@@ -224,9 +224,9 @@ RMFComponent RMFComponent::FromPath(const QString& input) {
   // [thirdToLastSlashIndex + 1, lastSlashIndex + 1)
   // start = thirdToLastSlashIndex + 1, length = lastSlashIndex + 1 - (thirdToLastSlashIndex + 1) = lastSlashIndex - thirdToLastSlashIndex
   return {
-      input.left(thirdToLastSlashIndex + 1),                                         //
-      input.mid(thirdToLastSlashIndex + 1, lastSlashIndex - thirdToLastSlashIndex),  //
-      input.mid(lastSlashIndex + 1)                                                  //
+      input.left(thirdToLastSlashIndex + 1),                                        //
+      input.mid(thirdToLastSlashIndex + 1, lastSlashIndex - thirdToLastSlashIndex), //
+      input.mid(lastSlashIndex + 1)                                                 //
   };
 }
 // get last 3 part of a file abs path
@@ -349,4 +349,4 @@ QString GetAsteriskDotFileExtension(const QString& path) {
   return '*' + path.mid(lastIndexOfDot);
 }
 
-}
+} // namespace PathTool

@@ -3,13 +3,15 @@
 #include "StyleSheet.h"
 #include "SceneInfo.h"
 #include "PublicMacro.h"
+#include <QToolBar>
 
-SceneInPageActions& g_SceneInPageActions() {
+SceneInPageActions& SceneInPageActions::GetInst() {
   static SceneInPageActions ins;
   return ins;
 }
 
-SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
+SceneInPageActions::SceneInPageActions(QObject* parent)
+  : QObject{parent} {
   _UPDATE_JSON = new (std::nothrow) QAction(QIcon(":img/UPDATE_JSON"), tr("Update K-V"), this);
   CHECK_NULLPTR_RETURN_VOID(_UPDATE_JSON);
   _UPDATE_JSON->setToolTip(QString("<b>%1 (%2)</b><br/>"
@@ -27,16 +29,34 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
-  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance Mode(disable image)"), this);
+  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS = new (std::nothrow) QAction(QIcon{":img/GENERATOR_THUMBNAIL_FOR_FRONT_IMAGE"}, tr("Generate Thumbnails"), this);
+  CHECK_NULLPTR_RETURN_VOID(_CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS);
+  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setShortcutVisibleInContextMenu(true);
+  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setToolTip("Generate thumbnails from primary images in JSON metadata to accelerate loading");
+
+  _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance Mode"), this);
   CHECK_NULLPTR_RETURN_VOID(_DISABLE_IMAGE_DECORATION);
   _DISABLE_IMAGE_DECORATION->setCheckable(true);
   const bool disableImage{SceneInfo::GetInitialDisableImageDecoration()};
   _DISABLE_IMAGE_DECORATION->setChecked(disableImage);
   _DISABLE_IMAGE_DECORATION->setShortcutVisibleInContextMenu(true);
   _DISABLE_IMAGE_DECORATION->setToolTip(QString("<b>%1 (%2)</b><br/>"
-                                                "Hide images for faster performance. Otherwise show movie posters by default.\n"
-                                                "(<i>Useful for faster sorting and filtering</i>)")
+                                                "Disable image decorations for improved responsiveness. "
+                                                "When unchecked, movie posters display normally.<br/>"
+                                                "<i>Recommended when sorting or filtering large datasets.</i>")
                                             .arg(_DISABLE_IMAGE_DECORATION->text(), _DISABLE_IMAGE_DECORATION->shortcut().toString()));
+
+  _INCLUDEING_SUBDIRECTORIES = new (std::nothrow) QAction(QIcon{":img/INCLUDEING_SUBDIRS"}, tr("Include Subdirectories"), this);
+  CHECK_NULLPTR_RETURN_VOID(_INCLUDEING_SUBDIRECTORIES);
+  const bool bIncludeScnInSubdirectory{SceneInfo::GetIncludeScnInSubdirectories()};
+  _INCLUDEING_SUBDIRECTORIES->setCheckable(true);
+  _INCLUDEING_SUBDIRECTORIES->setChecked(bIncludeScnInSubdirectory);
+  _INCLUDEING_SUBDIRECTORIES->setShortcutVisibleInContextMenu(true);
+  _INCLUDEING_SUBDIRECTORIES->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                                 "Scan subdirectories for scene files (enabled by default). "
+                                                 "When unchecked, only the current directory is processed.<br/>"
+                                                 "<i>Improves performance with deep folder structures.</i>")
+                                             .arg(_INCLUDEING_SUBDIRECTORIES->text(), _INCLUDEING_SUBDIRECTORIES->shortcut().toString()));
 
   _CLEAR_SCN_FILE = new (std::nothrow) QAction(QIcon(":img/CLEAR_SCN_FILES"), tr("Clear scn"), this);
   CHECK_NULLPTR_RETURN_VOID(_CLEAR_SCN_FILE);
@@ -78,12 +98,13 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
   _SORT_RANGE_PAGE_BY_PAGE->setChecked(false);
   _SORT_RANGE_PAGE_BY_PAGE->setToolTip("Sort each page independently when enabled. Otherwise sort entire list by default");
 
-  mSortOrderIntAction.init({{_BY_NAME, SceneInfo::Role::DEF_NAME_TEXT_ROLE},       //
-                            {_BY_MOVIE_PATH, SceneInfo::Role::REL_PATH_ROLE},      //
-                            {_BY_MOVIE_SIZE, SceneInfo::Role::VID_SIZE_ROLE},      //
-                            {_BY_RATE, SceneInfo::Role::RATE_ROLE},                //
-                            {_BY_UPLOADED_TIME, SceneInfo::Role::UPLOADED_ROLE}},  //
-                           SceneInfo::DEF_SORT_ROLE, QActionGroup::ExclusionPolicy::Exclusive);
+  mSortOrderIntAction.init({{_BY_NAME, SceneInfo::Role::DEF_NAME_TEXT_ROLE},      //
+                            {_BY_MOVIE_PATH, SceneInfo::Role::REL_PATH_ROLE},     //
+                            {_BY_MOVIE_SIZE, SceneInfo::Role::VID_SIZE_ROLE},     //
+                            {_BY_RATE, SceneInfo::Role::RATE_ROLE},               //
+                            {_BY_UPLOADED_TIME, SceneInfo::Role::UPLOADED_ROLE}}, //
+                           SceneInfo::DEF_SORT_ROLE,
+                           QActionGroup::ExclusionPolicy::Exclusive);
   SceneInfo::Role sortDim = SceneInfo::GetInitialSortRole();
   mSortOrderIntAction.setCheckedIfActionExist(sortDim);
 
@@ -93,6 +114,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent) : QObject{parent} {
 SceneInPageActions::~SceneInPageActions() {
   SceneInfo::SaveInitialSortRole(GetSortRole());
   SceneInfo::SaveSortOrderReverse(GetSortOrderReverse());
+  SceneInfo::SaveIncludeScnInSubdirectories(GetbSubdirectories());
 }
 
 void SceneInPageActions::subscribe() {
@@ -103,7 +125,9 @@ void SceneInPageActions::subscribe() {
 }
 
 void SceneInPageActions::onDisableImageDecorationToggled(bool bDisabled) {
-  // user may want to disable image decoration before show scene view, so here must write changes into memory
+  // user may want to disable image decoration before show scene view;
+  // model initial show/hide depend on cfg;
+  // so here must write changes into memory
   SceneInfo::SaveDisableImageDecoration(bDisabled);
   emit disableImageDecorationChanged(bDisabled);
 }
@@ -117,11 +141,11 @@ void SceneInPageActions::onSortDimensionTriggered(const QAction* triggeredAct) {
   emit sceneSortDimensionChanged(sortDimension);
 }
 
-QToolBar* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
-  auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(),  //
-                                                            QToolButton::InstantPopup,                         //
-                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,     //
-                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,                  //
+QWidget* SceneInPageActions::GetOrderToolBar(QWidget* parent) {
+  auto* orderToolButton = new (std::nothrow) MenuToolButton(mSortOrderIntAction.getActionEnumAscendingList(), //
+                                                            QToolButton::InstantPopup,                        //
+                                                            Qt::ToolButtonStyle::ToolButtonTextBesideIcon,    //
+                                                            IMAGE_SIZE::TABS_ICON_IN_MENU_16,                 //
                                                             parent);
   CHECK_NULLPTR_RETURN_NULLPTR(parent);
   orderToolButton->SetCaption(QIcon{":img/SORTING_FILE_FOLDER"}, tr("Sort Role"));

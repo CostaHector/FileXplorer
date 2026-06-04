@@ -1507,7 +1507,7 @@
         <translation>检查文件的完整性并给出修复入口</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+27"/>
         <source>Set Redundancy Rate</source>
         <translation>指定冗余度</translation>
     </message>
@@ -1517,12 +1517,12 @@
         <translation>冗余度区间[%1, %2]</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+42"/>
         <source>Create Par2</source>
         <translation>创建Par2冗余</translation>
     </message>
     <message>
-        <location line="-76"/>
+        <location line="-71"/>
         <source>Verify Integrity</source>
         <translation>校验完整性</translation>
     </message>
@@ -2135,7 +2135,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../../Actions/SceneInPageActions.cpp" line="+13"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+15"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -2146,11 +2146,21 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+9"/>
-        <source>Performance Mode(disable image)</source>
-        <translation>性能模式(禁用图片)</translation>
+        <source>Generate Thumbnails</source>
+        <translation>生成缩略图</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+5"/>
+        <source>Performance Mode</source>
+        <translation>禁用图片</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Include Subdirectories</source>
+        <translation>包含子目录</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Clear scn</source>
         <translation>清除场景</translation>
     </message>
@@ -2190,7 +2200,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>逐页排序</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+56"/>
         <source>Sort Role</source>
         <translation>按角色排序</translation>
     </message>

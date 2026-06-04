@@ -20,7 +20,7 @@ class ScenesListModel : public QAbstractListModelPub {
   bool setSortDimension(SceneInfo::Role newSortDimension);
   bool setSortResultReverse(bool bResultReverse);
 
-  bool setRootPath(const QString& rootPath, const bool bForce = false);
+  bool setRootPath(const QString& rootPath, const bool bForce = false, const bool bSubdirectories = true);
   inline QString rootPath() const { return mRootPath; }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
@@ -52,6 +52,8 @@ class ScenesListModel : public QAbstractListModelPub {
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
   void EmitPagesCountChanged(int newPagesCount) { emit pagesCountChanged(newPagesCount); }
   bool onDisableImageDecorationChanged(bool bDisabled);
+  bool onSubdirectoriesToggled(bool bDisabled);
+  int createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist);
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);

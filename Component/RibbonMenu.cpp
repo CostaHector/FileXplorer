@@ -327,9 +327,7 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
   CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
 
-  auto& ag = g_SceneInPageActions();
-  QToolBar* orderTB = ag.GetOrderToolBar(sceneTB);
-  CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
+  auto& ag = SceneInPageActions::GetInst();
 
   sceneTB->addAction(g_viewActions()._SCENE_VIEW);
   sceneTB->addSeparator();
@@ -337,10 +335,15 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
   sceneTB->addAction(ag._UPDATE_SCN);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._DISABLE_IMAGE_DECORATION);
+  sceneTB->addAction(ag._INCLUDEING_SUBDIRECTORIES);
   sceneTB->addSeparator();
   sceneTB->addAction(ag._CLEAR_SCN_FILE);
   sceneTB->addSeparator();
-  sceneTB->addWidget(orderTB);
+  {
+    QWidget* orderTB = ag.GetOrderToolBar(sceneTB);
+    CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
+    sceneTB->addWidget(orderTB);
+  }
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }
@@ -393,9 +396,9 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   archiveVidsTB->addSeparator();
   {
     auto& inst = ThumbnailActions::GetInst();
+    archiveVidsTB->addWidget(inst.GetThumbnailCreateTools(archiveVidsTB));
     archiveVidsTB->addWidget(inst.GetThumbnailFrameTools(archiveVidsTB));
     archiveVidsTB->addWidget(inst.GetStoryBoardToolbar(archiveVidsTB));
-    archiveVidsTB->addAction(inst._SKIP_IF_ALREADY_EXIST);
   }
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);

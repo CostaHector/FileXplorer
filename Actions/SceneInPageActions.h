@@ -4,7 +4,6 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
-#include <QToolBar>
 #include "EnumIntAction.h"
 #include "SceneInfo.h"
 
@@ -13,25 +12,19 @@ extern template struct EnumIntAction<SceneInfo::Role>;
 class SceneInPageActions : public QObject {
   Q_OBJECT
  public:
+  static SceneInPageActions& GetInst();
+
   explicit SceneInPageActions(QObject* parent = nullptr);
   ~SceneInPageActions();
 
-  QToolBar* GetOrderToolBar(QWidget* parent);
+  QWidget* GetOrderToolBar(QWidget* parent);
 
   QAction* _UPDATE_JSON{nullptr};
   QAction* _UPDATE_SCN{nullptr};
+  QAction* _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS{nullptr};
   QAction* _DISABLE_IMAGE_DECORATION{nullptr};
+  QAction* _INCLUDEING_SUBDIRECTORIES{nullptr};
   QAction* _CLEAR_SCN_FILE{nullptr};
-
-  QAction* _BY_NAME{nullptr};
-  QAction* _BY_MOVIE_PATH{nullptr};
-  QAction* _BY_MOVIE_SIZE{nullptr};
-  QAction* _BY_RATE{nullptr};
-  QAction* _BY_UPLOADED_TIME{nullptr};
-
-  QAction* _REVERSE_RESULT{nullptr};
-
-  QAction* _SORT_RANGE_PAGE_BY_PAGE{nullptr};
 
   SceneInfo::Role GetSortRole() const {
     return mSortOrderIntAction.curVal();
@@ -41,6 +34,10 @@ class SceneInPageActions : public QObject {
   }
   bool GetSortRangeCurrentPageOnly() const {
     return _SORT_RANGE_PAGE_BY_PAGE != nullptr && _SORT_RANGE_PAGE_BY_PAGE->isChecked();
+  }
+
+  bool GetbSubdirectories() const {
+    return _INCLUDEING_SUBDIRECTORIES != nullptr && _INCLUDEING_SUBDIRECTORIES->isChecked();
   }
 
  signals:
@@ -58,8 +55,16 @@ class SceneInPageActions : public QObject {
 
   void subscribe();
   EnumIntAction<SceneInfo::Role> mSortOrderIntAction;
-};
 
-SceneInPageActions& g_SceneInPageActions();
+  QAction* _BY_NAME{nullptr};
+  QAction* _BY_MOVIE_PATH{nullptr};
+  QAction* _BY_MOVIE_SIZE{nullptr};
+  QAction* _BY_RATE{nullptr};
+  QAction* _BY_UPLOADED_TIME{nullptr};
+
+  QAction* _REVERSE_RESULT{nullptr};
+
+  QAction* _SORT_RANGE_PAGE_BY_PAGE{nullptr};
+};
 
 #endif  // SCENEINPAGEACTIONS_H

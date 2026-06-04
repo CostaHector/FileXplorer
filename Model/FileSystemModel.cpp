@@ -23,6 +23,7 @@ void FileSystemModel::setThumbnailAsDecoration(bool bEnableUse) {
   if (ROW_CNT <= 0 || COL_CNT <= 0) {
     return;
   }
+  emit layoutAboutToBeChanged();
   emit dataChanged(index(0, 0), index(ROW_CNT - 1, 0), {Qt::DecorationRole});
   emit layoutChanged();
 }
@@ -133,7 +134,7 @@ QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
       static const QIcon COPY_ICON{":img/COPY_ITEM"};
       return COPY_ICON;
     } else if (m_bThumbnailAsDecoration && isDir(index)) {
-      const QString decorationImgPath = PathTool::GetThumbnailDecorationImgPath(filePath(index), fileName(index));
+      const QString decorationImgPath = PathTool::GetThumbnailDecorationImgPathFromFolder(filePath(index), fileName(index));
       if (QFile::exists(decorationImgPath)) {
         return QPixmap(decorationImgPath);
       }

@@ -10,6 +10,7 @@ class ThumbnailActions : public QObject {
 public:
   static ThumbnailActions& GetInst();
 
+  QWidget* GetThumbnailCreateTools(QWidget* parent);
   QWidget* GetThumbnailFrameTools(QWidget* parent);
   QWidget* GetStoryBoardToolbar(QWidget* parent);
 
