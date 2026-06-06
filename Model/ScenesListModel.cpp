@@ -118,7 +118,7 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
 
   const bool bScnUpdatedOk = SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, eleBaseName, newRate);
   const QString jsonAbsFilePath = GetJson(index);
-  const bool bJsonUpdatedOk = RateHelper::RateMovie(jsonAbsFilePath, newRate);
+  const bool bJsonUpdatedOk = RateHelper::SetFileRate(jsonAbsFilePath, newRate);
   const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
 
   LOG_OE_P(bothUpdatedOk,

@@ -25,7 +25,7 @@ void setThumbnailExtractIndexRange(QAction* pAct, int startIndex, int endIndex) 
 }
 
 ThumbnailActions::ThumbnailActions(QObject* /*parent*/) {
-  CREATE_THUMBNAIL_FOR_A_PATH = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL"}, tr("Create thumbnail"), this);
+  CREATE_THUMBNAIL_FOR_A_PATH = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL_FOR_FOLDER"}, tr("Create thumbnail for folder"), this);
   CREATE_THUMBNAIL_FOR_A_PATH->setToolTip("Create thumbnails for all folder(s) in current view");
 
   _SKIP_IF_ALREADY_EXIST = new (std::nothrow) QAction(QIcon{":img/SKIP_IF_EXIST"}, tr("Skip if already exist"), this);

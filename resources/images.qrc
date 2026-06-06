@@ -38,8 +38,8 @@
         <file alias="ORDER_ASCENDING">Media/ORDER_ASCENDING.svg</file>
         <file alias="ORDER_DESCENDING">Media/ORDER_DESCENDING.svg</file>
         <file alias="LONG_PATH_FINDER">Media/LONG_PATH_FINDER.svg</file>
-        <file alias="GENERATOR_THUMBNAIL_FOR_FRONT_IMAGE">Media/GENERATOR_THUMBNAIL_FOR_FRONT_IMAGE.svg</file>
-        <file alias="THUMBNAIL">Media/THUMBNAIL.svg</file>
+        <file alias="THUMBNAIL_FOR_FOLDER">Media/THUMBNAIL_FOR_FOLDER.svg</file>
+        <file alias="THUMBNAIL_FOR_JSON">Media/THUMBNAIL_FOR_JSON.svg</file>
         <file alias="THUMBNAILS_1_BY_1">Media/THUMBNAILS_1_BY_1.svg</file>
         <file alias="THUMBNAILS_2_BY_2">Media/THUMBNAILS_2_BY_2.svg</file>
         <file alias="THUMBNAILS_3_BY_3">Media/THUMBNAILS_3_BY_3.svg</file>

@@ -201,7 +201,7 @@ bool BasicVideoView::rateCurrentVideo(int score) const {
     LOG_WARN_P("Cannot rate", "Media file[%s] not exist", qPrintable(curMedia));
     return false;
   }
-  if (!RateHelper::RateMovie(curMedia, score)) {
+  if (!RateHelper::SetFileRate(curMedia, score)) {
     LOG_WARN_P("Cannot rate", "Media file[%s], see details in log", qPrintable(curMedia));
     return false;
   }
@@ -218,7 +218,7 @@ bool BasicVideoView::adjustRateCurrentVideo(int delta) const {
     LOG_WARN_P("Cannot rate", "Media file[%s] not exist", qPrintable(curMedia));
     return false;
   }
-  if (!RateHelper::AdjustRateMovie(curMedia, delta)) {
+  if (!RateHelper::AdjustFileRate(curMedia, delta)) {
     LOG_WARN_P("Cannot adjust rate", "Media file[%s], see details in log", qPrintable(curMedia));
     return false;
   }
@@ -247,7 +247,7 @@ int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
     LOG_WARN_P("Cannot adjust rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
     return 0;
   }
-  return RateHelper::AdjustRateMovieRecursively(sameLevelPath, delta); // no need widget
+  return RateHelper::AdjustFileRateRecursively(sameLevelPath, delta); // no need widget
 }
 
 bool BasicVideoView::deviatePositionPrevious() {

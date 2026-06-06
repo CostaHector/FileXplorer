@@ -29,10 +29,10 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
-  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS = new (std::nothrow) QAction(QIcon{":img/GENERATOR_THUMBNAIL_FOR_FRONT_IMAGE"}, tr("Generate Thumbnails"), this);
+  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL_FOR_JSON"}, tr("Create Thumbnail for Json"), this);
   CHECK_NULLPTR_RETURN_VOID(_CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS);
   _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setShortcutVisibleInContextMenu(true);
-  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setToolTip("Generate thumbnails from primary images in JSON metadata to accelerate loading");
+  _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setToolTip("Create thumbnails from primary images in JSON metadata to accelerate loading");
 
   _DISABLE_IMAGE_DECORATION = new (std::nothrow) QAction(QIcon(":img/DISABLE_IMAGE_DECORATION"), tr("Performance Mode"), this);
   CHECK_NULLPTR_RETURN_VOID(_DISABLE_IMAGE_DECORATION);

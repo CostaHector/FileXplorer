@@ -10,10 +10,11 @@
 #include <QFile>
 #include <QDirIterator>
 #include <QRegularExpression>
+#include <QSet>
 
 constexpr int RateHelper::RATING_BAR_X, RateHelper::RATING_BAR_HEIGHT;
 
-bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
+bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
   using namespace JsonHelper;
   using namespace MOVIE_TABLE;
   QVariantHash data = MovieJsonLoader(jsonPath);
@@ -46,34 +47,20 @@ bool RateHelper::RateMovieCore(const QString& jsonPath, int newRateVal, bool bOv
   return true;
 }
 
-bool RateHelper::RateMovie(const QString& fileAbsPath, int rate) {
-  QString jsonPath;
-  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
-    LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
-    return false;
+QSet<QString> RateHelper::GetRelatedJsonAbsPaths(const QStringList& paths) {
+  QSet<QString> uniqueJsons;
+  for (const QString& path : paths) {
+    QString jsonPath;
+    if (!RateHelper::getJsonPathFromFile(path, jsonPath)) { // no json related
+      continue;
+    }
+    uniqueJsons.insert(jsonPath);
   }
-  return RateMovieCore(jsonPath, rate, true);
+  return uniqueJsons;
 }
 
-int RateHelper::RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce) {
-  QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  int succeedCnt{0}, totalCnt{0};
-  while (it.hasNext()) {
-    succeedCnt += RateMovieCore(it.next(), rate, bOverrideForce);
-    ++totalCnt;
-  }
-  LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) have been updated to rate %d", succeedCnt, totalCnt, rate);
-
-  return succeedCnt;
-}
-
-bool RateHelper::AdjustRateMovie(const QString& fileAbsPath, int delta, int* newRateValue) {
+bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int* newRateValue) {
   if (delta == 0) {
-    return false;
-  }
-  QString jsonPath;
-  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
-    LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
   using namespace JsonHelper;
@@ -109,11 +96,81 @@ bool RateHelper::AdjustRateMovie(const QString& fileAbsPath, int delta, int* new
   return true;
 }
 
-int RateHelper::AdjustRateMovieRecursively(const QString& folderAbsPath, int delta) {
+bool RateHelper::SetFileRate(const QString& fileAbsPath, int rate) {
+  QString jsonPath;
+  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
+    LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
+    return false;
+  }
+  return SetJsonRateValueCore(jsonPath, rate, true);
+}
+
+int RateHelper::SetFilesRate(const QStringList& fileAbsPathList, int rate) {
+  const QSet<QString> uniqueJsons{RateHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
+  if (uniqueJsons.isEmpty()) {
+    return 0;
+  }
+  int succeedCnt{0}, totalCnt{0};
+  for (const QString& jsonAbsPath: uniqueJsons) {
+    if (RateHelper::SetJsonRateValueCore(jsonAbsPath, rate, true)) {
+      ++succeedCnt;
+    }
+    ++totalCnt;
+  }
+  LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) have been updated to rate %d", succeedCnt, totalCnt, rate);
+  return succeedCnt;
+}
+
+int RateHelper::SetFileRateRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce) {
   QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+
   int succeedCnt{0}, totalCnt{0};
   while (it.hasNext()) {
-    succeedCnt += AdjustRateMovie(it.next(), delta);
+    if (SetJsonRateValueCore(it.next(), rate, bOverrideForce)) {
+      ++succeedCnt;
+    }
+    ++totalCnt;
+  }
+  LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) have been updated to rate %d", succeedCnt, totalCnt, rate);
+
+  return succeedCnt;
+}
+
+bool RateHelper::AdjustFileRate(const QString& fileAbsPath, int delta, int* newRateValue) {
+  if (delta == 0) {
+    return false;
+  }
+  QString jsonPath;
+  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
+    LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
+    return false;
+  }
+  return AdjustJsonRateValueCore(jsonPath, delta, newRateValue);
+}
+
+int RateHelper::AdjustFilesRate(const QStringList& fileAbsPathList, int delta) {
+  const QSet<QString> uniqueJsons{RateHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
+  if (uniqueJsons.isEmpty()) {
+    return 0;
+  }
+  int succeedCnt{0}, totalCnt{0};
+  for (const QString& jsonAbsPath: uniqueJsons) {
+    if (RateHelper::AdjustJsonRateValueCore(jsonAbsPath, delta)) {
+      ++succeedCnt;
+    }
+    ++totalCnt;
+  }
+  return succeedCnt;
+}
+
+int RateHelper::AdjustFileRateRecursively(const QString& folderAbsPath, int delta) {
+  QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+
+  int succeedCnt{0}, totalCnt{0};
+  while (it.hasNext()) {
+    if (AdjustJsonRateValueCore(it.next(), delta)) {
+      ++succeedCnt;
+    }
     ++totalCnt;
   }
   LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) rate value have been [%d]", succeedCnt, totalCnt, delta);
@@ -131,38 +188,36 @@ bool RateHelper::getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPa
     return false;
   }
   const QString dirPath{fileAbsPath.chopped(choppedSize)};
-  const auto JoinDirAndBasename = [dirPath](const QString& baseName) -> QString { return PathTool::JoinJsonAbsFilePath(dirPath, baseName); };
 
-  using namespace ItemsPileCategory;
-  static const T_DOT_EXT_2_TYPE& dotExt2TypeHash = GetTypeFromDotExtension();
-  SCENE_COMPONENT_TYPE fileType = dotExt2TypeHash.value(ext.toLower(), OTHER);
+  static const ItemsPileCategory::T_DOT_EXT_2_TYPE& dotExt2TypeHash = ItemsPileCategory::GetTypeFromDotExtension();
+  const ItemsPileCategory::SCENE_COMPONENT_TYPE fileType = dotExt2TypeHash.value(ext.toLower(), ItemsPileCategory::OTHER);
 
   bool bFindJson{false};
-  QString tempJsonPath;
 
+  QString tempJsonPath;
   switch (fileType) {
-    case JSON: {
+    case ItemsPileCategory::JSON: {
       tempJsonPath = fileAbsPath;
       break;
     }
-    case VID: {
-      tempJsonPath = JoinDirAndBasename(baseName);
+    case ItemsPileCategory::VID: {
+      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName);
       break;
     }
-    case IMG: {
+    case ItemsPileCategory::IMG: {
       // same name.JSON
-      tempJsonPath = JoinDirAndBasename(baseName);
+      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName);
       if (bFindJson = QFile::exists(tempJsonPath)) {
         jsonPath.swap(tempJsonPath);
         break;
       }
       // name without number.JSON
-      tempJsonPath = JoinDirAndBasename(getBaseNameForImage(baseName));
+      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, getBaseNameForImage(baseName));
       break;
     }
-    case OTHER: {
+    case ItemsPileCategory::OTHER: {
       // folder -> folder/folder.json
-      tempJsonPath = JoinDirAndBasename(baseName + "/" + baseName);
+      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName + "/" + baseName);
       break;
     }
     default: {

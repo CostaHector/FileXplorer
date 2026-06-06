@@ -296,11 +296,7 @@ bool FileXplorerEvent::onRateMovie(int newRate) const {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false; // selection some row first
   }
-  int succeedCnt = 0;
-  for (const QString& path : paths) {
-    succeedCnt += (int) RateHelper::RateMovie(path, newRate);
-  }
-
+  const int succeedCnt{RateHelper::SetFilesRate(paths, newRate)};
   LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
   return succeedCnt > 0;
 }
@@ -313,15 +309,12 @@ bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
 
 bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
   const QStringList& paths = _contentPane->getFilePaths();
-
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false;
   }
-  int succeedCnt = 0;
-  for (const QString& path : paths) {
-    succeedCnt += (int) RateHelper::AdjustRateMovie(path, delta);
-  }
+
+  const int succeedCnt{RateHelper::AdjustFilesRate(paths, delta)};
 
   LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been adjust[%d]", succeedCnt, delta);
   return succeedCnt > 0;
@@ -329,7 +322,7 @@ bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
 
 bool FileXplorerEvent::onAdjustRateMoviesRecursively(int delta) const {
   const QString rootPath{_contentPane->getRootPath()};
-  return RateHelper::AdjustRateMovieRecursively(rootPath, delta) > 0;
+  return RateHelper::AdjustFileRateRecursively(rootPath, delta) > 0;
 }
 
 QStringList FileXplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
