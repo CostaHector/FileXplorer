@@ -115,6 +115,7 @@ QString FileExtReplacedWithJson(QString fileName);
 QString JoinJsonAbsFilePath(const QString& rootPath, const QString& baseName);
 QString GetPrepathAndFileName(const QString& fullpath, QString& prepath);
 QString GetThumbnailDecorationImgPathFromFolder(QString dirPath, const QString& dirName);
+constexpr const char* THUMBNAIL_FILE_ABBR{"_tn"};
 constexpr const char* THUMBNAIL_IMAGE_SUFFIX{"_tn.jpg"};
 
 QString Path2Join(const QString& a, const QString& b);

@@ -10,7 +10,7 @@ enum class RnmResult {
   ALL_SUCCEED = 1,
 };
 
-QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames);
+QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames);
 RnmResult InsertQueryAndConfirm(const QString& workPath,           //
                                 const QStringList& selectedNames,  //
                                 const QString& defStrInsert = "",  //

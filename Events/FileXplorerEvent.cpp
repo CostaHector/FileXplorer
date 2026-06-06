@@ -423,7 +423,7 @@ void FileXplorerEvent::subscribeThumbnailActions() {
     on_RenameThumbnailImages(bSkipExist);
   });
 
-  connect(ins.CREATE_THUMBNAIL_FOR_A_PATH, &QAction::triggered, this, [this, &ins]() {
+  connect(ins._CREATE_THUMBNAIL_FOR_FOLDER, &QAction::triggered, this, [this, &ins]() {
     const bool bSkipExist = ins.isSkipIfAlreadyExist();
     on_CreateThumbnailForAPath(bSkipExist);
   });

@@ -9,7 +9,7 @@
 namespace BatchRenameBy {
 static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d{1,3})$"};
 
-QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames) {
+QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames) {
   QStringList filesNeedRename;
   QString relPath;
   QString jsonFileName;
@@ -40,6 +40,8 @@ QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames
       jsonLevelPath += '/';
       jsonLevelPath += relPath;
     }
+
+    std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
     auto relIt = dirToJsonNames.find(jsonLevelPath);
     if (relIt == dirToJsonNames.end()) {
       if (sameLevelDir.path() != jsonLevelPath) {
@@ -48,26 +50,32 @@ QStringList GetFilesNeedRename(const QString& path, const QStringList& jsonNames
       relIt = dirToJsonNames.insert(jsonLevelPath, sameLevelDir.entryList());
     }
 
-    std::tie(jsonBaseName, jsonExt) = PathTool::GetBaseNameExt(jsonFileName);
-
     const QStringList& files{relIt.value()};
     auto firstFileIt = std::__lower_bound(files.cbegin(), files.cend(), jsonBaseName, prefixLessThan);
     for (auto it = firstFileIt; it != files.end(); ++it) {
       const QString& fileName = *it;
       if (!fileName.startsWith(jsonBaseName)) {
-        break;
+        continue;
       }
       std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
-      // fileBaseName == (jsonBaseName + extraContent) + fileExt
-      // extraContent can be
+      // fileBaseName == (jsonBaseName + extraContent) + fileExt. extraContent can be:
       // 1. "": (fileBaseName == jsonBaseName)
-      // 2. " - number": len(fileBaseName) > len(jsonBaseName)
-      // 3. " number": len(fileBaseName) > len(jsonBaseName)
-      QString extraContent = fileBaseName.mid(jsonBaseName.size());
-      if (!extraContent.isEmpty() && !JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
-        continue; // Todo: llt cover this line
+      // 2. "_tn"
+      // 3. " - number": len(fileBaseName) > len(jsonBaseName)
+      // 4. " number": len(fileBaseName) > len(jsonBaseName)
+      const QString extraContent = fileBaseName.mid(jsonBaseName.size());
+      if (extraContent.isEmpty()) {
+        filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        continue;
       }
-      filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+      if (extraContent == PathTool::THUMBNAIL_FILE_ABBR) {
+        filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        continue;
+      }
+      if (JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
+        filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        continue;
+      }
     }
   }
   std::sort(filesNeedRename.begin(), filesNeedRename.end());
@@ -135,7 +143,7 @@ RnmResult NumerizerQueryAndConfirm(const QString& workPath, //
 }
 
 int InsertBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
-  const QStringList& filesNeedRename{GetFilesNeedRename(path, jsonNames)};
+  const QStringList& filesNeedRename{GetFilesNeedProcess(path, jsonNames)};
   if (filesNeedRename.isEmpty()) {
     return 0;
   }
@@ -164,7 +172,7 @@ QString GetDefaultOldName(const QStringList& jsonNames, bool& bDisableOldNameLin
 }
 
 int ReplaceBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
-  const QStringList& filesNeedRename{GetFilesNeedRename(path, jsonNames)};
+  const QStringList& filesNeedRename{GetFilesNeedProcess(path, jsonNames)};
   if (filesNeedRename.isEmpty()) {
     return 0;
   }
@@ -184,7 +192,7 @@ int ReplaceBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
 }
 
 int NumerizerBySpecifiedJson(const QString& path, const QStringList& jsonNames) {
-  const QStringList& filesNeedRename{GetFilesNeedRename(path, jsonNames)};
+  const QStringList& filesNeedRename{GetFilesNeedProcess(path, jsonNames)};
   if (filesNeedRename.isEmpty()) {
     return 0;
   }

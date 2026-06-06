@@ -356,7 +356,7 @@ int SceneListView::onRecycleSceneAndRelated() {
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
 
   if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {

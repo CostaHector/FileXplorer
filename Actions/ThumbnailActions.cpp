@@ -25,8 +25,8 @@ void setThumbnailExtractIndexRange(QAction* pAct, int startIndex, int endIndex) 
 }
 
 ThumbnailActions::ThumbnailActions(QObject* /*parent*/) {
-  CREATE_THUMBNAIL_FOR_A_PATH = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL_FOR_FOLDER"}, tr("Create thumbnail for folder"), this);
-  CREATE_THUMBNAIL_FOR_A_PATH->setToolTip("Create thumbnails for all folder(s) in current view");
+  _CREATE_THUMBNAIL_FOR_FOLDER = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL_FOR_FOLDER"}, tr("Create thumbnail for folder"), this);
+  _CREATE_THUMBNAIL_FOR_FOLDER->setToolTip("Create thumbnails for all folder(s) in current view");
 
   _SKIP_IF_ALREADY_EXIST = new (std::nothrow) QAction(QIcon{":img/SKIP_IF_EXIST"}, tr("Skip if already exist"), this);
   _SKIP_IF_ALREADY_EXIST->setCheckable(true);
@@ -155,7 +155,7 @@ QWidget* ThumbnailActions::GetThumbnailCreateTools(QWidget* parent) {
   crtTB->setOrientation(Qt::Orientation::Vertical);
   crtTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   crtTB->addAction(_SKIP_IF_ALREADY_EXIST);
-  crtTB->addAction(CREATE_THUMBNAIL_FOR_A_PATH);
+  crtTB->addAction(_CREATE_THUMBNAIL_FOR_FOLDER);
   crtTB->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
   SetLayoutAlightment(crtTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return crtTB;

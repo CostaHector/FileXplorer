@@ -266,7 +266,7 @@ int VideoTableView::onRecycleVideoAndRelated() {
   const QString& jsonLocatedInPath{mVideoModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{mVideoModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
 
   if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {

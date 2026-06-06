@@ -29,34 +29,47 @@ class BatchRenameByTest : public PlainTestSuite {
  private slots:
   void initTestCase() {  //
     QVERIFY(mTDir.IsValid());
+    //  space 0x20
+    // . period 0x2E
+    // 大写字母
+    // _ underscore 0x5F
+    // 小写字母
     const QList<FsNodeEntry> nodesEntries  //
         {
+            {"replace/pattern/Chris Evans 2.png", false, ""},        //
             {"replace/pattern/Chris Evans.jpg", false, ""},          //
             {"replace/pattern/Chris Evans.json", false, ""},         //
+            {"replace/pattern/Chris Evans_tn.jpg", false, ""},       //
             {"replace/pattern/Chris Hemsworth_a.pson", false, ""},   //
             {"replace/pattern/Jensen Ackles.mp4", false, ""},        //
             {"replace/pattern/Jensen Ackles.pson", false, ""},       //
             {"replace/pattern/Michael Fassbender.json", false, ""},  //
         };
 
-    QCOMPARE(mTDir.createEntries(nodesEntries), 6);
+    QCOMPARE(mTDir.createEntries(nodesEntries), 8);
   }
 
-  void cleanupTestCase() { Configuration().clear(); }
+  void cleanupTestCase() { //
+    Configuration().clear();
+  }
 
   void init() {
     GlobalMockObject::reset();
     AdvanceRenamerTestTool::clear();
   }
-  void cleanup() { GlobalMockObject::verify(); }
+  void cleanup() { //
+    GlobalMockObject::verify();
+  }
 
-  void GetFilesNeedRename_ok() {
+  void GetFilesNeedProcess_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     QStringList patterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList filesNeedRename{GetFilesNeedRename(workPath, patterns)};
+    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns)};
     const QStringList beforeSelectedNames{
+        "Chris Evans 2.png",        //
         "Chris Evans.jpg",          //
         "Chris Evans.json",         //
+        "Chris Evans_tn.jpg",       //
         "Jensen Ackles.mp4",        //
         "Jensen Ackles.pson",       //
         "Michael Fassbender.json",  //
@@ -67,10 +80,12 @@ class BatchRenameByTest : public PlainTestSuite {
   void GetFilesNeedRename_subdirectory_ok() {
     QString workPath = mTDir.itemPath("replace");
     QStringList patterns{"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"};
-    const QStringList filesNeedRename{GetFilesNeedRename(workPath, patterns)};
+    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns)};
     const QStringList beforeSelectedNames{
+        "pattern/Chris Evans 2.png",        //
         "pattern/Chris Evans.jpg",          //
         "pattern/Chris Evans.json",         //
+        "pattern/Chris Evans_tn.jpg",       //
         "pattern/Jensen Ackles.mp4",        //
         "pattern/Jensen Ackles.pson",       //
     };
@@ -86,7 +101,7 @@ class BatchRenameByTest : public PlainTestSuite {
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedRename(workPath, beforePatterns)};
+    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
 
     // 字符串替换"a"->"X"->"a", 恢复成功
     QString defOldName{"a"};
@@ -104,8 +119,10 @@ class BatchRenameByTest : public PlainTestSuite {
     const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
     QVERIFY(snapshot3 != snapshot1);
     const QSet<QString> expectAfterRename{
+        "Chris EvXns 2.png",        //
         "Chris EvXns.jpg",          //
         "Chris EvXns.json",         //
+        "Chris EvXns_tn.jpg",         //
         "Chris Hemsworth_a.pson",   //
         "Jensen Ackles.mp4",        //
         "Jensen Ackles.pson",       //
@@ -113,8 +130,9 @@ class BatchRenameByTest : public PlainTestSuite {
     };
     QCOMPARE(snapshot3, expectAfterRename);
 
+    // 恢复
     QStringList afterPatterns{"Chris EvXns.json", "Jensen Ackles.mp4", "MichXel FXssbender.json"};
-    const QStringList afterSelectedNames{GetFilesNeedRename(workPath, afterPatterns)};
+    const QStringList afterSelectedNames{GetFilesNeedProcess(workPath, afterPatterns)};
 
     QCOMPARE(ReplaceQueryAndConfirm(workPath, afterSelectedNames, defNewName, defOldName, disableOldNameEdit), RnmResult::ALL_SUCCEED);
 
@@ -131,7 +149,7 @@ class BatchRenameByTest : public PlainTestSuite {
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedRename(workPath, beforePatterns)};
+    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
 
     QString strInsert{"best of "};
     int insertAtIndex{0};
@@ -149,17 +167,19 @@ class BatchRenameByTest : public PlainTestSuite {
     QVERIFY(snapshot3 != snapshot1);
     const QSet<QString> expectAfterRename{
         "Chris Hemsworth_a.pson",           //
+        "best of Chris Evans 2.png",        //
         "best of Chris Evans.jpg",          //
         "best of Chris Evans.json",         //
+        "best of Chris Evans_tn.jpg",       //
         "best of Jensen Ackles.mp4",        //
         "best of Jensen Ackles.pson",       //
         "best of Michael Fassbender.json",  //
     };
     QCOMPARE(snapshot3, expectAfterRename);
 
-    // 2nd. replace "best of " by "", recover ok
+    // recover: replace "best of " by ""
     QStringList afterPatterns{"best of Chris Evans.json", "best of Jensen Ackles.mp4", "best of Michael Fassbender.json"};
-    const QStringList afterSelectedNames{GetFilesNeedRename(workPath, afterPatterns)};
+    const QStringList afterSelectedNames{GetFilesNeedProcess(workPath, afterPatterns)};
     QCOMPARE(ReplaceQueryAndConfirm(workPath, afterSelectedNames, "best of ", "", true), RnmResult::ALL_SUCCEED);
     const QSet<QString> snapshot4 = mTDir.SnapshotAtPath(workPath);
     QCOMPARE(snapshot4, snapshot1);
@@ -179,14 +199,7 @@ class BatchRenameByTest : public PlainTestSuite {
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedRename(workPath, beforePatterns)};
-
-    // {"replace/pattern/Chris Evans.jpg", false, ""},          //
-    // {"replace/pattern/Chris Evans.json", false, ""},         //
-    // {"replace/pattern/Chris Hemsworth_a.pson", false, ""},   //
-    // {"replace/pattern/Jensen Ackles.mp4", false, ""},        //
-    // {"replace/pattern/Jensen Ackles.pson", false, ""},       //
-    // {"replace/pattern/Michael Fassbender.json", false, ""},  //
+    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
 
     // 默认入参not crash
     QCOMPARE(NumerizerQueryAndConfirm({}, {}), RnmResult::SKIP);
@@ -200,8 +213,10 @@ class BatchRenameByTest : public PlainTestSuite {
     const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
     QVERIFY(snapshot3 != snapshot1);
     const QSet<QString> expectAfterRename{
-        "Chris Evans 0.jpg",       //
-        "Chris Evans 1.json",      //
+        "Chris Evans 2 0.png",       //
+        "Chris Evans 2 1.jpg",       //
+        "Chris Evans 2 2.json",      //
+        "Chris Evans 2 3.jpg",      //
         "Chris Hemsworth_a.pson",  //
         "Jensen Ackles.mp4",       //
         "Jensen Ackles.pson",      //
@@ -218,20 +233,19 @@ class BatchRenameByTest : public PlainTestSuite {
   void ReplaceBySpecifiedJson_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     MOCKER(ReplaceQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
-
     // default not crash down
     QCOMPARE(ReplaceBySpecifiedJson({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedRename(workPath, json2Names)};
-    QCOMPARE(filesNeedRename_cnt3.size(), 3);
-    QCOMPARE(ReplaceBySpecifiedJson(workPath, json2Names), 3);
+    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1); // 4Chris Evans+1Michael Fassbender
+    QCOMPARE(ReplaceBySpecifiedJson(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedRename(workPath, json1Names)};
-    QCOMPARE(filesNeedRename_cnt2.size(), 2);
-    QCOMPARE(ReplaceBySpecifiedJson(workPath, json1Names), 2);
+    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    QCOMPARE(filesNeedRename_cnt2.size(), 4);
+    QCOMPARE(ReplaceBySpecifiedJson(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 
@@ -243,15 +257,15 @@ class BatchRenameByTest : public PlainTestSuite {
     QCOMPARE(InsertBySpecifiedJson({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedRename(workPath, json2Names)};
-    QCOMPARE(filesNeedRename_cnt3.size(), 3);
-    QCOMPARE(InsertBySpecifiedJson(workPath, json2Names), 3);
+    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1);
+    QCOMPARE(InsertBySpecifiedJson(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedRename(workPath, json1Names)};
-    QCOMPARE(filesNeedRename_cnt2.size(), 2);
-    QCOMPARE(InsertBySpecifiedJson(workPath, json1Names), 2);
+    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    QCOMPARE(filesNeedRename_cnt2.size(), 4);
+    QCOMPARE(InsertBySpecifiedJson(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 
@@ -263,15 +277,15 @@ class BatchRenameByTest : public PlainTestSuite {
     QCOMPARE(NumerizerBySpecifiedJson({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedRename(workPath, json2Names)};
-    QCOMPARE(filesNeedRename_cnt3.size(), 3);
-    QCOMPARE(NumerizerBySpecifiedJson(workPath, json2Names), 3);
+    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1);
+    QCOMPARE(NumerizerBySpecifiedJson(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedRename(workPath, json1Names)};
-    QCOMPARE(filesNeedRename_cnt2.size(), 2);
-    QCOMPARE(NumerizerBySpecifiedJson(workPath, json1Names), 2);
+    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    QCOMPARE(filesNeedRename_cnt2.size(), 4);
+    QCOMPARE(NumerizerBySpecifiedJson(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 };
