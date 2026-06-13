@@ -63,7 +63,7 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
     _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "/UNIFORM_ITEM_SIZES", false).toBool());
     _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
 
-    _THUMBNAIL_AS_DECORATION = new (std::nothrow) QAction{QIcon{":img/THUMBNAIL"}, CustomListView::tr("Use thumbnail as decoration"), this};
+    _THUMBNAIL_AS_DECORATION = new (std::nothrow) QAction{QIcon{":img/THUMBNAIL_FOR_FOLDER"}, CustomListView::tr("Use thumbnail as decoration"), this};
     CHECK_NULLPTR_RETURN_VOID(_THUMBNAIL_AS_DECORATION);
     _THUMBNAIL_AS_DECORATION->setCheckable(true);
     _THUMBNAIL_AS_DECORATION->setChecked(false);

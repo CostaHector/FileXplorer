@@ -12,11 +12,13 @@ class RateHelper {
     BUTT_V,
   };
 
-  static bool RateMovie(const QString& fileAbsPath, int rate);
-  static int RateMovieRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce = true);
+  static bool SetFileRate(const QString& fileAbsPath, int rate);
+  static int SetFilesRate(const QStringList& fileAbsPathList, int rate);
+  static int SetFileRateRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce = true);
 
-  static bool AdjustRateMovie(const QString& fileAbsPath, int delta = 1, int* newRateValue = nullptr);
-  static int AdjustRateMovieRecursively(const QString& folderAbsPath, int delta = 1);
+  static bool AdjustFileRate(const QString& fileAbsPath, int delta = 1, int* newRateValue = nullptr);
+  static int AdjustFilesRate(const QStringList& fileAbsPathList, int delta = 1);
+  static int AdjustFileRateRecursively(const QString& folderAbsPath, int delta = 1);
 
   static const QPixmap& GetRatePixmap(int rate);
   static inline int clampRate(int rate) { return std::max(std::min(rate, (int)MAX_V), (int)MIN_V); }
@@ -26,8 +28,10 @@ class RateHelper {
 
   static constexpr int RATING_BAR_X = 32, RATING_BAR_HEIGHT = 32;
  private:
-  static bool RateMovieCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
+  static bool SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
+  static bool AdjustJsonRateValueCore(const QString& jsonPath, int delta = 1, int* newRateValue = nullptr);
 
+  static QSet<QString> GetRelatedJsonAbsPaths(const QStringList& paths);
   static bool getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPath);
   static QString getBaseNameForImage(const QString& imagePath);
 

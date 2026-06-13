@@ -248,7 +248,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
 
     // rateCurrentVideo: assume the 1st time rate failed, second time succeed.
-    MOCKER(RateHelper::RateMovie).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
+    MOCKER(RateHelper::SetFileRate).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
 
     QCOMPARE(basicVideoView.rateCurrentVideo(10), false);  // 1st
     QCOMPARE(basicVideoView.rateCurrentVideo(10), true);   // 2nd
@@ -258,7 +258,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     emit rateActions->RateMovieReq(9);  // 3rd
 
     // adjustRateCurrentVideo assume the 1st time rate failed, second time succeed.
-    MOCKER(RateHelper::AdjustRateMovie).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
+    MOCKER(RateHelper::AdjustFileRate).expects(exactly(3)).will(returnValue(false)).then(returnValue(true));
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(0), true);   // delta=0, skipped
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(3), false);  // 1st
     QCOMPARE(basicVideoView.adjustRateCurrentVideo(4), true);   // 2nd
@@ -284,7 +284,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     MOCKER(InputDialogHelper::GetIntWithInitial)
         .expects(exactly(2))                                                                                   //
         .will(returnValue(expectAcceptIntNumberPair));                                                         //
-    MOCKER(RateHelper::RateMovieRecursively)
+    MOCKER(RateHelper::SetFileRateRecursively)
         .expects(exactly(2))                                                     //
         .with(eq(expectRatePathRecursive), eq(expectScore), eq(bForceRecusive))  //
         .will(returnValue(rateSucceedFilesCnt));                                 // 3 file
@@ -295,7 +295,7 @@ class BasicVideoViewTest : public PlainTestSuite {
     emit rateActions->RateMovieRecursivelyReq(false);  // 2nd
 
     const int expectDelta{9};
-    MOCKER(RateHelper::AdjustRateMovieRecursively)
+    MOCKER(RateHelper::AdjustFileRateRecursively)
         .expects(exactly(2))                                                                               //
         .with(eq(expectRatePathRecursive), eq(expectDelta))                                                //
         .will(returnValue(rateSucceedFilesCnt));                                                           // 3 file

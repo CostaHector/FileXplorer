@@ -219,7 +219,8 @@ int SceneListView::onUpdateScnFiles() {
   using namespace SceneInfoManager;
   int scnFileCnt = ScnMgr::UpdateScnFiles(workPath);
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
-  _sceneModel->setRootPath(workPath, true);
+  const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
+  _sceneModel->setRootPath(workPath, true, bSubdirectories);
   return scnFileCnt;
 }
 
@@ -240,7 +241,8 @@ int SceneListView::onClearScnFiles() {
   using namespace SceneInfoManager;
   int deleteCnt = ScnMgr::ClearScnFiles(workPath);
   LOG_OK_P("Delete scn file", "cnt: %d under[%s]", deleteCnt, qPrintable(workPath));
-  _sceneModel->setRootPath(workPath, true);
+  const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
+  _sceneModel->setRootPath(workPath, true, bSubdirectories);
   return deleteCnt;
 }
 
@@ -356,7 +358,7 @@ int SceneListView::onRecycleSceneAndRelated() {
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedRename(jsonLocatedInPath, jsonFileNames);
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
 
   if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {

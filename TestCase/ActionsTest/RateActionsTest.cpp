@@ -82,10 +82,10 @@ class RateActionsTest : public PlainTestSuite {
       QCOMPARE(adjustRateMovieReqSpy.count(), 1);
       QCOMPARE(adjustRateMovieReqSpy.takeLast(), (QVariantList{-1}));
 
-      inst._INCREASING_RATETING_RECURSIVELY->trigger();
+      inst._INCREASING_RATING_RECURSIVELY->trigger();
       QCOMPARE(adjustRateMovieRecursivelyReqSpy.count(), 1);
       QCOMPARE(adjustRateMovieRecursivelyReqSpy.takeLast(), (QVariantList{1}));
-      inst._DECREASING_RATETING_RECURSIVELY->trigger();
+      inst._DECREASING_RATING_RECURSIVELY->trigger();
       QCOMPARE(adjustRateMovieRecursivelyReqSpy.count(), 1);
       QCOMPARE(adjustRateMovieRecursivelyReqSpy.takeLast(), (QVariantList{-1}));
     }

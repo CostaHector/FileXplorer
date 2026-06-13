@@ -209,7 +209,7 @@ int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newR
       continue;
     }
     const QString mediaPath{GetMediaFullPath(ind)};
-    if (!RateHelper::RateMovie(mediaPath, newRate)) {
+    if (!RateHelper::SetFileRate(mediaPath, newRate)) {
       LOG_W("Rate[%s] failed", qPrintable(mediaPath));
       continue;
     }
@@ -246,7 +246,7 @@ int VideoTableModel::adjustRateSelectedMovies(const QModelIndexList& indexes, in
       continue;
     }
     const QString mediaPath{GetMediaFullPath(ind)};
-    if (!RateHelper::AdjustRateMovie(mediaPath, delta, &newRate)) {
+    if (!RateHelper::AdjustFileRate(mediaPath, delta, &newRate)) {
       LOG_W("Rate[%s] failed", qPrintable(mediaPath));
       continue;
     }

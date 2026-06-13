@@ -733,7 +733,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+282"/>
+        <location line="+278"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -748,7 +748,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-321"/>
+        <location line="-317"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -1779,43 +1779,44 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../../Actions/RateActions.cpp" line="+29"/>
+        <location filename="../../Actions/RateActions.cpp" line="+30"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>Rate recusively</source>
-        <translation>穿透评分</translation>
+        <source>Rate All (Recursive)</source>
+        <translation>​递归评分（仅未评分）</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Rate recusively(force)</source>
-        <translation>穿透评分(强制)</translation>
+        <location line="+5"/>
+        <source>Rate All (Recursive, Overwrite)</source>
+        <translation>递归评分（覆盖已有）</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Increase rating</source>
-        <translation>+1分</translation>
+        <location line="+5"/>
+        <source>Increase Rating (+1)</source>
+        <translation>评分 +1</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Decrease rating</source>
-        <translation>-1分</translation>
+        <location line="+5"/>
+        <source>Decrease Rating (−1)</source>
+        <translation>评分 -1</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Increase rating recusively</source>
-        <translation>穿透+1分</translation>
+        <location line="+5"/>
+        <source>Increase Rating Recursively (+1)</source>
+        <translatorcomment>递归评分 -1</translatorcomment>
+        <translation>递归评分 +1</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Decrease rating recusively</source>
-        <translation>穿透-1分</translation>
+        <location line="+5"/>
+        <source>Decrease Rating Recursively (−1)</source>
+        <translation>递归评分 -1</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location line="+27"/>
+        <location line="+10"/>
+        <location line="+28"/>
         <source>Rate</source>
         <translation>评分</translation>
     </message>
@@ -2146,8 +2147,8 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+9"/>
-        <source>Generate Thumbnails</source>
-        <translation>生成缩略图</translation>
+        <source>Create Thumbnail for Json</source>
+        <translation>为json创建缩略图</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2200,7 +2201,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>逐页排序</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+50"/>
         <source>Sort Role</source>
         <translation>按角色排序</translation>
     </message>
@@ -2208,22 +2209,22 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+39"/>
+        <location filename="../../View/SceneListView.cpp" line="+43"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Rename related(Insert)</source>
         <translation>重命名相关文件(插入)</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Rename (ith)</source>
         <translation>重命名(编号)</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Recycle related files</source>
         <translation>回收相关文件</translation>
     </message>
@@ -2357,8 +2358,8 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     <name>ThumbnailActions</name>
     <message>
         <location filename="../../Actions/ThumbnailActions.cpp" line="+28"/>
-        <source>Create thumbnail</source>
-        <translation>创建缩略图</translation>
+        <source>Create thumbnail for folder</source>
+        <translation>为文件夹创建缩略图</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2556,7 +2557,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ViewActions</name>
     <message>
-        <location filename="../../Actions/ViewActions.cpp" line="+9"/>
+        <location filename="../../Actions/ViewActions.cpp" line="+14"/>
         <source>Navigation Pane</source>
         <translation>导航面板</translation>
     </message>

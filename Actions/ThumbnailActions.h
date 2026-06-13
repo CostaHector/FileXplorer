@@ -17,7 +17,7 @@ public:
   bool isSkipIfAlreadyExist() const { return _SKIP_IF_ALREADY_EXIST != nullptr && _SKIP_IF_ALREADY_EXIST->isChecked(); }
 
   QAction* _SKIP_IF_ALREADY_EXIST{nullptr};
-  QAction* CREATE_THUMBNAIL_FOR_A_PATH{nullptr};
+  QAction* _CREATE_THUMBNAIL_FOR_FOLDER{nullptr};
   QAction* _RENAME_STORYBOARD_FROM_POT_PLAYER{nullptr};
 
 signals:

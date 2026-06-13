@@ -259,7 +259,7 @@ class ScenesListModelTest : public PlainTestSuite {
     MOCKER(SceneHelper::UpdateNameWithNewRate)  //
         .expects(exactly(2))                    //
         .will(returnValue(true));
-    MOCKER(RateHelper::RateMovie)  //
+    MOCKER(RateHelper::SetFileRate)  //
         .expects(exactly(2))       //
         .will(returnValue(true));
 
