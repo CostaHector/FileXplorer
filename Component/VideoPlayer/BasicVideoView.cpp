@@ -283,7 +283,7 @@ bool BasicVideoView::reqPlayInSystemApplication() const {
 }
 
 QMediaPlayer::Error BasicVideoView::onError(QMediaPlayer::Error error) const {
-  LOG_E("Player error:%d", error);
+  LOG_E("Player error:%d [%s]", error, qPrintable(mPlayer->errorString()));
   return mError = error;
 }
 

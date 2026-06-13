@@ -63,7 +63,18 @@ void IsFFmpegInstalledOK() {
 ### 2. MediaInfo Library (Required for Media File Information)
 MediaInfo library is required to retrieve detailed metadata from media files. Below are the installation steps for Windows and Ubuntu systems:
 
-#### Windows: already available
+#### Windows
+
+For H.264+AAC MP4. [K-Lite Codec Pack](https://codecguide.com/download_k-lite_codec_pack_basic.htm) required.
+
+Download > Download Basic and install it
+
+```sh
+Filename: K-Lite_Codec_Pack_1975_Basic.exe
+Size: 21765 KB
+MD5: be678b051f23fc3348e4e6448e9ef81b
+SHA256: 029b7aa18da2506ff94769454ee145dabba551700b2609694480ae9d84bb7c14
+```
 
 #### Ubuntu
 
