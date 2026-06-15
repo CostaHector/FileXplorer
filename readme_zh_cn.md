@@ -55,7 +55,16 @@ void IsFFmpegInstalledOK() {
 获取媒体文件详细元数据需要 MediaInfo 库支持，以下是 Windows 和 Ubuntu 系统的安装步骤：
 
 #### Windows 系统
-已预置，无需额外操作。
+由于 H.264+AAC MP4. 需要安装[K-Lite Codec Pack](https://codecguide.com/download_k-lite_codec_pack_basic.htm).
+
+Download > Download Basic and install it
+
+```sh
+Filename: K-Lite_Codec_Pack_1975_Basic.exe
+Size: 21765 KB
+MD5: be678b051f23fc3348e4e6448e9ef81b
+SHA256: 029b7aa18da2506ff94769454ee145dabba551700b2609694480ae9d84bb7c14
+```
 
 #### Ubuntu 系统
 1. **验证系统架构**
