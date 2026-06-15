@@ -56,7 +56,7 @@ chcp 65001 >nul
 echo Now adding "%1" to Right Click Menu...
 reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\%1" /ve /d "%1" /f
 reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\%1\command" /ve /d "\"%2\" \"%%V\"" /f
-echo Adding succeed！
+echo Adding succeed!
 pause)"
   };
   const QString exePath = QCoreApplication::applicationFilePath();
