@@ -7,7 +7,7 @@ namespace RenamerKey {
 using namespace GeneralDataType;
 using namespace RawVariant;
 using namespace ValueChecker;
-constexpr KV NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
+constexpr KV NAME_EXT_INDEPENDENT{"RenamerKey/NAME_EXT_INDEPENDENT", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 constexpr KV INCLUDING_DIR{"RenamerKey/INCLUDING_DIR", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 constexpr KV INS_OLD_STR_LIST{"RenamerKey/INS_OLD_STR_LIST", //
                               Var{"\n"                       // insert nothing
