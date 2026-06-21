@@ -27,7 +27,8 @@ constexpr KV REP_OLD_STR_LIST{"RenamerKey/REP_OLD_STR_LIST",    //
                               Var{"\n"                          // replace nothing
                                   "\\s\\s+"                     // used for remove extra continous space
                                   "([a-z])([A-Z])\n"            // aA. used for add space between lowercase and uppercase
-                                  "(\\d{4})(\\d{2})(\\d{2})]\n" // 19700101->1970-01-01. used for date add hypen
+                                  "(\\d{4})(\\d{2})(\\d{2})\n" // 19700101->1970-01-01. used for date add hypen
+                                  "(\\d{4}) - (\\d{2}) - (\\d{2})\n"
                                   "BB\n"
                                   "- 360p\n"
                                   "- 480p\n"
@@ -42,6 +43,7 @@ constexpr KV NEW_STR_LIST{"RenamerKey/NEW_STR_LIST", //
                           Var{"\n"                   // replaced with empty(i.e. delete)
                               " \n"                  // replaced with single space
                               "\\1 \\2\n"            // used for add space
+                              "\\1\\2\\3\n"    // used for date
                               "\\1 - \\2 - \\3\n"    // used for date
                               "HD\n"
                               "FHD\n"
