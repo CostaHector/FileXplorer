@@ -35,6 +35,7 @@ bool DumpJsonDict(const QVariantHash& dict, const QString& jsonFilePth);
 
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path);
 
+int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int defaultDurationValue=0);
 int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue=0);
 QByteArray GetMD5FromJsonFile(const QString& jsonFullPath);
 }  // namespace JsonHelper

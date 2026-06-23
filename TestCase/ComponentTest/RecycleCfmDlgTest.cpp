@@ -36,13 +36,13 @@ class RecycleCfmDlgTest : public PlainTestSuite {
 
     MOCKER(InputDialogHelper::YesOrCancelBox)                                                                                                     //
         .expects(exactly(2))                                                                                                                  //
-        .with(QMessageBox::Icon::Question, any(), checkWith(recycleTitleChecker), checkWith(recycleMsgChecker), checkWith(detailMsgChecker))  //
+        .with(QMessageBox::Icon::Question, any(), checkWith(recycleTitleChecker), checkWith(recycleMsgChecker), any(), checkWith(detailMsgChecker))  //
         .will(returnValue(false))                                                                                                             //
         .then(returnValue(true))                                                                                                              //
         .id("0");
     MOCKER(InputDialogHelper::YesOrCancelBox)                                                                                                  //
         .expects(exactly(2))                                                                                                               //
-        .with(QMessageBox::Icon::Warning, any(), checkWith(deleteTitleChecker), checkWith(deleteMsgChecker), checkWith(detailMsgChecker))  //
+        .with(QMessageBox::Icon::Warning, any(), checkWith(deleteTitleChecker), checkWith(deleteMsgChecker), any(), checkWith(detailMsgChecker))  //
         .after("0")                                                                                                                        //
         .will(returnValue(false))                                                                                                          //
         .then(returnValue(true))                                                                                                           //

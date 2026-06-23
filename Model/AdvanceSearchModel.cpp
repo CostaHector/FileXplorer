@@ -52,7 +52,8 @@ bool AdvanceSearchModel::checkPathNeed(const QString& path, const bool queryWhen
   }
   const bool bSkipProceed{queryWhenSearchUnderLargeDirectory         //
                           && PathTool::isPathAtShallowDepth(stdPath) //
-                          && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{}, "Confirm search(May cause lag)?", QString{"A Large Directory:  under [%1]"}.arg(stdPath), "")};
+                          && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{}, "Confirm search(May cause lag)?", //
+                                                                QString{"A Large Directory:  under [%1]"}.arg(stdPath), "", "")};
   if (bSkipProceed) { // C:/A
     LOG_INFO_NP("User cancel search under large directory(may lag)", stdPath);
     return false;

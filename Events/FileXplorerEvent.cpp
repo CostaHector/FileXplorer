@@ -192,7 +192,7 @@ bool FileXplorerEvent::on_ExtractImagesFromThumbnail(int beg, int end, bool skip
                                                                 QIcon{":img/THUMBNAIL_EXTRACTOR_B_E"},
                                                                 "Extract images out of thumbnail Confirm (lag may cause)?",
                                                                 QString("All images(s) under [%1] will be extract out!").arg(currentPath),
-                                                                "")};
+                                                                "", "")};
   if (bSkipProceed) {
     LOG_INFO_NP("[Skip] User cancel", "will not extract images out of thumbnail");
     return true;
@@ -1126,7 +1126,7 @@ bool FileXplorerEvent::on_NameStandardize() {
                                          QIcon{":img/NAME_RULER"},
                                          "Confirm Name Standardlizer?",
                                          QString{"All item(s) under [%1] will be <b>RENAMED RECURSIVELY</b>!"}.arg(currentPath),
-                                         "")) {
+                                         "", "")) {
     LOG_INFO_NP("[Skip] User cancel", "will not rename at all");
     return true;
   }
@@ -1153,7 +1153,11 @@ bool FileXplorerEvent::on_FileClassify() {
     return false;
   }
 
-  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning, QIcon{":img/PACK_FOLDERS"}, "Confirm File Classify?", QString{"All item(s) under [%1] will be classfied!"}.arg(currentPath), "")) {
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,                                            //
+                                         QIcon{":img/PACK_FOLDERS"},                                            //
+                                         "Confirm File Classify?",                                              //
+                                         QString{"All item(s) under [%1] will be classfied!"}.arg(currentPath), //
+                                         "", "")) {
     LOG_INFO_NP("[Skip] User cancel", "will not classfy files");
     return true;
   }
@@ -1192,7 +1196,7 @@ bool FileXplorerEvent::on_FileUnclassify() {
                                          QIcon{":img/UNPACK_FOLDERS"},
                                          "Unpile Confirm (lag may cause)?",
                                          QString("All item(s) under [%1] will be unpile out!").arg(currentPath),
-                                         "")) {
+                                         "", "")) {
     LOG_INFO_NP("[Skip] User cancel", "will not unpile");
     return true;
   }
@@ -1233,7 +1237,7 @@ bool FileXplorerEvent::on_RemoveDuplicateImages() {
                                          QIcon{},
                                          "Delete lower-resolution images?",
                                          QString{"Lower-resolution duplicates will be deleted.\nFolder:\n%1"}.arg(currentPath),
-                                         "")) {
+                                         "", "")) {
     LOG_INFO_NP("[Skip] User cancelled", "lower-resolution images not removed");
     return true;
   }
@@ -1260,12 +1264,13 @@ bool FileXplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
     LOG_OK_NP("Skip", "Nothing to remove");
     return true;
   }
+  const QString removeCmdDetail{remover};
 
   if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
                                          QIcon{},
                                          QString{"Confirm %1 command(s)?"}.arg(cmdCnt),
                                          QString{"Remove Redundant folder\nFolder:\n%1"}.arg(currentPath),
-                                         QString(remover))) {
+                                         "", removeCmdDetail)) {
     LOG_INFO_NP("[Skip] User cancelled", "redundant item will not remove");
     return true;
   }
