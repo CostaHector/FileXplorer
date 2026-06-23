@@ -168,6 +168,37 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
   return fileNameHash2Json;
 }
 
+int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int defaultDurationValue) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    if (bSucceed != nullptr) { *bSucceed = false; }
+    return defaultDurationValue;
+  }
+  int rateIndex = contents.indexOf(R"("Duration":)");
+  if (rateIndex == -1) {
+    if (bSucceed != nullptr) { *bSucceed = false; }
+    return defaultDurationValue;
+  }
+  // 跳过"Duration":11个字符
+  int valuePos = rateIndex + 11;
+  while (valuePos < contents.size() && contents[valuePos] == ' ') {
+    ++valuePos;
+  }
+
+  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
+    if (bSucceed != nullptr) { *bSucceed = false; }
+    return defaultDurationValue; // Todo: llt cover this line
+  }
+  int duration = 0;
+  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
+    duration = duration * 10 + (contents[valuePos] - '0');
+    ++valuePos;
+  }
+  if (bSucceed != nullptr) { *bSucceed = true; }
+  return duration;
+}
+
 int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
   bool bReadResult{false};
   QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
@@ -185,7 +216,7 @@ int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
   }
 
   if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
-    return defaultRateValue;  // Todo: llt cover this line
+    return defaultRateValue; // Todo: llt cover this line
   }
   int rate = 0;
   while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {

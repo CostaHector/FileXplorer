@@ -1,5 +1,6 @@
 #include "QMediaInfo.h"
 #include "MediaInfoDLL.h"
+#include "TableFields.h"
 #include "Logger.h"
 #include <QTime>
 #include <QFile>
@@ -58,7 +59,8 @@ bool QMediaInfo::Open(const QString& filename) {
 
 int QMediaInfo::DurationLengthQuick(const QString& fileAbsPath) {
   if (!Open(fileAbsPath)) {
-    return -1;
+    LOG_D("MediaInfo Open file[%s] failed", qPrintable(fileAbsPath));
+    return MOVIE_TABLE::DURATION_GET_FAILED_VALUE;
   }
 
   using namespace MediaInfoDLL;

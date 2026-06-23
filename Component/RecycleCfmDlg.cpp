@@ -29,7 +29,7 @@ bool recycleQuestion(const QString& locatedIn, const QStringList& files, bool bD
       bDeletePermanently ? QIcon(":img/DELETE_ITEMS_PERMANENTLY") : QIcon(":img/MOVE_TO_TRASH_BIN"), //
       bDeletePermanently ? "Permanently Delete Files" : "Move to Recycle Bin",                       //
       recycleMsg,                                                                                    //
-      recycleDetailMsg);
+      "", recycleDetailMsg);
 }
 
 } // namespace RecycleCfmDlg

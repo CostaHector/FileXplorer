@@ -172,7 +172,7 @@ void SceneListView::setRootPath(const QString& rootPath) {
                                             "Loading it could cause performance issues.\n\n"
                                             "Directory: "
                                                 + rootPath + "\n\n Do you want to proceed?",
-                                            "")
+                                            "", "")
 #endif
   };
   if (bNeedSkip) {

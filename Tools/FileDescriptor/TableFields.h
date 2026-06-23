@@ -66,6 +66,9 @@ enum FIELD_E {
   PathHash,     //
   BUTT
 };
+constexpr int SIZE_INITIAL_VALUE = 0;
+constexpr int DURATION_INITIAL_VALUE = 0;
+constexpr int DURATION_GET_FAILED_VALUE = -1;
 }
 
 namespace TORRENTS_DB_HEADER_KEY {
