@@ -39,6 +39,7 @@ constexpr const KV* mKVs[]{
     &BehaviorKey::VIDS_LAST_TABLE_NAME,    //
     &BehaviorKey::WHERE_CLAUSE_HISTORY,    //
     &PathKey::LAST_TIME_COPY_TO,           //
+    &PathKey::PERFORMER_IMAGEHOST_LOCATE,
     &RedunImgFinderKey::RUND_IMG_PATH,     //
     &StyleKey::STYLE_PRESET,               //
     &StyleKey::STYLE_THEME,                //
