@@ -28,7 +28,7 @@ constexpr char NTY_ORANGE_RGB[] = "#FF7D01";
 constexpr char NTY_ORANGE_BG_RGB[] = "#FFF6ED";
 } // namespace
 
-bool Notificator::m_isTopToBottom = false; // for unit-test purpose only
+bool Notificator::m_isTopToBottom = true; // for unit-test purpose only
 std::list<std::unique_ptr<Notificator>> Notificator::instances;
 
 Notificator::Notificator(int timeoutLength) //
