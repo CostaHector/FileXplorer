@@ -57,6 +57,7 @@ bool QMediaInfo::Open(const QString& filename) {
   return m_mediaInfo->Open(ToMediaInfoString(filename)) != 0;
 }
 
+// fileAbsPath may not contain Chinese Charactor
 int QMediaInfo::DurationLengthQuick(const QString& fileAbsPath) {
   if (!Open(fileAbsPath)) {
     LOG_D("MediaInfo Open file[%s] failed", qPrintable(fileAbsPath));

@@ -11,6 +11,7 @@
 #include "Configuration.h"
 #include "RateHelper.h"
 #include "FileTool.h"
+#include "PathTool.h"
 #include "VideoTestPrecoditionTools.h"
 #include "InputDialogHelper.h"
 
@@ -272,11 +273,12 @@ class BasicVideoViewTest : public PlainTestSuite {
     QCOMPARE(basicVideoView.rateAllVideoSameLevelAsCurrentVideo(false), 0);    // no path specified
     QCOMPARE(basicVideoView.adjustRateAllVideoSameLevelAsCurrentVideo(5), 0);  // no path specified
 
+    QString mediaFile{PathTool::normPath(__FILE__)};
     const bool bForceRecusive{false};
-    basicVideoView.PlayAVideo(__FILE__, false);
-    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), __FILE__);
+    basicVideoView.PlayAVideo(mediaFile, false);
+    QCOMPARE(basicVideoView.GetCurrentPlayingMediaPath(), mediaFile);
 
-    const QString expectRatePathRecursive{QFileInfo{__FILE__}.absolutePath()};
+    const QString expectRatePathRecursive{QFileInfo{mediaFile}.absolutePath()};
     const int rateSucceedFilesCnt{3};
     const int expectScore{9};
     const bool expectOk{true};
