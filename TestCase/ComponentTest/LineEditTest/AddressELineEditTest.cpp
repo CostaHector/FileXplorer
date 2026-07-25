@@ -75,7 +75,7 @@ private slots:
 
   void returnPressed_file_ok() {
     // 文件, 不会触发input切换到click模式, 不会修改toolbars中的actions
-    const QString filePath{__FILE__};
+    const QString filePath{PathTool::normPath(__FILE__)};
     MOCKER(FileTool::OpenLocalFile).expects(exactly(1)).with(eq(filePath)).will(returnValue(true));
 
     AddressELineEdit addLe;

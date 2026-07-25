@@ -404,7 +404,7 @@ private slots:
       QVERIFY(fileLineEdit != nullptr);
       QCOMPARE(fileLineEdit->text(), "");
 
-      const QString filePathInLineEdit{__FILE__};
+      const QString filePathInLineEdit{PathTool::normPath(__FILE__)};
       fileLineEdit->setText(filePathInLineEdit);
 
       const StyleItemData& r5ItemData = r5->value();
