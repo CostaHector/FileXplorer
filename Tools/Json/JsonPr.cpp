@@ -14,6 +14,7 @@
 #include <QJsonDocument>
 #include "DataFormatter.h"
 #include "VideoDurationGetter.h"
+#include "DvdFileInfo.h"
 #include "MD5Calculator.h"
 
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
@@ -37,6 +38,30 @@ JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonO
 #undef JSON_KEY_ITEM
       jsonFileName{fileName} {  //
   m_Detail.replace("<br/>", "\n");
+  MergeTextContentsIntoDetailAndRecycleTxt();
+}
+
+void JsonPr::MergeTextContentsIntoDetailAndRecycleTxt() {
+  const QString& jsonFileBaseName = PathTool::GetBaseName(jsonFileName);
+  QString txtAbsPath = m_Prepath + '/' + jsonFileBaseName + ".txt";
+  QFileInfo txtFi{txtAbsPath};
+  if (!txtFi.isFile()) {
+    return;
+  }
+  if (txtFi.size() > 10 * 1024) {
+    // too big file
+    return;
+  }
+  bool bReadOk{false};
+  const QString contents = FileTool::StringTextReader(txtAbsPath, &bReadOk);
+  if (!bReadOk) { // read failed
+    return;
+  }
+  if (!contents.isEmpty() && !m_Detail.contains(contents)) {
+    m_Detail += contents;
+    WriteIntoFiles();
+  }
+  QFile::moveToTrash(txtAbsPath);
 }
 
 bool JsonPr::operator==(const JsonPr& rhs) const {
@@ -126,6 +151,7 @@ QString JsonPr::FindVideoAbsPath() const {
     }
     videoAbsPath.chop(videoAbsPath.size() - beforeSize);
   }
+  videoAbsPath.chop(videoAbsPath.size() - beforeSize);
   return "";
 }
 
@@ -138,7 +164,11 @@ bool JsonPr::UpdateVideoSizeField(QString videoAbsPath) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-  m_Size = fi.size();
+  if (videoAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    m_Size = DvdFileInfo::ReadTotalFileSizeFromDvdFile(videoAbsPath);
+  } else {
+    m_Size = fi.size();
+  }
   return true;
 }
 
@@ -150,7 +180,8 @@ bool JsonPr::UpdateDurationField(QString videoAbsPath) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-  m_Duration = VideoDurationGetter::ReadAVideo(videoAbsPath);
+  VideoDurationGetter mi;
+  m_Duration = VideoDurationGetter::GetLengthQuickStatic(mi, videoAbsPath);
   return m_Duration > 0;
 }
 
@@ -162,7 +193,12 @@ bool JsonPr::UpdateVideoMD5Field(QString videoAbsPath) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-  m_MD5 = MD5Calculator::GetFileMD5(videoAbsPath, BytesRangeTool::BytesRangeE::SAMPLED_128_KB);
+
+  if (videoAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    m_MD5 = DvdFileInfo::ReadTotalMD5FromDvdFile(videoAbsPath);
+  } else {
+    m_MD5 = MD5Calculator::GetFileMD5(videoAbsPath, BytesRangeTool::BytesRangeE::SAMPLED_128_KB);
+  }
   return true;
 }
 

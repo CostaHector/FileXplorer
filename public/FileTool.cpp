@@ -86,7 +86,6 @@ QString StringTextReader(const QString& textPath, bool* bReadOk) {
 QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk) {
   QFile baFile(baFilePath);
   if (!baFile.exists()) {
-    LOG_D("File[%s] not found", qPrintable(baFilePath));
     if (bReadOk != nullptr) {
       *bReadOk = false;
     }

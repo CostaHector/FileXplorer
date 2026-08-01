@@ -27,6 +27,7 @@ QList<int> invokeReadVideos(const QStringList& vidsPath) {
 int invokeGetLengthQuickStatic(const VideoDurationGetter& self, const QString& vidPath) {
   return g_vidPath2Duration.value(vidPath, -1);
 }
+
 QList<int> invokeGetLengthsQuickStatic(const VideoDurationGetter& self, const QStringList& vidsPath) {
   QList<int> ansList;
   ansList.reserve(vidsPath.size());

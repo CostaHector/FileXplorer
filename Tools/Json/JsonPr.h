@@ -47,12 +47,14 @@ struct JsonPr {
   bool UpdateVideoSizeField(QString videoAbsPath="");
   bool UpdateDurationField(QString videoAbsPath="");
   bool UpdateVideoMD5Field(QString videoAbsPath="");
+
   bool ConstructCastStudioValue();  // contruct cast/studio
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);
   bool SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP_MODE fieldMode);
   void HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const;
 
+  void MergeTextContentsIntoDetailAndRecycleTxt();
   void RejectCastHint();
   void RejectStudioHint();
 };

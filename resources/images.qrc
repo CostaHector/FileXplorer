@@ -137,6 +137,7 @@
         <file alias="NEW_TEXT_DOCUMENT">FileOperation/NEW_TEXT_DOCUMENT.svg</file>
         <file alias="NEW_TEXT_DOCUMENTS">FileOperation/NEW_TEXT_DOCUMENTS.svg</file>
         <file alias="NEW_JSON_FILE">FileOperation/NEW_JSON_FILE.svg</file>
+        <file alias="NEW_DVD_INFO">FileOperation/NEW_DVD_INFO.svg</file>
         <file alias="FILE_STRUCTURE_QUERY">FileOperation/FILE_STRUCTURE_QUERY.svg</file>
         <file alias="FILE_STRUCTURE_FLATTEN">FileOperation/FILE_STRUCTURE_FLATTEN.svg</file>
         <file alias="FILE_STRUCTURE_PRESERVE">FileOperation/FILE_STRUCTURE_PRESERVE.svg</file>

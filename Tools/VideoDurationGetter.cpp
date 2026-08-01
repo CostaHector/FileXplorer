@@ -1,6 +1,7 @@
 ﻿#include "VideoDurationGetter.h"
 #include "Logger.h"
 #include "QMediaInfo.h"
+#include "DvdFileInfo.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -15,6 +16,10 @@ constexpr int VideoDurationGetter::MILLISECONDS_PER_SECOND;
 constexpr int VideoDurationGetter::MICROSECONDS_PER_MILLISECOND;
 
 int VideoDurationGetter::ReadAVideo(const QString& vidPath) {
+  if (vidPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    return DvdFileInfo::ReadTotalDurationFromDvdFile(vidPath);
+  }
+
   AVFormatContext* fmtCtx = nullptr;
   // open local video file(disable netword function)
   if (avformat_open_input(&fmtCtx, vidPath.toUtf8().constData(), nullptr, nullptr) != 0) {
@@ -35,6 +40,11 @@ QList<int> VideoDurationGetter::ReadVideos(const QStringList& vidsPath) {
   QList<int> durations;
   AVFormatContext* fmtCtx = avformat_alloc_context();
   for (const QString& path : vidsPath) {
+    if (path.endsWith(".dvd", Qt::CaseInsensitive)) {
+      durations.push_back(DvdFileInfo::ReadTotalDurationFromDvdFile(path));
+      continue;
+    }
+
     if (avformat_open_input(&fmtCtx, path.toUtf8().constData(), nullptr, nullptr) != 0) {
       durations.push_back(-1);
       continue;
@@ -72,11 +82,11 @@ QList<int> VideoDurationGetter::GetLengthsQuickStatic(const VideoDurationGetter&
 }
 
 int VideoDurationGetter::GetLengthQuick(const QString& vidPath) const {
-// #ifdef _WIN32
+#ifdef _WIN32
   static auto& inst = QMediaInfo::GetInst();
   return inst.DurationLengthQuick(vidPath);
-// #endif
-//   return ReadAVideo(vidPath);
+#endif
+  return ReadAVideo(vidPath);
 }
 
 QList<int> VideoDurationGetter::GetLengthsQuick(const QStringList& vidsPath) const {

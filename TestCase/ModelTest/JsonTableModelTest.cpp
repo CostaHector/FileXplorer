@@ -328,9 +328,9 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 1);
     QVERIFY(ind.siblingAtColumn(JsonKey::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
 
-    MOCKER(VideoDurationGetter::ReadAVideo)
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic)
         .expects(exactly(1))
-        .with(mTDir.itemPath("duration_check/duration_test.mp4"))
+        .with(any(), mTDir.itemPath("duration_check/duration_test.mp4"))
         .will(returnValue(10 * 60 * 1000));  // 10min
     QCOMPARE(ind.siblingAtColumn(JsonKey::Duration).data(Qt::DisplayRole).toString(), "00:00:00");
     QCOMPARE(jtm.UpdateDurationField({ind}, 1), 1);

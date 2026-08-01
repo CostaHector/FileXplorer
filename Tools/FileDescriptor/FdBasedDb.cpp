@@ -210,7 +210,7 @@ int FdBasedDb::ReadADirectory(const QString& tableName, const QString& folderAbs
   // 1. fd->absolute file path
   QHash<QByteArray, QString> newFd2Pth;
   QByteArray fdVal{0};
-  QDirIterator it{folderAbsPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
+  QDirIterator it{folderAbsPath, TYPE_FILTER::ADD_INTO_DB_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   static constexpr int LOG_PER_CALC_FILE_FD = 500;
   int fileProcessCnt = 0;
@@ -520,7 +520,7 @@ FD_ERROR_CODE FdBasedDb::Adt(const QString& tableName, const QString& peerPath, 
   // 2. fd->absolute file path
   QHash<QByteArray, QString> newFd2Pth;
   QByteArray fdVal{0};
-  QDirIterator it{peerPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
+  QDirIterator it{peerPath, TYPE_FILTER::ADD_INTO_DB_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   QString absFilePath;
   while (it.hasNext()) {
     it.next();

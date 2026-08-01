@@ -119,6 +119,7 @@ bool VideoStoryboard::RenameVideoStoryBoardCreatedByPotPlayer(const QString& pat
     oldImgPath = it.next();
     std::tie(correspondFile, imgDotExt) = PathTool::GetBaseNameExt(oldImgPath);
     std::tie(vidBaseName, vidDotext) = PathTool::GetBaseNameExt(correspondFile);
+    vidDotext = vidDotext.toLower();
     directFolderPath = oldImgPath.chopped(1 + correspondFile.size() + imgDotExt.size());
     oldImgName = oldImgPath.mid(directFolderPath.size() + 1);
     if (!VID_TYPE_HASH.contains("*" + vidDotext)) {

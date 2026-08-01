@@ -598,7 +598,7 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonView.onUpdateFileMD5(), 0);
 
     jsonView.selectAll();
-    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).with(tDir.itemPath("a.mp4")).will(returnValue(10 * 60 * 1000));  // 10min
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(1)).with(any(), tDir.itemPath("a.mp4")).will(returnValue(10 * 60 * 1000));  // 10min
     QCOMPARE(jsonView.onUpdateFileSize(), 1);  // only a.json contains a.mp4
     QCOMPARE(jsonView.onUpdateDuration(), 1);
     QCOMPARE(jsonView.onUpdateFileMD5(), 1);

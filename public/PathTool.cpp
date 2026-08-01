@@ -112,11 +112,11 @@ bool HasLetter(const QString& fullpath, int startIdx) {
 BASE_NAME_2_DOT_EXT GetBaseNameExt(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash                         // Kris./nice shoes
-      || lastIndexOfExtDot == -1                                    // hello world
-      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size() // ok. say when
-      || !HasLetter(fullpath, lastIndexOfExtDot + 1))               // sc. 01
+  if (lastIndexOfExtDot <= lastIndexOfSlash                     // eg: Kris./nice shoes
+      || !isExtensionValid(lastIndexOfExtDot, fullpath.size()) //
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))           // eg: file sc. 01
   {
+    // invalid extension
     return std::make_pair(fullpath.mid(lastIndexOfSlash + 1), // base
                           "");                                // extension
   }
@@ -127,11 +127,11 @@ BASE_NAME_2_DOT_EXT GetBaseNameExt(const QString& fullpath) {
 QString GetBaseName(const QString& fullpath) {
   const int lastIndexOfSlash = fullpath.lastIndexOf(PATH_SEP_CHAR);
   const int lastIndexOfExtDot = fullpath.lastIndexOf('.');
-  if (lastIndexOfExtDot <= lastIndexOfSlash                         // Kris./nice shoes
-      || lastIndexOfExtDot == -1                                    // hello world
-      || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fullpath.size() // ok. say when
-      || !HasLetter(fullpath, lastIndexOfExtDot + 1))               // sc. 01
+  if (lastIndexOfExtDot <= lastIndexOfSlash                     // Kris./nice shoes
+      || !isExtensionValid(lastIndexOfExtDot, fullpath.size()) //
+      || !HasLetter(fullpath, lastIndexOfExtDot + 1))           // sc. 01
   {
+    // invalid extension
     return fullpath.mid(lastIndexOfSlash + 1);
   }
 
@@ -140,7 +140,7 @@ QString GetBaseName(const QString& fullpath) {
 
 QString GetFileNameExtRemoved(const QString& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
-  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+  if (!isExtensionValid(lastIndexOfExtDot, fileName.size())) {
     return fileName;
   }
   return fileName.left(lastIndexOfExtDot);
@@ -148,7 +148,7 @@ QString GetFileNameExtRemoved(const QString& fileName) {
 
 QString GetFileNameExtRemoved(QString&& fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
-  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+  if (!isExtensionValid(lastIndexOfExtDot, fileName.size())) {
     return fileName;
   }
   return fileName.left(lastIndexOfExtDot);
@@ -156,7 +156,7 @@ QString GetFileNameExtRemoved(QString&& fileName) {
 
 QString FileExtReplacedWithJson(QString fileName) {
   const int lastIndexOfExtDot = fileName.lastIndexOf('.');
-  if (lastIndexOfExtDot == -1 || lastIndexOfExtDot + EXTENSION_MAX_LENGTH < fileName.size()) {
+  if (!isExtensionValid(lastIndexOfExtDot, fileName.size())) {
     fileName += ".json";
     return fileName;
   }
@@ -334,7 +334,7 @@ QString GetFormatInHar(const QString& path) {
   } else {
     lastIndex = std::max(lastIndexOfDot, lastIndexOfSlash);
   }
-  if (lastIndex == -1 || lastIndex + 8 < path.size()) {
+  if (!isExtensionValid(lastIndex, path.size())) {
     return {};
   }
   return path.mid(lastIndex + 1);
@@ -343,7 +343,7 @@ QString GetFormatInHar(const QString& path) {
 // contains dot itself, e.g. .gif, .webp
 QString GetDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.'); // .torrent
-  if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {
+  if (!isExtensionValid(lastIndexOfDot, path.size())) {
     return {};
   }
   return path.mid(lastIndexOfDot);
@@ -352,7 +352,7 @@ QString GetDotFileExtension(const QString& path) {
 // contains dot itself, e.g. *.gif, *.webp
 QString GetAsteriskDotFileExtension(const QString& path) {
   const int lastIndexOfDot = path.lastIndexOf('.');
-  if (lastIndexOfDot == -1 || lastIndexOfDot + 8 < path.size()) {
+  if (!isExtensionValid(lastIndexOfDot, path.size())) {
     return {};
   }
   return '*' + path.mid(lastIndexOfDot);

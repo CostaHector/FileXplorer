@@ -1,6 +1,7 @@
 #include "QMediaInfo.h"
 #include "MediaInfoDLL.h"
 #include "TableFields.h"
+#include "DvdFileInfo.h"
 #include "Logger.h"
 #include <QTime>
 #include <QFile>
@@ -59,6 +60,10 @@ bool QMediaInfo::Open(const QString& filename) {
 
 // fileAbsPath may not contain Chinese Charactor
 int QMediaInfo::DurationLengthQuick(const QString& fileAbsPath) {
+  if (fileAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    return DvdFileInfo::ReadTotalDurationFromDvdFile(fileAbsPath);
+  }
+
   if (!Open(fileAbsPath)) {
     LOG_D("MediaInfo Open file[%s] failed", qPrintable(fileAbsPath));
     return MOVIE_TABLE::DURATION_GET_FAILED_VALUE;

@@ -8,6 +8,7 @@ bool NewPlainTextFile(const QString& createIn, QString* newTextFileAbsPath = nul
 int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames);
 bool NewFolder(const QString& createIn, QString* folderAbsPath = nullptr);
 bool NewItems(const QString& createIn, const QString& namePattern="Page %03d.txt", int numStartIndex=1, int numEndIndex=11, bool isFolder = false);
+int GenerateDvdFileRecursively(const QString& path, bool bOverrideWhenExist = false);
 }
 
 #endif // CREATEFILEFOLDERHELPER_H
