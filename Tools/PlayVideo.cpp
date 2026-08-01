@@ -1,7 +1,7 @@
 #include "PlayVideo.h"
-#include "PublicVariable.h"
 #include "FileTool.h"
 #include "Logger.h"
+#include "PathTool.h"
 
 #include <QDir>
 #include <QFile>
@@ -18,7 +18,14 @@ bool PlayADir(const QString& dirPath) {
 #else
   process.setProgram("xdg-open");
 #endif
-  process.setArguments({QDir::toNativeSeparators(dirPath)});
+  QString playArg{dirPath};
+  if (QFile{PathTool::Path2Join(dirPath, "VTS_01_0.IFO")}.exists()) {
+    playArg = PathTool::Path2Join(dirPath, "VTS_01_0.IFO");
+  } else if (QFile{PathTool::Path2Join(dirPath, "VIDEO_TS/VTS_01_0.IFO")}.exists()) {
+    playArg = PathTool::Path2Join(dirPath, "VIDEO_TS/VTS_01_0.IFO");
+  }
+  process.setArguments({QDir::toNativeSeparators(playArg)});
+
   process.startDetached();  // Start the process in detached mode instead of start
   LOG_W("Play folder program[%s], args[%s]...", qPrintable(process.program()), qPrintable(process.arguments().join(',')));
   return true;
