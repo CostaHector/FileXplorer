@@ -403,7 +403,7 @@ class JsonPrTest : public PlainTestSuite {
   void UpdateDurationField_ok() {
     QString videoPath{__FILE__};
     MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
-    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).will(returnValue(60 * 1000));
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(1)).will(returnValue(60 * 1000));
     JsonPr jpr;
     QCOMPARE(jpr.FindVideoAbsPath(), "");
     QCOMPARE(jpr.UpdateVideoSizeField(), false);
@@ -425,7 +425,7 @@ class JsonPrTest : public PlainTestSuite {
 
   void FindVideoAbsPath_ok() {
     MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
-    MOCKER(VideoDurationGetter::ReadAVideo).expects(exactly(1)).will(returnValue(60 * 1000));
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(1)).will(returnValue(60 * 1000));
     JsonPr jpr{"any random file.json"};  // no video at all
     QCOMPARE(jpr.FindVideoAbsPath(), "");
     QCOMPARE(jpr.UpdateVideoSizeField(), false);

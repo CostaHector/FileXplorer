@@ -240,8 +240,25 @@ private slots:
              "any movie name folder sc.1 - performer 1, performer 2");
   }
 
+  void test_isExtensionValid() {
+    const QStringList filesWithValidExtension{
+      "a.m", "a.mp4", "a.json", "a.torrent"
+    };
+    for (const QString& file: filesWithValidExtension) {
+      QVERIFY(isExtensionValid(file.lastIndexOf('.'), file.size()));
+    }
+    const QStringList filesWithInvalidExtension {
+        "a", "file.not_a_extension_at_all"
+    };
+    for (const QString& file: filesWithInvalidExtension) {
+      QVERIFY(!isExtensionValid(file.lastIndexOf('.'), file.size()));
+    }
+  }
+
   void test_GetBaseName_file() {
     QCOMPARE(GetBaseName("C:/home/file.m"), "file");
+    QCOMPARE(GetBaseName("file.not_a_extension_at_all"), "file.not_a_extension_at_all");
+    QCOMPARE(GetBaseName("file.torrent"), "file");
     QCOMPARE(GetBaseName("a.txt"), "a");
     QCOMPARE(GetBaseName("a"), "a");
     QCOMPARE(GetBaseName("any movie name sc.1 - performer 1, performer 2"), "any movie name sc.1 - performer 1, performer 2");
@@ -253,6 +270,8 @@ private slots:
 
   void test_GetBaseNameExt() {
     QCOMPARE(GetBaseNameExt("C:/home/file.m"), std::make_pair(QString("file"), QString(".m")));
+    QCOMPARE(GetBaseNameExt("file.not_a_extension_at_all"), std::make_pair(QString("file.not_a_extension_at_all"), QString("")));
+    QCOMPARE(GetBaseNameExt("file.torrent"), std::make_pair(QString("file"), QString(".torrent")));
     QCOMPARE(GetBaseNameExt("a.txt"), std::make_pair(QString("a"), QString(".txt")));
     QCOMPARE(GetBaseNameExt("a"), std::make_pair(QString("a"), QString("")));
     QCOMPARE(GetBaseNameExt("C:/home/any movie name sc.1 - performer 1, performer 2.txt"), std::make_pair(QString("any movie name sc.1 - performer 1, performer 2"), QString(".txt")));

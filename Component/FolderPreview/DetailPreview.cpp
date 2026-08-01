@@ -2,8 +2,6 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "Configuration.h"
-#include "Logger.h"
-#include "NotificatorMacro.h"
 #include "PublicMacro.h"
 
 DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_PREVIEW_SPLITTER", parent} {

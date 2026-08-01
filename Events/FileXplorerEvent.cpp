@@ -143,6 +143,32 @@ bool FileXplorerEvent::on_BatchNewFilesOrFolders(bool isFolder) {
   return CreateFileFolderHelper::NewItems(createIn, namePattern, startIndex, endIndex, isFolder);
 }
 
+bool FileXplorerEvent::on_CreateDvdInfoRecursively() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+
+  const QString createIn{_fileSysModel->rootPath()};
+
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Create DVD Metadata");
+  msgBox.setWindowIcon(QIcon(":img/NEW_DVD_INFO"));
+  msgBox.setText(QString{"Do you want to overwrite existing .dvd files\nunder path\n%1?"}.arg(createIn));
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+  msgBox.setDefaultButton(QMessageBox::No);
+
+  const int ret = msgBox.exec();
+  if (ret != QMessageBox::Yes && ret != QMessageBox::No) {
+    LOG_INFO_NP("Skip", "User canceled creation of DVD info recursively");
+    return true;
+  }
+
+  const bool bOverrideWhenExist{ret == QMessageBox::Yes};
+  int succeedCnt = CreateFileFolderHelper::GenerateDvdFileRecursively(createIn, bOverrideWhenExist);
+  LOG_OE_P(succeedCnt >= 0, "Create dvd meta", "%d .dvd file under path:%s created ok", succeedCnt, qPrintable(createIn));
+  return succeedCnt >= 0;
+}
+
 bool FileXplorerEvent::on_CreateVideoStoryBoard(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
   if (!__CanNewItem()) {
     return false;
@@ -448,6 +474,7 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst.NEW_JSON_FILE, &QAction::triggered, this, &FileXplorerEvent::on_NewJsonFile);
     connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(false); });
     connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(true); });
+    connect(fileOpInst.NEW_DVD_INFO, &QAction::triggered, this, &FileXplorerEvent::on_CreateDvdInfoRecursively);
 
     connect(fileOpInst._REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileXplorerEvent::on_revealInExplorer);
     connect(fileOpInst._OPEN_IN_TERMINAL, &QAction::triggered, this, &FileXplorerEvent::on_OpenInTerminal);

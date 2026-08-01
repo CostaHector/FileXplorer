@@ -32,6 +32,7 @@ FileOpActs::FileOpActs(QObject* parent)
   BATCH_NEW_FILES = new (std::nothrow) QAction(QIcon(":img/NEW_TEXT_DOCUMENTS"), tr("New Files"), this);
 
   BATCH_NEW_FOLDERS = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), tr("New Folders"), this);
+  NEW_DVD_INFO = new (std::nothrow) QAction(QIcon(":img/NEW_DVD_INFO"), tr("New DVD Info"), this);
   NEW = GetNEWActions();
 
   _MOVE_TO = new (std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), tr("Move to"), this);
@@ -267,15 +268,17 @@ QActionGroup* FileOpActs::GetNEWActions() {
   NEW_JSON_FILE->setCheckable(false);
 
   BATCH_NEW_FILES->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FILES->text(), BATCH_NEW_FILES->shortcut().toString()) +
-                              "Create a batch of files by specified pattern.<br/>"
+                              "Create a batch of files with specified pattern given.<br/>"
                               "e.g. Given pattern:<br/>"
                               "\"Page %03d.txt$1$10\"<br/>"
                               "it will create ten text documents numbered by Page 001,002,...,009 respectively.");
   BATCH_NEW_FOLDERS->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(BATCH_NEW_FOLDERS->text(), BATCH_NEW_FOLDERS->shortcut().toString()) +
-                                "Create a batch of folders by specified pattern.<br/>"
+                                "Create a batch of folders with specified pattern given.<br/>"
                                 "e.g. Given pattern:<br/>"
                                 "\"Page %03d$1$10\"<br/>"
                                 "it will create ten folders numbered by Page 001,002,...,009 respectively.");
+  NEW_DVD_INFO->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(NEW_DVD_INFO->text(), NEW_DVD_INFO->shortcut().toString()) +
+                           "Create a .dvd metadata file that stores total size, total duration, and an MD5 checksum, allowing rapid database rebuilds without rescanning the original DVD files.");
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(NEW_FOLDER);
@@ -283,6 +286,7 @@ QActionGroup* FileOpActs::GetNEWActions() {
   actionGroup->addAction(NEW_JSON_FILE);
   actionGroup->addAction(BATCH_NEW_FILES);
   actionGroup->addAction(BATCH_NEW_FOLDERS);
+  actionGroup->addAction(NEW_DVD_INFO);
   return actionGroup;
 }
 

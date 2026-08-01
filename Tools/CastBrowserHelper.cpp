@@ -7,6 +7,7 @@
 #include "PublicVariable.h"
 #include "StringTool.h"
 #include "ImageTool.h"
+#include "DvdFileInfo.h"
 
 #include <QDir>
 #include <QSqlField>
@@ -75,7 +76,12 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     imgStr = ImageTool::GetBase64PixmapForHtml(starDotExtensionLowerCase);
   }
   const QFileInfo fi{fileAbsPath};
-  const qint64 filesz = fi.size();
+  qint64 filesz{0};
+  if (fileAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    filesz = DvdFileInfo::ReadTotalFileSizeFromDvdFile(fileAbsPath);
+  } else {
+    filesz = fi.size();
+  }
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<font size="+2">)");
   detail += QString(R"(Size: %1<br/>)").arg(DataFormatter::formatFileSizeWithBytes(filesz));

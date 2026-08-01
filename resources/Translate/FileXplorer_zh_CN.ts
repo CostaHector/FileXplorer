@@ -668,6 +668,11 @@
         <translation>新建批量文件夹</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>New DVD Info</source>
+        <translation>新建DVD元数据</translation>
+    </message>
+    <message>
         <location line="+3"/>
         <source>Move to</source>
         <translation>移动到</translation>
@@ -733,7 +738,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+278"/>
+        <location line="+281"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -748,7 +753,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-317"/>
+        <location line="-320"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>

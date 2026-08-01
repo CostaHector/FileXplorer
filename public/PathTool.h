@@ -63,11 +63,18 @@ struct RMFComponent {
 };
 
 constexpr char PATH_SEP_CHAR = '/';
-constexpr int EXTENSION_MAX_LENGTH = 5; // ".json"
+inline bool isExtensionValid(int lastDotIndex, int length) {
+  static constexpr const char MAX_LENGTH_EXTENSION[]{"torrent"};
+  static constexpr int EXTENSION_MAX_LENGTH = sizeof(MAX_LENGTH_EXTENSION) - 1;
+  // eg:
+  // invalid: fileWithoutExtension, file.not_a_extension_at_all
+  // valid: file.torrent, file.json, file.m
+  return lastDotIndex != -1 && lastDotIndex + EXTENSION_MAX_LENGTH + 1 >= length;
+}
 
 inline QString GetWinStdPath(const QString& path) {
 #ifdef _WIN32
-  if (!path.isEmpty() and path.back() == ':') {
+  if (!path.isEmpty() && path.back() == ':') {
     return path + '/';
   }
 #endif

@@ -16,7 +16,7 @@ bool FsNodeEntry::operator<(const FsNodeEntry& rhs) const {
 
 bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   QFile file{absFilePath};
-  if (!file.open(QIODevice::WriteOnly)) {
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
     return false;
   }
   file.write(contents);

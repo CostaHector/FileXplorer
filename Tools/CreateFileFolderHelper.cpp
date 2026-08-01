@@ -6,9 +6,11 @@
 #include "JsonKey.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
+#include "DvdFileInfo.h"
 
 #include <QDateTime>
 #include <QDir>
+#include <QDirIterator>
 
 namespace CreateFileFolderHelper {
 
@@ -42,7 +44,8 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
   QString jsonBaseName, ext;
   for (const QString& fileItem : basedOnFileNames) {
     std::tie(jsonBaseName, ext) = PathTool::GetBaseNameExt(fileItem);
-    if (!TYPE_FILTER::isDotExtVideo(ext)) {
+    const bool bNeedJson{ext.compare(".torrent", Qt::CaseInsensitive) == 0 || TYPE_FILTER::isDotExtVideo(ext)};
+    if (!bNeedJson) {
       continue;
     }
     const QString jPath = PathTool::JoinJsonAbsFilePath(createIn, jsonBaseName);
@@ -57,6 +60,26 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
   }
   LOG_OK_P("[Ok]Json file(s) create", "count: succ:%d/total:%d/selected:%d", crtSucceed, totalNeedCnd, basedOnFileNames.size());
   return crtSucceed;
+}
+
+int GenerateDvdFileRecursively(const QString& path, bool bOverrideWhenExist) {
+  int dvdGeneratedCnt{0};
+  QDirIterator videoTsIter{path, QStringList{"VIDEO_TS"}, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
+  bool bFailed = false;
+  while (videoTsIter.hasNext()) {
+    // Ten years before/VIDEO_TS
+    QString videoTsAbsPath = videoTsIter.next();
+    bFailed = false;
+    bool bIsFileNew = DvdFileInfo::GenerateDvdFile(videoTsAbsPath, bOverrideWhenExist, &bFailed);
+    if (bFailed) {
+      LOG_ERR_P("Failed", "when create .dvd file for folder[%s]", qPrintable(videoTsAbsPath));
+      return dvdGeneratedCnt;
+    }
+    if (bIsFileNew) {
+      ++dvdGeneratedCnt;
+    }
+  }
+  return dvdGeneratedCnt;
 }
 
 bool NewFolder(const QString& createIn, QString* folderAbsPath) {
