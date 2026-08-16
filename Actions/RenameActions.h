@@ -9,8 +9,8 @@ class RenameActions : public QObject {
  public:
   explicit RenameActions(QObject* parent = nullptr);
 
-  auto Get_CASE_Actions() -> QActionGroup*;
-  auto Get_Rename_Actions() -> QActionGroup*;
+  QActionGroup* Get_CASE_Actions();
+  QActionGroup* Get_Rename_Actions();
 
   QAction* _NUMERIZER {nullptr};
   QAction* _SECTIONS_ARRANGE {nullptr};
@@ -30,6 +30,7 @@ class RenameActions : public QObject {
   QAction* _CAPITALIZE_KEEP_OTHER {nullptr};
   QAction* _CAPITALIZE_LOWER_OTHER {nullptr};
   QAction* _TOGGLE_CASE {nullptr};
+  QAction* _LOWER_CASE_FILE_EXTENSION {nullptr};
   QActionGroup* NAME_CASE {nullptr};
 };
 
