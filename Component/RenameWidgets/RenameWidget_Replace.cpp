@@ -155,6 +155,9 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
     // init lineedit only at first time. when lineedit editted by user. lineedit should not init
     m_oldStrInited = true;
     UpdateOldStrCbCurrentText();
+    if (m_oldStrCB->lineEdit() != nullptr) {
+      m_oldStrCB->lineEdit()->selectAll();
+    }
     using CURRENT_INDEX_CHANGED_MEMBER_FUNC = void (QComboBox::*)(int);
     connect(m_oldStrDefaultModeCB, (CURRENT_INDEX_CHANGED_MEMBER_FUNC)&QComboBox::currentIndexChanged, this, &RenameWidget_Replace::onOldStrDefaultModeChanged);
   }
