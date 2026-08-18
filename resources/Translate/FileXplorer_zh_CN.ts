@@ -557,7 +557,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+119"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+194"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -738,7 +738,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+281"/>
+        <location line="+279"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -753,7 +753,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-320"/>
+        <location line="-318"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -1214,6 +1214,14 @@
         <location line="+3"/>
         <source>Rmv Tag</source>
         <translation>移除标签</translation>
+    </message>
+</context>
+<context>
+    <name>JsonTableView</name>
+    <message>
+        <location filename="../../View/JsonTableView.cpp" line="+45"/>
+        <source>Recycle related files</source>
+        <translation>回收相关文件</translation>
     </message>
 </context>
 <context>
@@ -2219,7 +2227,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+43"/>
+        <location filename="../../View/SceneListView.cpp" line="+44"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>

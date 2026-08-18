@@ -104,7 +104,59 @@ bool VideoStoryboard::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) 
   return false;
 }
 
+bool VideoStoryboard::RenameVideoSourceFrameSavedByPotPlayer(const QString& path) const {
+  // xxxx.mp4_20260818_155313.075.jpg
+  static constexpr const char SOURCE_FRAME_FORMAT_EXAMPLE[]{"_20260818_155313.075.jpg"};
+  static constexpr int SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof(SOURCE_FRAME_FORMAT_EXAMPLE)/sizeof(*SOURCE_FRAME_FORMAT_EXAMPLE) - 1};
+  const static QRegularExpression SOURCE_FRAME_NAME_PATTERN(R"(_\d{8}_\d{6}\.\d{3}\.jpg$)");
+
+  QHash<QString, QStringList> sourceFrames;
+  QDirIterator it{path, {"*.jpg"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  while (it.hasNext()) {
+    it.next();
+    QString srcFrameImgName = it.fileName();
+    if (!SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
+      continue;
+    }
+    QString srcFrameVidName = srcFrameImgName.chopped(SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
+    QString vidNameWithoutExtension = PathTool::GetBaseName(srcFrameVidName);
+    sourceFrames[vidNameWithoutExtension].push_back(it.filePath());
+  }
+  if (sourceFrames.isEmpty()) {
+    return true;
+  }
+
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE cmds;
+
+  for (auto it = sourceFrames.cbegin(); it != sourceFrames.cend(); ++it) {
+    const QString& vidNameWithoutExtension = it.key();
+    const QStringList& srcFrameImages = it.value();
+    int startNo = 0;
+    QString srcFramePrePath, srcFrameImageName;
+    QString newName;
+    for (const QString& srcFrameImg: srcFrameImages) {
+      srcFrameImageName = PathTool::GetPrepathAndFileName(srcFrameImg, srcFramePrePath);
+      do  {
+        newName = vidNameWithoutExtension + " " + QString::number(startNo) + ".jpg";
+        ++startNo;
+      } while (QFile::exists(PathTool::Path2Join(srcFramePrePath, newName)));
+      cmds.push_back(ACMD::GetInstRENAME(srcFramePrePath, srcFrameImageName, newName));
+    }
+  }
+  if (cmds.isEmpty()) {
+    return true;
+  }
+  auto& undoRedo = UndoRedo::GetInst();
+  return undoRedo.Do(cmds);
+}
+
+
 bool VideoStoryboard::RenameVideoStoryBoardCreatedByPotPlayer(const QString& path) const {
+  if (!RenameVideoSourceFrameSavedByPotPlayer(path)) {
+    return false;
+  }
+
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds;
 
