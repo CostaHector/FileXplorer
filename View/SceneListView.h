@@ -10,7 +10,7 @@ class ScenesListModel;
 
 class SceneListView : public CustomListView {
   Q_OBJECT
- public:
+public:
   explicit SceneListView(ScenesListModel* sceneModel,
                          SceneSortProxyModel* sceneSortProxyModel,
                          ScenePageControl* scenePageControl,
@@ -26,23 +26,25 @@ class SceneListView : public CustomListView {
   bool onOpenCorrespondingFolder();
   bool onClickEvent(const QModelIndex& idx);
 
- signals:
+signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
   void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
 
- public slots:
+public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
   int onRenameSceneAndRelated();
   int onRenameSceneAndRelatedInsert();
   int onRenameSceneAndRelatedNumerize();
   int onRecycleSceneAndRelated();
   void toggleSortRequestImplementer(bool bPageByPage);
+  bool onArchiveActionTriggered(const QAction* archivedToAct);
+  int onArchiveTo(int videoTier);
 
- protected:
+protected:
   void mousePressEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* e) override;
 
- private:
+private:
   void initExclusivePreferenceSetting() override;
 
   QModelIndexList selectedRowsSource() const;
@@ -52,6 +54,8 @@ class SceneListView : public CustomListView {
   QAction* _RENAME_SCENE_RELATED_FILES_NUMERIZE{nullptr};
   QAction* _RECYCLE_SCENE_RELATED_FILES{nullptr};
   QAction* _OPEN_CORRESPONDING_FOLDER{nullptr};
+  QAction* _ARCHIVE_ESSENTIALS{nullptr},* _ARCHIVE_NORMALS{nullptr},* _ARCHIVE_CASUALS{nullptr},* _ARCHIVE_DISPOSABLE{nullptr};
+  QActionGroup* _ARCHIVE_AG{nullptr};
 
   ScenesListModel* _sceneModel{nullptr};
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};

@@ -18,6 +18,10 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 
+enum class VideoTierE {
+  INVALID, ESSENTIALS, NORMALS, CASUALS, DISPOSABLE,
+};
+
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
                              ScenePageControl* scenePageControl,
@@ -67,14 +71,31 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   _OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("Play this folder"), this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
 
+  _ARCHIVE_ESSENTIALS = new QAction{"Archived to Essentials", this};
+  _ARCHIVE_ESSENTIALS->setProperty("ArchivedVideoTier", (int)VideoTierE::ESSENTIALS);
+  _ARCHIVE_NORMALS = new QAction{"Archived to Normals", this};
+  _ARCHIVE_NORMALS->setProperty("ArchivedVideoTier", (int)VideoTierE::NORMALS);
+  _ARCHIVE_CASUALS = new QAction{"Archived to Casuals", this};
+  _ARCHIVE_CASUALS->setProperty("ArchivedVideoTier", (int)VideoTierE::CASUALS);
+  _ARCHIVE_DISPOSABLE = new QAction{"Archived to Disposable", this};
+  _ARCHIVE_DISPOSABLE->setProperty("ArchivedVideoTier", (int)VideoTierE::DISPOSABLE);
+
+  _ARCHIVE_AG = new QActionGroup(this);
+  _ARCHIVE_AG->addAction(_ARCHIVE_ESSENTIALS);
+  _ARCHIVE_AG->addAction(_ARCHIVE_NORMALS);
+  _ARCHIVE_AG->addAction(_ARCHIVE_CASUALS);
+  _ARCHIVE_AG->addAction(_ARCHIVE_DISPOSABLE);
+
   QList<QAction*> exclusiveActions{
       SceneInPageActions::GetInst()._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
       _RENAME_SCENE_RELATED_FILES_REPLACE,  //
       _RENAME_SCENE_RELATED_FILES_INSERT,   //
       _RENAME_SCENE_RELATED_FILES_NUMERIZE, //
-      _RECYCLE_SCENE_RELATED_FILES,         //
-      _OPEN_CORRESPONDING_FOLDER,           //
   };
+  exclusiveActions += _ARCHIVE_AG->actions();
+  exclusiveActions.push_back(_RECYCLE_SCENE_RELATED_FILES);
+  exclusiveActions.push_back(_OPEN_CORRESPONDING_FOLDER);
+
   PushFrontExclusiveActions(exclusiveActions);
   PushBackExclusiveActions(_sceneModel->GetExcusiveActions());
 
@@ -111,6 +132,7 @@ void SceneListView::subscribe() {
   connect(_RENAME_SCENE_RELATED_FILES_INSERT, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedInsert);
   connect(_RENAME_SCENE_RELATED_FILES_NUMERIZE, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedNumerize);
   connect(_RECYCLE_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRecycleSceneAndRelated);
+  connect(_ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
@@ -383,5 +405,92 @@ int SceneListView::onRecycleSceneAndRelated() {
   bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
   const int removeRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
   LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
+  return relatedFilesCnt;
+}
+
+VideoTierE MovieRate2VideoTierE(int movieRate) {
+  switch (movieRate) {
+    case 0:
+      return VideoTierE::INVALID;
+    case 1:
+    case 2:
+    case 3:
+      return VideoTierE::DISPOSABLE;
+    case 4:
+    case 5:
+      return VideoTierE::CASUALS;
+    case 6:
+    case 7:
+      return VideoTierE::NORMALS;
+    case 8:
+    case 9:
+    case 10:
+      return VideoTierE::ESSENTIALS;
+    default:
+      return VideoTierE::INVALID;
+  }
+}
+
+QString TierNameStr(int videoTier) {
+  switch (videoTier) {
+    case (int)VideoTierE::ESSENTIALS:
+      return "Essentials";
+    case (int)VideoTierE::NORMALS:
+      return "Normal";
+    case (int)VideoTierE::CASUALS:
+      return "Casuals";
+    case (int)VideoTierE::DISPOSABLE:
+      return "Disposable";
+    default:
+      return "invalid";
+  }
+}
+
+bool SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
+  if (archivedToAct == nullptr) {
+    return false;
+  }
+  bool bHasValidVideoTier{false};
+  const int videoTier = archivedToAct->property("ArchivedVideoTier").toInt(&bHasValidVideoTier);
+  if (!bHasValidVideoTier) {
+    return false;
+  }
+  onArchiveTo(videoTier);
+  return true;
+}
+
+int SceneListView::onArchiveTo(int videoTier) {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip recycle");
+    return 0;
+  }
+
+  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
+
+  QString tierFolderLocatedIn;
+  QString tierFolderName = PathTool::GetPrepathAndFileName(_sceneModel->rootPath(), tierFolderLocatedIn) + " " + TierNameStr(videoTier);
+  QString tierFolderAbsPath = PathTool::Path2Join(tierFolderLocatedIn, tierFolderName);
+
+  const QStringList& filesNeedArchive = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+  const int relatedFilesCnt{filesNeedArchive.size()};
+
+  if (!RecycleCfmDlg::archiveQuestion(jsonLocatedInPath, filesNeedArchive, tierFolderAbsPath)) {
+    LOG_INFO_P("[Cancel] User cancel archive", "%d item(s) no change", relatedFilesCnt);
+    return 0;
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE archiveCmds;
+  archiveCmds.reserve(1 + relatedFilesCnt);
+  if (!QFileInfo{tierFolderAbsPath}.isDir()) {
+    archiveCmds.append(FileOperatorType::ACMD::GetInstMKDIR(tierFolderLocatedIn, tierFolderName));
+  }
+  for (const auto& nm : filesNeedArchive) {
+    archiveCmds.append(FileOperatorType::ACMD::GetInstMV(jsonLocatedInPath, nm, tierFolderAbsPath));
+  }
+  bool bAllSucceed = UndoRedo::GetInst().Do(archiveCmds);
+  const int archiveRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
+  LOG_OE_P(bAllSucceed, "Archive", "Archive %d json/img/video items, rows[%d]", relatedFilesCnt, archiveRowCnt);
   return relatedFilesCnt;
 }

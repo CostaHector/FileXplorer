@@ -44,4 +44,36 @@ bool recycleQuestion(const QString& locatedIn, const QStringList& files, bool bD
       "", recycleDetailMsg);
 }
 
+bool archiveQuestion(const QString& locatedIn, const QStringList& files, const QString& destinationIn) {
+  QString recycleMsg;
+  recycleMsg.reserve(80);
+
+  qint64 totalSize{0};
+  for (const QString& fileName: files) {
+    totalSize += QFileInfo{PathTool::Path2Join(locatedIn, fileName)}.size();
+  }
+
+  recycleMsg += QString{"Following <b>%1</b> item(s)<br/>"
+                        "size: <b>%2</b><br/>"
+                        "under path: %3<br/>"}//
+                    .arg(files.size()).arg(DataFormatter::formatFileSizeGMKB(totalSize)).arg(locatedIn);
+  recycleMsg += QString{"will be archived into %1."}.arg(destinationIn);
+
+  QString recycleDetailMsg;
+  static constexpr int MAX_FILE_NAME_DISP = 20;
+  if (files.size() > MAX_FILE_NAME_DISP) {
+    recycleDetailMsg += files.mid(0, MAX_FILE_NAME_DISP).join('\n');
+    recycleDetailMsg += QString("\n---\n... and %1 more item(s)\n---\n").arg(files.size() - MAX_FILE_NAME_DISP);
+    recycleDetailMsg += files.constLast();
+  } else {
+    recycleDetailMsg += files.join('\n');
+  }
+  return InputDialogHelper::YesOrCancelBox(                                                          //
+      QMessageBox::Icon::Question,                 //
+      QIcon(":img/VIDEO_ARCHIVE"), //
+      "Archive",                       //
+      recycleMsg,                                                                                    //
+      "", recycleDetailMsg);
+}
+
 } // namespace RecycleCfmDlg
