@@ -5,6 +5,7 @@
 #include "RenameWidget_Replace.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
 #include "TDir.h"
 
 class RenameWidget_ReplaceTest : public PlainTestSuite {
@@ -21,6 +22,8 @@ class RenameWidget_ReplaceTest : public PlainTestSuite {
             {"Henry Cavill.jpg", false, ""},
         };
     QCOMPARE(mTDir.createEntries(nodesEntries), nodesEntries.size());
+
+    Configuration().clear();
   }
 
   void replace_ok() {
@@ -123,6 +126,7 @@ class RenameWidget_ReplaceTest : public PlainTestSuite {
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 
+    pDelete.setOldNameAndNewName("Chris Evans", "");
     {  // new name is empty by default, Chris Evans->""
       const QString& sNewName = pDelete.m_nBaseTE->toPlainText();
       const QString& sNewExt = pDelete.m_nExtTE->toPlainText();

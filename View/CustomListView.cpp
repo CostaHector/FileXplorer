@@ -194,7 +194,7 @@ void CustomListView::InitListView() {
 
 void CustomListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event)
-  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
+  if (ViewHelper::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
     event->accept();
     return;
   }

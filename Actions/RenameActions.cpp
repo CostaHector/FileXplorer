@@ -19,7 +19,7 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), tr("Capitalize first and keep other"), this);
   _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), tr("Capitalize first and lower other"), this);
   _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), tr("Toggle Case"), this);
-  _LOWER_CASE_FILE_EXTENSION = new (std::nothrow) QAction(tr("Lowercase Extension"), this);
+  _LOWER_CASE_FILE_EXTENSION = new (std::nothrow) QAction(QIcon{":img/RENAME_DOT_FILE_EXTENSION"}, tr("Lowercase Extension"), this);
   _LOWER_CASE_FILE_EXTENSION->setToolTip("Lowercase File Extension");
   _LOWER_CASE_FILE_EXTENSION->setCheckable(true);
   NAME_CASE = Get_CASE_Actions();

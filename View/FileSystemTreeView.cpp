@@ -58,25 +58,24 @@ void FileSystemTreeView::initExclusivePreferenceSetting() {
 }
 
 void FileSystemTreeView::dropEvent(QDropEvent* event) {
-  View::dropEventCore(this, _fsModel, event);
+  ViewHelper::dropEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragEnterEvent(QDragEnterEvent* event) {
-  View::dragEnterEventCore(this, _fsModel, event);
+  ViewHelper::dragEnterEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragMoveEvent(QDragMoveEvent* event) {
-  View::dragMoveEventCore(this, _fsModel, event);
+  ViewHelper::dragMoveEventCore(this, _fsModel, event);
 }
 
 void FileSystemTreeView::dragLeaveEvent(QDragLeaveEvent* event) {
-  View::dragLeaveEventCore(_fsModel, event);
+  ViewHelper::dragLeaveEventCore(_fsModel, event);
 }
 
 void FileSystemTreeView::keyPressEvent(QKeyEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier and e->key() == Qt::Key_Delete) {
-    emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
+  if (ViewHelper::keyPressEventCore(e)) {
     return;
   }
   QTreeView::keyPressEvent(e);

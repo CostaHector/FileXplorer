@@ -1,10 +1,8 @@
 #include "ScenesListModel.h"
 #include "SceneKey.h"
 #include "Configuration.h"
-#include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
-#include "StringTool.h"
 #include "ImageTool.h"
 #include <QObject>
 #include <QPixmap>

@@ -56,24 +56,24 @@ void FileSystemListView::subscribe() {
 }
 
 void FileSystemListView::dropEvent(QDropEvent* event) {
-  View::dropEventCore(this, _fsModel, event);
+  ViewHelper::dropEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragEnterEvent(QDragEnterEvent* event) {
-  View::dragEnterEventCore(this, _fsModel, event);
+  ViewHelper::dragEnterEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragMoveEvent(QDragMoveEvent* event) {
-  View::dragMoveEventCore(this, _fsModel, event);
+  ViewHelper::dragMoveEventCore(this, _fsModel, event);
 }
 
 void FileSystemListView::dragLeaveEvent(QDragLeaveEvent* event) {
-  View::dragLeaveEventCore(_fsModel, event);
+  ViewHelper::dragLeaveEventCore(_fsModel, event);
 }
 
 void FileSystemListView::keyPressEvent(QKeyEvent* e) {
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
-    emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
+  CHECK_NULLPTR_RETURN_VOID(e);
+  if (ViewHelper::keyPressEventCore(e)) {
     return;
   }
   QListView::keyPressEvent(e);

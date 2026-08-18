@@ -182,7 +182,7 @@ bool JsonPr::UpdateDurationField(QString videoAbsPath) {
   }
   VideoDurationGetter mi;
   int newDuration = VideoDurationGetter::GetLengthQuickStatic(mi, videoAbsPath);
-  if (newDuration < 0) {
+  if (newDuration <= 0) {
     return false;
   }
   m_Duration = newDuration;

@@ -146,6 +146,7 @@
         <file alias="FORCE_RESEARCH">FileOperation/FORCE_RESEARCH.svg</file>
         <file alias="SQLITE_APP">FileOperation/SQLITE_APP.svg</file>
         <file alias="MOVE_TO_TRASH_BIN">FileOperation/MOVE_TO_TRASH_BIN.svg</file>
+        <file alias="MOVE_TO_TRASH_BIN_INCLUDE_RELATED">FileOperation/MOVE_TO_TRASH_BIN_INCLUDE_RELATED.svg</file>
         <file alias="DELETE_ITEMS_PERMANENTLY">FileOperation/DELETE_ITEMS_PERMANENTLY.svg</file>
 
         <!--LeftSideToolBarIcons here-->
@@ -186,6 +187,7 @@
         <file alias="CAPITALIZE_KEEP_OTHER">Rename/CAPITALIZE_KEEP_OTHER.svg</file>
         <file alias="CAPITALIZE_LOWER_OTHER">Rename/CAPITALIZE_LOWER_OTHER.svg</file>
         <file alias="RENAME_TOGGLE_CASE">Rename/RENAME_TOGGLE_CASE.svg</file>
+        <file alias="RENAME_DOT_FILE_EXTENSION">Rename/RENAME_DOT_FILE_EXTENSION.svg</file>
         <file alias="NAME_STR_INSERTER_PATH">Rename/NAME_STR_INSERTER_PATH.svg</file>
         <file alias="NAME_STR_DELETER_PATH">Rename/NAME_STR_DELETER_PATH.svg</file>
         <file alias="NAME_STR_REPLACER_PATH">Rename/NAME_STR_REPLACER_PATH.svg</file>

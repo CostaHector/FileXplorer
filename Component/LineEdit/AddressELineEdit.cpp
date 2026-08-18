@@ -191,7 +191,7 @@ void AddressELineEdit::keyPressEvent(QKeyEvent* e) {
 
 void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
   const QString& draggedEnterPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
-  View::changeDropAction(event);
+  ViewHelper::changeDropAction(event);
   const QString& dragEnterMsg{RELEASE_HINT_MSG + draggedEnterPath};
   LOG_D("%s", qPrintable(dragEnterMsg));
   QToolTip::showText(mapToGlobal(event->pos()), dragEnterMsg);
@@ -200,10 +200,10 @@ void AddressELineEdit::dragEnterEvent(QDragEnterEvent* event) {
 
 void AddressELineEdit::dropEvent(QDropEvent* event) {
   setCurrentWidget(m_pathActionsTB);
-  View::changeDropAction(event);
+  ViewHelper::changeDropAction(event);
   const QString& to = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   LOG_D("Drop items to path[%s]", qPrintable(to));
-  View::onDropMimeData(event->mimeData(), event->dropAction(), to);
+  ViewHelper::onDropMimeData(event->mimeData(), event->dropAction(), to);
   event->accept();
 }
 
@@ -215,6 +215,6 @@ void AddressELineEdit::dragMoveEvent(QDragMoveEvent* event) {
   const QString& droppedPath = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   const QString& dragMoveMsg{RELEASE_HINT_MSG + droppedPath};
   QToolTip::showText(mapToGlobal(event->pos()), dragMoveMsg);
-  View::changeDropAction(event);
+  ViewHelper::changeDropAction(event);
   event->accept();
 }

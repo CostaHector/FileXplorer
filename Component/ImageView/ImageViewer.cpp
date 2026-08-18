@@ -5,7 +5,6 @@
 #include "SizeTool.h"
 #include "StyleSheet.h"
 #include "DataFormatter.h"
-#include "Logger.h"
 
 #include <QScrollBar>
 #include <QFileInfo>

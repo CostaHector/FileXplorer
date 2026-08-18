@@ -139,7 +139,7 @@ private slots:
     emit addLe.m_pathComboBox->lineEdit()->returnPressed();
     QVERIFY(addLe.isClickMode());
 
-    MOCKER(View::onDropMimeData)
+    MOCKER(ViewHelper::onDropMimeData)
         .expects(exactly(1))                                 //
         .with(any(), Qt::DropAction::CopyAction, folderPath) //
         .will(returnValue(true));
