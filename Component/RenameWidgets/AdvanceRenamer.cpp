@@ -84,19 +84,19 @@ QHBoxLayout* AdvanceRenamer::GetNameEditsLayout() {
   m_relNameTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_relNameTE)
   m_relNameTE->setProperty("UseCodeFontFamily", true);
-  m_relNameTE->setReadOnly(true);
+  m_relNameTE->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
   m_relNameTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
 
   m_oBaseTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_oBaseTE)
   m_oBaseTE->setProperty("UseCodeFontFamily", true);
-  m_oBaseTE->setReadOnly(true);
+  m_oBaseTE->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
   m_oBaseTE->setWordWrapMode(QTextOption::WrapMode::NoWrap);
 
   m_oExtTE = new (std::nothrow) QPlainTextEdit{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_oExtTE)
   m_oExtTE->setProperty("UseCodeFontFamily", true);
-  m_oExtTE->setReadOnly(true);
+  m_oExtTE->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
   m_nBaseTE = new (std::nothrow) MultiCursorEditor{this};
   CHECK_NULLPTR_RETURN_NULLPTR(m_nBaseTE)

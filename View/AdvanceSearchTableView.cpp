@@ -1,6 +1,7 @@
 ﻿#include "AdvanceSearchTableView.h"
 #include "FileOpActs.h"
 #include "ViewActions.h"
+#include "ViewHelper.h"
 #include <QKeyEvent>
 
 AdvanceSearchTableView::AdvanceSearchTableView(AdvanceSearchModel* sourceModel, SearchProxyModel* searchProxyModel, QWidget* parent)
@@ -34,11 +35,7 @@ void AdvanceSearchTableView::subscribe() {
 
 void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
-    if (this->selectionModel()->hasSelection()) {
-      emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
-    }
-    e->accept();
+  if (ViewHelper::keyPressEventCore(e)) {
     return;
   }
   QTableView::keyPressEvent(e);

@@ -87,12 +87,10 @@ FileOpActs::FileOpActs(QObject* parent)
 }
 
 QActionGroup* FileOpActs::GetDeleteActions() {
-  MOVE_TO_TRASHBIN->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_D));
   MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
   MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
                                    .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
 
-  DELETE_PERMANENTLY->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Delete));
   DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
   DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
                                      .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));

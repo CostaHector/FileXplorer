@@ -3,15 +3,6 @@
 #include "RenameActions.h"
 #include "PublicMacro.h"
 
-typedef enum tagRENAME_CASE_E {
-  UPPER_CASE = 0,
-  LOWER_CASE,
-  CAPITALIZE_FIRST_LETTER,
-  CAPITALIZE_FIRST_LETTER_AND_LOWER_OTHER,
-  TOGGLE_CASE,
-  BUTTON_CASE,
-} RENAME_CASE_E;
-
 struct StringCaseOperator {
   QStringList operator()(const QStringList& lst, const QAction* caseAct) const;
 };
@@ -46,12 +37,17 @@ QStringList StringCaseOperator::operator()(const QStringList& lst, const QAction
 RenameWidget_Case::RenameWidget_Case(QWidget* parent)  //
     : AdvanceRenamer(parent) {}
 
-auto RenameWidget_Case::RenameCore(const QStringList& replaceeList) -> QStringList {
+QStringList RenameWidget_Case::RenameCore(const QStringList& replaceeList) {
   const QAction* pCaseAct = g_renameAg().NAME_CASE->checkedAction();
   if (pCaseAct == nullptr) {
     LOG_W("pCaseAct is nullptr");
     return replaceeList;
   }
+
+  if (g_renameAg()._LOWER_CASE_FILE_EXTENSION->isChecked()) {
+    m_nExtTE->setPlainText(NameTool::Lower(m_nExtTE->toPlainText()));
+  }
+
   const StringCaseOperator sco;
   return sco(replaceeList, pCaseAct);
 }
@@ -66,6 +62,7 @@ QToolBar* RenameWidget_Case::InitControlTB() {
   QToolBar* caseControlTb{new (std::nothrow) QToolBar{"Case", this}};
   CHECK_NULLPTR_RETURN_NULLPTR(caseControlTb);
   caseControlTb->addActions(g_renameAg().NAME_CASE->actions());
+  caseControlTb->addAction(g_renameAg()._LOWER_CASE_FILE_EXTENSION);
   caseControlTb->addSeparator();
   caseControlTb->addWidget(m_nameExtIndependent);
   caseControlTb->addWidget(m_recursiveCB);
@@ -74,6 +71,6 @@ QToolBar* RenameWidget_Case::InitControlTB() {
 }
 
 void RenameWidget_Case::extraSubscribe() {                   //
-  connect(g_renameAg().NAME_CASE, &QActionGroup::triggered,  //
-          this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(g_renameAg().NAME_CASE, &QActionGroup::triggered, this, &AdvanceRenamer::OnlyTriggerRenameCore);
+  connect(g_renameAg()._LOWER_CASE_FILE_EXTENSION, &QAction::toggled, this, &AdvanceRenamer::OnlyTriggerRenameCore);
 }

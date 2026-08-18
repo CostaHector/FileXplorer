@@ -7,6 +7,7 @@ class RenameWidget_Replace : public AdvanceRenamer {
   Q_OBJECT
  public:
   using AdvanceRenamer::AdvanceRenamer;
+  virtual ~RenameWidget_Replace();
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
@@ -22,8 +23,13 @@ class RenameWidget_Replace : public AdvanceRenamer {
   QComboBox* m_newStrCB{nullptr};
 
  private:
+  void onOldStrDefaultModeChanged(int oldStrDefaultMode);
+  bool UpdateOldStrCbCurrentText();
+
   QComboBox* m_oldStrCB{nullptr};
+  QComboBox* m_oldStrDefaultModeCB{nullptr};
   QCheckBox* m_regexCB{nullptr};
+  bool m_oldStrInited = false;
 };
 
 class RenameWidget_Delete : public RenameWidget_Replace {

@@ -93,7 +93,7 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     QString torrentTextContents = FileTool::StringTextReader(fileAbsPath, &bReadOk);
     if (bReadOk) {
       detail += "Contents:<br/>";
-      detail += torrentTextContents.replace("\n", "<br/><br/>");
+      detail += torrentTextContents.replace("\n", "<br/>");
     }
   }
   detail += QString(R"(</font>)");

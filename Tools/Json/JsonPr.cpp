@@ -181,8 +181,12 @@ bool JsonPr::UpdateDurationField(QString videoAbsPath) {
     return false;
   }
   VideoDurationGetter mi;
-  m_Duration = VideoDurationGetter::GetLengthQuickStatic(mi, videoAbsPath);
-  return m_Duration > 0;
+  int newDuration = VideoDurationGetter::GetLengthQuickStatic(mi, videoAbsPath);
+  if (newDuration <= 0) {
+    return false;
+  }
+  m_Duration = newDuration;
+  return true;
 }
 
 bool JsonPr::UpdateVideoMD5Field(QString videoAbsPath) {

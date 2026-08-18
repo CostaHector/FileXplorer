@@ -77,7 +77,7 @@ class FileSystemListViewTest : public PlainTestSuite {
 
     listView.mousePressEvent(nullptr);
 
-    MOCKER(View::onMouseSidekeyBackwardForward)  //
+    MOCKER(ViewHelper::onMouseSidekeyBackwardForward)  //
         .expects(exactly(2))                     //
         .will(returnValue(true))                 //
         .then(returnValue(false));               //

@@ -61,27 +61,24 @@ void FileSystemTableView::initExclusivePreferenceSetting() {
 }
 
 void FileSystemTableView::dropEvent(QDropEvent* event) {
-  View::dropEventCore(this, _fsModel, event);
+  ViewHelper::dropEventCore(this, _fsModel, event);
 }
 
 void FileSystemTableView::dragEnterEvent(QDragEnterEvent* event) {
-  View::dragEnterEventCore(this, _fsModel, event);
+  ViewHelper::dragEnterEventCore(this, _fsModel, event);
 }
 
 void FileSystemTableView::dragMoveEvent(QDragMoveEvent* event) {
-  View::dragMoveEventCore(this, _fsModel, event);
+  ViewHelper::dragMoveEventCore(this, _fsModel, event);
 }
 
 void FileSystemTableView::dragLeaveEvent(QDragLeaveEvent* event) {
-  View::dragLeaveEventCore(_fsModel, event);
+  ViewHelper::dragLeaveEventCore(_fsModel, event);
 }
 
 void FileSystemTableView::keyPressEvent(QKeyEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
-  const int ky = e->key();
-  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && ky == Qt::Key_Delete) {
-    emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
-    e->accept();
+  if (ViewHelper::keyPressEventCore(e)) {
     return;
   }
   QTableView::keyPressEvent(e);

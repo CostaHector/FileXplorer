@@ -9,7 +9,7 @@
 
 class FileSystemModel;
 
-namespace View {
+namespace ViewHelper {
 bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
 
 bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
@@ -22,6 +22,8 @@ void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* 
 void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event);
 
 void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
+
+bool keyPressEventCore(QKeyEvent* e);
 }  // namespace View
 
 #endif  // VIEWHELPER_H

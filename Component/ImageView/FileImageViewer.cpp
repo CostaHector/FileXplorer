@@ -2,16 +2,26 @@
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "FileTool.h"
+#include "RateHelper.h"
+#include "RecycleCfmDlg.h"
+#include "BatchRenameBy.h"
+#include "FileOperatorPub.h"
+#include "UndoRedo.h"
+#include "FileOpActs.h"
 #include "PublicMacro.h"
-
+#include "NotificatorMacro.h"
 #include <QPixmap>
 #include <QMenu>
 
-void SetNavigateButtonNeedTransparent(QToolBar* toolBar, QAction* pAct) {
+void SetNavigateButtonNeedTransparent(QToolBar* toolBar) {
   CHECK_NULLPTR_RETURN_VOID(toolBar);
-  CHECK_NULLPTR_RETURN_VOID(pAct);
-  if (QWidget *widget = toolBar->widgetForAction(pAct)) {
-    widget->setProperty("needTransparentFlag", true);
+  for (QAction* pAct: toolBar->actions()) {
+    if (pAct->isSeparator()) {
+      continue;
+    }
+    if (QWidget *widget = toolBar->widgetForAction(pAct)) {
+      widget->setProperty("needTransparentFlag", true);
+    }
   }
 }
 
@@ -25,19 +35,41 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
   CHECK_NULLPTR_RETURN_VOID(mNavigateIntoSub);
   mNavigateIntoSub->setCheckable(true);
   mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
-  SetNavigateButtonNeedTransparent(mNaviToolBar, mNavigateIntoSub);
 
   m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "<");
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
   m_prevButton->setShortcut(QKeySequence(Qt::Key_Left));
   m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
-  SetNavigateButtonNeedTransparent(mNaviToolBar, m_prevButton);
 
   m_nextButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_NEXT"}, ">");
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
   m_nextButton->setShortcut(QKeySequence(Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
-  SetNavigateButtonNeedTransparent(mNaviToolBar, m_nextButton);
+
+  mNaviToolBar->addSeparator();
+  m_recycleThisImageButton = mNaviToolBar->addAction(QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle");
+  CHECK_NULLPTR_RETURN_VOID(m_recycleThisImageButton);
+  m_recycleThisImageButton->setShortcut(QKeySequence(Qt::Key_Delete));
+  m_recycleThisImageButton->setShortcutVisibleInContextMenu(true);
+  m_recycleThisImageButton->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Move the current image to the trash bin.")
+          .arg(m_recycleThisImageButton->text(),
+               m_recycleThisImageButton->shortcut().toString())
+      );
+
+  m_recyleThisImageAndRelatedButton = mNaviToolBar->addAction(QIcon{":img/MOVE_TO_TRASH_BIN_INCLUDE_RELATED"}, "Recyle Related");
+  CHECK_NULLPTR_RETURN_VOID(m_recyleThisImageAndRelatedButton);
+  m_recyleThisImageAndRelatedButton->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_D));
+  m_recyleThisImageAndRelatedButton->setShortcutVisibleInContextMenu(true);
+  m_recyleThisImageAndRelatedButton->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Delete the current image along with all associated sidecar files (e.g., .xmp, .pp3, or paired RAW+JPEG).")
+          .arg(m_recyleThisImageAndRelatedButton->text(),
+               m_recyleThisImageAndRelatedButton->shortcut().toString())
+      );
+  mNaviToolBar->addSeparator();
+  mNaviToolBar->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
+
+  SetNavigateButtonNeedTransparent(mNaviToolBar);
 
   subscribe();
 }
@@ -48,6 +80,9 @@ void FileImageViewer::subscribe() {
   connect(m_prevButton, &QAction::triggered, this, &FileImageViewer::NavigateImagePrevious);
   connect(m_nextButton, &QAction::triggered, this, &FileImageViewer::NavigateImageNext);
   connect(mNavigateIntoSub, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
+
+  connect(m_recycleThisImageButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImage);
+  connect(m_recyleThisImageAndRelatedButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImageAndItsRelated);
 }
 
 QString FileImageViewer::GetImageAbsPath() const { //
@@ -111,6 +146,46 @@ void FileImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
   mImgIt(mParentPath, true); // force refresh images in folder structure
 }
 
+bool FileImageViewer::RecycleCurrentImage() {
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds{FileOperatorType::ACMD::GetInstMOVETOTRASH(mParentPath, mRel2Image)};
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
+  if (!bAllSucceed) {
+    return false;
+  }
+  return NavigateImageNext();
+}
+
+bool FileImageViewer::RecycleCurrentImageAndItsRelated() {
+  const QString currentImageAbsPath = GetImageAbsPath();
+
+  QString jsonPath;
+  if (!RateHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
+    // no json find no need recycle, only recycle itself
+    return RecycleCurrentImage();
+  }
+
+  QString jsonLocatedInPath = PathTool::absolutePath(jsonPath);
+  QStringList jsonFileNames{PathTool::relativePath(jsonPath, jsonLocatedInPath.size())};
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+  const int relatedFilesCnt{filesNeedRecycle.size()};
+
+  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
+    return true;
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relatedFilesCnt);
+  for (const auto& nm : filesNeedRecycle) {
+    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
+  }
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
+  if (!bAllSucceed) {
+    return false;
+  }
+  return NavigateImageNext();
+}
+
 void FileImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
   if (mMenu == nullptr) {
     mMenu = new (std::nothrow) QMenu{"Image viewer system menu", nullptr};
@@ -119,6 +194,9 @@ void FileImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
     _OPEN_IN_SYSTEM_APPLICATION = mMenu->addAction(QIcon{":img/SYSTEM_APPLICATION"}, tr("Open in system application"));
     _REVEAL_IN_FILE_EXPLORER = mMenu->addAction(QIcon{":img/REVEAL_IN_EXPLORER"}, tr("Reveal in explorer"));
     _COPY_FILE_NAME = mMenu->addAction(QIcon{":img/COPY_TEXT"}, tr("Copy file name"));
+    mMenu->addSeparator();
+    mMenu->addAction(m_recycleThisImageButton);
+    mMenu->addAction(m_recyleThisImageAndRelatedButton);
 
     _OPEN_IN_SYSTEM_APPLICATION->setShortcutVisibleInContextMenu(true);
     _REVEAL_IN_FILE_EXPLORER->setShortcutVisibleInContextMenu(true);

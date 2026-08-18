@@ -78,10 +78,11 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
     advSearch.clearSelection();
     QSignalSpy removeSignalSpy(FileOpActs::GetInst().MOVE_TO_TRASHBIN,
                                &QAction::triggered);
-    // nothing selected
+    // nothing selected, but still emit signal
     QKeyEvent deleteEvent{QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier, QString(), false, 1};
     advSearch.keyPressEvent(&deleteEvent);
-    QCOMPARE(removeSignalSpy.count(), 0);
+    QCOMPARE(removeSignalSpy.count(), 1);
+    removeSignalSpy.clear();
 
     // all 3 item(s) selected
     advSearch.selectAll();

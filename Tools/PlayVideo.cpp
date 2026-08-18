@@ -8,6 +8,30 @@
 #include <QFileInfo>
 #include <QProcess>
 
+bool isDvdDirectory(const QString& rawPath, QString& stdDvdPath) {
+  if (!QFileInfo{rawPath}.isDir()) {
+    return false;
+  }
+  if (PathTool::fileName(rawPath).compare("VIDEO_TS", Qt::CaseInsensitive) == 0) {
+    stdDvdPath = rawPath;
+    return true;
+  }
+  if (QFileInfo{PathTool::Path2Join(rawPath, "VIDEO_TS")}.isDir()) {
+    stdDvdPath = PathTool::Path2Join(rawPath, "VIDEO_TS");
+    return true;
+  }
+  return false;
+}
+
+bool getPrimaryIFOFile(const QString& stdDvdPath, QString& primaryIfoFile) {
+  const QDir dvdDir{stdDvdPath, "*.ifo", QDir::SortFlag::Size, QDir::Filter::Files}; // size in descending
+  if (dvdDir.count() > 0) {
+    return false;
+  }
+  primaryIfoFile = PathTool::Path2Join(stdDvdPath, dvdDir.entryList().front());
+  return true;
+}
+
 bool PlayADir(const QString& dirPath) {
 #ifdef RUNNING_UNIT_TESTS
   return true;
@@ -19,10 +43,13 @@ bool PlayADir(const QString& dirPath) {
   process.setProgram("xdg-open");
 #endif
   QString playArg{dirPath};
-  if (QFile{PathTool::Path2Join(dirPath, "VTS_01_0.IFO")}.exists()) {
-    playArg = PathTool::Path2Join(dirPath, "VTS_01_0.IFO");
-  } else if (QFile{PathTool::Path2Join(dirPath, "VIDEO_TS/VTS_01_0.IFO")}.exists()) {
-    playArg = PathTool::Path2Join(dirPath, "VIDEO_TS/VTS_01_0.IFO");
+
+  QString stdDvdPath;
+  if (isDvdDirectory(dirPath, stdDvdPath)) {
+    QString primaryIfoFile;
+    if (getPrimaryIFOFile(stdDvdPath, primaryIfoFile)) {
+      playArg.swap(primaryIfoFile);
+    }
   }
   process.setArguments({QDir::toNativeSeparators(playArg)});
 

@@ -1,8 +1,11 @@
 #include "RecycleCfmDlg.h"
 #include "InputDialogHelper.h"
+#include "PathTool.h"
+#include "DataFormatter.h"
 
 #include <QMessageBox>
 #include <QIcon>
+#include <QFileInfo>
 
 namespace RecycleCfmDlg {
 
@@ -12,7 +15,16 @@ bool recycleQuestion(const QString& locatedIn, const QStringList& files, bool bD
   if (bDeletePermanently) {
     recycleMsg += "<b>WARNING: This action cannot be undone!</b> ";
   }
-  recycleMsg += QString{"Following <b>%1</b> item(s) under path[%2] "}.arg(files.size()).arg(locatedIn);
+
+  qint64 totalSize{0};
+  for (const QString& fileName: files) {
+    totalSize += QFileInfo{PathTool::Path2Join(locatedIn, fileName)}.size();
+  }
+
+  recycleMsg += QString{"Following <b>%1</b> item(s)<br/>"
+                        "size: <b>%2</b><br/>"
+                        "under path: %3<br/>"}//
+                    .arg(files.size()).arg(DataFormatter::formatFileSizeGMKB(totalSize)).arg(locatedIn);
   recycleMsg += bDeletePermanently ? "will be permanently deleted." : "will be moved to the Recycle Bin.";
 
   QString recycleDetailMsg;

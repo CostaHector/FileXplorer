@@ -37,6 +37,8 @@ BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
 
   COPY_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, tr("Copy Selected Text"), this};
   COPY_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_3));
+  COPY_SELECTED_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Copy the selected text to system clipboard"}//
+                                              .arg(COPY_SELECTED_TEXT->text(), COPY_SELECTED_TEXT->shortcut().toString()));
 }
 
 QMenu* BrowserActions::GetSearchInDBMenu(QWidget* parent) {

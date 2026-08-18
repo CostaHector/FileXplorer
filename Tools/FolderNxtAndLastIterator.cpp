@@ -1,6 +1,5 @@
 #include "FolderNxtAndLastIterator.h"
 #include "Logger.h"
-#include "PathTool.h"
 #include "PublicVariable.h"
 #include <QDir>
 #include <QDirIterator>

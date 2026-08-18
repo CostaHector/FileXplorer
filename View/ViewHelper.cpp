@@ -4,12 +4,12 @@
 #include "ComplexOperation.h"
 #include "AddressBarActions.h"
 #include "ViewActions.h"
-#include "ImageTool.h"
+#include "FileOpActs.h"
 #include <QApplication>
 #include <QDrag>
 #include <QPainter>
 
-namespace View {
+namespace ViewHelper {
 bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton) {
   // when return true, event should not be populated to its parent
   if (mods == Qt::KeyboardModifier::NoModifier) {
@@ -139,4 +139,17 @@ void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event) {
   event->accept();
 }
 
+bool keyPressEventCore(QKeyEvent *e) {
+  // return true when no need further process
+  if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
+    emit FileOpActs::GetInst().MOVE_TO_TRASHBIN->triggered();
+    e->accept();
+    return true;
+  } else if (e->modifiers() == Qt::KeyboardModifier::ShiftModifier && e->key() == Qt::Key_Delete) {
+    emit FileOpActs::GetInst().DELETE_PERMANENTLY->triggered();
+    e->accept();
+    return true;
+  }
+  return false;
+}
 }  // namespace View

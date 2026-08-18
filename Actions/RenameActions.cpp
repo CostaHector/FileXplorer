@@ -19,10 +19,13 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), tr("Capitalize first and keep other"), this);
   _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), tr("Capitalize first and lower other"), this);
   _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), tr("Toggle Case"), this);
+  _LOWER_CASE_FILE_EXTENSION = new (std::nothrow) QAction(QIcon{":img/RENAME_DOT_FILE_EXTENSION"}, tr("Lowercase Extension"), this);
+  _LOWER_CASE_FILE_EXTENSION->setToolTip("Lowercase File Extension");
+  _LOWER_CASE_FILE_EXTENSION->setCheckable(true);
   NAME_CASE = Get_CASE_Actions();
 }
 
-auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
+QActionGroup* RenameActions::Get_CASE_Actions() {
   _UPPER_CASE->setToolTip("All uppercase letters");
   _LOWER_CASE->setToolTip("All lowercase letters");
   _TOGGLE_CASE->setToolTip("Alternates between upper-and lower-case");
@@ -50,7 +53,7 @@ auto RenameActions::Get_CASE_Actions() -> QActionGroup* {
   return caseAG;
 }
 
-auto RenameActions::Get_Rename_Actions() -> QActionGroup* {
+QActionGroup* RenameActions::Get_Rename_Actions() {
   _NUMERIZER->setShortcut(QKeySequence(Qt::Key_F2));
   _NUMERIZER->setToolTip(QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.").arg(_NUMERIZER->text()).arg(_NUMERIZER->shortcut().toString()));
 

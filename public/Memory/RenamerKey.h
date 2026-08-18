@@ -51,6 +51,7 @@ constexpr KV NEW_STR_LIST{"RenamerKey/NEW_STR_LIST", //
                               "UHD"},
                           GeneralDataType::Type::MULTI_LINE_STR, //
                           GeneralCStrChecker};
+constexpr KV OLD_STR_DEFAULT_MODE_SELECT{"RenamerKey/OLD_STR_DEFAULT_MODE_SELECT", Var{0}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<0, 100>};
 constexpr KV INSERT_INDEXES_LIST{"RenamerKey/INSERT_INDEXES_LIST", //
                                  Var{"0\n"                         // insert at index 0
                                      "260\n"                       // insert after back

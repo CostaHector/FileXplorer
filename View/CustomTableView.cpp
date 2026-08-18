@@ -239,7 +239,7 @@ bool CustomTableView::setRowHeight(int newRowHeight) {
 
 void CustomTableView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  if (View::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
+  if (ViewHelper::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {
     event->accept();
     return;
   }

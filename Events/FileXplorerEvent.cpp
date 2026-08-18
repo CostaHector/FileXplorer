@@ -627,8 +627,8 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     return;
   }
 
-  const bool bPathSwichedAwayFirst{preNames.size() > 100};
-  if (bPathSwichedAwayFirst) {
+  const bool bPathSwitchedAwayFirst{preNames.size() > 100};
+  if (bPathSwitchedAwayFirst) {
     _fileSysModel->setRootPath(""); // switch to another path
   }
   renameWid.init();
@@ -637,7 +637,7 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
   if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
   }
-  if (bPathSwichedAwayFirst) {
+  if (bPathSwitchedAwayFirst) {
     _fileSysModel->setRootPath(currentPath); // switch to another path
   }
 }
