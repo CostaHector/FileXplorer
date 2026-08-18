@@ -12,6 +12,7 @@
 #include "UndoRedo.h"
 #include "RecycleCfmDlg.h"
 #include "InputDialogHelper.h"
+#include "ViewHelper.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -287,6 +288,14 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
     emit sceneGridClicked(proIndex, imageRect, pos);
   }
   QListView::mousePressEvent(event);
+}
+
+void SceneListView::keyPressEvent(QKeyEvent* e) {
+  CHECK_NULLPTR_RETURN_VOID(e);
+  if (ViewHelper::keyPressEventCore(e)) {
+    return;
+  }
+  CustomListView::keyPressEvent(e);
 }
 
 void SceneListView::onCellVisualUpdateRequested(const QModelIndex& ind) {

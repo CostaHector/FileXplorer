@@ -44,6 +44,12 @@ class JsonTableView : public CustomTableView {
  signals:
   void currentJsonSelectedChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
 
+ public slots:
+  int onRecycleJsonAndRelated();
+
+ protected:
+  void keyPressEvent(QKeyEvent* e) override;
+
  private:
   void onSelectNewJsonLine(const QModelIndex &current);
   int onFixSelectionRecordContents(bool bFixed);
@@ -51,6 +57,7 @@ class JsonTableView : public CustomTableView {
   QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
+  QAction* _RECYCLE_JSON_RELATED_FILES{nullptr};
 
 #ifdef RUNNING_UNIT_TESTS
   QWidget* pWidgetInCellMock{nullptr};

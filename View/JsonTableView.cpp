@@ -3,9 +3,12 @@
 #include "NotificatorMacro.h"
 #include "StudiosManager.h"
 #include "NameTool.h"
-#include "PathTool.h"
 #include "BatchRenameBy.h"
 #include "StyleSheetEditDelegate.h"
+#include "RecycleCfmDlg.h"
+#include "FileOperatorPub.h"
+#include "UndoRedo.h"
+#include "ViewHelper.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -39,9 +42,15 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   CHECK_NULLPTR_RETURN_VOID(castColumnDelegator);
   setItemDelegateForColumn(JSON_KEY_E::Cast, castColumnDelegator);
 
+  _RECYCLE_JSON_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
+  CHECK_NULLPTR_RETURN_VOID(_RECYCLE_JSON_RELATED_FILES)
+  _RECYCLE_JSON_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin") //
+                                               .arg(_RECYCLE_JSON_RELATED_FILES->text())
+                                               .arg(_RECYCLE_JSON_RELATED_FILES->shortcut().toString()));
+
   {
     auto& jsonInst = g_JsonActions();
-    const QList<QAction*> jsonSpecialActs{jsonInst._RENAME_JSON_AND_RELATED_FILES};
+    const QList<QAction*> jsonSpecialActs{jsonInst._RENAME_JSON_AND_RELATED_FILES, _RECYCLE_JSON_RELATED_FILES};
     PushFrontExclusiveActions(jsonSpecialActs);
   }
 
@@ -497,6 +506,7 @@ void JsonTableView::subscribe() {
   connect(inst._LOWER_ALL_WORDS, &QAction::triggered, this, [this]() { onSelectionCaseOperation(false); });
 
   connect(inst._RENAME_JSON_AND_RELATED_FILES, &QAction::triggered, this, &JsonTableView::onRenameJsonAndRelated);
+  connect(_RECYCLE_JSON_RELATED_FILES, &QAction::triggered, this, &JsonTableView::onRecycleJsonAndRelated);
 
   connect(inst._INFER_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
   connect(inst._FORMAT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onFormatCast);
@@ -533,4 +543,39 @@ void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
   const JsonPr& json = _JsonModel->GetJsonPr(srcModelInd);
   const QString jsonAbsPath = json.GetJsonFileAbsPath();
   emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), json.GetVideosAbsPath());
+}
+
+int JsonTableView::onRecycleJsonAndRelated() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip recycle");
+    return 0;
+  }
+  const QString& jsonLocatedInPath{_JsonModel->rootPath()};
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const QStringList& jsonFileNames{_JsonModel->rel2fileNames(indexes)};
+  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+  const int relatedFilesCnt{filesNeedRecycle.size()};
+
+  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
+    return 0;
+  }
+
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relatedFilesCnt);
+  for (const auto& nm : filesNeedRecycle) {
+    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
+  }
+  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
+  const int removeRowCnt = _JsonModel->AfterJsonFilesNameRenamed(indexes);
+  LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
+  return relatedFilesCnt;
+}
+
+void JsonTableView::keyPressEvent(QKeyEvent* e) {
+  CHECK_NULLPTR_RETURN_VOID(e);
+  if (ViewHelper::keyPressEventCore(e)) {
+    return;
+  }
+  CustomTableView::keyPressEvent(e);
 }

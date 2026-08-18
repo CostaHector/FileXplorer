@@ -40,6 +40,7 @@ class SceneListView : public CustomListView {
 
  protected:
   void mousePressEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* e) override;
 
  private:
   void initExclusivePreferenceSetting() override;
