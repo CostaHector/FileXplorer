@@ -58,6 +58,14 @@ void CurrentRowPreviewer::UpdatePreview() {
   }
 }
 
+void CurrentRowPreviewer::onRequestStopMediaPlay() {
+  using namespace PreviewTypeTool;
+  if (mCurrentPreviewType != PREVIEW_TYPE_E::CATEGORY) {
+    return;
+  }
+  m_fileFolderPreviewStackedWid->StopVideoPlay();
+}
+
 QSize CurrentRowPreviewer::sizeHint() const {
   static const int w = Configuration().value("CurrentRowPreviewer/width", SizeTool::DOCKER_DEFAULT_SIZE.width()).toInt();
   return {w, QStackedWidget::sizeHint().height()};

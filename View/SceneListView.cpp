@@ -319,7 +319,7 @@ int SceneListView::onRenameSceneAndRelated() {
     LOG_INFO_NP("nothing selected", "skip rename");
     return 0;
   }
-
+  emit requestStopMediaPlay();
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
@@ -337,7 +337,7 @@ int SceneListView::onRenameSceneAndRelatedInsert() {
     LOG_INFO_NP("Skip rename(insert)", "no row selected");
     return 0;
   }
-
+  emit requestStopMediaPlay();
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(srcIndexes)};
   const int relatedFilesCnt{BatchRenameBy::InsertBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
@@ -355,7 +355,7 @@ int SceneListView::onRenameSceneAndRelatedNumerize() {
     LOG_INFO_NP("Skip rename(numerize)", "no row selected");
     return 0;
   }
-
+  emit requestStopMediaPlay();
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(srcIndexes)};
   const int relatedFilesCnt{BatchRenameBy::NumerizerBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
@@ -372,6 +372,7 @@ int SceneListView::onRecycleSceneAndRelated() {
     LOG_INFO_NP("nothing selected", "skip recycle");
     return 0;
   }
+  emit requestStopMediaPlay();
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
@@ -485,7 +486,8 @@ int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringLi
     LOG_INFO_P("[Cancel] User cancel archive", "%d item(s) no change", allFilesNeedArchive.size());
     return 0;
   }
-
+  // "Avoid file blocking; stop playback before archiving."
+  emit requestStopMediaPlay();
   bool bAllSucceed = UndoRedo::GetInst().Do(archiveCmds);
   const int archiveRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
   LOG_OE_P(bAllSucceed, "Archive", "Archive [%d] json/img/video items, rows[%d]", allFilesNeedArchive.size(), archiveRowCnt);

@@ -30,6 +30,7 @@ public:
 signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
   void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
+  void requestStopMediaPlay();
 
 public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
