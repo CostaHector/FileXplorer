@@ -239,14 +239,19 @@ QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const
   return relativePaths2FileName;
 }
 
-std::array<QStringList, RateHelper::BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes) const {
-  std::array<QStringList, RateHelper::BUTT_V> movieRate2Jsons;
+std::array<QStringList, RateHelper::BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const {
+  std::array<QStringList, RateHelper::BUTT_V> movieRate2JsonsArr;
   const int N = rootPath().size();
   for (const QModelIndex& index : indexes) {
     const QString& fullPath = GetJson(index);
-    movieRate2Jsons[GetRate(index)].push_back(PathTool::relativePath(fullPath, N));
+    const int rate = GetRate(index);
+    if (rate == RateHelper::BEGIN_INVALID_V) {
+      continue;
+    }
+    nonRate0Indexes.push_back(index);
+    movieRate2JsonsArr[rate].push_back(PathTool::relativePath(fullPath, N));
   }
-  return movieRate2Jsons;
+  return movieRate2JsonsArr;
 }
 
 bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {

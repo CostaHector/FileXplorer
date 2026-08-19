@@ -7,7 +7,8 @@
 class RateHelper {
  public:
   enum MOVIE_RATE_VALUE {
-    MIN_V = 0, // initial value, unspecified value
+    BEGIN_INVALID_V = 0,
+    MIN_V = BEGIN_INVALID_V, // initial value, unspecified value
     MAX_V = 10,
     BUTT_V,
   };
