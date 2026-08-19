@@ -2196,7 +2196,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     <message>
         <location line="+2"/>
         <source>Essentials</source>
-        <translation>必备级</translation>
+        <translation>精选级</translation>
     </message>
     <message>
         <location line="+2"/>
