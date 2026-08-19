@@ -3,6 +3,8 @@
 #include "StyleSheet.h"
 #include "SceneInfo.h"
 #include "PublicMacro.h"
+#include "RateHelper.h"
+#include "VideoTierTool.h"
 #include <QToolBar>
 
 SceneInPageActions& SceneInPageActions::GetInst() {
@@ -64,6 +66,33 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
                                       "Remove all scene cache files (.scn) recursively from the selected directory. "
                                       "This does not affect the original JSON source files.")
                                   .arg(_CLEAR_SCN_FILE->text(), _CLEAR_SCN_FILE->shortcut().toString()));
+
+  {
+    _ARCHIVE_BY_MOVIE_SCORE = new (std::nothrow) QAction(QIcon(":img/VIDEO_ARCHIVE"), tr("Archive by Score"), this);
+    CHECK_NULLPTR_RETURN_VOID(_ARCHIVE_BY_MOVIE_SCORE);
+    _ARCHIVE_BY_MOVIE_SCORE->setToolTip(QString("<b>%1 (%2)</b><br/>"
+                                                "Archive selected items to the destination folder based on their movie scores defined in the JSON file.")
+                                            .arg(_ARCHIVE_BY_MOVIE_SCORE->text(), _ARCHIVE_BY_MOVIE_SCORE->shortcut().toString()));
+
+    using namespace VideoTierTool;
+    _ARCHIVE_ARCHIVAL = new QAction{RateHelper::GetRatePixmap(10), tr("Archival"), this};
+    _ARCHIVE_ARCHIVAL->setProperty("ArchivedVideoTier", (int)VideoTierE::ARCHIVAL);
+    _ARCHIVE_ESSENTIALS = new QAction{RateHelper::GetRatePixmap(8), tr("Essentials"), this};
+    _ARCHIVE_ESSENTIALS->setProperty("ArchivedVideoTier", (int)VideoTierE::ESSENTIALS);
+    _ARCHIVE_NORMALS = new QAction{RateHelper::GetRatePixmap(6), tr("Normals"), this};
+    _ARCHIVE_NORMALS->setProperty("ArchivedVideoTier", (int)VideoTierE::NORMALS);
+    _ARCHIVE_CASUALS = new QAction{RateHelper::GetRatePixmap(3), tr("Casuals"), this};
+    _ARCHIVE_CASUALS->setProperty("ArchivedVideoTier", (int)VideoTierE::CASUALS);
+    _ARCHIVE_DISPOSABLE = new QAction{RateHelper::GetRatePixmap(1), tr("Disposable"), this};
+    _ARCHIVE_DISPOSABLE->setProperty("ArchivedVideoTier", (int)VideoTierE::DISPOSABLE);
+
+    _ARCHIVE_AG = new QActionGroup(this);
+    _ARCHIVE_AG->addAction(_ARCHIVE_ARCHIVAL);
+    _ARCHIVE_AG->addAction(_ARCHIVE_ESSENTIALS);
+    _ARCHIVE_AG->addAction(_ARCHIVE_NORMALS);
+    _ARCHIVE_AG->addAction(_ARCHIVE_CASUALS);
+    _ARCHIVE_AG->addAction(_ARCHIVE_DISPOSABLE);
+  }
 
   _BY_NAME = new (std::nothrow) QAction(tr("Movie Name"), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_NAME);

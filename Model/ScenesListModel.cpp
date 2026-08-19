@@ -4,6 +4,7 @@
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
 #include "ImageTool.h"
+#include "PathTool.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -233,9 +234,19 @@ QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const
   const int N = rootPath().size();
   for (const QModelIndex& index : indexes) {
     const QString& fullPath = GetJson(index);
-    relativePaths2FileName.push_back(fullPath.isEmpty() ? "" : fullPath.mid(N + 1));
+    relativePaths2FileName.push_back(PathTool::relativePath(fullPath, N));
   }
   return relativePaths2FileName;
+}
+
+std::array<QStringList, RateHelper::BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes) const {
+  std::array<QStringList, RateHelper::BUTT_V> movieRate2Jsons;
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const QString& fullPath = GetJson(index);
+    movieRate2Jsons[GetRate(index)].push_back(PathTool::relativePath(fullPath, N));
+  }
+  return movieRate2Jsons;
 }
 
 bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {

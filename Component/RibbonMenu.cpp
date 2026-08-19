@@ -344,6 +344,9 @@ QToolBar* RibbonMenu::LeafScenesTools() const {
     CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
     sceneTB->addWidget(orderTB);
   }
+  sceneTB->addSeparator();
+  sceneTB->addAction(ag._ARCHIVE_BY_MOVIE_SCORE);
+  sceneTB->addActions(ag._ARCHIVE_AG->actions());
   sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return sceneTB;
 }

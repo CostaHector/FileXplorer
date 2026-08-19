@@ -5,6 +5,7 @@
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
 #include "SceneStyleDelegate.h"
+#include "VideoTierTool.h"
 
 class ScenesListModel;
 
@@ -39,6 +40,7 @@ public slots:
   void toggleSortRequestImplementer(bool bPageByPage);
   bool onArchiveActionTriggered(const QAction* archivedToAct);
   int onArchiveTo(int videoTier);
+  int onArchiveToByMovieRate();
 
 protected:
   void mousePressEvent(QMouseEvent* event) override;
@@ -46,6 +48,7 @@ protected:
 
 private:
   void initExclusivePreferenceSetting() override;
+  int ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]);
 
   QModelIndexList selectedRowsSource() const;
 
@@ -54,8 +57,6 @@ private:
   QAction* _RENAME_SCENE_RELATED_FILES_NUMERIZE{nullptr};
   QAction* _RECYCLE_SCENE_RELATED_FILES{nullptr};
   QAction* _OPEN_CORRESPONDING_FOLDER{nullptr};
-  QAction* _ARCHIVE_ESSENTIALS{nullptr},* _ARCHIVE_NORMALS{nullptr},* _ARCHIVE_CASUALS{nullptr},* _ARCHIVE_DISPOSABLE{nullptr};
-  QActionGroup* _ARCHIVE_AG{nullptr};
 
   ScenesListModel* _sceneModel{nullptr};
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};

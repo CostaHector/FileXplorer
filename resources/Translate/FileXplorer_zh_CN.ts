@@ -2154,7 +2154,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../../Actions/SceneInPageActions.cpp" line="+15"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+17"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -2184,7 +2184,37 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>清除场景</translation>
     </message>
     <message>
+        <location line="+8"/>
+        <source>Archive by Score</source>
+        <translation>根据评分归类</translation>
+    </message>
+    <message>
         <location line="+7"/>
+        <source>Archival</source>
+        <translation>归档级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Essentials</source>
+        <translation>必备级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Normals</source>
+        <translation>普通级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Casuals</source>
+        <translation>尝鲜级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Disposable</source>
+        <translation>可丢弃级</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Movie Name</source>
         <translation>按名称</translation>
     </message>
@@ -2227,7 +2257,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+44"/>
+        <location filename="../../View/SceneListView.cpp" line="+45"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>

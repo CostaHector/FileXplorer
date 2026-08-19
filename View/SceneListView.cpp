@@ -13,14 +13,11 @@
 #include "RecycleCfmDlg.h"
 #include "InputDialogHelper.h"
 #include "ViewHelper.h"
+#include "VideoTierTool.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QMouseEvent>
-
-enum class VideoTierE {
-  INVALID, ESSENTIALS, NORMALS, CASUALS, DISPOSABLE,
-};
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
@@ -71,28 +68,15 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   _OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("Play this folder"), this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
 
-  _ARCHIVE_ESSENTIALS = new QAction{"Archived to Essentials", this};
-  _ARCHIVE_ESSENTIALS->setProperty("ArchivedVideoTier", (int)VideoTierE::ESSENTIALS);
-  _ARCHIVE_NORMALS = new QAction{"Archived to Normals", this};
-  _ARCHIVE_NORMALS->setProperty("ArchivedVideoTier", (int)VideoTierE::NORMALS);
-  _ARCHIVE_CASUALS = new QAction{"Archived to Casuals", this};
-  _ARCHIVE_CASUALS->setProperty("ArchivedVideoTier", (int)VideoTierE::CASUALS);
-  _ARCHIVE_DISPOSABLE = new QAction{"Archived to Disposable", this};
-  _ARCHIVE_DISPOSABLE->setProperty("ArchivedVideoTier", (int)VideoTierE::DISPOSABLE);
-
-  _ARCHIVE_AG = new QActionGroup(this);
-  _ARCHIVE_AG->addAction(_ARCHIVE_ESSENTIALS);
-  _ARCHIVE_AG->addAction(_ARCHIVE_NORMALS);
-  _ARCHIVE_AG->addAction(_ARCHIVE_CASUALS);
-  _ARCHIVE_AG->addAction(_ARCHIVE_DISPOSABLE);
-
+  auto& inst = SceneInPageActions::GetInst();
   QList<QAction*> exclusiveActions{
-      SceneInPageActions::GetInst()._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
+      inst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
       _RENAME_SCENE_RELATED_FILES_REPLACE,  //
       _RENAME_SCENE_RELATED_FILES_INSERT,   //
       _RENAME_SCENE_RELATED_FILES_NUMERIZE, //
   };
-  exclusiveActions += _ARCHIVE_AG->actions();
+  exclusiveActions += inst._ARCHIVE_AG->actions();
+  exclusiveActions.push_back(inst._ARCHIVE_BY_MOVIE_SCORE);
   exclusiveActions.push_back(_RECYCLE_SCENE_RELATED_FILES);
   exclusiveActions.push_back(_OPEN_CORRESPONDING_FOLDER);
 
@@ -132,7 +116,6 @@ void SceneListView::subscribe() {
   connect(_RENAME_SCENE_RELATED_FILES_INSERT, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedInsert);
   connect(_RENAME_SCENE_RELATED_FILES_NUMERIZE, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedNumerize);
   connect(_RECYCLE_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRecycleSceneAndRelated);
-  connect(_ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
@@ -150,6 +133,9 @@ void SceneListView::subscribe() {
   connect(sceneActInst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS, &QAction::triggered, this, &SceneListView::onCreateFrontImageThumbnail);
   connect(sceneActInst._INCLUDEING_SUBDIRECTORIES, &QAction::toggled, _sceneModel, &ScenesListModel::onSubdirectoriesToggled);
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
+  connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
+  connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
+
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
 }
@@ -408,44 +394,6 @@ int SceneListView::onRecycleSceneAndRelated() {
   return relatedFilesCnt;
 }
 
-VideoTierE MovieRate2VideoTierE(int movieRate) {
-  switch (movieRate) {
-    case 0:
-      return VideoTierE::INVALID;
-    case 1:
-    case 2:
-    case 3:
-      return VideoTierE::DISPOSABLE;
-    case 4:
-    case 5:
-      return VideoTierE::CASUALS;
-    case 6:
-    case 7:
-      return VideoTierE::NORMALS;
-    case 8:
-    case 9:
-    case 10:
-      return VideoTierE::ESSENTIALS;
-    default:
-      return VideoTierE::INVALID;
-  }
-}
-
-QString TierNameStr(int videoTier) {
-  switch (videoTier) {
-    case (int)VideoTierE::ESSENTIALS:
-      return "Essentials";
-    case (int)VideoTierE::NORMALS:
-      return "Normal";
-    case (int)VideoTierE::CASUALS:
-      return "Casuals";
-    case (int)VideoTierE::DISPOSABLE:
-      return "Disposable";
-    default:
-      return "invalid";
-  }
-}
-
 bool SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
   if (archivedToAct == nullptr) {
     return false;
@@ -460,37 +408,85 @@ bool SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
 }
 
 int SceneListView::onArchiveTo(int videoTier) {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("nothing selected", "skip recycle");
+  if (!VideoTierTool::isVideoTierValid(videoTier)) {
+    LOG_WARN_P("Cannot archive to videoTier", "VideoTier[%d]", videoTier);
+    return -1;
+  }
+  const QModelIndexList& indexes{selectedRowsSource()};
+  QStringList movieTier2Jsons[(int)VideoTierTool::VideoTierE::BUTT_INVALID];
+  movieTier2Jsons[videoTier] = _sceneModel->rel2fileNames(indexes);
+  return ArchiveToCore(indexes, movieTier2Jsons);
+}
+
+int SceneListView::onArchiveToByMovieRate() {
+  const QModelIndexList& indexes{selectedRowsSource()};
+  const std::array<QStringList, RateHelper::BUTT_V>& movieRate2Jsons = _sceneModel->movieRate2Jsons(indexes);
+
+  using namespace VideoTierTool;
+  int needArchiveJsonFileCount = 0;
+  QStringList movieTier2Jsons[(int)VideoTierE::BUTT_INVALID];
+  for (int movieRate = (int)RateHelper::MOVIE_RATE_VALUE::MIN_V; movieRate < (int)RateHelper::MOVIE_RATE_VALUE::BUTT_V; ++movieRate) {
+    const VideoTierE videoTier = MovieRate2VideoTierE(movieRate);
+    if (!isVideoTierValid(videoTier)) {
+      continue;
+    }
+    const QStringList& jsonFileNames = movieRate2Jsons[movieRate];
+    if (jsonFileNames.isEmpty()) {
+      continue;
+    }
+    needArchiveJsonFileCount += jsonFileNames.size();
+
+    movieTier2Jsons[(int)videoTier] += jsonFileNames;
+  }
+  if (needArchiveJsonFileCount == 0) {
+    LOG_INFO_NP("No need archive", "None of the selected movies have ratings within the valid VideoTier range");
     return 0;
   }
+
+  return ArchiveToCore(indexes, movieTier2Jsons);
+}
+
+int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]) {
+  if (indexes.isEmpty()) {
+    LOG_INFO_NP("Skip", "No items selected");
+    return 0;
+  }
+  using namespace VideoTierTool;
+
+  QStringList allFilesNeedArchive;
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE archiveCmds;
 
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const QModelIndexList& indexes{selectedRowsSource()};
-  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
-
   QString tierFolderLocatedIn;
-  QString tierFolderName = PathTool::GetPrepathAndFileName(_sceneModel->rootPath(), tierFolderLocatedIn) + " " + TierNameStr(videoTier);
-  QString tierFolderAbsPath = PathTool::Path2Join(tierFolderLocatedIn, tierFolderName);
-
-  const QStringList& filesNeedArchive = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
-  const int relatedFilesCnt{filesNeedArchive.size()};
-
-  if (!RecycleCfmDlg::archiveQuestion(jsonLocatedInPath, filesNeedArchive, tierFolderAbsPath)) {
-    LOG_INFO_P("[Cancel] User cancel archive", "%d item(s) no change", relatedFilesCnt);
+  QString parentFolderName = PathTool::GetPrepathAndFileName(jsonLocatedInPath, tierFolderLocatedIn);
+  for (int videoTier = (int)VideoTierE::BEGIN; videoTier < (int)VideoTierE::BUTT_INVALID; ++videoTier) {
+    const QStringList& jsonFileNames = movieTier2Jsons[videoTier];
+    if (jsonFileNames.isEmpty()) {
+      continue;
+    }
+    QString tierFolderName = VideoTierTool::GetArchiveToFolderName(parentFolderName, static_cast<VideoTierE>(videoTier));
+    QString tierFolderAbsPath = PathTool::Path2Join(tierFolderLocatedIn, tierFolderName);
+    if (!QFileInfo{tierFolderAbsPath}.isDir()) {
+      archiveCmds.append(FileOperatorType::ACMD::GetInstMKDIR(tierFolderLocatedIn, tierFolderName));
+    }
+    const QStringList& filesNeedArchive = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+    allFilesNeedArchive += filesNeedArchive;
+    for (const auto& nm : filesNeedArchive) {
+      archiveCmds.append(FileOperatorType::ACMD::GetInstMV(jsonLocatedInPath, nm, tierFolderAbsPath));
+    }
+  }
+  if (allFilesNeedArchive.isEmpty()) {
+    LOG_INFO_NP("Skip", "No files need archive");
     return 0;
   }
 
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE archiveCmds;
-  archiveCmds.reserve(1 + relatedFilesCnt);
-  if (!QFileInfo{tierFolderAbsPath}.isDir()) {
-    archiveCmds.append(FileOperatorType::ACMD::GetInstMKDIR(tierFolderLocatedIn, tierFolderName));
+  if (!RecycleCfmDlg::archiveQuestion(jsonLocatedInPath, allFilesNeedArchive, tierFolderLocatedIn + "/FolderXYZ Level")) {
+    LOG_INFO_P("[Cancel] User cancel archive", "%d item(s) no change", allFilesNeedArchive.size());
+    return 0;
   }
-  for (const auto& nm : filesNeedArchive) {
-    archiveCmds.append(FileOperatorType::ACMD::GetInstMV(jsonLocatedInPath, nm, tierFolderAbsPath));
-  }
+
   bool bAllSucceed = UndoRedo::GetInst().Do(archiveCmds);
   const int archiveRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
-  LOG_OE_P(bAllSucceed, "Archive", "Archive %d json/img/video items, rows[%d]", relatedFilesCnt, archiveRowCnt);
-  return relatedFilesCnt;
+  LOG_OE_P(bAllSucceed, "Archive", "Archive [%d] json/img/video items, rows[%d]", allFilesNeedArchive.size(), archiveRowCnt);
+  return allFilesNeedArchive.size();
 }
