@@ -1,6 +1,5 @@
 #include "BasicVideoView.h"
 #include "DataFormatter.h"
-#include "DualIconCheckableAction.h"
 #include "Logger.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
@@ -10,6 +9,7 @@
 #include "VideoPlayerActions.h"
 #include "PathTool.h"
 #include "VideoPlayTool.h"
+#include "WindowsSystemVolumeMixer.h"
 #include <QFile>
 #include <QEvent>
 
@@ -365,6 +365,10 @@ void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
     case QMediaPlayer::PlayingState: {
       mProgressSliderUpdateTimer.start();
       mOperationStatusLbl->setAutoHideText("Playing");
+      static bool bSystemUnmutedInited{false};
+      if (!mPlayer->isMuted() && !bSystemUnmutedInited) {
+        bSystemUnmutedInited = setSystemAppMute(false);
+      }
       break;
     }
     case QMediaPlayer::PausedState: {
