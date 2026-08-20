@@ -7,6 +7,7 @@ class FdBasedDb : public DbManager {
  public:
   using DbManager::DbManager;
   int ReadADirectory(const QString& tableName, const QString& folderAbsPath);
+  int ReadADirectoryJson(const QString& tableName, const QString& folderAbsPath);
   FD_ERROR_CODE Adt(const QString& tableName, const QString& peerPath, VolumeUpdateResult* pAdt = nullptr);
   int SetDuration(const QString& tableName);
   int ExportDurationStudioCastTagsToJson(const QString& tableName) const;

@@ -422,12 +422,12 @@ int SceneListView::onArchiveTo(int videoTier) {
 int SceneListView::onArchiveToByMovieRate() {
   const QModelIndexList& indexes{selectedRowsSource()};
   QModelIndexList nonRate0Indexes;
-  const std::array<QStringList, RateHelper::BUTT_V>& movieRate2JsonsArr = _sceneModel->movieRate2Jsons(indexes, nonRate0Indexes);
+  const std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V>& movieRate2JsonsArr = _sceneModel->movieRate2Jsons(indexes, nonRate0Indexes);
 
   using namespace VideoTierTool;
   int needArchiveJsonFileCount = 0;
   QStringList movieTier2Jsons[(int)VideoTierE::BUTT_INVALID];
-  for (int movieRate = (int)RateHelper::MOVIE_RATE_VALUE::MIN_V; movieRate < (int)RateHelper::MOVIE_RATE_VALUE::BUTT_V; ++movieRate) {
+  for (int movieRate = (int)JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V; movieRate < (int)JsonFieldBoundary::RATE_BUTT_V; ++movieRate) {
     const VideoTierE videoTier = MovieRate2VideoTierE(movieRate);
     if (!isVideoTierValid(videoTier)) {
       continue;

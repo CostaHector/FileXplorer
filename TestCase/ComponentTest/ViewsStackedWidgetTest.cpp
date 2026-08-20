@@ -868,7 +868,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.m_movieDbModel->rowCount(), 1);
 
       m_fsPanel.m_movieView->sortByColumn(0, Qt::SortOrder::AscendingOrder);
-      const QModelIndex movieInd = m_fsPanel.m_movieDbModel->index(0, MOVIE_TABLE::Fd);
+      const QModelIndex movieInd = m_fsPanel.m_movieDbModel->index(0, MOVIE_TABLE::SampleMD5);
       const QModelIndex movieNameInd = m_fsPanel.m_movieDbModel->index(0, MOVIE_TABLE::Name);
       QCOMPARE(movieNameInd.data(Qt::DisplayRole).toString(), mp4Name);
       const QStringList fileNamesMovie{mp4Name};

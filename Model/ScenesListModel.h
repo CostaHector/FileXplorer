@@ -4,7 +4,7 @@
 #include "QAbstractListModelPub.h"
 #include "SceneInfoManager.h"
 #include "PaginatedList.h"
-#include "RateHelper.h"
+#include "JsonFieldBoundary.h"
 #include <QSet>
 #include <QFileInfo>
 
@@ -39,7 +39,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QString GetScn(const QModelIndex& index) const;
 
   QStringList rel2fileNames(const QModelIndexList& indexes) const;
-  std::array<QStringList, RateHelper::BUTT_V> movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const;
+  std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const;
 
   bool isLocalIndexValid(const QModelIndex& localIndex, int& localInd) const { return mPagedData.isLocalIndexValid(localIndex, localInd); }
   SceneInfoList::const_iterator constBeginCurPage() const { return mPagedData.constBeginCurPage(); }

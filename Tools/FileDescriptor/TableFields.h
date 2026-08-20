@@ -54,7 +54,7 @@ enum FIELD_E {
 
 namespace MOVIE_TABLE {
 enum FIELD_E {
-  Fd = 0,       //
+  SampleMD5 = 0,//
   PrePathLeft,  //
   PrePathRight, //
   Name,         //
@@ -63,12 +63,11 @@ enum FIELD_E {
   Studio,       //
   Cast,         //
   Tags,         //
+  Rate,         //
+  Detail,       //
   PathHash,     //
   BUTT
 };
-constexpr int SIZE_INITIAL_VALUE = 0;
-constexpr int DURATION_INITIAL_VALUE = 0;
-constexpr int DURATION_GET_FAILED_VALUE = -1;
 }
 
 namespace TORRENTS_DB_HEADER_KEY {

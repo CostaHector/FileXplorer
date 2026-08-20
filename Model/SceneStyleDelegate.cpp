@@ -1,6 +1,7 @@
 #include "SceneStyleDelegate.h"
 #include "PublicMacro.h"
 #include "ScenesListModel.h"
+#include "RateHelper.h"
 #include "ColorTools.h"
 #include <QPainter>
 

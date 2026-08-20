@@ -6,8 +6,7 @@
 #include "RateHelper.h"
 #include "Logger.h"
 #include "RateHelper.h"
-#include "FileTool.h"
-#include "JsonHelper.h"
+#include "JsonParser.h"
 #include <QDirIterator>
 
 const QStringList VideoTableModel::VIDEO_VERTICAL_HEAD{"Rate", "File name", "Duration", "Size", "Relative path"};
@@ -106,7 +105,7 @@ int VideoTableModel::setRootPath(const QString& rootPath, VideoFindMode findMode
     fileName = fi.fileName();
     rel2searchItem = GetRelPathFromRootRelName(ROOT_PATH_N_WITH_NO_TRAILING_SLASH, fi.filePath(), fileName.size());
     const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(fi.filePath())};
-    const int scoreValue{JsonHelper::GetRateFromJsonFile(jsonCorrespondVideo)};
+    const int scoreValue{JsonParser::GetRateFromJsonFile(jsonCorrespondVideo)};
     videosList.push_back(VideoBasicInfo{fileName, rel2searchItem, fi.size(), 0, (short)scoreValue});
   }
 

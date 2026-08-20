@@ -1403,8 +1403,13 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Insert Into</source>
-        <translation>插入</translation>
+        <source>Import from Video</source>
+        <translation>从视频文件导入</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Import from JSON</source>
+        <translation>从Json文件导入</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1422,7 +1427,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+19"/>
         <source>Read Duration</source>
         <translation>更新时长</translation>
     </message>
@@ -1792,7 +1797,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../../Actions/RateActions.cpp" line="+30"/>
+        <location filename="../../Actions/RateActions.cpp" line="+31"/>
         <source> score</source>
         <translation> 分</translation>
     </message>

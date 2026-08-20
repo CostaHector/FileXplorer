@@ -1,16 +1,15 @@
 #include "FileDescriptor.h"
 #include "MD5Calculator.h"
 #include "BytesRangeTool.h"
-#include "FileTool.h"
 #include "PathTool.h"
-#include "JsonHelper.h"
+#include "JsonParser.h"
 #include <QFile>
 
 namespace FileDescriptor {
 QByteArray GetFileUniquedId(const QString& fileAbsPath) {
   const QString& jsonPath{PathTool::FileExtReplacedWithJson(fileAbsPath)};
   if (QFile::exists(jsonPath)) {
-    const QByteArray& md5{JsonHelper::GetMD5FromJsonFile(jsonPath)};
+    const QByteArray& md5{JsonParser::GetMD5FromJsonFile(jsonPath)};
     if (!md5.isEmpty()) {
       return md5;
     }

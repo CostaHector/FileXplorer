@@ -430,4 +430,4 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
 };
 
 #include "SceneInfoManagerTest.moc"
-REGISTER_TEST(SceneInfoManagerTest, false)
+REGISTER_TEST(SceneInfoManagerTest, true)

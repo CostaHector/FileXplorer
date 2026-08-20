@@ -1,7 +1,7 @@
 #ifndef RATINGSTATEMACHINE_H
 #define RATINGSTATEMACHINE_H
 
-#include "RateHelper.h"
+#include "JsonFieldBoundary.h"
 #include <QModelIndex>
 #include <QPersistentModelIndex>
 
@@ -23,19 +23,19 @@ enum class RatingAction {
 struct RateData {
   explicit RateData(QModelIndex _curIndex = {},
            RatingState _state = RatingState::IDLE,
-           int _oldRateValue = RateHelper::MOVIE_RATE_VALUE::MIN_V,
-           int _newRateValue = RateHelper::MOVIE_RATE_VALUE::MIN_V)
+           int _oldRateValue = JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V,
+           int _newRateValue = JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V)
       : curIndex{_curIndex}, mState{_state}, oldRateValue{_oldRateValue}, newRateValue{_newRateValue} {}
 
   operator bool() const { return curIndex.isValid(); }
   void invalidate() {
     curIndex = QPersistentModelIndex{};
     mState = RatingState::IDLE;
-    oldRateValue = newRateValue = RateHelper::MOVIE_RATE_VALUE::MIN_V;
+    oldRateValue = newRateValue = JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V;
   }
   bool isInit() const {
-    return !curIndex.isValid() && mState == RatingState::IDLE && oldRateValue == RateHelper::MOVIE_RATE_VALUE::MIN_V &&
-           newRateValue == RateHelper::MOVIE_RATE_VALUE::MIN_V;
+    return !curIndex.isValid() && mState == RatingState::IDLE && oldRateValue == JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V &&
+           newRateValue == JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V;
   }
   bool operator==(const RateData& rhs) const {
     return curIndex == rhs.curIndex && mState == rhs.mState && oldRateValue == rhs.oldRateValue && newRateValue == rhs.newRateValue;

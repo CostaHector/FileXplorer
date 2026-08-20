@@ -60,7 +60,9 @@ void MovieDBView::subscribe() {
   connect(inst.INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
   connect(inst.INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
   connect(inst.DROP_A_TABLE, &QAction::triggered, this, &MovieDBView::onDropATable);
-  connect(inst.INSERT_A_PATH, &QAction::triggered, this, &MovieDBView::onInsertIntoTable);
+  connect(inst.IMPORT_FROM_VIDEO, &QAction::triggered, this, &MovieDBView::onImportFromVideosUnderPath);
+  connect(inst.IMPORT_FROM_JSON, &QAction::triggered, this, &MovieDBView::onImportFromJsonsUnderPath);
+
   connect(inst.DELETE_FROM_TABLE, &QAction::triggered, this, &MovieDBView::onDeleteFromTable);
   connect(inst.UNION_TABLE, &QAction::triggered, this, &MovieDBView::onUnionTables);
   connect(inst.AUDIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onAuditATable);
@@ -147,7 +149,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   return true;
 }
 
-bool MovieDBView::onInsertIntoTable() {
+bool MovieDBView::onImportFromVideosUnderPath() {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
     LOG_ERR_NP("[failed] Open table", con.lastError().text());
@@ -161,7 +163,7 @@ bool MovieDBView::onInsertIntoTable() {
   }
 
   QString selectPath;
-  if (!GetAPathFromUserSelect("and load videos into", selectPath)) {
+  if (!GetAPathFromUserSelect("and import videos from", selectPath)) {
     return false;
   }
   const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
@@ -179,6 +181,41 @@ bool MovieDBView::onInsertIntoTable() {
   }
   _dbModel->select();
   LOG_OK_P("Read videos ok", "%d video(s) under path[%s] are inserted into table[%s]", retCnt, qPrintable(selectPath), qPrintable(curTblName));
+  return true;
+}
+
+bool MovieDBView::onImportFromJsonsUnderPath() {
+  QSqlDatabase con = _fdBasedDb.GetDb();
+  if (!_fdBasedDb.CheckValidAndOpen(con)) {
+    LOG_ERR_NP("[failed] Open table", con.lastError().text());
+    return false;
+  }
+
+  const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();
+  if (!con.tables().contains(curTblName)) {
+    LOG_ERR_NP("[ABORT] Table NOT exist.", curTblName);
+    return false;
+  }
+
+  QString selectPath;
+  if (!GetAPathFromUserSelect("and import jsons into", selectPath)) {
+    return false;
+  }
+  const QString hintTemplate{"json(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
+  const QString confirmInsertIntoMsg{hintTemplate.arg(selectPath, _movieDbSearchBar->GetCurrentTableName())};
+  QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
+  if (cfmInsertIntoBtn != QMessageBox::StandardButton::Yes) {
+    LOG_INFO_NP("User cancel insert", selectPath);
+    return false;
+  }
+
+  int retCnt = _fdBasedDb.ReadADirectoryJson(curTblName, selectPath);
+  if (retCnt < 0) {
+    LOG_ERR_P("Read jsons from path failed", "errorCode:%d", retCnt);
+    return false;
+  }
+  _dbModel->select();
+  LOG_OK_P("Read jsons ok", "%d json(s) under path[%s] are inserted into table[%s]", retCnt, qPrintable(selectPath), qPrintable(curTblName));
   return true;
 }
 

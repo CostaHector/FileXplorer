@@ -112,7 +112,7 @@ class FdBasedDbTest : public PlainTestSuite {
       ++fdVal;
       fdByteArray = QString::number(fdVal).toUtf8();
       using namespace MOVIE_TABLE;
-      query.bindValue(":" ENUM_2_STR(Fd), fdByteArray);
+      query.bindValue(":" ENUM_2_STR(SampleMD5), fdByteArray);
       query.bindValue(":" ENUM_2_STR(PrePathLeft), item[0]);
       query.bindValue(":" ENUM_2_STR(PrePathRight), item[1]);
       query.bindValue(":" ENUM_2_STR(Name), item[2]);
@@ -241,7 +241,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
 
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.path()), 4);  // remeber: Fd conflict because file contents same!
+    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.path()), 4);  // remeber: SampleMD5 conflict because file contents same!
     QCOMPARE(dbManager.SetDuration(tableName), 4);
     QCOMPARE(dbManager.SetDuration(tableName), 0);  // 0 duration need update
 

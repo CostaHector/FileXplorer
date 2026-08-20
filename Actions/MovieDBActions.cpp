@@ -35,9 +35,13 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
   DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
 
-  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Insert Into"), this);
-  CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
-  INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::MOVIES`(COLUMN_NAME) VALUES (VALUE);");
+  IMPORT_FROM_VIDEO = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Import from Video"), this);
+  CHECK_NULLPTR_RETURN_VOID(IMPORT_FROM_VIDEO);
+  IMPORT_FROM_VIDEO->setToolTip("Scan video file(s) in a specified path and insert each video meta data current table.");
+
+  IMPORT_FROM_JSON = new (std::nothrow) QAction(tr("Import from JSON"), this);
+  CHECK_NULLPTR_RETURN_VOID(IMPORT_FROM_JSON);
+  IMPORT_FROM_JSON->setToolTip("Scan json file(s) in a specified path and insert each key field value current table.");
 
   DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete Where"), this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
@@ -62,7 +66,8 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(_MODEL_REPOPULATE);
   DB_CONTROL_ACTIONS->addAction(REVERT);
   DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(INSERT_A_PATH);
+  DB_CONTROL_ACTIONS->addAction(IMPORT_FROM_VIDEO);
+  DB_CONTROL_ACTIONS->addAction(IMPORT_FROM_JSON);
   DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
   DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);

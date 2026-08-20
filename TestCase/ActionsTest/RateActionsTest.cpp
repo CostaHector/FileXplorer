@@ -102,7 +102,7 @@ class RateActionsTest : public PlainTestSuite {
 
     MOCKER(InputDialogHelper::GetIntWithInitial)                                                                                 //
         .expects(exactly(2))                                                                                                     //
-        .with(eq((QWidget*)nullptr), any(), any(), eq(initRate), eq((int)RateHelper::MIN_V), eq((int)RateHelper::MAX_V), eq(1))  //
+        .with(eq((QWidget*)nullptr), any(), any(), eq(initRate), eq((int)JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V), eq((int)RateHelper::MAX_V), eq(1))  //
         .will(returnValue(cancel0))                                                                                              // user cancelled
         .then(returnValue(accept1));                                                                                             // path not exist
 

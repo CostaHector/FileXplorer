@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "TableFields.h"
 #include "CastPsonFileHelper.h"
+#include "JsonFieldBoundary.h"
 #include <QPainter>
 #include <QFile>
 #include <QDirIterator>
@@ -23,7 +24,7 @@ bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, b
     return false;
   }
 
-  const int afterValue = clampRate(newRateVal);
+  const int afterValue = JsonFieldBoundary::clampRate(newRateVal);
 
   using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
@@ -73,8 +74,8 @@ bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int
 
   using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
-  const int beforeValue{itRate != data.end() ? itRate.value().toInt() : MIN_V};
-  const int afterValue{clampRate(beforeValue + delta)};
+  const int beforeValue{itRate != data.end() ? itRate.value().toInt() : JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V};
+  const int afterValue{JsonFieldBoundary::clampRate(beforeValue + delta)};
   if (newRateValue != nullptr) {
     *newRateValue = afterValue;
   }
@@ -283,23 +284,21 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
 }
 
 const QPixmap& RateHelper::GetRatePixmap(int rate) {
-  static_assert(MIN_V == 0, "Minumum rate value should be 0");
-  static_assert(MAX_V == 10, "Maximum rate value should be 10");
-  static const QPixmap SCORE_BOARD[BUTT_V] //
+  static const QPixmap SCORE_BOARD[JsonFieldBoundary::RATE_BUTT_V] //
       {
-          GenerateRatePixmap(0, MAX_V),  //
-          GenerateRatePixmap(1, MAX_V),  //
-          GenerateRatePixmap(2, MAX_V),  //
-          GenerateRatePixmap(3, MAX_V),  //
-          GenerateRatePixmap(4, MAX_V),  //
-          GenerateRatePixmap(5, MAX_V),  //
-          GenerateRatePixmap(6, MAX_V),  //
-          GenerateRatePixmap(7, MAX_V),  //
-          GenerateRatePixmap(8, MAX_V),  //
-          GenerateRatePixmap(9, MAX_V),  //
-          GenerateRatePixmap(10, MAX_V), //
+          GenerateRatePixmap(0,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(1,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(2,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(3,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(4,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(5,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(6,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(7,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(8,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(9,  JsonFieldBoundary::RATE_MAX_V),  //
+          GenerateRatePixmap(10, JsonFieldBoundary::RATE_MAX_V), //
       };
-  return SCORE_BOARD[clampRate(rate)];
+  return SCORE_BOARD[JsonFieldBoundary::clampRate(rate)];
 }
 
 bool RateHelper::isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& visualRect) {
@@ -309,6 +308,6 @@ bool RateHelper::isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect
 int RateHelper::ratingAtPosition(const QPoint& pos, const QRect& visualRect) {
   int delta = pos.x() - visualRect.x();
   int nomindator = visualRect.width();
-  int rate = RateHelper::MOVIE_RATE_VALUE::MAX_V * delta / nomindator + 1;
-  return RateHelper::clampRate(rate);
+  int rate = JsonFieldBoundary::RATE_MAX_V * delta / nomindator + 1;
+  return JsonFieldBoundary::clampRate(rate);
 }

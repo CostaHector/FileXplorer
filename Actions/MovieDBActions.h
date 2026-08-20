@@ -16,7 +16,7 @@ class MovieDBActions : public QObject {
   QAction* INIT_A_DATABASE{nullptr};
   QAction* INIT_A_TABLE{nullptr};
   QAction* DROP_A_TABLE{nullptr};
-  QAction* INSERT_A_PATH{nullptr};
+  QAction* IMPORT_FROM_VIDEO{nullptr}, *IMPORT_FROM_JSON{nullptr};
   QAction* DELETE_FROM_TABLE{nullptr};
   QAction* UNION_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};

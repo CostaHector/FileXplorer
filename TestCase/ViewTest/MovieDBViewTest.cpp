@@ -363,7 +363,7 @@ class MovieDBViewTest : public PlainTestSuite {
     if (!tableName2.contains("-")) {
       dbModel.sort((int)MOVIE_TABLE::Name, Qt::SortOrder::DescendingOrder);
       LOG_D("Generated SQL: %s", qPrintable(dbModel.query().lastQuery()));
-      // Generated SQL: SELECT "Fd", "PrePathLeft", "PrePathRight", "Name", "Size", "Duration", "Studio", "Cast", "Tags", "PathHash" FROM
+      // Generated SQL: SELECT "SampleMD5", "PrePathLeft", "PrePathRight", "Name", "Size", "Duration", "Studio", "Cast", "Tags", "PathHash" FROM
       // "_tmp_FileXplorerTest-IThoEl_path2" WHERE `Name` LIKE "%" ORDER BY _tmp_FileXplorerTest-IThoEl_path2."Name" ASC
       QVERIFY2(dbModel.select(), qPrintable(dbModel.lastError().text()));
       // no such column: _tmp_FileXplorerTest Unable to execute statement

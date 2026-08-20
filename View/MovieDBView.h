@@ -21,7 +21,8 @@ public:
 
   bool onSubmit();
   bool onRevert();
-  bool onInsertIntoTable();
+  bool onImportFromVideosUnderPath();
+  bool onImportFromJsonsUnderPath();
   bool onInitDataBase();
   bool onCreateATable();
   bool onDropATable();
