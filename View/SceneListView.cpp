@@ -395,17 +395,16 @@ int SceneListView::onRecycleSceneAndRelated() {
   return relatedFilesCnt;
 }
 
-bool SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
+int SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
   if (archivedToAct == nullptr) {
-    return false;
+    return -1;
   }
   bool bHasValidVideoTier{false};
   const int videoTier = archivedToAct->property("ArchivedVideoTier").toInt(&bHasValidVideoTier);
   if (!bHasValidVideoTier) {
-    return false;
+    return -1;
   }
-  onArchiveTo(videoTier);
-  return true;
+  return onArchiveTo(videoTier);
 }
 
 int SceneListView::onArchiveTo(int videoTier) {
@@ -459,6 +458,7 @@ int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringLi
   FileOperatorType::BATCH_COMMAND_LIST_TYPE archiveCmds;
 
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
+  const int N = jsonLocatedInPath.size();
   QString tierFolderLocatedIn;
   QString parentFolderName = PathTool::GetPrepathAndFileName(jsonLocatedInPath, tierFolderLocatedIn);
   for (int videoTier = (int)VideoTierE::BEGIN; videoTier < (int)VideoTierE::BUTT_INVALID; ++videoTier) {

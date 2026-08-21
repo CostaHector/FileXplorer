@@ -39,7 +39,7 @@ public slots:
   int onRenameSceneAndRelatedNumerize();
   int onRecycleSceneAndRelated();
   void toggleSortRequestImplementer(bool bPageByPage);
-  bool onArchiveActionTriggered(const QAction* archivedToAct);
+  int onArchiveActionTriggered(const QAction* archivedToAct);
   int onArchiveTo(int videoTier);
   int onArchiveToByMovieRate();
 
