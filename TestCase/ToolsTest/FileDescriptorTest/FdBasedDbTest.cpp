@@ -1,14 +1,10 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "PlainTestSuite.h"
-#include "GlbDataProtect.h"
-#include "OnScopeExit.h"
 #include "FdBasedDb.h"
-#include "TableFields.h"
-#include "JsonKey.h"
+#include "MovieDBModelField.h"
 #include "JsonHelper.h"
 #include "PublicMacro.h"
-#include "PublicVariable.h"
 #include "QuickWhereClauseHelper.h"
 #include "TDir.h"
 
@@ -111,7 +107,7 @@ class FdBasedDbTest : public PlainTestSuite {
     for (const auto& item : items) {
       ++fdVal;
       fdByteArray = QString::number(fdVal).toUtf8();
-      using namespace MOVIE_TABLE;
+      using namespace MovieDBModelField;
       query.bindValue(":" ENUM_2_STR(SampleMD5), fdByteArray);
       query.bindValue(":" ENUM_2_STR(PrePathLeft), item[0]);
       query.bindValue(":" ENUM_2_STR(PrePathRight), item[1]);
@@ -177,7 +173,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 2);
     QCOMPARE(dbManager.CountRow(tableName), 4);
 
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     const QString qryWhereClause{QString(R"(`%1` like "%.mp4")").arg(ENUM_2_STR(Name))};
     QCOMPARE(dbManager.CountRow(tableName, qryWhereClause), 1);
     QCOMPARE(dbManager.DeleteByWhereClause(tableName, qryWhereClause), 1);
@@ -185,7 +181,7 @@ class FdBasedDbTest : public PlainTestSuite {
   }
 
   void adt_ok() {
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     // precondition
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
@@ -246,7 +242,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.SetDuration(tableName), 0);  // 0 duration need update
 
     QSet<int> actualDurations;
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     QVERIFY(dbManager.QueryPK(tableName, ENUM_2_STR(Duration), actualDurations));
     QCOMPARE(actualDurations, (QSet<int>{20, 40, 30, 60}));
   }
@@ -269,7 +265,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.ExportDurationStudioCastTagsToJson(tableName), 0);
 
     // 2 row update (Cast, Duration)
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     MOCKER(VideoDurationGetter::GetLengthQuickStatic)  //
         .stubs()                                       //
         .will(invoke(VideoDurationGetterMock::invokeGetLengthQuickStatic));
@@ -319,7 +315,7 @@ class FdBasedDbTest : public PlainTestSuite {
 
     // 前提: 只要json中的studio/performers/tags有一个字段值非空
     // 预期: json字段原封不动覆盖写入表中字段(若json字段为空, 则表字段会设置为空)
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     QVariantHash keyValueNotFull{{ENUM_2_STR(Studio), "Century"},    //
                                  {ENUM_2_STR(Cast), QStringList()},  //
                                  {ENUM_2_STR(Tags), QStringList()}};
@@ -339,17 +335,17 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(dbManager.QueryForTest(selectCentury.arg(tableName).arg(ENUM_2_STR(Studio)), centuryList));
     QCOMPARE(centuryList.size(), 1);
     const QSqlRecord& centuryRec = centuryList.front();
-    QCOMPARE(centuryRec.value(MOVIE_TABLE::Studio).toString(), "Century");
-    QCOMPARE(centuryRec.value(MOVIE_TABLE::Cast).toString(), "");
-    QCOMPARE(centuryRec.value(MOVIE_TABLE::Tags).toString(), "");
+    QCOMPARE(centuryRec.value(MovieDBModelField::Studio).toString(), "Century");
+    QCOMPARE(centuryRec.value(MovieDBModelField::Cast).toString(), "");
+    QCOMPARE(centuryRec.value(MovieDBModelField::Tags).toString(), "");
 
     QList<QSqlRecord> foxList;
     QVERIFY(dbManager.QueryForTest(selectFox.arg(tableName).arg(ENUM_2_STR(Studio)), foxList));
     QCOMPARE(foxList.size(), 1);
     const QSqlRecord& foxRec = foxList.front();
-    QCOMPARE(foxRec.value(MOVIE_TABLE::Studio).toString(), "Fox");
-    QCOMPARE(foxRec.value(MOVIE_TABLE::Cast).toString(), "Chris Evans,Henry Cavill");  // sperated by comma only
-    QCOMPARE(foxRec.value(MOVIE_TABLE::Tags).toString(), "Action,Science");            // sperated by comma only
+    QCOMPARE(foxRec.value(MovieDBModelField::Studio).toString(), "Fox");
+    QCOMPARE(foxRec.value(MovieDBModelField::Cast).toString(), "Chris Evans,Henry Cavill");  // sperated by comma only
+    QCOMPARE(foxRec.value(MovieDBModelField::Tags).toString(), "Action,Science");            // sperated by comma only
   }
 };
 

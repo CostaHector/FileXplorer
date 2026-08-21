@@ -1,20 +1,20 @@
 #include "FdBasedDb.h"
 #include "FileDescriptor.h"
 #include "JsonHelper.h"
-#include "RateHelper.h"
 #include "JsonParser.h"
 #include "VideoDurationGetter.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
+#include "NotificatorMacro.h"
+#include "MovieDBModelField.h"
 #include "JsonFieldBoundary.h"
 #include <QDirIterator>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSet>
 
-using namespace MOVIE_TABLE;
+using namespace MovieDBModelField;
 
 const QString FdBasedDb::CREATE_TABLE_TEMPLATE                                                //
     {"CREATE TABLE IF NOT EXISTS `%1` ("                                                      // TABLE_NAME
@@ -36,25 +36,26 @@ const QString FdBasedDb::CREATE_TABLE_TEMPLATE                                  
            .arg(ENUM_2_STR(Studio), ENUM_2_STR(Cast), ENUM_2_STR(Tags))                       //
      + QString{"`%1` INTEGER DEFAULT %2, "}                                                   // Rate (0~10) default 0
            .arg(ENUM_2_STR(Rate)).arg(JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V)            //
-     + QString{"`%1` VARCHAR(2048) DEFAULT '', "}                                             // Detail
-           .arg(ENUM_2_STR(Detail))                                                           //
-     + QString{"`%6` INTEGER UNIQUE NOT NULL, "}.arg(ENUM_2_STR(PathHash))                    // PathHash
+     + QString{"`%1` VARCHAR(2048) DEFAULT '', "}.arg(ENUM_2_STR(Detail))                     // Detail
+     + QString{"`%1` INTEGER UNIQUE NOT NULL, "}.arg(ENUM_2_STR(PathHash))                    // PathHash
+     + QString{"`%1` BOOLEAN DEFAULT 1, "}.arg(ENUM_2_STR(InLocal))                           // InLocal
      + QString{"PRIMARY KEY (%1, %2, %3, %4)"}.arg(ENUM_2_STR(SampleMD5), ENUM_2_STR(PrePathLeft), ENUM_2_STR(PrePathRight), ENUM_2_STR(Name)) //
      + ");"};
 
 const QString FdBasedDb::INSERT_MOVIE_RECORD_FULL_TEMPLATE //
     {
-    "REPLACE INTO `%1` "                                                       // TABLE_NAME
-    + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`, `%11`, `%12`) " //
-              "VALUES "                                                                  //
-              "(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8, :%9, :%10, :%11, :%12);"}          //
-          .arg(ENUM_2_STR(SampleMD5))                                                    //
-          .arg(ENUM_2_STR(PrePathLeft), ENUM_2_STR(PrePathRight), ENUM_2_STR(Name))      //
-          .arg(ENUM_2_STR(Size), ENUM_2_STR(Duration))                                   //
-          .arg(ENUM_2_STR(Studio), ENUM_2_STR(Cast), ENUM_2_STR(Tags))                   //
-          .arg(ENUM_2_STR(Rate))                                                         //
-          .arg(ENUM_2_STR(Detail))                                                       //
-          .arg(ENUM_2_STR(PathHash))                                                     //
+    "REPLACE INTO `%1` "                                                                            // TABLE_NAME
+    + QString{"(`%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`, `%11`, `%12`, `%13`) " //
+              "VALUES "                                                                             //
+              "(:%1, :%2, :%3, :%4, :%5, :%6, :%7, :%8, :%9, :%10, :%11, :%12, :%13);"}             //
+          .arg(ENUM_2_STR(SampleMD5))                                                               //
+          .arg(ENUM_2_STR(PrePathLeft), ENUM_2_STR(PrePathRight), ENUM_2_STR(Name))                 //
+          .arg(ENUM_2_STR(Size), ENUM_2_STR(Duration))                                              //
+          .arg(ENUM_2_STR(Studio), ENUM_2_STR(Cast), ENUM_2_STR(Tags))                              //
+          .arg(ENUM_2_STR(Rate))                                                                    //
+          .arg(ENUM_2_STR(Detail))                                                                  //
+          .arg(ENUM_2_STR(PathHash))                                                                //
+          .arg(ENUM_2_STR(InLocal))                                                                 //
     };
 
 enum INSERT_FIELD {
@@ -70,6 +71,7 @@ enum INSERT_FIELD {
   JSON_Rate,                //
   JSON_Detail,              //
   JSON_PathHash,            //
+  JSON_InLocal,             //
 };
 
 const QString FdBasedDb::INSERT_MOVIE_RECORD_TEMPLATE //
@@ -195,11 +197,13 @@ enum EXPORT_TO_JSON {
 
 const QString FdBasedDb::QUERY_KEY_INFO_TEMPLATE //
     {
-    QString{"SELECT `%1`, `%2`, `%3`, `%4` FROM"} //
+    QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6` FROM"} //
         .arg(ENUM_2_STR(PrePathLeft))             //
         .arg(ENUM_2_STR(PrePathRight))            //
         .arg(ENUM_2_STR(Name))                    //
         .arg(ENUM_2_STR(Size))                    //
+        .arg(ENUM_2_STR(Duration))                //
+        .arg(ENUM_2_STR(SampleMD5))               //
     + " `%1` WHERE %2"                            //
     };
 
@@ -292,37 +296,43 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
     return FD_TRANSACTION_FAILED;
   }
 
-  // 1. fd->absolute file path
-  QHash<QByteArray, QString> newFd2Pth;
-  QByteArray sampleMd5Val;
-  QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   QString jsonAbsPath, vidAbsPath;
 
+  QByteArray sampleMd5Val;
   QString name, studio, vidName, detail;
   qint64 size{-1};
   int duration{-1}, rate{-1};
   QStringList casts, tags;
 
+  JsonParser::ParseResult parseRet = JsonParser::ParseResult::ERROR;
+
   int fileProcessCnt = 0;
+  QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   while (it.hasNext()) {
     jsonAbsPath = it.next();
-    if (!JsonParser::ParseEssentialFieldJson(jsonAbsPath, &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail)) {
+    parseRet = JsonParser::ParseEssentialFieldJson(jsonAbsPath, &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail);
+    if (parseRet == JsonParser::ParseResult::ERROR) {
+      LOG_ERR_NP("Parse Json Failed", jsonAbsPath);
+      return FD_JSON_PARSED_INVALID;
+    }
+    if (parseRet == JsonParser::ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS) {
       continue;
     }
     vidAbsPath = PathTool::Path2Join(PathTool::absolutePath(jsonAbsPath), vidName);
     const PathTool::RMFComponent& rmf = PathTool::RMFComponent::FromPath(vidAbsPath);
-    query.bindValue(JSON_SampleMD5,   sampleMd5Val);
-    query.bindValue(JSON_PrePathLeft, rmf.rootPart);
-    query.bindValue(JSON_PrePathRight,rmf.middlePart);
-    query.bindValue(JSON_Name,        vidName);
-    query.bindValue(JSON_Size,        size);
-    query.bindValue(JSON_Duration,    duration);
-    query.bindValue(JSON_Studio,      studio);
-    query.bindValue(JSON_Cast,        casts);
-    query.bindValue(JSON_Tags,        tags);
-    query.bindValue(JSON_Rate,        rate);
-    query.bindValue(JSON_Detail,      detail);
-    query.bindValue(JSON_PathHash,    JsonHelper::CalcFileHash(vidAbsPath));
+    query.bindValue(JSON_SampleMD5,    sampleMd5Val);
+    query.bindValue(JSON_PrePathLeft,  rmf.rootPart);
+    query.bindValue(JSON_PrePathRight, rmf.middlePart);
+    query.bindValue(JSON_Name,         vidName);
+    query.bindValue(JSON_Size,         size);
+    query.bindValue(JSON_Duration,     duration);
+    query.bindValue(JSON_Studio,       studio);
+    query.bindValue(JSON_Cast,         casts);
+    query.bindValue(JSON_Tags,         tags);
+    query.bindValue(JSON_Rate,         rate);
+    query.bindValue(JSON_Detail,       detail);
+    query.bindValue(JSON_PathHash,     JsonHelper::CalcFileHash(vidAbsPath));
+    query.bindValue(JSON_InLocal,      QFile::exists(vidAbsPath));
     ++fileProcessCnt;
     if (!query.exec()) {
       db.rollback();
@@ -748,21 +758,12 @@ int FdBasedDb::SetDuration(const QString& tableName) {
                                                query.value(QUERY_DURATION_0_FILED_Name).toString());
 
     relatedJsonFullPath = PathTool::FileExtReplacedWithJson(absFilePath);
-    bool bDurationFromJsonSucceed{QFile::exists(relatedJsonFullPath)};
-    if (bDurationFromJsonSucceed) {
-      duration = JsonParser::GetDurationFromJsonFile(relatedJsonFullPath, &bDurationFromJsonSucceed, JsonFieldBoundary::DURATION_GET_FAILED_VALUE);
-    }
-    if (!bDurationFromJsonSucceed) {
-      // json not exist or json not contains key "Duration".
-      // Fallback to get duration from video file meta data.
-      duration = VideoDurationGetter::GetLengthQuickStatic(mi, absFilePath);
-    }
-    if (duration == JsonFieldBoundary::DURATION_GET_FAILED_VALUE) {
+    if ((duration = VideoDurationGetter::GetDurationFromJsonFirst(absFilePath)) == JsonFieldBoundary::DURATION_GET_FAILED_VALUE) {
       continue;
     }
 
-    fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toByteArray();
     // 立即更新
+    fdVal = query.value(QUERY_DURATION_0_FILED_Fd).toByteArray();
     updateQuery.bindValue(UPDATE_DURATION_0_FILED_Duration, duration);
     updateQuery.bindValue(UPDATE_DURATION_0_FILED_Fd, fdVal);
 

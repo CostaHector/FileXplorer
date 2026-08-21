@@ -11,7 +11,6 @@
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
-#include "TableFields.h"
 #include "StringTool.h"
 #include "ImageTool.h"
 
@@ -243,19 +242,16 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whe
   searchResult.reserve(512);
   searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(whereText);
   searchResult += "<table border='1' cellpadding='4' style='border-collapse: collapse;'>";
-  searchResult += "<thead><tr><th>Size</th><th>Name</th><th>Path</th></tr></thead>";
+  searchResult += "<thead><tr><th>Size</th><th>Name</th><th>Duration</th><th>MD5Sample</th><th>Path</th></tr></thead>";
   searchResult += "<tbody>";
 
-  static constexpr int NAME_FILED_IND{(int)FdBasedDb::QUERY_KEY_INFO_FIELED::Name};
-  static constexpr int SIZE_FILED_IND{(int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size};
-  static constexpr int PREPATH_R_FILED_IND{(int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight};
-
   for (const QSqlRecord& record : records) {
-    const qint64 sz = record.field(SIZE_FILED_IND).value().toLongLong();
     searchResult += "<tr>";
-    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(sz));
-    searchResult += QString{"<td>%1</td>"}.arg(record.field(NAME_FILED_IND).value().toString());
-    searchResult += QString{"<td>%1</td>"}.arg(record.field(PREPATH_R_FILED_IND).value().toString());
+    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size).value().toLongLong()));
+    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Name).value().toString());
+    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Duration).value().toLongLong()));
+    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::SampleMD5).value().toString());
+    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight).value().toString());
     searchResult += "</tr>";
   }
 

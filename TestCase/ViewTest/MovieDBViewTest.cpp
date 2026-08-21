@@ -10,7 +10,7 @@
 #include "PublicVariable.h"
 #include "TDir.h"
 #include "MountHelper.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "MovieDBActions.h"
 #include "VideoDurationGetter.h"
 
@@ -187,7 +187,7 @@ class MovieDBViewTest : public PlainTestSuite {
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName1);
 
     // 1.4.1 empty path skip
-    QVERIFY(!movieView.onInsertIntoTable());
+    QVERIFY(!movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName1), 0);
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
@@ -195,15 +195,15 @@ class MovieDBViewTest : public PlainTestSuite {
         .will(returnValue(QMessageBox::StandardButton::No))
         .then(returnValue(QMessageBox::StandardButton::Yes));
     // 1.4.2 path user specified differ from mount path from table name, skip
-    QVERIFY(!movieView.onInsertIntoTable());
+    QVERIFY(!movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName1), 0);
 
     // 1.4.3 path start with mount path from table name, but user cancel, skip
-    QVERIFY(!movieView.onInsertIntoTable());
+    QVERIFY(!movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName1), 0);
 
     // 1.4.4 path start with mount path from table name, user accept, 3 insert ok
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName1), 3);
     QCOMPARE(dbModel.rowCount(), 3);
     QCOMPARE(movieView.onCountRow(), 3);
@@ -269,7 +269,7 @@ class MovieDBViewTest : public PlainTestSuite {
       emit dbToolBar.movieTableChanged(tableName1);  // signal-slot setCurrentMovieTable should connected
       QCOMPARE(dbModel.tableName(), tableName1);
       QCOMPARE(dbModel.rowCount(), 0);
-      QVERIFY(movieView.onInsertIntoTable());
+      QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
       QCOMPARE(fdDb.CountRow(tableName1), 3);
       QCOMPARE(dbModel.rowCount(), 3);
       QCOMPARE(movieView.onCountRow(), 3);
@@ -285,7 +285,7 @@ class MovieDBViewTest : public PlainTestSuite {
       emit dbToolBar.movieTableChanged(tableName2);  // aka setCurrentMovieTable
       QCOMPARE(dbModel.tableName(), tableName2);
       QCOMPARE(dbModel.rowCount(), 0);
-      QVERIFY(movieView.onInsertIntoTable());
+      QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
       QCOMPARE(fdDb.CountRow(tableName2), 2);
       QCOMPARE(dbModel.rowCount(), 2);
       QCOMPARE(movieView.onCountRow(), 2);
@@ -312,7 +312,7 @@ class MovieDBViewTest : public PlainTestSuite {
 
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName2), 2);
     QCOMPARE(dbModel.rowCount(), 2);
     QCOMPARE(movieView.onCountRow(), 2);
@@ -320,10 +320,10 @@ class MovieDBViewTest : public PlainTestSuite {
     // SetFilterAndSelect(dbToolBar.GetCurrentWhereClause()) filter should works ok
     // "path2/Michael Fassbender.mp4"
     // "path2/Morata.mp4"
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "Michael%")").arg(ENUM_2_STR(Name)));
     dbModel.SetFilterAndSelect(dbToolBar.GetCurrentWhereClause());
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Name).toString(), "Michael Fassbender.mp4");
     QCOMPARE(dbModel.rowCount(), 1);
 
     dbToolBar.m_whereCB->setCurrentText(QString(R"(`%1` like "%mp4")").arg(ENUM_2_STR(Name)));
@@ -355,13 +355,13 @@ class MovieDBViewTest : public PlainTestSuite {
 
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName2), 2);
     QCOMPARE(dbModel.rowCount(), 2);
 
     // 表名无连字符时才可以调用sort实现排序 call sort only if no special char exist in table Name
     if (!tableName2.contains("-")) {
-      dbModel.sort((int)MOVIE_TABLE::Name, Qt::SortOrder::DescendingOrder);
+      dbModel.sort((int)MovieDBModelField::Name, Qt::SortOrder::DescendingOrder);
       LOG_D("Generated SQL: %s", qPrintable(dbModel.query().lastQuery()));
       // Generated SQL: SELECT "SampleMD5", "PrePathLeft", "PrePathRight", "Name", "Size", "Duration", "Studio", "Cast", "Tags", "PathHash" FROM
       // "_tmp_FileXplorerTest-IThoEl_path2" WHERE `Name` LIKE "%" ORDER BY _tmp_FileXplorerTest-IThoEl_path2."Name" ASC
@@ -373,8 +373,8 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY2(dbModel.lastError().type() == QSqlError::NoError, qPrintable(dbModel.lastError().text()));
     }
     QCOMPARE(dbModel.rowCount(), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Morata.mp4");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Name).toString(), "Morata.mp4");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Name).toString(), "Michael Fassbender.mp4");
   }
 
   void set_duration_by_video_ok() {
@@ -393,23 +393,23 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
     // 1. 预期插入记录时不会填写Duration字段
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName2), 2);
     QCOMPARE(dbModel.rowCount(), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Duration).toInt(), 0);
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt(), 0);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Duration).toInt(), 0);
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Duration).toInt(), 0);
     // 2. 根据视频协议标准读取文件时长
     movieView.onSetDurationByVideo();
 
     // 3. 按时长升序排列 Morata.mp4(5000ms) < Michael Fassbender.mp4(6000ms)
-    using namespace MOVIE_TABLE;
+    using namespace MovieDBModelField;
     QSqlQuery sqlQry(QString("SELECT * FROM `%1` ORDER BY `%2` ASC").arg(tableName2).arg(ENUM_2_STR(Duration)), dbModel.database());
     dbModel.setQuery(sqlQry);
     QVERIFY2(dbModel.lastError().type() == QSqlError::NoError, qPrintable(dbModel.lastError().text()));
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Name).toString(), "Morata.mp4");
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Duration).toInt(), 5000);
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Name).toString(), "Michael Fassbender.mp4");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Duration).toInt(), 6000);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Name).toString(), "Morata.mp4");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Duration).toInt(), 5000);
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Name).toString(), "Michael Fassbender.mp4");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Duration).toInt(), 6000);
   }
 
   void no_row_selected_action_will_ignored() {
@@ -429,7 +429,7 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)  //
         .stubs()
         .will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     MOCKER(FdBasedDbModel::setDataStatic).expects(never());
@@ -462,38 +462,38 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)  //
         .stubs()
         .will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     // 1.2.0 set studio ok
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "");
 
     movieView.selectionModel()->clear();
     // 1.2.1 no selection: set studio return 0
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Marvel");
     QCOMPARE(movieView.onSetStudio(), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "");
 
     movieView.selectAll();
     // 1.2.2 all 2 row selected, user cancel: set studio return 0
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Marvel");
     QCOMPARE(movieView.onSetStudio(), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "");
 
     // 1.2.3 all 2 row selected, user accept: set studio return 2 row
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Marvel");
     QCOMPARE(movieView.onSetStudio(), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Marvel");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Marvel");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Marvel");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Marvel");
 
     // 1.2.4 all 2 row selected, user accept: set studio to empty(be regard as clear) return 2 row
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
     QCOMPARE(movieView.onSetStudio(), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "");
   }
 
   void set_cast_json_set_append_remove_ok() {
@@ -513,54 +513,54 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)  //
         .stubs()
         .will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     // set cast or tags should modify table
     // CAST SET no selection
     movieView.selectionModel()->clear();
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET), 0);
 
     // CAST SET "Cast Morata" Cancel
     movieView.selectAll();
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(false, "Cast Morata");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET), 0);
 
     // CAST SET "Cast Morata" Apply
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata");
 
     // CAST SET "" Apply, will ignored
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET), 0);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata");
 
     // 2.4.1 user accept cast add empty "", ignored
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND), 0);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata");
 
     // 2.4.2 user accept cast add non empty "Cast Morata 2", ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata 2");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata,Cast Morata 2");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata,Cast Morata 2");
 
     // 2.5 user accept cast remove empty "", ignored
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata,Cast Morata 2");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE), 0);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata,Cast Morata 2");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata,Cast Morata 2");
 
     // 2.5 user accept cast remove non empty "Cast Morata"(full match), ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
   }
 
   void set_cast_json_clear_ok() {
@@ -579,42 +579,42 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)  //
         .stubs()
-        .will(returnValue(QMessageBox::StandardButton::Yes))  // onInsertIntoTable
+        .will(returnValue(QMessageBox::StandardButton::Yes))  // onImportFromVideosUnderPath
         .then(returnValue(QMessageBox::StandardButton::No))   // onSetCastOrTags, 2.6
         .then(returnValue(QMessageBox::StandardButton::Yes))  // onSetCastOrTags, 2.7
         .then(returnValue(QMessageBox::StandardButton::Yes))  // onSetCastOrTags, 2.9
         ;
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     movieView.selectAll();
 
     // 2.5 user apply set cast "Cast Morata 2"
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata 2");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
 
     // 2.6 user cancel cast CLEAR: NO
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 0);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::CLEAR), 0);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata 2");
 
     // 2.7 user accept cast CLEAR: YES
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::CLEAR), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "");
 
     // 2.8 user accept tags set
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Football,Spanish");
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "Football,Spanish");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "Football,Spanish");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Tags).toString(), "Football,Spanish");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Tags).toString(), "Football,Spanish");
 
     // 2.9 user accept tags CLEAR: YES
-    QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "");
+    QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::CLEAR), 2);
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Tags).toString(), "");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Tags).toString(), "");
   }
 
   void export_to_json_update_by_json_ok() {
@@ -633,10 +633,10 @@ class MovieDBViewTest : public PlainTestSuite {
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)  //
         .stubs()
-        .will(returnValue(QMessageBox::StandardButton::Yes))  // onInsertIntoTable and onSetCastOrTags all return ok
+        .will(returnValue(QMessageBox::StandardButton::Yes))  // onImportFromVideosUnderPath and onSetCastOrTags all return ok
         ;
 
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     movieView.selectAll();
@@ -644,16 +644,16 @@ class MovieDBViewTest : public PlainTestSuite {
     {
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Real Madrid");
       QCOMPARE(movieView.onSetStudio(), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Real Madrid");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Real Madrid");
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Cast Morata");
-      QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
+      QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND), 2);
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata");
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "FootBall");
-      QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "FootBall");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "FootBall");
+      QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND), 2);
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Tags).toString(), "FootBall");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Tags).toString(), "FootBall");
     }
 
     {
@@ -678,8 +678,8 @@ class MovieDBViewTest : public PlainTestSuite {
       movieView.selectAll();
       UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "X-Men");
       QCOMPARE(movieView.onSetStudio(), 2);  // it has not been write into db
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "X-Men");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "X-Men");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "X-Men");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "X-Men");
       QSet<QString> expectStudiosInDatabase{"Real Madrid"};
       QSet<QString> actualStudiosInDatabase;
       QVERIFY(fdDb.QueryPK(tableName2, ENUM_2_STR(Studio), actualStudiosInDatabase));
@@ -687,14 +687,14 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(dbModel.isDirty());
       QVERIFY(movieView.onRevert());  // revert can also let it not dirty
       QVERIFY(!dbModel.isDirty());
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "");
-      QCOMPARE(movieView.onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Real Madrid");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Real Madrid");
+      QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::CLEAR), 2);
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "");
+      QCOMPARE(movieView.onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::CLEAR), 2);
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Tags).toString(), "");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Tags).toString(), "");
 
       // 5.2 table dirty cannot Update By Json, skip
       QVERIFY(dbModel.isDirty());
@@ -704,12 +704,12 @@ class MovieDBViewTest : public PlainTestSuite {
       QVERIFY(movieView.onSubmit());
       QVERIFY(!dbModel.isDirty());
       QCOMPARE(movieView.onUpdateByJson(), 2);
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Real Madrid");
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Cast).toString(), "Cast Morata");
-      QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Tags).toString(), "FootBall");
-      QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Tags).toString(), "FootBall");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Real Madrid");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Real Madrid");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Cast).toString(), "Cast Morata");
+      QCOMPARE(dbModel.record(0).value(MovieDBModelField::Tags).toString(), "FootBall");
+      QCOMPARE(dbModel.record(1).value(MovieDBModelField::Tags).toString(), "FootBall");
     }
   }
 
@@ -723,7 +723,7 @@ class MovieDBViewTest : public PlainTestSuite {
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
         .stubs()                                               //
-        .will(returnValue(QMessageBox::StandardButton::Yes));  // onInsertIntoTable
+        .will(returnValue(QMessageBox::StandardButton::Yes));  // onImportFromVideosUnderPath
 
     // create tableName2 ok
     {
@@ -733,7 +733,7 @@ class MovieDBViewTest : public PlainTestSuite {
       QCOMPARE(dbModel.tableName(), tableName2);
 
       MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
-      QVERIFY(movieView.onInsertIntoTable());
+      QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
       QCOMPARE(dbModel.rowCount(), 2);
     }
 
@@ -770,7 +770,7 @@ class MovieDBViewTest : public PlainTestSuite {
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
         .stubs()                                               //
-        .will(returnValue(QMessageBox::StandardButton::Yes));  // onInsertIntoTable
+        .will(returnValue(QMessageBox::StandardButton::Yes));  // onImportFromVideosUnderPath
 
     MOCKER(QFileDialog::getExistingDirectory)
         .stubs()                   //
@@ -787,7 +787,7 @@ class MovieDBViewTest : public PlainTestSuite {
     QCOMPARE(dbModel.tableName(), tableName2);
 
     // 1.1 读取path2路径下的文件到tableName2. use `path2`
-    QVERIFY(movieView.onInsertIntoTable());
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
     // files not exist any more(if Fds not exist before, but now not exist) will be delete from this table,
@@ -820,8 +820,8 @@ class MovieDBViewTest : public PlainTestSuite {
     movieView.selectAll();
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, "Spanish/Brazil");
     QCOMPARE(movieView.onSetStudio(), 2);
-    QCOMPARE(dbModel.record(0).value(MOVIE_TABLE::Studio).toString(), "Spanish/Brazil");
-    QCOMPARE(dbModel.record(1).value(MOVIE_TABLE::Studio).toString(), "Spanish/Brazil");
+    QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Spanish/Brazil");
+    QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Spanish/Brazil");
     QVERIFY(dbModel.isDirty());
     QVERIFY(!movieView.onAuditATable());
   }
@@ -839,7 +839,7 @@ class MovieDBViewTest : public PlainTestSuite {
     QVERIFY(movieView.onCreateATable());
     QVERIFY(fdDb.IsTableExist(tableName2));
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
-    QVERIFY(movieView.onInsertIntoTable());  // use `path2`
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));  // use `path2`
     QCOMPARE(dbModel.rowCount(), 2);
 
     {

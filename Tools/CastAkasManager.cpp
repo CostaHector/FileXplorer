@@ -1,10 +1,6 @@
 ﻿#include "CastAkasManager.h"
-#include "CastPsonFileHelper.h"
-#include "TableFields.h"
-#include "PathTool.h"
 #include "SystemPath.h"
-#include "PublicMacro.h"
-#include "StringTool.h"
+#include "Logger.h"
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QFile>

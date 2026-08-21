@@ -5,7 +5,7 @@
 #include "DevicesDrivesTV.h"
 #include "EndToExposePrivateMember.h"
 
-#include "TableFields.h"
+#include "DeviceDriverDBModelField.h"
 #include "Configuration.h"
 #include <QPainter>
 
@@ -32,10 +32,10 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     DevicesDrivesTV devicesDrivesTV;
     QVERIFY(devicesDrivesTV.mDevModel != nullptr);
     QCOMPARE(devicesDrivesTV.mDevModel->rowCount(), 2);
-    QCOMPARE(devicesDrivesTV.mDevModel->columnCount(), DEV_DRV_TABLE::FILED_BUTT);
+    QCOMPARE(devicesDrivesTV.mDevModel->columnCount(), DeviceDriverDBModelField::FILED_BUTT);
 
-    QStringList expectedHeaders = DEV_DRV_TABLE::GetDevDrvTableHeaders();
-    QCOMPARE(devicesDrivesTV.mDevModel->horizontalHeaderItem(DEV_DRV_TABLE::ROOT_PATH)->text(), expectedHeaders[DEV_DRV_TABLE::ROOT_PATH]);
+    QStringList expectedHeaders = DeviceDriverDBModelField::GetDevDrvTableHeaders();
+    QCOMPARE(devicesDrivesTV.mDevModel->horizontalHeaderItem(DeviceDriverDBModelField::ROOT_PATH)->text(), expectedHeaders[DeviceDriverDBModelField::ROOT_PATH]);
 
     QVERIFY(devicesDrivesTV.mProgressStyleDelegate != nullptr);
   }
@@ -45,11 +45,11 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
 
     QCOMPARE(model->rowCount(), 2);
-    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
+    devicesDrivesTV.sortByColumn(DeviceDriverDBModelField::ROOT_PATH, Qt::SortOrder::AscendingOrder);
 
-    QModelIndex rootPathIndex = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
-    QModelIndex totalBytesIndex = model->index(0, DEV_DRV_TABLE::TOTAL_BYTES);
-    QModelIndex usedBytesIndex = model->index(0, DEV_DRV_TABLE::USED_BYTES);
+    QModelIndex rootPathIndex = model->index(0, DeviceDriverDBModelField::ROOT_PATH);
+    QModelIndex totalBytesIndex = model->index(0, DeviceDriverDBModelField::TOTAL_BYTES);
+    QModelIndex usedBytesIndex = model->index(0, DeviceDriverDBModelField::USED_BYTES);
 
     QCOMPARE(model->data(rootPathIndex).toString(), QString("C:"));
     QCOMPARE(model->data(totalBytesIndex).toLongLong(), 50000000000LL);
@@ -61,8 +61,8 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
     ProgressDelegate delegate(model);
 
-    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
-    QModelIndex index = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
+    devicesDrivesTV.sortByColumn(DeviceDriverDBModelField::ROOT_PATH, Qt::SortOrder::AscendingOrder);
+    QModelIndex index = model->index(0, DeviceDriverDBModelField::ROOT_PATH);
     float percentage = delegate.GetUsedPercentage(index);
     QCOMPARE(percentage, 0.6f);  // 30GB / 50GB = 0.6
 
@@ -94,9 +94,9 @@ class DevicesDrivesTVTest : public PlainTestSuite {
     DevicesDrivesTV devicesDrivesTV;
     QStandardItemModel* model = devicesDrivesTV.mDevModel;
     QCOMPARE(model->rowCount(), 1);
-    devicesDrivesTV.sortByColumn(DEV_DRV_TABLE::ROOT_PATH, Qt::SortOrder::AscendingOrder);
+    devicesDrivesTV.sortByColumn(DeviceDriverDBModelField::ROOT_PATH, Qt::SortOrder::AscendingOrder);
 
-    QModelIndex rootPathIndex = model->index(0, DEV_DRV_TABLE::ROOT_PATH);
+    QModelIndex rootPathIndex = model->index(0, DeviceDriverDBModelField::ROOT_PATH);
     QCOMPARE(model->data(rootPathIndex).toString(), QString("/"));
   }
 

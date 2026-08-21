@@ -1,14 +1,9 @@
 #include "JsonHelper.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "PublicMacro.h"
-#include "NameTool.h"
-#include "CastManager.h"
-#include "StudiosManager.h"
-#include "TableFields.h"
-#include "MD5Calculator.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -96,12 +91,12 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     dict = MovieJsonLoader(jsonPth);
   } else {
     const QString& name = PathTool::GetBaseName(jsonPth);
-    dict = JsonKey::GetJsonDictDefault(name);
+    dict = JsonModelField::GetJsonDictDefault(name);
     changed = true;
   }
 
   QHash<QString, QVariant>::iterator it;
-  using namespace JsonKey;
+  using namespace JsonModelField;
   if (duration != 0) {
     it = dict.find(ENUM_2_STR(Duration));  // here size is the duration
     if (it != dict.cend() && it->toInt() != duration) {
@@ -155,7 +150,7 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = MovieJsonLoader(jsonPath);
-    using namespace MOVIE_TABLE;
+    using namespace JsonModelField;
     const QString& studio = dict.value(ENUM_2_STR(Studio), "").toString();
     const QStringList& cast = dict.value(ENUM_2_STR(Cast), {}).toStringList();
     const QStringList& tags = dict.value(ENUM_2_STR(Tags), {}).toStringList();

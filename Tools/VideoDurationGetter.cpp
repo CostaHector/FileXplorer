@@ -2,6 +2,10 @@
 #include "Logger.h"
 #include "QMediaInfo.h"
 #include "DvdFileInfo.h"
+#include "PathTool.h"
+#include "JsonParser.h"
+#include "JsonFieldBoundary.h"
+#include <QFile>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -14,6 +18,22 @@ void IsFFmpegInstalledOK() {
 
 constexpr int VideoDurationGetter::MILLISECONDS_PER_SECOND;
 constexpr int VideoDurationGetter::MICROSECONDS_PER_MILLISECOND;
+
+int VideoDurationGetter::GetDurationFromJsonFirst(const QString &vidPath) {
+  const QString& relatedJsonFullPath = PathTool::FileExtReplacedWithJson(vidPath);
+  int duration = JsonFieldBoundary::DURATION_GET_FAILED_VALUE;
+  if (QFile::exists(relatedJsonFullPath)) {
+    bool readJsonRate{false};
+    duration = JsonParser::GetDurationFromJsonFile(relatedJsonFullPath, &readJsonRate, JsonFieldBoundary::DURATION_INITIAL_VALUE);
+    if (readJsonRate && duration != JsonFieldBoundary::DURATION_INITIAL_VALUE && duration != JsonFieldBoundary::DURATION_GET_FAILED_VALUE) {
+      return duration;
+    }
+  }
+  // json not exist or json not contains key "Duration".
+  // Fallback to get duration from video file meta data.
+  static VideoDurationGetter mi;
+  return VideoDurationGetter::GetLengthQuickStatic(mi, vidPath);
+}
 
 int VideoDurationGetter::ReadAVideo(const QString& vidPath) {
   if (vidPath.endsWith(".dvd", Qt::CaseInsensitive)) {
@@ -31,7 +51,7 @@ int VideoDurationGetter::ReadAVideo(const QString& vidPath) {
     return -1;
   }
   // fmtCtx->duration unit is us
-  int duration = (fmtCtx->duration == AV_NOPTS_VALUE) ? -1 : (double)fmtCtx->duration / MICROSECONDS_PER_MILLISECOND;
+  int duration = (fmtCtx->duration == AV_NOPTS_VALUE) ? JsonFieldBoundary::DURATION_GET_FAILED_VALUE : (double)fmtCtx->duration / MICROSECONDS_PER_MILLISECOND;
   avformat_close_input(&fmtCtx);
   return duration;
 }

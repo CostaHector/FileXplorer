@@ -5,7 +5,6 @@
 #include "PlainTestSuite.h"
 #include "CastBaseDb.h"
 #include "TDir.h"
-#include "TableFields.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "StringTool.h"
@@ -151,8 +150,8 @@ private slots:
     QList<QSqlRecord> records;
     QVERIFY(perfDb.QueryForTest("SELECT * from " + DB_TABLE::PERFORMERS, records));
     for (const auto& record : records) {
-      const QString castName{record.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
-      const QString akaNames{record.value(PERFORMER_DB_HEADER_KEY::ALIAS).toString()};
+      const QString castName{record.value(CastDbModelField::Name).toString()};
+      const QString akaNames{record.value(CastDbModelField::ALIAS).toString()};
       if (newMap.contains(castName)) {
         QCOMPARE(newMap[castName], akaNames);
       } else if (oldMap.contains(castName)) {  // only newMap not exists this one, we consider oldMap
@@ -181,13 +180,13 @@ private slots:
     QCOMPARE(records.size(), 4);
 
     for (const auto& record : records) {
-      const QString castName = record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
+      const QString castName = record.value(CastDbModelField::Name).toString();
       auto it = gExpectName2Property.find(castName);
       QVERIFY2(it != gExpectName2Property.cend(), qPrintable(castName));
 
-      QCOMPARE(record.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), it->ori);
+      QCOMPARE(record.value(CastDbModelField::Ori).toString(), it->ori);
 
-      const QStringList actualImgsLst = record.value(PERFORMER_DB_HEADER_KEY::Imgs).toString().split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
+      const QStringList actualImgsLst = record.value(CastDbModelField::Imgs).toString().split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
       QSet<QString> actualImgsSet{actualImgsLst.cbegin(), actualImgsLst.cend()};
       QCOMPARE(actualImgsSet, it->imgsStr);
     }
@@ -210,7 +209,7 @@ private slots:
 
     QSet<QString> pkNames;
     {
-      using namespace PERFORMER_DB_HEADER_KEY;
+      using namespace CastDbModelField;
       QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, ENUM_2_STR(Name), pkNames));
     }
     QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
@@ -221,28 +220,28 @@ private slots:
     QCOMPARE(records.size(), 4);
 
     for (const auto& record : records) {
-      const QString castName = record.value(PERFORMER_DB_HEADER_KEY::Name).toString();
+      const QString castName = record.value(CastDbModelField::Name).toString();
       auto it = gExpectName2Property.find(castName);
       QVERIFY2(it != gExpectName2Property.cend(), qPrintable(castName));
 
-      QCOMPARE(record.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), it->ori);
+      QCOMPARE(record.value(CastDbModelField::Ori).toString(), it->ori);
 
-      const QStringList actualImgsLst = record.value(PERFORMER_DB_HEADER_KEY::Imgs).toString().split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
+      const QStringList actualImgsLst = record.value(CastDbModelField::Imgs).toString().split(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
       QSet<QString> actualImgsSet{actualImgsLst.cbegin(), actualImgsLst.cend()};
       QCOMPARE(actualImgsSet, it->imgsStr);
 
-      QCOMPARE(record.value(PERFORMER_DB_HEADER_KEY::Rate).toInt(), it->rate);
+      QCOMPARE(record.value(CastDbModelField::Rate).toInt(), it->rate);
     }
   }
 
   void test_UpdateRecordImgsField() {
     const QString defaultImgs{"Chris Hemsworth 0.jpg\nChris Hemsworth 1.jpg"};
 
-    using namespace PERFORMER_DB_HEADER_KEY;
+    using namespace CastDbModelField;
     // 1. folder not exist should skip update
     QSqlRecord chrisHenmworthRecord = GetACastRecordLine("Chris Hemsworth", "Movie", defaultImgs);
-    QCOMPARE(chrisHenmworthRecord.value(PERFORMER_DB_HEADER_KEY::Name).toString(), "Chris Hemsworth");
-    QCOMPARE(chrisHenmworthRecord.value(PERFORMER_DB_HEADER_KEY::Ori).toString(), "Movie");
+    QCOMPARE(chrisHenmworthRecord.value(CastDbModelField::Name).toString(), "Chris Hemsworth");
+    QCOMPARE(chrisHenmworthRecord.value(CastDbModelField::Ori).toString(), "Movie");
     QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Name)).toString(), "Chris Hemsworth");
     QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Ori)).toString(), "Movie");
     const QString castFolderPath{imgHostPath + "/Movie/Chris Hemsworth"};
@@ -254,10 +253,10 @@ private slots:
 
     // 2. folder exist should update img fields only
     QSqlRecord chrisEvansRecord = GetACastRecordLine("Chris Evans", "Movie", defaultImgs);
-    const QString& oldImgs = chrisEvansRecord.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
+    const QString& oldImgs = chrisEvansRecord.value(CastDbModelField::Imgs).toString();
     QCOMPARE(oldImgs, defaultImgs);
     QVERIFY(CastBaseDb::UpdateRecordImgsField(chrisEvansRecord, imgHostPath));
-    const QString& newImgs = chrisEvansRecord.value(PERFORMER_DB_HEADER_KEY::Imgs).toString();
+    const QString& newImgs = chrisEvansRecord.value(CastDbModelField::Imgs).toString();
     QVERIFY(newImgs != defaultImgs);
     QVERIFY(newImgs.contains("Chris Evans 2.jpg")); // 2 file "A.jpg\nB.jpg" in filesystem-depend sequence
     QVERIFY(newImgs.contains("Chris Evans.jpg"));

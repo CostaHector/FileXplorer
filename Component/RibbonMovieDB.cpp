@@ -14,6 +14,7 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_dbControlTB = new (std::nothrow) QToolBar{"DB Control", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);
   m_dbControlTB->addActions(inst.DB_CONTROL_ACTIONS->actions());
+  m_dbControlTB->addWidget(inst.GetScanFilesToolButton(this));
   m_dbControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   m_dbControlTB->setOrientation(Qt::Orientation::Horizontal);
 

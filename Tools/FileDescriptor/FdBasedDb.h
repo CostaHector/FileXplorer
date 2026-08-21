@@ -27,6 +27,8 @@ class FdBasedDb : public DbManager {
     PrePathRight,
     Name,
     Size,
+    Duration,
+    SampleMD5,
   };
   static const QString QUERY_KEY_INFO_TEMPLATE;
   static const QString WHERE_NAME_CORE_TEMPLATE;

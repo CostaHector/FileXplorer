@@ -1,6 +1,5 @@
 #include "QMediaInfo.h"
 #include "MediaInfoDLL.h"
-#include "TableFields.h"
 #include "JsonFieldBoundary.h"
 #include "DvdFileInfo.h"
 #include "Logger.h"

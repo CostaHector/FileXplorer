@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "FileImageViewer.h"
+#include "DvdFileInfo.h"
 
 #include <QAction>
 #include <QDir>
@@ -223,6 +224,13 @@ bool IsTorrentFile(const QString& localFilePath) {
 
 bool IsTorrentTxtFile(const QString& localFilePath) {
   return localFilePath.endsWith(".torrent.txt", Qt::CaseSensitivity::CaseInsensitive);
+}
+
+qint64 GetFileSize(const QString& fileAbsPath) {
+  if (fileAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
+    return DvdFileInfo::ReadTotalFileSizeFromDvdFile(fileAbsPath);
+  }
+  return QFile{fileAbsPath}.size();
 }
 
 bool OpenLocalTorrentFile(const QString& localFilePath) {

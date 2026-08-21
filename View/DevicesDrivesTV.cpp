@@ -1,9 +1,8 @@
 ﻿#include "DevicesDrivesTV.h"
 #include "PublicMacro.h"
-#include "NotificatorMacro.h"
 #include "SizeTool.h"
 #include "Configuration.h"
-#include "TableFields.h"
+#include "DeviceDriverDBModelField.h"
 #include "StyleSheet.h"
 
 #include <QStorageInfo>
@@ -48,8 +47,8 @@ ProgressDelegate::ProgressDelegate(QStandardItemModel* model, QObject* parent)  
     : QStyledItemDelegate(parent), mModel{model} {}
 float ProgressDelegate::GetUsedPercentage(const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_INT(mModel, 0);
-  return (float)mModel->index(index.row(), DEV_DRV_TABLE::USED_BYTES).data().toLongLong()  //
-         / mModel->index(index.row(), DEV_DRV_TABLE::TOTAL_BYTES).data().toLongLong();     //
+  return (float)mModel->index(index.row(), DeviceDriverDBModelField::USED_BYTES).data().toLongLong()  //
+         / mModel->index(index.row(), DeviceDriverDBModelField::TOTAL_BYTES).data().toLongLong();     //
 }
 void ProgressDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
   QStyleOptionViewItem opt = option;
@@ -74,22 +73,22 @@ DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)  //
   mDevModel = new (std::nothrow) QStandardItemModel;
   CHECK_NULLPTR_RETURN_VOID(mDevModel);
   mDevModel->setRowCount(mDisks.size());
-  mDevModel->setColumnCount(DEV_DRV_TABLE::FILED_BUTT);
+  mDevModel->setColumnCount(DeviceDriverDBModelField::FILED_BUTT);
   for (int row = 0; row < mDevModel->rowCount(); ++row) {
-    QModelIndex idxRootPath = mDevModel->index(row, DEV_DRV_TABLE::ROOT_PATH);
-    QModelIndex idxTotalSpace = mDevModel->index(row, DEV_DRV_TABLE::TOTAL_BYTES);
-    QModelIndex idxUsedSpace = mDevModel->index(row, DEV_DRV_TABLE::USED_BYTES);
+    QModelIndex idxRootPath = mDevModel->index(row, DeviceDriverDBModelField::ROOT_PATH);
+    QModelIndex idxTotalSpace = mDevModel->index(row, DeviceDriverDBModelField::TOTAL_BYTES);
+    QModelIndex idxUsedSpace = mDevModel->index(row, DeviceDriverDBModelField::USED_BYTES);
     mDevModel->setData(idxRootPath, mDisks[row].diskName);
     mDevModel->setData(idxTotalSpace, mDisks[row].totalSpace);
     mDevModel->setData(idxUsedSpace, mDisks[row].occupiedSpace);
   }
-  mDevModel->setHorizontalHeaderLabels(DEV_DRV_TABLE::GetDevDrvTableHeaders());
+  mDevModel->setHorizontalHeaderLabels(DeviceDriverDBModelField::GetDevDrvTableHeaders());
   setModel(mDevModel);
 
   mProgressStyleDelegate = new (std::nothrow) ProgressDelegate{mDevModel};
   CHECK_NULLPTR_RETURN_VOID(mProgressStyleDelegate);
 
-  setItemDelegateForColumn(DEV_DRV_TABLE::ROOT_PATH, mProgressStyleDelegate);
+  setItemDelegateForColumn(DeviceDriverDBModelField::ROOT_PATH, mProgressStyleDelegate);
   setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
 
   InitTableView();

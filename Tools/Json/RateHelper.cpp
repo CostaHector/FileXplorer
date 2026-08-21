@@ -4,8 +4,7 @@
 #include "ItemsPileCategory.h"
 #include "PublicVariable.h"
 #include "Logger.h"
-#include "TableFields.h"
-#include "CastPsonFileHelper.h"
+#include "JsonModelField.h"
 #include "JsonFieldBoundary.h"
 #include <QPainter>
 #include <QFile>
@@ -16,9 +15,8 @@
 constexpr int RateHelper::RATING_BAR_X, RateHelper::RATING_BAR_HEIGHT;
 
 bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
-  using namespace JsonHelper;
-  using namespace MOVIE_TABLE;
-  QVariantHash data = MovieJsonLoader(jsonPath);
+  using namespace JsonModelField;
+  QVariantHash data = JsonHelper::MovieJsonLoader(jsonPath);
   if (!data.contains(ENUM_2_STR(Name))) {
     LOG_D("JSON data[%s] not contains key" ENUM_2_STR(Name), qPrintable(jsonPath));
     return false;
@@ -26,7 +24,6 @@ bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, b
 
   const int afterValue = JsonFieldBoundary::clampRate(newRateVal);
 
-  using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
   if (itRate != data.cend()) { // Rate already exist
     int beforeValue = itRate.value().toInt();
@@ -41,7 +38,7 @@ bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, b
     data[ENUM_2_STR(Rate)] = afterValue;
   }
 
-  if (!DumpJsonDict(data, jsonPath)) {
+  if (!JsonHelper::DumpJsonDict(data, jsonPath)) {
     LOG_E("Failed to save JSON data to: %s", qPrintable(jsonPath));
     return false;
   }
@@ -64,15 +61,13 @@ bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int
   if (delta == 0) {
     return false;
   }
-  using namespace JsonHelper;
-  using namespace MOVIE_TABLE;
-  QVariantHash data = MovieJsonLoader(jsonPath);
+  using namespace JsonModelField;
+  QVariantHash data = JsonHelper::MovieJsonLoader(jsonPath);
   if (!data.contains(ENUM_2_STR(Name))) {
     LOG_D("JSON data[%s] not contains key" ENUM_2_STR(Name), qPrintable(jsonPath));
     return false;
   }
 
-  using namespace PERFORMER_DB_HEADER_KEY;
   auto itRate = data.find(ENUM_2_STR(Rate));
   const int beforeValue{itRate != data.end() ? itRate.value().toInt() : JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V};
   const int afterValue{JsonFieldBoundary::clampRate(beforeValue + delta)};
@@ -90,7 +85,7 @@ bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int
     data[ENUM_2_STR(Rate)] = afterValue;
   }
 
-  if (!DumpJsonDict(data, jsonPath)) {
+  if (!JsonHelper::DumpJsonDict(data, jsonPath)) {
     LOG_E("Failed to save JSON data to: %s", qPrintable(jsonPath));
     return false;
   }

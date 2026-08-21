@@ -10,7 +10,6 @@
 #include "PathKey.h"
 #include "Configuration.h"
 #include "PublicVariable.h"
-#include "TableFields.h"
 
 #include <QSignalSpy>
 #include <QSqlRecord>
@@ -80,20 +79,20 @@ class CastDBViewTest : public PlainTestSuite {
       QVERIFY(!castModel.isDirty());
       QVERIFY(!castView.currentIndex().isValid());
 
-      QModelIndexList indexesNames{GetIndexessAtOneRow(castModel, 0, 2, PERFORMER_DB_HEADER_KEY::Name)};
+      QModelIndexList indexesNames{GetIndexessAtOneRow(castModel, 0, 2, CastDbModelField::Name)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesNames,  //
                                                  QStringList{"Guardiola", "Huge Jackman"}));
-      QModelIndexList indexesAkas{GetIndexessAtOneRow(castModel, 0, 2, PERFORMER_DB_HEADER_KEY::ALIAS)};
+      QModelIndexList indexesAkas{GetIndexessAtOneRow(castModel, 0, 2, CastDbModelField::ALIAS)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesAkas,  //
                                                  QStringList{"Pep", "Wolverine"}));
 
-      QVERIFY(castModel.setData(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), 99, Qt::ItemDataRole::EditRole));
-      QCOMPARE(castModel.data(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), Qt::ItemDataRole::DisplayRole).toInt(), 99);
+      QVERIFY(castModel.setData(castModel.index(0, CastDbModelField::Rate), 99, Qt::ItemDataRole::EditRole));
+      QCOMPARE(castModel.data(castModel.index(0, CastDbModelField::Rate), Qt::ItemDataRole::DisplayRole).toInt(), 99);
       QVERIFY(castModel.isDirty());
       QVERIFY(castModel.submitSaveAllChanges());
       QCOMPARE(castView.onAppendCasts(), 2);  // will not check if changes
       // should not modify other fields like rate
-      QCOMPARE(castModel.data(castModel.index(0, PERFORMER_DB_HEADER_KEY::Rate), Qt::ItemDataRole::DisplayRole).toInt(), 99);
+      QCOMPARE(castModel.data(castModel.index(0, CastDbModelField::Rate), Qt::ItemDataRole::DisplayRole).toInt(), 99);
     }
 
     {  // onDeleteRecords ok
@@ -164,7 +163,7 @@ class CastDBViewTest : public PlainTestSuite {
       QVERIFY(tDir.exists("Action/James Caviezel/James Caviezel.pson"));
       //
       using namespace CastPsonFileHelper;
-      castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
+      castModel.sort(CastDbModelField::Name, Qt::AscendingOrder);
 
       CastDbViewMocker::MockLoadFromPsonDirectory() = false;                                             // user cancel
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", DEFAULT_RATE, "", "", "SuperHero",  //
@@ -181,7 +180,7 @@ class CastDBViewTest : public PlainTestSuite {
       QCOMPARE(castView.onLoadFromPsonDirectory(), 3);       // 3 pson find out and updated
       QCOMPARE(castModel.rowCount(), 5 + 1);                 // James Caviezel added
 
-      castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
+      castModel.sort(CastDbModelField::Name, Qt::AscendingOrder);
       // Chris Evans(0), Chris Hemsworth(1), Chris Pine, Cristiano Ronaldo, James Caviezel(4), Michael Fassbender
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero",
                                  -1, -1, "", "Chris Evans in captain america.mp4", "Chris Evans portait.jpg",  //
@@ -285,7 +284,7 @@ class CastDBViewTest : public PlainTestSuite {
       QCOMPARE(currentRecordChangedByVidUpdSig.count(), 1);
       QCOMPARE(castView.currentIndex(), firstInd);
 
-      castModel.sort(PERFORMER_DB_HEADER_KEY::Name, Qt::AscendingOrder);
+      castModel.sort(CastDbModelField::Name, Qt::AscendingOrder);
       // Chris Evans(0), Chris Hemsworth(1), Chris Pine, Cristiano Ronaldo, James Caviezel(4), Michael Fassbender
       QVERIFY(CheckRecordIfEqual(castModel.record(0), "Chris Evans", 10, "Captain,Steve", "hero,movie star", "SuperHero",
                                  -1, -1, "", "videos/superhero/Chris Evans Captain America.mp4\nvideos/superhero/Chris Evans Steve.mp4",  //

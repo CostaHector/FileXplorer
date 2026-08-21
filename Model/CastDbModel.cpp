@@ -1,18 +1,15 @@
 #include "CastDbModel.h"
 #include "CastBaseDb.h"
-#include "CastDBActions.h"
 #include "PathKey.h"
 #include "Configuration.h"
 #include "PublicVariable.h"
-#include "TableFields.h"
-#include "PublicMacro.h"
-#include "NotificatorMacro.h"
-#include "JsonHelper.h"
 #include "CastPsonFileHelper.h"
+#include "RateHelper.h"
+#include "JsonHelper.h"
+#include "JsonRenameRegex.h"
 #include "QuickWhereClauseHelper.h"
 #include "StringTool.h"
-#include "RateHelper.h"
-#include "JsonRenameRegex.h"
+#include "NotificatorMacro.h"
 #include <QPainter>
 #include <QPixmap>
 #include <QSqlError>
@@ -57,7 +54,7 @@ QVariant CastDbModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
     return {};
   }
-  if (role == Qt::DecorationRole && index.column() == PERFORMER_DB_HEADER_KEY::Rate) {
+  if (role == Qt::DecorationRole && index.column() == CastDbModelField::Rate) {
     const int sc = QSqlTableModel::data(index, Qt::DisplayRole).toInt();
     return RateHelper::GetRatePixmap(sc);
   }
@@ -69,7 +66,7 @@ bool CastDbModel::setData(const QModelIndex& index, const QVariant& value, int r
   if (!index.isValid()) {
     return false;
   }
-  if (index.column() == PERFORMER_DB_HEADER_KEY::Name) {
+  if (index.column() == CastDbModelField::Name) {
     const QString oldName{data(index, Qt::DisplayRole).toString()};
     const QString newName{value.toString()};
     if (oldName == newName) {
@@ -81,7 +78,7 @@ bool CastDbModel::setData(const QModelIndex& index, const QVariant& value, int r
       LOG_C("Rename failed, will not write into db");
       return false;
     }
-  } else if (index.column() == PERFORMER_DB_HEADER_KEY::Ori) {
+  } else if (index.column() == CastDbModelField::Ori) {
     const QString newOri{value.toString()};
     if (!MigrateCastsOriFolder(index, newOri)) {
       LOG_C("Migrate failed, will not write into db");
@@ -95,7 +92,7 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return "";
   }
-  const QModelIndex& nameIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Name);
+  const QModelIndex& nameIndex = curIndex.siblingAtColumn(CastDbModelField::Name);
   return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
 }
 
@@ -114,7 +111,7 @@ QString CastDbModel::oriPath(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return "";
   }
-  const QModelIndex& oriIndex = curIndex.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori);
+  const QModelIndex& oriIndex = curIndex.siblingAtColumn(CastDbModelField::Ori);
   return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString();
 }
 
@@ -126,7 +123,7 @@ QString CastDbModel::psonFilePath(const QModelIndex& curIndex) const {
 }
 
 QModelIndexList CastDbModel::GetAllRowsIndexes() const {
-  QItemSelection allSelection(index(0, PERFORMER_DB_HEADER_KEY::Name), index(rowCount() - 1, PERFORMER_DB_HEADER_KEY::Name));
+  QItemSelection allSelection(index(0, CastDbModelField::Name), index(rowCount() - 1, CastDbModelField::Name));
   return allSelection.indexes();
 }
 
@@ -146,7 +143,7 @@ int CastDbModel::SyncImageFieldsFromImageHost(const QModelIndexList& selectedRow
       continue;
     }
     if (!setRecord(r, imgUpdatedRec)) {
-      LOG_D("Update image field failed", qPrintable(imgUpdatedRec.value(PERFORMER_DB_HEADER_KEY::Name).toString()));
+      LOG_W("Update image field[%s] failed", qPrintable(imgUpdatedRec.value(CastDbModelField::Name).toString()));
       return FD_ERROR_CODE::FD_SET_RECORDS_FAILED;
     }
     ++succeedCnt;
@@ -169,8 +166,8 @@ int CastDbModel::DumpRecordsIntoPsonFile(const QModelIndexList& selectedRowsInde
   for (const auto& indr : selectedRowsIndexes) {
     const int r = indr.row();
     const auto& needDumpRec = record(r);
-    const QString ori{needDumpRec.value(PERFORMER_DB_HEADER_KEY::Ori).toString()};
-    const QString castName{needDumpRec.value(PERFORMER_DB_HEADER_KEY::Name).toString()};
+    const QString ori{needDumpRec.value(CastDbModelField::Ori).toString()};
+    const QString castName{needDumpRec.value(CastDbModelField::Name).toString()};
     const QString prepath{ori + '/' + castName};
     if (!imageHostDir.exists(prepath) && !imageHostDir.mkpath(prepath)) {
       LOG_W("Create folder [%s] under [%s] failed", qPrintable(prepath), qPrintable(m_imageHostPath));
@@ -257,8 +254,8 @@ int CastDbModel::RefreshVidsForRecords(const QModelIndexList& selectedRowsIndexe
     QSqlRecord rec = record(row);
 
     // 获取演员信息
-    QString performer = rec.value(PERFORMER_DB_HEADER_KEY::Name).toString();
-    QString akas = rec.value(PERFORMER_DB_HEADER_KEY::ALIAS).toString();
+    QString performer = rec.value(CastDbModelField::Name).toString();
+    QString akas = rec.value(CastDbModelField::ALIAS).toString();
 
     // 构建并执行查询
     QString queryStr = QuickWhereClauseHelper::GetSelectMovieByCastStatement(performer, akas, DB_TABLE::MOVIES);
@@ -273,10 +270,10 @@ int CastDbModel::RefreshVidsForRecords(const QModelIndexList& selectedRowsIndexe
     vidsCntFindOut += vidCount;
 
     // 更新记录
-    if (rec.value(PERFORMER_DB_HEADER_KEY::Vids).toString() == vidPaths) {
+    if (rec.value(CastDbModelField::Vids).toString() == vidPaths) {
       continue; // unchange no need update
     }
-    rec.setValue(PERFORMER_DB_HEADER_KEY::Vids, vidPaths);
+    rec.setValue(CastDbModelField::Vids, vidPaths);
     if (!setRecord(row, rec)) {
       LOG_W("update the %dth row record[%s] failed %s", row, qPrintable(performer), qPrintable(lastError().text()));
       return FD_ERROR_CODE::FD_SET_RECORDS_FAILED;
@@ -307,13 +304,13 @@ bool CastDbModel::MigrateCastsOriFolder(const QModelIndex& ind, const QString& n
     return false;
   }
 
-  const QString& oldOri = ind.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Ori).data(Qt::DisplayRole).toString();
+  const QString& oldOri = ind.siblingAtColumn(CastDbModelField::Ori).data(Qt::DisplayRole).toString();
   if (newOri == oldOri) {
     LOG_D("Skip Migrate, Old/New Ori Name equals to[%s] ", qPrintable(newOri));
     return true;
   }
 
-  const QString& castName = ind.siblingAtColumn(PERFORMER_DB_HEADER_KEY::Name).data(Qt::DisplayRole).toString();
+  const QString& castName = ind.siblingAtColumn(CastDbModelField::Name).data(Qt::DisplayRole).toString();
   QDir imageHostDir{m_imageHostPath};
   if (!imageHostDir.exists(oldOri + '/' + castName)) {
     LOG_W("Migrate abort. folder[oldOri:%s/castName:%s] not exist", qPrintable(oldOri), qPrintable(castName));
@@ -360,11 +357,11 @@ bool CastDbModel::submitSaveAllChanges() {
 
 bool CastDbModel::onRevert() {
   if (!isDirty()) {
-    LOG_D("Table not dirty.", "Skip revert");
+    LOG_INFO_NP("Table not dirty.", "Skip revert");
     return false;
   }
   revertAll();
   select();
-  LOG_D("Revert succeed", "All changes revert");
+  LOG_OK_NP("Revert succeed", "All changes revert");
   return true;
 }

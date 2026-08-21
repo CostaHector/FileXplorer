@@ -159,16 +159,11 @@ bool JsonPr::UpdateVideoSizeField(QString videoAbsPath) {
   if (videoAbsPath.isEmpty()) {
     videoAbsPath = FindVideoAbsPath();
   }
-  const QFile fi{videoAbsPath};
-  if (!fi.exists()) {
+  if (!QFile::exists(videoAbsPath)) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-  if (videoAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
-    m_Size = DvdFileInfo::ReadTotalFileSizeFromDvdFile(videoAbsPath);
-  } else {
-    m_Size = fi.size();
-  }
+  m_Size = FileTool::GetFileSize(videoAbsPath);
   return true;
 }
 
@@ -257,13 +252,13 @@ bool JsonPr::SetStudio(const QString& studio) {
   return true;
 }
 
-bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP_MODE fieldMode) {
+bool JsonPr::SetCastOrTags(const QString& val, JsonModelField::FIELD_OP_TYPE fieldType, JsonModelField::FIELD_OP_MODE fieldMode) {
   SortedUniqStrLst* p2Lst{nullptr};
   switch (fieldType) {
-    case FIELD_OP_TYPE::CAST:
+    case JsonModelField::FIELD_OP_TYPE::CAST:
       p2Lst = &m_Cast;
       break;
-    case FIELD_OP_TYPE::TAGS:
+    case JsonModelField::FIELD_OP_TYPE::TAGS:
       p2Lst = &m_Tags;
       break;
     default:
@@ -276,15 +271,15 @@ bool JsonPr::SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP
   }
 
   switch (fieldMode) {
-    case FIELD_OP_MODE::SET: {
+    case JsonModelField::FIELD_OP_MODE::SET: {
       p2Lst->setBatchFromSentence(val);
       break;
     }
-    case FIELD_OP_MODE::APPEND: {
+    case JsonModelField::FIELD_OP_MODE::APPEND: {
       p2Lst->insertBatchFromSentence(val);
       break;
     }
-    case FIELD_OP_MODE::REMOVE: {
+    case JsonModelField::FIELD_OP_MODE::REMOVE: {
       p2Lst->remove(val);
       break;
     }

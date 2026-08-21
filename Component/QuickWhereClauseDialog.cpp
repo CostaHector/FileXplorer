@@ -1,14 +1,9 @@
 ﻿#include "QuickWhereClauseDialog.h"
-#include "QuickWhereClauseHelper.h"
-#include "CastAkasManager.h"
 #include "PublicMacro.h"
-#include "PublicVariable.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "StringTool.h"
-#include "TableFields.h"
-#include "CastPsonFileHelper.h"
 #include <QHash>
 #include <QPushButton>
 #include <QInputDialog>

@@ -9,13 +9,14 @@
 
 #include "Configuration.h"
 #include "TDir.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "ImageTestPrecoditionTools.h"
 #include "JsonHelper.h"
 #include "UndoRedo.h"
 #include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
 #include "PathTool.h"
+#include "RateHelper.h"
 
 #include <QSignalSpy>
 #include <mockcpp/mokc.h>
@@ -53,10 +54,10 @@ class SceneListViewTest : public PlainTestSuite {
     QString md5;
     QString uploaded;
 
-    QByteArray chrisEvansJsonBA = JsonKey::ConstructJsonByteArray("Chris Evans", casts, studios, tags, uploaded, rateChrisEvans,  //
+    QByteArray chrisEvansJsonBA = JsonModelField::ConstructJsonByteArray("Chris Evans", casts, studios, tags, uploaded, rateChrisEvans,  //
                                                                   0, "", "", {}, 0, {}, "",                                       //
                                                                   false, md5, details);
-    QByteArray henryCavillJsonBA = JsonKey::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, uploaded, rateHenryCavill,  //
+    QByteArray henryCavillJsonBA = JsonModelField::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, uploaded, rateHenryCavill,  //
                                                                    0, "", "", {}, 0, {}, "",                                         //
                                                                    false, md5, details);
 

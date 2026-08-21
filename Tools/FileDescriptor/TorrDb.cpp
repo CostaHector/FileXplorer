@@ -1,8 +1,8 @@
 #include "TorrDb.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
+#include "TorrentDBModelField.h"
 
-using namespace TORRENTS_DB_HEADER_KEY;
+using namespace TorrentDBModelField;
 const QString TorrDb::CREATE_TABLE_TEMPLATE  //
     {
         "CREATE TABLE IF NOT EXISTS `%1`( "  //

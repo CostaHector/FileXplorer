@@ -4,19 +4,25 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QObject>
+#include "MovieDBModelField.h"
 
 class MovieDBActions : public QObject {
   Q_OBJECT
- public:
+public:
   explicit MovieDBActions(QObject* parent = nullptr);
+  QWidget* GetScanFilesToolButton(QWidget* notNullParent) const;
 
+signals:
+  void reqScanFiles(MovieDBModelField::ScanFilesTypeE filesType);
+
+public:
   QAction* SUBMIT{nullptr};
   QAction* _MODEL_REPOPULATE{nullptr};
   QAction* REVERT{nullptr};
   QAction* INIT_A_DATABASE{nullptr};
   QAction* INIT_A_TABLE{nullptr};
   QAction* DROP_A_TABLE{nullptr};
-  QAction* IMPORT_FROM_VIDEO{nullptr}, *IMPORT_FROM_JSON{nullptr};
+
   QAction* DELETE_FROM_TABLE{nullptr};
   QAction* UNION_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
@@ -32,6 +38,13 @@ class MovieDBActions : public QObject {
   QAction *SET_STUDIO{nullptr};
   QAction *SET_CAST{nullptr}, *APPEND_CAST{nullptr}, *REMOVE_CAST{nullptr};
   QAction *SET_TAGS{nullptr}, *APPEND_TAGS{nullptr}, *REMOVE_TAGS{nullptr};
+
+private:
+  void subscribe();
+  void onScanFilesAgTriggered(const QAction* pScanFilesAct);
+
+  QAction* SCAN_VIDEOS{nullptr}, *SCAN_JSONS{nullptr};
+  QActionGroup* SCAN_FILES{nullptr};
 };
 
 MovieDBActions& g_dbAct();

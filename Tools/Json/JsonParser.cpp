@@ -1,14 +1,10 @@
 #include "JsonParser.h"
 #include "FileTool.h"
-#include "TableFields.h"
-#include "RateHelper.h"
-#include "JsonFieldBoundary.h"
 #include "MD5Calculator.h"
 
 #include <QByteArray>
 #include <QString>
 #include <QStringList>
-#include <tuple>
 #include <cstring>
 
 namespace JsonParser {
@@ -135,7 +131,7 @@ inline QStringList parseStringArray(const QByteArray& data, int& pos) {
   return result;
 }
 
-bool ParseEssentialFieldJson(const QString& jsonFilePath,
+ParseResult ParseEssentialFieldJson(const QString& jsonFilePath,
                              QByteArray* pSampleMd5Val, QString* pName, QString* pVidName,
                              qint64* pSize, int* pDuration,
                              QString* pStudio, QStringList* pCasts, QStringList* pTags,
@@ -143,11 +139,11 @@ bool ParseEssentialFieldJson(const QString& jsonFilePath,
   bool readOk = false;
   const QByteArray rawData = FileTool::ByteArrayReader(jsonFilePath, &readOk);
   if (!readOk || rawData.isEmpty()) {
-    return false;
+    return ParseResult::ERROR;
   }
 
-  // md5
-  QString localName;
+  bool bNameMet = false;
+  QString localVidName;
   QByteArray localSampleMD5;
 
   const int totalSize = rawData.size();
@@ -189,10 +185,13 @@ bool ParseEssentialFieldJson(const QString& jsonFilePath,
     // 5. 按需解析目标字段，非目标字段直接跳整行
     if (keyLen == 3 && std::memcmp(rawPtr + keyStart, "MD5", 3) == 0) {
       localSampleMD5 = parseMD5ByteArray(rawData, valuePos);
-    } if (keyLen == 4 && std::memcmp(rawPtr + keyStart, "Name", 4) == 0) {
-      localName = parseString(rawData, valuePos);
-    } else if (pVidName && keyLen == 7 && std::memcmp(rawPtr + keyStart, "VidName", 7) == 0) {
-      *pVidName = parseString(rawData, valuePos);
+    } if (!bNameMet && keyLen == 4 && std::memcmp(rawPtr + keyStart, "Name", 4) == 0) {
+      bNameMet = true;
+      if (pName) {
+        *pName = parseString(rawData, valuePos);
+      }
+    } else if (keyLen == 7 && std::memcmp(rawPtr + keyStart, "VidName", 7) == 0) {
+      localVidName = parseString(rawData, valuePos);
     } else if (pSize && keyLen == 4 && std::memcmp(rawPtr + keyStart, "Size", 4) == 0) {
       *pSize = parseNumber<qint64>(rawData, valuePos);
     } else if (pDuration && keyLen == 8 && std::memcmp(rawPtr + keyStart, "Duration", 8) == 0) {
@@ -211,16 +210,28 @@ bool ParseEssentialFieldJson(const QString& jsonFilePath,
     pos = lineEnd + 1;
   }
 
-  if (localSampleMD5.isEmpty() || localName.isEmpty()) {
-    return false;
+  if (!bNameMet) {
+    return ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS;
   }
+
+  // 2个空
+  if (localSampleMD5.isEmpty() && localVidName.isEmpty()) {
+    return ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS;
+  }
+
+  // 有且仅有1个空 => 原因: 未计算MD5的json, 手动删去了vidName
+  if (localSampleMD5.isEmpty() || localVidName.isEmpty()) {
+    LOG_E("MD5 or VidName in file[%s] is empty. Dismatch found.", qPrintable(jsonFilePath));
+    return ParseResult::ERROR;
+  }
+
   if (pSampleMd5Val) {
     pSampleMd5Val->swap(localSampleMD5);
   }
-  if (pName) {
-    pName->swap(localName);
+  if (pVidName) {
+    pVidName->swap(localVidName);
   }
-  return true;
+  return ParseResult::OK_NEED_FURTHER_PROCESS;
 }
 
 int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int defaultDurationValue) {
@@ -235,6 +246,8 @@ int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int def
     if (bSucceed != nullptr) { *bSucceed = false; }
     return defaultDurationValue;
   }
+  durationIndex += sizeof(R"("Duration":)"); // "a": xxx
+  if (bSucceed != nullptr) { *bSucceed = true; }
   return parseNumber<int>(contents, durationIndex);
 }
 
@@ -248,7 +261,22 @@ int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
   if (rateIndex == -1) {
     return defaultRateValue;
   }
+  rateIndex += sizeof(R"("Rate":)");
   return parseNumber<int>(contents, rateIndex);
+}
+
+qint64 GetSizeFromJsonFile(const QString& jsonFullPath, qint64 defaultSizeValue) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return defaultSizeValue;
+  }
+  int sizeIndex = contents.indexOf(R"("Size":)");
+  if (sizeIndex == -1) {
+    return defaultSizeValue;
+  }
+  sizeIndex += sizeof(R"("Size":)");
+  return parseNumber<qint64>(contents, sizeIndex);
 }
 
 QByteArray GetMD5FromJsonFile(const QString& jsonFullPath) {
@@ -261,6 +289,7 @@ QByteArray GetMD5FromJsonFile(const QString& jsonFullPath) {
   if (md5Index == -1) {
     return {};
   }
+  md5Index += sizeof(R"("MD5":)");
   return parseMD5ByteArray(contents, md5Index);
 }
 

@@ -1,11 +1,9 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-
-#include "BeginToExposePrivateMember.h"
 #include "JsonParser.h"
-#include "EndToExposePrivateMember.h"
 
 #include "FileTool.h"
+#include "JsonFieldBoundary.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -24,14 +22,60 @@ private slots:
     GlobalMockObject::verify();
   }
 
-
-  void whenJsonFileReadFailed() {
+  void GetDurationFromJsonFile_ok() {
     bool bReadOk = true;
-    MOCKER(FileTool::ByteArrayReader).stubs().with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{}));
-    QVERIFY(!JsonParser::ParseEssentialFieldJson("inexist json file"));
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(3)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk)))
+        .will(returnValue(QByteArray{R"({"Duration": 2264212,"Hot": []})"}))
+        .then(returnValue(QByteArray{R"({"Duration": 2264213})"}))
+        .then(returnValue(QByteArray{R"({})"}));
+    bool bSucceed{false};
+    QCOMPARE(JsonParser::GetDurationFromJsonFile("valid.json", &bSucceed, JsonFieldBoundary::DURATION_GET_FAILED_VALUE), 2264212);
+    QVERIFY(bSucceed);
+    bSucceed = false;
+    QCOMPARE(JsonParser::GetDurationFromJsonFile("valid.json", &bSucceed, JsonFieldBoundary::DURATION_GET_FAILED_VALUE), 2264213);
+    QVERIFY(bSucceed);
+    bSucceed = true;
+    QCOMPARE(JsonParser::GetDurationFromJsonFile("valid.json", &bSucceed, JsonFieldBoundary::DURATION_GET_FAILED_VALUE), JsonFieldBoundary::DURATION_GET_FAILED_VALUE);
+    QVERIFY(!bSucceed);
   }
 
-  void standardJson_Formatted_Ok() {
+  void GetRateFromJsonFile_ok() {
+    bool bReadOk = true;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(3)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk)))
+        .will(returnValue(QByteArray{R"({"Rate": 8,"Hot": []})"}))
+        .then(returnValue(QByteArray{R"({"Rate": 10})"}))
+        .then(returnValue(QByteArray{R"({})"}));
+    QCOMPARE(JsonParser::GetRateFromJsonFile("valid.json", JsonFieldBoundary::MovieRateE::RATE_MIN_UNINITIALIZED_V), 8);
+    QCOMPARE(JsonParser::GetRateFromJsonFile("valid.json", JsonFieldBoundary::MovieRateE::RATE_MIN_UNINITIALIZED_V), 10);
+    QCOMPARE(JsonParser::GetRateFromJsonFile("valid.json", JsonFieldBoundary::MovieRateE::RATE_MIN_UNINITIALIZED_V), JsonFieldBoundary::MovieRateE::RATE_MIN_UNINITIALIZED_V);
+  }
+
+  void GetMD5FromJsonFile_ok() {
+    bool bReadOk = true;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(4)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk)))
+        .will(returnValue(QByteArray{R"({"MD5": "01234567890123456789012345678901","Hot": []})"}))
+        .then(returnValue(QByteArray{R"({"MD5": "01234567890123456789012345678910"})"}))
+        .then(returnValue(QByteArray{R"({"MD5": "01"})"}))
+        .then(returnValue(QByteArray{R"({})"}));
+    QCOMPARE(JsonParser::GetMD5FromJsonFile("valid.json"), (QByteArray{"01234567890123456789012345678901"}));
+    QCOMPARE(JsonParser::GetMD5FromJsonFile("valid.json"), (QByteArray{"01234567890123456789012345678910"}));
+    QCOMPARE(JsonParser::GetMD5FromJsonFile("valid.json"), (QByteArray{}));
+    QCOMPARE(JsonParser::GetMD5FromJsonFile("valid.json"), (QByteArray{}));
+  }
+
+  void JsonFileReadFailed() {
+    bool bReadOk = false;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{"{}"}));
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("inexist json file"), JsonParser::ParseResult::ERROR);
+  }
+
+  void JsonFileContentEmpty() {
+    bool bReadOk = true;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{}));
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("empty json file"), JsonParser::ParseResult::ERROR);
+  }
+
+  void standardJson_Formatted_NeedFurtherProcess() {
     bool bReadOk = true;
     MOCKER(FileTool::ByteArrayReader).stubs().with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{R"({
     "Bitrate": "5000 kbps",
@@ -67,7 +111,7 @@ private slots:
     qint64 size{-1};
     int duration{-1}, rate{-1};
     QStringList casts, tags;
-    QVERIFY(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail));
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::OK_NEED_FURTHER_PROCESS);
     QCOMPARE(name, "AAAA");
     QCOMPARE(studio, "Pride");
     QCOMPARE(size, 1543270854);
@@ -77,7 +121,8 @@ private slots:
     QCOMPARE(casts, (QStringList{"Person 2", "99 Person"}));
   }
 
-  void standardJson_Formatted_butSomeFieldNotExist_Ok() {
+  void standardJson_Formatted_butSomeFieldNotExist_NeedFurtherProcess() {
+    // "Name" exist, MD5!=""
     bool bReadOk = true;
     MOCKER(FileTool::ByteArrayReader).stubs().with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{R"({
     "Cast": ["Person 2", "99 Person"],
@@ -85,13 +130,15 @@ private slots:
     "Name": "AAAA",
     "Studio": "Pride",
     "Tags": ["2tage", "tage"],
+    "MD5": "01234567890123456789012345678901",
+    "VidName": "AAAA.dvd"
 })"}));
     QByteArray sampleMd5Val;
     QString name, studio, vidName, detail;
     qint64 size{-1};
     int duration{-1}, rate{-1};
     QStringList casts, tags;
-    QVERIFY(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail));
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::OK_NEED_FURTHER_PROCESS);
     QCOMPARE(name, "AAAA");
     QCOMPARE(studio, "Pride");
     QCOMPARE(size, -1);
@@ -100,7 +147,54 @@ private slots:
     QCOMPARE(casts, (QStringList{"Person 2", "99 Person"}));
   }
 
+  void standardJson_NoMD5_MD5EmptyVidNameNotNull_noNeedFurtherProcess() {
+    bool bReadOk = true;
+    // 1. 无Name                       IGNORE_NO_NEED_FURTHER_PROCESS
+    // 2. 有Name, MD5="", VidName=""   IGNORE_NO_NEED_FURTHER_PROCESS
+    // 3. 有Name, MD5="", VidName!=""  ERROR log(Dismatch) and return ERROR
+    // 4. 有Name, MD5!="", VidName=""  ERROR log(Dismatch) and return ERROR
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(4)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{R"({
+    "Cast": ["Person 2", "99 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Studio": "Pride",
+    "Tags": ["2tage", "tage"]
+})"})).then(returnValue(QByteArray{R"({
+    "Cast": ["Person 2", "99 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "AAAA",
+    "Studio": "Pride",
+    "Tags": ["2tage", "tage"],
+    "MD5": "",
+    "VidName": ""
+})"})).then(returnValue(QByteArray{R"({
+    "Cast": ["Person 2", "99 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "AAAA",
+    "Studio": "Pride",
+    "Tags": ["2tage", "tage"],
+    "MD5": "",
+    "VidName": "AAAA.dvd"
+})"})).then(returnValue(QByteArray{R"({
+    "Cast": ["Person 2", "99 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "AAAA",
+    "Studio": "Pride",
+    "Tags": ["2tage", "tage"],
+    "MD5": "01234567890123456789012345678901",
+    "VidName": ""
+})"}));
+    QByteArray sampleMd5Val;
+    QString name, studio, vidName, detail;
+    qint64 size{-1};
+    int duration{-1}, rate{-1};
+    QStringList casts, tags;
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("No Name Field.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("Both MD5 and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Empty and VidName Not Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::ERROR);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Not Empty and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::ParseResult::ERROR);
+  }
+
 };
 
 #include "JsonParserTest.moc"
-REGISTER_TEST(JsonParserTest, true)
+REGISTER_TEST(JsonParserTest, false)

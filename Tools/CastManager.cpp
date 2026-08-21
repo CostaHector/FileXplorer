@@ -1,11 +1,7 @@
 #include "CastManager.h"
 #include "JsonRenameRegex.h"
-#include "PublicMacro.h"
 #include "SystemPath.h"
-#include "PathTool.h"
-#include "JsonKey.h"
-#include "JsonHelper.h"
-#include "TableFields.h"
+#include "Logger.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QTextStream>

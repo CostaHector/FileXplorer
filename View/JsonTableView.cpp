@@ -29,18 +29,18 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   _JsonProxyModel = jsonProxyModel;
 
   _JsonProxyModel->setSourceModel(_JsonModel);
-  _JsonProxyModel->setFilterKeyColumn(JSON_KEY_E::Name);  // only filter the specified name row; set -1 to filter all column if needed
+  _JsonProxyModel->setFilterKeyColumn(JsonModelField::Name);  // only filter the specified name row; set -1 to filter all column if needed
 
   setModel(_JsonProxyModel);
   setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 
-  auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Detail, this};
+  auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JsonModelField::Detail, this};
   CHECK_NULLPTR_RETURN_VOID(detailColumnDelegator);
-  setItemDelegateForColumn(JSON_KEY_E::Detail, detailColumnDelegator);
+  setItemDelegateForColumn(JsonModelField::Detail, detailColumnDelegator);
 
-  auto* castColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JSON_KEY_E::Cast, this};
+  auto* castColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JsonModelField::Cast, this};
   CHECK_NULLPTR_RETURN_VOID(castColumnDelegator);
-  setItemDelegateForColumn(JSON_KEY_E::Cast, castColumnDelegator);
+  setItemDelegateForColumn(JsonModelField::Cast, castColumnDelegator);
 
   _RECYCLE_JSON_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
   CHECK_NULLPTR_RETURN_VOID(_RECYCLE_JSON_RELATED_FILES)
@@ -67,7 +67,7 @@ QModelIndex JsonTableView::CurrentIndexSource() const {
   return _JsonProxyModel->mapToSource(proIndex);
 }
 
-QModelIndexList JsonTableView::selectedRowsSource(JSON_KEY_E column) const {
+QModelIndexList JsonTableView::selectedRowsSource(JsonModelField::FIELD_E column) const {
   const QModelIndexList& proIndexes = CustomTableView::selectionModel()->selectedRows(column);
   QModelIndexList srcIndexes;
   srcIndexes.reserve(proIndexes.size());
@@ -94,7 +94,7 @@ int JsonTableView::onFixSelectionRecordContents(bool bFixed) {
     LOG_INFO_NP("[skip] nothing selected", "skip fix json record");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::ContentFixed);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::ContentFixed);
   return _JsonModel->SetRecordContentsFixed(indexes, bFixed);
 }
 
@@ -103,7 +103,7 @@ int JsonTableView::onSaveCurrentChanges() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
   const int cnt = _JsonModel->SaveCurrentChanges(indexes);
   if (cnt < 0) {
     LOG_ERR_P("Save failed", "errorCode:%d", cnt);
@@ -118,7 +118,7 @@ int JsonTableView::onSyncNameField() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
   const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
   LOG_OK_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -129,7 +129,7 @@ int JsonTableView::onExportCastStudioToDictonary() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Name);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
   int castCnt{0}, studioCnt{0};
   std::tie(castCnt, studioCnt) = _JsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
   if (castCnt < 0 || studioCnt < 0) {
@@ -191,7 +191,7 @@ int JsonTableView::onSetStudio() {
     m_studioCandidates.insert(insertPos, studio);
   }
 
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, studio);
 
   LOG_OK_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
@@ -203,7 +203,7 @@ int JsonTableView::onInitCastAndStudio() {
     LOG_INFO_NP("nothing selected", "skip init cast/studio studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
   const int cnt = _JsonModel->InitCastAndStudio(indexes);
 
   LOG_OK_P("cast/studio has been inited", "%d/%d row(s)", cnt, indexes.size());
@@ -223,7 +223,7 @@ int JsonTableView::onHintCastAndStudio() {
     return -1;
   }
 
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
   if (indexes.size() > 1 && !userSelection.isEmpty()) {
     LOG_WARN_NP("Dangerous! User select more than 1 line and text selected", "skip");
     return -1;
@@ -240,7 +240,7 @@ int JsonTableView::onFormatCast() {
     LOG_INFO_NP("[Skip]nothing selected", "skip cast format");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Cast);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Cast);
   const int cnt = _JsonModel->FormatCast(indexes);
 
   LOG_OK_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
@@ -252,7 +252,7 @@ int JsonTableView::onUpdateFileSize() {
     LOG_INFO_NP("[Skip]nothing selected", "skip file size update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Size);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Size);
   const int cnt = _JsonModel->UpdateFizeSizeField(indexes);
   LOG_OK_P("File size field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -263,7 +263,7 @@ int JsonTableView::onUpdateDuration() {
     LOG_INFO_NP("[Skip]nothing selected", "skip duration update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Duration);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Duration);
   const int cnt = _JsonModel->UpdateDurationField(indexes);
   LOG_OK_P("Duration field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -274,7 +274,7 @@ int JsonTableView::onUpdateFileMD5() {
     LOG_INFO_NP("[Skip]nothing selected", "skip file md5 update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::MD5);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::MD5);
   const int cnt = _JsonModel->UpdateMD5Field(indexes);
   LOG_OK_P("File md5 field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -285,21 +285,21 @@ int JsonTableView::onClearStudio() {
     LOG_INFO_NP("[Skip]nothing selected", "skip clear studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JSON_KEY_E::Studio);
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
   const int cnt = _JsonModel->SetStudio(indexes, "");
   LOG_OK_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
 }
 
-int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
-  const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
+int JsonTableView::onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode) {
+  const QString fieldOperation{"Operation:" + JsonModelField::FIELD_OP_TYPE_ARR[(int)type] + ' ' + JsonModelField::FIELD_OP_MODE_ARR[(int)mode]};
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("nothing selected. skip", fieldOperation);
     return 0;
   }
 
   QString tagsOrCast;
-  if (mode == FIELD_OP_MODE::CLEAR) {
+  if (mode == JsonModelField::FIELD_OP_MODE::CLEAR) {
     tagsOrCast = "";
     const QString clearQryCfm{"Confirm " + fieldOperation};
     const QString clearTagsCastsHintMsg{"Clear text?"};
@@ -329,13 +329,13 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
     candidates.push_back(tagsOrCast);
   }
 
-  JSON_KEY_E fieldColumn{JSON_KEY_E::JSON_KEY_BUTT};
+  JsonModelField::FIELD_E fieldColumn{JsonModelField::FIELD_E::JSON_KEY_BUTT};
   switch (type) {
-    case FIELD_OP_TYPE::CAST:
-      fieldColumn = JSON_KEY_E::Cast;
+    case JsonModelField::FIELD_OP_TYPE::CAST:
+      fieldColumn = JsonModelField::Cast;
       break;
-    case FIELD_OP_TYPE::TAGS:
-      fieldColumn = JSON_KEY_E::Tags;
+    case JsonModelField::FIELD_OP_TYPE::TAGS:
+      fieldColumn = JsonModelField::Tags;
       break;
     default:
       LOG_ERR_P("Field Type invalid", "field: %d", (int)type);
@@ -345,14 +345,14 @@ int JsonTableView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE
   int cnt{0};
   const QModelIndexList& indexes = selectedRowsSource(fieldColumn);
   switch (mode) {
-    case FIELD_OP_MODE::SET:
-    case FIELD_OP_MODE::CLEAR:
+    case JsonModelField::FIELD_OP_MODE::SET:
+    case JsonModelField::FIELD_OP_MODE::CLEAR:
       cnt = _JsonModel->SetCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
-    case FIELD_OP_MODE::APPEND:
+    case JsonModelField::FIELD_OP_MODE::APPEND:
       cnt = _JsonModel->AddCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
-    case FIELD_OP_MODE::REMOVE:
+    case JsonModelField::FIELD_OP_MODE::REMOVE:
       cnt = _JsonModel->RmvCastOrTags(indexes, fieldColumn, tagsOrCast);
       break;
     default:
@@ -518,16 +518,16 @@ void JsonTableView::subscribe() {
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);
 
   connect(inst._CLEAR_STUDIO, &QAction::triggered, this, &JsonTableView::onClearStudio);
-  connect(inst._CLEAR_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::CLEAR); });
-  connect(inst._CLEAR_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::CLEAR); });
+  connect(inst._CLEAR_CAST, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::CLEAR); });
+  connect(inst._CLEAR_TAGS, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::CLEAR); });
 
-  connect(inst._CAST_FIELD_SET, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET); });
-  connect(inst._CAST_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND); });
-  connect(inst._CAST_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE); });
+  connect(inst._CAST_FIELD_SET, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET); });
+  connect(inst._CAST_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND); });
+  connect(inst._CAST_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE); });
 
-  connect(inst._TAGS_FIELD_SET, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET); });
-  connect(inst._TAGS_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND); });
-  connect(inst._TAGS_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE); });
+  connect(inst._TAGS_FIELD_SET, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET); });
+  connect(inst._TAGS_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND); });
+  connect(inst._TAGS_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE); });
 
   connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });

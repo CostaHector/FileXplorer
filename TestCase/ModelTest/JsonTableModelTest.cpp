@@ -47,19 +47,19 @@ class JsonTableModelTest : public PlainTestSuite {
   CastManager& actorMgr = CastManager::getInst();
 
   void CheckModelData(JsonTableModel& model) {
-    QCOMPARE(model.data(model.index(0, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
-    QCOMPARE(model.data(model.index(0, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast A 1\nEmpty Cast A 2");
-    QCOMPARE(model.data(model.index(0, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio A");
-    QCOMPARE(model.data(model.index(0, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag A");
-    QCOMPARE(model.data(model.index(0, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just a json example.");
-    QCOMPARE(model.data(model.index(0, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:36");  // 36000ms
+    QCOMPARE(model.data(model.index(0, JsonModelField::Name), Qt::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
+    QCOMPARE(model.data(model.index(0, JsonModelField::Cast), Qt::DisplayRole).toString(), "Empty Cast A 1\nEmpty Cast A 2");
+    QCOMPARE(model.data(model.index(0, JsonModelField::Studio), Qt::DisplayRole).toString(), "Empty Studio A");
+    QCOMPARE(model.data(model.index(0, JsonModelField::Tags), Qt::DisplayRole).toString(), "Empty Tag A");
+    QCOMPARE(model.data(model.index(0, JsonModelField::Detail), Qt::DisplayRole).toString(), "This is just a json example.");
+    QCOMPARE(model.data(model.index(0, JsonModelField::Duration), Qt::DisplayRole).toString(), "00:00:36");  // 36000ms
 
-    QCOMPARE(model.data(model.index(1, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - B rank - XX YY and ZZ DD EE");
-    QCOMPARE(model.data(model.index(1, JsonKey::Cast), Qt::DisplayRole).toString(), "Empty Cast B 1\nEmpty Cast B 2");
-    QCOMPARE(model.data(model.index(1, JsonKey::Studio), Qt::DisplayRole).toString(), "Empty Studio B");
-    QCOMPARE(model.data(model.index(1, JsonKey::Tags), Qt::DisplayRole).toString(), "Empty Tag B");
-    QCOMPARE(model.data(model.index(1, JsonKey::Detail), Qt::DisplayRole).toString(), "This is just b json example.");
-    QCOMPARE(model.data(model.index(1, JsonKey::Duration), Qt::DisplayRole).toString(), "00:00:03");  // 3600ms
+    QCOMPARE(model.data(model.index(1, JsonModelField::Name), Qt::DisplayRole).toString(), "GameTurbo - B rank - XX YY and ZZ DD EE");
+    QCOMPARE(model.data(model.index(1, JsonModelField::Cast), Qt::DisplayRole).toString(), "Empty Cast B 1\nEmpty Cast B 2");
+    QCOMPARE(model.data(model.index(1, JsonModelField::Studio), Qt::DisplayRole).toString(), "Empty Studio B");
+    QCOMPARE(model.data(model.index(1, JsonModelField::Tags), Qt::DisplayRole).toString(), "Empty Tag B");
+    QCOMPARE(model.data(model.index(1, JsonModelField::Detail), Qt::DisplayRole).toString(), "This is just b json example.");
+    QCOMPARE(model.data(model.index(1, JsonModelField::Duration), Qt::DisplayRole).toString(), "00:00:03");  // 3600ms
   }
 
  private slots:
@@ -82,9 +82,9 @@ class JsonTableModelTest : public PlainTestSuite {
   void initalize_ok() {
     JsonTableModel jtm;
     QCOMPARE(jtm.rowCount(), 0);
-    QCOMPARE(jtm.columnCount(), JsonKey::JSON_TABLE_HEADERS_COUNT);
-    QVERIFY(1 <= JsonKey::JSON_TABLE_HEADERS_COUNT && JsonKey::JSON_TABLE_HEADERS_COUNT <= 999);
-    QCOMPARE(jtm.headerData(0, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(), JsonKey::JSON_TABLE_HEADERS[0]);
+    QCOMPARE(jtm.columnCount(), JsonModelField::JSON_TABLE_HEADERS_COUNT);
+    QVERIFY(1 <= JsonModelField::JSON_TABLE_HEADERS_COUNT && JsonModelField::JSON_TABLE_HEADERS_COUNT <= 999);
+    QCOMPARE(jtm.headerData(0, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toString(), JsonModelField::JSON_TABLE_HEADERS[0]);
     QCOMPARE(jtm.headerData(999, Qt::Orientation::Horizontal, Qt::ItemDataRole::DisplayRole).toInt(), 999 + 1);
     QCOMPARE(jtm.headerData(0, Qt::Horizontal, Qt::ItemDataRole::TextAlignmentRole).isNull(), true);
 
@@ -117,21 +117,21 @@ class JsonTableModelTest : public PlainTestSuite {
 
       QCOMPARE(jtm.SetStudio({}, "new cast"), 0);
       QCOMPARE(jtm.SetStudio(invalidIndexes, "new cast"), 0);
-      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JSON_KEY_E::Name, "SetCastOrTags not allowed field"), -1);
-      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JSON_KEY_E::Cast, "learn from this sentence"), 0);
-      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JSON_KEY_E::Name, "AddCastOrTags not allowed field"), -1);
-      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JSON_KEY_E::Cast, "learn from this sentence"), 0);
-      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JSON_KEY_E::Name, "AddCastOrTags not allowed field"), -1);
-      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JSON_KEY_E::Cast, "remove me cast"), 0);
-      QCOMPARE(jtm.SetCastOrTags({}, JSON_KEY_E::Cast, "learn from this sentence"), 0);
-      QCOMPARE(jtm.AddCastOrTags({}, JSON_KEY_E::Cast, "learn from this sentence"), 0);
-      QCOMPARE(jtm.RmvCastOrTags({}, JSON_KEY_E::Cast, "remove me cast"), 0);
-      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JSON_KEY_E::Tags, "learn from this sentence"), 0);
-      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JSON_KEY_E::Tags, "learn from this sentence"), 0);
-      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JSON_KEY_E::Tags, "remove me tag"), 0);
-      QCOMPARE(jtm.SetCastOrTags({}, JSON_KEY_E::Tags, "learn from this sentence"), 0);
-      QCOMPARE(jtm.AddCastOrTags({}, JSON_KEY_E::Tags, "learn from this sentence"), 0);
-      QCOMPARE(jtm.RmvCastOrTags({}, JSON_KEY_E::Tags, "remove me tag"), 0);
+      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JsonModelField::Name, "SetCastOrTags not allowed field"), -1);
+      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JsonModelField::Cast, "learn from this sentence"), 0);
+      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JsonModelField::Name, "AddCastOrTags not allowed field"), -1);
+      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JsonModelField::Cast, "learn from this sentence"), 0);
+      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JsonModelField::Name, "AddCastOrTags not allowed field"), -1);
+      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JsonModelField::Cast, "remove me cast"), 0);
+      QCOMPARE(jtm.SetCastOrTags({}, JsonModelField::Cast, "learn from this sentence"), 0);
+      QCOMPARE(jtm.AddCastOrTags({}, JsonModelField::Cast, "learn from this sentence"), 0);
+      QCOMPARE(jtm.RmvCastOrTags({}, JsonModelField::Cast, "remove me cast"), 0);
+      QCOMPARE(jtm.SetCastOrTags(invalidIndexes, JsonModelField::Tags, "learn from this sentence"), 0);
+      QCOMPARE(jtm.AddCastOrTags(invalidIndexes, JsonModelField::Tags, "learn from this sentence"), 0);
+      QCOMPARE(jtm.RmvCastOrTags(invalidIndexes, JsonModelField::Tags, "remove me tag"), 0);
+      QCOMPARE(jtm.SetCastOrTags({}, JsonModelField::Tags, "learn from this sentence"), 0);
+      QCOMPARE(jtm.AddCastOrTags({}, JsonModelField::Tags, "learn from this sentence"), 0);
+      QCOMPARE(jtm.RmvCastOrTags({}, JsonModelField::Tags, "remove me tag"), 0);
       QCOMPARE(jtm.InitCastAndStudio(invalidIndexes), 0);
       QCOMPARE(jtm.HintCastAndStudio(invalidIndexes, "learn from this sentence"), 0);
       QCOMPARE(jtm.FormatCast(invalidIndexes), 0);
@@ -147,8 +147,8 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.UpdateFizeSizeField({}), 0);
       QCOMPARE(jtm.UpdateDurationField({}), 0);
       QCOMPARE(jtm.UpdateMD5Field({}), 0);
-      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JSON_KEY_E::Name), -1); // field cannot update
-      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JSON_KEY_E::Detail), -1);
+      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JsonModelField::Name), -1); // field cannot update
+      QCOMPARE(jtm.JsonFieldValueUpdateCore({QModelIndex{}}, JsonModelField::Detail), -1);
     }
   }
 
@@ -208,7 +208,7 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.rowCount(), 2);                      // still 2 file
       QVERIFY(jtm.mCachedJsons != mCachedJsonsBackup);  // will not same as initial
 
-      QCOMPARE(jtm.data(jtm.index(0, JsonKey::Name), Qt::DisplayRole).toString(), "GAMETURBO - A RANK - GGG YYYYY");
+      QCOMPARE(jtm.data(jtm.index(0, JsonModelField::Name), Qt::DisplayRole).toString(), "GAMETURBO - A RANK - GGG YYYYY");
     }
 
     // AutoRollbackFileContentModify rollback should be ok
@@ -221,7 +221,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.forceReloadPath(), 3);
     QCOMPARE(jtm.rowCount(), 3);
     QCOMPARE(jtm.mCachedJsons.size(), 3);
-    QCOMPARE(jtm.data(jtm.index(2, JsonKey::Name), Qt::DisplayRole).toString(), "GameTurbo - Z rank - ActorZ");
+    QCOMPARE(jtm.data(jtm.index(2, JsonModelField::Name), Qt::DisplayRole).toString(), "GameTurbo - Z rank - ActorZ");
 
     QCOMPARE(jtm.m_modifiedRows.any(), false);  // force reload can be regard as model reset
   }
@@ -253,8 +253,8 @@ class JsonTableModelTest : public PlainTestSuite {
     JsonTableModel jtm;
     QCOMPARE(jtm.setRootPath(rootPath), 1);
     QCOMPARE(jtm.rowCount(), 1);
-    QModelIndex ind = jtm.index(0, JsonKey::ContentFixed);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Name).data(Qt::DisplayRole).toString(), "Real Madrid - decoration - Cristiano Ronaldo, Leite Kaka");
+    QModelIndex ind = jtm.index(0, JsonModelField::ContentFixed);
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Name).data(Qt::DisplayRole).toString(), "Real Madrid - decoration - Cristiano Ronaldo, Leite Kaka");
 
     // unmark fixed: can init/hint/set/rmv/add/clear
     QCOMPARE(jtm.SetRecordContentsFixed({ind}, false), 1);
@@ -264,17 +264,17 @@ class JsonTableModelTest : public PlainTestSuite {
     }
     QCOMPARE(jtm.InitCastAndStudio({ind}), 1);
     jtm.SetStudio({ind}, "");
-    jtm.SetCastOrTags({ind}, JsonKey::Cast, "");
+    jtm.SetCastOrTags({ind}, JsonModelField::Cast, "");
     QCOMPARE(jtm.HintCastAndStudio({ind}, "Real Madrid - decoration - Cristiano Ronaldo, Leite Kaka"), 2);  // both cast abd studio hint succeed
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Studio).data(Qt::DisplayRole).toString(), "RealMadrid");
-    QVERIFY(jtm.data(ind.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::ForegroundRole) != QColor{Qt::GlobalColor::darkRed});
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "Cristiano Ronaldo\nLeite Kaka");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Studio).data(Qt::DisplayRole).toString(), "RealMadrid");
+    QVERIFY(jtm.data(ind.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::ForegroundRole) != QColor{Qt::GlobalColor::darkRed});
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Cast).data(Qt::DisplayRole).toString(), "Cristiano Ronaldo\nLeite Kaka");
     jtm.SetStudio({ind}, "");
-    jtm.SetCastOrTags({ind}, JsonKey::Cast, "");
-    jtm.SetCastOrTags({ind}, JsonKey::Tags, "");
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Studio).data(Qt::DisplayRole).toString(), "");
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "");
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Tags).data(Qt::DisplayRole).toString(), "");
+    jtm.SetCastOrTags({ind}, JsonModelField::Cast, "");
+    jtm.SetCastOrTags({ind}, JsonModelField::Tags, "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Studio).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Cast).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Tags).data(Qt::DisplayRole).toString(), "");
     // modified red
     QCOMPARE(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QBrush(Qt::GlobalColor::red));
 
@@ -287,20 +287,20 @@ class JsonTableModelTest : public PlainTestSuite {
     }
     QCOMPARE(jtm.InitCastAndStudio({ind}), 0);
     jtm.SetStudio({ind}, "");
-    jtm.SetCastOrTags({ind}, JsonKey::Cast, "");
+    jtm.SetCastOrTags({ind}, JsonModelField::Cast, "");
     QCOMPARE(jtm.HintCastAndStudio({ind}, "Real Madrid - decoration - Cristiano Ronaldo,Leite Kaka"), 0);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Studio).data(Qt::DisplayRole).toString(), "");
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Studio).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Cast).data(Qt::DisplayRole).toString(), "");
     QCOMPARE(jtm.SetStudio({ind}, "Bayern"), 1);
-    QCOMPARE(jtm.SetCastOrTags({ind}, JsonKey::Cast, "Muller"), 1);
-    QCOMPARE(jtm.SetCastOrTags({ind}, JsonKey::Tags, "Football"), 1);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Studio).data(Qt::DisplayRole).toString(), "Bayern");
+    QCOMPARE(jtm.SetCastOrTags({ind}, JsonModelField::Cast, "Muller"), 1);
+    QCOMPARE(jtm.SetCastOrTags({ind}, JsonModelField::Tags, "Football"), 1);
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Studio).data(Qt::DisplayRole).toString(), "Bayern");
     // modified red->saved->studio not in dictionary(dark red)
-    QCOMPARE(jtm.data(ind.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::ForegroundRole), QColor{Qt::GlobalColor::red});
+    QCOMPARE(jtm.data(ind.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::ForegroundRole), QColor{Qt::GlobalColor::red});
     QCOMPARE(jtm.SaveCurrentChanges({ind}), 1);
-    QCOMPARE(jtm.data(ind.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::ForegroundRole), QColor{Qt::GlobalColor::darkRed});
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Cast).data(Qt::DisplayRole).toString(), "Muller");
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Tags).data(Qt::DisplayRole).toString(), "Football");
+    QCOMPARE(jtm.data(ind.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::ForegroundRole), QColor{Qt::GlobalColor::darkRed});
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Cast).data(Qt::DisplayRole).toString(), "Muller");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Tags).data(Qt::DisplayRole).toString(), "Football");
   }
 
   void update_duration_ok() {
@@ -323,23 +323,23 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.setRootPath(rootPath), 1);
     QCOMPARE(jtm.rowCount(), 1);
 
-    const QModelIndex ind = jtm.index(0, JsonKey::Duration);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
+    const QModelIndex ind = jtm.index(0, JsonModelField::Duration);
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
     QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 1);
-    QVERIFY(ind.siblingAtColumn(JsonKey::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
+    QVERIFY(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
 
     MOCKER(VideoDurationGetter::GetLengthQuickStatic)
         .expects(exactly(1))
         .with(any(), mTDir.itemPath("duration_check/duration_test.mp4"))
         .will(returnValue(10 * 60 * 1000));  // 10min
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Duration).data(Qt::DisplayRole).toString(), "00:00:00");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Duration).data(Qt::DisplayRole).toString(), "00:00:00");
     QCOMPARE(jtm.UpdateDurationField({ind}, 1), 1);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::Duration).data(Qt::DisplayRole).toString(), "00:10:00");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Duration).data(Qt::DisplayRole).toString(), "00:10:00");
 
     MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));  // 10min
-    QCOMPARE(ind.siblingAtColumn(JsonKey::MD5).data(Qt::DisplayRole).toString(), "");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::MD5).data(Qt::DisplayRole).toString(), "");
     QCOMPARE(jtm.UpdateMD5Field({ind}, 1), 1);
-    QCOMPARE(ind.siblingAtColumn(JsonKey::MD5).data(Qt::DisplayRole).toString(), "AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::MD5).data(Qt::DisplayRole).toString(), "AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD");
   }
 
   void jsonFileProperty_retrieve_correct() {
@@ -399,20 +399,20 @@ class JsonTableModelTest : public PlainTestSuite {
 
     decltype(jtm.mCachedJsons) mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
-    QCOMPARE(firstLineIndex.siblingAtColumn(JsonKey::Cast).isValid(), true);
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+    QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
+    QCOMPARE(firstLineIndex.siblingAtColumn(JsonModelField::Cast).isValid(), true);
 
     QModelIndexList valid2Indexes{firstLineIndex, secondLineIndex};
     {  // 1. cast and studio already has value. hint init get skipped
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
 
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(),
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(),
                "GameTurbo - B rank - XX YY and ZZ DD EE");
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::DisplayRole).toString().isEmpty(), false);
 
       QCOMPARE(jtm.InitCastAndStudio(valid2Indexes), 0);  // field Name/Cast/Studio already has value
       QCOMPARE(jtm.mCachedJsons, mCachedJsonsBackup);
@@ -420,8 +420,8 @@ class JsonTableModelTest : public PlainTestSuite {
 
       // clear this field
       QCOMPARE(jtm.SetStudio(valid2Indexes, ""), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, ""), 2);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Cast, ""), 2);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Tags, ""), 2);
 
       // here 2 row affected.
       // but we don't assume what value it has been changed to.
@@ -438,80 +438,80 @@ class JsonTableModelTest : public PlainTestSuite {
 
     {  // 2. set directly succeed
       QCOMPARE(jtm.SetStudio(valid2Indexes, "Marvel"), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 2);
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString(), "Marvel");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender"), 2);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic"), 2);
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::DisplayRole).toString(), "Marvel");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
 
       // set again, skip unchange
       QCOMPARE(jtm.SetStudio(valid2Indexes, "Marvel"), 0);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 0);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 0);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender"), 0);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic"), 0);
 
       // set to empty. also clear this field
       QCOMPARE(jtm.SetStudio(valid2Indexes, ""), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 2);
-      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Tags, ""), 2);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Cast, ""), 2);
+      QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Tags, ""), 2);
 
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString(), "");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "");
 
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Studio), Qt::ItemDataRole::DisplayRole).toString(), "");
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "");
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "");
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "");
 
       QCOMPARE(jtm.SetStudio(valid2Indexes, "Marvel"), 2);
     }
 
     {                                                                       // 3. AddCastOrTags succeed
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 0);  // empty skip
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Cast, ""), 0);  // empty skip
 
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 2);
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 2);
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender"), 2);
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic"), 2);
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nMichael Fassbender");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comic\nDocumentary");
 
       // unchange
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender"), 0);  // affect none
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic"), 0);
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender"), 0);  // affect none
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic"), 0);
 
       // append
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender,Xander"), 2);  // affect 2 rows
-      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic,Comedy"), 2);
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(),
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender,Xander"), 2);  // affect 2 rows
+      QCOMPARE(jtm.AddCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic,Comedy"), 2);
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(),
                "Chris Evans\nMichael Fassbender\nXander");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy\nComic\nDocumentary");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy\nComic\nDocumentary");
     }
 
     mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
     {
       // rmv one element(full match) at one time ok.
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 0);  // empty skip
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Cast, ""), 0);  // empty skip
 
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans,Michael Fassbender,Xander"), 0);
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary,Comic,Comedy"), 0);
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans,Michael Fassbender,Xander"), 0);
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary,Comic,Comedy"), 0);
       QCOMPARE(jtm.mCachedJsons, mCachedJsonsBackup);  // nothing changed
 
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Chris Evans"), 2);  // affect 2 rows
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Documentary"), 2);
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Cast, "Chris Evans"), 2);  // affect 2 rows
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Tags, "Documentary"), 2);
 
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Cast, "Michael Fassbender"), 2);  // affect 2 rows
-      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JSON_KEY_E::Tags, "Comic"), 2);
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Cast, "Michael Fassbender"), 2);  // affect 2 rows
+      QCOMPARE(jtm.RmvCastOrTags(valid2Indexes, JsonModelField::Tags, "Comic"), 2);
 
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Xander");
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Xander");
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Tags), Qt::ItemDataRole::DisplayRole).toString(), "Comedy");
     }
 
     {  // sync field will file name
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(),
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(),
                "GameTurbo - B rank - XX YY and ZZ DD EE");
       jtm.SyncFieldNameByJsonBaseName(valid2Indexes);
 
-      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "a");   // a.json
-      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "b");  // b.json
+      QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "a");   // a.json
+      QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "b");  // b.json
     }
 
     // above operation should not write into files
@@ -538,7 +538,7 @@ class JsonTableModelTest : public PlainTestSuite {
 
     decltype(jtm.mCachedJsons) mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
 
     QCOMPARE(jtm.AppendCastFromSentence(firstLineIndex, "Chris Evans & Jensen & Franko De Jong", false), 3);
 
@@ -614,9 +614,9 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.mCachedJsons[2].m_Studio, "NotCorrect");
     QCOMPARE(jtm.mCachedJsons[2].m_Cast.toSortedList(), (QStringList{"Not Correct"}));
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
-    QModelIndex thirdLineIndex{jtm.index(2, JsonKey::Name)};
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+    QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
+    QModelIndex thirdLineIndex{jtm.index(2, JsonModelField::Name)};
     QModelIndexList valid3Indexes{firstLineIndex, secondLineIndex, thirdLineIndex};
     jtm.HintCastAndStudio(valid3Indexes, "");
 
@@ -656,16 +656,16 @@ class JsonTableModelTest : public PlainTestSuite {
         "gameturbo\tGameTurbo\n",
         "");
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+    QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
     QModelIndexList valid2Indexes{firstLineIndex, secondLineIndex};
     QCOMPARE(jtm.SetStudio(valid2Indexes, ""), 2);
-    QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JSON_KEY_E::Cast, ""), 2);
+    QCOMPARE(jtm.SetCastOrTags(valid2Indexes, JsonModelField::Cast, ""), 2);
 
     {
       // before color is not red
-      const QVariant studioHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JSON_KEY_E::Studio), Qt::ItemDataRole::ForegroundRole);
-      const QVariant castHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JSON_KEY_E::Cast), Qt::ItemDataRole::ForegroundRole);
+      const QVariant studioHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::ForegroundRole);
+      const QVariant castHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::ForegroundRole);
       QCOMPARE(studioHintColorData.isNull(), true);
       QCOMPARE(castHintColorData.isNull(), true);
     }
@@ -686,8 +686,8 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.mCachedJsons[1].m_Cast.toSortedList(), (QStringList{"XX YY", "ZZ DD EE"}));  // hintCast insert to m_Cast
 
     {
-      const QVariant studioHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JSON_KEY_E::Studio), Qt::ItemDataRole::ForegroundRole);
-      const QVariant castHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JSON_KEY_E::Cast), Qt::ItemDataRole::ForegroundRole);
+      const QVariant studioHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Studio), Qt::ItemDataRole::ForegroundRole);
+      const QVariant castHintColorData = jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::ForegroundRole);
       QCOMPARE(studioHintColorData.isValid(), true);
       QCOMPARE(castHintColorData.isValid(), true);
       QCOMPARE(studioHintColorData.canConvert<QColor>(), true);
@@ -706,30 +706,30 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
     QVERIFY(mJsonsFileCountInitial >= 2);
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+    QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
     QModelIndexList valid2Indexes{firstLineIndex, secondLineIndex};
 
     decltype(jtm.mCachedJsons) mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
     QVERIFY(!jtm.m_modifiedRows.test(firstLineIndex.row()));
     QVERIFY(!jtm.m_modifiedRows.test(secondLineIndex.row()));
 
-    QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonKey::Prepath), "any path cannot edit"), false);  // cannot edit prepath field
-    QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonKey::Cast), "Xander,Chris Evans, Xander,Chris Evans"), true);
-    QCOMPARE(jtm.setData(secondLineIndex.siblingAtColumn(JsonKey::Cast), "Xander,Chris Evans, Xander,Chris Evans"), true);
+    QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonModelField::Prepath), "any path cannot edit"), false);  // cannot edit prepath field
+    QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonModelField::Cast), "Xander,Chris Evans, Xander,Chris Evans"), true);
+    QCOMPARE(jtm.setData(secondLineIndex.siblingAtColumn(JsonModelField::Cast), "Xander,Chris Evans, Xander,Chris Evans"), true);
 
     // 1. format cast ok
     QCOMPARE(jtm.FormatCast(valid2Indexes), 2);
-    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nXander");
+    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Cast), Qt::ItemDataRole::DisplayRole).toString(), "Chris Evans\nXander");
     QVERIFY(jtm.mCachedJsons != mCachedJsonsBackup);
 
     // 2. SyncFieldNameByJsonBaseName ok
-    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
-    QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(),
+    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "GameTurbo - A rank - GGG YYYYY");
+    QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(),
              "GameTurbo - B rank - XX YY and ZZ DD EE");
     QCOMPARE(jtm.SyncFieldNameByJsonBaseName(valid2Indexes), 2);
-    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "a");
-    QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonKey::Name), Qt::ItemDataRole::DisplayRole).toString(), "b");
+    QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "a");
+    QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "b");
     QVERIFY(jtm.m_modifiedRows.test(firstLineIndex.row()));
     QVERIFY(jtm.m_modifiedRows.test(secondLineIndex.row()));
   }
@@ -742,16 +742,16 @@ class JsonTableModelTest : public PlainTestSuite {
     QVERIFY(mJsonsFileCountInitial >= 2);
     QCOMPARE(jtm.m_modifiedRows.any(), false);
 
-    QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-    QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
+    QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+    QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
     QModelIndexList valid2Indexes{firstLineIndex, secondLineIndex};
 
     {
       // set a specified studio/cast
       QCOMPARE(jtm.SetStudio({firstLineIndex}, "GameTurboA"), 1);
-      QCOMPARE(jtm.SetCastOrTags({firstLineIndex}, JSON_KEY_E::Cast, "Cast11,Cast12"), 1);
+      QCOMPARE(jtm.SetCastOrTags({firstLineIndex}, JsonModelField::Cast, "Cast11,Cast12"), 1);
       QCOMPARE(jtm.SetStudio({secondLineIndex}, "GameTurboB"), 1);
-      QCOMPARE(jtm.SetCastOrTags({secondLineIndex}, JSON_KEY_E::Cast, "Cast21,Cast22"), 1);
+      QCOMPARE(jtm.SetCastOrTags({secondLineIndex}, JsonModelField::Cast, "Cast21,Cast22"), 1);
       // save changed to local file
       QCOMPARE(jtm.m_modifiedRows.any(), true);
       QCOMPARE(jtm.SaveCurrentChanges(valid2Indexes), 2);
@@ -795,7 +795,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.m_modifiedRows.any(), false);
     const auto rowElementsRmv = [&jtm](int beg, int end) { jtm.mCachedJsons.erase(jtm.mCachedJsons.begin() + beg, jtm.mCachedJsons.begin() + end); };
     {
-      QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
+      QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
       QSignalSpy rowsAboutToBeRemovedSig{&jtm, &JsonTableModel::rowsAboutToBeRemoved};
       QSignalSpy rowsRemovedSig{&jtm, &JsonTableModel::rowsRemoved};
       QCOMPARE(jtm.onRowsRemoved({firstLineIndex}, rowElementsRmv), 1);
@@ -808,8 +808,8 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
 
     {
-      QModelIndex firstLineIndex{jtm.index(0, JsonKey::Name)};
-      QModelIndex secondLineIndex{jtm.index(1, JsonKey::Name)};
+      QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
+      QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
       QCOMPARE(jtm.onRowsRemoved({firstLineIndex, secondLineIndex, firstLineIndex}, rowElementsRmv), 2);  // should remove duplicate
       QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial - 2);
     }

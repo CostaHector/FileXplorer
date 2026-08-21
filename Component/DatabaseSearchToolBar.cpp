@@ -2,14 +2,12 @@
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "CastPsonFileHelper.h"
-#include "TableFields.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "MountHelper.h"
-#include "MovieDBActions.h"
-#include "CastDBActions.h"
 #include "QuickWhereClauseDialogMovie.h"
 #include "QuickWhereClauseDialogCast.h"
+#include "MovieDBModelField.h"
 #include <QLineEdit>
 #include <QCompleter>
 #include <QInputDialog>
@@ -27,9 +25,11 @@ DatabaseSearchToolBar::DatabaseSearchToolBar(const QString& title, QWidget* pare
   m_whereCB->lineEdit()->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
   m_whereCB->lineEdit()->setClearButtonEnabled(true);
   m_whereCB->setPlaceholderText("Search items here");
-  using namespace MOVIE_TABLE;
-  m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(Name)));
-  m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  {
+    using namespace MovieDBModelField;
+    m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(ENUM_2_STR(Name)));
+    m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(ENUM_2_STR(Name)));
+  }
   m_whereCB->setCurrentIndex(0);
 
   QCompleter* pCompleter = new (std::nothrow) QCompleter{this};
@@ -190,7 +190,7 @@ QStringList MovieDBSearchToolBar::toMovieTableCandidates() const {
 CastDatabaseSearchToolBar::CastDatabaseSearchToolBar(const QString& title, QWidget* parent) //
   : DatabaseSearchToolBar{title, parent} {
   CHECK_NULLPTR_RETURN_VOID(m_whereCB) {
-    using namespace PERFORMER_DB_HEADER_KEY;
+    using namespace CastDbModelField;
     for (const auto& field : CAST_TABLE_HEADERS) {
       m_whereCB->addItem(QString{R"(`%1` LIKE "%%")"}.arg(field));
       m_whereCB->addItem(QString{R"(INSTR(`%1`, "")>0)"}.arg(field));

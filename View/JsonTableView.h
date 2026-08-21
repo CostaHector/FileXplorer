@@ -10,7 +10,7 @@ class JsonTableView : public CustomTableView {
  public:
   explicit JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent = nullptr);
   QModelIndex CurrentIndexSource() const;
-  QModelIndexList selectedRowsSource(JSON_KEY_E column = JSON_KEY_E::Name) const;
+  QModelIndexList selectedRowsSource(JsonModelField::FIELD_E column = JsonModelField::Name) const;
 
   int ReadADirectory(const QString& path);
   void subscribe();
@@ -29,7 +29,7 @@ class JsonTableView : public CustomTableView {
   int onUpdateDuration();
   int onUpdateFileMD5();
   int onClearStudio();
-  int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
+  int onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode);
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
 
@@ -54,7 +54,7 @@ class JsonTableView : public CustomTableView {
   void onSelectNewJsonLine(const QModelIndex &current);
   int onFixSelectionRecordContents(bool bFixed);
   QStringList m_studioCandidates;
-  QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
+  QStringList m_candidatesLst[(int)JsonModelField::FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
   QAction* _RECYCLE_JSON_RELATED_FILES{nullptr};

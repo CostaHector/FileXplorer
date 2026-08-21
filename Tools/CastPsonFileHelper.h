@@ -19,7 +19,7 @@
   PSON_KEY_ITEM(Imgs, 9, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Detail, 10, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"})
 
-namespace PERFORMER_DB_HEADER_KEY {
+namespace CastDbModelField {
 enum FIELD_E {
 #define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) enu = enumVal,
   PSON_MODEL_FIELD_MAPPING
@@ -59,6 +59,6 @@ QByteArray CastValues2PsonStr(
 #undef PSON_KEY_ITEM
     void* P_DONT_USE_ME
     = nullptr);
-} // namespace CastPsonFileHelper
+} // namespace CastDbModelField
 
 #endif // CASTPSONFILEHELPER_H
