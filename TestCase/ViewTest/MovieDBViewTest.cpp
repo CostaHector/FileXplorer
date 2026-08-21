@@ -30,34 +30,37 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-class MovieDBViewTest : public PlainTestSuite {
+    class MovieDBViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   const QString dbName{tDir.itemPath("MovieViewTest.db")};
   const QString connName{"MovieViewTestConn"};
   const QString path1 = tDir.itemPath("path1");
   const QString path2 = tDir.itemPath("path2");
+  const QString path3 = tDir.itemPath("ScanJsonsFolder");
   bool path1ToTableName1Ok{false};
   bool path2ToTableName2Ok{false};
+  bool path3ToTableName3Ok{false};
   const QString tableName1 = MountPathTableNameMapperMock::invokeToTableName(path1, &path1ToTableName1Ok);
   const QString tableName2 = MountPathTableNameMapperMock::invokeToTableName(path2, &path2ToTableName2Ok);
+  const QString tableName3 = MountPathTableNameMapperMock::invokeToTableName(path3, &path3ToTableName3Ok);
   const QList<FsNodeEntry> nodes{
-      // 3 videos in path1, tableName1
-      {"path1/Chris Evans.mp4", false, "Chris Evans"},
-      {"path1/Chris Hemsworth.mp4", false, "Chris Hemsworth"},
-      {"path1/Chris Pine.mp4", false, "Chris Pine"},
-      // 2 videos in path2, tableName2
-      {"path2/Michael Fassbender.mp4", false, "Michael Fassbender"},
-      {"path2/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
-      {"path2/Morata.mp4", false, "Contents in Morata.mp4"},
-  };
+                                 // 3 videos in path1, tableName1
+                                 {"path1/Chris Evans.mp4", false, "Chris Evans"},
+                                 {"path1/Chris Hemsworth.mp4", false, "Chris Hemsworth"},
+                                 {"path1/Chris Pine.mp4", false, "Chris Pine"},
+                                 // 2 videos in path2, tableName2
+                                 {"path2/Michael Fassbender.mp4", false, "Michael Fassbender"},
+                                 {"path2/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
+                                 {"path2/Morata.mp4", false, "Contents in Morata.mp4"},
+                                 };
   const QHash<QString, int> vidspath2Duration{
-      {tDir.itemPath("path1/Chris Evans.mp4"), 0},  // broken file
-      {tDir.itemPath("path1/Chris Hemsworth.mp4"), 8000},    {tDir.itemPath("path1/Chris Pine.mp4"), 7000},
-      {tDir.itemPath("path2/Michael Fassbender.mp4"), 6000}, {tDir.itemPath("path2/Morata.mp4"), 5000},
-  };
- private slots:
+                                              {tDir.itemPath("path1/Chris Evans.mp4"), 0},  // broken file
+                                              {tDir.itemPath("path1/Chris Hemsworth.mp4"), 8000},    {tDir.itemPath("path1/Chris Pine.mp4"), 7000},
+                                              {tDir.itemPath("path2/Michael Fassbender.mp4"), 6000}, {tDir.itemPath("path2/Morata.mp4"), 5000},
+                                              };
+private slots:
   void initTestCase() {
     Configuration().clear();
     {
@@ -69,14 +72,18 @@ class MovieDBViewTest : public PlainTestSuite {
     {  // path -> table name -> path. 预期: 路径->表名->路径 可逆
       QVERIFY(path1ToTableName1Ok);
       QVERIFY(path2ToTableName2Ok);
+      QVERIFY(path3ToTableName3Ok);
 
       bool tableName1ToPath1Ok = false;
       bool tableName2ToPath2Ok = false;
+      bool tableName3ToPath3Ok = false;
       using namespace MountPathTableNameMapperMock;
       QCOMPARE(invokeToMountPath(tableName1, &tableName1ToPath1Ok), path1);
       QCOMPARE(invokeToMountPath(tableName2, &tableName2ToPath2Ok), path2);
+      QCOMPARE(invokeToMountPath(tableName3, &tableName3ToPath3Ok), path3);
       QVERIFY(tableName1ToPath1Ok);
       QVERIFY(tableName2ToPath2Ok);
+      QVERIFY(tableName3ToPath3Ok);
     }
   }
 
@@ -165,9 +172,9 @@ class MovieDBViewTest : public PlainTestSuite {
     QCOMPARE(dbModel.rowCount(), 0);
   }
 
-  void insert_into_tableName1_ok() {
+  void onScanFilesUnderPath_VIDEOS_ok() {
     MOCKER(QFileDialog::getExistingDirectory)
-        .stubs()
+    .stubs()
         .will(returnValue(QString()))
         .then(returnValue(QString("/path/not/start/with/mountPathOfTableName1")))
         .then(returnValue(path1))
@@ -866,6 +873,45 @@ class MovieDBViewTest : public PlainTestSuite {
       movieView.onRevert();
     }
     movieView.close();
+  }
+
+  void onScanFilesUnderPath_JSONS_ok() {
+    const QList<FsNodeEntry> ScanJsonsFolderNodes {
+        {"ScanJsonsFolder/Kaka.json", false, R"({
+    "Cast": ["Person 1", "2 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "Kaka",
+    "Studio": "Pride",
+    "Tags": ["tags 0", "tags 1"],
+    "MD5": "01234567890123456789012345678MD5",
+    "VidName": "Kaka.mp4",
+    "Size": 1024,
+    "Duration": 6000
+})"}};
+    QCOMPARE(tDir.createEntries(ScanJsonsFolderNodes), ScanJsonsFolderNodes.size());
+
+    MOCKER(QFileDialog::getExistingDirectory)
+        .stubs()
+        .will(returnValue(path3));
+
+    QVERIFY(!QFile::exists(dbName));
+    QWidget parent;
+    MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
+    FdBasedDb fdDb{dbName, connName};
+    FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
+    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+
+    // 1. create tableName3 ok
+    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName3);
+    QVERIFY(movieView.onCreateATable());
+    QVERIFY(fdDb.IsTableExist(tableName3));
+    QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName3);
+
+    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
+        .stubs()
+        .will(returnValue(QMessageBox::StandardButton::Yes));
+    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::JSONS));
+    QCOMPARE(fdDb.CountRow(tableName3), 1); // only 1 json will be inserted into table
   }
 };
 // todo: testcase too large. need extract

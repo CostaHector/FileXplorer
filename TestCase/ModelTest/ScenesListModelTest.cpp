@@ -140,8 +140,10 @@ class ScenesListModelTest : public PlainTestSuite {
   }
 
   void setRootPath_ok() {
+    // rate=10
     SceneInfo si0{"/", "Kaka", {}, {"Kaka.mp4"}, 0, 10, "2000-06-16 00:00:60"};
-    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 10, "2000-06-16 00:00:60"};
+    // rate=0
+    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 0, "2000-06-16 00:00:60"};
     const SceneInfoList scenesLstInPath0{si0};
     const SceneInfoList scenesLstInPath1{si0, si1};
 
@@ -169,6 +171,15 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/40)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
     QCOMPARE(slm.rel2fileNames({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
+    {
+      std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> expectRelJsonArr;
+      expectRelJsonArr[10] = QStringList{"Kaka.json"};
+
+      QModelIndexList nonRate0Indexes;
+      std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> relJsonArr = slm.movieRate2Jsons({slm.index(0), slm.index(1)}, nonRate0Indexes);
+      QCOMPARE(nonRate0Indexes, {slm.index(0)});
+      QCOMPARE(relJsonArr, expectRelJsonArr);
+    }
 
     QCOMPARE(slm.setRootPath("inexist/path0"), false);  // again and not force->ignore, no emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                        // 1 item

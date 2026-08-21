@@ -8,6 +8,7 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "MovieDBModelField.h"
+#include "NameTool.h"
 #include "JsonFieldBoundary.h"
 #include <QDirIterator>
 #include <QSqlError>
@@ -289,10 +290,9 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
     return FD_PREPARE_FAILED;
   }
 
+  db.rollback(); // 先回滚掉悬空的事务
   if (!db.transaction()) {
-    LOG_W("start the %dth transaction failed: %s", //
-          1,
-          qPrintable(db.lastError().text()));
+    LOG_W("start the %dth transaction failed: %s", 1, qPrintable(db.lastError().text()));
     return FD_TRANSACTION_FAILED;
   }
 
@@ -300,8 +300,8 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
 
   QByteArray sampleMd5Val;
   QString name, studio, vidName, detail;
-  qint64 size{-1};
-  int duration{-1}, rate{-1};
+  qint64 size{JsonFieldBoundary::SIZE_GET_FAILED_VALUE};
+  int duration{JsonFieldBoundary::DURATION_GET_FAILED_VALUE}, rate{JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V};
   QStringList casts, tags;
 
   JsonParser::ParseResult parseRet = JsonParser::ParseResult::ERROR;
@@ -310,8 +310,15 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
   QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   while (it.hasNext()) {
     jsonAbsPath = it.next();
+
+    sampleMd5Val.clear();
+    name.clear(); studio.clear(); vidName.clear(); detail.clear();
+    size = JsonFieldBoundary::SIZE_GET_FAILED_VALUE;
+    duration = JsonFieldBoundary::DURATION_GET_FAILED_VALUE; rate = JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V;
+
     parseRet = JsonParser::ParseEssentialFieldJson(jsonAbsPath, &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail);
     if (parseRet == JsonParser::ParseResult::ERROR) {
+      db.rollback();
       LOG_ERR_NP("Parse Json Failed", jsonAbsPath);
       return FD_JSON_PARSED_INVALID;
     }
@@ -327,33 +334,27 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
     query.bindValue(JSON_Size,         size);
     query.bindValue(JSON_Duration,     duration);
     query.bindValue(JSON_Studio,       studio);
-    query.bindValue(JSON_Cast,         casts);
-    query.bindValue(JSON_Tags,         tags);
+    query.bindValue(JSON_Cast,         casts.join(NameTool::CSV_COMMA));
+    query.bindValue(JSON_Tags,         tags.join(NameTool::CSV_COMMA));
     query.bindValue(JSON_Rate,         rate);
     query.bindValue(JSON_Detail,       detail);
     query.bindValue(JSON_PathHash,     JsonHelper::CalcFileHash(vidAbsPath));
     query.bindValue(JSON_InLocal,      QFile::exists(vidAbsPath));
     ++fileProcessCnt;
     if (!query.exec()) {
+      LOG_W("replace[%s] failed: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));
       db.rollback();
-      LOG_W("replace[%s] failed: %s", //
-            qPrintable(query.executedQuery()),
-            qPrintable(query.lastError().text()));
       return FD_EXEC_FAILED;
     }
 
     if (fileProcessCnt % MAX_BATCH_SIZE == 0) {
       if (!db.commit()) {
+        LOG_W("commit the %dth batch record(s) failed: %s", fileProcessCnt / MAX_BATCH_SIZE + 1, qPrintable(db.lastError().text()));
         db.rollback();
-        LOG_W("commit the %dth batch record(s) failed: %s", //
-              fileProcessCnt / MAX_BATCH_SIZE + 1,
-              qPrintable(db.lastError().text()));
         return FD_COMMIT_FAILED;
       }
       if (!db.transaction()) { // another new batch
-        LOG_W("start the %dth transaction failed: %s", //
-              fileProcessCnt / MAX_BATCH_SIZE + 2,
-              qPrintable(db.lastError().text()));
+        LOG_W("start the %dth transaction failed: %s", fileProcessCnt / MAX_BATCH_SIZE + 2, qPrintable(db.lastError().text()));
         return FD_TRANSACTION_FAILED;
       }
       LOG_W("The %dth of %d files fd have been calculated", fileProcessCnt / MAX_BATCH_SIZE, MAX_BATCH_SIZE);

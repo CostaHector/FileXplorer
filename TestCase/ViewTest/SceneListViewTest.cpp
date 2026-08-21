@@ -17,6 +17,7 @@
 #include "RecycleCfmDlg.h"
 #include "PathTool.h"
 #include "RateHelper.h"
+#include "UndoRedo.h"
 
 #include <QSignalSpy>
 #include <mockcpp/mokc.h>
@@ -25,11 +26,11 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace ImageTestPrecoditionTools;
+    using namespace ImageTestPrecoditionTools;
 
 class SceneListViewTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir tDir;
   const QString scnAbsPath = SceneInfoManager::ScnMgr::GetScnAbsFilePath(tDir.path());
   QVariantList expectCurrentSceneChangedArgs_ChrisEvans;
@@ -38,7 +39,7 @@ class SceneListViewTest : public PlainTestSuite {
   static constexpr int rateChrisEvans = 3;
   static constexpr int rateHenryCavill = 8;
 
- private slots:
+private slots:
   void initTestCase() {
     // precondition here
     QVERIFY(tDir.IsValid());
@@ -55,11 +56,11 @@ class SceneListViewTest : public PlainTestSuite {
     QString uploaded;
 
     QByteArray chrisEvansJsonBA = JsonModelField::ConstructJsonByteArray("Chris Evans", casts, studios, tags, uploaded, rateChrisEvans,  //
-                                                                  0, "", "", {}, 0, {}, "",                                       //
-                                                                  false, md5, details);
+                                                                         0, "", "", {}, 0, {}, "",                                       //
+                                                                         false, md5, details);
     QByteArray henryCavillJsonBA = JsonModelField::ConstructJsonByteArray("Henry Cavill", casts, studios, tags, uploaded, rateHenryCavill,  //
-                                                                   0, "", "", {}, 0, {}, "",                                         //
-                                                                   false, md5, details);
+                                                                          0, "", "", {}, 0, {}, "",                                         //
+                                                                          false, md5, details);
 
     QList<FsNodeEntry> nodes{
         {"Chris Evans.json", false, chrisEvansJsonBA},             // batch 1
@@ -72,23 +73,24 @@ class SceneListViewTest : public PlainTestSuite {
     QCOMPARE(tDir.createEntries(nodes), 6);
 
     expectCurrentSceneChangedArgs_ChrisEvans = QVariantList{
-        "Chris Evans",                                  //
-        tDir.itemPath("Chris Evans.json"),              //
-        QStringList{tDir.itemPath("Chris Evans.jpg")},  //
-        QStringList{tDir.itemPath("Chris Evans.mp4")},
-    };
+                                                            "Chris Evans",                                  //
+                                                            tDir.itemPath("Chris Evans.json"),              //
+                                                            QStringList{tDir.itemPath("Chris Evans.jpg")},  //
+                                                            QStringList{tDir.itemPath("Chris Evans.mp4")},
+                                                            };
     expectCurrentSceneChangedArgs_HenryCavill = QVariantList{
-        "Henry Cavill",                                  //
-        tDir.itemPath("Henry Cavill.json"),              //
-        QStringList{tDir.itemPath("Henry Cavill.png")},  //
-        QStringList{tDir.itemPath("Henry Cavill.mp4")},
-    };
+                                                             "Henry Cavill",                                  //
+                                                             tDir.itemPath("Henry Cavill.json"),              //
+                                                             QStringList{tDir.itemPath("Henry Cavill.png")},  //
+                                                             QStringList{tDir.itemPath("Henry Cavill.mp4")},
+                                                             };
   }
 
   void init() {
     SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     sceneAct._BY_MOVIE_PATH->setChecked(true);
     sceneAct._REVERSE_RESULT->setChecked(false);  // by name ascending chris -> henry
+    sceneAct._INCLUDEING_SUBDIRECTORIES->setChecked(true);
     GlobalMockObject::reset();
   }
 
@@ -130,8 +132,6 @@ class SceneListViewTest : public PlainTestSuite {
   }
 
   void update_json_update_scene_slot_ok() {
-    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
-
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
     ScenePageControl pageControlToolbar;
@@ -541,6 +541,167 @@ class SceneListViewTest : public PlainTestSuite {
       QCOMPARE(delegate->displayText(shortText, QLocale()), shortText);
     }
   }
+
+  void ArchiveToCore_ok() {
+    // prepare material files
+    QStringList casts;
+    QString studios;
+    QStringList tags;
+    QString details;
+    QString uploaded;
+    // rate=10, size=1 MiB, duration=1hour, MD5Sample="01234567890123456789012345678MD5"
+    QByteArray KakaJsonBA = JsonModelField::ConstructJsonByteArray("Kaka", casts, studios, tags, uploaded, 10,  //
+                                                                   1 * 1024 * 1024, "", "", {}, 1*60*60*1000, {"Kaka 1.jpg", "Kaka 2.jpg"}, "Kaka.mp4",                //
+                                                                   false, "01234567890123456789012345678MD5", details);
+    // rate=1, size=10 KiB, duration=1min, MD5Sample="MD501234567890123456789012345678"
+    QByteArray RandomOneJsonBA = JsonModelField::ConstructJsonByteArray("RandomOne", casts, studios, tags, uploaded, 1, //
+                                                                        10 * 1024, "", "", {}, 1*60*1000, {"RandomOne 1.jpg"}, "RandomOne.mp4",               //
+                                                                        false, "MD501234567890123456789012345678", details);
+
+    QList<FsNodeEntry> nodes{
+        {"Famous/2026Special/Kaka.json", false, KakaJsonBA},             // batch 1
+        {"Famous/2026Special/Kaka 1.jpg", false, "Content:Kaka 1.jpg"},  //
+        {"Famous/2026Special/Kaka 2.jpg", false, "Content:Kaka 2.jpg"},  //
+        {"Famous/2026Special/Kaka_tn.jpg", false, "Content:Kaka_tn.jpg"},//
+        {"Famous/2026Special/Kaka.mp4", false, "Content:Kaka.mp4"},      //
+        {"Famous/RandomOne.json", false, RandomOneJsonBA},           // batch 2
+        {"Famous/RandomOne 1.jpg", false, "RandomOne 1.jpg"},        //
+        {"Famous/RandomOne.mp4", false, ""},                         //
+    };
+    QCOMPARE(tDir.createEntries(nodes), 8);
+    const QString jsonLocatedInPath = tDir.itemPath("Famous");
+
+    ScenesListModel sceneModel{"ScenesListView"};
+    SceneSortProxyModel sceneProxyModel;
+    ScenePageControl pageControlToolbar;
+    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    sceneView.InitListView();
+    QCOMPARE(sceneModel.rowCount(), 0);
+
+    sceneView.setRootPath(jsonLocatedInPath);
+    QCOMPARE(sceneModel.rootPath(), jsonLocatedInPath);
+    QCOMPARE(sceneModel.rowCount(), 0);
+    QVERIFY(!tDir.exists("Famous/Famous.scn"));
+    QVERIFY(!tDir.exists("Famous/2026Special/2026Special.scn"));
+
+    sceneView.onUpdateJsonFiles();
+    sceneView.onUpdateScnFiles();
+    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
+    {
+      // 包含子目录, 不包含子目录, 包含子目录, 预期行数各自为2, 1, 2
+      QVERIFY(sceneAct.GetbSubdirectories());
+      QCOMPARE(sceneModel.rowCount(), 2);
+      QVERIFY(tDir.exists("Famous/Famous.scn"));
+      QVERIFY(tDir.exists("Famous/2026Special/2026Special.scn"));
+
+      sceneAct._INCLUDEING_SUBDIRECTORIES->toggle();
+      QVERIFY(!sceneAct.GetbSubdirectories());
+      QCOMPARE(sceneModel.rowCount(), 1);
+
+      sceneAct._INCLUDEING_SUBDIRECTORIES->toggle();
+      QVERIFY(sceneAct.GetbSubdirectories());
+      QCOMPARE(sceneModel.rowCount(), 2);
+    }
+
+    {
+      // onArchiveActionTriggered 在无选中下的行为
+      sceneView.clearSelection();
+      QVERIFY(!sceneView.selectionModel()->hasSelection());
+      QCOMPARE(sceneView.onArchiveActionTriggered(nullptr), -1);
+      QAction tempActNoPropertySet;
+      QCOMPARE(sceneView.onArchiveActionTriggered(&tempActNoPropertySet), -1); // no ArchivedVideoTier property find
+      QCOMPARE(sceneView.onArchiveActionTriggered(sceneAct._ARCHIVE_ARCHIVAL), 0); // no selection
+    }
+
+    QSet<QString> allItemUnderFamous = TDir::SnapshotAtPath(tDir.itemPath("Famous"));
+    {
+      // onArchiveActionTriggered 在有选中下的行为
+      sceneView.selectAll();
+      QVERIFY(sceneView.selectionModel()->hasSelection());
+      QCOMPARE(sceneView.selectionModel()->selectedIndexes().size(), 2);
+      QCOMPARE(sceneView.onArchiveActionTriggered(nullptr), -1);
+      QAction tempActNoPropertySet;
+      QCOMPARE(sceneView.onArchiveActionTriggered(&tempActNoPropertySet), -1); // no ArchivedVideoTier property find
+
+      MOCKER(RecycleCfmDlg::archiveQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
+      QCOMPARE(sceneView.onArchiveActionTriggered(sceneAct._ARCHIVE_ARCHIVAL), 0); // user cancelled
+      QCOMPARE(sceneView.onArchiveActionTriggered(sceneAct._ARCHIVE_ARCHIVAL), nodes.size());// 8 files need archive
+
+      QVERIFY(tDir.exists("Famous"));
+      QVERIFY(tDir.exists("Famous Archival"));
+
+      const QSet<QString> afterArchived = TDir::SnapshotAtPath(tDir.itemPath("Famous"));
+      QCOMPARE(afterArchived, (QSet<QString>{"Famous.scn", "2026Special", "2026Special/2026Special.scn"}));
+
+      const QSet<QString> allItemUnderFamousArchival = TDir::SnapshotAtPath(tDir.itemPath("Famous Archival"));
+      QCOMPARE(allItemUnderFamousArchival, (QSet<QString>{
+                                                          "2026Special",
+                                                          "2026Special/Kaka.json",
+                                                          "2026Special/Kaka 1.jpg",
+                                                          "2026Special/Kaka 2.jpg",
+                                                          "2026Special/Kaka_tn.jpg",
+                                                          "2026Special/Kaka.mp4",
+                                                          "RandomOne.json",
+                                                          "RandomOne 1.jpg",
+                                                          "RandomOne.mp4"}));
+
+      QVERIFY(UndoRedo::on_Undo());
+      QSet<QString> undoArchive = TDir::SnapshotAtPath(tDir.itemPath("Famous"));
+      QCOMPARE(undoArchive, allItemUnderFamous);
+      QVERIFY(tDir.exists("Famous"));
+      QVERIFY(!tDir.exists("Famous Archival"));
+    }
+    GlobalMockObject::verify();
+    GlobalMockObject::reset();
+    sceneView.onUpdateJsonFiles();
+    sceneView.onUpdateScnFiles();
+    QCOMPARE(sceneModel.rowCount(), 2);
+    {
+      // onArchiveToByMovieRate 在无选中下的行为
+      sceneView.clearSelection();
+      QVERIFY(!sceneView.selectionModel()->hasSelection());
+      QCOMPARE(sceneView.onArchiveToByMovieRate(), 0);
+    }
+    {
+      // onArchiveToByMovieRate 在有选中下的行为
+      MOCKER(RecycleCfmDlg::archiveQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
+      sceneView.selectAll();
+      QVERIFY(sceneView.selectionModel()->hasSelection());
+      QCOMPARE(sceneView.selectionModel()->selectedIndexes().size(), 2);
+      QCOMPARE(sceneView.onArchiveToByMovieRate(), 0); // user cancel
+      QCOMPARE(sceneView.onArchiveToByMovieRate(), nodes.size()); // user confirm
+
+      QVERIFY(tDir.exists("Famous"));
+      QVERIFY(tDir.exists("Famous Archival"));
+      QVERIFY(tDir.exists("Famous Disposable"));
+
+      const QSet<QString> afterArchived = TDir::SnapshotAtPath(tDir.itemPath("Famous"));
+      QCOMPARE(afterArchived, (QSet<QString>{"Famous.scn", "2026Special", "2026Special/2026Special.scn"}));
+
+      const QSet<QString> allItemUnderFamousArchival = TDir::SnapshotAtPath(tDir.itemPath("Famous Archival"));
+      QCOMPARE(allItemUnderFamousArchival, (QSet<QString>{
+                                                          "2026Special",
+                                                          "2026Special/Kaka.json",
+                                                          "2026Special/Kaka 1.jpg",
+                                                          "2026Special/Kaka 2.jpg",
+                                                          "2026Special/Kaka_tn.jpg",
+                                                          "2026Special/Kaka.mp4"}));
+
+      const QSet<QString> allItemUnderDisposableArchival = TDir::SnapshotAtPath(tDir.itemPath("Famous Disposable"));
+      QCOMPARE(allItemUnderDisposableArchival, (QSet<QString>{
+                                                          "RandomOne.json",
+                                                          "RandomOne 1.jpg",
+                                                          "RandomOne.mp4"}));
+
+      QVERIFY(UndoRedo::on_Undo());
+      QSet<QString> undoArchive = TDir::SnapshotAtPath(tDir.itemPath("Famous"));
+      QCOMPARE(undoArchive, allItemUnderFamous);
+      QVERIFY(tDir.exists("Famous"));
+      QVERIFY(!tDir.exists("Famous Archival"));
+      QVERIFY(!tDir.exists("Famous Disposable"));
+    }
+  }
+
 };
 
 #include "SceneListViewTest.moc"
