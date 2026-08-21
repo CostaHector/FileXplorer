@@ -1,6 +1,6 @@
 #include "QMediaInfo.h"
 #include "MediaInfoDLL.h"
-#include "TableFields.h"
+#include "JsonFieldBoundary.h"
 #include "DvdFileInfo.h"
 #include "Logger.h"
 #include <QTime>
@@ -66,7 +66,7 @@ int QMediaInfo::DurationLengthQuick(const QString& fileAbsPath) {
 
   if (!Open(fileAbsPath)) {
     LOG_D("MediaInfo Open file[%s] failed", qPrintable(fileAbsPath));
-    return MOVIE_TABLE::DURATION_GET_FAILED_VALUE;
+    return JsonFieldBoundary::DURATION_GET_FAILED_VALUE;
   }
 
   using namespace MediaInfoDLL;

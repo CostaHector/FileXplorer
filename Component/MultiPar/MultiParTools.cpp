@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "Par2Tools.h"
 #include "PathTool.h"
-#include "JsonHelper.h"
+#include "JsonParser.h"
 #include <QRegularExpression>
 #include <QFile>
 #include <QFileInfo>
@@ -51,7 +51,7 @@ std::pair<bool, int> CreatePar2Automatic(const QStringList& filesAbsPath) {
   QMap<int, QStringList> rateOfRedundancyGroup;
   for (const QString& vidPath: filesAbsPath) {
     const QString& jsonCorrespondVideo{PathTool::FileExtReplacedWithJson(vidPath)};
-    const int scoreValue{JsonHelper::GetRateFromJsonFile(jsonCorrespondVideo, 0)};
+    const int scoreValue{JsonParser::GetRateFromJsonFile(jsonCorrespondVideo, 0)};
     const int rateOfRedundancy{GetRateOfRedundancyFromRate(scoreValue)};
     rateOfRedundancyGroup[rateOfRedundancy].push_back(vidPath);
   }

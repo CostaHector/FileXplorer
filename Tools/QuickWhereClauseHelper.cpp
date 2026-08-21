@@ -1,7 +1,6 @@
 #include "QuickWhereClauseHelper.h"
 #include "StringTool.h"
-#include "TableFields.h"
-#include "PublicVariable.h"
+#include "MovieDBModelField.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
 #include <QSet>
@@ -98,7 +97,7 @@ QString InfixNotation2RPN2Value(const QString& infixNot,       //
 
 QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& akas, const QString& tableName) {
   // movies table
-  using namespace MOVIE_TABLE;
+  using namespace MovieDBModelField;
 
   QString whereClause;
   if (akas.isEmpty()) {
@@ -119,7 +118,7 @@ QString GetSelectMovieByCastStatement(const QString& aCastName, const QString& a
 }
 
 QString GetMovieFullPathFromSqlQry(QSqlQuery& query) {
-  using namespace MOVIE_TABLE;
+  using namespace MovieDBModelField;
   return PathTool::RMFComponent::join(query.value(ENUM_2_STR(PrePathLeft)).toString(),  //
                                       query.value(ENUM_2_STR(PrePathRight)).toString(), //
                                       query.value(ENUM_2_STR(Name)).toString());

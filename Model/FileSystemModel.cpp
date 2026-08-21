@@ -1,6 +1,6 @@
 ﻿#include "FileSystemModel.h"
 #include "PathTool.h"
-#include "TableFields.h"
+#include "FileSystemModelField.h"
 #include "PublicMacro.h"
 #include <QMimeData>
 #include <QUrl>
@@ -34,9 +34,9 @@ void FileSystemModel::BindLogger(CustomStatusBar* pLogger) const {
 }
 
 QString FileSystemModel::fullInfo(const QModelIndex& curIndex) const {
-  return data(curIndex.siblingAtColumn(MainKey::Name)).toString()   //
+  return data(curIndex.siblingAtColumn(FileSystemModelField::Name)).toString()   //
          + '\t'                                                     //
-         + data(curIndex.siblingAtColumn(MainKey::Size)).toString() //
+         + data(curIndex.siblingAtColumn(FileSystemModelField::Size)).toString() //
          + '\t'                                                     //
          + rootPath();
 }

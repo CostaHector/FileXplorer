@@ -7,7 +7,7 @@
 #include "StyleSheet.h"
 
 #include "TorrDBAction.h"
-#include "TableFields.h"
+#include "TorrentDBModelField.h"
 #include "NotificatorMacro.h"
 
 #include <QFileDialog>
@@ -141,11 +141,11 @@ bool TorrentsManagerWidget::onInsertIntoTable() {
   while (it.hasNext()) {
     it.next();
     const QFileInfo& fi = it.fileInfo();
-    query.bindValue(TORRENTS_DB_HEADER_KEY::Name, fi.fileName());
-    query.bindValue(TORRENTS_DB_HEADER_KEY::Size, fi.size());
-    query.bindValue(TORRENTS_DB_HEADER_KEY::DateModified, fi.lastModified().toMSecsSinceEpoch());
-    query.bindValue(TORRENTS_DB_HEADER_KEY::MD5, "");
-    query.bindValue(TORRENTS_DB_HEADER_KEY::PrePath, fi.absolutePath());
+    query.bindValue(TorrentDBModelField::Name, fi.fileName());
+    query.bindValue(TorrentDBModelField::Size, fi.size());
+    query.bindValue(TorrentDBModelField::DateModified, fi.lastModified().toMSecsSinceEpoch());
+    query.bindValue(TorrentDBModelField::MD5, "");
+    query.bindValue(TorrentDBModelField::PrePath, fi.absolutePath());
     if (!query.exec()) {
       con.rollback();
       LOG_W("Error when[%s] fail: %s", qPrintable(query.executedQuery()), qPrintable(query.lastError().text()));

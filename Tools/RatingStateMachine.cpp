@@ -2,6 +2,7 @@
 #include "SceneStyleDelegate.h"
 #include "ScenesListModel.h"
 #include "SceneInfo.h"
+#include "RateHelper.h"
 #include "Logger.h"
 #include "PublicMacro.h"
 

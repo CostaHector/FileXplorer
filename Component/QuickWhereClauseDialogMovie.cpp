@@ -1,12 +1,10 @@
 #include "QuickWhereClauseDialogMovie.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "PublicVariable.h"
-#include "QuickWhereClauseHelper.h"
-#include "CastAkasManager.h"
 
 void QuickWhereClauseDialogMovie::CreatePrivateWidget() {
-  using namespace MOVIE_TABLE;
+  using namespace MovieDBModelField;
   m_Name = new (std::nothrow) ColumnFilterLineEdit{ENUM_2_STR(Name), this}; // shared
   CHECK_NULLPTR_RETURN_VOID(m_Name);
   m_Name->setToolTip( //

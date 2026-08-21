@@ -15,7 +15,7 @@
 #include "ArchiveFilesActions.h"
 #include "CastPsonFileHelper.h"
 #include "Logger.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "ScenesListModel.h"
 
 #include "SystemPath.h"
@@ -476,9 +476,9 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::CAST);
       QCOMPARE(m_fsPanel.m_castDbModel->rowCount(), 1);
 
-      QModelIndex kakaNameInCastModel = m_fsPanel.m_castDbModel->index(0, PERFORMER_DB_HEADER_KEY::Name);
+      QModelIndex kakaNameInCastModel = m_fsPanel.m_castDbModel->index(0, CastDbModelField::Name);
       QCOMPARE(kakaNameInCastModel.data(Qt::DisplayRole).toString(), "Kaka");
-      QModelIndex kakaRateInCastModel = m_fsPanel.m_castDbModel->index(0, PERFORMER_DB_HEADER_KEY::Rate);
+      QModelIndex kakaRateInCastModel = m_fsPanel.m_castDbModel->index(0, CastDbModelField::Rate);
       QCOMPARE(kakaRateInCastModel.data(Qt::DisplayRole).toInt(), 10);
 
       QSignalSpy tableViewSpy{ViewActions::GetInst()._TABLE_VIEW, &QAction::toggled};
@@ -751,8 +751,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       m_fsPanel.m_jsonTableView->sortByColumn(0, Qt::SortOrder::AscendingOrder);
       QCOMPARE(m_fsPanel.getRootPath(), lvl1Path);
 
-      const QModelIndex jsonInd{m_fsPanel.m_jsonProxyModel->index(0, JsonKey::Prepath)};
-      const QModelIndex jsonNameInd{m_fsPanel.m_jsonProxyModel->index(0, JsonKey::Name)};
+      const QModelIndex jsonInd{m_fsPanel.m_jsonProxyModel->index(0, JsonModelField::Prepath)};
+      const QModelIndex jsonNameInd{m_fsPanel.m_jsonProxyModel->index(0, JsonModelField::Name)};
       QCOMPARE(jsonNameInd.data(Qt::DisplayRole).toString(), "Kaka");
       const QModelIndexList selectedRowsIndexes{jsonInd};
       const QStringList filePrepathsJson{lvl1Path};
@@ -812,8 +812,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.m_castDbModel->rowCount(), 1);
       QCOMPARE(m_fsPanel.getRootPath(), imageHostPath);
 
-      const QModelIndex kakaNameInd{m_fsPanel.m_castDbModel->index(0, PERFORMER_DB_HEADER_KEY::Name)};
-      const QModelIndex kakaOriInd{m_fsPanel.m_castDbModel->index(0, PERFORMER_DB_HEADER_KEY::Ori)};
+      const QModelIndex kakaNameInd{m_fsPanel.m_castDbModel->index(0, CastDbModelField::Name)};
+      const QModelIndex kakaOriInd{m_fsPanel.m_castDbModel->index(0, CastDbModelField::Ori)};
       QCOMPARE(kakaNameInd.data(Qt::DisplayRole).toString(), "Kaka");
       QCOMPARE(kakaOriInd.data(Qt::DisplayRole).toString(), "lvl0");
       const QModelIndexList selectedRowsIndexes{kakaNameInd};
@@ -868,8 +868,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.m_movieDbModel->rowCount(), 1);
 
       m_fsPanel.m_movieView->sortByColumn(0, Qt::SortOrder::AscendingOrder);
-      const QModelIndex movieInd = m_fsPanel.m_movieDbModel->index(0, MOVIE_TABLE::Fd);
-      const QModelIndex movieNameInd = m_fsPanel.m_movieDbModel->index(0, MOVIE_TABLE::Name);
+      const QModelIndex movieInd = m_fsPanel.m_movieDbModel->index(0, MovieDBModelField::SampleMD5);
+      const QModelIndex movieNameInd = m_fsPanel.m_movieDbModel->index(0, MovieDBModelField::Name);
       QCOMPARE(movieNameInd.data(Qt::DisplayRole).toString(), mp4Name);
       const QStringList fileNamesMovie{mp4Name};
       const QModelIndexList selectedRowsMovie{movieInd};

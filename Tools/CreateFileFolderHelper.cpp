@@ -3,7 +3,7 @@
 #include "UndoRedo.h"
 #include "NotificatorMacro.h"
 #include "JsonHelper.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "DvdFileInfo.h"
@@ -53,7 +53,7 @@ int NewJsonFile(const QString& createIn, const QStringList& basedOnFileNames) {
       continue;
     }
     ++totalNeedCnd;
-    const auto& dict = JsonKey::GetJsonDictDefault(jsonBaseName);
+    const auto& dict = JsonModelField::GetJsonDictDefault(jsonBaseName);
     if (JsonHelper::DumpJsonDict(dict, jPath)) {
       ++crtSucceed;
     }

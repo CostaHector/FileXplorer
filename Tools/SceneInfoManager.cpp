@@ -60,36 +60,22 @@ Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
     }
 
     const QString& vidFileName = sMixed.GetFirstVid(baseName);
-    it = rawJsonDict.find("VidName");
-    if (it == rawJsonDict.end()) {
-      rawJsonDict.insert("VidName", vidFileName);
-      jsonNeedUpdate = true;
-      ++vidNameKeyFieldUpdatedCnt;
-    } else if (it.value().toString() != vidFileName) {
-      it->setValue(vidFileName);
-      jsonNeedUpdate = true;
-      ++vidNameKeyFieldUpdatedCnt;
-    }
-
     if (!vidFileName.isEmpty()) {
-      const QFileInfo vidFi{path + '/' + vidFileName};
-      it = rawJsonDict.find("Uploaded");
+      it = rawJsonDict.find("VidName");
       if (it == rawJsonDict.end()) {
-#ifdef _WIN32
-        rawJsonDict.insert("Uploaded", vidFi.birthTime().toString("yyyyMMdd hh:mm:ss"));
-#else
-        rawJsonDict.insert("Uploaded", vidFi.metadataChangeTime().toString("yyyyMMdd hh:mm:ss"));
-#endif
+        rawJsonDict.insert("VidName", vidFileName);
         jsonNeedUpdate = true;
-      } else if (it.value().toString().isEmpty()) {
-#ifdef _WIN32
-        it->setValue(vidFi.birthTime().toString("yyyyMMdd hh:mm:ss"));
-#else
-        it->setValue(vidFi.metadataChangeTime().toString("yyyyMMdd hh:mm:ss"));
-#endif
-        jsonNeedUpdate = true;
+        ++vidNameKeyFieldUpdatedCnt;
+      } else {
+        const QString& oldVidName = it.value().toString();
+        if (oldVidName.isEmpty() || vidFileName != oldVidName) {
+          it->setValue(vidFileName);
+          jsonNeedUpdate = true;
+          ++vidNameKeyFieldUpdatedCnt;
+        }
       }
 
+      const QFileInfo vidFi{path + '/' + vidFileName};
       it = rawJsonDict.find("Size");
       qint64 newVidSize = vidFi.size();
       if (it == rawJsonDict.end()) {

@@ -1,6 +1,5 @@
 ﻿#include "PropertiesWindow.h"
 #include "PropertiesWindowActions.h"
-#include "TableFields.h"
 #include "SizeTool.h"
 #include "Configuration.h"
 #include "FileSystemItemFilter.h"

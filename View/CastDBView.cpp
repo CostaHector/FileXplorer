@@ -1,16 +1,10 @@
 #include "CastDBView.h"
 #include "CastDBActions.h"
 #include "FdBasedDb.h"
-#include "JsonHelper.h"
 #include "NotificatorMacro.h"
-#include "CastPsonFileHelper.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
-#include "StringTool.h"
 #include "SystemPath.h"
-#include "TableFields.h"
-#include "QuickWhereClauseHelper.h"
-#include "PathTool.h"
 
 #include <QInputDialog>
 #include <QItemSelectionModel>

@@ -1,14 +1,9 @@
 #include "JsonHelper.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "PublicMacro.h"
-#include "NameTool.h"
-#include "CastManager.h"
-#include "StudiosManager.h"
-#include "TableFields.h"
-#include "MD5Calculator.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -96,12 +91,12 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     dict = MovieJsonLoader(jsonPth);
   } else {
     const QString& name = PathTool::GetBaseName(jsonPth);
-    dict = JsonKey::GetJsonDictDefault(name);
+    dict = JsonModelField::GetJsonDictDefault(name);
     changed = true;
   }
 
   QHash<QString, QVariant>::iterator it;
-  using namespace JsonKey;
+  using namespace JsonModelField;
   if (duration != 0) {
     it = dict.find(ENUM_2_STR(Duration));  // here size is the duration
     if (it != dict.cend() && it->toInt() != duration) {
@@ -155,7 +150,7 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
     it.next();
     const QString& jsonPath = it.filePath();
     const QVariantHash& dict = MovieJsonLoader(jsonPath);
-    using namespace MOVIE_TABLE;
+    using namespace JsonModelField;
     const QString& studio = dict.value(ENUM_2_STR(Studio), "").toString();
     const QStringList& cast = dict.value(ENUM_2_STR(Cast), {}).toStringList();
     const QStringList& tags = dict.value(ENUM_2_STR(Tags), {}).toStringList();
@@ -166,88 +161,6 @@ QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {
   }
   LOG_D("%d json file contains Studio|Cast|Tags Field", fileNameHash2Json.size());
   return fileNameHash2Json;
-}
-
-int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int defaultDurationValue) {
-  bool bReadResult{false};
-  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
-  if (!bReadResult) {
-    if (bSucceed != nullptr) { *bSucceed = false; }
-    return defaultDurationValue;
-  }
-  int rateIndex = contents.indexOf(R"("Duration":)");
-  if (rateIndex == -1) {
-    if (bSucceed != nullptr) { *bSucceed = false; }
-    return defaultDurationValue;
-  }
-  // 跳过"Duration":11个字符
-  int valuePos = rateIndex + 11;
-  while (valuePos < contents.size() && contents[valuePos] == ' ') {
-    ++valuePos;
-  }
-
-  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
-    if (bSucceed != nullptr) { *bSucceed = false; }
-    return defaultDurationValue; // Todo: llt cover this line
-  }
-  int duration = 0;
-  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
-    duration = duration * 10 + (contents[valuePos] - '0');
-    ++valuePos;
-  }
-  if (bSucceed != nullptr) { *bSucceed = true; }
-  return duration;
-}
-
-int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
-  bool bReadResult{false};
-  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
-  if (!bReadResult) {
-    return defaultRateValue;
-  }
-  int rateIndex = contents.indexOf(R"("Rate":)");
-  if (rateIndex == -1) {
-    return defaultRateValue;
-  }
-  // 跳过"Rate":7个字符
-  int valuePos = rateIndex + 7;
-  while (valuePos < contents.size() && contents[valuePos] == ' ') {
-    ++valuePos;
-  }
-
-  if (valuePos >= contents.size() || contents[valuePos] < '0' || contents[valuePos] > '9') {
-    return defaultRateValue; // Todo: llt cover this line
-  }
-  int rate = 0;
-  while (valuePos < contents.size() && contents[valuePos] >= '0' && contents[valuePos] <= '9') {
-    rate = rate * 10 + (contents[valuePos] - '0');
-    ++valuePos;
-  }
-  return rate;
-}
-
-QByteArray GetMD5FromJsonFile(const QString& jsonFullPath) {
-  bool bReadResult{false};
-  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
-  if (!bReadResult) {
-    return {};
-  }
-  int rateIndex = contents.indexOf(R"("MD5":)");
-  if (rateIndex == -1) {
-    return {};
-  }
-  // 跳过"MD5":6个字符
-  int valuePos = rateIndex + 6;
-  while (valuePos < contents.size() && contents[valuePos] == ' ') {
-    ++valuePos;
-  }
-  if (contents.mid(valuePos, 2) == R"("")") {  // empty md5
-    return {};
-  }
-  if (valuePos + 1 + MD5Calculator::FIXED_MD5_LENGTH + 1 > contents.size()) {  // fixed length: 32, 2 quotes
-    return {};
-  }
-  return contents.mid(valuePos + 1, MD5Calculator::FIXED_MD5_LENGTH);
 }
 
 uint CalcFileHash(const QString& vidPth) {

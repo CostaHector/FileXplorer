@@ -1,6 +1,7 @@
 #include "RateActions.h"
 #include "PublicMacro.h"
 #include "RateHelper.h"
+#include "JsonFieldBoundary.h"
 #include "MenuToolButton.h"
 #include "NotificatorMacro.h"
 #include "VideoPlayerKey.h"
@@ -24,8 +25,8 @@ RateActions::RateActions(QObject* parent)
   CHECK_NULLPTR_RETURN_VOID(RATE_AGS);
   RATE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
-  ALL_RATE_ACTIONS_LIST.reserve(RateHelper::BUTT_V - RateHelper::MIN_V);
-  for (int rate = RateHelper::BUTT_V - 1; rate >= RateHelper::MIN_V; --rate) {
+  ALL_RATE_ACTIONS_LIST.reserve(JsonFieldBoundary::RATE_BUTT_V - JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+  for (int rate = JsonFieldBoundary::RATE_BUTT_V - 1; rate >= JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V; --rate) {
     QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)), //
                                                QString::number(rate) + tr(" score"),   //
                                                this};
@@ -135,7 +136,7 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
 
   bool bAccept{false};
   int newRate{defaultRate};
-  std::tie(bAccept, newRate) = InputDialogHelper::GetIntWithInitial(parent, title, message, defaultRate, RateHelper::MIN_V, RateHelper::MAX_V, 1);
+  std::tie(bAccept, newRate) = InputDialogHelper::GetIntWithInitial(parent, title, message, defaultRate, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, JsonFieldBoundary::RATE_MAX_V, 1);
   if (!bAccept) {
     LOG_INFO_NP("User cancel rate recursively", rootPath);
     return 0;

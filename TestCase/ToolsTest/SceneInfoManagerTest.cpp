@@ -8,7 +8,7 @@
 
 #include "JsonHelper.h"
 #include "TDir.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "JsonTestPrecoditionTools.h"
 
 using namespace SceneHelper;
@@ -42,7 +42,7 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QVERIFY(scnMgr.UpdateJsonUnderAPath("/path/to/inexist").isEmpty());
       QVERIFY(scnMgr.UpdateJsonUnderAPath(__FILE__).isEmpty());
     }
-    using namespace JsonKey;
+    using namespace JsonModelField;
     {  // 2.
       QList<FsNodeEntry> notExistJsonFileNodes{
           {"some file.mp4", false, ""},               // file
@@ -148,7 +148,7 @@ Precondition: Xander.json value of key ImgName, VidName is empty
 
   void WriteDictIntoScnFiles_correct() {
     QVERIFY(tDir.IsValid());
-    using namespace JsonKey;
+    using namespace JsonModelField;
     {  // 1.0 ScnMgr.m_jsonsDicts为空, 写入跳过, 返回0
       ScnMgr scnMgr;
       QCOMPARE(scnMgr.UpdateScnFiles(tDir.path()), 0);
@@ -216,7 +216,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
   void operator_caller_test() {
     QVERIFY(tDir.IsValid());
     QVERIFY(tDir.IsEmpty());
-    using namespace JsonKey;
+    using namespace JsonModelField;
 
     {  // 0. not a valid directory, skip
       ScnMgr scnMgr;
@@ -266,7 +266,7 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
   }
   void test_ParseAScnFile_Integration() {
     QVERIFY(tDir.IsValid());
-    using namespace JsonKey;
+    using namespace JsonModelField;
     {
       // 1. 基本功能测试：单个组场景
       {  // bounder test

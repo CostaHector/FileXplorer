@@ -4,7 +4,7 @@
 #include "TDir.h"
 #include "CreateFileFolderHelper.h"
 #include "JsonHelper.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 
 class CreateFileFolderHelperTest : public PlainTestSuite {
   Q_OBJECT
@@ -58,7 +58,7 @@ private slots:
 
     QString jsonAbsPath = mDir.itemPath("0.json");
     QVariantHash json0 = JsonHelper::MovieJsonLoader(jsonAbsPath);
-    using namespace JsonKey;
+    using namespace JsonModelField;
     QCOMPARE(json0.value(ENUM_2_STR(Name), "").toString(), "0");
   }
   void test_NewFolder_ok() {

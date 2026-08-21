@@ -1,9 +1,9 @@
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "JsonHelper.h"
 #include <QVariantHash>
 #include <QHash>
 
-namespace JsonKey {
+namespace JsonModelField {
 QVariantHash GetJsonDictDefault(const QString& jsonBaseName) {  //  QVariantHash dict {
   QVariantHash dict{
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) {ENUM_2_STR(enu), def},

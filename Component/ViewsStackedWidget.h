@@ -55,6 +55,9 @@ class ViewsStackedWidget : public QStackedWidget {
     if (mDoubleClickedConnectConn) {
       ViewsStackedWidget::disconnect(mDoubleClickedConnectConn);
     }
+    if (mStopMediaPlayConn) {
+      ViewsStackedWidget::disconnect(mStopMediaPlayConn);
+    }
   }
 
   void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
@@ -142,7 +145,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
-  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn;
+  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn, mStopMediaPlayConn;
   ViewTypeTool::ViewType mVt{ViewTypeTool::DEFAULT_VIEW_TYPE};
 };
 

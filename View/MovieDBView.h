@@ -5,7 +5,8 @@
 #include "FdBasedDb.h"
 #include "FdBasedDbModel.h"
 #include "CustomTableView.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
+#include "MovieDBModelField.h"
 
 class MovieDBView : public CustomTableView {
 public:
@@ -21,7 +22,7 @@ public:
 
   bool onSubmit();
   bool onRevert();
-  bool onInsertIntoTable();
+  bool onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesType);
   bool onInitDataBase();
   bool onCreateATable();
   bool onDropATable();
@@ -36,7 +37,7 @@ public:
   int onCountRow();
 
   int onSetStudio();
-  int onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode);
+  int onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode);
 
   QList<qint64> GetSelectionFileSizes() const;
   QList<int> GetSelectionDurations() const;
@@ -54,7 +55,7 @@ private:
 
   bool m_isHeaderStateAlreadyInited{false};
   QStringList m_studioCandidates;
-  QStringList m_candidatesLst[(int)FIELD_OP_TYPE::BUTT];
+  QStringList m_candidatesLst[(int)JsonModelField::FIELD_OP_TYPE::BUTT];
 };
 
 #endif  // MOVIEDBVIEW_H

@@ -63,6 +63,8 @@ public:
     m_nextFolderTimer.start();
   }
 
+  void onRequestStopMediaPlay();
+
   bool isTimerDisabled() const { return CurrentRowPreviewer::NEXT_FOLDER_TIME_INTERVAL <= 0; }
 
   void UpdatePreview();

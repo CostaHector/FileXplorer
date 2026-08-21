@@ -56,6 +56,9 @@ QString absolutePath(QString input) {
   return input.left(parentPathEndIndex);
 }
 QString relativePath(const QString& fullPath, const int rootpathLen) {
+  if (fullPath.size() < rootpathLen + 1) {
+    return "";
+  }
   return fullPath.mid(rootpathLen + 1);
 }
 QString forSearchPath(const QString& fullPath) {

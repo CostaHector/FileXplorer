@@ -7,10 +7,9 @@
 #include "MountHelper.h"
 #include "NotificatorMacro.h"
 #include "StudiosManager.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "PublicMacro.h"
 #include "PublicVariable.h"
-#include "JsonRenameRegex.h"
 #include "ViewActions.h"
 #include <QSqlError>
 #include <QSqlQuery>
@@ -60,7 +59,8 @@ void MovieDBView::subscribe() {
   connect(inst.INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
   connect(inst.INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
   connect(inst.DROP_A_TABLE, &QAction::triggered, this, &MovieDBView::onDropATable);
-  connect(inst.INSERT_A_PATH, &QAction::triggered, this, &MovieDBView::onInsertIntoTable);
+  connect(&inst, &MovieDBActions::reqScanFiles, this, &MovieDBView::onScanFilesUnderPath);
+
   connect(inst.DELETE_FROM_TABLE, &QAction::triggered, this, &MovieDBView::onDeleteFromTable);
   connect(inst.UNION_TABLE, &QAction::triggered, this, &MovieDBView::onUnionTables);
   connect(inst.AUDIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onAuditATable);
@@ -74,22 +74,22 @@ void MovieDBView::subscribe() {
   // record studio/cast/tags manual batch edit
   connect(inst.SET_STUDIO, &QAction::triggered, this, &MovieDBView::onSetStudio);
   connect(inst.SET_CAST, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET);  //
   });
   connect(inst.APPEND_CAST, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND);  //
   });
   connect(inst.REMOVE_CAST, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE);  //
   });
   connect(inst.SET_TAGS, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET);  //
   });
   connect(inst.APPEND_TAGS, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND);  //
   });
   connect(inst.REMOVE_TAGS, &QAction::triggered, this, [this]() {
-    onSetCastOrTags(FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE);  //
+    onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE);  //
   });
   auto& fileOpInst = FileOpActs::GetInst();
   addAction(fileOpInst.COPY_FULL_PATH);
@@ -129,7 +129,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = tblPeerPath;
   }
-  const QString caption{QString{"Choose a path %1(contains %2) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
+  const QString caption{QString{"Choose a path %1(subdirectory of [%2]) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
 
   QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
@@ -147,7 +147,7 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   return true;
 }
 
-bool MovieDBView::onInsertIntoTable() {
+bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesType) {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
     LOG_ERR_NP("[failed] Open table", con.lastError().text());
@@ -161,7 +161,7 @@ bool MovieDBView::onInsertIntoTable() {
   }
 
   QString selectPath;
-  if (!GetAPathFromUserSelect("and load videos into", selectPath)) {
+  if (!GetAPathFromUserSelect("and scan videos/jsons from", selectPath)) {
     return false;
   }
   const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
@@ -172,13 +172,26 @@ bool MovieDBView::onInsertIntoTable() {
     return false;
   }
 
-  int retCnt = _fdBasedDb.ReadADirectory(curTblName, selectPath);
+  int retCnt = -1;
+  switch (filesType) {
+    case MovieDBModelField::ScanFilesTypeE::VIDEOS: {
+      retCnt = _fdBasedDb.ReadADirectory(curTblName, selectPath);
+      break;
+    }
+    case MovieDBModelField::ScanFilesTypeE::JSONS: {
+      retCnt = _fdBasedDb.ReadADirectoryJson(curTblName, selectPath);
+      break;
+    }
+    default:
+      break;
+  }
+
   if (retCnt < 0) {
-    LOG_ERR_P("Read videos from path failed", "errorCode:%d", retCnt);
+    LOG_ERR_P("Read videos/jsons from path failed", "errorCode:%d", retCnt);
     return false;
   }
   _dbModel->select();
-  LOG_OK_P("Read videos ok", "%d video(s) under path[%s] are inserted into table[%s]", retCnt, qPrintable(selectPath), qPrintable(curTblName));
+  LOG_OK_P("Read videos/jsons ok", "%d videos/jsons(s) under path[%s] are inserted into table[%s]", retCnt, qPrintable(selectPath), qPrintable(curTblName));
   return true;
 }
 
@@ -291,7 +304,7 @@ int MovieDBView::onDeleteFromTable() {
     return -1;
   }
 
-  using namespace MOVIE_TABLE;
+  using namespace MovieDBModelField;
   const QString& tbl = _movieDbSearchBar->GetCurrentTableName();
   static const QString RELATION_TEMPLATE{R"("%1" = )"};
   static const QStringList candidates{
@@ -545,21 +558,21 @@ int MovieDBView::onSetStudio() {
     m_studioCandidates.insert(insertPos, studio);
   }
 
-  const QModelIndexList& indexes = selectionModel()->selectedRows(MOVIE_TABLE::Studio);
+  const QModelIndexList& indexes = selectionModel()->selectedRows(MovieDBModelField::Studio);
   _dbModel->SetStudio(indexes, studio);
 
   LOG_OK_P("[Uncommit] SetStudio", "%d row(s) studio has been changed to %s", indexes.size(), qPrintable(studio));
   return indexes.size();
 }
 
-int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE mode) {
-  const QString fieldOperation{"Operation:" + FIELF_OP_TYPE_ARR[(int)type] + ' ' + FIELD_OP_MODE_ARR[(int)mode]};
+int MovieDBView::onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode) {
+  const QString fieldOperation{"Operation:" + JsonModelField::FIELD_OP_TYPE_ARR[(int)type] + ' ' + JsonModelField::FIELD_OP_MODE_ARR[(int)mode]};
   if (!IsHasSelection(fieldOperation)) {
     return 0;
   }
 
   QString tagsOrCast;
-  if (mode == FIELD_OP_MODE::CLEAR) {
+  if (mode == JsonModelField::FIELD_OP_MODE::CLEAR) {
     tagsOrCast = "";
     const QString clearQryCfm{"Confirm " + fieldOperation};
     const QString clearTagsCastsHintMsg{"Clear text?"};
@@ -586,13 +599,13 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
     }
     candidates.push_back(tagsOrCast);
   }
-  MOVIE_TABLE::FIELD_E fieldColumn{MOVIE_TABLE::BUTT};
+  MovieDBModelField::FIELD_E fieldColumn{MovieDBModelField::BUTT};
   switch (type) {
-    case FIELD_OP_TYPE::CAST:
-      fieldColumn = MOVIE_TABLE::Cast;
+    case JsonModelField::FIELD_OP_TYPE::CAST:
+      fieldColumn = MovieDBModelField::Cast;
       break;
-    case FIELD_OP_TYPE::TAGS:
-      fieldColumn = MOVIE_TABLE::Tags;
+    case JsonModelField::FIELD_OP_TYPE::TAGS:
+      fieldColumn = MovieDBModelField::Tags;
       break;
     default:
       LOG_ERR_P("[invalid Field] SetCastOrTags", "Field: %d", (int)type);
@@ -601,14 +614,14 @@ int MovieDBView::onSetCastOrTags(const FIELD_OP_TYPE type, const FIELD_OP_MODE m
 
   const QModelIndexList& indexes = selectionModel()->selectedRows(fieldColumn);
   switch (mode) {
-    case FIELD_OP_MODE::SET:
-    case FIELD_OP_MODE::CLEAR:
+    case JsonModelField::FIELD_OP_MODE::SET:
+    case JsonModelField::FIELD_OP_MODE::CLEAR:
       _dbModel->SetCastOrTags(indexes, tagsOrCast);
       break;
-    case FIELD_OP_MODE::APPEND:
+    case JsonModelField::FIELD_OP_MODE::APPEND:
       _dbModel->AddCastOrTags(indexes, tagsOrCast);
       break;
-    case FIELD_OP_MODE::REMOVE:
+    case JsonModelField::FIELD_OP_MODE::REMOVE:
       _dbModel->RmvCastOrTags(indexes, tagsOrCast);
       break;
     default:

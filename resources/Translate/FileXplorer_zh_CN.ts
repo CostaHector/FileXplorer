@@ -557,7 +557,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+119"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+194"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -738,7 +738,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+281"/>
+        <location line="+279"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -753,7 +753,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-320"/>
+        <location line="-318"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -1217,6 +1217,14 @@
     </message>
 </context>
 <context>
+    <name>JsonTableView</name>
+    <message>
+        <location filename="../../View/JsonTableView.cpp" line="+45"/>
+        <source>Recycle related files</source>
+        <translation>回收相关文件</translation>
+    </message>
+</context>
+<context>
     <name>LogActions</name>
     <message>
         <location filename="../../Actions/LogActions.cpp" line="+11"/>
@@ -1395,8 +1403,13 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Insert Into</source>
-        <translation>插入</translation>
+        <source>Import from Video</source>
+        <translation>从视频文件导入</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Import from JSON</source>
+        <translation>从Json文件导入</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1414,7 +1427,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+19"/>
         <source>Read Duration</source>
         <translation>更新时长</translation>
     </message>
@@ -1784,7 +1797,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../../Actions/RateActions.cpp" line="+30"/>
+        <location filename="../../Actions/RateActions.cpp" line="+31"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
@@ -2146,7 +2159,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../../Actions/SceneInPageActions.cpp" line="+15"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+17"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -2176,7 +2189,37 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>清除场景</translation>
     </message>
     <message>
+        <location line="+8"/>
+        <source>Archive by Score</source>
+        <translation>根据评分归类</translation>
+    </message>
+    <message>
         <location line="+7"/>
+        <source>Archival</source>
+        <translation>归档级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Essentials</source>
+        <translation>精选级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Normals</source>
+        <translation>普通级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Casuals</source>
+        <translation>尝鲜级</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Disposable</source>
+        <translation>可丢弃级</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Movie Name</source>
         <translation>按名称</translation>
     </message>
@@ -2219,7 +2262,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+43"/>
+        <location filename="../../View/SceneListView.cpp" line="+45"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>

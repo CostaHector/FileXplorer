@@ -23,6 +23,8 @@ bool CopyTextToSystemClipboard(const QString& text);
 bool IsTorrentFile(const QString& localFilePath);
 bool OpenLocalTorrentFile(const QString& localFilePath);
 bool IsTorrentTxtFile(const QString& localFilePath);
+
+qint64 GetFileSize(const QString& fileAbsPath);
 }
 
 QString ChooseCopyDestination(QString defaultPath, QWidget* parent = nullptr);

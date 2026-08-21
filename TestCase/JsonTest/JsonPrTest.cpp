@@ -171,7 +171,7 @@ class JsonPrTest : public PlainTestSuite {
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
 
     // 3. prepare a json that contains deprecated key ProductionStudio, Performers
-    using namespace JsonKey;
+    using namespace JsonModelField;
     QVariantHash dict;
     dict[ENUM_2_STR(Name)] = "SuperMan - Henry Cavill [2020]";
     dict["ProductionStudio"] = "SuperMan";
@@ -334,40 +334,40 @@ class JsonPrTest : public PlainTestSuite {
     QCOMPARE(jrDefaultConstuct.jsonFileName, "");
 
     JsonPr jr{""};
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::BUTT));
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::SET));
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::APPEND));
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::BUTT, FIELD_OP_MODE::REMOVE));
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::BUTT));
-    QVERIFY(!jr.SetCastOrTags("", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::BUTT));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::BUTT, JsonModelField::FIELD_OP_MODE::BUTT));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::BUTT, JsonModelField::FIELD_OP_MODE::SET));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::BUTT, JsonModelField::FIELD_OP_MODE::APPEND));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::BUTT, JsonModelField::FIELD_OP_MODE::REMOVE));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::BUTT));
+    QVERIFY(!jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::BUTT));
 
     // --------------------------- Cast
     jr.m_Cast.setBatch(QStringList{"C", "D"});
     QCOMPARE(jr.m_Cast.join(), "C,D");
 
     // set first time, change
-    QVERIFY(jr.SetCastOrTags("A,B", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("A,B", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET));
     QCOMPARE(jr.m_Cast.join(), "A,B");
     // set again, no change
-    QVERIFY(jr.SetCastOrTags("A,B", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("A,B", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET));
     QCOMPARE(jr.m_Cast.join(), "A,B");
 
     // append first time, change
-    QVERIFY(jr.SetCastOrTags("C,D", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND));
+    QVERIFY(jr.SetCastOrTags("C,D", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND));
     QCOMPARE(jr.m_Cast.join(), "A,B,C,D");
     // append again, no change
-    QVERIFY(jr.SetCastOrTags("C,D", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::APPEND));
+    QVERIFY(jr.SetCastOrTags("C,D", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::APPEND));
     QCOMPARE(jr.m_Cast.join(), "A,B,C,D");
 
     // remove first time, change
-    QVERIFY(jr.SetCastOrTags("C", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE));
+    QVERIFY(jr.SetCastOrTags("C", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE));
     QCOMPARE(jr.m_Cast.join(), "A,B,D");
     // remove again, no change
-    QVERIFY(jr.SetCastOrTags("C", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::REMOVE));
+    QVERIFY(jr.SetCastOrTags("C", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::REMOVE));
     QCOMPARE(jr.m_Cast.join(), "A,B,D");
 
     // set an empty sentence should empty all
-    QVERIFY(jr.SetCastOrTags("", FIELD_OP_TYPE::CAST, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::CAST, JsonModelField::FIELD_OP_MODE::SET));
     QVERIFY(jr.m_Cast.isEmpty());
 
     // --------------------------- Tags
@@ -375,28 +375,28 @@ class JsonPrTest : public PlainTestSuite {
     QCOMPARE(jr.m_Tags.join(), "C,D");
 
     // set first time, change
-    QVERIFY(jr.SetCastOrTags("A,B", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("A,B", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET));
     QCOMPARE(jr.m_Tags.join(), "A,B");
     // set again, no change
-    QVERIFY(jr.SetCastOrTags("A,B", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("A,B", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET));
     QCOMPARE(jr.m_Tags.join(), "A,B");
 
     // append first time, change
-    QVERIFY(jr.SetCastOrTags("C,D", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND));
+    QVERIFY(jr.SetCastOrTags("C,D", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND));
     QCOMPARE(jr.m_Tags.join(), "A,B,C,D");
     // append again, no change
-    QVERIFY(jr.SetCastOrTags("C,D", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::APPEND));
+    QVERIFY(jr.SetCastOrTags("C,D", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND));
     QCOMPARE(jr.m_Tags.join(), "A,B,C,D");
 
     // remove first time, change
-    QVERIFY(jr.SetCastOrTags("C", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE));
+    QVERIFY(jr.SetCastOrTags("C", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE));
     QCOMPARE(jr.m_Tags.join(), "A,B,D");
     // remove again, no change
-    QVERIFY(jr.SetCastOrTags("C", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::REMOVE));
+    QVERIFY(jr.SetCastOrTags("C", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE));
     QCOMPARE(jr.m_Tags.join(), "A,B,D");
 
     // set an empty sentence should empty all
-    QVERIFY(jr.SetCastOrTags("", FIELD_OP_TYPE::TAGS, FIELD_OP_MODE::SET));
+    QVERIFY(jr.SetCastOrTags("", JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::SET));
     QVERIFY(jr.m_Tags.isEmpty());
   }
 

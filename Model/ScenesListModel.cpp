@@ -4,6 +4,7 @@
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
 #include "ImageTool.h"
+#include "PathTool.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -233,9 +234,24 @@ QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const
   const int N = rootPath().size();
   for (const QModelIndex& index : indexes) {
     const QString& fullPath = GetJson(index);
-    relativePaths2FileName.push_back(fullPath.isEmpty() ? "" : fullPath.mid(N + 1));
+    relativePaths2FileName.push_back(PathTool::relativePath(fullPath, N));
   }
   return relativePaths2FileName;
+}
+
+std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const {
+  std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> movieRate2JsonsArr;
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const QString& fullPath = GetJson(index);
+    const int rate = GetRate(index);
+    if (rate == JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V) {
+      continue;
+    }
+    nonRate0Indexes.push_back(index);
+    movieRate2JsonsArr[rate].push_back(PathTool::relativePath(fullPath, N));
+  }
+  return movieRate2JsonsArr;
 }
 
 bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {

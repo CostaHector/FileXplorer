@@ -25,6 +25,10 @@ class SceneInPageActions : public QObject {
   QAction* _INCLUDEING_SUBDIRECTORIES{nullptr};
   QAction* _CLEAR_SCN_FILE{nullptr};
 
+  QAction* _ARCHIVE_BY_MOVIE_SCORE{nullptr};
+  QAction* _ARCHIVE_ARCHIVAL{nullptr},* _ARCHIVE_ESSENTIALS{nullptr},* _ARCHIVE_NORMALS{nullptr},* _ARCHIVE_CASUALS{nullptr},* _ARCHIVE_DISPOSABLE{nullptr};
+  QActionGroup* _ARCHIVE_AG{nullptr};
+
   SceneInfo::Role GetSortRole() const {
     return mSortOrderIntAction.curVal();
   }

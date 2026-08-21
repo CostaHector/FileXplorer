@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 #include "PlainTestSuite.h"
 #include "DataFormatter.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "SortedUniqStrLst.h"
 #include <QJsonValue>
 

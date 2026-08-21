@@ -827,6 +827,14 @@ bool FileXplorerEvent::on_RedunImageFinder(bool bChecked) {
 
 bool FileXplorerEvent::on_moveToTrashBin() {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
+  if (vt == ViewTypeTool::ViewType::SCENE) {
+    emit _contentPane->m_sceneTableView->onRecycleSceneAndRelated();
+    return true;
+  } else if (vt == ViewTypeTool::ViewType::JSON) {
+    emit _contentPane->m_jsonTableView->onRecycleJsonAndRelated();
+    return true;
+  }
+
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     LOG_WARN_NP("[Abort] Current view not support MoveToTrashbin", _contentPane->GetCurViewName());
     return false;

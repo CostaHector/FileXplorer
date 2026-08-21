@@ -10,7 +10,6 @@
 #include <QTimer>
 #include "AutoHideLabel.h"
 #include "ClickableSlider.h"
-#include "MenuToolButton.h"
 #include "VolumeWidget.h"
 #include "ToolBarWidget.h"
 #include "InteractiveVideoWidget.h"

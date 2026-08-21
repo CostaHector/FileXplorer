@@ -6,9 +6,8 @@
 #include "FdBasedDb.h"
 #include "FdBasedDbModel.h"
 #include "EndToExposePrivateMember.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "TDir.h"
-#include "PathTool.h"
 #include "SqlTableTestPreconditionTool.h"
 
 #include "VideoDurationGetter.h"
@@ -110,10 +109,10 @@ class FdBasedDbModelTest : public PlainTestSuite {
       QSet<QString> actualAbsolutePathSet;
       QSet<QString> actualFileNameSet;
       for (int i = 0; i < movieModel.rowCount(); ++i) {
-        actualMovieNames.insert(movieModel.data(movieModel.index(i, MOVIE_TABLE::Name), Qt::DisplayRole).toString());
-        actualMovieSizes.insert(movieModel.data(movieModel.index(i, MOVIE_TABLE::Size), Qt::DisplayRole).toString());
-        actualAbsolutePathSet.insert(movieModel.absolutePath(movieModel.index(i, MOVIE_TABLE::Name)));
-        actualFileNameSet.insert(movieModel.fileName(movieModel.index(i, MOVIE_TABLE::Name)));
+        actualMovieNames.insert(movieModel.data(movieModel.index(i, MovieDBModelField::Name), Qt::DisplayRole).toString());
+        actualMovieSizes.insert(movieModel.data(movieModel.index(i, MovieDBModelField::Size), Qt::DisplayRole).toString());
+        actualAbsolutePathSet.insert(movieModel.absolutePath(movieModel.index(i, MovieDBModelField::Name)));
+        actualFileNameSet.insert(movieModel.fileName(movieModel.index(i, MovieDBModelField::Name)));
       }
       QCOMPARE(actualMovieNames, movieNames);
       QCOMPARE(actualMovieSizes, movieSizes);
@@ -131,8 +130,8 @@ class FdBasedDbModelTest : public PlainTestSuite {
 
     // 2.1 Studio in table modified
     {
-      QModelIndex index4Studio{movieModel.index(4, MOVIE_TABLE::Studio)};
-      QModelIndex index5Studio{movieModel.index(5, MOVIE_TABLE::Studio)};
+      QModelIndex index4Studio{movieModel.index(4, MovieDBModelField::Studio)};
+      QModelIndex index5Studio{movieModel.index(5, MovieDBModelField::Studio)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
                                                  QStringList{"", ""}));                     // todo: use GetIndexessAtOneRow
       movieModel.SetStudio({index4Studio, index5Studio}, "Marvel");
@@ -148,8 +147,8 @@ class FdBasedDbModelTest : public PlainTestSuite {
 
     // 2.2 Cast modified
     {
-      QModelIndex index4Cast{movieModel.index(4, MOVIE_TABLE::Cast)};
-      QModelIndex index5Cast{movieModel.index(5, MOVIE_TABLE::Cast)};
+      QModelIndex index4Cast{movieModel.index(4, MovieDBModelField::Cast)};
+      QModelIndex index5Cast{movieModel.index(5, MovieDBModelField::Cast)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
                                                  QStringList{"", ""}));
       movieModel.SetCastOrTags({index4Cast, index5Cast}, "Cristiano Ronaldo&Kaka");
@@ -182,8 +181,8 @@ class FdBasedDbModelTest : public PlainTestSuite {
     }
     // 2.3 Tags modified
     {
-      QModelIndex index4Tags{movieModel.index(4, MOVIE_TABLE::Tags)};
-      QModelIndex index5Tags{movieModel.index(5, MOVIE_TABLE::Tags)};
+      QModelIndex index4Tags{movieModel.index(4, MovieDBModelField::Tags)};
+      QModelIndex index5Tags{movieModel.index(5, MovieDBModelField::Tags)};
 
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
                                                  QStringList{"", ""}));
@@ -251,18 +250,18 @@ class FdBasedDbModelTest : public PlainTestSuite {
     QCOMPARE(movieDb.ReadADirectory(tableName, mTDir.path()), 2);
     QCOMPARE(movieDb.SetDuration(tableName), 2);
 
-    movieModel.sort(MOVIE_TABLE::Name, Qt::AscendingOrder);
+    movieModel.sort(MovieDBModelField::Name, Qt::AscendingOrder);
     movieModel.select();
     QCOMPARE(movieModel.rowCount(), 2);
 
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Name), Qt::DisplayRole).toString(), "Chris Evans.mp4");
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Name), Qt::DisplayRole).toString(), "Chris Hemsworth.mp4");
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Size), Qt::DisplayRole).toLongLong(), 11);
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Size), Qt::DisplayRole).toLongLong(), 15);
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MOVIE_TABLE::Duration), Qt::DisplayRole).toInt(), 10000);
-    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MOVIE_TABLE::Duration), Qt::DisplayRole).toInt(), 70000);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MovieDBModelField::Name), Qt::DisplayRole).toString(), "Chris Evans.mp4");
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MovieDBModelField::Name), Qt::DisplayRole).toString(), "Chris Hemsworth.mp4");
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MovieDBModelField::Size), Qt::DisplayRole).toLongLong(), 11);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MovieDBModelField::Size), Qt::DisplayRole).toLongLong(), 15);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(0, MovieDBModelField::Duration), Qt::DisplayRole).toInt(), 10000);
+    QCOMPARE(movieModel.QSqlTableModel::data(movieModel.index(1, MovieDBModelField::Duration), Qt::DisplayRole).toInt(), 70000);
 
-    const QModelIndexList indexes{movieModel.index(0, MOVIE_TABLE::Name), movieModel.index(1, MOVIE_TABLE::Name)};
+    const QModelIndexList indexes{movieModel.index(0, MovieDBModelField::Name), movieModel.index(1, MovieDBModelField::Name)};
 
     QCOMPARE(movieModel.GetSelectionFileSizes(indexes), (QList<qint64>{11, 15}));
     QCOMPARE(movieModel.GetSelectionDurations(indexes), (QList<int>{10000, 70000}));

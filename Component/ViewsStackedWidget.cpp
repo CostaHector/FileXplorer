@@ -321,6 +321,10 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
           _previewFolder,  //
           static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
               &CurrentRowPreviewer::operator()));
+      mStopMediaPlayConn = ViewsStackedWidget::connect(
+          m_sceneTableView, &SceneListView::requestStopMediaPlay,
+          _previewFolder,  //
+          &CurrentRowPreviewer::onRequestStopMediaPlay);
       break;
     }
     case ViewType::CAST: {

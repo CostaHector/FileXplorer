@@ -23,25 +23,25 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (col) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
-      case enu: return format(item.m_##enu); //
+      case JsonModelField::FIELD_E::enu: return format(item.m_##enu); //
       JSON_MODEL_FIELD_MAPPING   //
 #undef JSON_KEY_ITEM             //
       default: return {};
     }
-  } else if (role == Qt::DecorationRole && col == JsonKey::ContentFixed) {
+  } else if (role == Qt::DecorationRole && col == JsonModelField::FIELD_E::ContentFixed) {
     if (item.m_ContentFixed) {
       static const QIcon CONTENTS_FIXED_IMG{":/JsonEditor/ANCHOR_DROP"};
       return CONTENTS_FIXED_IMG;
     }
   } else if (role == Qt::ForegroundRole) {
     switch (col) {
-      case JSON_KEY_E::Cast: {
+      case JsonModelField::FIELD_E::Cast: {
         if (!item.hintCast.isEmpty()) {
           return QColor{Qt::GlobalColor::red};
         }
         break;
       }
-      case JSON_KEY_E::Studio: {
+      case JsonModelField::FIELD_E::Studio: {
         if (!item.hintStudio.isEmpty()) {
           return QColor{Qt::GlobalColor::red};
         }
@@ -56,7 +56,7 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
   } else if (role == JsonTableModel::DATA_TYPE_ROLE) {
     switch (col) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
-      case enu: return generalDataType; //
+      case JsonModelField::FIELD_E::enu: return generalDataType; //
         JSON_MODEL_FIELD_MAPPING    //
 #undef JSON_KEY_ITEM                //
       default: return GeneralDataType::Type::ERROR_TYPE;
@@ -69,7 +69,7 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
   switch (role) {
     case Qt::DisplayRole: {
       if (0 <= section && section < columnCount() && orientation == Qt::Orientation::Horizontal) {
-        return JsonKey::JSON_TABLE_HEADERS[section];
+        return JsonModelField::JSON_TABLE_HEADERS[section];
       }
       return section + 1;
     }
@@ -90,14 +90,14 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-  if (index.column() == JsonKey::Prepath) {  // ignore it
+  if (index.column() == JsonModelField::FIELD_E::Prepath) {  // ignore it
     return false;
   }
   if (role == Qt::EditRole) {
     auto& item = mCachedJsons[index.row()];
     switch (index.column()) {
 #define JSON_KEY_ITEM(enu, val, def, enhanceDef, generalDataType, format, writer, initer, jsonWriter) \
-  case enu: {                                                                        \
+  case JsonModelField::FIELD_E::enu: {                                                                        \
     if (!writer(item.m_##enu, value)) {                                              \
       return false;                                                                  \
     }                                                                                \
@@ -109,7 +109,7 @@ bool JsonTableModel::setData(const QModelIndex& index, const QVariant& value, in
     }
     setModified(index.row(), true);
     // what you see is what you get, no need emit change signal; avoid cursor selection be cleared
-    if (index.column() != JsonKey::Detail) {
+    if (index.column() != JsonModelField::FIELD_E::Detail) {
       emit dataChanged(index, index, {Qt::DisplayRole});
     }
     return true;
@@ -263,16 +263,16 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
     LOG_W("Studio Field of %d row(s) NO change at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Studio, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Studio, {});
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Studio, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Studio, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Studio Field of %d/%d row(s) range [%d, %d) changed to [%s]", affectedRows, rowIndexes.size(), minRow, maxRow, qPrintable(studio));
   return affectedRows;
 }
 
-int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E keyEnum, const QString& sentence) {
-  if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
+int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JsonModelField::FIELD_E keyEnum, const QString& sentence) {
+  if (keyEnum != JsonModelField::FIELD_E::Cast && keyEnum != JsonModelField::FIELD_E::Tags) {
     LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
@@ -287,7 +287,7 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
+    auto& targetField = (keyEnum == JsonModelField::FIELD_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == newLst) {
       continue;
     }
@@ -314,12 +314,12 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JSON_KEY_E 
   return affectedRows;
 }
 
-int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_KEY_E keyEnum, const QString& sentence) {
+int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence) {
   if (sentence.isEmpty()) {
     LOG_D("No need add empty to cast or tags field[%d]", keyEnum);
     return 0;
   }
-  if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
+  if (keyEnum != JsonModelField::FIELD_E::Cast && keyEnum != JsonModelField::FIELD_E::Tags) {
     LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
@@ -335,7 +335,7 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
+    auto& targetField = (keyEnum == JsonModelField::FIELD_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (targetField == appendContainer) {
       continue;
     }
@@ -362,13 +362,13 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JSON_
   return affectedRows;
 }
 
-int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_KEY_E keyEnum, const QString& oneElement) {
+int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& oneElement) {
   if (oneElement.isEmpty()) {
     LOG_D("No need remove empty from cast or tags field[%d]", keyEnum);
     return 0;
   }
 
-  if (keyEnum != JSON_KEY_E::Cast && keyEnum != JSON_KEY_E::Tags) {
+  if (keyEnum != JsonModelField::FIELD_E::Cast && keyEnum != JsonModelField::FIELD_E::Tags) {
     LOG_W("Field[%d] not support", (int)keyEnum);
     return -1;
   }
@@ -382,7 +382,7 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JSON_
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return affectedRows;
     }
-    auto& targetField = (keyEnum == JSON_KEY_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
+    auto& targetField = (keyEnum == JsonModelField::FIELD_E::Cast) ? mCachedJsons[row].m_Cast : mCachedJsons[row].m_Tags;
     if (!targetField.remove(oneElement)) {
       continue;
     }
@@ -439,13 +439,13 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
     LOG_W("Cast and Tags Field of %d row(s) NO init at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& castFrontInd = sibling(minRow, JSON_KEY_E::Cast, {});
-  const QModelIndex& castBackInd = sibling(maxRow, JSON_KEY_E::Cast, {});
+  const QModelIndex& castFrontInd = sibling(minRow, JsonModelField::FIELD_E::Cast, {});
+  const QModelIndex& castBackInd = sibling(maxRow, JsonModelField::FIELD_E::Cast, {});
   emit dataChanged(castFrontInd, castBackInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
 
-  const QModelIndex& studioFrontInd = sibling(minRow, JSON_KEY_E::Studio, {});
-  const QModelIndex& studioBackInd = sibling(maxRow, JSON_KEY_E::Studio, {});
+  const QModelIndex& studioFrontInd = sibling(minRow, JsonModelField::FIELD_E::Studio, {});
+  const QModelIndex& studioBackInd = sibling(maxRow, JsonModelField::FIELD_E::Studio, {});
   emit dataChanged(studioFrontInd, studioBackInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Cast and Tags Field of %d/%d row(s) range [%d, %d) init ok", affecteRows, rowIndexes.size(), minRow, maxRow);
@@ -501,8 +501,8 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const Q
   if (studioMaxRow < 0 || studioMinRow > studioMaxRow) {
     LOG_W("Studio Field of %d row(s) NO hint at all", rowIndexes.size());
   } else {
-    const QModelIndex& studioFrontInd = sibling(studioMinRow, JSON_KEY_E::Studio, {});
-    const QModelIndex& studioBackInd = sibling(studioMaxRow, JSON_KEY_E::Studio, {});
+    const QModelIndex& studioFrontInd = sibling(studioMinRow, JsonModelField::FIELD_E::Studio, {});
+    const QModelIndex& studioBackInd = sibling(studioMaxRow, JsonModelField::FIELD_E::Studio, {});
     emit dataChanged(studioFrontInd, studioBackInd, {Qt::DisplayRole});
     emit headerDataChanged(Qt::Vertical, studioMinRow, studioMaxRow);
     LOG_D("Studio Field of %d/%d row(s) range [%d, %d) hint ok", studioCnt, rowIndexes.size(), studioMinRow, studioMaxRow);
@@ -511,8 +511,8 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const Q
   if (castMaxRow < 0 || castMinRow > castMaxRow) {
     LOG_W("Cast Field of %d row(s) NO hint at all", rowIndexes.size());
   } else {
-    const QModelIndex& castFrontInd = sibling(castMinRow, JSON_KEY_E::Cast, {});
-    const QModelIndex& castBackInd = sibling(castMaxRow, JSON_KEY_E::Cast, {});
+    const QModelIndex& castFrontInd = sibling(castMinRow, JsonModelField::FIELD_E::Cast, {});
+    const QModelIndex& castBackInd = sibling(castMaxRow, JsonModelField::FIELD_E::Cast, {});
     emit dataChanged(castFrontInd, castBackInd, {Qt::ForegroundRole | Qt::DisplayRole});
     emit headerDataChanged(Qt::Vertical, castMinRow, castMaxRow);
     LOG_D("Cast Field of %d/%d row(s) range [%d, %d) hint ok", castCnt, rowIndexes.size(), castMinRow, castMaxRow);
@@ -545,8 +545,8 @@ int JsonTableModel::FormatCast(const QModelIndexList& rowIndexes) {
     LOG_W("Cast Field of %d row(s) NO format at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Cast, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Cast, {});
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Cast, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Cast, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Cast Field of %d/%d row(s) range [%d, %d) format ok", affectedRows, rowIndexes.size(), minRow, maxRow);
@@ -564,16 +564,16 @@ QHash<QString, QString> JsonTableModel::GetVidBaseName2FullPath() const {
   return vidBaseName2FullPath;
 }
 
-int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JSON_KEY_E field, const int ITERATE_FOLDER_FIRST_LIMIT) {
+int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JsonModelField::FIELD_E field, const int ITERATE_FOLDER_FIRST_LIMIT) {
   JsonPr::UPDATER_FUNC func{nullptr};
   switch (field) {
-    case JSON_KEY_E::Size:
+    case JsonModelField::FIELD_E::Size:
       func = &JsonPr::UpdateVideoSizeField;
       break;
-    case JSON_KEY_E::Duration:
+    case JsonModelField::FIELD_E::Duration:
       func = &JsonPr::UpdateDurationField;
       break;
-    case JSON_KEY_E::MD5:
+    case JsonModelField::FIELD_E::MD5:
       func = &JsonPr::UpdateVideoMD5Field;
       break;
     default:
@@ -628,15 +628,15 @@ int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, 
 }
 
 int JsonTableModel::UpdateFizeSizeField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
-  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::Size, ITERATE_FOLDER_FIRST_LIMIT);
+  return JsonFieldValueUpdateCore(rowIndexes, JsonModelField::FIELD_E::Size, ITERATE_FOLDER_FIRST_LIMIT);
 }
 
 int JsonTableModel::UpdateDurationField(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
-  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::Duration, ITERATE_FOLDER_FIRST_LIMIT);
+  return JsonFieldValueUpdateCore(rowIndexes, JsonModelField::FIELD_E::Duration, ITERATE_FOLDER_FIRST_LIMIT);
 }
 
 int JsonTableModel::UpdateMD5Field(const QModelIndexList& rowIndexes, const int ITERATE_FOLDER_FIRST_LIMIT) {
-  return JsonFieldValueUpdateCore(rowIndexes, JSON_KEY_E::MD5, ITERATE_FOLDER_FIRST_LIMIT);
+  return JsonFieldValueUpdateCore(rowIndexes, JsonModelField::FIELD_E::MD5, ITERATE_FOLDER_FIRST_LIMIT);
 }
 
 int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes) {
@@ -665,8 +665,8 @@ int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexe
     LOG_W("Name Field of %d row(s) NO sync at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Name, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Name, {});
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Name, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Name, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Name Field of %d/%d row(s) range [%d, %d) sync ok", cnt, rowIndexes.size(), minRow, maxRow);
@@ -709,8 +709,8 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
     LOG_W("Name Field of %d row(s) NO sync at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::Cast, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::Tags, {});
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Cast, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Tags, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole | Qt::ForegroundRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Changes of %d/%d row(s) range [%d, %d) saved ok", cnt, rowIndexes.size(), minRow, maxRow);
@@ -784,7 +784,7 @@ int JsonTableModel::AppendCastFromSentence(const QModelIndex& ind, const QString
   }
 
   setModifiedNoEmit(row, true);
-  const QModelIndex& frontAndBackInd = ind.siblingAtColumn(JSON_KEY_E::Cast);
+  const QModelIndex& frontAndBackInd = ind.siblingAtColumn(JsonModelField::FIELD_E::Cast);
   emit dataChanged(frontAndBackInd, frontAndBackInd, {Qt::DisplayRole | Qt::ForegroundRole});
   emit headerDataChanged(Qt::Vertical, row, row);
   LOG_D("%d cast increased by selected sentence[%s]", afterCastCnt - beforeCastCnt, qPrintable(sentence));
@@ -818,8 +818,8 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
     LOG_W("ContentFixed Field of %d row(s) NO change at all", rowIndexes.size());
     return 0;
   }
-  const QModelIndex& frontInd = sibling(minRow, JSON_KEY_E::ContentFixed, {});
-  const QModelIndex& backInd = sibling(maxRow, JSON_KEY_E::ContentFixed, {});
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::ContentFixed, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::ContentFixed, {});
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole, Qt::DecorationRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("ContentFixed Field of %d/%d row(s) range [%d, %d) changed to bool[%d]", affectedRows, rowIndexes.size(), minRow, maxRow, bFixed);

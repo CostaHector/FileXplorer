@@ -2,11 +2,9 @@
 #include "JsonHelper.h"
 #include "NameTool.h"
 #include "CastPsonFileHelper.h"
-#include "FileTool.h"
 #include "PublicVariable.h"
 #include "PublicMacro.h"
 #include "StringTool.h"
-#include "TableFields.h"
 #include "JsonRenameRegex.h"
 
 #include <QSqlQuery>
@@ -14,7 +12,7 @@
 #include <QSqlError>
 #include <QDirIterator>
 
-using namespace PERFORMER_DB_HEADER_KEY;
+using namespace CastDbModelField;
 
 const QString CastBaseDb::CREATE_PERF_TABLE_TEMPLATE  //
     {"CREATE TABLE IF NOT EXISTS `%1` ("                //
@@ -163,7 +161,7 @@ int CastBaseDb::LoadFromPsonFile(const QString& imgsHostOriPath) {
 
   int succeedCnt = 0;
   QDirIterator it{imgsHostOriPath, {"*.pson"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  using namespace PERFORMER_DB_HEADER_KEY;
+  using namespace CastDbModelField;
   while (it.hasNext()) {
     const QString psonPath = it.next();
     const QVariantHash& pson = JsonHelper::MovieJsonLoader(psonPath);
@@ -270,10 +268,10 @@ bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& ima
     return false;  // no need update
   }
   const QString newImages = castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
-  if (sqlRecord.value(PERFORMER_DB_HEADER_KEY::Imgs).toString() == newImages) {
+  if (sqlRecord.value(CastDbModelField::Imgs).toString() == newImages) {
     return false;  // no need update
   }
-  sqlRecord.setValue(PERFORMER_DB_HEADER_KEY::Imgs, newImages);
+  sqlRecord.setValue(CastDbModelField::Imgs, newImages);
   return true;
 }
 

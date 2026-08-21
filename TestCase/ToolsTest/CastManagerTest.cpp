@@ -1,7 +1,7 @@
 ﻿#include <QCoreApplication>
 #include <QtTest>
 #include "TDir.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "JsonHelper.h"
 #include "PlainTestSuite.h"
 

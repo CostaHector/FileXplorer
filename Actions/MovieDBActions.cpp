@@ -35,9 +35,15 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DROP_A_TABLE);
   DROP_A_TABLE->setToolTip("DROP TABLE `DB_TABLE::MOVIES`;");
 
-  INSERT_A_PATH = new (std::nothrow) QAction(QIcon(":img/INSERT_INTO_TABLE"), tr("Insert Into"), this);
-  CHECK_NULLPTR_RETURN_VOID(INSERT_A_PATH);
-  INSERT_A_PATH->setToolTip("INSERT INTO `DB_TABLE::MOVIES`(COLUMN_NAME) VALUES (VALUE);");
+  SCAN_VIDEOS = new (std::nothrow) QAction(QIcon(":img/SCAN_JSONS"), tr("Import from Video"), this);
+  CHECK_NULLPTR_RETURN_VOID(SCAN_VIDEOS);
+  SCAN_VIDEOS->setToolTip("Scan video file(s) in a specified path and insert each video meta data current table.");
+  SCAN_JSONS = new (std::nothrow) QAction(QIcon(":img/SCAN_VIDEOS"), tr("Import from JSON"), this);
+  CHECK_NULLPTR_RETURN_VOID(SCAN_JSONS);
+  SCAN_JSONS->setToolTip("Scan json file(s) in a specified path and insert each key field value current table.");
+  SCAN_FILES = new QActionGroup{this};
+  SCAN_FILES->addAction(SCAN_VIDEOS);
+  SCAN_FILES->addAction(SCAN_JSONS);
 
   DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete Where"), this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
@@ -62,7 +68,6 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(_MODEL_REPOPULATE);
   DB_CONTROL_ACTIONS->addAction(REVERT);
   DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(INSERT_A_PATH);
   DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
   DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
@@ -109,4 +114,33 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   SET_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_SET"), tr("Set Tags"), this);
   APPEND_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_APPEND"), tr("Add Tags"), this);
   REMOVE_TAGS = new (std::nothrow) QAction(QIcon(":/JsonEditor/TAGS_REMOVE"), tr("Rmv Tag"), this);
+
+  subscribe();
+}
+
+#include "MenuToolButton.h"
+QWidget *MovieDBActions::GetScanFilesToolButton(QWidget *notNullParent) const {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  MenuToolButton* scanToolButton = new (std::nothrow) MenuToolButton(SCAN_FILES->actions(),                           //
+                                                                     QToolButton::InstantPopup,               //
+                                                                     Qt::ToolButtonStyle::ToolButtonTextUnderIcon, //
+                                                                     IMAGE_SIZE::TABS_ICON_IN_MENU_48,
+                                                                     notNullParent);
+  CHECK_NULLPTR_RETURN_NULLPTR(scanToolButton);
+  scanToolButton->SetCaption(QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert into"), "Insert records from videos/jsons into current table");
+  return scanToolButton;
+}
+
+void MovieDBActions::subscribe() {
+  connect(SCAN_FILES, &QActionGroup::triggered, this, &MovieDBActions::onScanFilesAgTriggered);
+}
+
+void MovieDBActions::onScanFilesAgTriggered(const QAction* pScanFilesAct) {
+  if (pScanFilesAct == SCAN_VIDEOS) {
+    emit reqScanFiles(MovieDBModelField::ScanFilesTypeE::VIDEOS);
+  }
+  if (pScanFilesAct == SCAN_JSONS) {
+    emit reqScanFiles(MovieDBModelField::ScanFilesTypeE::JSONS);
+  }
+  LOG_W("ScanFilesAction unknown");
 }

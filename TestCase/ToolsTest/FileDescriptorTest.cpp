@@ -5,7 +5,7 @@
 #include "FileDescriptor.h"
 #include "EndToExposePrivateMember.h"
 #include "MD5Calculator.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "TDir.h"
 
 #include <mockcpp/mokc.h>
@@ -30,10 +30,10 @@ class FileDescriptorTest : public PlainTestSuite {
     bool bContentsFixed{false};
     QString details;
 
-    QByteArray kakaJsonBA = JsonKey::ConstructJsonByteArray("Kaka", casts, studios, tags, uploaded, rates,  //
+    QByteArray kakaJsonBA = JsonModelField::ConstructJsonByteArray("Kaka", casts, studios, tags, uploaded, rates,  //
                                                             0, "", "", {}, 0, {}, "",                       //
                                                             bContentsFixed, emptyKakaMd5, details);
-    QByteArray varaneJsonBA = JsonKey::ConstructJsonByteArray("Kaka", casts, studios, tags, uploaded, rates,  //
+    QByteArray varaneJsonBA = JsonModelField::ConstructJsonByteArray("Kaka", casts, studios, tags, uploaded, rates,  //
                                                               0, "", "", {}, 0, {}, "",                       //
                                                               bContentsFixed, validVaraneMd5, details);
     QList<FsNodeEntry> nodes{

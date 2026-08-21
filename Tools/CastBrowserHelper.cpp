@@ -60,11 +60,7 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
   detail += QString(R"(<h2><font color="gray">%1</font></h2>)").arg(extension);
   const bool isFileAVideo{TYPE_FILTER::isDotExtVideo(extension)};
   if (isFileAVideo) {
-    VideoDurationGetter mi;
-    if (!mi.StartToGet()) {
-      return {};
-    }
-    int dur = VideoDurationGetter::GetLengthQuickStatic(mi, fileAbsPath);
+    int dur = VideoDurationGetter::GetDurationFromJsonFirst(fileAbsPath);
     detail += QString(R"(<h3>Length: %1</h3>)").arg(DataFormatter::formatDurationISOMs(dur));
   }
 
@@ -76,12 +72,7 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
     imgStr = ImageTool::GetBase64PixmapForHtml(starDotExtensionLowerCase);
   }
   const QFileInfo fi{fileAbsPath};
-  qint64 filesz{0};
-  if (fileAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
-    filesz = DvdFileInfo::ReadTotalFileSizeFromDvdFile(fileAbsPath);
-  } else {
-    filesz = fi.size();
-  }
+  const qint64 filesz = FileTool::GetFileSize(fileAbsPath);
   detail += QString(R"(<h3><a href="file:///%1">%2</a></h3>)").arg(fileAbsPath, imgStr);
   detail += QString(R"(<font size="+2">)");
   detail += QString(R"(Size: %1<br/>)").arg(DataFormatter::formatFileSizeWithBytes(filesz));
@@ -102,10 +93,10 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
 }
 
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE) {
-  const QString castName{record.field(PERFORMER_DB_HEADER_KEY::Name).value().toString()};
-  const QString orientation{record.field(PERFORMER_DB_HEADER_KEY::Ori).value().toString()};
-  const QStringList& vidsLst{StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Vids).value().toString())};
-  const QStringList& imgsLst{StringTool::GetImgsVidsListFromField(record.field(PERFORMER_DB_HEADER_KEY::Imgs).value().toString())};
+  const QString castName{record.field(CastDbModelField::Name).value().toString()};
+  const QString orientation{record.field(CastDbModelField::Ori).value().toString()};
+  const QStringList& vidsLst{StringTool::GetImgsVidsListFromField(record.field(CastDbModelField::Vids).value().toString())};
+  const QStringList& imgsLst{StringTool::GetImgsVidsListFromField(record.field(CastDbModelField::Imgs).value().toString())};
 
   static const QString CAST_BRIEF_INTRODUCTION_TEMPLATE //
       {R"(
@@ -120,11 +111,11 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
   htmlSrc.reserve(CAST_BRIEF_INTRODUCTION_TEMPLATE.size() + 200);
   htmlSrc += CAST_BRIEF_INTRODUCTION_TEMPLATE                                         //
                  .arg(castName)                                                       //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::Rate).value().toInt())    //
+                 .arg(record.field(CastDbModelField::Rate).value().toInt())    //
                  .arg(orientation)                                                    //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::Tags).value().toString()) //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::ALIAS).value().toString())  //
-                 .arg(record.field(PERFORMER_DB_HEADER_KEY::Detail).value().toString());
+                 .arg(record.field(CastDbModelField::Tags).value().toString()) //
+                 .arg(record.field(CastDbModelField::ALIAS).value().toString())  //
+                 .arg(record.field(CastDbModelField::Detail).value().toString());
 
   // Videos here
   const int vidCnt{vidsLst.size()};

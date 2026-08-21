@@ -11,7 +11,7 @@
 #include "Configuration.h"
 #include "SceneInfoManager.h"
 #include "StringTool.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "RateHelper.h"
 
 #include <QSignalSpy>

@@ -2,10 +2,9 @@
 #define JSON_DICT_H
 
 #include <QVariantHash>
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "SortedUniqStrLst.h"
 
-using namespace JsonKey;
 struct JsonPr {
   using UPDATER_FUNC = bool(JsonPr::*)(QString);
   static JsonPr fromJsonFile(const QString& jsonAbsFile);
@@ -51,7 +50,7 @@ struct JsonPr {
   bool ConstructCastStudioValue();  // contruct cast/studio
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);
-  bool SetCastOrTags(const QString& val, FIELD_OP_TYPE fieldType, FIELD_OP_MODE fieldMode);
+  bool SetCastOrTags(const QString& val, JsonModelField::FIELD_OP_TYPE fieldType, JsonModelField::FIELD_OP_MODE fieldMode);
   void HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const;
 
   void MergeTextContentsIntoDetailAndRecycleTxt();

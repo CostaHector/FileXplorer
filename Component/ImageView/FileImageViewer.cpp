@@ -49,7 +49,7 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
   mNaviToolBar->addSeparator();
   m_recycleThisImageButton = mNaviToolBar->addAction(QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle");
   CHECK_NULLPTR_RETURN_VOID(m_recycleThisImageButton);
-  m_recycleThisImageButton->setShortcut(QKeySequence(Qt::Key_Delete));
+  m_recycleThisImageButton->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_D));
   m_recycleThisImageButton->setShortcutVisibleInContextMenu(true);
   m_recycleThisImageButton->setToolTip(
       QString("<b>%1 (%2)</b><br/>Move the current image to the trash bin.")
@@ -59,7 +59,7 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
 
   m_recyleThisImageAndRelatedButton = mNaviToolBar->addAction(QIcon{":img/MOVE_TO_TRASH_BIN_INCLUDE_RELATED"}, "Recyle Related");
   CHECK_NULLPTR_RETURN_VOID(m_recyleThisImageAndRelatedButton);
-  m_recyleThisImageAndRelatedButton->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_D));
+  m_recyleThisImageAndRelatedButton->setShortcut(QKeySequence(Qt::Key_Delete));
   m_recyleThisImageAndRelatedButton->setShortcutVisibleInContextMenu(true);
   m_recyleThisImageAndRelatedButton->setToolTip(
       QString("<b>%1 (%2)</b><br/>Delete the current image along with all associated sidecar files (e.g., .xmp, .pp3, or paired RAW+JPEG).")

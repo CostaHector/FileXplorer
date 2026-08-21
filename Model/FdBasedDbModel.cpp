@@ -5,7 +5,7 @@
 #include "MountHelper.h"
 #include "Logger.h"
 #include <QSqlQuery>
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 
 FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
     : SqlTableModelPub{parent, con} {
@@ -24,9 +24,9 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
   }
   if (role == Qt::DisplayRole) {
     using namespace DataFormatter;
-    if (idx.column() == MOVIE_TABLE::Size) {
+    if (idx.column() == MovieDBModelField::Size) {
       return formatFileSizeGMKB(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
-    } else if (idx.column() == MOVIE_TABLE::Duration) {
+    } else if (idx.column() == MovieDBModelField::Duration) {
       return formatDurationISOMs(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
     }
   }
@@ -37,8 +37,8 @@ QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return {};
   }
-  const QModelIndex& preLeft = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathLeft);
-  const QModelIndex& preRight = curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight);
+  const QModelIndex& preLeft = curIndex.siblingAtColumn(MovieDBModelField::PrePathLeft);
+  const QModelIndex& preRight = curIndex.siblingAtColumn(MovieDBModelField::PrePathRight);
   return PathTool::RMFComponent::joinParentPath(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(), data(preRight, Qt::ItemDataRole::DisplayRole).toString());
 }
 
@@ -46,7 +46,7 @@ QString FdBasedDbModel::fileName(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return {};
   }
-  const QModelIndex& nameIndex = curIndex.siblingAtColumn(MOVIE_TABLE::Name);
+  const QModelIndex& nameIndex = curIndex.siblingAtColumn(MovieDBModelField::Name);
   return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
 }
 
@@ -54,11 +54,11 @@ QString FdBasedDbModel::fullInfo(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return {};
   }
-  return data(curIndex.siblingAtColumn(MOVIE_TABLE::Name)).toString()    //
+  return data(curIndex.siblingAtColumn(MovieDBModelField::Name)).toString()    //
          + '\t'                                                          //
-         + data(curIndex.siblingAtColumn(MOVIE_TABLE::Size)).toString()  //
+         + data(curIndex.siblingAtColumn(MovieDBModelField::Size)).toString()  //
          + '\t'                                                          //
-         + data(curIndex.siblingAtColumn(MOVIE_TABLE::PrePathRight)).toString();
+         + data(curIndex.siblingAtColumn(MovieDBModelField::PrePathRight)).toString();
 }
 
 void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {
@@ -104,7 +104,7 @@ QList<qint64> FdBasedDbModel::GetSelectionFileSizes(const QModelIndexList& index
   QList<qint64> fileSizes;
   QModelIndex szInd;
   for (const QModelIndex& idx : indexes) {
-    szInd = idx.siblingAtColumn(MOVIE_TABLE::Size);
+    szInd = idx.siblingAtColumn(MovieDBModelField::Size);
     fileSizes.push_back(QSqlTableModel::data(szInd, Qt::ItemDataRole::DisplayRole).toLongLong());
   }
   return fileSizes;
@@ -114,7 +114,7 @@ QList<int> FdBasedDbModel::GetSelectionDurations(const QModelIndexList& indexes)
   QList<int> durations;
   QModelIndex durInd;
   for (const QModelIndex& idx : indexes) {
-    durInd = idx.siblingAtColumn(MOVIE_TABLE::Duration);
+    durInd = idx.siblingAtColumn(MovieDBModelField::Duration);
     durations.push_back(QSqlTableModel::data(durInd, Qt::ItemDataRole::DisplayRole).toInt());
   }
   return durations;

@@ -4,13 +4,13 @@
 #include "OnScopeExit.h"
 #include "PlainTestSuite.h"
 #include "TDir.h"
-#include "JsonKey.h"
+#include "JsonModelField.h"
 #include "JsonHelper.h"
 #include "JsonPr.h"
 #include "PublicMacro.h"
 
 using namespace JsonHelper;
-using namespace JsonKey;
+using namespace JsonModelField;
 
 class JsonHelperTest : public PlainTestSuite {
   Q_OBJECT

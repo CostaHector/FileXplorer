@@ -25,6 +25,18 @@ public:
   FileOperationTest()
     : PlainTestSuite{} {}
 private slots:
+  void ACMD_MemberFunction_Ok() {
+    ACMD mkPathCmd = ACMD::GetInstMKPATH("/home", "/home/to/path");
+    ACMD mvCmd = ACMD::GetInstMV("/home", "a.mp4", "/home/to/path");
+    mkPathCmd.swap(mvCmd);
+    mkPathCmd.swap(mvCmd);
+    QCOMPARE(mkPathCmd.op, FILE_OPERATOR_E::MKPATH);
+    QCOMPARE(mkPathCmd.parms, (QStringList{"/home", "/home/to/path"}));
+
+    QCOMPARE(mvCmd.op, FILE_OPERATOR_E::MV);
+    QCOMPARE(mvCmd.parms, (QStringList{"/home", "a.mp4", "/home/to/path"}));
+  }
+
   void test_file_remove_not_recoverable() {
     TDir dir;
     QVERIFY(dir.touch("a.txt", "contents in a.txt"));

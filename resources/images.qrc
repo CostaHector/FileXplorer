@@ -33,6 +33,11 @@
         <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
         <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
         <file alias="UPDATE_JSON">Media/UPDATE_JSON.svg</file>
+        <file alias="VIDEO_ARCHIVE">Media/VIDEO_ARCHIVE.svg</file>
+        <file alias="ARCHIVE_ARCHIVAL">Media/ARCHIVE_ARCHIVAL.svg</file>
+        <file alias="ARCHIVE_NORMAL">Media/ARCHIVE_NORMAL.svg</file>
+        <file alias="ARCHIVE_CASUALS">Media/ARCHIVE_CASUALS.svg</file>
+        <file alias="ARCHIVE_DISPOSABLE">Media/ARCHIVE_DISPOSABLE.svg</file>
         <file alias="DISABLE_IMAGE_DECORATION">Media/DISABLE_IMAGE_DECORATION.svg</file>
         <file alias="CLEAR_SCN_FILES">Media/CLEAR_SCN_FILES.svg</file>
         <file alias="ORDER_ASCENDING">Media/ORDER_ASCENDING.svg</file>
@@ -279,6 +284,8 @@
         <file alias="ANALYSE_AI_MEDIA_TABLES">Database/ANALYSE_AI_MEDIA_TABLES.svg</file>
         <file alias="AUDIT_AI_MEDIA_DUP">Database/AUDIT_AI_MEDIA_DUP.svg</file>
         <file alias="INSERT_INTO_TABLE">Database/INSERT_INTO_TABLE.svg</file>
+        <file alias="SCAN_JSONS">Database/SCAN_JSONS.svg</file>
+        <file alias="SCAN_VIDEOS">Database/SCAN_VIDEOS.svg</file>
         <file alias="DELETE_FROM_TABLE">Database/DELETE_FROM_TABLE.svg</file>
         <file alias="WHERE_CLAUSE_HISTORY_REMOVED">Database/WHERE_CLAUSE_HISTORY_REMOVED.svg</file>
         <file alias="WHERE_CLAUSE_HISTORY_CLEAR">Database/WHERE_CLAUSE_HISTORY_CLEAR.png</file>

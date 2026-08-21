@@ -92,7 +92,7 @@ struct ACMD {
     return *this;
   }
   void swap(ACMD& rhs) noexcept {
-    op = rhs.op;
+    std::swap(op, rhs.op);
     parms.swap(rhs.parms);
   }
   inline bool operator==(const ACMD& rhs) const noexcept { return op == rhs.op && parms == rhs.parms; }

@@ -6,7 +6,7 @@
 #include "CastAkasManager.h"
 
 void QuickWhereClauseDialogCast::CreatePrivateWidget() {
-  using namespace PERFORMER_DB_HEADER_KEY;
+  using namespace CastDbModelField;
   m_Name = new (std::nothrow) ColumnFilterLineEdit{ENUM_2_STR(Name), this}; // shared
   CHECK_NULLPTR_RETURN_VOID(m_Name);
   m_Name->setToolTip(                     //

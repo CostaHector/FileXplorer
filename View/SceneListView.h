@@ -5,12 +5,13 @@
 #include "SceneSortProxyModel.h"
 #include "ScenePageControl.h"
 #include "SceneStyleDelegate.h"
+#include "VideoTierTool.h"
 
 class ScenesListModel;
 
 class SceneListView : public CustomListView {
   Q_OBJECT
- public:
+public:
   explicit SceneListView(ScenesListModel* sceneModel,
                          SceneSortProxyModel* sceneSortProxyModel,
                          ScenePageControl* scenePageControl,
@@ -26,23 +27,29 @@ class SceneListView : public CustomListView {
   bool onOpenCorrespondingFolder();
   bool onClickEvent(const QModelIndex& idx);
 
- signals:
+signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
   void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
+  void requestStopMediaPlay();
 
- public slots:
+public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
   int onRenameSceneAndRelated();
   int onRenameSceneAndRelatedInsert();
   int onRenameSceneAndRelatedNumerize();
   int onRecycleSceneAndRelated();
   void toggleSortRequestImplementer(bool bPageByPage);
+  bool onArchiveActionTriggered(const QAction* archivedToAct);
+  int onArchiveTo(int videoTier);
+  int onArchiveToByMovieRate();
 
- protected:
+protected:
   void mousePressEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* e) override;
 
- private:
+private:
   void initExclusivePreferenceSetting() override;
+  int ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]);
 
   QModelIndexList selectedRowsSource() const;
 

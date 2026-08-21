@@ -1,7 +1,7 @@
 #include "SqlRecordTestHelper.h"
 #include "CastPsonFileHelper.h"
 #include "PublicMacro.h"
-#include "TableFields.h"
+#include "MovieDBModelField.h"
 #include "FdBasedDb.h"
 #include <QSqlField>
 #include <QVariant>
@@ -10,7 +10,7 @@
 namespace SqlRecordTestHelper {
 
 QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const QString& imgs, const QString& vids) {
-  using namespace PERFORMER_DB_HEADER_KEY;
+  using namespace CastDbModelField;
   QSqlRecord rec;
   rec.append(QSqlField(ENUM_2_STR(Name), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Rate), QVariant::Int));
@@ -43,7 +43,7 @@ bool CheckRecordIfEqual(const QSqlRecord& actualRec,
                         PSON_MODEL_FIELD_MAPPING
 #undef PSON_KEY_ITEM
                         bool fullMatch) {
-  using namespace PERFORMER_DB_HEADER_KEY;
+  using namespace CastDbModelField;
 
   const QVariantHash expectedValues {CastPsonFileHelper::PerformerJsonJoiner(
 #define PSON_KEY_ITEM(enu, enumVal, defaultValue, sqlRecordToValueFunc, tblFieldDefinition) _##enu,
@@ -84,7 +84,7 @@ bool CheckRecordIfEqual(const QSqlRecord& actualRec,
 }
 
 QSqlRecord GetAMovieRecordUsedInBrowser(const QString& prePathLeft, const QString& prePathRight, const QString& name, qint64 sz) {
-  using namespace MOVIE_TABLE;
+  using namespace MovieDBModelField;
   QSqlRecord rec;
   rec.append(QSqlField(ENUM_2_STR(PrePathLeft), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(PrePathRight), QVariant::String));
