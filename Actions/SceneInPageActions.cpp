@@ -24,7 +24,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
 
   _UPDATE_SCN = new (std::nothrow) QAction(QIcon(":img/UPDATE_SCN_FILE"), tr("Update scn"), this);
   CHECK_NULLPTR_RETURN_VOID(_UPDATE_SCN);
-  _UPDATE_SCN->setShortcut(QKeySequence(Qt::Key_F5));
+  _UPDATE_SCN->setShortcut(QKeySequence(Qt::KeyboardModifier::ShiftModifier | Qt::Key_F5));
   _UPDATE_SCN->setShortcutVisibleInContextMenu(true);
   _UPDATE_SCN->setToolTip(QString("<b>%1 (%2)</b><br/>"
                                   "Generate scene cache files (.scn) from JSON metadata files. "
