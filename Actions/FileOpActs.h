@@ -82,7 +82,13 @@ Q_OBJECT
 
   QAction* _FORCE_RESEARCH{nullptr};
 
+signals:
+  void unlockOccupiedFiles();
+
  private:
+  void subscribe();
+
+  QAction* _UNLOCK_OCCUPIED_FILES{nullptr};
   EnumIntAction<FileStructurePolicy::FileStuctureModeE> mFileStructureIntAction;
 };
 

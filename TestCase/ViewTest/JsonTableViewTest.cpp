@@ -11,7 +11,6 @@
 #include "JsonActions.h"
 #include "TDir.h"
 #include "UserInteractiveMock.h"
-#include "BatchRenameBy.h"
 
 #include <QLineEdit>
 #include <QPlainTextEdit>
@@ -99,7 +98,6 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonView.onSaveCurrentChanges(), 0);  // nothing selected
     QCOMPARE(jsonView.onSyncNameField(), 0);
     QCOMPARE(jsonView.onExportCastStudioToDictonary(), 0);
-    QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
     QCOMPARE(jsonView.onSetStudio(), 0);
     QCOMPARE(jsonView.onInitCastAndStudio(), 0);
     QCOMPARE(jsonView.onHintCastAndStudio(), 0);
@@ -513,42 +511,6 @@ class JsonTableViewTest : public PlainTestSuite {
 
     STUDIO_MGR_DATA_T expectStudios{{"marvel", "Marvel"}};
     QCOMPARE(studioInst.ProStudioMap(), expectStudios);
-  }
-
-  void onRenameJsonAndRelated_ok() {
-    QVERIFY(tDir.exists("a.json"));
-    QVERIFY(tDir.exists("a.mp4"));
-
-    QSortFilterProxyModel jsonProxyModel;
-    JsonTableModel jsonModel;
-    JsonTableView jsonView{&jsonModel, &jsonProxyModel};
-    QCOMPARE(jsonView.ReadADirectory(workPath), 2);
-    QCOMPARE(jsonModel.rowCount(), 2);
-
-    // rename "a.json" to "Super Hero - Captain America.json".
-    // will also rename images/videos/and other files
-    // whose base name match pattern "a", or "a \d{1,3}" or "a | \d{1,3}"
-    jsonView.selectionModel()->clear();
-    QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
-
-    QString expectWorkPath{workPath};
-    QStringList expectSelectedNames{"a.json", "a.mp4"};
-    QString expectDefOldName{"a"};
-    QString expectDefNewName{"a"};
-    bool expectDisableOldNameEdit{true};
-
-    MOCKER(BatchRenameBy::ReplaceQueryAndConfirm)
-        .expects(exactly(2))  //
-        .with(eq(expectWorkPath), eq(expectSelectedNames), eq(expectDefOldName), eq(expectDefNewName), eq(expectDisableOldNameEdit))
-        .will(returnValue(BatchRenameBy::RnmResult::SKIP))  //
-        .then(returnValue(BatchRenameBy::RnmResult::ALL_SUCCEED));
-    jsonView.selectRow(0);
-    QCOMPARE(jsonView.onRenameJsonAndRelated(), 0);
-    QCOMPARE(jsonView.onRenameJsonAndRelated(), 2);  // two file get renamed
-    QCOMPARE(jsonModel.rowCount(), 2 - 1);           // 1 json get remove from table
-
-    jsonModel.forceReloadPath();
-    QCOMPARE(jsonModel.rowCount(), 2 - 1 + 1);  //
   }
 
   void onFixSelectionRecordContents_ok() {

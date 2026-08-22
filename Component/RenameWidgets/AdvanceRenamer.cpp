@@ -10,6 +10,7 @@
 #include "NotificatorMacro.h"
 #include "RenameNamesUnique.h"
 #include "CommandsPreview.h"
+#include "FileOpActs.h"
 
 #include <QDataStream>
 #include <QScrollBar>
@@ -226,6 +227,7 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
     m_commandsPreview->setPlainText(cmds);
     return true;
   }
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
   if (!UndoRedo::GetInst().Do(reversedcmds)) {
     LOG_ERR_NP("Batch commands partially failed", "See details in log");
     return false;

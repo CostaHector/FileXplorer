@@ -153,6 +153,7 @@
         <file alias="MOVE_TO_TRASH_BIN">FileOperation/MOVE_TO_TRASH_BIN.svg</file>
         <file alias="MOVE_TO_TRASH_BIN_INCLUDE_RELATED">FileOperation/MOVE_TO_TRASH_BIN_INCLUDE_RELATED.svg</file>
         <file alias="DELETE_ITEMS_PERMANENTLY">FileOperation/DELETE_ITEMS_PERMANENTLY.svg</file>
+        <file alias="_UNLOCK_OCCUPIED_FILES">FileOperation/_UNLOCK_OCCUPIED_FILES.svg</file>
 
         <!--LeftSideToolBarIcons here-->
         <file alias="DISKS">LeftSideToolBarIcons/DISKS.svg</file>

@@ -6,6 +6,7 @@
 #include "FileTool.h"
 #include "RateHelper.h"
 #include "RateActions.h"
+#include "FileOpActs.h"
 #include "VideoPlayerActions.h"
 #include "PathTool.h"
 #include "VideoPlayTool.h"
@@ -135,6 +136,8 @@ void BasicVideoView::subscribe() {
   connect(rateActions, &RateActions::RateMovieRecursivelyReq, this, &BasicVideoView::rateAllVideoSameLevelAsCurrentVideo);
   connect(rateActions, &RateActions::AdjustRateMovieReq, this, &BasicVideoView::adjustRateCurrentVideo);
   connect(rateActions, &RateActions::AdjustRateMovieRecursivelyReq, this, &BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo);
+
+  connect(&FileOpActs::GetInst(), &FileOpActs::unlockOccupiedFiles, this, &BasicVideoView::onStopPlaying);
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {

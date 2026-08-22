@@ -38,6 +38,7 @@ typedef int ViewTypeMaskInt;
 namespace ViewTypeUtils {
 constexpr ViewTypeMaskInt FS_VIEWS_MASK {(1 << (int)ViewType::LIST) | (1 << (int)ViewType::TABLE) | (1 << (int)ViewType::TREE)};
 constexpr ViewTypeMaskInt VIEWS_USE_FILE_SYSTEM_SEARCHBAR { FS_VIEWS_MASK | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::JSON)};
+constexpr ViewTypeMaskInt RENAME_MOVE_RECYCLE_MASK { FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::JSON)};
 constexpr ViewTypeMaskInt CHROME_SEARCH_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SCENE) | (1 << (int)ViewType::CAST) | (1 << (int)ViewType::JSON)};
 constexpr ViewTypeMaskInt OPEN_IN_TERMINAL_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH) | (1 << (int)ViewType::CAST)};
 constexpr ViewTypeMaskInt DECOMPRESS_MASK {FS_VIEWS_MASK | (1 << (int)ViewType::SEARCH)};
@@ -55,6 +56,10 @@ inline bool isFSView(ViewType vt) {
 
 inline bool IsUseFileSystemSearchBar(ViewType vt) { // share the same filesystem search bar
   return IsMatch(vt, ViewTypeUtils::VIEWS_USE_FILE_SYSTEM_SEARCHBAR);
+}
+
+inline bool IsRenameMoveRecycleAvail(ViewType vt) {
+  return IsMatch(vt, ViewTypeUtils::RENAME_MOVE_RECYCLE_MASK);
 }
 
 inline bool IsChromeSearchAvail(ViewType vt) {

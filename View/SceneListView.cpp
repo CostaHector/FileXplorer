@@ -11,9 +11,11 @@
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "RecycleCfmDlg.h"
-#include "InputDialogHelper.h"
 #include "ViewHelper.h"
 #include "VideoTierTool.h"
+#include "FileOpActs.h"
+#include "RenameActions.h"
+#include "InputDialogHelper.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -42,42 +44,14 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
   CHECK_NULLPTR_RETURN_VOID(mAlignDelegate)
   setItemDelegate(mAlignDelegate);
 
-  _RENAME_SCENE_RELATED_FILES_REPLACE = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related(replace)"), this);
-  _RENAME_SCENE_RELATED_FILES_REPLACE->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_REPLACE->setToolTip(QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by replacing a substring in the file names.") //
-                                                      .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->text())
-                                                      .arg(_RENAME_SCENE_RELATED_FILES_REPLACE->shortcut().toString()));
-
-  _RENAME_SCENE_RELATED_FILES_INSERT = new (std::nothrow) QAction(QIcon(":img/NAME_STR_INSERTER_PATH"), tr("Rename related(Insert)"), this);
-  _RENAME_SCENE_RELATED_FILES_INSERT->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_INSERT->setToolTip(QString("<b>%1 (%2)</b><br/>Rename selected json file(s) and associated files by inserting a string into the file names.") //
-                                                     .arg(_RENAME_SCENE_RELATED_FILES_INSERT->text())
-                                                     .arg(_RENAME_SCENE_RELATED_FILES_INSERT->shortcut().toString()));
-
-  _RENAME_SCENE_RELATED_FILES_NUMERIZE = new (std::nothrow) QAction(QIcon(":img/NAME_STR_NUMERIZER_PATH"), tr("Rename (ith)"), this);
-  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setShortcutVisibleInContextMenu(true);
-  _RENAME_SCENE_RELATED_FILES_NUMERIZE->setToolTip(
-      QString("<b>%1 (%2)</b><br/> Numerizer each file in a sequence.").arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->text()).arg(_RENAME_SCENE_RELATED_FILES_NUMERIZE->shortcut().toString()));
-
-  _RECYCLE_SCENE_RELATED_FILES = new (std::nothrow) QAction{QIcon{":img/MOVE_TO_TRASH_BIN"}, tr("Recycle related files"), this};
-  CHECK_NULLPTR_RETURN_VOID(_RECYCLE_SCENE_RELATED_FILES)
-  _RECYCLE_SCENE_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Move selected scene related file(s) name to trash bin") //
-                                               .arg(_RECYCLE_SCENE_RELATED_FILES->text())
-                                               .arg(_RECYCLE_SCENE_RELATED_FILES->shortcut().toString()));
-
   _OPEN_CORRESPONDING_FOLDER = new (std::nothrow) QAction{QIcon{":img/SYSTEM_APPLICATION_VIDEO"}, tr("Play this folder"), this};
   CHECK_NULLPTR_RETURN_VOID(_OPEN_CORRESPONDING_FOLDER)
 
   auto& inst = SceneInPageActions::GetInst();
-  QList<QAction*> exclusiveActions{
-      inst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS,
-      _RENAME_SCENE_RELATED_FILES_REPLACE,  //
-      _RENAME_SCENE_RELATED_FILES_INSERT,   //
-      _RENAME_SCENE_RELATED_FILES_NUMERIZE, //
-  };
+  QList<QAction*> exclusiveActions;
+  exclusiveActions.push_back(inst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS);
   exclusiveActions += inst._ARCHIVE_AG->actions();
   exclusiveActions.push_back(inst._ARCHIVE_BY_MOVIE_SCORE);
-  exclusiveActions.push_back(_RECYCLE_SCENE_RELATED_FILES);
   exclusiveActions.push_back(_OPEN_CORRESPONDING_FOLDER);
 
   PushFrontExclusiveActions(exclusiveActions);
@@ -85,6 +59,7 @@ SceneListView::SceneListView(ScenesListModel* sceneModel,
 
   subscribe();
 
+  // _sceneModel->AfterJsonFilesNameRenamed(srcIndexes)
   // setMouseTracking(true);
   // setAttribute(Qt::WA_Hover, true);
   // viewport()->setMouseTracking(true);
@@ -110,12 +85,10 @@ bool SceneListView::onOpenCorrespondingFolder() {
 }
 
 void SceneListView::subscribe() {
+  addActions(g_renameAg().RENAME_RIBBONS->actions());
+
   connect(_OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
-  connect(_RENAME_SCENE_RELATED_FILES_REPLACE, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelated);
-  connect(_RENAME_SCENE_RELATED_FILES_INSERT, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedInsert);
-  connect(_RENAME_SCENE_RELATED_FILES_NUMERIZE, &QAction::triggered, this, &SceneListView::onRenameSceneAndRelatedNumerize);
-  connect(_RECYCLE_SCENE_RELATED_FILES, &QAction::triggered, this, &SceneListView::onRecycleSceneAndRelated);
 
   connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
   connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
@@ -314,87 +287,6 @@ void SceneListView::onCellVisualUpdateRequested(const QModelIndex& ind) {
   update(ind);
 }
 
-int SceneListView::onRenameSceneAndRelated() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("nothing selected", "skip rename");
-    return 0;
-  }
-  emit requestStopMediaPlay();
-  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const QModelIndexList& indexes{selectedRowsSource()};
-  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
-  const int relatedFilesCnt{BatchRenameBy::ReplaceBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
-  if (relatedFilesCnt <= 0) {
-    return 0;
-  }
-  const int removeRowCnt{_sceneModel->AfterJsonFilesNameRenamed(indexes)};
-  return relatedFilesCnt;
-}
-
-int SceneListView::onRenameSceneAndRelatedInsert() {
-  const QModelIndexList& srcIndexes{selectedRowsSource()};
-  if (srcIndexes.isEmpty()) {
-    LOG_INFO_NP("Skip rename(insert)", "no row selected");
-    return 0;
-  }
-  emit requestStopMediaPlay();
-  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(srcIndexes)};
-  const int relatedFilesCnt{BatchRenameBy::InsertBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
-  if (relatedFilesCnt <= 0) {
-    return 0;
-  }
-
-  const int removeRowCnt{_sceneModel->AfterJsonFilesNameRenamed(srcIndexes)};
-  return relatedFilesCnt;
-}
-
-int SceneListView::onRenameSceneAndRelatedNumerize() {
-  const QModelIndexList& srcIndexes{selectedRowsSource()};
-  if (srcIndexes.isEmpty()) {
-    LOG_INFO_NP("Skip rename(numerize)", "no row selected");
-    return 0;
-  }
-  emit requestStopMediaPlay();
-  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(srcIndexes)};
-  const int relatedFilesCnt{BatchRenameBy::NumerizerBySpecifiedJson(jsonLocatedInPath, jsonFileNames)};
-  if (relatedFilesCnt <= 0) {
-    return 0;
-  }
-
-  const int removeRowCnt{_sceneModel->AfterJsonFilesNameRenamed(srcIndexes)};
-  return relatedFilesCnt;
-}
-
-int SceneListView::onRecycleSceneAndRelated() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("nothing selected", "skip recycle");
-    return 0;
-  }
-  emit requestStopMediaPlay();
-  const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const QModelIndexList& indexes{selectedRowsSource()};
-  const QStringList& jsonFileNames{_sceneModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
-  const int relatedFilesCnt{filesNeedRecycle.size()};
-
-  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
-    return 0;
-  }
-
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(relatedFilesCnt);
-  for (const auto& nm : filesNeedRecycle) {
-    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
-  }
-  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
-  const int removeRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
-  LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
-  return relatedFilesCnt;
-}
-
 int SceneListView::onArchiveActionTriggered(const QAction* archivedToAct) {
   if (archivedToAct == nullptr) {
     return -1;
@@ -487,7 +379,7 @@ int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringLi
     return 0;
   }
   // "Avoid file blocking; stop playback before archiving."
-  emit requestStopMediaPlay();
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
   bool bAllSucceed = UndoRedo::GetInst().Do(archiveCmds);
   const int archiveRowCnt = _sceneModel->AfterJsonFilesNameRenamed(indexes);
   LOG_OE_P(bAllSucceed, "Archive", "Archive [%d] json/img/video items, rows[%d]", allFilesNeedArchive.size(), archiveRowCnt);

@@ -25,6 +25,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   QString absolutePath(const QModelIndex& index) const;
   QString fullInfo(const QModelIndex& index) const;
   QStringList rel2fileNames(const QModelIndexList& indexes) const;
+  QStringList relativePath2RelatedFiles(const QModelIndexList& indexes) const;
 
   int SetStudio(const QModelIndexList& rowIndexes, const QString& studio);
   int SetCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);

@@ -610,12 +610,33 @@ void FileXplorerEvent::subscribe() {
   }
 }
 
+struct AutoSwitchPath {
+  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath)//
+    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && fsm != nullptr && filesCnt > 100},
+    mFsm{fsm},
+    mRootPath{recoverPath}  {
+    if (mIsNeedSwitchAway) {
+      mFsm->setRootPath("");
+    }
+  }
+  ~AutoSwitchPath() {
+    if (mIsNeedSwitchAway && mFsm != nullptr) {
+      mFsm->setRootPath(mRootPath);
+    }
+  }
+private:
+  bool mIsNeedSwitchAway{false};
+  FileSystemModel* mFsm{nullptr};
+  QString mRootPath;
+};
+
 void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
-  if (!_contentPane->IsCurFSView()) {
-    LOG_WARN_NP("[Rename] Current view not support rename", _contentPane->GetCurViewName());
+  ViewTypeTool::ViewType vt = _contentPane->GetVt();
+  if (!ViewTypeTool::IsRenameMoveRecycleAvail(vt)) {
+    LOG_WARN_NP("[Abort] Current view not support rename", _contentPane->GetCurViewName());
     return;
   }
-  const QString& currentPath{_fileSysModel->rootPath()};
+  const QString& currentPath{_contentPane->getRootPath()};
   if (PathTool::isLinuxRootOrWinEmpty(currentPath)) {
     LOG_WARN_NP("[Abort] Path root or empty", currentPath);
     return;
@@ -627,18 +648,12 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     return;
   }
 
-  const bool bPathSwitchedAwayFirst{preNames.size() > 100};
-  if (bPathSwitchedAwayFirst) {
-    _fileSysModel->setRootPath(""); // switch to another path
-  }
+  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath};
   renameWid.init();
   renameWid.setModal(true);
   renameWid.InitTextEditContent(currentPath, preNames);
   if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
-  }
-  if (bPathSwitchedAwayFirst) {
-    _fileSysModel->setRootPath(currentPath); // switch to another path
   }
 }
 
@@ -769,7 +784,7 @@ bool FileXplorerEvent::on_deCompress() {
     ArchiveFilesReader af;
     bool bReadResult = af.ReadAchiveFile(filePath);
     if (!bReadResult) {
-      LOG_ERR_P("Cannot read this qz file[%s]", qPrintable(filePath));
+      LOG_ERR_NP("Cannot read this qz file", qPrintable(filePath));
       return false;
     }
     const QString& decompressedTo = QFileInfo(filePath).absolutePath();
@@ -827,15 +842,7 @@ bool FileXplorerEvent::on_RedunImageFinder(bool bChecked) {
 
 bool FileXplorerEvent::on_moveToTrashBin() {
   ViewTypeTool::ViewType vt = _contentPane->GetVt();
-  if (vt == ViewTypeTool::ViewType::SCENE) {
-    emit _contentPane->m_sceneTableView->onRecycleSceneAndRelated();
-    return true;
-  } else if (vt == ViewTypeTool::ViewType::JSON) {
-    emit _contentPane->m_jsonTableView->onRecycleJsonAndRelated();
-    return true;
-  }
-
-  if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
+  if (!ViewTypeTool::IsRenameMoveRecycleAvail(vt)) {
     LOG_WARN_NP("[Abort] Current view not support MoveToTrashbin", _contentPane->GetCurViewName());
     return false;
   }
@@ -845,9 +852,10 @@ bool FileXplorerEvent::on_moveToTrashBin() {
     return false;
   }
 
+  std::function<int()> afterOperationUpdateModelCallback;
   QStringList prepaths, names;
-  std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(true);
-  if (names.size() <= 0) {
+  std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(&afterOperationUpdateModelCallback);
+  if (names.isEmpty()) {
     LOG_INFO_NP("[Skip]", "Nothing selected");
     return true;
   }
@@ -862,9 +870,13 @@ bool FileXplorerEvent::on_moveToTrashBin() {
   for (int i = 0; i < prepaths.size(); ++i) {
     removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
   }
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
   if (!UndoRedo::GetInst().Do(removeCmds)) {
     LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
     return false;
+  }
+  if (afterOperationUpdateModelCallback) {
+    afterOperationUpdateModelCallback();
   }
   LOG_OK_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
   return true;
@@ -907,7 +919,7 @@ bool FileXplorerEvent::on_deletePermanently() {
     LOG_INFO_P("[Cancel] User cancel delete", "%d item(s) no change", cmds.size());
     return true;
   }
-
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
   if (!UndoRedo::GetInst().Do(cmds)) {
     LOG_ERR_P("[Failed] Partial item(s) deleted failed", "%d cmds", cmds.size());
     return false;

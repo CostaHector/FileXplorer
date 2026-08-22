@@ -26,18 +26,14 @@ public:
   void subscribe();
   bool onOpenCorrespondingFolder();
   bool onClickEvent(const QModelIndex& idx);
+  QModelIndexList selectedRowsSource() const;
 
 signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
   void sceneGridClicked(const QModelIndex& ind, const QRect& vRect, const QPoint& clickedPnt);
-  void requestStopMediaPlay();
 
 public slots:
   void onCellVisualUpdateRequested(const QModelIndex& ind);
-  int onRenameSceneAndRelated();
-  int onRenameSceneAndRelatedInsert();
-  int onRenameSceneAndRelatedNumerize();
-  int onRecycleSceneAndRelated();
   void toggleSortRequestImplementer(bool bPageByPage);
   int onArchiveActionTriggered(const QAction* archivedToAct);
   int onArchiveTo(int videoTier);
@@ -51,12 +47,6 @@ private:
   void initExclusivePreferenceSetting() override;
   int ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]);
 
-  QModelIndexList selectedRowsSource() const;
-
-  QAction* _RENAME_SCENE_RELATED_FILES_REPLACE{nullptr};
-  QAction* _RENAME_SCENE_RELATED_FILES_INSERT{nullptr};
-  QAction* _RENAME_SCENE_RELATED_FILES_NUMERIZE{nullptr};
-  QAction* _RECYCLE_SCENE_RELATED_FILES{nullptr};
   QAction* _OPEN_CORRESPONDING_FOLDER{nullptr};
 
   ScenesListModel* _sceneModel{nullptr};

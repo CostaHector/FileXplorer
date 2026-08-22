@@ -5,6 +5,7 @@
 #include "RateHelper.h"
 #include "ImageTool.h"
 #include "PathTool.h"
+#include "BatchRenameBy.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -237,6 +238,11 @@ QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const
     relativePaths2FileName.push_back(PathTool::relativePath(fullPath, N));
   }
   return relativePaths2FileName;
+}
+
+QStringList ScenesListModel::relativePath2RelatedFiles(const QModelIndexList& indexes) const {
+  const QStringList& jsonFileNames{rel2fileNames(indexes)};
+  return BatchRenameBy::GetFilesNeedProcess(rootPath(), jsonFileNames);
 }
 
 std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const {

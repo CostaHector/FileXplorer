@@ -20,7 +20,6 @@ class JsonTableView : public CustomTableView {
   int onSaveCurrentChanges();
   int onSyncNameField();
   int onExportCastStudioToDictonary();
-  int onRenameJsonAndRelated();
   int onSetStudio();
   int onInitCastAndStudio();
   int onHintCastAndStudio();
@@ -44,9 +43,6 @@ class JsonTableView : public CustomTableView {
  signals:
   void currentJsonSelectedChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);
 
- public slots:
-  int onRecycleJsonAndRelated();
-
  protected:
   void keyPressEvent(QKeyEvent* e) override;
 
@@ -57,7 +53,6 @@ class JsonTableView : public CustomTableView {
   QStringList m_candidatesLst[(int)JsonModelField::FIELD_OP_TYPE::BUTT];
   JsonTableModel* _JsonModel{nullptr};
   QSortFilterProxyModel* _JsonProxyModel{nullptr};
-  QAction* _RECYCLE_JSON_RELATED_FILES{nullptr};
 
 #ifdef RUNNING_UNIT_TESTS
   QWidget* pWidgetInCellMock{nullptr};
