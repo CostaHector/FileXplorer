@@ -55,9 +55,6 @@ class ViewsStackedWidget : public QStackedWidget {
     if (mDoubleClickedConnectConn) {
       ViewsStackedWidget::disconnect(mDoubleClickedConnectConn);
     }
-    if (mStopMediaPlayConn) {
-      ViewsStackedWidget::disconnect(mStopMediaPlayConn);
-    }
   }
 
   void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
@@ -84,10 +81,10 @@ class ViewsStackedWidget : public QStackedWidget {
   QString getRootPath() const;
   QString getFilePath(const QModelIndex& ind) const;
   QModelIndexList getSelectedRows() const;
-  QStringList getFileNames() const;
+  QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
   QStringList getFilePaths() const;
   QStringList getFilePrepaths() const;
-  std::pair<QStringList, QStringList> getFilePrepathsAndName(const bool isSearchRecycle = false) const;
+  std::pair<QStringList, QStringList> getFilePrepathsAndName(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
   MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   QStringList getFullRecords() const;
 
@@ -145,7 +142,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
  private:
   QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
-  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn, mStopMediaPlayConn;
+  QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn;
   ViewTypeTool::ViewType mVt{ViewTypeTool::DEFAULT_VIEW_TYPE};
 };
 

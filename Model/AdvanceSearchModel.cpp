@@ -175,8 +175,9 @@ void AdvanceSearchModel::clearDisables() {
   }
 }
 
-void AdvanceSearchModel::RecycleSomething(const QSet<QModelIndex>& recycleIndexes) {
+int AdvanceSearchModel::RecycleSomething(const QSet<QModelIndex>& recycleIndexes) {
   m_recycleSet += recycleIndexes;
+  return recycleIndexes.size();
 }
 
 void AdvanceSearchModel::ClearRecycle() {

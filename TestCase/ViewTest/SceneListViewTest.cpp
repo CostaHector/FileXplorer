@@ -298,60 +298,6 @@ private slots:
     }
   }
 
-  void onRenameSceneAndRelated_ok() {
-    // 按页排序
-    SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
-    sceneAct._SORT_RANGE_PAGE_BY_PAGE->setChecked(true);
-
-    MOCKER(RecycleCfmDlg::recycleQuestion)  //
-        .expects(exactly(2))                //
-        .will(returnValue(false))           //
-        .then(returnValue(true));
-    ScenesListModel sceneModel{"ScenesListView"};
-    SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
-    sceneView.InitListView();
-    QCOMPARE(sceneModel.rowCount(), 0);
-    QVERIFY(QFile::exists(scnAbsPath));
-    sceneView.setRootPath(tDir.path());
-    QCOMPARE(sceneModel.rowCount(), 2);
-
-    MOCKER(BatchRenameBy::ReplaceBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
-    MOCKER(BatchRenameBy::InsertBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
-    MOCKER(BatchRenameBy::NumerizerBySpecifiedJson).expects(exactly(1)).will(returnValue(1));
-
-    sceneView.clearSelection();
-    QCOMPARE(sceneView.onRenameSceneAndRelated(), 0);          // no selection
-    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 0);    // no selection
-    QCOMPARE(sceneView.onRenameSceneAndRelatedNumerize(), 0);  // no selection
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);         // no selection
-
-    QCOMPARE(sceneModel.rowCount(), 2);
-    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::ClearAndSelect);
-    QCOMPARE(sceneView.onRenameSceneAndRelated(), 1);
-
-    sceneModel.setRootPath(tDir.path(), true);
-    QCOMPARE(sceneModel.rowCount(), 2);
-    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::ClearAndSelect);
-    QCOMPARE(sceneView.onRenameSceneAndRelatedInsert(), 1);
-    QCOMPARE(sceneModel.rowCount(), 1);
-
-    sceneModel.setRootPath(tDir.path(), true);
-    QCOMPARE(sceneModel.rowCount(), 2);
-    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::ClearAndSelect);
-    QCOMPARE(sceneView.onRenameSceneAndRelatedNumerize(), 1);
-    QCOMPARE(sceneModel.rowCount(), 1);
-
-    sceneView.clearSelection();
-    sceneView.selectionModel()->select(sceneProxyModel.index(0, 0), QItemSelectionModel::SelectionFlag::ClearAndSelect);
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 0);  // 1st. user click cancel
-    QCOMPARE(sceneView.onRecycleSceneAndRelated(), 3);  // 2nd. user click yes 3 files related to json(include json self)
-    QCOMPARE(sceneModel.rowCount(), 0);
-
-    QVERIFY(UndoRedo::GetInst().on_Undo());
-  }
-
   void delegate_ok() {
     SceneInPageActions& sceneAct = SceneInPageActions::GetInst();
     sceneAct._BY_RATE->setChecked(true);

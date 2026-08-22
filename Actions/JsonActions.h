@@ -21,9 +21,6 @@ public:
   QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD{nullptr};
   QAction* _LOWER_ALL_WORDS{nullptr};
 
-  // **File Operation**
-  QAction* _RENAME_JSON_AND_RELATED_FILES{nullptr};
-
   // **Studio/Cast/Tags Field Operation**
   QAction* _INIT_STUDIO_CAST_FIELD{nullptr};
   QAction* _INFER_CAST_STUDIO{nullptr};

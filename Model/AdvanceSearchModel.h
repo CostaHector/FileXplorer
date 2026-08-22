@@ -70,7 +70,7 @@ public:
   void removeDisable(const QModelIndex& ind);
   void clearDisables();
 
-  void RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
+  int RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
   void ClearRecycle();
 
   QString absolutePath(const QModelIndex& curIndex) const {  //

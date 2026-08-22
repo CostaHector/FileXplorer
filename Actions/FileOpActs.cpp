@@ -84,6 +84,14 @@ FileOpActs::FileOpActs(QObject* parent)
   FolderFileCategoryProcess();
 
   _FORCE_RESEARCH = new (std::nothrow) QAction{QIcon{":img/FORCE_RESEARCH"}, tr("Force Research"), this};
+
+  _UNLOCK_OCCUPIED_FILES = new (std::nothrow) QAction{QIcon{":img/_UNLOCK_OCCUPIED_FILES"}, tr("Unlock Occupied Files"), this};
+  _UNLOCK_OCCUPIED_FILES->setToolTip("Release occupied files and folders to allow renaming, moving, recycling, or deleting them.");
+  subscribe();
+}
+
+void FileOpActs::subscribe() {
+  connect(_UNLOCK_OCCUPIED_FILES, &QAction::triggered, this, &FileOpActs::unlockOccupiedFiles);
 }
 
 QActionGroup* FileOpActs::GetDeleteActions() {

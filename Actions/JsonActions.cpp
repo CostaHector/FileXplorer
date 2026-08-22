@@ -48,12 +48,6 @@ JsonActions::JsonActions(QObject* parent) //
                                    .arg(_LOWER_ALL_WORDS->text())                   //
                                    .arg(_LOWER_ALL_WORDS->shortcut().toString()));
 
-  // **File Operation**
-  _RENAME_JSON_AND_RELATED_FILES = new (std::nothrow) QAction(QIcon(":img/RENAME"), tr("Rename related files"), this);
-  _RENAME_JSON_AND_RELATED_FILES->setToolTip(QString("<b>%1 (%2)</b><br/> Rename selected json file(s) and its related file(s) name") //
-                                                 .arg(_RENAME_JSON_AND_RELATED_FILES->text())
-                                                 .arg(_RENAME_JSON_AND_RELATED_FILES->shortcut().toString()));
-
   // **Studio/Cast/Tags Field Operation**
   _INIT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST"), tr("Init Cast/Studio"), this);
   _INIT_STUDIO_CAST_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/>Init Cast/Studio Fields if empty.") //

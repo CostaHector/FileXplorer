@@ -755,10 +755,10 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QModelIndex jsonNameInd{m_fsPanel.m_jsonProxyModel->index(0, JsonModelField::Name)};
       QCOMPARE(jsonNameInd.data(Qt::DisplayRole).toString(), "Kaka");
       const QModelIndexList selectedRowsIndexes{jsonInd};
-      const QStringList filePrepathsJson{lvl1Path};
-      const QStringList fileNamesJson{jsonName};
+      const QStringList filePrepathsJson{lvl1Path, lvl1Path, lvl1Path, lvl1Path};
+      const QStringList fileNamesRelatedToJson{jpgName, jsonName, mp4Name, psonName};
       const QStringList filePathsJson{jsonFileAbsPath};
-      const std::pair<QStringList, QStringList> expectPreAndNameJson{filePrepathsJson, fileNamesJson};
+      const std::pair<QStringList, QStringList> expectPreAndNameJson{filePrepathsJson, fileNamesRelatedToJson};
 
       QVERIFY(!m_fsPanel.hasSelection());
 
@@ -772,7 +772,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
 
       QVERIFY(compareModelIndexList(m_fsPanel.getSelectedRows(), selectedRowsIndexes));
       QCOMPARE(m_fsPanel.getFullRecords().size(), 1);
-      QCOMPARE(m_fsPanel.getFileNames(), fileNamesJson);
+      QCOMPARE(m_fsPanel.getFileNames(), fileNamesRelatedToJson);
       QCOMPARE(m_fsPanel.getFilePath(jsonInd), jsonFileAbsPath);
       QCOMPARE(m_fsPanel.getFilePaths(), filePathsJson);
       QCOMPARE(m_fsPanel.getFilePrepaths(), filePrepathsJson);
@@ -932,11 +932,11 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QModelIndex kakaScnInd{m_fsPanel.m_sceneProxyModel->index(0, 0)};
       QCOMPARE(kakaScnInd.data(Qt::DisplayRole).toString(), "Kaka");
       const QModelIndexList selectedRowsIndexes{kakaScnInd};
+      const QStringList filePrepaths{lvl1Path, lvl1Path, lvl1Path, lvl1Path, lvl1Path}; // scn included
       const QString fileName{"Kaka.mp4"};
-      const QStringList fileNames{fileName};
+      const QStringList fileNames{jpgName, jsonName, mp4Name, psonName, "Kaka.scn"}; // sort by ascii ascending
       const QString filePath{mTDir.itemPath("lvl0/Kaka/Kaka.mp4")};
       const QStringList filePaths{filePath};
-      const QStringList filePrepaths{lvl1Path + '/'};
 
       QModelIndex leftTop, rightDown;
       std::tie(leftTop, rightDown) = m_fsPanel.getTopLeftAndRightDownRectangleIndex();
@@ -952,7 +952,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
 
       const MimeDataHelper::MimeDataMember& pathsAndUrls = m_fsPanel.getFilePathsAndUrls();
       QVERIFY(pathsAndUrls.isEmpty());
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), (std::pair<QStringList, QStringList>{}));
+      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), (std::pair<QStringList, QStringList>{filePrepaths, fileNames}));
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 

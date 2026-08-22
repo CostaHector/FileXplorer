@@ -6,6 +6,7 @@
 #include "CastManager.h"
 #include "PathTool.h"
 #include "GeneralDataType.h"
+#include "BatchRenameBy.h"
 #include <QIcon>
 #include <QBrush>
 #include <QDir>
@@ -216,6 +217,11 @@ QStringList JsonTableModel::rel2fileNames(const QModelIndexList& indexes) const 
     relativePaths2FileName.push_back(fullPath.mid(N + 1));
   }
   return relativePaths2FileName;
+}
+
+QStringList JsonTableModel::relativePath2RelatedFiles(const QModelIndexList& indexes) const {
+  const QStringList& jsonFileNames{rel2fileNames(indexes)};
+  return BatchRenameBy::GetFilesNeedProcess(rootPath(), jsonFileNames);
 }
 
 bool JsonTableModel::setModified(int row, bool modified) {

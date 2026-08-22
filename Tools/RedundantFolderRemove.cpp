@@ -65,12 +65,12 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
 
 auto EmptyFolderRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {
   // as recursive calling, m_cmds will not clean automatically
-  QDir dir(folderPath);
-  if (dir.isEmpty()) {
+  QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden};
+  if (dir.count() == 0) {
     m_cmds.append(ACMD::GetInstMOVETOTRASH("", folderPath));
     return 1;
   }
-  dir.setFilter(QDir::Filter::AllDirs | QDir::Filter::NoDotAndDotDot);
+  dir.setFilter(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
   int totalCount = 0;
   for (const QString& path : dir.entryList()) {
     totalCount += CleanEmptyFolderCore(folderPath + '/' + path);
