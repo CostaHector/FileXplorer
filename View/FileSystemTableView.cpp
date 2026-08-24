@@ -51,7 +51,7 @@ void FileSystemTableView::subscribe() {
 
   addAction(FileOpActs::GetInst().COPY_RECORDS);
   addActions(FileOpActs::GetInst().SELECTION_RIBBONS->actions());
-  addActions(FileOpActs::GetInst().DELETE_ACTIONS->actions());
+  addActions(FileOpActs::GetInst().GetDeleteItemsActions());
 
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 }

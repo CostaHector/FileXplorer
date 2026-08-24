@@ -30,7 +30,7 @@ void AdvanceSearchTableView::subscribe() {
   addActions(fileOpInst.OPEN_AG->actions());
   addActions(fileOpInst.COPY_PATH_AG->actions());
   addActions(fileOpInst.CUT_COPY_PASTE->actions());
-  addActions(fileOpInst.DELETE_ACTIONS->actions());
+  addActions(fileOpInst.GetDeleteItemsActions());
 }
 
 void AdvanceSearchTableView::keyPressEvent(QKeyEvent* e) {

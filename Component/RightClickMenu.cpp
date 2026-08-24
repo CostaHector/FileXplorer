@@ -39,7 +39,7 @@ QList<QAction*> GetRightClickMenuActions(QWidget* parent) {
   actions += FileOpActs::GetInst().FOLDER_MERGE->actions();
   actions.push_back(NewSeperatorAction(parent));
 
-  actions += FileOpActs::GetInst().DELETE_ACTIONS->actions();
+  actions += FileOpActs::GetInst().GetDeleteItemsActions();
   actions.push_back(NewSeperatorAction(parent));
 
   actions.push_back(g_AchiveFilesActions().ARCHIVE_PREVIEW);

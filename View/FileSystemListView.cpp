@@ -49,7 +49,7 @@ void FileSystemListView::subscribe() {
   addActions(g_renameAg().RENAME_RIBBONS->actions());
 
   addActions(FileOpActs::GetInst().SELECTION_RIBBONS->actions());
-  addActions(FileOpActs::GetInst().DELETE_ACTIONS->actions());
+  addActions(FileOpActs::GetInst().GetDeleteItemsActions());
   addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
 
   connect(this, &FileSystemListView::onUseThumbnailAsDecorationRoleChanged, _fsModel, &FileSystemModel::setThumbnailAsDecoration);
