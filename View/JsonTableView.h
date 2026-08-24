@@ -31,6 +31,7 @@ class JsonTableView : public CustomTableView {
   int onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode);
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
+  int onCheckSampleMD5AndVidNameConsistency() const;
 
   enum class EDITOR_WIDGET_TYPE {
     LINE_EDIT = 0,

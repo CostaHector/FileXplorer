@@ -762,6 +762,16 @@ std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const 
   return {actorRet, studioRet};
 }
 
+QStringList JsonTableModel::CheckMd5AndVidNameConsistency() const {
+  QStringList inconsistentFiles;
+  for (const JsonPr& jpr: mCachedJsons) {
+    if (!jpr.checkMd5AndVidNameConsistency()) {
+      inconsistentFiles.push_back(jpr.m_Name);
+    }
+  }
+  return inconsistentFiles;
+}
+
 JsonPr JsonTableModel::GetJsonPr(const QModelIndex& ind) const {
   const int row = ind.row();
   if (row < 0 || row >= rowCount()) {

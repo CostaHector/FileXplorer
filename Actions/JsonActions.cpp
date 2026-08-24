@@ -143,6 +143,10 @@ JsonActions::JsonActions(QObject* parent) //
   _INFER_CAST_FROM_UPPERCASE_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected UPPERCASE sentence") //
                                           .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->text())                                    //
                                           .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->shortcut().toString()));
+
+  _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY = new (std::nothrow) QAction(QIcon(":/JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT"), tr("Check MD5 & VidName Consistency"), this);
+  _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY->setToolTip("List JSON files where SampleMD5 and VidName are inconsistent.\n"
+                                                       "Valid states: both fields empty, or both fields non‑empty.");
 }
 
 JsonActions& g_JsonActions() {

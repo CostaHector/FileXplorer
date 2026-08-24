@@ -461,6 +461,18 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   return 0;
 }
 
+int JsonTableView::onCheckSampleMD5AndVidNameConsistency() const {
+  const QStringList& inconsistentFiles = _JsonModel->CheckMd5AndVidNameConsistency();
+  const int inconsistentCount = inconsistentFiles.size();
+  if (inconsistentCount == 0) {
+    LOG_OK_P("Consistency check passed", "All %d JSON file(s) have consistent MD5 and VidName fields.", _JsonModel->rowCount());
+    return 0;
+  }
+
+  LOG_WARN_P("Inconsistent files found", "Found %d inconsistent file(s) out of %d total JSON file(s).", inconsistentCount, _JsonModel->rowCount());
+  return inconsistentCount;
+}
+
 void JsonTableView::subscribe() {
   addActions(g_renameAg().GetGeneralRenameActions());
 
@@ -501,6 +513,8 @@ void JsonTableView::subscribe() {
 
   connect(inst._SET_CONTENTS_FIXED, &QAction::triggered, this, &JsonTableView::onReqFixSelectionRecordContents);
   connect(inst._SET_CONTENTS_UNFIXED, &QAction::triggered, this, &JsonTableView::onReqUnfixSelectionRecordContents);
+
+  connect(inst._CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY, &QAction::triggered, this, &JsonTableView::onCheckSampleMD5AndVidNameConsistency);
 
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
 }

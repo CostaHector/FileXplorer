@@ -50,6 +50,8 @@ public:
 
   QAction* _INFER_CAST_FROM_SELECTION{nullptr};
   QAction* _INFER_CAST_FROM_UPPERCASE_SELECTION{nullptr};
+
+  QAction* _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY{nullptr};
 };
 
 JsonActions& g_JsonActions();

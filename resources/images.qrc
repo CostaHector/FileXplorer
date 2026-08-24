@@ -355,6 +355,7 @@
         <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
         <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
         <file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
+        <file alias="CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT">JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT.svg</file>
     </qresource>
 
     <qresource prefix="/VideoPlayer">

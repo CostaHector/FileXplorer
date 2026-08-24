@@ -101,6 +101,8 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   addWidget(mTagsMenu);
   addSeparator();
   addWidget(mUpdateFieldTb);
+  addSeparator();
+  addAction(inst._CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY);
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }

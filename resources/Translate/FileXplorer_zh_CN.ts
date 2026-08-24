@@ -683,17 +683,17 @@
         <translation>复制到</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+12"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Delete Permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+14"/>
         <source>Merged to Front</source>
         <translation>合并到前一个</translation>
     </message>
@@ -738,12 +738,12 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-44"/>
         <source>Unlock Occupied Files</source>
         <translation>解除占用文件</translation>
     </message>
     <message>
-        <location line="+281"/>
+        <location line="+323"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -758,7 +758,7 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-326"/>
+        <location line="-318"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
@@ -1146,7 +1146,12 @@
         <translation>根据大写选中推测演员</translation>
     </message>
     <message>
-        <location line="-47"/>
+        <location line="+5"/>
+        <source>Check MD5 &amp; VidName Consistency</source>
+        <translation>MD5/VidName一致性检查</translation>
+    </message>
+    <message>
+        <location line="-52"/>
         <source>Clear Studio</source>
         <translation>清除厂商</translation>
     </message>

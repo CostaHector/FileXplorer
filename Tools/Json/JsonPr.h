@@ -56,6 +56,8 @@ struct JsonPr {
   void MergeTextContentsIntoDetailAndRecycleTxt();
   void RejectCastHint();
   void RejectStudioHint();
+
+  bool checkMd5AndVidNameConsistency() const;
 };
 
 #endif

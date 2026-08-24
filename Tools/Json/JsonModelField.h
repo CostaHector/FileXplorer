@@ -81,5 +81,4 @@ static const QString FIELD_OP_MODE_ARR[(int)FIELD_OP_MODE::BUTT]{
 };
 }  // namespace JsonKey
 
-
 #endif  // JSONMODELFIELD_H

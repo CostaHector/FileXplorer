@@ -304,7 +304,7 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
   int duration{JsonFieldBoundary::DURATION_GET_FAILED_VALUE}, rate{JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V};
   QStringList casts, tags;
 
-  JsonParser::ParseResult parseRet = JsonParser::ParseResult::ERROR;
+  JsonParser::InsertByJsonParseResult parseRet = JsonParser::InsertByJsonParseResult::ERROR;
 
   int fileProcessCnt = 0;
   QDirIterator it{folderAbsPath, TYPE_FILTER::JSON_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
@@ -317,12 +317,12 @@ int FdBasedDb::ReadADirectoryJson(const QString& tableName, const QString& folde
     duration = JsonFieldBoundary::DURATION_GET_FAILED_VALUE; rate = JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V;
 
     parseRet = JsonParser::ParseEssentialFieldJson(jsonAbsPath, &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail);
-    if (parseRet == JsonParser::ParseResult::ERROR) {
+    if (parseRet == JsonParser::InsertByJsonParseResult::ERROR) {
       db.rollback();
       LOG_ERR_NP("Parse Json Failed", jsonAbsPath);
       return FD_JSON_PARSED_INVALID;
     }
-    if (parseRet == JsonParser::ParseResult::IGNORE_NO_NEED_FURTHER_PROCESS) {
+    if (parseRet == JsonParser::InsertByJsonParseResult::IGNORE_NO_NEED_FURTHER_PROCESS) {
       continue;
     }
     vidAbsPath = PathTool::Path2Join(PathTool::absolutePath(jsonAbsPath), vidName);

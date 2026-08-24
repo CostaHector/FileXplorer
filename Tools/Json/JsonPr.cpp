@@ -16,6 +16,7 @@
 #include "VideoDurationGetter.h"
 #include "DvdFileInfo.h"
 #include "MD5Calculator.h"
+#include "JsonParser.h"
 
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
@@ -328,4 +329,9 @@ void JsonPr::RejectCastHint() {
 
 void JsonPr::RejectStudioHint() {
   hintStudio.clear();
+}
+
+bool JsonPr::checkMd5AndVidNameConsistency() const {
+  // return true if MD5 and VidName both empty or both non-empty.
+  return JsonParser::ValidateSampleMd5AndVidName(m_MD5.size(), m_VidName.size()) != JsonParser::InsertByJsonParseResult::ERROR;
 }
