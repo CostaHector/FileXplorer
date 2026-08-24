@@ -243,9 +243,9 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.data(slm.index(0), Qt::ForegroundRole).isValid(), false);
     QCOMPARE(slm.data(slm.index(1), Qt::ForegroundRole).isValid(), false);
 
-    QCOMPARE(slm.fileInfo(slm.index(0)).fileName().isEmpty(), true);
-    QCOMPARE(slm.filePath(slm.index(0)), "");
-    QCOMPARE(slm.fileName(slm.index(0)), "");
+    QCOMPARE(slm.fileInfo(slm.index(0)), QFileInfo("inexist/path/Kaka.json")); // fall back to json
+    QCOMPARE(slm.filePath(slm.index(0)), "inexist/path/Kaka.json"); // fall back to json
+    QCOMPARE(slm.fileName(slm.index(0)), "Kaka"); // fall back to json base name
     QCOMPARE(slm.GetRate(slm.index(0)), 9);
     QCOMPARE(slm.baseName(slm.index(0)), "Kaka");
     QCOMPARE(slm.absolutePath(slm.index(0)), "inexist/path/");

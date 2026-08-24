@@ -13,7 +13,6 @@
 #include "ImageTestPrecoditionTools.h"
 #include "JsonHelper.h"
 #include "UndoRedo.h"
-#include "BatchRenameBy.h"
 #include "RecycleCfmDlg.h"
 #include "PathTool.h"
 #include "RateHelper.h"
