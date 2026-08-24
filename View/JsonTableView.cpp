@@ -469,7 +469,8 @@ int JsonTableView::onCheckSampleMD5AndVidNameConsistency() const {
     return 0;
   }
 
-  LOG_WARN_P("Inconsistent files found", "Found %d inconsistent file(s) out of %d total JSON file(s).", inconsistentCount, _JsonModel->rowCount());
+  LOG_WARN_P("Inconsistent files found", "Found %d inconsistent file(s) out of %d total JSON file(s). There are:\n%s",
+             inconsistentCount, _JsonModel->rowCount(), qPrintable(inconsistentFiles.join('\n')));
   return inconsistentCount;
 }
 
