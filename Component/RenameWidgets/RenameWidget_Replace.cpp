@@ -96,7 +96,7 @@ bool RenameWidget_Replace::UpdateOldStrCbCurrentText() {
   if (afterOldName == beforeOldName) {
     return false;
   }
-  m_oldStrCB->setCurrentText(afterOldName);
+  setOldNameAndNewName(afterOldName, afterOldName);
   return true;
 }
 
