@@ -462,7 +462,7 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
 }
 
 void JsonTableView::subscribe() {
-  addActions(g_renameAg().RENAME_RIBBONS->actions());
+  addActions(g_renameAg().GetGeneralRenameActions());
 
   auto& inst = g_JsonActions();
 

@@ -85,7 +85,7 @@ bool SceneListView::onOpenCorrespondingFolder() {
 }
 
 void SceneListView::subscribe() {
-  addActions(g_renameAg().RENAME_RIBBONS->actions());
+  addActions(g_renameAg().GetGeneralRenameActions());
 
   connect(_OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);

@@ -12,6 +12,9 @@ class RenameActions : public QObject {
   QActionGroup* Get_CASE_Actions();
   QActionGroup* Get_Rename_Actions();
 
+  QList<QAction*> GetGeneralRenameActions() {
+    return {_STR_INSERTER, _STR_DELETER, _STR_REPLACER};
+  }
   QAction* _NUMERIZER {nullptr};
   QAction* _SECTIONS_ARRANGE {nullptr};
   QAction* _REVERSE_NAMES_LIST {nullptr};
