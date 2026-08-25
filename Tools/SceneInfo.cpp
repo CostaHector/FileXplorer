@@ -3,7 +3,8 @@
 #include "PublicVariable.h"
 #include "SceneKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "Logger.h"
+
 #include <QFileInfo>
 #include <QFile>
 #include <QDirIterator>

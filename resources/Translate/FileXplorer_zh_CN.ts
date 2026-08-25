@@ -1131,6 +1131,11 @@
         <translation>更新哈希字段</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <source>Update K-V</source>
+        <translation>更新键值对</translation>
+    </message>
+    <message>
         <location line="+23"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
@@ -1161,7 +1166,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-72"/>
+        <location line="-77"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -1186,7 +1191,7 @@
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+45"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -2107,7 +2112,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+59"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2161,7 +2166,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../../Actions/SceneInPageActions.cpp" line="+17"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+16"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>

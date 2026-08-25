@@ -6,6 +6,7 @@
 #include "StyleSheetEditDelegate.h"
 #include "RenameActions.h"
 #include "ViewHelper.h"
+#include "PathTool.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -246,6 +247,27 @@ int JsonTableView::onUpdateFileMD5() {
   const int cnt = _JsonModel->UpdateMD5Field(indexes);
   LOG_OK_P("File md5 field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
+}
+
+int JsonTableView::onUpdateJsonKeyValuePair() {
+  const QString workPath = _JsonModel->rootPath();
+  if (PathTool::isPathAtShallowDepth(workPath)) {
+    LOG_ERR_P("Update aborted",
+              "Path [%s] is too close to root directory. "
+              "System files may get accidentally modified at this level.",
+              qPrintable(workPath));
+    return -1;
+  }
+
+  const JsonOp::Counter cnt = _JsonModel->UpdateJsonKeyValuePair();
+  LOG_OK_P("Json file K-V updated",
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
+           cnt.m_jsonUpdatedCnt,
+           cnt.m_jsonUsedCnt, //
+           cnt.m_ImgNameKeyFieldUpdatedCnt,
+           cnt.m_VidNameKeyFieldUpdatedCnt, //
+           qPrintable(workPath));
+  return cnt.m_jsonUpdatedCnt;
 }
 
 int JsonTableView::onClearStudio() {
@@ -493,6 +515,7 @@ void JsonTableView::subscribe() {
   connect(inst._UPDATE_SIZE_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileSize);
   connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
   connect(inst._UPDATE_MD5_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileMD5);
+  connect(inst._UPDATE_JSON_KEY_VALUE_PAIR, &QAction::triggered, this, &JsonTableView::onUpdateJsonKeyValuePair);
 
   connect(inst._INIT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);
@@ -524,7 +547,7 @@ void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(current);
   const JsonPr& json = _JsonModel->GetJsonPr(srcModelInd);
   const QString jsonAbsPath = json.GetJsonFileAbsPath();
-  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), json.GetVideosAbsPath());
+  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), {json.GetVideoAbsPath()});
 }
 
 void JsonTableView::keyPressEvent(QKeyEvent* e) {

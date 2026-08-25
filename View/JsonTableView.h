@@ -27,6 +27,7 @@ class JsonTableView : public CustomTableView {
   int onUpdateFileSize();
   int onUpdateDuration();
   int onUpdateFileMD5();
+  int onUpdateJsonKeyValuePair();
   int onClearStudio();
   int onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode);
   int onAppendFromSelection(bool isUpperCaseSentence);

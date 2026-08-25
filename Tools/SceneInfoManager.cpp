@@ -1,10 +1,10 @@
 #include "SceneInfoManager.h"
 #include "PublicVariable.h"
-#include "FileTool.h"
 #include "SceneMixed.h"
 #include "JsonHelper.h"
 #include "PathTool.h"
 #include "Logger.h"
+#include "JsonUpdater.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
@@ -16,9 +16,10 @@ QString ScnMgr::GetScnAbsFilePath(const QString& folderPath) {
   return folderPath + '/' + PathTool::fileName(folderPath) + ".scn";
 }
 
-Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
+JsonOp::Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
+  JsonOp::Counter counter;
   if (!QFileInfo(path).isDir()) {
-    return {};
+    return counter;
   }
   int jsonUpdatedCnt = 0, jsonUsedCnt = 0;
   int imgNameKeyFieldUpdatedCnt = 0, vidNameKeyFieldUpdatedCnt = 0;
@@ -26,89 +27,27 @@ Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
   ScenesMixed sMixed;
   sMixed(path);
 
-  for (auto jsFileIt = sMixed.m_json2Name.cbegin(); jsFileIt != sMixed.m_json2Name.cend(); ++jsFileIt) {
-    const QString& baseName = jsFileIt.key();
-    const QString jPath = path + '/' + jsFileIt.value();
+  for (const QString& jsonFileBaseName: sMixed.m_json2Name) {
+    const QString jPath{path + '/' + jsonFileBaseName + ".json"};
     QVariantHash rawJsonDict = JsonHelper::MovieJsonLoader(jPath);
-    if (rawJsonDict.isEmpty()) {
-      LOG_W("json file[%s] may corrupt read failed", qPrintable(jPath));
+    JsonOp::Counter currentCounter = JsonUpdater::UpdateJsonKeyValuePair(sMixed, rawJsonDict, path, jsonFileBaseName);
+    if (currentCounter.m_jsonUsedCnt == 0) { // useless json found
       continue;
     }
-
-    QVariantHash::iterator it = rawJsonDict.find("Name");
-    if (it == rawJsonDict.cend()) {
-      LOG_D("This json file[%s] is not we want", qPrintable(jPath));
-      continue;
-    }
-
-    bool jsonNeedUpdate{false};
-    if (it.value() != baseName) {
-      it->setValue(baseName);
-      jsonNeedUpdate = true;
-    }
-
-    const QStringList& imgsLst = sMixed.GetAllImgs(baseName);
-    it = rawJsonDict.find("ImgName");
-    if (it == rawJsonDict.cend()) {
-      rawJsonDict.insert("ImgName", imgsLst);
-      jsonNeedUpdate = true;
-      ++imgNameKeyFieldUpdatedCnt;
-    } else if (it.value().toStringList() != imgsLst) {
-      it->setValue(imgsLst);
-      jsonNeedUpdate = true;
-      ++imgNameKeyFieldUpdatedCnt;
-    }
-
-    const QString& vidFileName = sMixed.GetFirstVid(baseName);
-    if (!vidFileName.isEmpty()) {
-      it = rawJsonDict.find("VidName");
-      if (it == rawJsonDict.end()) {
-        rawJsonDict.insert("VidName", vidFileName);
-        jsonNeedUpdate = true;
-        ++vidNameKeyFieldUpdatedCnt;
-      } else {
-        const QString& oldVidName = it.value().toString();
-        if (oldVidName.isEmpty() || vidFileName != oldVidName) {
-          it->setValue(vidFileName);
-          jsonNeedUpdate = true;
-          ++vidNameKeyFieldUpdatedCnt;
-        }
-      }
-
-      const QFileInfo vidFi{path + '/' + vidFileName};
-      it = rawJsonDict.find("Size");
-      qint64 newVidSize = vidFi.size();
-      if (it == rawJsonDict.end()) {
-        // construct Size
-        rawJsonDict.insert("Size", newVidSize);
-        jsonNeedUpdate = true;
-      } else if (it.value().toLongLong() != newVidSize) {
-        // first set Size
-        it->setValue(vidFi.size());
-        jsonNeedUpdate = true;
-      }
-    }
-
-    if (rawJsonDict.find("Rate") == rawJsonDict.end()) {
-      rawJsonDict.insert("Rate", 0);
-      jsonNeedUpdate = true;
-    }
-
-    if (jsonNeedUpdate) {
+    counter += currentCounter;
+    if (currentCounter.m_jsonUpdatedCnt != 0) {
       JsonHelper::DumpJsonDict(rawJsonDict, jPath);
-      ++jsonUpdatedCnt;
     }
-    ++jsonUsedCnt;
   }
-  return Counter{jsonUpdatedCnt, jsonUsedCnt, vidNameKeyFieldUpdatedCnt, imgNameKeyFieldUpdatedCnt};
+  return counter;
 }
 
-Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub
+JsonOp::Counter ScnMgr::operator()(const QString& rootPath) {  // will iterate all sub
   if (!QFileInfo(rootPath).isDir()) {
     LOG_D("Not an existed directory[%s]", qPrintable(rootPath));
-    return {};
+    return JsonOp::Counter{};
   }
-  Counter cnt{0, 0, 0, 0};
+  JsonOp::Counter cnt{0, 0, 0, 0};
   QDirIterator folderIt{rootPath, {}, QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDirIterator::IteratorFlag::Subdirectories};
   while (folderIt.hasNext()) {
     cnt += UpdateJsonUnderAPath(folderIt.next());

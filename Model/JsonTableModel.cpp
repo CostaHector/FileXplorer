@@ -7,6 +7,8 @@
 #include "PathTool.h"
 #include "GeneralDataType.h"
 #include "BatchRenameBy.h"
+#include "SceneMixed.h"
+#include "JsonUpdater.h"
 #include <QIcon>
 #include <QBrush>
 #include <QDir>
@@ -840,4 +842,38 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("ContentFixed Field of %d/%d row(s) range [%d, %d) changed to bool[%d]", affectedRows, rowIndexes.size(), minRow, maxRow, bFixed);
   return affectedRows;
+}
+
+JsonOp::Counter JsonTableModel::UpdateJsonKeyValuePair() {
+  JsonOp::Counter counter;
+  ScenesMixed sMixed;
+  sMixed(rootPath());
+
+  int minRow{INT_MAX}, maxRow{-1};
+  for (int row = 0; row < rowCount(); ++row) {
+    if (row < m_modifiedRows.size() && !m_modifiedRows.test(row)) {
+      continue;
+    }
+    JsonOp::Counter currentCount = JsonUpdater::UpdateJsonKeyValuePair(sMixed, mCachedJsons[row]);
+    if (currentCount.m_jsonUpdatedCnt == 0) { // useless json found
+      continue;
+    }
+    counter += currentCount;
+    setModifiedNoEmit(row, true);
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    LOG_W("No Field(s) of %d row(s) updated", rowCount());
+    return counter;
+  }
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Name, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Detail, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole | Qt::ForegroundRole});
+  emit headerDataChanged(Qt::Vertical, minRow, maxRow);
+  return counter;
 }

@@ -131,19 +131,19 @@ inline QStringList parseStringArray(const QByteArray& data, int& pos) {
   return result;
 }
 
-InsertByJsonParseResult ValidateSampleMd5AndVidName(const int localSampleMD5Size, const int localVidNameSize) {
+JsonOp::ResultE ValidateSampleMd5AndVidName(const int localSampleMD5Size, const int localVidNameSize) {
   // 2个空
   if (localSampleMD5Size == 0 && localVidNameSize == 0) {
-    return InsertByJsonParseResult::IGNORE_NO_NEED_FURTHER_PROCESS;
+    return JsonOp::ResultE::IGNORE_NO_NEED_FURTHER_PROCESS;
   }
   // 有且仅有1个空 => 原因: 未计算MD5的json, 手动删去了vidName
   if (localSampleMD5Size == 0 || localVidNameSize == 0) {
-    return InsertByJsonParseResult::ERROR;
+    return JsonOp::ResultE::ERROR;
   }
-  return InsertByJsonParseResult::OK_NEED_FURTHER_PROCESS;
+  return JsonOp::ResultE::OK_NEED_FURTHER_PROCESS;
 }
 
-InsertByJsonParseResult ParseEssentialFieldJson(const QString& jsonFilePath,
+JsonOp::ResultE ParseEssentialFieldJson(const QString& jsonFilePath,
                              QByteArray* pSampleMd5Val, QString* pName, QString* pVidName,
                              qint64* pSize, int* pDuration,
                              QString* pStudio, QStringList* pCasts, QStringList* pTags,
@@ -151,7 +151,7 @@ InsertByJsonParseResult ParseEssentialFieldJson(const QString& jsonFilePath,
   bool readOk = false;
   const QByteArray rawData = FileTool::ByteArrayReader(jsonFilePath, &readOk);
   if (!readOk || rawData.isEmpty()) {
-    return InsertByJsonParseResult::ERROR;
+    return JsonOp::ResultE::ERROR;
   }
 
   bool bNameMet = false;
@@ -224,11 +224,11 @@ InsertByJsonParseResult ParseEssentialFieldJson(const QString& jsonFilePath,
 
 
   if (!bNameMet) {
-    return InsertByJsonParseResult::IGNORE_NO_NEED_FURTHER_PROCESS;
+    return JsonOp::ResultE::IGNORE_NO_NEED_FURTHER_PROCESS;
   }
 
   const auto checkResult = ValidateSampleMd5AndVidName(localSampleMD5.size(), localVidName.size());
-  if (checkResult != InsertByJsonParseResult::OK_NEED_FURTHER_PROCESS) {
+  if (checkResult != JsonOp::ResultE::OK_NEED_FURTHER_PROCESS) {
     return checkResult;
   }
 
@@ -238,7 +238,7 @@ InsertByJsonParseResult ParseEssentialFieldJson(const QString& jsonFilePath,
   if (pVidName) {
     pVidName->swap(localVidName);
   }
-  return InsertByJsonParseResult::OK_NEED_FURTHER_PROCESS;
+  return JsonOp::ResultE::OK_NEED_FURTHER_PROCESS;
 }
 
 int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int defaultDurationValue) {

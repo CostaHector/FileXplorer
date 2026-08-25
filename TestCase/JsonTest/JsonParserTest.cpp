@@ -66,13 +66,13 @@ private slots:
   void JsonFileReadFailed() {
     bool bReadOk = false;
     MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{"{}"}));
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("inexist json file"), JsonParser::InsertByJsonParseResult::ERROR);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("inexist json file"), JsonOp::ResultE::ERROR);
   }
 
   void JsonFileContentEmpty() {
     bool bReadOk = true;
     MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{}));
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("empty json file"), JsonParser::InsertByJsonParseResult::ERROR);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("empty json file"), JsonOp::ResultE::ERROR);
   }
 
   void standardJson_Formatted_NeedFurtherProcess() {
@@ -111,7 +111,7 @@ private slots:
     qint64 size{-1};
     int duration{-1}, rate{-1};
     QStringList casts, tags;
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::OK_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::OK_NEED_FURTHER_PROCESS);
     QCOMPARE(name, "AAAA");
     QCOMPARE(studio, "Pride");
     QCOMPARE(size, 1543270854);
@@ -138,7 +138,7 @@ private slots:
     qint64 size{-1};
     int duration{-1}, rate{-1};
     QStringList casts, tags;
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::OK_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("ValidJsonPath", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::OK_NEED_FURTHER_PROCESS);
     QCOMPARE(name, "AAAA");
     QCOMPARE(studio, "Pride");
     QCOMPARE(size, -1);
@@ -188,10 +188,10 @@ private slots:
     qint64 size{-1};
     int duration{-1}, rate{-1};
     QStringList casts, tags;
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("No Name Field.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::IGNORE_NO_NEED_FURTHER_PROCESS);
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("Both MD5 and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::IGNORE_NO_NEED_FURTHER_PROCESS);
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Empty and VidName Not Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::ERROR);
-    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Not Empty and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonParser::InsertByJsonParseResult::ERROR);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("No Name Field.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::IGNORE_NO_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("Both MD5 and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::IGNORE_NO_NEED_FURTHER_PROCESS);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Empty and VidName Not Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::ERROR);
+    QCOMPARE(JsonParser::ParseEssentialFieldJson("MD5 Not Empty and VidName Empty.json", &sampleMd5Val, &name, &vidName, &size, &duration, &studio, &casts, &tags, &rate, &detail), JsonOp::ResultE::ERROR);
   }
 
 };

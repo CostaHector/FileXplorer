@@ -178,7 +178,7 @@ int SceneListView::onUpdateJsonFiles() {
 
   using namespace SceneInfoManager;
   ScnMgr scnMgr;
-  Counter cnt = scnMgr(workPath);
+  JsonOp::Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated",
            "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
            cnt.m_jsonUpdatedCnt,

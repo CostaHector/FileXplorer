@@ -1,6 +1,7 @@
 #ifndef JSONTABLEMODEL_H
 #define JSONTABLEMODEL_H
 #include "QAbstractTableModelPub.h"
+#include "JsonOp.h"
 #include "JsonPr.h"
 #include <QFileInfo>
 #include <bitset>
@@ -40,6 +41,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
   int SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed=true);
+  JsonOp::Counter UpdateJsonKeyValuePair();
 
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);

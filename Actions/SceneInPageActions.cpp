@@ -3,7 +3,6 @@
 #include "StyleSheet.h"
 #include "SceneInfo.h"
 #include "PublicMacro.h"
-#include "RateHelper.h"
 #include "VideoTierTool.h"
 #include <QToolBar>
 

@@ -15,6 +15,7 @@ struct JsonPr {
   bool operator==(const JsonPr& rhs) const;
   bool operator<(const JsonPr& rhs) const;
 
+  bool isLocalFile() { return !jsonFileName.isEmpty(); }
   bool Reload();
   bool WriteIntoFiles() const;
   QByteArray GetJsonBA() const;
@@ -23,7 +24,7 @@ struct JsonPr {
   inline QString GetItemsAbsPath(const QString& itemName) const {return GetJsonPrepath() + '/' + itemName;}
   inline QString GetJsonFileAbsPath() const { return GetItemsAbsPath(jsonFileName); }
   QStringList GetImagesAbsPath() const;
-  QStringList GetVideosAbsPath() const;
+  QString GetVideoAbsPath() const;
 
 // Json Key and Value
 #define JSON_KEY_ITEM(enu, enumVal, defValue, enhanceDefVal, generalDataType, format, writer, initer, jsonWriter) decltype(enhanceDefVal) m_##enu = enhanceDefVal;
@@ -53,7 +54,6 @@ struct JsonPr {
   bool SetCastOrTags(const QString& val, JsonModelField::FIELD_OP_TYPE fieldType, JsonModelField::FIELD_OP_MODE fieldMode);
   void HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const;
 
-  void MergeTextContentsIntoDetailAndRecycleTxt();
   void RejectCastHint();
   void RejectStudioHint();
 

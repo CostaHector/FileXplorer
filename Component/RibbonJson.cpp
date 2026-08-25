@@ -1,9 +1,7 @@
 #include "RibbonJson.h"
 #include "PublicMacro.h"
-#include "FileTool.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
-#include "PublicVariable.h"
 #include "JsonActions.h"
 #include "ViewActions.h"
 #include "JsonOpMemoryKey.h"
@@ -100,6 +98,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   addWidget(mCastMenu);
   addWidget(mTagsMenu);
   addSeparator();
+  addAction(inst._UPDATE_JSON_KEY_VALUE_PAIR);
   addWidget(mUpdateFieldTb);
   addSeparator();
   addAction(inst._CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY);
