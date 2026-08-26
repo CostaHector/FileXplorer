@@ -842,12 +842,20 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
 
 JsonOp::Counter JsonTableModel::UpdateJsonKeyValuePair() {
   JsonOp::Counter counter;
-  ScenesMixed sMixed;
-  sMixed(rootPath());
+
+  QMap<QString, ScenesMixed> prePath2SceneMixed;
 
   int minRow{INT_MAX}, maxRow{-1};
   for (int row = 0; row < rowCount(); ++row) {
-    JsonOp::Counter currentCounter = JsonUpdater::UpdateJsonKeyValuePair(sMixed, mCachedJsons[row]);
+    const QString& prePath = mCachedJsons[row].GetJsonPrepath();
+    decltype(prePath2SceneMixed)::const_iterator it = prePath2SceneMixed.find(prePath);
+    if (it == prePath2SceneMixed.cend()) {
+      ScenesMixed sMixed;
+      sMixed(prePath);
+      it = prePath2SceneMixed.insert(prePath, sMixed);
+    }
+
+    JsonOp::Counter currentCounter = JsonUpdater::UpdateJsonKeyValuePair(*it, mCachedJsons[row]);
     if (currentCounter.m_jsonUsedCnt == 0) { // useless json found
       continue;
     }
