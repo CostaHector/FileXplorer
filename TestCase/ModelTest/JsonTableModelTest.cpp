@@ -14,6 +14,7 @@
 #include "PathTool.h"
 #include "ModelTestHelper.h"
 #include "StudioActorManagerTestHelper.h"
+#include "JsonUpdater.h"
 
 #include "VideoDurationGetter.h"
 #include "MD5Calculator.h"
@@ -70,12 +71,15 @@ class JsonTableModelTest : public PlainTestSuite {
     bool readAok = false;
     QCOMPARE(FileTool::StringTextReader(mTDir.itemPath("a.json"), &readAok), JSON_CONTENTS_A_RANK_IN_MODEL);
 
-    GlobalMockObject::reset();
     actorHelper.init();
     studioHelper.init();
   }
 
-  void cleanupTestCase() {  //
+  void init() {
+    GlobalMockObject::reset();
+  }
+
+  void cleanup() {
     GlobalMockObject::verify();
   }
 
@@ -98,7 +102,6 @@ class JsonTableModelTest : public PlainTestSuite {
     {  // should not crash down
       QCOMPARE(jtm.setModified(102400, true), false);
       QCOMPARE(jtm.setModifiedNoEmit(102400, true), false);
-      QCOMPARE(jtm.m_modifiedRows.any(), false);
 
       QModelIndex invalidIndex;
       QModelIndexList invalidIndexes{invalidIndex, invalidIndex};
@@ -222,8 +225,6 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.rowCount(), 3);
     QCOMPARE(jtm.mCachedJsons.size(), 3);
     QCOMPARE(jtm.data(jtm.index(2, JsonModelField::Name), Qt::DisplayRole).toString(), "GameTurbo - Z rank - ActorZ");
-
-    QCOMPARE(jtm.m_modifiedRows.any(), false);  // force reload can be regard as model reset
   }
 
   void decoration_check_ok() {
@@ -416,7 +417,6 @@ class JsonTableModelTest : public PlainTestSuite {
 
       QCOMPARE(jtm.InitCastAndStudio(valid2Indexes), 0);  // field Name/Cast/Studio already has value
       QCOMPARE(jtm.mCachedJsons, mCachedJsonsBackup);
-      QCOMPARE(jtm.m_modifiedRows.any(), false);
 
       // clear this field
       QCOMPARE(jtm.SetStudio(valid2Indexes, ""), 2);
@@ -433,7 +433,7 @@ class JsonTableModelTest : public PlainTestSuite {
 
       QCOMPARE(jtm.mCachedJsons.back().m_Studio, "GameTurbo");
       QCOMPARE(jtm.mCachedJsons.back().m_Cast, (SortedUniqStrLst{QStringList{"XX YY", "ZZ DD EE"}}));
-      QCOMPARE(jtm.m_modifiedRows.any(), true);
+      QVERIFY(jtm.mCachedJsons.cend() != std::find_if(jtm.mCachedJsons.cbegin(), jtm.mCachedJsons.cend(), [](const JsonPr& jPr)->bool{ return jPr.bModified; }));
     }
 
     {  // 2. set directly succeed
@@ -711,8 +711,8 @@ class JsonTableModelTest : public PlainTestSuite {
     QModelIndexList valid2Indexes{firstLineIndex, secondLineIndex};
 
     decltype(jtm.mCachedJsons) mCachedJsonsBackup = jtm.mCachedJsons;  // save backup here
-    QVERIFY(!jtm.m_modifiedRows.test(firstLineIndex.row()));
-    QVERIFY(!jtm.m_modifiedRows.test(secondLineIndex.row()));
+    QVERIFY(!jtm.mCachedJsons[firstLineIndex.row()].bModified);
+    QVERIFY(!jtm.mCachedJsons[secondLineIndex.row()].bModified);
 
     QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonModelField::Prepath), "any path cannot edit"), false);  // cannot edit prepath field
     QCOMPARE(jtm.setData(firstLineIndex.siblingAtColumn(JsonModelField::Cast), "Xander,Chris Evans, Xander,Chris Evans"), true);
@@ -730,8 +730,8 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.SyncFieldNameByJsonBaseName(valid2Indexes), 2);
     QCOMPARE(jtm.data(firstLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "a");
     QCOMPARE(jtm.data(secondLineIndex.siblingAtColumn(JsonModelField::Name), Qt::ItemDataRole::DisplayRole).toString(), "b");
-    QVERIFY(jtm.m_modifiedRows.test(firstLineIndex.row()));
-    QVERIFY(jtm.m_modifiedRows.test(secondLineIndex.row()));
+    QVERIFY(jtm.mCachedJsons[firstLineIndex.row()].bModified);
+    QVERIFY(jtm.mCachedJsons[secondLineIndex.row()].bModified);
   }
 
   void save_changes_and_export_to_dict_correct() {
@@ -740,7 +740,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.setRootPath(mTDir.path()), mJsonsFileCountInitial);
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
     QVERIFY(mJsonsFileCountInitial >= 2);
-    QCOMPARE(jtm.m_modifiedRows.any(), false);
+    QVERIFY(jtm.mCachedJsons.cend() == std::find_if(jtm.mCachedJsons.cbegin(), jtm.mCachedJsons.cend(), [](const JsonPr& jPr)->bool{ return jPr.bModified; }));
 
     QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
     QModelIndex secondLineIndex{jtm.index(1, JsonModelField::Name)};
@@ -753,9 +753,9 @@ class JsonTableModelTest : public PlainTestSuite {
       QCOMPARE(jtm.SetStudio({secondLineIndex}, "GameTurboB"), 1);
       QCOMPARE(jtm.SetCastOrTags({secondLineIndex}, JsonModelField::Cast, "Cast21,Cast22"), 1);
       // save changed to local file
-      QCOMPARE(jtm.m_modifiedRows.any(), true);
+      QVERIFY(jtm.mCachedJsons.cend() != std::find_if(jtm.mCachedJsons.cbegin(), jtm.mCachedJsons.cend(), [](const JsonPr& jPr)->bool{ return jPr.bModified; }));
       QCOMPARE(jtm.SaveCurrentChanges(valid2Indexes), 2);
-      QCOMPARE(jtm.m_modifiedRows.any(), false);
+      QVERIFY(jtm.mCachedJsons.cend() == std::find_if(jtm.mCachedJsons.cbegin(), jtm.mCachedJsons.cend(), [](const JsonPr& jPr)->bool{ return jPr.bModified; }));
       QCOMPARE(jtm.SaveCurrentChanges(valid2Indexes), 0);
       // above operation should write into files
 
@@ -792,7 +792,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(jtm.setRootPath(mTDir.path()), mJsonsFileCountInitial);
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
     QVERIFY(mJsonsFileCountInitial >= 2);
-    QCOMPARE(jtm.m_modifiedRows.any(), false);
+    QVERIFY(jtm.mCachedJsons.cend() == std::find_if(jtm.mCachedJsons.cbegin(), jtm.mCachedJsons.cend(), [](const JsonPr& jPr)->bool{ return jPr.bModified; }));
     const auto rowElementsRmv = [&jtm](int beg, int end) { jtm.mCachedJsons.erase(jtm.mCachedJsons.begin() + beg, jtm.mCachedJsons.begin() + end); };
     {
       QModelIndex firstLineIndex{jtm.index(0, JsonModelField::Name)};
@@ -816,6 +816,38 @@ class JsonTableModelTest : public PlainTestSuite {
 
     jtm.forceReloadPath();
     QCOMPARE(jtm.rowCount(), mJsonsFileCountInitial);
+  }
+
+  void UpdateJsonKeyValuePair_ok() {
+    const QList<FsNodeEntry> updateJsonKeyValuePairFolderNodes{
+      {"updateJsonKeyValuePair/unwant.json", false, "content in unwant.json"},
+      {"updateJsonKeyValuePair/noNeedUpdate.json", false, "content in noNeedUpdate.json"},
+      {"updateJsonKeyValuePair/NeedUpdateImgName.json", false, "content in NeedUpdateImgName.json"},
+      {"updateJsonKeyValuePair/NeedUpdateVidName.json", false, "content in NeedUpdateVidName.json"},
+    };
+    QCOMPARE(mTDir.createEntries(updateJsonKeyValuePairFolderNodes), 4);
+    OnScopeExit {
+      QVERIFY(QDir(mTDir.itemPath("updateJsonKeyValuePair")).removeRecursively());
+    };
+
+    JsonTableModel jtm;
+    QCOMPARE(jtm.setRootPath(mTDir.itemPath("updateJsonKeyValuePair")), 4);
+    QCOMPARE(jtm.rowCount(), 4);
+
+    using UpdateJsonKeyValuePairVariantHash = JsonOp::Counter (*)(const ScenesMixed&, JsonPr&);
+    // {是否更新, 是否有效, ImgName是否更新, VidName是否更新}
+    MOCKER((UpdateJsonKeyValuePairVariantHash)JsonUpdater::UpdateJsonKeyValuePair)//
+        .expects(exactly(4))
+        .will(returnValue(JsonOp::Counter{0, 0, 0, 0}))
+        .then(returnValue(JsonOp::Counter{0, 1, 0, 0}))
+        .then(returnValue(JsonOp::Counter{1, 1, 1, 0}))
+        .then(returnValue(JsonOp::Counter{1, 1, 0, 1}));
+
+    QSignalSpy dataChangedSig{&jtm, &JsonTableModel::dataChanged};
+    QSignalSpy headerDataChangedSig{&jtm, &JsonTableModel::headerDataChanged};
+    QCOMPARE(jtm.UpdateJsonKeyValuePair(), JsonOp::Counter(2, 3, 1, 1));
+    QCOMPARE(dataChangedSig.count(), 1);
+    QCOMPARE(headerDataChangedSig.count(), 1);
   }
 
   void proxy_model_works() {

@@ -89,6 +89,11 @@ JsonActions::JsonActions(QObject* parent) //
                                      .arg(_UPDATE_MD5_FIELD->text())
                                      .arg(_UPDATE_MD5_FIELD->shortcut().toString()));
 
+  _UPDATE_JSON_KEY_VALUE_PAIR = new (std::nothrow) QAction{QIcon{":img/UPDATE_JSON"}, tr("Update K-V"), this};
+  _UPDATE_JSON_KEY_VALUE_PAIR->setToolTip(QString("<b>%1 (%2)</b><br/> Update the key value of \"Name/VidName/ImgName/Size\"") //
+                                    .arg(_UPDATE_JSON_KEY_VALUE_PAIR->text())
+                                    .arg(_UPDATE_JSON_KEY_VALUE_PAIR->shortcut().toString()));
+
   _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":/JsonEditor/STUDIO"), tr("Set Studio"));
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field") //
                                     .arg(_STUDIO_FIELD_SET->text(), _STUDIO_FIELD_SET->shortcut().toString()));
@@ -143,6 +148,10 @@ JsonActions::JsonActions(QObject* parent) //
   _INFER_CAST_FROM_UPPERCASE_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected UPPERCASE sentence") //
                                           .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->text())                                    //
                                           .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->shortcut().toString()));
+
+  _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY = new (std::nothrow) QAction(QIcon(":/JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT"), tr("Check MD5 & VidName Consistency"), this);
+  _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY->setToolTip("List JSON files where SampleMD5 and VidName are inconsistent.\n"
+                                                       "Valid states: both fields empty, or both fields non‑empty.");
 }
 
 JsonActions& g_JsonActions() {

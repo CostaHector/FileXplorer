@@ -85,7 +85,7 @@ bool SceneListView::onOpenCorrespondingFolder() {
 }
 
 void SceneListView::subscribe() {
-  addActions(g_renameAg().RENAME_RIBBONS->actions());
+  addActions(g_renameAg().GetGeneralRenameActions());
 
   connect(_OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
@@ -178,7 +178,7 @@ int SceneListView::onUpdateJsonFiles() {
 
   using namespace SceneInfoManager;
   ScnMgr scnMgr;
-  Counter cnt = scnMgr(workPath);
+  JsonOp::Counter cnt = scnMgr(workPath);
   LOG_OK_P("Json file K-V updated",
            "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
            cnt.m_jsonUpdatedCnt,

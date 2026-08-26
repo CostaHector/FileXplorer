@@ -1,10 +1,10 @@
 #include "FileOpActs.h"
 #include "FileOperatorPub.h"
-#include "ComplexOperation.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
+#include "MenuToolButton.h"
 #include <QToolBar>
 
 FileOpActs& FileOpActs::GetInst() {
@@ -44,9 +44,18 @@ FileOpActs::FileOpActs(QObject* parent)
 
   InitFileStructureActions();
 
+  _UNLOCK_OCCUPIED_FILES = new (std::nothrow) QAction{QIcon{":img/_UNLOCK_OCCUPIED_FILES"}, tr("Unlock Occupied Files"), this};
+  _UNLOCK_OCCUPIED_FILES->setShortcutVisibleInContextMenu(true);
+  _UNLOCK_OCCUPIED_FILES->setToolTip("Release occupied files and folders to allow renaming, moving, recycling, or deleting them.");
+
   MOVE_TO_TRASHBIN = new (std::nothrow) QAction(QIcon(":img/MOVE_TO_TRASH_BIN"), tr("Recycle"), this);
+  MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
+  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
+                                   .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
   DELETE_PERMANENTLY = new (std::nothrow) QAction(QIcon(":img/DELETE_ITEMS_PERMANENTLY"), tr("Delete Permanently"), this);
-  DELETE_ACTIONS = GetDeleteActions();
+  DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
+  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
+                                     .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
   UNDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/UNDO"), tr("Undo"), this);
   REDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/REDO"), tr("Redo"), this);
@@ -85,8 +94,6 @@ FileOpActs::FileOpActs(QObject* parent)
 
   _FORCE_RESEARCH = new (std::nothrow) QAction{QIcon{":img/FORCE_RESEARCH"}, tr("Force Research"), this};
 
-  _UNLOCK_OCCUPIED_FILES = new (std::nothrow) QAction{QIcon{":img/_UNLOCK_OCCUPIED_FILES"}, tr("Unlock Occupied Files"), this};
-  _UNLOCK_OCCUPIED_FILES->setToolTip("Release occupied files and folders to allow renaming, moving, recycling, or deleting them.");
   subscribe();
 }
 
@@ -95,13 +102,7 @@ void FileOpActs::subscribe() {
 }
 
 QActionGroup* FileOpActs::GetDeleteActions() {
-  MOVE_TO_TRASHBIN->setShortcutVisibleInContextMenu(true);
-  MOVE_TO_TRASHBIN->setToolTip(QString("<b>%1 (%2)</b><br/> Move the selected item(s) to the Recyle Bin.")
-                                   .arg(MOVE_TO_TRASHBIN->text(), MOVE_TO_TRASHBIN->shortcut().toString()));
 
-  DELETE_PERMANENTLY->setShortcutVisibleInContextMenu(true);
-  DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
-                                     .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(MOVE_TO_TRASHBIN);
@@ -396,6 +397,22 @@ QToolBar* FileOpActs::GetFolderOperationModeTb(QWidget* parent) {
   folderOperationModeTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(folderOperationModeTB->layout(), Qt::AlignmentFlag::AlignLeft);
   return folderOperationModeTB;
+}
+
+QList<QAction*> FileOpActs::GetDeleteItemsActions() const {
+  return {MOVE_TO_TRASHBIN, DELETE_PERMANENTLY};
+}
+
+QWidget* FileOpActs::GetDeleteItemsToolButton(QWidget* notNullParent) const {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  QToolButton* recycleItemsTB = new (std::nothrow) MenuToolButton(GetDeleteItemsActions(),
+                                                                  QToolButton::MenuButtonPopup,
+                                                                  Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
+                                                                  IMAGE_SIZE::TABS_ICON_IN_MENU_48,
+                                                                  notNullParent);
+  CHECK_NULLPTR_RETURN_NULLPTR(recycleItemsTB);
+  recycleItemsTB->setDefaultAction(MOVE_TO_TRASHBIN);
+  return recycleItemsTB;
 }
 
 QToolBar* FileOpActs::GetCutCopyPasteTb(QWidget* parent) {

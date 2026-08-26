@@ -62,8 +62,10 @@ Q_OBJECT
   QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_PRESERVE{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
   void InitFileStructureActions();
 
+  QAction* _UNLOCK_OCCUPIED_FILES{nullptr};
+  QList<QAction*> GetDeleteItemsActions() const;
+  QWidget* GetDeleteItemsToolButton(QWidget* notNullParent) const;
   QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr};
-  QActionGroup* DELETE_ACTIONS{nullptr};
 
   QAction *UNDO_OPERATION{nullptr}, *REDO_OPERATION{nullptr};
   QActionGroup* UNDO_REDO_RIBBONS{nullptr};
@@ -88,7 +90,6 @@ signals:
  private:
   void subscribe();
 
-  QAction* _UNLOCK_OCCUPIED_FILES{nullptr};
   EnumIntAction<FileStructurePolicy::FileStuctureModeE> mFileStructureIntAction;
 };
 

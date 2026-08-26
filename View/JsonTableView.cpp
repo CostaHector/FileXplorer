@@ -6,6 +6,7 @@
 #include "StyleSheetEditDelegate.h"
 #include "RenameActions.h"
 #include "ViewHelper.h"
+#include "PathTool.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -248,6 +249,27 @@ int JsonTableView::onUpdateFileMD5() {
   return cnt;
 }
 
+int JsonTableView::onUpdateJsonKeyValuePair() {
+  const QString workPath = _JsonModel->rootPath();
+  if (PathTool::isPathAtShallowDepth(workPath)) {
+    LOG_ERR_P("Update aborted",
+              "Path [%s] is too close to root directory. "
+              "System files may get accidentally modified at this level.",
+              qPrintable(workPath));
+    return -1;
+  }
+
+  const JsonOp::Counter cnt = _JsonModel->UpdateJsonKeyValuePair();
+  LOG_OK_P("Json file K-V updated",
+           "updated:%d, used:%d\nimgUpdate:%d, vidUpdate:%d\nunder path[%s]", //
+           cnt.m_jsonUpdatedCnt,
+           cnt.m_jsonUsedCnt, //
+           cnt.m_ImgNameKeyFieldUpdatedCnt,
+           cnt.m_VidNameKeyFieldUpdatedCnt, //
+           qPrintable(workPath));
+  return cnt.m_jsonUpdatedCnt;
+}
+
 int JsonTableView::onClearStudio() {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("[Skip]nothing selected", "skip clear studio");
@@ -461,8 +483,21 @@ int JsonTableView::onSelectionCaseOperation(bool isTitle) {
   return 0;
 }
 
+int JsonTableView::onCheckSampleMD5AndVidNameConsistency() const {
+  const QStringList& inconsistentFiles = _JsonModel->CheckMd5AndVidNameConsistency();
+  const int inconsistentCount = inconsistentFiles.size();
+  if (inconsistentCount == 0) {
+    LOG_OK_P("Consistency check passed", "All %d JSON file(s) have consistent MD5 and VidName fields.", _JsonModel->rowCount());
+    return 0;
+  }
+
+  LOG_WARN_P("Inconsistent files found", "Found %d inconsistent file(s) out of %d total JSON file(s). There are:\n%s",
+             inconsistentCount, _JsonModel->rowCount(), qPrintable(inconsistentFiles.join('\n')));
+  return inconsistentCount;
+}
+
 void JsonTableView::subscribe() {
-  addActions(g_renameAg().RENAME_RIBBONS->actions());
+  addActions(g_renameAg().GetGeneralRenameActions());
 
   auto& inst = g_JsonActions();
 
@@ -480,6 +515,7 @@ void JsonTableView::subscribe() {
   connect(inst._UPDATE_SIZE_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileSize);
   connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
   connect(inst._UPDATE_MD5_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileMD5);
+  connect(inst._UPDATE_JSON_KEY_VALUE_PAIR, &QAction::triggered, this, &JsonTableView::onUpdateJsonKeyValuePair);
 
   connect(inst._INIT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onInitCastAndStudio);
   connect(inst._STUDIO_FIELD_SET, &QAction::triggered, this, &JsonTableView::onSetStudio);
@@ -502,6 +538,8 @@ void JsonTableView::subscribe() {
   connect(inst._SET_CONTENTS_FIXED, &QAction::triggered, this, &JsonTableView::onReqFixSelectionRecordContents);
   connect(inst._SET_CONTENTS_UNFIXED, &QAction::triggered, this, &JsonTableView::onReqUnfixSelectionRecordContents);
 
+  connect(inst._CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY, &QAction::triggered, this, &JsonTableView::onCheckSampleMD5AndVidNameConsistency);
+
   connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &JsonTableView::onSelectNewJsonLine);
 }
 
@@ -509,7 +547,7 @@ void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
   const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(current);
   const JsonPr& json = _JsonModel->GetJsonPr(srcModelInd);
   const QString jsonAbsPath = json.GetJsonFileAbsPath();
-  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), json.GetVideosAbsPath());
+  emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), {json.GetVideoAbsPath()});
 }
 
 void JsonTableView::keyPressEvent(QKeyEvent* e) {

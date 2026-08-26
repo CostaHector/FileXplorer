@@ -1,9 +1,9 @@
 #ifndef JSONTABLEMODEL_H
 #define JSONTABLEMODEL_H
 #include "QAbstractTableModelPub.h"
+#include "JsonOp.h"
 #include "JsonPr.h"
 #include <QFileInfo>
-#include <bitset>
 
 class JsonTableModel : public QAbstractTableModelPub {
  public:
@@ -40,10 +40,13 @@ class JsonTableModel : public QAbstractTableModelPub {
   int SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexes);
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
   int SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed=true);
+  JsonOp::Counter UpdateJsonKeyValuePair();
 
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);
   std::pair<int, int> ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const;
+
+  QStringList CheckMd5AndVidNameConsistency() const;
 
   JsonPr GetJsonPr(const QModelIndex& ind) const;
 
@@ -54,10 +57,9 @@ class JsonTableModel : public QAbstractTableModelPub {
  private:
   int JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JsonModelField::FIELD_E field, const int ITERATE_FOLDER_FIRST_LIMIT=50);
   QHash<QString, QString> GetVidBaseName2FullPath() const;
-  bool setModified(int row, bool modified = true);
-  bool setModifiedNoEmit(int row, bool modified = true);
+  bool setModified(int row, bool modified);
+  bool setModifiedNoEmit(int row, bool modified);
   QVector<JsonPr> mCachedJsons;
-  std::bitset<1000> m_modifiedRows;
   QString mRootPath;
 };
 

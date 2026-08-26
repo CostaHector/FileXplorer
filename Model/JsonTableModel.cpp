@@ -7,6 +7,8 @@
 #include "PathTool.h"
 #include "GeneralDataType.h"
 #include "BatchRenameBy.h"
+#include "SceneMixed.h"
+#include "JsonUpdater.h"
 #include <QIcon>
 #include <QBrush>
 #include <QDir>
@@ -81,7 +83,7 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
       break;
     }
     case Qt::ForegroundRole: {
-      if (orientation == Qt::Vertical && (0 <= section && section < rowCount()) && section < m_modifiedRows.size() && m_modifiedRows.test(section)) {
+      if (orientation == Qt::Vertical && (0 <= section && section < rowCount()) && mCachedJsons[section].bModified) {
         return QBrush(Qt::GlobalColor::red);
       }
       break;
@@ -142,7 +144,6 @@ int JsonTableModel::setRootPath(const QString& path, bool isForce) {
   const int afterRowCnt = tempCachedJsons.size();
   RowsCountBeginChange(befRowCnt, afterRowCnt);
   mCachedJsons.swap(tempCachedJsons);
-  m_modifiedRows.reset();
   RowsCountEndChange();
   return afterRowCnt;
 }
@@ -236,9 +237,7 @@ bool JsonTableModel::setModifiedNoEmit(int row, bool modified) {
   if (row < 0 || row >= rowCount()) {
     return false;
   }
-  if (row < m_modifiedRows.size()) {
-    m_modifiedRows.set(row, modified);
-  }
+  mCachedJsons[row].bModified = modified;
   return true;
 }
 
@@ -257,7 +256,7 @@ int JsonTableModel::SetStudio(const QModelIndexList& rowIndexes, const QString& 
     }
     ++affectedRows;
     mCachedJsons[row].m_Studio = studio;
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -298,7 +297,7 @@ int JsonTableModel::SetCastOrTags(const QModelIndexList& rowIndexes, JsonModelFi
       continue;
     }
     targetField = newLst;
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -346,7 +345,7 @@ int JsonTableModel::AddCastOrTags(const QModelIndexList& rowIndexes, const JsonM
       continue;
     }
     targetField += appendContainer;
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -392,7 +391,7 @@ int JsonTableModel::RmvCastOrTags(const QModelIndexList& rowIndexes, const JsonM
     if (!targetField.remove(oneElement)) {
       continue;
     }
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     ++affectedRows;
     if (row > maxRow) {
       maxRow = row;
@@ -432,7 +431,7 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
       continue;
     }
 
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     ++affecteRows;
     if (row > maxRow) {
       maxRow = row;
@@ -480,7 +479,7 @@ int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const Q
       continue;
     }
     // hintCast or hintStudio changed
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     // studio update in-place;
     if (studioChanged) {
       item.m_Studio = item.hintStudio;
@@ -538,7 +537,7 @@ int JsonTableModel::FormatCast(const QModelIndexList& rowIndexes) {
       return affectedRows;
     }
     mCachedJsons[row].m_Cast.format();
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -614,7 +613,7 @@ int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, 
       vidFullPath.clear();
     }
     affectedRows += (int)(mCachedJsons[row].*func)(vidFullPath);
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -658,7 +657,7 @@ int JsonTableModel::SyncFieldNameByJsonBaseName(const QModelIndexList& rowIndexe
     if (!mCachedJsons[row].SyncNameValueFromFileBaseName()) {
       continue;
     }
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -695,14 +694,13 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
       LOG_W("row: %d out of range [0,%d)", row, rowCount());
       return cnt;
     }
-    if (row < m_modifiedRows.size() && !m_modifiedRows.test(row)) {
+    if (!mCachedJsons[row].bModified) {
       continue;
     }
     if (!mCachedJsons[row].WriteIntoFiles()) {
       LOG_W("Write into local file[%s] failed", qPrintable(mCachedJsons[row].GetJsonFileAbsPath()));
       return -1;
     }
-    setModifiedNoEmit(row, false);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -762,6 +760,16 @@ std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const 
   return {actorRet, studioRet};
 }
 
+QStringList JsonTableModel::CheckMd5AndVidNameConsistency() const {
+  QStringList inconsistentFiles;
+  for (const JsonPr& jpr: mCachedJsons) {
+    if (!jpr.checkMd5AndVidNameConsistency()) {
+      inconsistentFiles.push_back(jpr.m_Name);
+    }
+  }
+  return inconsistentFiles;
+}
+
 JsonPr JsonTableModel::GetJsonPr(const QModelIndex& ind) const {
   const int row = ind.row();
   if (row < 0 || row >= rowCount()) {
@@ -812,7 +820,7 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
     }
     ++affectedRows;
     mCachedJsons[row].m_ContentFixed = bFixed;
-    setModifiedNoEmit(row);
+    setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;
     }
@@ -830,4 +838,38 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("ContentFixed Field of %d/%d row(s) range [%d, %d) changed to bool[%d]", affectedRows, rowIndexes.size(), minRow, maxRow, bFixed);
   return affectedRows;
+}
+
+JsonOp::Counter JsonTableModel::UpdateJsonKeyValuePair() {
+  JsonOp::Counter counter;
+  ScenesMixed sMixed;
+  sMixed(rootPath());
+
+  int minRow{INT_MAX}, maxRow{-1};
+  for (int row = 0; row < rowCount(); ++row) {
+    JsonOp::Counter currentCounter = JsonUpdater::UpdateJsonKeyValuePair(sMixed, mCachedJsons[row]);
+    if (currentCounter.m_jsonUsedCnt == 0) { // useless json found
+      continue;
+    }
+    counter += currentCounter;
+    if (currentCounter.m_jsonUpdatedCnt == 0) {
+      continue;
+    }
+    setModifiedNoEmit(row, true);
+    if (row > maxRow) {
+      maxRow = row;
+    }
+    if (row < minRow) {
+      minRow = row;
+    }
+  }
+  if (maxRow < 0 || minRow > maxRow) {
+    LOG_W("No Field(s) of %d row(s) updated", rowCount());
+    return counter;
+  }
+  const QModelIndex& frontInd = sibling(minRow, JsonModelField::FIELD_E::Name, {});
+  const QModelIndex& backInd = sibling(maxRow, JsonModelField::FIELD_E::Detail, {});
+  emit dataChanged(frontInd, backInd, {Qt::DisplayRole | Qt::ForegroundRole});
+  emit headerDataChanged(Qt::Vertical, minRow, maxRow);
+  return counter;
 }

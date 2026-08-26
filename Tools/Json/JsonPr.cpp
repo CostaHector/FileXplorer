@@ -16,6 +16,8 @@
 #include "VideoDurationGetter.h"
 #include "DvdFileInfo.h"
 #include "MD5Calculator.h"
+#include "JsonParser.h"
+#include "JsonUpdater.h"
 
 JsonPr JsonPr::fromJsonFile(const QString& jsonAbsFile) {
   QString prepath;
@@ -38,30 +40,10 @@ JsonPr::JsonPr(const QString& filePrePath, const QString& fileName, const QJsonO
 #undef JSON_KEY_ITEM
       jsonFileName{fileName} {  //
   m_Detail.replace("<br/>", "\n");
-  MergeTextContentsIntoDetailAndRecycleTxt();
-}
 
-void JsonPr::MergeTextContentsIntoDetailAndRecycleTxt() {
   const QString& jsonFileBaseName = PathTool::GetBaseName(jsonFileName);
-  QString txtAbsPath = m_Prepath + '/' + jsonFileBaseName + ".txt";
-  QFileInfo txtFi{txtAbsPath};
-  if (!txtFi.isFile()) {
-    return;
-  }
-  if (txtFi.size() > 10 * 1024) {
-    // too big file
-    return;
-  }
-  bool bReadOk{false};
-  const QString contents = FileTool::StringTextReader(txtAbsPath, &bReadOk);
-  if (!bReadOk) { // read failed
-    return;
-  }
-  if (!contents.isEmpty() && !m_Detail.contains(contents)) {
-    m_Detail += contents;
-    WriteIntoFiles();
-  }
-  QFile::moveToTrash(txtAbsPath);
+  QString txtAbsPath = PathTool::Path2Join(m_Prepath, jsonFileBaseName+".txt");
+  JsonUpdater::MergeTextContentsIntoDetailAndRecycleTxt(txtAbsPath, m_Detail);
 }
 
 bool JsonPr::operator==(const JsonPr& rhs) const {
@@ -100,6 +82,7 @@ bool JsonPr::WriteIntoFiles() const {
   if (writeResult) {
     hintCast.clear();
     hintStudio.clear();
+    bModified = false;
   }
   return writeResult;
 }
@@ -121,21 +104,19 @@ QStringList JsonPr::GetImagesAbsPath() const {
   return imgs;
 }
 
-QStringList JsonPr::GetVideosAbsPath() const {
-  QStringList vids;
-  vids.reserve(1);
-  if (!m_VidName.isEmpty()) {
-    vids.push_back(GetItemsAbsPath(m_VidName));
+QString JsonPr::GetVideoAbsPath() const {
+  if (m_VidName.isEmpty()) {
+    return "";
   }
-  return vids;
+  return GetItemsAbsPath(m_VidName);
 }
 
 bool JsonPr::SyncNameValueFromFileBaseName() {
-  const QString newbaseName{PathTool::GetBaseName(jsonFileName)};
+  QString newbaseName{PathTool::GetBaseName(jsonFileName)};
   if (newbaseName == m_Name) { // no need update
     return false;
   }
-  m_Name = newbaseName;
+  m_Name.swap(newbaseName);
   return true;
 }
 
@@ -163,7 +144,11 @@ bool JsonPr::UpdateVideoSizeField(QString videoAbsPath) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-  m_Size = FileTool::GetFileSize(videoAbsPath);
+  qint64 newSize = FileTool::GetFileSize(videoAbsPath);
+  if (m_Size == newSize) {
+    return false;
+  }
+  m_Size = newSize;
   return true;
 }
 
@@ -328,4 +313,9 @@ void JsonPr::RejectCastHint() {
 
 void JsonPr::RejectStudioHint() {
   hintStudio.clear();
+}
+
+bool JsonPr::checkMd5AndVidNameConsistency() const {
+  // return true if MD5 and VidName both empty or both non-empty.
+  return JsonParser::ValidateSampleMd5AndVidName(m_MD5.size(), m_VidName.size()) != JsonOp::ResultE::ERROR;
 }

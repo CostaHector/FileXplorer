@@ -28,7 +28,7 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(sMixed.m_vid2Name.size(), 1);
     QCOMPARE(sMixed.m_img2Name.size(), 1);
 
-    QCOMPARE(sMixed.m_json2Name["X-Man - The Last Stand"], "X-Man - The Last Stand.json");
+    QVERIFY(sMixed.m_json2Name.contains("X-Man - The Last Stand"));
     QCOMPARE(sMixed.m_vid2Name["X-Man - The Last Stand"].size(), 1);
     // in ascii table ' ' = 0x20, ' ' = 0x2E
     // but here we want length shorter rather than ascii less
@@ -69,12 +69,12 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(sMixed.m_img2Name["Tarzan"].size(), 5);
     QCOMPARE(sMixed.m_img2Name["Tarzan"][0], "Tarzan.jpg");
     QCOMPARE(sMixed.m_vid2Name["Tarzan"].size(), 2);
-    QCOMPARE(sMixed.m_json2Name["Tarzan"], "Tarzan.json");
+    QVERIFY(sMixed.m_json2Name.contains("Tarzan"));
 
     QCOMPARE(sMixed.m_img2Name["another Tarzan"].size(), 5);
     QCOMPARE(sMixed.m_img2Name["another Tarzan"][0], "another Tarzan.jpg");
     QCOMPARE(sMixed.m_vid2Name["another Tarzan"].size(), 2);
-    QCOMPARE(sMixed.m_json2Name["another Tarzan"], "another Tarzan.json");
+    QVERIFY(sMixed.m_json2Name.contains("another Tarzan"));
   }
 
   void test_video_with_part_and_images() {
@@ -97,7 +97,7 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(grps["Superman - The Inked Meat Part 1"].size(), 5);
     QCOMPARE(grps["Superman - The Inked Meat Part 2"].size(), 5);
 
-    QCOMPARE(sMixed.m_json2Name.keys(), expectGrpNames);
+    QCOMPARE(sMixed.m_json2Name, (QSet<QString>{expectGrpNames.cbegin(), expectGrpNames.cend()}));
     QCOMPARE(sMixed.m_vid2Name.keys(), expectGrpNames);
     QCOMPARE(sMixed.m_img2Name.keys(), expectGrpNames);
 
@@ -129,7 +129,7 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(grps["Captain America - Henry Carvill, Chris Evans"].size(), 4);
     QCOMPARE(grps["Captain America - Henry Carvill, Chris Evans Part 2"].size(), 2);
 
-    QCOMPARE(sMixed.m_json2Name.keys(), (QStringList{"Captain America - Henry Carvill, Chris Evans Part 2"}));
+    QCOMPARE(sMixed.m_json2Name, (QSet<QString>{"Captain America - Henry Carvill, Chris Evans Part 2"}));
     QCOMPARE(sMixed.m_vid2Name.keys(), expectGrpNames);
     QCOMPARE(sMixed.m_img2Name.size(), 1);
   }
@@ -155,11 +155,11 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(grps.size(), 1); // batch count = 1
     QCOMPARE(grps["Captain America - Henry Carvill, Chris Evans"].size(), 11);
     const QStringList expectGrpsNames{"Captain America - Henry Carvill, Chris Evans"};
-    QCOMPARE(sMixed.m_json2Name.keys(), expectGrpsNames);
+    QCOMPARE(sMixed.m_json2Name, (QSet<QString>{expectGrpsNames.cbegin(), expectGrpsNames.cend()}));
     QCOMPARE(sMixed.m_vid2Name.keys(), expectGrpsNames);
     QCOMPARE(sMixed.m_img2Name.keys(), expectGrpsNames);
 
-    QCOMPARE(sMixed.m_json2Name["Captain America - Henry Carvill, Chris Evans"], "Captain America - Henry Carvill, Chris Evans.json");
+    QVERIFY(sMixed.m_json2Name.contains("Captain America - Henry Carvill, Chris Evans"));
     QCOMPARE(sMixed.m_vid2Name["Captain America - Henry Carvill, Chris Evans"].size(), 6);
     QCOMPARE(sMixed.m_img2Name["Captain America - Henry Carvill, Chris Evans"].size(), 4);
   }

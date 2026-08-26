@@ -3,7 +3,6 @@
 #include "StyleSheet.h"
 #include "SceneInfo.h"
 #include "PublicMacro.h"
-#include "RateHelper.h"
 #include "VideoTierTool.h"
 #include <QToolBar>
 
@@ -77,19 +76,28 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
     using namespace VideoTierTool;
     _ARCHIVE_ARCHIVAL = new QAction{QIcon{":img/ARCHIVE_ARCHIVAL"}, tr("Archival"), this};
     _ARCHIVE_ARCHIVAL->setProperty("ArchivedVideoTier", (int)VideoTierE::ARCHIVAL);
+    _ARCHIVE_ARCHIVAL->setToolTip(GetVideoTierActionToolTip(VideoTierE::ARCHIVAL));
     _ARCHIVE_ESSENTIALS = new QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Essentials"), this};
     _ARCHIVE_ESSENTIALS->setProperty("ArchivedVideoTier", (int)VideoTierE::ESSENTIALS);
+    _ARCHIVE_ESSENTIALS->setToolTip(GetVideoTierActionToolTip(VideoTierE::ESSENTIALS));
     _ARCHIVE_NORMALS = new QAction{QIcon{":img/ARCHIVE_NORMAL"}, tr("Normals"), this};
     _ARCHIVE_NORMALS->setProperty("ArchivedVideoTier", (int)VideoTierE::NORMALS);
+    _ARCHIVE_NORMALS->setToolTip(GetVideoTierActionToolTip(VideoTierE::NORMALS));
+    _ARCHIVE_STANDBY = new QAction{QIcon{":img/ARCHIVE_STANDBY"}, tr("Standby"), this};
+    _ARCHIVE_STANDBY->setProperty("ArchivedVideoTier", (int)VideoTierE::STANDBY);
+    _ARCHIVE_STANDBY->setToolTip(GetVideoTierActionToolTip(VideoTierE::STANDBY));
     _ARCHIVE_CASUALS = new QAction{QIcon{":img/ARCHIVE_CASUALS"}, tr("Casuals"), this};
     _ARCHIVE_CASUALS->setProperty("ArchivedVideoTier", (int)VideoTierE::CASUALS);
+    _ARCHIVE_CASUALS->setToolTip(GetVideoTierActionToolTip(VideoTierE::CASUALS));
     _ARCHIVE_DISPOSABLE = new QAction{QIcon{":img/ARCHIVE_DISPOSABLE"}, tr("Disposable"), this};
     _ARCHIVE_DISPOSABLE->setProperty("ArchivedVideoTier", (int)VideoTierE::DISPOSABLE);
+    _ARCHIVE_DISPOSABLE->setToolTip(GetVideoTierActionToolTip(VideoTierE::DISPOSABLE));
 
     _ARCHIVE_AG = new QActionGroup(this);
     _ARCHIVE_AG->addAction(_ARCHIVE_ARCHIVAL);
     _ARCHIVE_AG->addAction(_ARCHIVE_ESSENTIALS);
     _ARCHIVE_AG->addAction(_ARCHIVE_NORMALS);
+    _ARCHIVE_AG->addAction(_ARCHIVE_STANDBY);
     _ARCHIVE_AG->addAction(_ARCHIVE_CASUALS);
     _ARCHIVE_AG->addAction(_ARCHIVE_DISPOSABLE);
   }

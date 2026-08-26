@@ -1,7 +1,6 @@
 #include "SceneMixed.h"
 #include "ItemsPileCategory.h"
 #include "PathTool.h"
-#include "FileTool.h"
 #include "PublicVariable.h"
 #include "JsonRenameRegex.h"
 #include "StringTool.h"
@@ -83,7 +82,7 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
         break;
       }
       case JSON: {
-        m_json2Name[baseName] = medName;
+        m_json2Name.insert(baseName);
         batches[baseName].append(medName);
         break;
       }

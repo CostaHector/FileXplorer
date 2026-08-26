@@ -145,10 +145,10 @@ QToolBar* RibbonMenu::LeafFile() const {
 }
 
 QToolBar* RibbonMenu::LeafHome() const {
-  auto& fileOpInst = FileOpActs::GetInst();
-
   QToolBar* leafHomeWid = new (std::nothrow) QToolBar{"LeafHome"};
   CHECK_NULLPTR_RETURN_NULLPTR(leafHomeWid);
+
+  auto& fileOpInst = FileOpActs::GetInst();
 
   QToolBar* openItemsTB = new (std::nothrow) QToolBar{"Open", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(openItemsTB);
@@ -210,20 +210,6 @@ QToolBar* RibbonMenu::LeafHome() const {
     SetLayoutAlightment(moveCopyItemsToTB->layout(), Qt::AlignmentFlag::AlignTop);
   }
 
-  QToolBar* cutCopyPasterTb = fileOpInst.GetCutCopyPasteTb(leafHomeWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(cutCopyPasterTb);
-
-  QToolBar* folderOpModeTb = fileOpInst.GetFolderOperationModeTb(leafHomeWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(folderOpModeTb);
-
-  QToolButton* recycleItemsTB = new (std::nothrow) MenuToolButton(fileOpInst.DELETE_ACTIONS->actions(),
-                                                                  QToolButton::MenuButtonPopup,
-                                                                  Qt::ToolButtonStyle::ToolButtonTextUnderIcon,
-                                                                  IMAGE_SIZE::TABS_ICON_IN_MENU_48,
-                                                                  leafHomeWid);
-  CHECK_NULLPTR_RETURN_NULLPTR(recycleItemsTB);
-  recycleItemsTB->setDefaultAction(fileOpInst.MOVE_TO_TRASHBIN);
-
   QToolBar* archievePreviewToolBar = new (std::nothrow) QToolBar{"ArchievePreview", leafHomeWid};
   CHECK_NULLPTR_RETURN_NULLPTR(archievePreviewToolBar);
   {
@@ -264,13 +250,14 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(propertiesTB);
   leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(folderOpModeTb);
+  leafHomeWid->addWidget(fileOpInst.GetFolderOperationModeTb(leafHomeWid));
   leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(cutCopyPasterTb);
+  leafHomeWid->addWidget(fileOpInst.GetCutCopyPasteTb(leafHomeWid));
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(moveCopyItemsToTB);
   leafHomeWid->addSeparator();
-  leafHomeWid->addWidget(recycleItemsTB);
+  leafHomeWid->addAction(fileOpInst._UNLOCK_OCCUPIED_FILES);
+  leafHomeWid->addWidget(fileOpInst.GetDeleteItemsToolButton(leafHomeWid));
   leafHomeWid->addWidget(renameItemsTB);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(newItemsTB);
@@ -281,6 +268,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addWidget(compressToolBar);
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(advanceSearchToolBar);
+  leafHomeWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   return leafHomeWid;
 }
 

@@ -73,7 +73,7 @@
 <context>
     <name>AdvanceRenamer</name>
     <message>
-        <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+27"/>
+        <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+28"/>
         <source>Name Ext Independent</source>
         <translation>名/扩展名独立</translation>
     </message>
@@ -683,17 +683,17 @@
         <translation>复制到</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+12"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Delete Permanently</source>
         <translation>永久删除</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+14"/>
         <source>Merged to Front</source>
         <translation>合并到前一个</translation>
     </message>
@@ -738,7 +738,12 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="+279"/>
+        <location line="-44"/>
+        <source>Unlock Occupied Files</source>
+        <translation>解除占用文件</translation>
+    </message>
+    <message>
+        <location line="+323"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -1111,12 +1116,7 @@
         <translation>小写</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Rename related files</source>
-        <translation>重命名相关</translation>
-    </message>
-    <message>
-        <location line="+23"/>
+        <location line="+25"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -1129,6 +1129,11 @@
         <location line="+14"/>
         <source>Update MD5</source>
         <translation>更新哈希字段</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Update K-V</source>
+        <translation>更新键值对</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1146,7 +1151,12 @@
         <translation>根据大写选中推测演员</translation>
     </message>
     <message>
-        <location line="-47"/>
+        <location line="+5"/>
+        <source>Check MD5 &amp; VidName Consistency</source>
+        <translation>MD5/VidName一致性检查</translation>
+    </message>
+    <message>
+        <location line="-52"/>
         <source>Clear Studio</source>
         <translation>清除厂商</translation>
     </message>
@@ -1156,7 +1166,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-72"/>
+        <location line="-77"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
@@ -1181,7 +1191,7 @@
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+45"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1214,14 +1224,6 @@
         <location line="+3"/>
         <source>Rmv Tag</source>
         <translation>移除标签</translation>
-    </message>
-</context>
-<context>
-    <name>JsonTableView</name>
-    <message>
-        <location filename="../../View/JsonTableView.cpp" line="+45"/>
-        <source>Recycle related files</source>
-        <translation>回收相关文件</translation>
     </message>
 </context>
 <context>
@@ -1407,12 +1409,12 @@
         <translation>从视频文件导入</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Import from JSON</source>
         <translation>从Json文件导入</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Delete Where</source>
         <translation>删除</translation>
     </message>
@@ -1427,7 +1429,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+17"/>
         <source>Read Duration</source>
         <translation>更新时长</translation>
     </message>
@@ -1490,6 +1492,11 @@
         <location line="+1"/>
         <source>Rmv Tag</source>
         <translation>移除标签</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Insert into</source>
+        <translation>插入</translation>
     </message>
 </context>
 <context>
@@ -2105,7 +2112,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+59"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2159,7 +2166,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneInPageActions</name>
     <message>
-        <location filename="../../Actions/SceneInPageActions.cpp" line="+17"/>
+        <location filename="../../Actions/SceneInPageActions.cpp" line="+16"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
@@ -2199,27 +2206,32 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>归档级</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Essentials</source>
         <translation>精选级</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Normals</source>
         <translation>普通级</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
+        <source>Standby</source>
+        <translation>候补级</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Casuals</source>
         <translation>尝鲜级</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Disposable</source>
         <translation>可丢弃级</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>Movie Name</source>
         <translation>按名称</translation>
     </message>
@@ -2262,27 +2274,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+45"/>
-        <source>Rename related(replace)</source>
-        <translation>重命名相关文件(替换)</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Rename related(Insert)</source>
-        <translation>重命名相关文件(插入)</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Rename (ith)</source>
-        <translation>重命名(编号)</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Recycle related files</source>
-        <translation>回收相关文件</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location filename="../../View/SceneListView.cpp" line="+47"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>

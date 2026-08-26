@@ -61,8 +61,8 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       };
       QCOMPARE(tDir.createEntries(onlyOneJsonFileNodes), 1);
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(0, 1, 0, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(0, 1, 0, 0));
       tDir.ClearAll();
     }
 
@@ -74,9 +74,9 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(jsonAndImgNodes), 2);
       QVERIFY(tDir.checkFileContents("Xander.json", {}, {"Xander.jpg"}));
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 0, 1));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(1, 1, 1, 0));
       QVERIFY(tDir.checkFileContents("Xander.json", {"Xander.jpg"}));
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(0, 1, 0, 0));
       tDir.ClearAll();
     }
 
@@ -90,9 +90,9 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(jsonAndVidNodes), 2);
       QVERIFY(tDir.checkFileContents("Xander.json", {}, {"Xander.mp4"}));
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 1, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(1, 1, 0, 1));
       QVERIFY(tDir.checkFileContents("Xander.json", {"Xander.mp4", "22"}));  // Size changed to 22
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(0, 1, 0, 0));
       tDir.ClearAll();
     }
 
@@ -105,9 +105,9 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QCOMPARE(tDir.createEntries(allNodes), 3);
       QVERIFY(tDir.checkFileContents("Xander.json", {}, {"Xander.jpg", "Xander.mp4"}));
       ScnMgr scnMgr;
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(1, 1, 1, 1));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(1, 1, 1, 1));
       QVERIFY(tDir.checkFileContents("Xander.json", {"Xander.jpg", "Xander.mp4"}));
-      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), Counter(0, 1, 0, 0));
+      QCOMPARE(scnMgr.UpdateJsonUnderAPath(tDir.path()), JsonOp::Counter(0, 1, 0, 0));
       tDir.ClearAll();
     }
     {  // 7. protection: it cannot write into what we don't want to
@@ -131,16 +131,16 @@ Precondition: Xander.json value of key ImgName, VidName is empty
       QVERIFY(tDir.checkFileContents("ChrisOnlyNameKey.json", {"ChrisOnlyNameKey"}, {"ChrisOnlyNameKey.jpg", "ChrisOnlyNameKey.mp4"}));
 
       ScnMgr scnMgr;
-      Counter result = scnMgr.UpdateJsonUnderAPath(tDir.path());  // first call
-      QCOMPARE(result, Counter(2, 2, 2, 2));                      // only FassbenderNameKeyDifferToFileName.json/ChrisOnlyNameKey.json is usefull
+      JsonOp::Counter result = scnMgr.UpdateJsonUnderAPath(tDir.path());  // first call
+      QCOMPARE(result, JsonOp::Counter(2, 2, 2, 2));                      // only FassbenderNameKeyDifferToFileName.json/ChrisOnlyNameKey.json is usefull
 
       QVERIFY(tDir.checkFileContents("MichaelNoNameKeyUseless.json", {}, {"ImgName", "VidName"}));  // unmodified
       QVERIFY(tDir.checkFileContents("FassbenderNameKeyDifferToFileName.json", {"FassbenderNameKeyDifferToFileName", "ImgName", "VidName"},
                                      {"Differ to its json file base Name"}));  // Name synced with file base name, and including img/vid
       QVERIFY(tDir.checkFileContents("ChrisOnlyNameKey.json", {"ChrisOnlyNameKey.jpg", "ChrisOnlyNameKey.mp4"}));  // including img/vid
 
-      Counter secondResult = scnMgr.UpdateJsonUnderAPath(tDir.path());  // second call. no update
-      QCOMPARE(secondResult, Counter(0, 2, 0, 0));
+      JsonOp::Counter secondResult = scnMgr.UpdateJsonUnderAPath(tDir.path());  // second call. no update
+      QCOMPARE(secondResult, JsonOp::Counter(0, 2, 0, 0));
 
       tDir.ClearAll();
     }
@@ -240,9 +240,9 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       ScnMgr scnMgr;
 
       // 第一次调用：应处理所有层级的JSON文件
-      Counter result = scnMgr(tDir.path());
+      JsonOp::Counter result = scnMgr(tDir.path());
 
-      QCOMPARE(result, Counter(3, 3, 3, 2));  // 预期：更新3个JSON，使用3个JSON，更新3个视频字段, 更新2个图片字段
+      QCOMPARE(result, JsonOp::Counter(3, 3, 2, 3));  // 预期：更新3个JSON，使用3个JSON，更新3个视频字段, 更新2个图片字段
 
       // 验证文件更新
       // 根目录：Disney.json
@@ -256,8 +256,8 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       // 3 scn file in total QVERIFY(scnMgr.m_jsonsDicts.isEmpty());
 
       // 第二次调用：不应有更新, 文件未改变
-      Counter secondResult = scnMgr(tDir.path());
-      QCOMPARE(secondResult, Counter(0, 3, 0, 0));  // 预期：{0,3,0,0}
+      JsonOp::Counter secondResult = scnMgr(tDir.path());
+      QCOMPARE(secondResult, JsonOp::Counter(0, 3, 0, 0));  // 预期：{0,3,0,0}
       const QStringList& afterList = tDir.FilesContentsSnapshot({"Disney.json", "Marvel/Captain American.json", "Marvel/Bonus/Chris Evans.json"});
       QCOMPARE(afterList, beforeList);
 

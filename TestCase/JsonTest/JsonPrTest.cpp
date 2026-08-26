@@ -11,7 +11,6 @@
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
 
-#include "NameTool.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
 #include "JsonTestPrecoditionTools.h"
@@ -169,6 +168,7 @@ class JsonPrTest : public PlainTestSuite {
     JsonPr jPr{fixedFi.fileName()};
     QCOMPARE(jPr.m_Prepath, rootpath);
     QCOMPARE(jPr.jsonFileName, fixedJsonName);
+    QVERIFY(!jPr.bModified);
 
     // 3. prepare a json that contains deprecated key ProductionStudio, Performers
     using namespace JsonModelField;

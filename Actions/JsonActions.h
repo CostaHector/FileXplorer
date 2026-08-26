@@ -31,6 +31,7 @@ public:
   QAction* _UPDATE_DURATION_FIELD{nullptr};
   QAction* _UPDATE_SIZE_FIELD{nullptr};
   QAction* _UPDATE_MD5_FIELD{nullptr};
+  QAction* _UPDATE_JSON_KEY_VALUE_PAIR{nullptr};
 
   QAction* _STUDIO_FIELD_SET{nullptr};
   QAction* _CLEAR_STUDIO{nullptr};
@@ -50,6 +51,8 @@ public:
 
   QAction* _INFER_CAST_FROM_SELECTION{nullptr};
   QAction* _INFER_CAST_FROM_UPPERCASE_SELECTION{nullptr};
+
+  QAction* _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY{nullptr};
 };
 
 JsonActions& g_JsonActions();

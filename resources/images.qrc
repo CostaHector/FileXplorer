@@ -36,6 +36,7 @@
         <file alias="VIDEO_ARCHIVE">Media/VIDEO_ARCHIVE.svg</file>
         <file alias="ARCHIVE_ARCHIVAL">Media/ARCHIVE_ARCHIVAL.svg</file>
         <file alias="ARCHIVE_NORMAL">Media/ARCHIVE_NORMAL.svg</file>
+        <file alias="ARCHIVE_STANDBY">Media/ARCHIVE_STANDBY.svg</file>
         <file alias="ARCHIVE_CASUALS">Media/ARCHIVE_CASUALS.svg</file>
         <file alias="ARCHIVE_DISPOSABLE">Media/ARCHIVE_DISPOSABLE.svg</file>
         <file alias="DISABLE_IMAGE_DECORATION">Media/DISABLE_IMAGE_DECORATION.svg</file>
@@ -354,6 +355,7 @@
         <file alias="STUDIO_CLEAR">JsonEditor/STUDIO_CLEAR.svg</file>
         <file alias="STUDIO">JsonEditor/STUDIO.svg</file>
         <file alias="NAME_FROM_JSON_FILENAME">JsonEditor/NAME_FROM_JSON_FILENAME.svg</file>
+        <file alias="CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT">JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT.svg</file>
     </qresource>
 
     <qresource prefix="/VideoPlayer">

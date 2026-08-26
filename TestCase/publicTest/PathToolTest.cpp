@@ -429,6 +429,14 @@ private slots:
     QCOMPARE(PathTool::absolutePath("/home"), "/");
     QCOMPARE(PathTool::absolutePath("/"), "");
   }
+
+  void IsPathAtShallowDepth_ok() {
+    // test including /home/path/ and "C:/home/to" 2 platform should both ok
+    QVERIFY(PathTool::isPathAtShallowDepth("/"));
+    QVERIFY(PathTool::isPathAtShallowDepth("C:/"));
+    QVERIFY(!PathTool::isPathAtShallowDepth("/home/user"));
+    QVERIFY(!PathTool::isPathAtShallowDepth("C:/Users/Public/Documents"));
+  }
 };
 
 #include "PathToolTest.moc"

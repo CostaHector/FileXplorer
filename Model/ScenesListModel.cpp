@@ -142,7 +142,11 @@ QString ScenesListModel::filePath(const QModelIndex& index) const {
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mPagedData[i].GetVideoAbsPath(mRootPath);
+  const QString vidAbsPath = mPagedData[i].GetVideoAbsPath(mRootPath);
+  if (!vidAbsPath.isEmpty()) {
+    return vidAbsPath;
+  }
+  return mPagedData[i].GetJsonAbsPath(mRootPath); // fall back to json abs path
 }
 
 QString ScenesListModel::fileName(const QModelIndex& index) const {
@@ -150,11 +154,10 @@ QString ScenesListModel::fileName(const QModelIndex& index) const {
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  if (mPagedData[i].vidName.isEmpty()) {
-    LOG_D("vidName is empty");
-    return {};
+  if (!mPagedData[i].vidName.isEmpty()) {
+    return mPagedData[i].vidName;
   }
-  return mPagedData[i].vidName;
+  return mPagedData[i].name; // fall back to json base name
 }
 
 int ScenesListModel::GetRate(const QModelIndex& index) const {
