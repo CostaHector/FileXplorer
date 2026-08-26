@@ -27,7 +27,11 @@ bool MergeTextContentsIntoDetailAndRecycleTxt(const QString& txtAbsPath, QString
     detailContent += '\n';
   }
   detailContent += contents;
+#ifdef RUNNING_UNIT_TESTS
+  QFile::remove(txtAbsPath);
+#else
   QFile::moveToTrash(txtAbsPath);
+#endif
   return true;
 }
 

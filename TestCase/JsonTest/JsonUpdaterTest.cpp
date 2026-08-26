@@ -185,12 +185,7 @@ private slots:
       QString afterVidName = noVidNameMatchJson["VidName"].toString();
       QCOMPARE(afterVidName, beforeVidName);
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameMatchJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0))); // update again. no field updated
-      // Videos no longer exist. will not update VidName
-      QVERIFY(touchOrDeleteMP4File(mTDir, false));
-      QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameMatchJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0))); // update again. no field updated
-      QCOMPARE(noVidNameMatchJson["VidName"].toString(), (QString{"Lewandowski 1024.mp4"}));
 
-      QVERIFY(touchOrDeleteMP4File(mTDir, true));
       JsonPr noVidNameJsonPr;
       {
         noVidNameJsonPr.m_Prepath = parentPath;
@@ -204,8 +199,12 @@ private slots:
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameJsonPr), (JsonOp::Counter(1, 1, 0, 1)));
       QCOMPARE(noVidNameJsonPr.m_VidName, (QString{"Lewandowski 1024.mp4"}));
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameJsonPr), (JsonOp::Counter(0, 1, 0, 0)));
+
       // Videos no longer exist. will not update VidName
       QVERIFY(touchOrDeleteMP4File(mTDir, false));
+      QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameMatchJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0))); // update again. no field updated
+      QCOMPARE(noVidNameMatchJson["VidName"].toString(), (QString{"Lewandowski 1024.mp4"}));
+
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noVidNameJsonPr), (JsonOp::Counter(0, 1, 0, 0)));
       QCOMPARE(noVidNameJsonPr.m_VidName, (QString{"Lewandowski 1024.mp4"}));
     }
@@ -221,15 +220,9 @@ private slots:
       noSizeJson["Size"] = 1024 * 1000;
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJson, parentPath, jsonFileBaseName), (JsonOp::Counter(1, 1, 0, 0)));
       QCOMPARE(noSizeJson["Size"].toLongLong(), 1024);
-
       // update again. no field updated
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0)));
-      // Videos no longer exist. will not update Size
-      QVERIFY(touchOrDeleteMP4File(mTDir, false));
-      QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0)));
-      QCOMPARE(noSizeJson["Size"].toLongLong(), 1024);
 
-      QVERIFY(touchOrDeleteMP4File(mTDir, true));
       JsonPr noSizeJsonPr;
       {
         noSizeJsonPr.m_Prepath = parentPath;
@@ -244,8 +237,12 @@ private slots:
       QCOMPARE(noSizeJsonPr.m_Size, 1024);
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJsonPr), (JsonOp::Counter(0, 1, 0, 0)));
 
+
       // Videos no longer exist. will not update Size
       QVERIFY(touchOrDeleteMP4File(mTDir, false));
+      QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJson, parentPath, jsonFileBaseName), (JsonOp::Counter(0, 1, 0, 0)));
+      QCOMPARE(noSizeJson["Size"].toLongLong(), 1024);
+
       QCOMPARE(JsonUpdater::UpdateJsonKeyValuePair(sMixed, noSizeJsonPr), (JsonOp::Counter(0, 1, 0, 0)));
       QCOMPARE(noSizeJsonPr.m_Size, 1024);
     }
