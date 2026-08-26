@@ -4,7 +4,6 @@
 #include "JsonOp.h"
 #include "JsonPr.h"
 #include <QFileInfo>
-#include <bitset>
 
 class JsonTableModel : public QAbstractTableModelPub {
  public:
@@ -58,10 +57,9 @@ class JsonTableModel : public QAbstractTableModelPub {
  private:
   int JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JsonModelField::FIELD_E field, const int ITERATE_FOLDER_FIRST_LIMIT=50);
   QHash<QString, QString> GetVidBaseName2FullPath() const;
-  bool setModified(int row, bool modified = true);
-  bool setModifiedNoEmit(int row, bool modified = true);
+  bool setModified(int row, bool modified);
+  bool setModifiedNoEmit(int row, bool modified);
   QVector<JsonPr> mCachedJsons;
-  std::bitset<1000> m_modifiedRows;
   QString mRootPath;
 };
 

@@ -79,6 +79,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   bool hasSelection() const;
   QString getRootPath() const;
+
   QString getFilePath(const QModelIndex& ind) const;
   QModelIndexList getSelectedRows() const;
   QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
@@ -87,7 +88,6 @@ class ViewsStackedWidget : public QStackedWidget {
   std::pair<QStringList, QStringList> getFilePrepathsAndName(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
   MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
   QStringList getFullRecords() const;
-
   int getSelectedRowsCount() const;
   QString getCurFilePath() const;
   QString getCurFileName() const;

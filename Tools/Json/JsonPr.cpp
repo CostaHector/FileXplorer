@@ -82,6 +82,7 @@ bool JsonPr::WriteIntoFiles() const {
   if (writeResult) {
     hintCast.clear();
     hintStudio.clear();
+    bModified = false;
   }
   return writeResult;
 }

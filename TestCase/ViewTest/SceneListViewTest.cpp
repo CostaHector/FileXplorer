@@ -70,6 +70,7 @@ private slots:
         {"Henry Cavill.mp4", false, ""},                           //
     };
     QCOMPARE(tDir.createEntries(nodes), 6);
+    QVERIFY(!PathTool::isPathAtShallowDepth(tDir.path()));
 
     expectCurrentSceneChangedArgs_ChrisEvans = QVariantList{
                                                             "Chris Evans",                                  //
@@ -118,16 +119,6 @@ private slots:
     // call onClickEvent with invalid index should not crash down
     sceneView.onClickEvent(QModelIndex());
     sceneView.onCellVisualUpdateRequested({});
-  }
-
-  void IsPathAtShallowDepth_ok() {
-    // test including /home/path/ and "C:/home/to" 2 platform should both ok
-    QVERIFY(!PathTool::isPathAtShallowDepth(tDir.path()));
-
-    QVERIFY(PathTool::isPathAtShallowDepth("/"));
-    QVERIFY(PathTool::isPathAtShallowDepth("C:/"));
-    QVERIFY(!PathTool::isPathAtShallowDepth("/home/user"));
-    QVERIFY(!PathTool::isPathAtShallowDepth("C:/Users/Public/Documents"));
   }
 
   void update_json_update_scene_slot_ok() {

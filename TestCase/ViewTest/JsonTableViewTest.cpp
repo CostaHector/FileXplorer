@@ -572,6 +572,18 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonView.onUpdateDuration(), 0);
     QCOMPARE(jsonView.onUpdateFileMD5(), 0);
   }
+
+  void onUpdateJsonKeyValuePair_ok() {
+    QSortFilterProxyModel jsonProxyModel;
+    JsonTableModel jsonModel;
+    JsonTableView jsonView{&jsonModel, &jsonProxyModel};
+
+    jsonModel.mRootPath = "/";
+    QCOMPARE(jsonView.onUpdateJsonKeyValuePair(), -1);
+
+    jsonModel.mRootPath = "path/to/an/inexist/folder";
+    QCOMPARE(jsonView.onUpdateJsonKeyValuePair(), 0);
+  }
 };
 
 #include "JsonTableViewTest.moc"

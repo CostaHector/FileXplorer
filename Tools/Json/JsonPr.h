@@ -34,6 +34,7 @@ struct JsonPr {
   QString jsonFileName;
   mutable QString hintCast;
   mutable QString hintStudio;
+  mutable bool bModified{false};
 
   enum OP_RET {
     E_JSON_NOT_EXIST = -1000,      //

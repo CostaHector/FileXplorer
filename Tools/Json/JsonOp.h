@@ -9,6 +9,7 @@ enum class ResultE {
 };
 
 struct Counter {
+  // {是否更新, 是否有效, ImgName是否更新, VidName是否更新}
   explicit Counter(int jsonUpdatedCnt = 0, int jsonUsedCnt = 0, int imgNameKeyFieldUpdatedCnt = 0, int vidNameKeyFieldUpdatedCnt = 0)
       : m_jsonUpdatedCnt{jsonUpdatedCnt},
         m_jsonUsedCnt{jsonUsedCnt},
