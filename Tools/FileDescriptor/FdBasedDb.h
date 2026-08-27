@@ -10,6 +10,7 @@ class FdBasedDb : public DbManager {
   int ReadADirectoryJson(const QString& tableName, const QString& folderAbsPath);
   FD_ERROR_CODE Adt(const QString& tableName, const QString& peerPath, VolumeUpdateResult* pAdt = nullptr);
   int SetDuration(const QString& tableName);
+  int ExportToEfuFile(const QString& tableName, const QString& efuFileAbsPath) const;
   int ExportDurationStudioCastTagsToJson(const QString& tableName) const;
   int UpdateStudioCastTagsByJson(const QString& tableName, const QString& peerPath) const;
 
@@ -19,6 +20,7 @@ class FdBasedDb : public DbManager {
   static const QString UPDATE_PATH_TEMPLATE;
   static const QString SELECT_DURATION_0_TEMPLATE;
   static const QString UPDATE_DURATION_0_TEMPLATE;
+  static const QString SELECT_EFU_FIELDS_TEMPLATE;
   static const QString SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE;
   static const QString UPDATE_STUDIO_CAST_TAGS_TEMPLATE;
 

@@ -33,12 +33,12 @@ USING_MOCKCPP_NS
     class MovieDBViewTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  TDir tDir;
-  const QString dbName{tDir.itemPath("MovieViewTest.db")};
+  TDir mTDir;
+  const QString dbName{mTDir.itemPath("MovieViewTest.db")};
   const QString connName{"MovieViewTestConn"};
-  const QString path1 = tDir.itemPath("path1");
-  const QString path2 = tDir.itemPath("path2");
-  const QString path3 = tDir.itemPath("ScanJsonsFolder");
+  const QString path1 = mTDir.itemPath("path1");
+  const QString path2 = mTDir.itemPath("path2");
+  const QString path3 = mTDir.itemPath("ScanJsonsFolder");
   bool path1ToTableName1Ok{false};
   bool path2ToTableName2Ok{false};
   bool path3ToTableName3Ok{false};
@@ -56,16 +56,16 @@ public:
                                  {"path2/Morata.mp4", false, "Contents in Morata.mp4"},
                                  };
   const QHash<QString, int> vidspath2Duration{
-                                              {tDir.itemPath("path1/Chris Evans.mp4"), 0},  // broken file
-                                              {tDir.itemPath("path1/Chris Hemsworth.mp4"), 8000},    {tDir.itemPath("path1/Chris Pine.mp4"), 7000},
-                                              {tDir.itemPath("path2/Michael Fassbender.mp4"), 6000}, {tDir.itemPath("path2/Morata.mp4"), 5000},
+                                              {mTDir.itemPath("path1/Chris Evans.mp4"), 0},  // broken file
+                                              {mTDir.itemPath("path1/Chris Hemsworth.mp4"), 8000},    {mTDir.itemPath("path1/Chris Pine.mp4"), 7000},
+                                              {mTDir.itemPath("path2/Michael Fassbender.mp4"), 6000}, {mTDir.itemPath("path2/Morata.mp4"), 5000},
                                               };
 private slots:
   void initTestCase() {
     Configuration().clear();
     {
-      QVERIFY(tDir.IsValid());
-      QCOMPARE(tDir.createEntries(nodes), 6);
+      QVERIFY(mTDir.IsValid());
+      QCOMPARE(mTDir.createEntries(nodes), 6);
       VideoDurationGetterMock::PresetVidsDuration(vidspath2Duration);
     }
 
@@ -99,6 +99,10 @@ private slots:
     using namespace VideoDurationGetterMock;
     MOCKER(VideoDurationGetter::GetLengthQuickStatic).stubs().will(invoke(invokeGetLengthQuickStatic));
     MOCKER(VideoDurationGetter::GetLengthsQuickStatic).stubs().will(invoke(invokeGetLengthsQuickStatic));
+
+    if (mTDir.exists("ScanJsonsFolder")) {
+      QVERIFY(QDir{mTDir.itemPath("ScanJsonsFolder")}.removeRecursively());
+    }
   }
 
   void cleanup() {  //
@@ -128,8 +132,10 @@ private slots:
 
     QCOMPARE(dbModel.rowCount(), 0);
     QCOMPARE(movieView.onExportToJson(), -1);  // no tables at all
+    QCOMPARE(movieView.onExportToEfuFile(), -1); // no tables at all
     QCOMPARE(movieView.onUpdateByJson(), -1);  // no tables at all
     QVERIFY(!movieView.onAuditATable());       // no tables at all
+
 
     QVERIFY(movieView.onInitDataBase());  // usually we don't need call it
 
@@ -673,11 +679,18 @@ private slots:
       QVERIFY(movieView.onSubmit());
       QVERIFY(!dbModel.isDirty());
       movieView.selectionModel()->clear();
-      QVERIFY(!tDir.exists("path2/Michael Fassbender.json"));
-      QVERIFY(!tDir.exists("path2/Morata.json"));
+      QVERIFY(!mTDir.exists("path2/Michael Fassbender.json"));
+      QVERIFY(!mTDir.exists("path2/Morata.json"));
       QCOMPARE(movieView.onExportToJson(), 2);
-      QVERIFY(tDir.exists("path2/Michael Fassbender.json"));
-      QVERIFY(tDir.exists("path2/Morata.json"));
+      QVERIFY(mTDir.exists("path2/Michael Fassbender.json"));
+      QVERIFY(mTDir.exists("path2/Morata.json"));
+
+      // user cancel, user accept
+      MOCKER(QFileDialog::getSaveFileName).expects(exactly(2))
+          .will(returnValue(QString{""}))
+          .then(returnValue(mTDir.itemPath("recordsInPath2.efu")));
+      QCOMPARE(movieView.onExportToEfuFile(), -1);
+      QVERIFY(movieView.onExportToEfuFile() > 0);
     }
 
     {
@@ -809,11 +822,11 @@ private slots:
     QVERIFY(!movieView.onAuditATable());
 
     // 后台改掉文件名称 Morata.mp4 -> Alvaro Morata.mp4
-    QVERIFY(QDir(tDir).rename("path2/Morata.mp4", "path2/Alvaro Morata.mp4"));
+    QVERIFY(QDir(mTDir).rename("path2/Morata.mp4", "path2/Alvaro Morata.mp4"));
     // 后台移除文件 Michael Fassbender.mp4
-    QVERIFY(QFile::remove(tDir.itemPath("path2/Michael Fassbender.mp4")));
+    QVERIFY(QFile::remove(mTDir.itemPath("path2/Michael Fassbender.mp4")));
     // 后台增加文件 Kaka.mp4
-    tDir.touch("path2/Kaka.mp4", "Contents in Kaka.mp4");
+    mTDir.touch("path2/Kaka.mp4", "Contents in Kaka.mp4");
 
     // 3.1 更新1, 删除1, 增加1
     QVERIFY(movieView.onAuditATable());                        // path2 match tableName2
@@ -888,7 +901,7 @@ private slots:
     "Size": 1024,
     "Duration": 6000
 })"}};
-    QCOMPARE(tDir.createEntries(ScanJsonsFolderNodes), ScanJsonsFolderNodes.size());
+    QCOMPARE(mTDir.createEntries(ScanJsonsFolderNodes), ScanJsonsFolderNodes.size());
 
     MOCKER(QFileDialog::getExistingDirectory)
         .stubs()

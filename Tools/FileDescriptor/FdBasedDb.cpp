@@ -8,11 +8,14 @@
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
 #include "MovieDBModelField.h"
+#include "DataFormatter.h"
 #include "NameTool.h"
+#include "StringTool.h"
 #include "JsonFieldBoundary.h"
 #include <QDirIterator>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSet>
 
 using namespace MovieDBModelField;
@@ -149,6 +152,34 @@ const QString FdBasedDb::UPDATE_DURATION_0_TEMPLATE //
           .arg(ENUM_2_STR(Duration))        //
           .arg(ENUM_2_STR(SampleMD5))       //
     };
+
+
+enum SELECT_EFU_FIELDS_TEMPLATE_FIELD {
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_PrePathLeft = 0,
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_PrePathRight, //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Name,         //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Size,         //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Duration,     //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Studio,       //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Cast,         //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Tags,         //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Rate,         //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Detail,       //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_InLocal,      //
+  SELECT_EFU_FIELDS_TEMPLATE_FIELD_Sample,      //
+};
+
+const QString FdBasedDb::SELECT_EFU_FIELDS_TEMPLATE {
+    QString{"SELECT `%1`, `%2`, `%3`, `%4`, `%5`, `%6`, `%7`, `%8`, `%9`, `%10`, `%11`, `%12` FROM"}         //
+        .arg(ENUM_2_STR(PrePathLeft), ENUM_2_STR(PrePathRight), ENUM_2_STR(Name)) //
+        .arg(ENUM_2_STR(Size), ENUM_2_STR(Duration))                              //
+        .arg(ENUM_2_STR(Studio), ENUM_2_STR(Cast), ENUM_2_STR(Tags))              //
+        .arg(ENUM_2_STR(Rate))                                                 //
+        .arg(ENUM_2_STR(Detail))                                               //
+        .arg(ENUM_2_STR(InLocal))                                              //
+        .arg(ENUM_2_STR(SampleMD5))                                              //
+    + " `%1` "                                                                 //
+};
 
 const QString FdBasedDb::SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE //
     {
@@ -808,6 +839,87 @@ int FdBasedDb::SetDuration(const QString& tableName) {
 
   LOG_D("%d record(s) to be updated", count);
   return count;
+}
+
+int FdBasedDb::ExportToEfuFile(const QString& tableName, const QString& efuFileAbsPath) const {
+  auto db = GetDb();
+  if (!CheckValidAndOpen(db)) {
+    return FD_DB_OPEN_FAILED;
+  }
+  if (!db.tables().contains(tableName)) {
+    return FD_TABLE_INEXIST; // no need set duration
+  }
+
+  QFile file{efuFileAbsPath};
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    LOG_E("Cannot open file %s for writing", qPrintable(efuFileAbsPath));
+    return FD_EFU_FILE_INVALID;
+  }
+
+  QSqlQuery query{db};
+  if (!query.prepare(SELECT_EFU_FIELDS_TEMPLATE.arg(tableName))) {
+    LOG_W("prepare command[%s] failed: %s", //
+          qPrintable(query.executedQuery()),
+          qPrintable(query.lastError().text()));
+    return FD_PREPARE_FAILED;
+  }
+  if (!query.exec()) {
+    LOG_W("Query[%s] failed: %s", //
+          qPrintable(query.executedQuery()),
+          qPrintable(query.lastError().text()));
+    return FD_EXEC_FAILED;
+  }
+
+  QByteArray header = "Filename,Size,";
+  const int custom_property_count = query.record().count() - 4; // Filename={PrePathLeft, PrePathRight, Name}, Size=Size
+  for (int custom_property_ind = 0; custom_property_ind < custom_property_count; ++custom_property_ind) {
+    header.append("custom_property_");
+    header.append(QByteArray::number(custom_property_ind));
+    header.append(",");
+  }
+  if (custom_property_count > 0) {
+    header.chop(1);
+  }
+  header.append("\n");
+  file.write(header);
+
+  int recordCount{0};
+  QByteArray ba;
+  while (query.next()) {
+    ba.append(StringTool::EscapeCsv(PathTool::RMFComponent::join(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_PrePathLeft ).toString(),
+                                                                 query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_PrePathRight).toString(),
+                                                                 query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Name        ).toString())));
+    ba.append(',');
+    ba.append(QByteArray::number(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Size    ).toLongLong()));
+    ba.append(',');
+    ba.append(DataFormatter::formatDurationISOMs(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Duration).toInt()).toLatin1());
+    ba.append(',');
+    ba.append(StringTool::EscapeCsv(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Studio  ).toString()));
+    ba.append(',');
+    ba.append(StringTool::EscapeCsv(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Cast    ).toString()));
+    ba.append(',');
+    ba.append(StringTool::EscapeCsv(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Tags    ).toString()));
+    ba.append(',');
+    ba.append(QByteArray::number(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Rate    ).toInt()));
+    ba.append(',');
+    ba.append(StringTool::EscapeCsv(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Detail  ).toString()));
+    ba.append(',');
+    ba.append(QByteArray::number(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_InLocal ).toInt()));
+    ba.append(',');
+    ba.append(query.value(SELECT_EFU_FIELDS_TEMPLATE_FIELD_Sample ).toString().toLatin1());
+    ba.append('\n');
+    ++recordCount;
+    // 每 2MB 写入一次
+    if (ba.size() >= 2 * 1024 * 1024) {
+      file.write(ba);
+      ba.clear();
+    }
+  }
+  if (!ba.isEmpty()) {
+    file.write(ba);
+  }
+  file.close();
+  return recordCount;
 }
 
 struct DurStudioCastTags {

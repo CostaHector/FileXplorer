@@ -249,7 +249,7 @@ QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whe
     searchResult += "<tr>";
     searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size).value().toLongLong()));
     searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Name).value().toString());
-    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Duration).value().toLongLong()));
+    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Duration).value().toInt()));
     searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::SampleMD5).value().toString());
     searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight).value().toString());
     searchResult += "</tr>";

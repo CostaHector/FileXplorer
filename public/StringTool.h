@@ -27,6 +27,8 @@ int TrimEachElementAndRemoveEmpty(QStringList& keywords);
 void SearchHistoryListProc(QStringList& hists);
 
 QString PathJoinPixmapSize(QString path, int width, int height, bool bSmoothTrans);
+
+QByteArray EscapeCsv(const QString& value);
 }
 
 #endif // STRINGTOOL_H

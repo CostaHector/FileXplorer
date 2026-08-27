@@ -28,6 +28,8 @@ public:
   QAction* AUDIT_A_TABLE{nullptr};
   QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 
+  QAction* EXPORT_TO_EFU_FILE{nullptr};
+
   QAction* READ_DURATION_BY_VIDEO{nullptr};
   QAction* EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON{nullptr};
   QAction* UPDATE_STUDIO_CAST_TAGS_BY_JSON{nullptr};

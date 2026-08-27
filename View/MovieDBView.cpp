@@ -11,6 +11,8 @@
 #include "PublicMacro.h"
 #include "PublicVariable.h"
 #include "ViewActions.h"
+#include "SystemPath.h"
+#include "PathTool.h"
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -67,6 +69,7 @@ void MovieDBView::subscribe() {
   // extra function actions
   connect(inst.READ_DURATION_BY_VIDEO, &QAction::triggered, this, &MovieDBView::onSetDurationByVideo);
   connect(inst.EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON, &QAction::triggered, this, &MovieDBView::onExportToJson);
+  connect(inst.EXPORT_TO_EFU_FILE, &QAction::triggered, this, &MovieDBView::onExportToEfuFile);
   connect(inst.UPDATE_STUDIO_CAST_TAGS_BY_JSON, &QAction::triggered, this, &MovieDBView::onUpdateByJson);
   // common function actions
   connect(inst._COUNT, &QAction::triggered, this, &MovieDBView::onCountRow);
@@ -482,6 +485,33 @@ int MovieDBView::onExportToJson() {
 
   LOG_OK_P("[OK] Export to json succeed", "%d json file(s) get update", retCnt);
   return retCnt;
+}
+
+int MovieDBView::onExportToEfuFile() {
+  if (_dbModel->isDirty()) {
+    LOG_WARN_NP("[Skip Export] Table is dirty", "Submit/Revert first");
+    return -1;
+  }
+  QSqlDatabase con = _fdBasedDb.GetDb();
+  if (!_fdBasedDb.CheckValidAndOpen(con)) {
+    LOG_ERR_NP("[Abort] Open db failed", con.lastError().text());
+    return -1;
+  }
+  const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();
+  const QStringList& tbs = con.tables();
+  if (!tbs.contains(curTblName)) {
+    LOG_WARN_NP("[Skip] Table not exist", curTblName);
+    return -1;
+  }
+  QString savedInEfuFile = PathTool::Path2Join(SystemPath::RoamingPath(), curTblName + ".efu");
+  savedInEfuFile = QFileDialog::getSaveFileName(this, QString{"Export %1 to EFU file"}.arg(curTblName), savedInEfuFile, "EFU Files (*.efu)");
+  if (savedInEfuFile.isEmpty()) {
+    LOG_INFO_NP("User cancelled", "Export table to EFU file");
+    return -1;
+  }
+  int recordCnt = _fdBasedDb.ExportToEfuFile(curTblName, savedInEfuFile);
+  LOG_OE_P(recordCnt>=0, "Export to EFU", "%d records dump into file:%s", recordCnt, qPrintable(savedInEfuFile));
+  return recordCnt;
 }
 
 int MovieDBView::onUpdateByJson() {
