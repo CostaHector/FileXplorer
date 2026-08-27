@@ -292,6 +292,11 @@ QString formatBool(bool value) {  //
   return value ? "true" : "false";
 }
 
+qint64 formatDateToEfuFileTime(const qint64 ms) {
+  // EPOCH_DIFF=116444736000000000LL
+  return ms * 10000 + 116444736000000000LL;
+}
+
 QString formatDateIsoMs(const qint64 ms) {
   return QDateTime::fromMSecsSinceEpoch(ms).toString(Qt::ISODateWithMs);
 }

@@ -75,11 +75,16 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
   DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 
+  EXPORT_TO_EFU_FILE = new (std::nothrow) QAction(QIcon(":img/EXPORT_TO_EFU_FILE"), tr("Export to EFU"), this);
+  CHECK_NULLPTR_RETURN_VOID(EXPORT_TO_EFU_FILE);
+  EXPORT_TO_EFU_FILE->setToolTip("Export all records in the current table to an EFU file for use with Everything search.");
+
   READ_DURATION_BY_VIDEO = new (std::nothrow) QAction(QIcon(":img/VIDEO_DURATION"), tr("Read Duration"), this);
   CHECK_NULLPTR_RETURN_VOID(READ_DURATION_BY_VIDEO);
   EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON = new (std::nothrow) QAction(QIcon(":img/DUMP_INTO_PSON_FILE"), tr("Export to Json"), this);
   CHECK_NULLPTR_RETURN_VOID(EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON);
   EXPORT_DURATION_STUDIO_CAST_TAGS_TO_JSON->setToolTip("Export Duration/Studio/Cast/Tags to json file, if any field value is valid");
+
   UPDATE_STUDIO_CAST_TAGS_BY_JSON = new (std::nothrow) QAction(QIcon(":/JsonEditor/RELOAD_FROM_DISK"), tr("Update by Json"), this);
   CHECK_NULLPTR_RETURN_VOID(UPDATE_STUDIO_CAST_TAGS_BY_JSON);
   UPDATE_STUDIO_CAST_TAGS_BY_JSON->setToolTip("Update Studio/Cast/Tags fields from json file, only if all field value in json are valid");

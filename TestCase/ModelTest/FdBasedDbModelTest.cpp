@@ -1,7 +1,6 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-
 #include "BeginToExposePrivateMember.h"
 #include "FdBasedDb.h"
 #include "FdBasedDbModel.h"
@@ -9,7 +8,6 @@
 #include "MovieDBModelField.h"
 #include "TDir.h"
 #include "SqlTableTestPreconditionTool.h"
-#include "JsonFieldBoundary.h"
 
 #include "VideoDurationGetter.h"
 #include "VideoDurationGetterMock.h"
@@ -266,111 +264,6 @@ private slots:
 
     QCOMPARE(movieModel.GetSelectionFileSizes(indexes), (QList<qint64>{11, 15}));
     QCOMPARE(movieModel.GetSelectionDurations(indexes), (QList<int>{10000, 70000}));
-  }
-
-  void ReadADirectoryJson_ok() {
-    const QList<FsNodeEntry> scanJsonsFolderNodes {
-        // ignore videos
-        {"ScanJsonsFolder/CristianoRonaldo.mp4", false, "Content: Kaka.mp4"},
-        // Kaka, 6s, 1KiB, 01234567890123456789012345678MD5, inLocal=1, rate=10, need further process
-        {"ScanJsonsFolder/Kaka.mp4", false, "Content: Kaka.mp4"},
-        {"ScanJsonsFolder/Kaka.json", false, R"({
-    "Cast": ["Person 1", "2 Person"],
-    "Detail": "Release date: 1st June 2026",
-    "Name": "Kaka",
-    "Studio": "PrideKaka",
-    "Tags": ["tags 0", "tags 1"],
-    "MD5": "01234567890123456789012345678MD5",
-    "VidName": "Kaka.mp4",
-    "Size": 1024,
-    "Duration": 6000,
-    "Rate": 10
-})"}, // RandomOne, 60s, 2KiB, MD501234567890123456789012345678, inLocal=0, rate=use default JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, need further process
-        {"ScanJsonsFolder/RandomOne.json", false, R"({
-    "Cast": ["Person 3", "4 Person"],
-    "Detail": "Release date: 2nd June 2026",
-    "Name": "RandomOne",
-    "Studio": "PrideRandomOne",
-    "Tags": ["tags 2", "tags 3"],
-    "MD5": "MD501234567890123456789012345678",
-    "VidName": "RandomOne.mp4",
-    "Size": 2048,
-    "Duration": 60000
-})"}, // json with MD5 field empty but VidName not empty. cannot read
-        {"ScanJsonsFolder/MD5EmptyVidNameNotEmpty.json", false, R"({
-    "Cast": ["Person 5", "6 Person"],
-    "Detail": "Release date: 2nd June 2026",
-    "Name": "MD5EmptyVidNameNotEmpty",
-    "Studio": "Pride",
-    "Tags": ["tags 2", "tags 3"],
-    "MD5": "",
-    "VidName": "MD5EmptyVidNameNotEmpty.mp4",
-    "Size": 2048,
-    "Duration": 60000
-})"}, // json with MD5 field empty And VidName empty. ignore
-        {"ScanJsonsFolder/MD5EmptyAndVidNameEmpty.json", false, R"({
-    "Cast": ["Person 5", "6 Person"],
-    "Detail": "Release date: 2nd June 2026",
-    "Name": "MD5EmptyAndVidNameEmpty",
-    "Studio": "Pride",
-    "Tags": ["tags 2", "tags 3"],
-    "MD5": "",
-    "VidName": "",
-    "Size": 2048,
-    "Duration": 60000
-})"},
-
-    };
-    QCOMPARE(mTDir.createEntries(scanJsonsFolderNodes), scanJsonsFolderNodes.size());
-
-    const QString dbName{mTDir.itemPath("FdBasedMovieReadJsons.db")};
-    const QString connName{"FdBasedMovieReadJsonsConn"};
-    const QString tableName{"ABCDEF12_3456_7890_ABCDEF1234567890"};  // can be converted to guid
-
-    FdBasedDb movieDb{dbName, connName};
-    QVERIFY(movieDb.IsValid());
-    QVERIFY(movieDb.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
-
-    QCOMPARE(movieDb.ReadADirectoryJson(tableName, mTDir.itemPath("ScanJsonsFolder")), FD_ERROR_CODE::FD_JSON_PARSED_INVALID);
-    // delete the dismatch one
-    QVERIFY(QDir{mTDir}.remove("ScanJsonsFolder/MD5EmptyVidNameNotEmpty.json"));
-    QCOMPARE(movieDb.ReadADirectoryJson(tableName, mTDir.itemPath("ScanJsonsFolder")), 2); // 2 json need further process
-
-    FdBasedDb fdDb{dbName, connName};
-    QCOMPARE(fdDb.CountRow(tableName), 2); // only 2 json will be inserted into table
-
-    const QString sqlSelectCmd{QString{"SELECT * FROM `%1`"}.arg(tableName)};
-    QList<QSqlRecord> records;
-    QVERIFY(fdDb.QueryForTest(sqlSelectCmd, records));
-    QCOMPARE(records.size(), 2);
-
-    // "Kaka.mp4", "RandomOne.mp4"
-    using namespace MovieDBModelField;
-    std::sort(records.begin(), records.end(), [](const QSqlRecord& lhs, const QSqlRecord& rhs)->bool{
-      return lhs.value(ENUM_2_STR(Name)).toString() < rhs.value(ENUM_2_STR(Name)).toString();
-    });
-    const QSqlRecord& kaka = records[0], &randomOne = records[1];
-    QCOMPARE(kaka.value(ENUM_2_STR(Name)).toString(), "Kaka.mp4");
-    QCOMPARE(kaka.value(ENUM_2_STR(SampleMD5)).toString(), "01234567890123456789012345678MD5");
-    QCOMPARE(kaka.value(ENUM_2_STR(Size)).toLongLong(), 1024);
-    QCOMPARE(kaka.value(ENUM_2_STR(Duration)).toInt(), 6000);
-    QCOMPARE(kaka.value(ENUM_2_STR(Rate)).toInt(), 10);
-    QCOMPARE(kaka.value(ENUM_2_STR(Studio)).toString(), "PrideKaka");
-    QCOMPARE(kaka.value(ENUM_2_STR(Cast)).toString(), "Person 1,2 Person");
-    QCOMPARE(kaka.value(ENUM_2_STR(Tags)).toString(), "tags 0,tags 1");
-    QCOMPARE(kaka.value(ENUM_2_STR(Detail)).toString(), "Release date: 1st June 2026");
-    QCOMPARE(kaka.value(ENUM_2_STR(InLocal)).toInt(), 1);
-    
-    QCOMPARE(randomOne.value(ENUM_2_STR(Name)).toString(), "RandomOne.mp4");
-    QCOMPARE(randomOne.value(ENUM_2_STR(SampleMD5)).toString(), "MD501234567890123456789012345678");
-    QCOMPARE(randomOne.value(ENUM_2_STR(Size)).toLongLong(), 2048);
-    QCOMPARE(randomOne.value(ENUM_2_STR(Duration)).toInt(), 60000);
-    QCOMPARE(randomOne.value(ENUM_2_STR(Rate)).toInt(), JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
-    QCOMPARE(randomOne.value(ENUM_2_STR(Studio)).toString(), "PrideRandomOne");
-    QCOMPARE(randomOne.value(ENUM_2_STR(Cast)).toString(), "Person 3,4 Person");
-    QCOMPARE(randomOne.value(ENUM_2_STR(Tags)).toString(), "tags 2,tags 3");
-    QCOMPARE(randomOne.value(ENUM_2_STR(Detail)).toString(), "Release date: 2nd June 2026");
-    QCOMPARE(randomOne.value(ENUM_2_STR(InLocal)).toInt(), 0);
   }
 };
 

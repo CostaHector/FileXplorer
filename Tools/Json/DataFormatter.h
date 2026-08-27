@@ -90,6 +90,8 @@ inline QString formatFileSizeWithBytes(const qint64 total) {
   return FILE_SIZE_DETAIL_TEMPLATE.arg(formatFileSizeGMKB(total)).arg(total);
 }
 
+qint64 formatDateToEfuFileTime(const qint64 ms);
+
 QString formatDateIsoMs(const qint64 ms);
 QString formatDateIso(const qint64 ms);
 

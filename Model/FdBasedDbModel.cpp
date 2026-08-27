@@ -27,7 +27,7 @@ QVariant FdBasedDbModel::data(const QModelIndex& idx, int role) const {
     if (idx.column() == MovieDBModelField::Size) {
       return formatFileSizeGMKB(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
     } else if (idx.column() == MovieDBModelField::Duration) {
-      return formatDurationISOMs(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toLongLong());
+      return formatDurationISOMs(QSqlTableModel::data(idx, Qt::ItemDataRole::DisplayRole).toInt());
     }
   }
   return QSqlTableModel::data(idx, role);

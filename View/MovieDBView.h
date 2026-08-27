@@ -32,6 +32,7 @@ public:
   bool onAuditATable();
   bool onSetDurationByVideo();
   int onExportToJson();
+  int onExportToEfuFile();
   int onUpdateByJson();
 
   int onCountRow();

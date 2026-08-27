@@ -6,7 +6,9 @@
 #include "JsonHelper.h"
 #include "PublicMacro.h"
 #include "QuickWhereClauseHelper.h"
+#include "JsonFieldBoundary.h"
 #include "TDir.h"
+#include "FileTool.h"
 
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -27,8 +29,8 @@ class FdBasedDbTest : public PlainTestSuite {
  public:
   FdBasedDbTest() : PlainTestSuite{} {}
   const QString rootpath{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH};
-  TDir tDir;
-  const QString dbName = tDir.itemPath("FD_MOVIE_DB_CONN.db");
+  TDir mTDir;
+  const QString dbName = mTDir.itemPath("FD_MOVIE_DB_CONN.db");
   const QString connName = "FD_MOVIE_DB_CONN";
   const QString tableName = "RANDOM_TABLE_NAME";
   const QList<FsNodeEntry> mNodes{
@@ -41,21 +43,24 @@ class FdBasedDbTest : public PlainTestSuite {
   };
  private slots:
   void initTestCase() {
-    QVERIFY(tDir.IsValid());
-    QCOMPARE(tDir.createEntries(mNodes), 6);
+    QVERIFY(mTDir.IsValid());
+    QCOMPARE(mTDir.createEntries(mNodes), 6);
 
     QHash<QString, int> presetVidDurations{
-        {tDir.itemPath("path1/20s.mp4"), 20},   //
-        {tDir.itemPath("path1/40s.avi"), 40},   //
-        {tDir.itemPath("path2/60s.mkv"), 60},   //
-        {tDir.itemPath("path2/30s.mpeg"), 30},  //
-        {tDir.itemPath("path3/new name 30s.mpeg"), 30},
+        {mTDir.itemPath("path1/20s.mp4"), 20},   //
+        {mTDir.itemPath("path1/40s.avi"), 40},   //
+        {mTDir.itemPath("path2/60s.mkv"), 60},   //
+        {mTDir.itemPath("path2/30s.mpeg"), 30},  //
+        {mTDir.itemPath("path3/new name 30s.mpeg"), 30},
     };
     VideoDurationGetterMock::PresetVidsDuration(presetVidDurations);
   }
 
   void init() {  //
     GlobalMockObject::reset();
+    if (mTDir.exists("ScanJsonsFolder")) {
+      QVERIFY(QDir{mTDir.itemPath("ScanJsonsFolder")}.removeRecursively());
+    }
   }
 
   void cleanup() {
@@ -165,12 +170,12 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
 
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.itemPath("path1")), 2);
     QCOMPARE(dbManager.CountRow(tableName), 2);
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.itemPath("path2")), 2);
     QCOMPARE(dbManager.CountRow(tableName), 2 + 2);
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 2);
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path2")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.itemPath("path1")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.itemPath("path2")), 2);
     QCOMPARE(dbManager.CountRow(tableName), 4);
 
     using namespace MovieDBModelField;
@@ -190,7 +195,7 @@ class FdBasedDbTest : public PlainTestSuite {
     // 1. Adt(empty table no path, path1)
     VolumeUpdateResult adtRet{0};
     adtRet.Init();
-    QCOMPARE(dbManager.Adt(tableName, tDir.itemPath("path1"), &adtRet), FD_OK);
+    QCOMPARE(dbManager.Adt(tableName, mTDir.itemPath("path1"), &adtRet), FD_OK);
     QCOMPARE(adtRet.insertCnt, 2);
     QCOMPARE(adtRet.deleteCnt, 0);
     QCOMPARE(adtRet.updateCnt, 0);
@@ -201,7 +206,7 @@ class FdBasedDbTest : public PlainTestSuite {
 
     // 2. Adt(table contains path1, path2)
     adtRet.Init();
-    QCOMPARE(dbManager.Adt(tableName, tDir.itemPath("path2"), &adtRet), FD_OK);
+    QCOMPARE(dbManager.Adt(tableName, mTDir.itemPath("path2"), &adtRet), FD_OK);
     QCOMPARE(adtRet.insertCnt, 2);
     QCOMPARE(adtRet.deleteCnt, 2);
     QCOMPARE(adtRet.updateCnt, 0);
@@ -210,7 +215,7 @@ class FdBasedDbTest : public PlainTestSuite {
 
     // 3. Adt(path2, path3)
     adtRet.Init();
-    QCOMPARE(dbManager.Adt(tableName, tDir.itemPath("path3"), &adtRet), FD_OK);
+    QCOMPARE(dbManager.Adt(tableName, mTDir.itemPath("path3"), &adtRet), FD_OK);
     QCOMPARE(adtRet.insertCnt, 0);
     QCOMPARE(adtRet.deleteCnt, 1);
     QCOMPARE(adtRet.updateCnt, 1);
@@ -219,7 +224,7 @@ class FdBasedDbTest : public PlainTestSuite {
 
     // 4. Adt(path2, path4)
     adtRet.Init();
-    QCOMPARE(dbManager.Adt(tableName, tDir.itemPath("path4"), &adtRet), FD_OK);
+    QCOMPARE(dbManager.Adt(tableName, mTDir.itemPath("path4"), &adtRet), FD_OK);
     QCOMPARE(adtRet.insertCnt, 0);
     QCOMPARE(adtRet.deleteCnt, 1);
     QCOMPARE(adtRet.updateCnt, 0);
@@ -237,7 +242,7 @@ class FdBasedDbTest : public PlainTestSuite {
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
 
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.path()), 4);  // remeber: SampleMD5 conflict because file contents same!
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.path()), 4);  // remeber: SampleMD5 conflict because file contents same!
     QCOMPARE(dbManager.SetDuration(tableName), 4);
     QCOMPARE(dbManager.SetDuration(tableName), 0);  // 0 duration need update
 
@@ -245,6 +250,163 @@ class FdBasedDbTest : public PlainTestSuite {
     using namespace MovieDBModelField;
     QVERIFY(dbManager.QueryPK(tableName, ENUM_2_STR(Duration), actualDurations));
     QCOMPARE(actualDurations, (QSet<int>{20, 40, 30, 60}));
+  }
+
+  void ReadADirectoryJson_ok() {
+    const QList<FsNodeEntry> scanJsonsFolderNodes {
+        // ignore videos
+        {"ScanJsonsFolder/CristianoRonaldo.mp4", false, "Content: Kaka.mp4"},
+        // Kaka, 6s, 1KiB, 01234567890123456789012345678MD5, inLocal=1, rate=10, need further process
+        {"ScanJsonsFolder/Kaka.mp4", false, "Content: Kaka.mp4"},
+        {"ScanJsonsFolder/Kaka.json", false, R"({
+    "Cast": ["Person 1", "2 Person"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "Kaka",
+    "Studio": "PrideKaka",
+    "Tags": ["tags 0", "tags 1"],
+    "MD5": "01234567890123456789012345678MD5",
+    "VidName": "Kaka.mp4",
+    "Size": 1024,
+    "Duration": 6000,
+    "Rate": 10
+})"}, // RandomOne, 60s, 2KiB, MD501234567890123456789012345678, inLocal=0, rate=use default JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, need further process
+        {"ScanJsonsFolder/RandomOne.json", false, R"({
+    "Cast": ["Person 3", "4 Person"],
+    "Detail": "Release date: 2nd June 2026",
+    "Name": "RandomOne",
+    "Studio": "PrideRandomOne",
+    "Tags": ["tags 2", "tags 3"],
+    "MD5": "MD501234567890123456789012345678",
+    "VidName": "RandomOne.mp4",
+    "Size": 2048,
+    "Duration": 60000
+})"}, // json with MD5 field empty but VidName not empty. cannot read
+        {"ScanJsonsFolder/MD5EmptyVidNameNotEmpty.json", false, R"({
+    "Cast": ["Person 5", "6 Person"],
+    "Detail": "Release date: 2nd June 2026",
+    "Name": "MD5EmptyVidNameNotEmpty",
+    "Studio": "Pride",
+    "Tags": ["tags 2", "tags 3"],
+    "MD5": "",
+    "VidName": "MD5EmptyVidNameNotEmpty.mp4",
+    "Size": 2048,
+    "Duration": 60000
+})"}, // json with MD5 field empty And VidName empty. ignore
+        {"ScanJsonsFolder/MD5EmptyAndVidNameEmpty.json", false, R"({
+    "Cast": ["Person 5", "6 Person"],
+    "Detail": "Release date: 2nd June 2026",
+    "Name": "MD5EmptyAndVidNameEmpty",
+    "Studio": "Pride",
+    "Tags": ["tags 2", "tags 3"],
+    "MD5": "",
+    "VidName": "",
+    "Size": 2048,
+    "Duration": 60000
+})"},
+
+    };
+    QCOMPARE(mTDir.createEntries(scanJsonsFolderNodes), scanJsonsFolderNodes.size());
+
+    const QString dbName{mTDir.itemPath("FdBasedMovieReadJsons.db")};
+    const QString connName{"FdBasedMovieReadJsonsConn"};
+    const QString scanJsonTableName{"ABCDEF12_3456_7890_ABCDEF1234567890"};  // can be converted to guid
+
+    FdBasedDb movieDb{dbName, connName};
+    QVERIFY(movieDb.IsValid());
+    QVERIFY(movieDb.CreateTable(scanJsonTableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
+
+    QCOMPARE(movieDb.ReadADirectoryJson(scanJsonTableName, mTDir.itemPath("ScanJsonsFolder")), FD_ERROR_CODE::FD_JSON_PARSED_INVALID);
+    // delete the dismatch one
+    QVERIFY(QDir{mTDir}.remove("ScanJsonsFolder/MD5EmptyVidNameNotEmpty.json"));
+    QCOMPARE(movieDb.ReadADirectoryJson(scanJsonTableName, mTDir.itemPath("ScanJsonsFolder")), 2); // 2 json need further process
+
+    FdBasedDb fdDb{dbName, connName};
+    QCOMPARE(fdDb.CountRow(scanJsonTableName), 2); // only 2 json will be inserted into table
+
+    const QString sqlSelectCmd{QString{"SELECT * FROM `%1`"}.arg(scanJsonTableName)};
+    QList<QSqlRecord> records;
+    QVERIFY(fdDb.QueryForTest(sqlSelectCmd, records));
+    QCOMPARE(records.size(), 2);
+
+    // "Kaka.mp4", "RandomOne.mp4"
+    using namespace MovieDBModelField;
+    std::sort(records.begin(), records.end(), [](const QSqlRecord& lhs, const QSqlRecord& rhs)->bool{
+      return lhs.value(ENUM_2_STR(Name)).toString() < rhs.value(ENUM_2_STR(Name)).toString();
+    });
+    const QSqlRecord& kaka = records[0], &randomOne = records[1];
+    QCOMPARE(kaka.value(ENUM_2_STR(Name)).toString(), "Kaka.mp4");
+    QCOMPARE(kaka.value(ENUM_2_STR(SampleMD5)).toString(), "01234567890123456789012345678MD5");
+    QCOMPARE(kaka.value(ENUM_2_STR(Size)).toLongLong(), 1024);
+    QCOMPARE(kaka.value(ENUM_2_STR(Duration)).toInt(), 6000);
+    QCOMPARE(kaka.value(ENUM_2_STR(Rate)).toInt(), 10);
+    QCOMPARE(kaka.value(ENUM_2_STR(Studio)).toString(), "PrideKaka");
+    QCOMPARE(kaka.value(ENUM_2_STR(Cast)).toString(), "Person 1,2 Person");
+    QCOMPARE(kaka.value(ENUM_2_STR(Tags)).toString(), "tags 0,tags 1");
+    QCOMPARE(kaka.value(ENUM_2_STR(Detail)).toString(), "Release date: 1st June 2026");
+    QCOMPARE(kaka.value(ENUM_2_STR(InLocal)).toInt(), 1);
+
+    QCOMPARE(randomOne.value(ENUM_2_STR(Name)).toString(), "RandomOne.mp4");
+    QCOMPARE(randomOne.value(ENUM_2_STR(SampleMD5)).toString(), "MD501234567890123456789012345678");
+    QCOMPARE(randomOne.value(ENUM_2_STR(Size)).toLongLong(), 2048);
+    QCOMPARE(randomOne.value(ENUM_2_STR(Duration)).toInt(), 60000);
+    QCOMPARE(randomOne.value(ENUM_2_STR(Rate)).toInt(), JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+    QCOMPARE(randomOne.value(ENUM_2_STR(Studio)).toString(), "PrideRandomOne");
+    QCOMPARE(randomOne.value(ENUM_2_STR(Cast)).toString(), "Person 3,4 Person");
+    QCOMPARE(randomOne.value(ENUM_2_STR(Tags)).toString(), "tags 2,tags 3");
+    QCOMPARE(randomOne.value(ENUM_2_STR(Detail)).toString(), "Release date: 2nd June 2026");
+    QCOMPARE(randomOne.value(ENUM_2_STR(InLocal)).toInt(), 0);
+  }
+
+  void ExportToEfuFile_ok() {
+    const QList<FsNodeEntry> scanJsonsFolderNodes {
+      // No Kaka.mp4 found. InLocal=0
+        {"ScanJsonsFolder/Kaka.json", false, R"({
+    "Cast": ["Person 1"],
+    "Detail": "Release date: 1st June 2026",
+    "Name": "Kaka",
+    "Studio": "PrideKaka",
+    "Tags": ["tags 0"],
+    "MD5": "01234567890123456789012345678MD5",
+    "VidName": "Kaka.mp4",
+    "Size": 1024,
+    "Duration": 6000,
+    "Rate": 10
+})"}
+    };
+    QCOMPARE(mTDir.createEntries(scanJsonsFolderNodes), 1);
+
+    QString exportEfuTableName{"EXPORT12_3456_7890_ABCDEF1234567890"};
+    FdBasedDb dbManager{dbName, connName};
+    QVERIFY(dbManager.CreateTable(exportEfuTableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
+    QVERIFY(QFile{dbName}.exists());  // should created
+    QCOMPARE(dbManager.ReadADirectoryJson(exportEfuTableName, mTDir.itemPath("ScanJsonsFolder")), 1);
+
+    const QString exportToEfuPath{mTDir.itemPath("ScanJsonsFolder/EXPORT12_3456_7890_ABCDEF1234567890.efu")};
+    QCOMPARE(dbManager.ExportToEfuFile("inexist table name", exportToEfuPath), FD_ERROR_CODE::FD_TABLE_INEXIST);
+    QCOMPARE(dbManager.ExportToEfuFile(exportEfuTableName, "inexist/path/to/EfuFile.efu"), FD_ERROR_CODE::FD_EFU_FILE_INVALID);
+    QCOMPARE(dbManager.ExportToEfuFile(exportEfuTableName, exportToEfuPath), 1);
+
+    bool bReadOk{false};
+    const QByteArray& actualContents = FileTool::ByteArrayReader(exportToEfuPath, &bReadOk);
+    QVERIFY(bReadOk);
+    QCOMPARE(actualContents.count('\n'), 2); // "title line\nrecord 1\n"
+    const QList<QByteArray>& lines = actualContents.split('\n');
+    QVERIFY(lines.back().isEmpty());
+    QCOMPARE(lines.size(), 3);
+    const QByteArray& titleLine = lines[0];
+    const QByteArray& recordLine = lines[1];
+    QCOMPARE(titleLine.count(','), recordLine.count(',')); // columns count must equal
+    QVERIFY(recordLine.contains(mTDir.itemPath("ScanJsonsFolder/Kaka.mp4").toUtf8()));
+    QVERIFY(recordLine.contains(QByteArray::number(1024))); // size
+    QVERIFY(recordLine.contains("00:00:06.000")); // duration: 6000ms
+    QVERIFY(recordLine.contains("Kaka.mp4")); // Name
+    QVERIFY(recordLine.contains("PrideKaka")); // Studio
+    QVERIFY(recordLine.contains("Person 1")); // Cast
+    QVERIFY(recordLine.contains("tags 0")); // Tags
+    QVERIFY(recordLine.contains(QByteArray::number(10))); // Rate
+    QVERIFY(recordLine.contains("Release date: 1st June 2026")); // Detail
+    QVERIFY(recordLine.contains(QByteArray::number(0))); // InLocal
+    QVERIFY(recordLine.contains("01234567890123456789012345678MD5")); // SampleMD5
   }
 
   void ExportDurationStudioCastTagsToJson_ok() {
@@ -256,7 +418,7 @@ class FdBasedDbTest : public PlainTestSuite {
     FdBasedDb dbManager{dbName, connName};
     QVERIFY(dbManager.CreateTable(tableName, FdBasedDb::CREATE_TABLE_TEMPLATE));
     QVERIFY(QFile{dbName}.exists());  // should created
-    QCOMPARE(dbManager.ReadADirectory(tableName, tDir.itemPath("path1")), 2);
+    QCOMPARE(dbManager.ReadADirectory(tableName, mTDir.itemPath("path1")), 2);
 
     // volume "tableName" is offline, no need export
     QCOMPARE(dbManager.ExportDurationStudioCastTagsToJson(tableName), FD_DISK_OFFLINE);
@@ -271,8 +433,8 @@ class FdBasedDbTest : public PlainTestSuite {
         .will(invoke(VideoDurationGetterMock::invokeGetLengthQuickStatic));
     QCOMPARE(dbManager.SetDuration(tableName), 2);
     QCOMPARE(dbManager.ExportDurationStudioCastTagsToJson(tableName), 2);
-    QVERIFY(tDir.exists("path1/20s.json"));
-    QVERIFY(tDir.exists("path1/40s.json"));
+    QVERIFY(mTDir.exists("path1/20s.json"));
+    QVERIFY(mTDir.exists("path1/40s.json"));
 
     // Attention: there is an extra space after comma between two cast.
     // we expect it will be kept.
@@ -283,14 +445,14 @@ class FdBasedDbTest : public PlainTestSuite {
     using namespace JsonHelper;
     const QStringList expectCastLst{"Henry Cavill", " Chris Evans"};  // Atension,  here we use ',' to seperate not ", "
     const QStringList notExpectCastLst{"Henry Cavill", "Chris Evans"};
-    const auto& dict = MovieJsonLoader(tDir.itemPath("path1/20s.json"));
+    const auto& dict = MovieJsonLoader(mTDir.itemPath("path1/20s.json"));
     QCOMPARE(dict.value(ENUM_2_STR(Cast)).toStringList(), expectCastLst);
     QVERIFY(dict.value(ENUM_2_STR(Cast)).toStringList() != notExpectCastLst);
   }
 
   void UpdateStudioCastTagsByJson_ok() {
     using namespace JsonHelper;
-    const QString path1 = tDir.itemPath("path1");
+    const QString path1 = mTDir.itemPath("path1");
     MOCKER(FdBasedDb::IsTableVolumeOnline)
         .stubs()  //
         .will(returnValue(true));
@@ -307,10 +469,10 @@ class FdBasedDbTest : public PlainTestSuite {
     QCOMPARE(dbManager.UpdateForTest(updateTagsCmd), 2);
 
     // no json exists not exist, skip
-    QFile::remove(tDir.itemPath("path1/20s.json"));
-    QFile::remove(tDir.itemPath("path1/40s.json"));
-    QVERIFY(!tDir.exists("path1/20s.json"));
-    QVERIFY(!tDir.exists("path1/40s.json"));
+    QFile::remove(mTDir.itemPath("path1/20s.json"));
+    QFile::remove(mTDir.itemPath("path1/40s.json"));
+    QVERIFY(!mTDir.exists("path1/20s.json"));
+    QVERIFY(!mTDir.exists("path1/40s.json"));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 0);
 
     // 前提: 只要json中的studio/performers/tags有一个字段值非空
@@ -322,10 +484,10 @@ class FdBasedDbTest : public PlainTestSuite {
     QVariantHash keyFull{{ENUM_2_STR(Studio), "Fox"},
                          {ENUM_2_STR(Cast), QStringList{"Chris Evans", "Henry Cavill"}},  //
                          {ENUM_2_STR(Tags), QStringList{"Action", "Science"}}};
-    QVERIFY(DumpJsonDict(keyValueNotFull, tDir.itemPath("path1/20s.json")));
-    QVERIFY(DumpJsonDict(keyFull, tDir.itemPath("path1/40s.json")));
-    QVERIFY(tDir.exists("path1/20s.json"));
-    QVERIFY(tDir.exists("path1/40s.json"));
+    QVERIFY(DumpJsonDict(keyValueNotFull, mTDir.itemPath("path1/20s.json")));
+    QVERIFY(DumpJsonDict(keyFull, mTDir.itemPath("path1/40s.json")));
+    QVERIFY(mTDir.exists("path1/20s.json"));
+    QVERIFY(mTDir.exists("path1/40s.json"));
     QCOMPARE(dbManager.UpdateStudioCastTagsByJson(tableName, path1), 2);
 
     const QString selectCentury{R"(SELECT * FROM `%1` WHERE `%2`="Century";)"};

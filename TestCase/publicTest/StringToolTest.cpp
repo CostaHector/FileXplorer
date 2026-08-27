@@ -72,6 +72,14 @@ private slots:
     QCOMPARE(PathJoinPixmapSize("a.jpg", 64, 128, true), "a.jpg_64x128_1");
     QCOMPARE(PathJoinPixmapSize("b.jpg", 128, 64, false), "b.jpg_128x64_0");
   }
+
+  void EscapeCsv_ok() {
+    QCOMPARE(EscapeCsv("Hello world"), QByteArray("Hello world"));
+    // comma, \n, "
+    QCOMPARE(EscapeCsv("Hello, world"), QByteArray(R"("Hello, world")"));
+    QCOMPARE(EscapeCsv("Hello\nWorld"), QByteArray("\"Hello\nWorld\""));
+    QCOMPARE(EscapeCsv("\"Fancy\" meeting you here"), QByteArray(R"("""Fancy"" meeting you here")"));
+  }
 };
 
 #include "StringToolTest.moc"

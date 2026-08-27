@@ -304,6 +304,7 @@
         <file alias="SYNC_FROM_DISK">Database/SYNC_FROM_DISK.svg</file>
         <file alias="SYNC_FROM_DB">Database/SYNC_FROM_DB.svg</file>
         <file alias="MIGRATE_CAST_TO">Database/MIGRATE_CAST_TO.svg</file>
+        <file alias="EXPORT_TO_EFU_FILE">Database/EXPORT_TO_EFU_FILE.svg</file>
 
         <!--ConfigsTable icon here-->
         <file alias="SETTINGS">ConfigsTable/SETTINGS.svg</file>

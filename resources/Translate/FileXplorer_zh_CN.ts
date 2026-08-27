@@ -1430,6 +1430,11 @@
     </message>
     <message>
         <location line="+17"/>
+        <source>Export to EFU</source>
+        <translation>导出到EFU</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Read Duration</source>
         <translation>更新时长</translation>
     </message>
@@ -1439,7 +1444,7 @@
         <translation>写入到json文件</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Update by Json</source>
         <translation>根据Json更新</translation>
     </message>

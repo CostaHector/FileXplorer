@@ -61,4 +61,24 @@ QString PathJoinPixmapSize(QString path, int width, int height, bool bSmoothTran
   return path;
 }
 
+QByteArray EscapeCsv(const QString &value) {
+  if (value.isEmpty()) {
+    return {};
+  }
+  bool bContainsDoubleQuote{false};
+  if (!(value.contains(',') || (bContainsDoubleQuote = value.contains('"')) || value.contains('\n'))){
+    return value.toUtf8();
+  }
+  QByteArray escaped;
+  escaped.reserve(value.size() * 4 + 2);
+  escaped.append('z'); // nothing will be replaced
+  escaped += value.toUtf8();
+  if (bContainsDoubleQuote) {
+    escaped.replace('"', R"("")");
+  }
+  escaped.front() = '"';
+  escaped.push_back('"');
+  return escaped;
+}
+
 }
