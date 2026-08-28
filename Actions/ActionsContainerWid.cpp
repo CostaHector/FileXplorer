@@ -2,14 +2,19 @@
 #include <QToolButton>
 
 ActionsContainerWid::ActionsContainerWid(Qt::Orientation arrangeOrientation, int eachRankCnt, QWidget* parent)//
-  : QWidget{parent}, mArrangeOrientation{arrangeOrientation}, mEachRankCnt{eachRankCnt <= 0 ? 1 : eachRankCnt} {
-  mGridLo = new QGridLayout{this};
+  : QScrollArea{parent}, mArrangeOrientation{arrangeOrientation}, mEachRankCnt{eachRankCnt <= 0 ? 1 : eachRankCnt} {
+  QWidget* mWid = new QWidget{this};
+  mGridLo = new QGridLayout{mWid};
   mGridLo->setSpacing(0);
   mGridLo->setContentsMargins(0, 0, 0, 0);
+
+  setWidget(mWid);
+  setWidgetResizable(true);
+  setContentsMargins(0, 0, 0, 0);
+  setAlignment(Qt::AlignLeft);
 }
 
 void ActionsContainerWid::AddActions(const QList<QAction*>& acts, Qt::ToolButtonStyle tbs) {
-
   const int startDeviation = mGridLo->count();
   for (int i = 0; i < acts.size(); ++i) {
     QToolButton* btn = new QToolButton{this};
