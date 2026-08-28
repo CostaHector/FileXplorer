@@ -15,6 +15,7 @@
 #include "VideoTierTool.h"
 #include "FileOpActs.h"
 #include "RenameActions.h"
+#include "JsonActions.h"
 #include "InputDialogHelper.h"
 
 #include <QHeaderView>
@@ -108,6 +109,8 @@ void SceneListView::subscribe() {
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
   connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
   connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
+
+  connect(&JsonActions::GetInst(), &JsonActions::reqAddTagsScene, this, &SceneListView::onAddTags);
 
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
@@ -337,6 +340,17 @@ int SceneListView::onArchiveToByMovieRate() {
   }
 
   return ArchiveToCore(nonRate0Indexes, movieTier2Jsons);
+}
+
+int SceneListView::onAddTags(const QString& tags) const {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("Skip Add Tags", "no item selected");
+    return 0;
+  }
+  const QModelIndexList& indexes = selectedRowsSource();
+  int cnt = _sceneModel->AddTags(indexes, tags);
+  LOG_OK_P("AddTags", "%d/%d json(s) affected", cnt, indexes.size());
+  return cnt;
 }
 
 int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]) {

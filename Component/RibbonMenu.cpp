@@ -4,6 +4,7 @@
 #include <QToolButton>
 #include "ActionsRecorder.h"
 #include "ActionsSearcher.h"
+
 #include "ArchiveFilesActions.h"
 #include "FileRenameRulerActions.h"
 #include "FileOpActs.h"
@@ -11,7 +12,6 @@
 #include "PreferenceActions.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"
-#include "SceneInPageActions.h"
 #include "SyncFileSystemModificationActions.h"
 #include "ViewActions.h"
 #include "ThumbnailActions.h"
@@ -21,6 +21,7 @@
 #include "RibbonCastDB.h"
 #include "RibbonJson.h"
 #include "RibbonMovieDB.h"
+#include "RibbonScene.h"
 #include "SizeChangeAnimation.h"
 #include "MenuToolButton.h"
 #include "BehaviorKey.h"
@@ -312,30 +313,9 @@ QToolBar* RibbonMenu::LeafJson() const {
 }
 
 QToolBar* RibbonMenu::LeafScenesTools() const {
-  auto* sceneTB = new (std::nothrow) QToolBar("scene toolbar");
+  auto* sceneTB = new (std::nothrow) RibbonScene{"Leaf Scene"};
   CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
-
-  auto& ag = SceneInPageActions::GetInst();
-
-  sceneTB->addAction(ViewActions::GetInst()._SCENE_VIEW);
-  sceneTB->addSeparator();
-  sceneTB->addAction(ag._UPDATE_JSON);
-  sceneTB->addAction(ag._UPDATE_SCN);
-  sceneTB->addSeparator();
-  sceneTB->addAction(ag._DISABLE_IMAGE_DECORATION);
-  sceneTB->addAction(ag._INCLUDEING_SUBDIRECTORIES);
-  sceneTB->addSeparator();
-  sceneTB->addAction(ag._CLEAR_SCN_FILE);
-  sceneTB->addSeparator();
-  {
-    QWidget* orderTB = ag.GetOrderToolBar(sceneTB);
-    CHECK_NULLPTR_RETURN_NULLPTR(orderTB);
-    sceneTB->addWidget(orderTB);
-  }
-  sceneTB->addSeparator();
-  sceneTB->addAction(ag._ARCHIVE_BY_MOVIE_SCORE);
-  sceneTB->addActions(ag._ARCHIVE_AG->actions());
-  sceneTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  _registerUnderRibbonScene = sceneTB->GetScenePageControl();
   return sceneTB;
 }
 
@@ -412,12 +392,8 @@ void RibbonMenu::AfterSubscribeInitialSettings() {
   QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
 }
 
-bool RibbonMenu::AddScenePageControlWidget(QWidget* scenePageControlWidget) {
-  CHECK_NULLPTR_RETURN_FALSE(m_leafScenes);
-  CHECK_NULLPTR_RETURN_FALSE(scenePageControlWidget);
-  m_leafScenes->addSeparator();
-  m_leafScenes->addWidget(scenePageControlWidget);
-  return true;
+ScenePageControl* RibbonMenu::GetScenePageControlWidget() const {
+  return _registerUnderRibbonScene;
 }
 
 void RibbonMenu::on_expandStackedWidget(bool bExpand) {

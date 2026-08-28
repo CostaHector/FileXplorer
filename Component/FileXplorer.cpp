@@ -18,7 +18,6 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   : QMainWindow(parent)                                            //
 {
   m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
-  m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
   const ViewTypeTool::ViewType initialViewType{m_viewSwitcher->GetCurViewType()};
 
   m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this}; // previewer in docker
@@ -27,7 +26,6 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"AddressToolbar", this}; // searchToolBar
   m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};     // left navigation bar
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                        // ribbon menu
-
   m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
 
   m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
@@ -35,15 +33,13 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
 
   m_viewSwitchHelper = new (std::nothrow)
-      ViewSwitchHelper{m_stackedBar, m_fsPanel, m_scenePageControl, m_navigationToolBar, this}; // view/searchToolBar switcher
+      ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget(), m_navigationToolBar, this}; // view/searchToolBar switcher
   m_viewSwitchHelper->onSwitchByViewType(initialViewType);
 
   const QString& defaultPath = GetInitialPathFromArgs(args);
   m_fsPanel->onActionAndViewNavigate(defaultPath, true);
 
   setCentralWidget(m_fsPanel);
-
-  m_ribbonMenu->AddScenePageControlWidget(m_scenePageControl);
 
   m_naviSideBarDock = new (std::nothrow) QDockWidget{"Navigation Sidebar", this};
   auto title = new QLabel{"Navi", this};

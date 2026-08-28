@@ -6,6 +6,7 @@
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "BatchRenameBy.h"
+#include "JsonHelper.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -338,4 +339,16 @@ int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
   const auto rowElementsRmv = mPagedData.GetRangeListEraser();
   const int rowRmvedCnt{onRowsRangeListRemoved(indexes, rowElementsRmv)};
   return rowRmvedCnt;
+}
+
+int ScenesListModel::AddTags(const QModelIndexList& rowIndexes, const QString& tagString) {
+  if (rowIndexes.isEmpty()) {
+    return 0;
+  }
+  int cnt{0};
+  QStringList tagsList = tagString.split(JsonHelper::ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);
+  for (const QModelIndex& ind: rowIndexes) {
+    cnt += JsonHelper::AddTagsIntoJsonFieldValue(GetJson(ind), tagsList);
+  }
+  return cnt;
 }

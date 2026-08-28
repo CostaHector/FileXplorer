@@ -112,7 +112,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     }
   }
   if (!cast.isEmpty()) {
-    const QStringList& castLst = cast.split(ELEMENT_JOINER);  // casts must seperated by comma only
+    const QStringList& castLst = cast.split(ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);  // casts must seperated by comma only
     it = dict.find(ENUM_2_STR(Cast));                         // here cast is the Performers
     if (it != dict.cend() && it->toStringList() != castLst) {
       it->setValue(castLst);
@@ -120,7 +120,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     }
   }
   if (!tags.isEmpty()) {
-    const QStringList& tagsLst = tags.split(ELEMENT_JOINER);  // tags must seperated by comma only
+    const QStringList& tagsLst = tags.split(ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);  // tags must seperated by comma only
     it = dict.find(ENUM_2_STR(Tags));
     if (it != dict.cend() && it->toStringList() != tagsLst) {
       it->setValue(tagsLst);
@@ -136,6 +136,37 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
     return CHANGED_WRITE_FILE_FAILED;
   }
   return CHANGED_OK;
+}
+
+bool AddTagsIntoJsonFieldValue(const QString& jsonPth, const QStringList& tagsList) {
+  if (tagsList.isEmpty()) {
+    return false;
+  }
+  QVariantHash dict = MovieJsonLoader(jsonPth);
+  if (!dict.contains("Name")) {
+    return false;
+  }
+  QStringList oldTagsList;
+  auto it = dict.find("Tags");
+  if (it != dict.end()) {
+    oldTagsList = it.value().toStringList();
+  }
+  QStringList newTagsList;
+  {
+    newTagsList.reserve(oldTagsList.size() + tagsList.size());
+    newTagsList += oldTagsList;
+    newTagsList += tagsList;
+    newTagsList.removeDuplicates();
+  }
+  if (newTagsList == oldTagsList) {
+    return false;
+  }
+  if (it == dict.end()) {
+    dict.insert("Tags", std::move(newTagsList));
+  } else {
+    it->setValue(std::move(newTagsList));
+  }
+  return DumpJsonDict(dict, jsonPth);
 }
 
 QMap<uint, JsonDict2Table> ReadStudioCastTagsOut(const QString& path) {

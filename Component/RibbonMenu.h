@@ -6,6 +6,7 @@
 #include "ViewTypeTool.h"
 
 class LogFloatingPreviewer;
+class ScenePageControl;
 
 class RibbonMenu : public QTabWidget {
   Q_OBJECT
@@ -25,7 +26,7 @@ class RibbonMenu : public QTabWidget {
   void Subscribe();
   void AfterSubscribeInitialSettings();
 
-  bool AddScenePageControlWidget(QWidget* scenePageControlWidget);
+  ScenePageControl* GetScenePageControlWidget() const;
 
  public slots:
   void on_expandStackedWidget(bool bExpand);
@@ -44,6 +45,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* m_leafMovie{nullptr};
   QToolBar* m_leafCast{nullptr};
   QToolBar* m_leafScenes{nullptr};
+  mutable ScenePageControl* _registerUnderRibbonScene{nullptr};
   QToolBar* m_leafJson{nullptr};
   QToolBar* m_leafMedia{nullptr};
 

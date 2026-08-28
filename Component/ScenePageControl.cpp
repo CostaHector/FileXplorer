@@ -2,7 +2,6 @@
 #include "SceneKey.h"
 #include "Configuration.h"
 #include "ImageTool.h"
-#include "NotificatorMacro.h"
 #include <QFormLayout>
 #include <QIntValidator>
 #include <QLabel>

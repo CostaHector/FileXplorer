@@ -77,6 +77,7 @@ QString StringTextReader(const QString& textPath, bool* bReadOk) {
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   QString contents(stream.readAll());
+  contents.replace("\r\n", "\n");
   file.close();
   if (bReadOk != nullptr) {
     *bReadOk = true;
