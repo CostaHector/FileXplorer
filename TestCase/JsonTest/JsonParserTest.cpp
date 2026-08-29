@@ -63,6 +63,17 @@ private slots:
     QCOMPARE(JsonParser::GetMD5FromJsonFile("valid.json"), (QByteArray{}));
   }
 
+  void GetTagsFromJsonFile_ok() {
+    bool bReadOk = true;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(3)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk)))
+        .will(returnValue(QByteArray{R"({"Tags": ["A", "B"],"Hot": []})"}))
+        .then(returnValue(QByteArray{R"({"Tags": ["C"]})"}))
+        .then(returnValue(QByteArray{R"({})"}));
+    QCOMPARE(JsonParser::GetTagsFromJsonFile("valid.json"), (QStringList{"A", "B"}));
+    QCOMPARE(JsonParser::GetTagsFromJsonFile("valid.json"), (QStringList{"C"}));
+    QCOMPARE(JsonParser::GetTagsFromJsonFile("valid.json"), (QStringList{}));
+  }
+
   void JsonFileReadFailed() {
     bool bReadOk = false;
     MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{"{}"}));

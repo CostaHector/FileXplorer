@@ -16,6 +16,7 @@
 #include "FileOpActs.h"
 #include "RenameActions.h"
 #include "JsonActions.h"
+#include "JsonParser.h"
 #include "InputDialogHelper.h"
 
 #include <QHeaderView>
@@ -239,6 +240,7 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
   const QString& name = _sceneModel->baseName(srcInd);
   const QString& jsonPath = _sceneModel->GetJson(srcInd);
+  JsonActions::GetInst().UpdateTagsActionCheckedStatusScene(JsonParser::GetTagsFromJsonFile(jsonPath));
   emit currentSceneChanged(name, jsonPath, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
   return true;
 }

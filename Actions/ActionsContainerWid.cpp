@@ -11,6 +11,7 @@ ActionsContainerWid::ActionsContainerWid(Qt::Orientation arrangeOrientation, int
   setWidget(mWid);
   setWidgetResizable(true);
   setContentsMargins(0, 0, 0, 0);
+  setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   setAlignment(Qt::AlignLeft);
 }
 
@@ -23,9 +24,9 @@ void ActionsContainerWid::AddActions(const QList<QAction*>& acts, Qt::ToolButton
     btn->setAutoRaise(true);
     int eleIndex = i + startDeviation;
     if (mArrangeOrientation == Qt::Orientation::Horizontal) {
-      mGridLo->addWidget(btn, eleIndex / mEachRankCnt, eleIndex % mEachRankCnt);
+      mGridLo->addWidget(btn, eleIndex / mEachRankCnt, eleIndex % mEachRankCnt, Qt::AlignLeft);
     } else {
-      mGridLo->addWidget(btn, eleIndex % mEachRankCnt, eleIndex / mEachRankCnt);
+      mGridLo->addWidget(btn, eleIndex % mEachRankCnt, eleIndex / mEachRankCnt, Qt::AlignLeft);
     }
   }
 }

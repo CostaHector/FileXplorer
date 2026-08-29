@@ -1,8 +1,11 @@
 #include "JsonActions.h"
 #include "PublicMacro.h"
-
+#include "PublicVariable.h"
 #include "FileTool.h"
 #include "SystemPath.h"
+#include "PathTool.h"
+#include <QDir>
+
 QStringList GetMovieTagsList() {
   const QString& tagsFilePath = SystemPath::GetMovieTagsListFilePath();
   bool bReadOk{false};
@@ -17,6 +20,19 @@ QStringList GetMovieTagsList() {
   }
   return tags;
 }
+
+QMap<QString, QString> GetTagActionText2IconPath() {
+  const QString& resourceImagesPath{PathTool::Path2Join(SystemPath::CastStudioListPath(), "resources")};
+  QDir dir{resourceImagesPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
+  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  QMap<QString, QString> actionText2IconPath;
+  for (const QString& imgName: dir.entryList()) {
+    actionText2IconPath[PathTool::GetBaseName(imgName)] = PathTool::Path2Join(resourceImagesPath, imgName);
+  }
+  return actionText2IconPath;
+}
+
+QStringList JsonActions::mTagsActionText;
 
 JsonActions::JsonActions(QObject* parent) //
   : QObject{parent}                       //
@@ -153,17 +169,40 @@ JsonActions::JsonActions(QObject* parent) //
   _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY = new (std::nothrow) QAction(QIcon(":/JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT"), tr("Check MD5 & VidName Consistency"), this);
   _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY->setToolTip("List JSON files where SampleMD5 and VidName are inconsistent.\n"
                                                        "Valid states: both fields empty, or both fields non‑empty.");
-
-  const QStringList& tags = GetMovieTagsList();
-  _ADD_TAGS_ACTIONS_JSON = InitTagsAction(tags);
-  _ADD_TAGS_ACTIONS_SCENE = InitTagsAction(tags);
+  mTagsActionText = GetMovieTagsList();
+  const QMap<QString, QString> tagActText2IconPath = GetTagActionText2IconPath();
+  _ADD_TAGS_ACTIONS_JSON = InitTagsAction(mTagsActionText, tagActText2IconPath);
+  mTagsJson = _ADD_TAGS_ACTIONS_JSON->actions();
+  _ADD_TAGS_ACTIONS_SCENE = InitTagsAction(mTagsActionText, tagActText2IconPath);
+  mTagsScene = _ADD_TAGS_ACTIONS_SCENE->actions();
   subcribe();
 }
 
-QActionGroup* JsonActions::InitTagsAction(const QStringList& tags) {
+void JsonActions::UpdateTagsActionCheckedStatus(const QStringList& checkedTags, QList<QAction*>& tagsActList) {
+  for (int i = 0; i < mTagsActionText.size(); ++i) {
+    bool bShouldChecked = checkedTags.contains(mTagsActionText[i], Qt::CaseInsensitive);
+    if (tagsActList[i]->isChecked() == bShouldChecked) {
+      continue;
+    }
+    tagsActList[i]->setChecked(bShouldChecked);
+  }
+}
+
+void JsonActions::UpdateTagsActionCheckedStatusJson(const QStringList& checkedTags) {
+  UpdateTagsActionCheckedStatus(checkedTags, mTagsJson);
+}
+
+void JsonActions::UpdateTagsActionCheckedStatusScene(const QStringList& checkedTags) {
+  UpdateTagsActionCheckedStatus(checkedTags, mTagsScene);
+}
+
+QActionGroup* JsonActions::InitTagsAction(const QStringList& tags, const QMap<QString, QString>& tagActText2IconPath) {
   QActionGroup* tagsAG = new QActionGroup{this};
+  tagsAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
   for (const QString& tag: tags) {
-    tagsAG->addAction(new QAction{tag, this});
+    QAction* tagAct = new QAction{QIcon{tagActText2IconPath.value(tag.toLower(), "")}, tag, this};
+    tagAct->setCheckable(true);
+    tagsAG->addAction(tagAct);
   }
   return tagsAG;
 }
@@ -177,5 +216,4 @@ void JsonActions::subcribe() {
     CHECK_NULLPTR_RETURN_VOID(pTagAction);
     emit reqAddTagsScene(pTagAction->text());
   });
-
 }

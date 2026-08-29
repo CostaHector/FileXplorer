@@ -58,13 +58,19 @@ public:
 
   QAction* _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY{nullptr};
 
-  QActionGroup* _ADD_TAGS_ACTIONS_JSON{nullptr}, *_ADD_TAGS_ACTIONS_SCENE{nullptr};
-  QActionGroup* InitTagsAction(const QStringList& tags);
+  QList<QAction*> mTagsJson, mTagsScene;
 signals:
   void reqAddTagsJson(const QString& tagString);
   void reqAddTagsScene(const QString& tagString);
+public slots:
+  void UpdateTagsActionCheckedStatusJson(const QStringList& checkedTags);
+  void UpdateTagsActionCheckedStatusScene(const QStringList& checkedTags);
 private:
   void subcribe();
+  QActionGroup* InitTagsAction(const QStringList& tags, const QMap<QString, QString>& tagActText2IconPath);
+  QActionGroup* _ADD_TAGS_ACTIONS_JSON{nullptr}, *_ADD_TAGS_ACTIONS_SCENE{nullptr};
+  static void UpdateTagsActionCheckedStatus(const QStringList& checkedTags, QList<QAction*>& tagsActList);
+  static QStringList mTagsActionText;
 };
 
 #endif  // JsonActions_H

@@ -35,7 +35,7 @@ RibbonScene::RibbonScene(const QString& title, QWidget* parent) //
   addSeparator();
 
   ActionsContainerWid* tagsContainer = new ActionsContainerWid{Qt::Orientation::Vertical, 3, this};
-  tagsContainer->AddActions(JsonActions::GetInst()._ADD_TAGS_ACTIONS_SCENE->actions(), Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  tagsContainer->AddActions(JsonActions::GetInst().mTagsScene, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
   addWidget(tagsContainer);
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);

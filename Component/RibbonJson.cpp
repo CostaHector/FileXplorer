@@ -87,7 +87,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
 
   {
     ActionsContainerWid* _mTagsContainer = new ActionsContainerWid{Qt::Orientation::Vertical, 3, this};
-    _mTagsContainer->AddActions(inst._ADD_TAGS_ACTIONS_JSON->actions(), Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+    _mTagsContainer->AddActions(inst.mTagsJson, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
     mTagsContainer = _mTagsContainer;
   }
 
