@@ -3,7 +3,7 @@
 
 #include <QRegularExpression>
 namespace JSON_RENAME_REGEX {
-const QRegularExpression INVALID_CHARS_IN_FILENAME{R"([#\\/:*?<>|])"};  // #\/:*?<>|
+const QRegularExpression INVALID_CHARS_IN_FILENAME{R"([#\\/:*?<>|…—])"};  // #\/:*?<>|
 const QRegularExpression INVALID_QUOTE_IN_FILENAME{R"([’“”"])"};        //'
 
 const QRegularExpression TORRENT_LEADING_STR_COMP{R"(^((\[GT\])|(\[FFL\])|(\[FL\])))",
