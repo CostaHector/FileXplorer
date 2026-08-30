@@ -138,7 +138,7 @@ RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int durati
   return CHANGED_OK;
 }
 
-bool AddTagsIntoJsonFieldValue(const QString& jsonPth, const QStringList& tagsList) {
+bool AddRemoveTagsIntoJsonFieldValue(const QString& jsonPth, const QStringList& tagsList, bool bAdd) {
   if (tagsList.isEmpty()) {
     return false;
   }
@@ -152,12 +152,17 @@ bool AddTagsIntoJsonFieldValue(const QString& jsonPth, const QStringList& tagsLi
     oldTagsList = it.value().toStringList();
   }
   QStringList newTagsList;
-  {
+  if (bAdd) {
     newTagsList.reserve(oldTagsList.size() + tagsList.size());
     newTagsList += oldTagsList;
     newTagsList += tagsList;
-    newTagsList.removeDuplicates();
+  } else {
+    newTagsList = oldTagsList;
+    for (const QString& tag : tagsList) {
+      newTagsList.removeAll(tag);
+    }
   }
+  newTagsList.removeDuplicates();
   if (newTagsList == oldTagsList) {
     return false;
   }

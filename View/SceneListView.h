@@ -38,7 +38,7 @@ public slots:
   int onArchiveActionTriggered(const QAction* archivedToAct);
   int onArchiveTo(int videoTier);
   int onArchiveToByMovieRate();
-  int onAddTags(const QString& tags) const;
+  int onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) const;
 
 protected:
   void mousePressEvent(QMouseEvent* event) override;

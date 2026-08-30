@@ -30,7 +30,7 @@ class JsonTableView : public CustomTableView {
   int onUpdateJsonKeyValuePair();
   int onClearStudio();
   int onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, const JsonModelField::FIELD_OP_MODE mode);
-  int onAddTags(const QString& tags);
+  int onAddRemoveTags(const QString& tags, bool bCheckOrUncheck);
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
   int onCheckSampleMD5AndVidNameConsistency() const;

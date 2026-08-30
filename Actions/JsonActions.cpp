@@ -210,10 +210,10 @@ QActionGroup* JsonActions::InitTagsAction(const QStringList& tags, const QMap<QS
 void JsonActions::subcribe() {
   connect(_ADD_TAGS_ACTIONS_JSON, &QActionGroup::triggered, this, [this](QAction* pTagAction) -> void {
     CHECK_NULLPTR_RETURN_VOID(pTagAction);
-    emit reqAddTagsJson(pTagAction->text());
+    emit reqAddRmvTagsJson(pTagAction->text(), pTagAction->isChecked());
   });
   connect(_ADD_TAGS_ACTIONS_SCENE, &QActionGroup::triggered, this, [this](QAction* pTagAction) -> void {
     CHECK_NULLPTR_RETURN_VOID(pTagAction);
-    emit reqAddTagsScene(pTagAction->text());
+    emit reqAddRmvTagsScene(pTagAction->text(), pTagAction->isChecked());
   });
 }

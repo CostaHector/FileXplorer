@@ -341,14 +341,14 @@ int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
   return rowRmvedCnt;
 }
 
-int ScenesListModel::AddTags(const QModelIndexList& rowIndexes, const QString& tagString) {
+int ScenesListModel::AddRemoveTags(const QModelIndexList& rowIndexes, const QString& tagString, bool bAdd) {
   if (rowIndexes.isEmpty()) {
     return 0;
   }
   int cnt{0};
   QStringList tagsList = tagString.split(JsonHelper::ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);
   for (const QModelIndex& ind: rowIndexes) {
-    cnt += JsonHelper::AddTagsIntoJsonFieldValue(GetJson(ind), tagsList);
+    cnt += JsonHelper::AddRemoveTagsIntoJsonFieldValue(GetJson(ind), tagsList, bAdd);
   }
   return cnt;
 }

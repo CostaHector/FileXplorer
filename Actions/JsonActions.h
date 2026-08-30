@@ -60,8 +60,8 @@ public:
 
   QList<QAction*> mTagsJson, mTagsScene;
 signals:
-  void reqAddTagsJson(const QString& tagString);
-  void reqAddTagsScene(const QString& tagString);
+  void reqAddRmvTagsJson(const QString& tagString, bool bCheckOrUncheck);
+  void reqAddRmvTagsScene(const QString& tagString, bool bCheckOrUncheck);
 public slots:
   void UpdateTagsActionCheckedStatusJson(const QStringList& checkedTags);
   void UpdateTagsActionCheckedStatusScene(const QStringList& checkedTags);

@@ -111,7 +111,7 @@ void SceneListView::subscribe() {
   connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
   connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
 
-  connect(&JsonActions::GetInst(), &JsonActions::reqAddTagsScene, this, &SceneListView::onAddTags);
+  connect(&JsonActions::GetInst(), &JsonActions::reqAddRmvTagsScene, this, &SceneListView::onAddRemoveTags);
 
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
@@ -344,13 +344,13 @@ int SceneListView::onArchiveToByMovieRate() {
   return ArchiveToCore(nonRate0Indexes, movieTier2Jsons);
 }
 
-int SceneListView::onAddTags(const QString& tags) const {
+int SceneListView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) const {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("Skip Add Tags", "no item selected");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource();
-  int cnt = _sceneModel->AddTags(indexes, tags);
+  int cnt = _sceneModel->AddRemoveTags(indexes, tags, bCheckOrUncheck);
   LOG_OK_P("AddTags", "%d/%d json(s) affected", cnt, indexes.size());
   return cnt;
 }

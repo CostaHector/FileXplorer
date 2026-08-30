@@ -353,13 +353,18 @@ int JsonTableView::onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, con
   return indexes.size();
 }
 
-int JsonTableView::onAddTags(const QString& tags) {
+int JsonTableView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) {
   if (!selectionModel()->hasSelection()) {
     LOG_INFO_NP("Skip Add Tags", "no item selected");
     return 0;
   }
   const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Tags);
-  int cnt = _JsonModel->AddCastOrTags(indexes, JsonModelField::Tags, tags);
+  int cnt{0};
+  if (bCheckOrUncheck) {
+    cnt = _JsonModel->AddCastOrTags(indexes, JsonModelField::Tags, tags);
+  } else {
+    cnt = _JsonModel->RmvCastOrTags(indexes, JsonModelField::Tags, tags);
+  }
   LOG_OK_P("AddTags", "%d/%d row(s) affected", cnt, indexes.size());
   return cnt;
 }
@@ -543,7 +548,7 @@ void JsonTableView::subscribe() {
   connect(inst._TAGS_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND); });
   connect(inst._TAGS_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE); });
 
-  connect(&inst, &JsonActions::reqAddTagsJson, this, &JsonTableView::onAddTags);
+  connect(&inst, &JsonActions::reqAddRmvTagsJson, this, &JsonTableView::onAddRemoveTags);
 
   connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
