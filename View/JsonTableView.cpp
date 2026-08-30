@@ -365,7 +365,7 @@ int JsonTableView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) {
   } else {
     cnt = _JsonModel->RmvCastOrTags(indexes, JsonModelField::Tags, tags);
   }
-  LOG_OK_P("AddTags", "%d/%d row(s) affected", cnt, indexes.size());
+  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d row(s) affected", bCheckOrUncheck, cnt, indexes.size());
   return cnt;
 }
 

@@ -351,7 +351,7 @@ int SceneListView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) co
   }
   const QModelIndexList& indexes = selectedRowsSource();
   int cnt = _sceneModel->AddRemoveTags(indexes, tags, bCheckOrUncheck);
-  LOG_OK_P("AddTags", "%d/%d json(s) affected", cnt, indexes.size());
+  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d json(s) affected", bCheckOrUncheck, cnt, indexes.size());
   return cnt;
 }
 
