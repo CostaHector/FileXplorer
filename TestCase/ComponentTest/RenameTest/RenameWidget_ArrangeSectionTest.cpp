@@ -5,6 +5,8 @@
 #include "RenameWidget_ArrangeSection.h"
 #include "EndToExposePrivateMember.h"
 
+#include "Configuration.h"
+#include "RenamerKey.h"
 #include "TDir.h"
 
 class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
@@ -21,6 +23,8 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
          {"Part A - Part B/json A - json B - json C - json D.json", false, ""},
          };
     QCOMPARE(mTDir.createEntries(nodesEntries), nodesEntries.size());
+
+    Configuration().clear();
   }
 
   void ArrangeSection_ok() {
@@ -32,9 +36,15 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
     pArrange.setModal(true);
     QCOMPARE(pArrange.m_nameExtIndependent->checkState(), Qt::CheckState::Checked);
 
+    QCOMPARE(getConfig(RenamerKey::CHOP_POSTFIX_ENABLED).toBool(), false);
+    QCOMPARE(pArrange._CHOP_POSTFIX->isChecked(), false);
+    pArrange._CHOP_POSTFIX->setChecked(true);
+    QCOMPARE(getConfig(RenamerKey::CHOP_POSTFIX_ENABLED).toBool(), true); // take effect right now
+
     pArrange.m_nameExtIndependent->setChecked(true);
     pArrange.m_recursiveCB->setChecked(true);
 
+    QCOMPARE(getConfig(RenamerKey::ARRANGE_SECTION_INDEX).toString(), "1,2"); // by default
     pArrange._SWAP_SECTION_AT_2_INDEXES->setChecked(true);
     pArrange.m_swap2Index->setCurrentText("0,1");
     pArrange.m_recordWasted->setChecked(true);
@@ -58,6 +68,7 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
       QCOMPARE(sNewName, "Part B - Part A\nImg B - Img A - Img C - Img D\njson B - json A - json C - json D");
       QCOMPARE(sNewExt, "\n.jpg\n.json");
       QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED);
+      QCOMPARE(getConfig(RenamerKey::ARRANGE_SECTION_INDEX).toString(), "0,1");
     }
 
     {  // swap index char invalid

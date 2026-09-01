@@ -9,7 +9,7 @@
 class RenameWidget_ArrangeSection : public AdvanceRenamer {
   Q_OBJECT
  public:
-  explicit RenameWidget_ArrangeSection(QWidget* parent = nullptr);
+  using AdvanceRenamer::AdvanceRenamer;
   void initExclusiveSetting() override;
 
   void InitExtraCommonVariable() override;
@@ -19,6 +19,7 @@ class RenameWidget_ArrangeSection : public AdvanceRenamer {
   QStringList RenameCore(const QStringList& replaceeList) override;
 
  private:
+  QAction* _CHOP_POSTFIX{nullptr};
   QAction* _SWAP_SECTION_AT_2_INDEXES{nullptr};
   QAction* _SECTIONS_USED_TO_JOIN{nullptr};
   QActionGroup* _ARRANGE_SECTION_AG{nullptr};

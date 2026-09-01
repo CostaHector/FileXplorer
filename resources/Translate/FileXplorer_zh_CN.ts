@@ -1083,7 +1083,7 @@
 <context>
     <name>JsonActions</name>
     <message>
-        <location filename="../../Actions/JsonActions.cpp" line="+8"/>
+        <location filename="../../Actions/JsonActions.cpp" line="+41"/>
         <source>Save</source>
         <translatorcomment>写入变更到json文件中</translatorcomment>
         <translation>保存变更</translation>
@@ -1999,6 +1999,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     <name>RenameWidget_ArrangeSection</name>
     <message>
         <location filename="../../Component/RenameWidgets/RenameWidget_ArrangeSection.cpp" line="+27"/>
+        <source>Strip Suffixes</source>
+        <translation>后缀不参与</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Swap 2 sections:</source>
         <translation>交换两段:</translation>
     </message>
@@ -2125,7 +2130,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../../Component/RibbonMenu.cpp" line="+45"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+46"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -2279,7 +2284,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+47"/>
+        <location filename="../../View/SceneListView.cpp" line="+49"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -2287,7 +2292,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../../Component/ScenePageControl.cpp" line="+12"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+11"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>

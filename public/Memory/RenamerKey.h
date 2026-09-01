@@ -59,6 +59,7 @@ constexpr KV INSERT_INDEXES_LIST{"RenamerKey/INSERT_INDEXES_LIST", //
                                      "100"},                            //
                                  GeneralDataType::Type::MULTI_LINE_STR, //
                                  GeneralCStrChecker};
+constexpr KV CHOP_POSTFIX_ENABLED{"RenamerKey/CHOP_POSTFIX", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 constexpr KV ARRANGE_SECTION_INDEX{"RenamerKey/ARRANGE_SECTION_INDEX", Var{"1,2"}, GeneralDataType::Type::PLAIN_STR, GeneralCStrChecker};
 constexpr KV REGEX_ENABLED{"RenamerKey/REGEX_ENABLED", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 
