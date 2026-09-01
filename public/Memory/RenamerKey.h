@@ -25,9 +25,9 @@ constexpr KV INS_OLD_STR_LIST{"RenamerKey/INS_OLD_STR_LIST", //
                               GeneralCStrChecker};
 constexpr KV REP_OLD_STR_LIST{"RenamerKey/REP_OLD_STR_LIST",    //
                               Var{"\n"                          // replace nothing
-                                  "\\s\\s+"                     // used for remove extra continous space
+                                  "\\s\\s+\n"                   // used for remove extra continous space
                                   "([a-z])([A-Z])\n"            // aA. used for add space between lowercase and uppercase
-                                  "(\\d{4})(\\d{2})(\\d{2})\n" // 19700101->1970-01-01. used for date add hypen
+                                  "(\\d{4})(\\d{2})(\\d{2})\n"  // 19700101->1970-01-01. used for date add hypen
                                   "(\\d{4}) - (\\d{2}) - (\\d{2})\n"
                                   "BB\n"
                                   "- 360p\n"
