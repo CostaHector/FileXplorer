@@ -13,7 +13,6 @@ public:
   static QMediaInfo& GetInst();
   bool Open(const QString& filename);
   int DurationLengthQuick(const QString& fileAbsPath);
-  QList<int> batchVidsDurationLength(const QStringList& vidsAbsPath);
   explicit operator bool() const { return isLoadDllOk(); }
 
 private:

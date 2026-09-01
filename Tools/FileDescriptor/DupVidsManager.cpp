@@ -99,12 +99,6 @@ bool DupVidsManager::ScanALocation(const QString& path) {
   }
 
   const bool bSkipDuration = isSkipGetVideosDuration();
-  VideoDurationGetter mi;
-  if (!bSkipDuration && !mi.StartToGet()) {
-    LOG_W("Video duration getter start failed");
-    return false;
-  }
-
   int suceedCnt = 0;
   QDirIterator it{path, TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Files, QDirIterator::Subdirectories};
   while (it.hasNext()) {
@@ -112,7 +106,7 @@ bool DupVidsManager::ScanALocation(const QString& path) {
     const QFileInfo file_info{file_path};
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME, PathTool::GetEffectiveName(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_SIZE, file_info.size());
-    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : VideoDurationGetter::GetLengthQuickStatic(mi, file_path));
+    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : VideoDurationGetter::GetDurationFromJsonFirst(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DATE, file_info.birthTime().toMSecsSinceEpoch());
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_ABSOLUTE_PATH, file_path);
     if (!query.exec()) {

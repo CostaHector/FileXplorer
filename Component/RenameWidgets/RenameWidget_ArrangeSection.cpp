@@ -5,10 +5,6 @@
 #include "Configuration.h"
 #include "NameSectionArrange.h"
 
-RenameWidget_ArrangeSection::RenameWidget_ArrangeSection(QWidget* parent)  //
-    : AdvanceRenamer{parent}                                               //
-{ }
-
 void RenameWidget_ArrangeSection::initExclusiveSetting() {
   m_nameExtIndependent->setEnabled(false);
   m_nameExtIndependent->setChecked(true);
@@ -16,6 +12,10 @@ void RenameWidget_ArrangeSection::initExclusiveSetting() {
 }
 
 auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
+  connect(_CHOP_POSTFIX, &QAction::toggled, this, [this](const bool bChopPostfix) {
+    Configuration().setValue(RenamerKey::CHOP_POSTFIX_ENABLED.name, bChopPostfix);
+    AdvanceRenamer::OnlyTriggerRenameCore();
+  });
   connect(_SWAP_SECTION_AT_2_INDEXES, &QAction::toggled, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(_SECTIONS_USED_TO_JOIN, &QAction::toggled, this, &AdvanceRenamer::OnlyTriggerRenameCore);
   connect(m_swap2Index, &QComboBox::currentTextChanged, this, &AdvanceRenamer::OnlyTriggerRenameCore);
@@ -24,12 +24,20 @@ auto RenameWidget_ArrangeSection::extraSubscribe() -> void {
 }
 
 auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
+  _CHOP_POSTFIX = new (std::nothrow) QAction{tr("Strip Suffixes"), this};
+  CHECK_NULLPTR_RETURN_VOID(_CHOP_POSTFIX);
+  // "开启后, 分段前先去除日期/分辨率/编号等后缀, 后续合并分段时再加上前面去除的后缀"
+  _CHOP_POSTFIX->setToolTip("When enabled, suffixes like date, resolution, or numbering are removed before splitting, "
+                            "then reattached after merging sections.");
+  _CHOP_POSTFIX->setCheckable(true);
+  _CHOP_POSTFIX->setChecked(getConfig(RenamerKey::CHOP_POSTFIX_ENABLED).toBool());
+
   _SWAP_SECTION_AT_2_INDEXES = new (std::nothrow) QAction{tr("Swap 2 sections:"), this};
   CHECK_NULLPTR_RETURN_VOID(_SWAP_SECTION_AT_2_INDEXES)
   _SWAP_SECTION_AT_2_INDEXES->setCheckable(true);
   _SWAP_SECTION_AT_2_INDEXES->setChecked(true);
 
-  _SECTIONS_USED_TO_JOIN = new (std::nothrow) QAction{tr("Arrange sections:"), this};
+  _SECTIONS_USED_TO_JOIN = new (std::nothrow) QAction{tr("Arrange sections:"), this}; // 指定分段顺序
   CHECK_NULLPTR_RETURN_VOID(_SECTIONS_USED_TO_JOIN)
   _SECTIONS_USED_TO_JOIN->setCheckable(true);
   _SECTIONS_USED_TO_JOIN->setChecked(false);
@@ -68,6 +76,7 @@ auto RenameWidget_ArrangeSection::InitExtraMemberWidget() -> void {
 }
 
 QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeList) {
+  const bool bChopPostFix = _CHOP_POSTFIX->isChecked();
   NameSectionArrange nsa;
 
   const bool bRecordWasted = m_recordWasted->isChecked();
@@ -83,17 +92,15 @@ QStringList RenameWidget_ArrangeSection::RenameCore(const QStringList& replaceeL
       regexValidLabel->ToNotSaved();
       return {};
     }
-#ifndef RUNNING_UNIT_TESTS
     setConfig(RenamerKey::ARRANGE_SECTION_INDEX, m_swap2Index->currentText());
-#endif
-    nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted);
+    nsa = NameSectionArrange(sortedSequenceIndex.front(), sortedSequenceIndex.back(), bRecordWasted, bChopPostFix);
   } else if (_SECTIONS_USED_TO_JOIN->isChecked()) {
     if (!SubscriptsDigitChar2Int(m_sectionsUsedToJoin->currentText(), sortedSequenceIndex)) {
       LOG_W("Sorted arrange indexes[%s] invalid", qPrintable(m_sectionsUsedToJoin->currentText()));
       regexValidLabel->ToNotSaved();
       return {};
     }
-    nsa = NameSectionArrange(sortedSequenceIndex, bRecordWasted);
+    nsa = NameSectionArrange(sortedSequenceIndex, bRecordWasted, bChopPostFix);
   } else {
     LOG_W("Section arrange method not found");
     regexValidLabel->ToNotSaved();
@@ -119,6 +126,8 @@ void RenameWidget_ArrangeSection::InitExtraCommonVariable() {
 QToolBar* RenameWidget_ArrangeSection::InitControlTB() {
   QToolBar* arrangeControlTb{new (std::nothrow) QToolBar{"section arrange", this}};
   CHECK_NULLPTR_RETURN_NULLPTR(arrangeControlTb);
+  arrangeControlTb->addAction(_CHOP_POSTFIX);
+  arrangeControlTb->addSeparator();
   arrangeControlTb->addAction(_SWAP_SECTION_AT_2_INDEXES);
   arrangeControlTb->addWidget(m_swap2Index);
   arrangeControlTb->addSeparator();

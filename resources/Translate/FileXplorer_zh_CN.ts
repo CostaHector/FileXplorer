@@ -1083,13 +1083,13 @@
 <context>
     <name>JsonActions</name>
     <message>
-        <location filename="../../Actions/JsonActions.cpp" line="+9"/>
+        <location filename="../../Actions/JsonActions.cpp" line="+41"/>
         <source>Save</source>
         <translatorcomment>写入变更到json文件中</translatorcomment>
         <translation>保存变更</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+7"/>
         <source>Sync Json Name Value</source>
         <translatorcomment>根据json文件名更新Name字段</translatorcomment>
         <translation>更新Name字段</translation>
@@ -1100,43 +1100,43 @@
         <translation>从磁盘重新加载</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Export to Dictionary</source>
         <translation>导出到字典</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+7"/>
         <source>Title</source>
         <translation>首字母大写</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Lowercase</source>
         <translatorcomment>选中段落小写化</translatorcomment>
         <translation>小写</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+22"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Unmark Contents Fixed</source>
         <translation>取消固定</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+11"/>
         <source>Update MD5</source>
         <translation>更新哈希字段</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Update K-V</source>
         <translation>更新键值对</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+22"/>
         <source>Clear Cast</source>
         <translation>清除演员</translation>
     </message>
@@ -1146,17 +1146,17 @@
         <translation>根据选中推测演员</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Infer cast from upper selection</source>
         <translation>根据大写选中推测演员</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Check MD5 &amp; VidName Consistency</source>
-        <translation>MD5/VidName一致性检查</translation>
+        <translation>检查字段</translation>
     </message>
     <message>
-        <location line="-52"/>
+        <location line="-50"/>
         <source>Clear Studio</source>
         <translation>清除厂商</translation>
     </message>
@@ -1166,32 +1166,32 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-77"/>
+        <location line="-69"/>
         <source>Cast/Studio Hint</source>
         <translation>推测可能的演员/制片厂</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Format Cast/Studio</source>
         <translation>格式化演员/制片厂</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+15"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Update size</source>
         <translation>更新大小字段</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-26"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+37"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1999,6 +1999,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     <name>RenameWidget_ArrangeSection</name>
     <message>
         <location filename="../../Component/RenameWidgets/RenameWidget_ArrangeSection.cpp" line="+27"/>
+        <source>Strip Suffixes</source>
+        <translation>后缀不参与</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Swap 2 sections:</source>
         <translation>交换两段:</translation>
     </message>
@@ -2117,7 +2122,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+59"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2125,7 +2130,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../../Component/RibbonMenu.cpp" line="+45"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+46"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -2279,7 +2284,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+47"/>
+        <location filename="../../View/SceneListView.cpp" line="+49"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -2287,7 +2292,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../../Component/ScenePageControl.cpp" line="+12"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+11"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>

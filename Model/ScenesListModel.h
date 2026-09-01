@@ -56,6 +56,7 @@ class ScenesListModel : public QAbstractListModelPub {
   bool onDisableImageDecorationChanged(bool bDisabled);
   bool onSubdirectoriesToggled(bool bDisabled);
   int createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist);
+  int AddRemoveTags(const QModelIndexList& rowIndexes, const QString& tagString, bool bAdd);
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);

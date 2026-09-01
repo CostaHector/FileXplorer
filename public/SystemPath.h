@@ -78,6 +78,11 @@ inline const QString& GetActorsAliasListFilePath() {
   return path;
 }
 
+inline const QString& GetMovieTagsListFilePath() {
+  static const QString path = SystemPath::CastStudioListPath() + "/MOVIE_TAGS_LIBRARY.txt";
+  return path;
+}
+
 QString GetPathByApplicationDirPath(const QString& relativePath);
 const QString& TORRENT_EDITOR_PROG_PATH();
 

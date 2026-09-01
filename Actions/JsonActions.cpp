@@ -1,6 +1,38 @@
 #include "JsonActions.h"
-#include <QApplication>
-#include <QStyle>
+#include "PublicMacro.h"
+#include "PublicVariable.h"
+#include "FileTool.h"
+#include "SystemPath.h"
+#include "PathTool.h"
+#include <QDir>
+
+QStringList GetMovieTagsList() {
+  const QString& tagsFilePath = SystemPath::GetMovieTagsListFilePath();
+  bool bReadOk{false};
+  QString tagsListString = FileTool::StringTextReader(tagsFilePath, &bReadOk);
+  if (!bReadOk) {
+    LOG_W("File[%s] inexist", qPrintable(tagsFilePath));
+  }
+  QStringList tags = tagsListString.split('\n', Qt::SplitBehaviorFlags::SkipEmptyParts);
+  if (tags.isEmpty()) {
+    tags = QStringList{"Documentary", "Superhero", "Comedy"};
+    LOG_W("Contents in file empty");
+  }
+  return tags;
+}
+
+QMap<QString, QString> GetTagActionText2IconPath() {
+  const QString& resourceImagesPath{PathTool::Path2Join(SystemPath::CastStudioListPath(), "resources")};
+  QDir dir{resourceImagesPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files};
+  dir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
+  QMap<QString, QString> actionText2IconPath;
+  for (const QString& imgName: dir.entryList()) {
+    actionText2IconPath[PathTool::GetBaseName(imgName)] = PathTool::Path2Join(resourceImagesPath, imgName);
+  }
+  return actionText2IconPath;
+}
+
+QStringList JsonActions::mTagsActionText;
 
 JsonActions::JsonActions(QObject* parent) //
   : QObject{parent}                       //
@@ -10,8 +42,7 @@ JsonActions::JsonActions(QObject* parent) //
   _SAVE_CURRENT_CHANGES->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_S));
   _SAVE_CURRENT_CHANGES->setShortcutVisibleInContextMenu(true);
   _SAVE_CURRENT_CHANGES->setToolTip(QString("<b>%1 (%2)</b><br/> Commit selected row changes") //
-                                        .arg(_SAVE_CURRENT_CHANGES->text())                    //
-                                        .arg(_SAVE_CURRENT_CHANGES->shortcut().toString()));
+                                        .arg(_SAVE_CURRENT_CHANGES->text(), _SAVE_CURRENT_CHANGES->shortcut().toString()));//
 
   // **Sync cache/file system**
   _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":/JsonEditor/NAME_FROM_JSON_FILENAME"), tr("Sync Json Name Value"));
@@ -23,30 +54,26 @@ JsonActions::JsonActions(QObject* parent) //
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
   _RELOAD_JSON_FROM_FROM_DISK->setShortcutVisibleInContextMenu(true);
   _RELOAD_JSON_FROM_FROM_DISK->setToolTip(QString("<b>%1 (%2)</b><br/> Force reload json file in current path from disk again") //
-                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->text())             //
-                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
+                                              .arg(_RELOAD_JSON_FROM_FROM_DISK->text(), _RELOAD_JSON_FROM_FROM_DISK->shortcut().toString()));
 
   _EXPORT_CAST_STUDIO_TO_DICTION = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_LEARN"), tr("Export to Dictionary"), this);
   _EXPORT_CAST_STUDIO_TO_DICTION->setToolTip(
       QString(
           "<b>%1 (%2)</b><br/> Export studio/cast from field `Cast` and `Studio` in json file. \n Improve its cast/studio hint capability.")
-          .arg(_EXPORT_CAST_STUDIO_TO_DICTION->text())
-          .arg(_EXPORT_CAST_STUDIO_TO_DICTION->shortcut().toString()));
+          .arg(_EXPORT_CAST_STUDIO_TO_DICTION->text(), _EXPORT_CAST_STUDIO_TO_DICTION->shortcut().toString()));
 
   // **Case Control**
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD = new (std::nothrow) QAction(QIcon{":/JsonEditor/CASE_TITLE"}, tr("Title"), this);
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);
   _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word in a sentence.")
-                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text())
-                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
+                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text(), _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
 
   _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase"), this);
   _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
   _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
   _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentence.") //
-                                   .arg(_LOWER_ALL_WORDS->text())                   //
-                                   .arg(_LOWER_ALL_WORDS->shortcut().toString()));
+                                   .arg(_LOWER_ALL_WORDS->text(), _LOWER_ALL_WORDS->shortcut().toString()));
 
   // **Studio/Cast/Tags Field Operation**
   _INIT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST"), tr("Init Cast/Studio"), this);
@@ -55,44 +82,36 @@ JsonActions::JsonActions(QObject* parent) //
   _INFER_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Cast/Studio Hint"), this);
   _INFER_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _INFER_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint") //
-                                       .arg(_INFER_CAST_STUDIO->text())
-                                       .arg(_INFER_CAST_STUDIO->shortcut().toString()));
+                                       .arg(_INFER_CAST_STUDIO->text(), _INFER_CAST_STUDIO->shortcut().toString()));
 
   _FORMAT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/FORMAT_PAINTER"), tr("Format Cast/Studio"), this);
   _FORMAT_STUDIO_CAST_FIELD->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
   _FORMAT_STUDIO_CAST_FIELD->setShortcutVisibleInContextMenu(true);
   _FORMAT_STUDIO_CAST_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Format Cast/Studio Field."
                                  "e.g., A,B -> A, B.")
-                             .arg(_FORMAT_STUDIO_CAST_FIELD->text())
-                             .arg(_FORMAT_STUDIO_CAST_FIELD->shortcut().toString()));
+                             .arg(_FORMAT_STUDIO_CAST_FIELD->text(), _FORMAT_STUDIO_CAST_FIELD->shortcut().toString()));
 
   _SET_CONTENTS_FIXED = new (std::nothrow) QAction(QIcon(":/JsonEditor/ANCHOR_DROP"), tr("Mark Contents Fixed"), this);
   _SET_CONTENTS_FIXED->setToolTip(QString("<b>%1 (%2)</b><br/> Mark selection record(s) fixed and will no longer changed when request hint on studio/cast field") //
-                                      .arg(_SET_CONTENTS_FIXED->text())
-                                      .arg(_SET_CONTENTS_FIXED->shortcut().toString()));
+                                      .arg(_SET_CONTENTS_FIXED->text(), _SET_CONTENTS_FIXED->shortcut().toString()));
   _SET_CONTENTS_UNFIXED = new (std::nothrow) QAction(QIcon(":/JsonEditor/ANCHOR_WEIGH"), tr("Unmark Contents Fixed"), this);
   _SET_CONTENTS_UNFIXED->setToolTip(QString("<b>%1 (%2)</b><br/> Unmark selection record(s) fixed and will changed when request hint on studio/cast field") //
-                                      .arg(_SET_CONTENTS_UNFIXED->text())
-                                      .arg(_SET_CONTENTS_UNFIXED->shortcut().toString()));
+                                      .arg(_SET_CONTENTS_UNFIXED->text(), _SET_CONTENTS_UNFIXED->shortcut().toString()));
 
 
   _UPDATE_DURATION_FIELD = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, tr("Update duration"), this};
   _UPDATE_DURATION_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the duration information from video file and write into json file")
-                                         .arg(_UPDATE_DURATION_FIELD->text())
-                                         .arg(_UPDATE_DURATION_FIELD->shortcut().toString()));
+                                         .arg(_UPDATE_DURATION_FIELD->text(), _UPDATE_DURATION_FIELD->shortcut().toString()));
   _UPDATE_SIZE_FIELD = new (std::nothrow) QAction{QIcon{":img/FILE_SIZE"}, tr("Update size"), this};
   _UPDATE_SIZE_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the file size information from video file and write into json file") //
-                                     .arg(_UPDATE_SIZE_FIELD->text())
-                                     .arg(_UPDATE_SIZE_FIELD->shortcut().toString()));
+                                     .arg(_UPDATE_SIZE_FIELD->text(), _UPDATE_SIZE_FIELD->shortcut().toString()));
   _UPDATE_MD5_FIELD = new (std::nothrow) QAction{QIcon{":img/MD5_FILE_IDENTIFIER_PATH"}, tr("Update MD5"), this};
   _UPDATE_MD5_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Read the hash information from video file and write into json file") //
-                                     .arg(_UPDATE_MD5_FIELD->text())
-                                     .arg(_UPDATE_MD5_FIELD->shortcut().toString()));
+                                     .arg(_UPDATE_MD5_FIELD->text(), _UPDATE_MD5_FIELD->shortcut().toString()));
 
   _UPDATE_JSON_KEY_VALUE_PAIR = new (std::nothrow) QAction{QIcon{":img/UPDATE_JSON"}, tr("Update K-V"), this};
   _UPDATE_JSON_KEY_VALUE_PAIR->setToolTip(QString("<b>%1 (%2)</b><br/> Update the key value of \"Name/VidName/ImgName/Size\"") //
-                                    .arg(_UPDATE_JSON_KEY_VALUE_PAIR->text())
-                                    .arg(_UPDATE_JSON_KEY_VALUE_PAIR->shortcut().toString()));
+                                    .arg(_UPDATE_JSON_KEY_VALUE_PAIR->text(), _UPDATE_JSON_KEY_VALUE_PAIR->shortcut().toString()));
 
   _STUDIO_FIELD_SET = new (std::nothrow) QAction(QIcon(":/JsonEditor/STUDIO"), tr("Set Studio"));
   _STUDIO_FIELD_SET->setToolTip(QString("<b>%1 (%2)</b><br/>Input studio string and used to set Studio field") //
@@ -141,20 +160,60 @@ JsonActions::JsonActions(QObject* parent) //
   _INFER_CAST_FROM_SELECTION->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key::Key_D));
   _INFER_CAST_FROM_SELECTION->setShortcutVisibleInContextMenu(true);
   _INFER_CAST_FROM_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected sentence") //
-                                              .arg(_INFER_CAST_FROM_SELECTION->text())                      //
-                                              .arg(_INFER_CAST_FROM_SELECTION->shortcut().toString()));
+                                              .arg(_INFER_CAST_FROM_SELECTION->text(), _INFER_CAST_FROM_SELECTION->shortcut().toString()));
   _INFER_CAST_FROM_UPPERCASE_SELECTION = new (std::nothrow)
       QAction(QIcon(":/JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE"), tr("Infer cast from upper selection"), this);
   _INFER_CAST_FROM_UPPERCASE_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Extract Cast from selected UPPERCASE sentence") //
-                                          .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->text())                                    //
-                                          .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->shortcut().toString()));
+                                          .arg(_INFER_CAST_FROM_UPPERCASE_SELECTION->text(), _INFER_CAST_FROM_UPPERCASE_SELECTION->shortcut().toString()));
 
   _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY = new (std::nothrow) QAction(QIcon(":/JsonEditor/CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCT"), tr("Check MD5 & VidName Consistency"), this);
   _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY->setToolTip("List JSON files where SampleMD5 and VidName are inconsistent.\n"
                                                        "Valid states: both fields empty, or both fields non‑empty.");
+  mTagsActionText = GetMovieTagsList();
+  const QMap<QString, QString> tagActText2IconPath = GetTagActionText2IconPath();
+  _ADD_TAGS_ACTIONS_JSON = InitTagsAction(mTagsActionText, tagActText2IconPath);
+  mTagsJson = _ADD_TAGS_ACTIONS_JSON->actions();
+  _ADD_TAGS_ACTIONS_SCENE = InitTagsAction(mTagsActionText, tagActText2IconPath);
+  mTagsScene = _ADD_TAGS_ACTIONS_SCENE->actions();
+  subcribe();
 }
 
-JsonActions& g_JsonActions() {
-  static JsonActions ins;
-  return ins;
+void JsonActions::UpdateTagsActionCheckedStatus(const QStringList& checkedTags, QList<QAction*>& tagsActList) {
+  for (int i = 0; i < mTagsActionText.size(); ++i) {
+    bool bShouldChecked = checkedTags.contains(mTagsActionText[i], Qt::CaseInsensitive);
+    if (tagsActList[i]->isChecked() == bShouldChecked) {
+      continue;
+    }
+    tagsActList[i]->setChecked(bShouldChecked);
+  }
+}
+
+void JsonActions::UpdateTagsActionCheckedStatusJson(const QStringList& checkedTags) {
+  UpdateTagsActionCheckedStatus(checkedTags, mTagsJson);
+}
+
+void JsonActions::UpdateTagsActionCheckedStatusScene(const QStringList& checkedTags) {
+  UpdateTagsActionCheckedStatus(checkedTags, mTagsScene);
+}
+
+QActionGroup* JsonActions::InitTagsAction(const QStringList& tags, const QMap<QString, QString>& tagActText2IconPath) {
+  QActionGroup* tagsAG = new QActionGroup{this};
+  tagsAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
+  for (const QString& tag: tags) {
+    QAction* tagAct = new QAction{QIcon{tagActText2IconPath.value(tag.toLower(), "")}, tag, this};
+    tagAct->setCheckable(true);
+    tagsAG->addAction(tagAct);
+  }
+  return tagsAG;
+}
+
+void JsonActions::subcribe() {
+  connect(_ADD_TAGS_ACTIONS_JSON, &QActionGroup::triggered, this, [this](QAction* pTagAction) -> void {
+    CHECK_NULLPTR_RETURN_VOID(pTagAction);
+    emit reqAddRmvTagsJson(pTagAction->text(), pTagAction->isChecked());
+  });
+  connect(_ADD_TAGS_ACTIONS_SCENE, &QActionGroup::triggered, this, [this](QAction* pTagAction) -> void {
+    CHECK_NULLPTR_RETURN_VOID(pTagAction);
+    emit reqAddRmvTagsScene(pTagAction->text(), pTagAction->isChecked());
+  });
 }

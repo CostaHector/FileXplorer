@@ -300,4 +300,18 @@ QByteArray GetMD5FromJsonFile(const QString& jsonFullPath) {
   return parseMD5ByteArray(contents, md5Index);
 }
 
+QStringList GetTagsFromJsonFile(const QString& jsonFullPath) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return {};
+  }
+  int md5Index = contents.indexOf(R"("Tags":)");
+  if (md5Index == -1) {
+    return {};
+  }
+  md5Index += sizeof(R"("Tags":)");
+  return parseStringArray(contents, md5Index);
+}
+
 }

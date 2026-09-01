@@ -68,7 +68,7 @@ class JsonTableViewTest : public PlainTestSuite {
     JsonTableModel jsonModel;
     JsonTableView jsonView{&jsonModel, &jsonProxyModel};
 
-    auto& inst = g_JsonActions();
+    auto& inst = JsonActions::GetInst();
     // not crash down when no rows
     QCOMPARE(jsonModel.rowCount(), 0);
 
@@ -143,7 +143,7 @@ class JsonTableViewTest : public PlainTestSuite {
       QCOMPARE(jsonView.onSyncNameField(), 0);
     }
 
-    auto& inst = g_JsonActions();
+    auto& inst = JsonActions::GetInst();
     {
       // sync has no been write into local disk files. reload will loose the unsave changes
       // 1.1 reload ok

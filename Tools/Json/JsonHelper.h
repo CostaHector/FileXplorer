@@ -26,6 +26,7 @@ QVariantHash MovieJsonLoader(const QString& jsonFilePth);
 QJsonObject GetJsonObject(const QString& jsonFilePath);
 
 RET_ENUM InsertOrUpdateDurationStudioCastTags(const QString& jsonPth, int duration, const QString& studio, const QString& cast, const QString& tags);
+bool AddRemoveTagsIntoJsonFieldValue(const QString& jsonPth, const QStringList& tagsList, bool bAdd);
 
 QByteArray SerializedJsonDict2ByteArray(const QVariantHash& dict);
 QVariantHash DeserializedJsonStr2Dict(const QString& serializedJsonStr, bool* bParseOk = nullptr);

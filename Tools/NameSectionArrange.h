@@ -5,12 +5,13 @@
 
 bool SubscriptsStr2Int(const QString& subscripts, QList<int>& sortedIndLst);
 bool SubscriptsDigitChar2Int(const QString& subscripts, QList<int>& sortedIndLst);
+QString ChopPostfix(const QString& baseName);
 
 class NameSectionArrange {
  public:
-  NameSectionArrange();
-  NameSectionArrange(const QList<int>& sortedIndlst, const bool strictMode = true);
-  NameSectionArrange(const int section1, const int section2, const bool strictMode = true);
+  explicit NameSectionArrange();
+  explicit NameSectionArrange(const QList<int>& sortedIndlst, const bool strictMode = true, bool bChopPostfix = false);
+  explicit NameSectionArrange(const int section1, const int section2, const bool strictMode = true, bool bChopPostfix = false);
 
   QString operator()(const QString& names);
   QStringList BatchSwapper(const QStringList& lst);
@@ -24,6 +25,7 @@ class NameSectionArrange {
  private:
   bool m_recordWasted;
   QList<int> m_seq;
+  bool m_chopPostfix;
 
   QStringList m_wastedList;  // remember to check this member when m_strictMode is false.
 };

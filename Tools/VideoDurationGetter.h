@@ -9,7 +9,7 @@ class VideoDurationGetter {
  public:
   // units: ms
   static int GetDurationFromJsonFirst(const QString& vidPath);
-  static int ReadAVideo(const QString& vidPath);
+  static int ReadAVideoByFFmpeg(const QString& vidPath);
   static QList<int> ReadVideos(const QStringList& vidsPath);
   static int GetLengthQuickStatic(const VideoDurationGetter& self, const QString& vidPath);
   static QList<int> GetLengthsQuickStatic(const VideoDurationGetter& self, const QStringList& vidsPath);

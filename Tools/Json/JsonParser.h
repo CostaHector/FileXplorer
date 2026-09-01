@@ -19,6 +19,7 @@ int GetDurationFromJsonFile(const QString& jsonFullPath, bool* bSucceed, int def
 int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue=0);
 qint64 GetSizeFromJsonFile(const QString& jsonFullPath, qint64 defaultSizeValue=0);
 QByteArray GetMD5FromJsonFile(const QString& jsonFullPath);
+QStringList GetTagsFromJsonFile(const QString& jsonFullPath);
 }
 
 #endif // JSONPARSER_H

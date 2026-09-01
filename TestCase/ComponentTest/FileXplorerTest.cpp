@@ -89,7 +89,6 @@ class FileXplorerTest : public PlainTestSuite {
     {
       FileXplorer fe{args, nullptr};
       QVERIFY(fe.m_viewSwitcher != nullptr);
-      QVERIFY(fe.m_scenePageControl != nullptr);
       QVERIFY(fe.m_previewHtmlDock != nullptr);
       QVERIFY(fe.m_previewFolder != nullptr);
       QVERIFY(fe.m_previewSwitcher != nullptr);

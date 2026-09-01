@@ -7,6 +7,10 @@
 class JsonActions : public QObject {
   Q_OBJECT
 public:
+  static JsonActions& GetInst() {
+    static JsonActions ins;
+    return ins;
+  }
   explicit JsonActions(QObject* parent = nullptr);
 
   // **Submit**
@@ -53,8 +57,20 @@ public:
   QAction* _INFER_CAST_FROM_UPPERCASE_SELECTION{nullptr};
 
   QAction* _CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY{nullptr};
-};
 
-JsonActions& g_JsonActions();
+  QList<QAction*> mTagsJson, mTagsScene;
+signals:
+  void reqAddRmvTagsJson(const QString& tagString, bool bCheckOrUncheck);
+  void reqAddRmvTagsScene(const QString& tagString, bool bCheckOrUncheck);
+public slots:
+  void UpdateTagsActionCheckedStatusJson(const QStringList& checkedTags);
+  void UpdateTagsActionCheckedStatusScene(const QStringList& checkedTags);
+private:
+  void subcribe();
+  QActionGroup* InitTagsAction(const QStringList& tags, const QMap<QString, QString>& tagActText2IconPath);
+  QActionGroup* _ADD_TAGS_ACTIONS_JSON{nullptr}, *_ADD_TAGS_ACTIONS_SCENE{nullptr};
+  static void UpdateTagsActionCheckedStatus(const QStringList& checkedTags, QList<QAction*>& tagsActList);
+  static QStringList mTagsActionText;
+};
 
 #endif  // JsonActions_H
