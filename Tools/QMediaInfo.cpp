@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include <QTime>
 #include <QFile>
+#include <qglobal.h>
 
 inline MediaInfoDLL::String ToMediaInfoString(const QString& qstr) {
 #if defined(UNICODE) || defined(_UNICODE)
@@ -77,20 +78,6 @@ int QMediaInfo::DurationLengthQuick(const QString& fileAbsPath) {
                                          info_t::Info_Name);
   const QString& qStringDur = fromMediaInfoString(mediaInfoDur);
   return QTime::fromString(qStringDur, Qt::ISODateWithMs).msecsSinceStartOfDay();
-}
-
-QList<int> QMediaInfo::batchVidsDurationLength(const QStringList& vidsAbsPath) {
-  if (vidsAbsPath.isEmpty()) {
-    LOG_D("Input vids abs path list is empty");
-    return {};
-  }
-
-  QList<int> durationList;
-  durationList.reserve(vidsAbsPath.size());
-  for (const QString& filename : vidsAbsPath) {
-    durationList.push_back(DurationLengthQuick(filename));
-  }
-  return durationList;
 }
 
 /*

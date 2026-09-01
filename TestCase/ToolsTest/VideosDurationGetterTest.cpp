@@ -25,7 +25,7 @@ class VideosDurationGetterTest : public PlainTestSuite {
     VideoDurationGetter mi;
     QVERIFY(mi.StartToGet());
     int actualDurationByMediaInfo = mi.GetLengthQuick(mp4Dir.absoluteFilePath(vidName));
-    int actualDurationByFFMpeg = mi.ReadAVideo(mp4Dir.absoluteFilePath(vidName));
+    int actualDurationByFFMpeg = mi.ReadAVideoByFFmpeg(mp4Dir.absoluteFilePath(vidName));
     QVERIFY2((std::abs(actualDurationByMediaInfo - expectDuration) < EPSILON_MILLIONSECOND), qPrintable(vidName));
     QVERIFY2((std::abs(actualDurationByFFMpeg - expectDuration) < EPSILON_MILLIONSECOND), qPrintable(vidName));
   }

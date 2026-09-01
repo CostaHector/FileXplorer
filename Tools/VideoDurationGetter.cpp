@@ -35,20 +35,16 @@ int VideoDurationGetter::GetDurationFromJsonFirst(const QString &vidPath) {
   return VideoDurationGetter::GetLengthQuickStatic(mi, vidPath);
 }
 
-int VideoDurationGetter::ReadAVideo(const QString& vidPath) {
-  if (vidPath.endsWith(".dvd", Qt::CaseInsensitive)) {
-    return DvdFileInfo::ReadTotalDurationFromDvdFile(vidPath);
-  }
-
+int VideoDurationGetter::ReadAVideoByFFmpeg(const QString& vidPath) {
   AVFormatContext* fmtCtx = nullptr;
   // open local video file(disable netword function)
   if (avformat_open_input(&fmtCtx, vidPath.toUtf8().constData(), nullptr, nullptr) != 0) {
-    return -1;  // open failed
+    return JsonFieldBoundary::DURATION_GET_FAILED_VALUE;
   }
   // quick parse stream information
   if (avformat_find_stream_info(fmtCtx, nullptr) < 0) {
     avformat_close_input(&fmtCtx);
-    return -1;
+    return JsonFieldBoundary::DURATION_GET_FAILED_VALUE;
   }
   // fmtCtx->duration unit is us
   int duration = (fmtCtx->duration == AV_NOPTS_VALUE) ? JsonFieldBoundary::DURATION_GET_FAILED_VALUE : (double)fmtCtx->duration / MICROSECONDS_PER_MILLISECOND;
@@ -101,18 +97,31 @@ QList<int> VideoDurationGetter::GetLengthsQuickStatic(const VideoDurationGetter&
   return self.GetLengthsQuick(vidsPath);
 }
 
+inline bool IsAllAscii(const QString& path) {
+  for (int i = path.size() - 1; i >= 0; --i) {
+    if (path.at(i).unicode() > 127) {
+      return false;
+    }
+  }
+  return true;
+}
+
 int VideoDurationGetter::GetLengthQuick(const QString& vidPath) const {
 #ifdef _WIN32
-  static auto& inst = QMediaInfo::GetInst();
-  return inst.DurationLengthQuick(vidPath);
+  // Windows and all ascii. use mediainfo, otherwise use ffmpeg
+  if (IsAllAscii(vidPath)) {
+    static auto& inst = QMediaInfo::GetInst();
+    return inst.DurationLengthQuick(vidPath);
+  }
 #endif
-  return ReadAVideo(vidPath);
+  return ReadAVideoByFFmpeg(vidPath);
 }
 
 QList<int> VideoDurationGetter::GetLengthsQuick(const QStringList& vidsPath) const {
-// #ifdef _WIN32
-  static auto& inst = QMediaInfo::GetInst();
-  return inst.batchVidsDurationLength(vidsPath);
-// #endif
-//   return ReadVideos(vidsPath);
+  QList<int> durations;
+  durations.reserve(vidsPath.size());
+  for (const QString& vidPath: vidsPath) {
+    durations.push_back(GetLengthQuick(vidPath));
+  }
+  return durations;
 }
