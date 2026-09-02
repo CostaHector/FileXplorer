@@ -15,7 +15,7 @@
 #include "VideoTierTool.h"
 #include "FileOpActs.h"
 #include "RenameActions.h"
-#include "JsonActions.h"
+#include "TagsHelper.h"
 #include "JsonParser.h"
 #include "InputDialogHelper.h"
 
@@ -110,8 +110,6 @@ void SceneListView::subscribe() {
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
   connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
   connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
-
-  connect(&JsonActions::GetInst(), &JsonActions::reqAddRmvTagsScene, this, &SceneListView::onAddRemoveTags);
 
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
@@ -240,7 +238,7 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
   const QModelIndex& srcInd = _sceneSortProxyModel->mapToSource(current);
   const QString& name = _sceneModel->baseName(srcInd);
   const QString& jsonPath = _sceneModel->GetJson(srcInd);
-  JsonActions::GetInst().UpdateTagsActionCheckedStatusScene(JsonParser::GetTagsFromJsonFile(jsonPath));
+  TagsHelper::GetInst().UpdateTagsActionCheckedStatus(JsonParser::GetTagsFromJsonFile(jsonPath));
   emit currentSceneChanged(name, jsonPath, _sceneModel->GetImgs(srcInd), _sceneModel->GetVids(srcInd));
   return true;
 }
@@ -311,7 +309,7 @@ int SceneListView::onArchiveTo(int videoTier) {
   }
   const QModelIndexList& indexes{selectedRowsSource()};
   QStringList movieTier2Jsons[(int)VideoTierTool::VideoTierE::BUTT_INVALID];
-  movieTier2Jsons[videoTier] = _sceneModel->rel2fileNames(indexes);
+  movieTier2Jsons[videoTier] = _sceneModel->RelativePath2JsonFile(indexes);
   return ArchiveToCore(indexes, movieTier2Jsons);
 }
 
@@ -342,17 +340,6 @@ int SceneListView::onArchiveToByMovieRate() {
   }
 
   return ArchiveToCore(nonRate0Indexes, movieTier2Jsons);
-}
-
-int SceneListView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) const {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Skip Add Tags", "no item selected");
-    return 0;
-  }
-  const QModelIndexList& indexes = selectedRowsSource();
-  int cnt = _sceneModel->AddRemoveTags(indexes, tags, bCheckOrUncheck);
-  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d json(s) affected", bCheckOrUncheck, cnt, indexes.size());
-  return cnt;
 }
 
 int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringList (&movieTier2Jsons)[(int)VideoTierTool::VideoTierE::BUTT_INVALID]) {

@@ -1,11 +1,11 @@
 #ifndef FILEXPLOREREVENT_H
 #define FILEXPLOREREVENT_H
-#include <QClipboard>
-#include "ComplexOperation.h"
 #include "RedundantFolderRemove.h"
 #include "FileSystemModel.h"
 #include "PopupWidgetManager.h"
+#include "ComplexOperation.h"
 
+#include <QClipboard>
 class ViewsStackedWidget;
 class CustomStatusBar;
 class ConfigsMgr;
@@ -52,6 +52,7 @@ private:
   bool onRateMoviesRecursively(bool bOverrideForce) const;
   bool onAdjustRateMovie(int delta) const;
   bool onAdjustRateMoviesRecursively(int delta) const;
+  int onAddRemoveTags(const QString& tags, bool bCheckOrUncheck);
 
   QStringList FsmSelectedItems() const;
 

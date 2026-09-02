@@ -42,12 +42,12 @@ private slots:
       AutoRollbackFileContentModify modifier(tDir.itemPath(filePath), "line2", "replaced");
       QVERIFY(modifier.Execute());
 
-      // 验证替换后CRLF->LF保持不变,
+      // 验证替换后CRLF保持不变
       QByteArray modified = readFileBytes(filePath);
-      QCOMPARE(modified, QByteArray("line1\nreplaced\nline3\n"));
+      QCOMPARE(modified, QByteArray("line1\r\nreplaced\r\nline3\r\n"));
     }
 
-    QCOMPARE(readFileBytes(filePath), (QByteArray{"line1\nline2\nline3\n"}));
+    QCOMPARE(readFileBytes(filePath), originalContent);
   }
 
   void test_FullReplaceMode_LF_Preservation() {
@@ -76,10 +76,10 @@ private slots:
       QVERIFY(modifier.Execute());
 
       QByteArray modified = readFileBytes(filePath);
-      QCOMPARE(modified, QByteArray("content with \t spaces \n and \0 nulls"));
+      QCOMPARE(modified, QByteArray("content with \t spaces \r\n and \0 nulls"));
     }
 
-    QCOMPARE(readFileBytes(filePath), (QByteArray{"content with \t tabs \n and \0 nulls"}));
+    QCOMPARE(readFileBytes(filePath), originalContent);
   }
 
   void test_FullReplaceMode_EmptyFile() {
@@ -123,4 +123,4 @@ private:
 };
 
 #include "AutoRollbackFileContentModifyTest.moc"
-REGISTER_TEST(AutoRollbackFileContentModifyTest, false)
+REGISTER_TEST(AutoRollbackFileContentModifyTest, true)

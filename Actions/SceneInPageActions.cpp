@@ -118,10 +118,6 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   CHECK_NULLPTR_RETURN_VOID(_BY_RATE);
   _BY_RATE->setCheckable(true);
 
-  _BY_UPLOADED_TIME = new (std::nothrow) QAction(tr("Created Time"), this);
-  CHECK_NULLPTR_RETURN_VOID(_BY_UPLOADED_TIME);
-  _BY_UPLOADED_TIME->setCheckable(true);
-
   _REVERSE_RESULT = new (std::nothrow) QAction(QIcon{":img/ORDER_DESCENDING"}, tr("Reverse result"), this);
   CHECK_NULLPTR_RETURN_VOID(_REVERSE_RESULT);
   _REVERSE_RESULT->setCheckable(true);
@@ -138,8 +134,8 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   mSortOrderIntAction.init({{_BY_NAME, SceneInfo::Role::DEF_NAME_TEXT_ROLE},      //
                             {_BY_MOVIE_PATH, SceneInfo::Role::REL_PATH_ROLE},     //
                             {_BY_MOVIE_SIZE, SceneInfo::Role::VID_SIZE_ROLE},     //
-                            {_BY_RATE, SceneInfo::Role::RATE_ROLE},               //
-                            {_BY_UPLOADED_TIME, SceneInfo::Role::UPLOADED_ROLE}}, //
+                            {_BY_RATE, SceneInfo::Role::RATE_ROLE},
+                            }, //
                            SceneInfo::DEF_SORT_ROLE,
                            QActionGroup::ExclusionPolicy::Exclusive);
   SceneInfo::Role sortDim = SceneInfo::GetInitialSortRole();

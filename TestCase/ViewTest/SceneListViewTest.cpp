@@ -31,7 +31,7 @@ class SceneListViewTest : public PlainTestSuite {
   Q_OBJECT
 public:
   TDir tDir;
-  const QString scnAbsPath = SceneInfoManager::ScnMgr::GetScnAbsFilePath(tDir.path());
+  const QString scnAbsPath = SceneInfo::GetSceneFullPathStatic(tDir.path());
   QVariantList expectCurrentSceneChangedArgs_ChrisEvans;
   QVariantList expectCurrentSceneChangedArgs_HenryCavill;
   const QSize listViewImageSize{RateHelper::RATING_BAR_HEIGHT * RateHelper::RATING_BAR_HEIGHT, RateHelper::RATING_BAR_HEIGHT * 2};

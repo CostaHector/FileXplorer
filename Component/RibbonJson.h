@@ -22,8 +22,6 @@ class RibbonJson : public QToolBar {
   MenuToolButton* mTagsMenu{nullptr};
 
   QToolBar* mUpdateFieldTb{nullptr};
-
-  QWidget* mTagsContainer{nullptr};
 };
 
 #endif  // RIBBONJSON_H

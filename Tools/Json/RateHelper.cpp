@@ -184,6 +184,9 @@ bool RateHelper::getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPa
     return false;
   }
   const QString dirPath{fileAbsPath.chopped(choppedSize)};
+  if (baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
+    baseName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
+  }
 
   static const ItemsPileCategory::T_DOT_EXT_2_TYPE& dotExt2TypeHash = ItemsPileCategory::GetTypeFromDotExtension();
   const ItemsPileCategory::SCENE_COMPONENT_TYPE fileType = dotExt2TypeHash.value(ext.toLower(), ItemsPileCategory::OTHER);

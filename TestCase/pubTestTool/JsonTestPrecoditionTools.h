@@ -1,6 +1,5 @@
 #ifndef JSONTESTPRECODITIONTOOLS_H
 #define JSONTESTPRECODITIONTOOLS_H
-#include "SceneInfoManager.h"
 
 namespace JsonTestPrecoditionTools {
 constexpr char JSON_CONTENTS[] {R"({

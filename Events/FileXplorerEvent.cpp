@@ -56,6 +56,8 @@
 #include "JsonRenameRegex.h"
 #include "RateActions.h"
 #include "RateHelper.h"
+#include "TagsHelper.h"
+#include "JsonHelper.h"
 #include "RecycleCfmDlg.h"
 #include "RowHeightRegistry.h"
 
@@ -317,7 +319,7 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
 }
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
-  const QStringList& paths = _contentPane->getFilePaths();
+  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false; // selection some row first
@@ -334,7 +336,7 @@ bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
 }
 
 bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
-  const QStringList& paths = _contentPane->getFilePaths();
+  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false;
@@ -349,6 +351,25 @@ bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
 bool FileXplorerEvent::onAdjustRateMoviesRecursively(int delta) const {
   const QString rootPath{_contentPane->getRootPath()};
   return RateHelper::AdjustFileRateRecursively(rootPath, delta) > 0;
+}
+
+int FileXplorerEvent::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) {
+  if (_contentPane->GetVt() == ViewTypeTool::ViewType::JSON) {
+    return _contentPane->m_jsonTableView->onAddRemoveTags(tags, bCheckOrUncheck);
+  }
+  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY);
+  if (paths.isEmpty()) {
+    LOG_INFO_NP("[Skip] No selection", "Select some items first");
+    return false; // selection some row first
+  }
+  int cnt{0};
+  QStringList tagsList = tags.split(JsonHelper::ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);
+  QSet<QString> jsonPaths = RateHelper::GetRelatedJsonAbsPaths(paths);
+  for (const QString& jsonPath: jsonPaths) {
+    cnt += JsonHelper::AddRemoveTagsIntoJsonFieldValue(jsonPath, tagsList, bCheckOrUncheck);
+  }
+  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d json(s) affected", bCheckOrUncheck, cnt, paths.size());
+  return cnt > 0;
 }
 
 QStringList FileXplorerEvent::FsmSelectedItems() const { // for file-systemmodel only
@@ -608,6 +629,8 @@ void FileXplorerEvent::subscribe() {
     connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &FileXplorerEvent::onAdjustRateMovie);
     connect(&rateInst, &RateActions::AdjustRateMovieRecursivelyReq, this, &FileXplorerEvent::onAdjustRateMoviesRecursively);
   }
+
+  connect(&TagsHelper::GetInst(), &TagsHelper::reqAddRmvTags, this, &FileXplorerEvent::onAddRemoveTags);
 }
 
 struct AutoSwitchPath {

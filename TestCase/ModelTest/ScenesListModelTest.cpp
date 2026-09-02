@@ -9,9 +9,6 @@
 #include "Logger.h"
 #include "SceneKey.h"
 #include "Configuration.h"
-#include "SceneInfoManager.h"
-#include "StringTool.h"
-#include "JsonModelField.h"
 #include "RateHelper.h"
 
 #include <QSignalSpy>
@@ -40,7 +37,7 @@ bool GetSceneInfoList(int count, SceneInfo::Role sortDim, bool isReverse, SceneI
 
   std::uniform_int_distribution<int> uniformIntDist(0, count + 1);
   std::default_random_engine e;
-  SceneInfo siBasic{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "2000-06-16 00:00:60"};
+  SceneInfo siBasic{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "Ben Affleck.json"};
   for (int i = 0; i < count; ++i) {
     // 所有dimension都是统一的无序
     int rndInt = uniformIntDist(e);
@@ -48,7 +45,6 @@ bool GetSceneInfoList(int count, SceneInfo::Role sortDim, bool isReverse, SceneI
     siBasic.name = "name" + rnd;
     siBasic.vidSize = rndInt * 1000;
     siBasic.rate = rndInt * 100;
-    siBasic.uploaded = "uploaded" + rnd;
     // 只有入参指定一个dimension有序
     const int valueForDistinguish = isReverse ? count - i - 1 : i;
     switch (sortDim) {
@@ -62,10 +58,6 @@ bool GetSceneInfoList(int count, SceneInfo::Role sortDim, bool isReverse, SceneI
       }
       case SceneInfo::Role::RATE_ROLE: {
         siBasic.rate = valueForDistinguish;
-        break;
-      }
-      case SceneInfo::Role::UPLOADED_ROLE: {
-        siBasic.uploaded = QString::asprintf("2010-06-16 00:00:00.%03d", valueForDistinguish);
         break;
       }
       default:
@@ -127,7 +119,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(defModel.GetVids(invalidIndex), (QStringList{}));
     QCOMPARE(defModel.GetJson(invalidIndex), "");
     QCOMPARE(defModel.GetScn(invalidIndex), "");
-    QVERIFY(defModel.rel2fileNames({}).isEmpty());
+    QVERIFY(defModel.RelativePath2JsonFile({}).isEmpty());
 
     // 测试分页功能
     QCOMPARE(defModel.mPagedData.GetPerPageEleCnt(), SceneKey::CNT_EACH_PAGE.toVariant());
@@ -141,9 +133,9 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void setRootPath_ok() {
     // rate=10
-    SceneInfo si0{"/", "Kaka", {}, {"Kaka.mp4"}, 0, 10, "2000-06-16 00:00:60"};
+    SceneInfo si0{"/", "Kaka", {}, {"Kaka.mp4"}, 0, 10, "Kaka.json"};
     // rate=0
-    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 0, "2000-06-16 00:00:60"};
+    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 0, "Cristiano Ronaldo.json"};
     const SceneInfoList scenesLstInPath0{si0};
     const SceneInfoList scenesLstInPath1{si0, si1};
 
@@ -170,7 +162,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(pgCntSpy.count(), 1);
     QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/40)
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
-    QCOMPARE(slm.rel2fileNames({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
+    QCOMPARE(slm.RelativePath2JsonFile({slm.index(0)}), (QStringList{"Kaka.json"}));  // inexist/path0/Kaka.json
     {
       std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> expectRelJsonArr;
       expectRelJsonArr[10] = QStringList{"Kaka.json"};
@@ -206,8 +198,8 @@ class ScenesListModelTest : public PlainTestSuite {
   }
 
   void data_retrieve_ok() {
-    SceneInfo si0{"/", "Kaka", {"Kaka.png"}, {}, 0, 9, "2000-06-16 00:00:60"};
-    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 10, "2000-06-16 00:00:60"};
+    SceneInfo si0{"/", "Kaka", {"Kaka.png"}, {}, 0, 9, "Kaka.json"};
+    SceneInfo si1{"/", "Cristiano Ronaldo", {}, {"Cristiano Ronaldo.mp4"}, 0, 10, "Cristiano Ronaldo.json"};
     const SceneInfoList sceneList{si0, si1};
 
     MOCKER(SceneHelper::GetScnsLstFromPath)  //
@@ -255,8 +247,8 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.GetScn(slm.index(0)), "inexist/path/path.scn");
 
     QCOMPARE(slm.fileInfo(slm.index(1)), QFileInfo("inexist/path/Cristiano Ronaldo.mp4"));
-    QCOMPARE(slm.filePath(slm.index(1)), "inexist/path/Cristiano Ronaldo.mp4");
-    QCOMPARE(slm.fileName(slm.index(1)), "Cristiano Ronaldo.mp4");
+    QCOMPARE(slm.filePath(slm.index(1)), "inexist/path/Cristiano Ronaldo.json");
+    QCOMPARE(slm.fileName(slm.index(1)), "Cristiano Ronaldo.json");
     QCOMPARE(slm.GetRate(slm.index(1)), 10);
     QCOMPARE(slm.baseName(slm.index(1)), "Cristiano Ronaldo");
     QCOMPARE(slm.absolutePath(slm.index(1)), "inexist/path/");
@@ -274,7 +266,7 @@ class ScenesListModelTest : public PlainTestSuite {
         .expects(exactly(2))       //
         .will(returnValue(true));
 
-    SceneInfo si0{"/", "Kaka", {"Kaka.png"}, {}, 0, 9, "2000-06-16 00:00:60"};
+    SceneInfo si0{"/", "Kaka", {"Kaka.png"}, {}, 0, 9, "Kaka.json"};
     const SceneInfoList sceneList{si0};
 
     MOCKER(SceneHelper::GetScnsLstFromPath)  //
@@ -307,15 +299,12 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(GetSceneInfoList(10, SceneInfo::Role::VID_SIZE_ROLE, true, mockMovieSizeDescendingList));
     SceneInfoList mockRateAscendingList;  // asc
     QVERIFY(GetSceneInfoList(10, SceneInfo::Role::RATE_ROLE, false, mockRateAscendingList));
-    SceneInfoList mockUploadedDescendingList;  // desc
-    QVERIFY(GetSceneInfoList(11, SceneInfo::Role::UPLOADED_ROLE, true, mockUploadedDescendingList));
 
     MOCKER(SceneHelper::GetScnsLstFromPath)              //
         .expects(exactly(4))                             //
         .will(returnValue(mockMoviePathAscendingList))   //
         .then(returnValue(mockMovieSizeDescendingList))  //
         .then(returnValue(mockRateAscendingList))        //
-        .then(returnValue(mockUploadedDescendingList))   //
         ;
     ScenesListModel slm{"ScenesListView"};
     SceneSortProxyModel sspm;
@@ -383,35 +372,16 @@ class ScenesListModelTest : public PlainTestSuite {
       QVERIFY(checkIndexMatch(slm, 8, sspm, 1));
       QVERIFY(checkIndexMatch(slm, 9, sspm, 0));
     }
-
-    // 测试UPLOADED_TIME排序
-    {
-      QCOMPARE(slm.setRootPath("any/inexists/path4"), true);
-      QCOMPARE(slm.rowCount(), 11);
-      // 降序排序
-      sspm.setSortRole(SceneInfo::Role::UPLOADED_ROLE);
-      QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
-      QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
-      QVERIFY(checkIndexMatch(slm, 8, sspm, 8));
-      QVERIFY(checkIndexMatch(slm, 9, sspm, 9));
-
-      // 升序排序
-      sspm.setSortOrder(false);
-      QVERIFY(checkIndexMatch(slm, 0, sspm, 10));
-      QVERIFY(checkIndexMatch(slm, 1, sspm, 9));
-      QVERIFY(checkIndexMatch(slm, 8, sspm, 2));
-      QVERIFY(checkIndexMatch(slm, 9, sspm, 1));
-    }
   }
 
   void local_sort_by_proxyModel_ok() {
     // precondition si 已经按照MoviePaths升序
-    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "2000-06-16 00:00:60"};
-    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "2000-06-16 00:00:59"};
-    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "2000-06-16 00:00:58"};
-    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "2000-06-16 00:00:50"};
-    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "2000-06-16 00:00:49"};
-    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "2000-06-16 00:00:46"};
+    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "Ben Affleck.json"};
+    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "Brad Pitt.json"};
+    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "Chris Evans.json"};
+    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "Kaka.json"};
+    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "Raphael Varane.json"};
+    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "Alvaro Morata.json"};
 
     SceneInfoList scenesLst{si0, si1, si2, si3, si4, si5};
     QCOMPARE(scenesLst.size(), 6);
@@ -481,20 +451,6 @@ class ScenesListModelTest : public PlainTestSuite {
       QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));
     }
 
-    // only one page sort(UPLOADED_ROLE)
-    {
-      sspm.setSortRole(SceneInfo::Role::UPLOADED_ROLE);
-      sspm.setSortOrder(false);
-      QVERIFY(checkIndexMatch(slm, 0, sspm, 6 - 0 - 1));
-      QVERIFY(checkIndexMatch(slm, 1, sspm, 6 - 1 - 1));
-      QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - (6 - 1) - 1));
-
-      sspm.setSortOrder(true);
-      QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
-      QVERIFY(checkIndexMatch(slm, 1, sspm, 1));
-      QVERIFY(checkIndexMatch(slm, 6 - 1, sspm, 6 - 1));
-    }
-
     // 2.0 设置10 cnt/page, 第1页有10个, 第2页有5个
     // 2.0 设置4 cnt/page, 第1页有4个, 第2页有2个
     slm.onScenesCountsPerPageChanged(4);
@@ -540,12 +496,12 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void global_sort_ok() {
     // precondition si 已经按照MoviePaths升序
-    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "2000-06-16 00:00:60"};              // rate: 10, size: 100
-    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "2000-06-16 00:00:59"};                   // rate: 11, size: 099
-    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "2000-06-16 00:00:58"};               // rate: 12, size: 098
-    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "2000-06-16 00:00:50"};                      // rate: 20, size: 090
-    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "2000-06-16 00:00:49"};  // rate: 21, size: 089
-    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "2000-06-16 00:00:46"};     // rate: 24, size: 086
+    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "Ben Affleck.json"};              // rate: 10, size: 100
+    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "Brad Pitt.json"};                   // rate: 11, size: 099
+    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "Chris Evans.json"};               // rate: 12, size: 098
+    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "Kaka.json"};                      // rate: 20, size: 090
+    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "Raphael Varane.json"};  // rate: 21, size: 089
+    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "Alvaro Morata.json"};     // rate: 24, size: 086
 
     SceneInfoList scenesLst{si0, si1, si2, si3, si4, si5};
     QCOMPARE(scenesLst.size(), 6);
@@ -587,12 +543,12 @@ class ScenesListModelTest : public PlainTestSuite {
 
   void AfterJsonFilesNameRenamed_ok() {
     // precondition si 已经按照MoviePaths升序
-    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "2000-06-16 00:00:60"};              // rate: 10, size: 100
-    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "2000-06-16 00:00:59"};                   // rate: 11, size: 099
-    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "2000-06-16 00:00:58"};               // rate: 12, size: 098
-    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "2000-06-16 00:00:50"};                      // rate: 20, size: 090
-    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "2000-06-16 00:00:49"};  // rate: 21, size: 089
-    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "2000-06-16 00:00:46"};     // rate: 24, size: 086
+    SceneInfo si0{"/", "Ben Affleck", {}, {"Ben Affleck.mp4"}, 100 * 1024 * 1024, 10, "Ben Affleck.json"};              // rate: 10, size: 100
+    SceneInfo si1{"/", "Brad Pitt", {}, {"Brad Pitt.mp4"}, 99 * 1024 * 1024, 11, "Brad Pitt.json"};                   // rate: 11, size: 099
+    SceneInfo si2{"/", "Chris Evans", {}, {"Chris Evans.mp4"}, 98 * 1024 * 1024, 12, "Chris Evans.json"};               // rate: 12, size: 098
+    SceneInfo si3{"/Brazil/", "Kaka", {}, {"Kaka.mp4"}, 90 * 1024 * 1024, 20, "Kaka.json"};                      // rate: 20, size: 090
+    SceneInfo si4{"/French/", "Raphael Varane", {}, {"Raphael Varane.mp4"}, 89 * 1024 * 1024, 21, "Raphael Varane.json"};  // rate: 21, size: 089
+    SceneInfo si5{"/Spain/", "Alvaro Morata", {}, {"Alvaro Morata.mp4"}, 86 * 1024 * 1024, 24, "Alvaro Morata.json"};     // rate: 24, size: 086
 
     SceneInfoList scenesLst{si0, si1, si2, si3, si4, si5};
     QCOMPARE(scenesLst.size(), 6);
@@ -627,4 +583,4 @@ class ScenesListModelTest : public PlainTestSuite {
 };
 
 #include "ScenesListModelTest.moc"
-REGISTER_TEST(ScenesListModelTest, false)
+REGISTER_TEST(ScenesListModelTest, true)

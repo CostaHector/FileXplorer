@@ -9,6 +9,18 @@
 namespace BatchRenameBy {
 static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d{1,3})$"};
 
+/*
+Given: path=".../replace"
+Given: jsonNames={"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"}
+Given: json mp4 jpg png files exist and are under ".../replace/pattern".
+Return:
+        "pattern/Chris Evans 2.png",        //
+        "pattern/Chris Evans.jpg",          //
+        "pattern/Chris Evans.json",         //
+        "pattern/Chris Evans_tn.jpg",       //
+        "pattern/Jensen Ackles.mp4",        //
+        "pattern/Jensen Ackles.pson",       //
+*/
 QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames) {
   QStringList filesNeedRename;
   QString relPath;

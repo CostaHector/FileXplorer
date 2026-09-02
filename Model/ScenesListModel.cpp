@@ -1,5 +1,6 @@
 #include "ScenesListModel.h"
 #include "SceneKey.h"
+#include "SceneInfoManager.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
@@ -83,9 +84,6 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
     case SceneInfo::Role::RATE_ROLE: {
       return item.rate;
     }
-    case SceneInfo::Role::UPLOADED_ROLE: {
-      return item.uploaded;
-    }
     default:
       break;
   }
@@ -134,55 +132,80 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
   return bothUpdatedOk;
 }
 
-QFileInfo ScenesListModel::fileInfo(const QModelIndex& index) const {
-  return QFileInfo(filePath(index));
+QFileInfo ScenesListModel::fileInfo(const QModelIndex& index, SelectionUsage usage) const {
+  return QFileInfo(filePath(index, usage));
 }
 
-QString ScenesListModel::filePath(const QModelIndex& index) const {
+QString ScenesListModel::filePath(const QModelIndex& index, SelectionUsage usage) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  const QString vidAbsPath = mPagedData[i].GetVideoAbsPath(mRootPath);
-  if (!vidAbsPath.isEmpty()) {
-    return vidAbsPath;
+  switch (usage)  {
+    case SelectionUsage::ITSELF_ONLY:
+    case SelectionUsage::RELATED_JSON_ONLY:
+      return mPagedData[i].GetJsonAbsPath(mRootPath);
+    case SelectionUsage::RELATED_VIDEO_ONLY:
+      return mPagedData[i].GetVideoFullPath(mRootPath);
+    default: {
+      LOG_W("unsupport type[%d]", (int)usage);
+      return "";
+    }
   }
-  return mPagedData[i].GetJsonAbsPath(mRootPath); // fall back to json abs path
 }
 
-QString ScenesListModel::fileName(const QModelIndex& index) const {
+QString ScenesListModel::fileName(const QModelIndex& index, SelectionUsage usage) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  if (!mPagedData[i].vidName.isEmpty()) {
-    return mPagedData[i].vidName;
+  switch (usage)  {
+    case SelectionUsage::ITSELF_ONLY:
+    case SelectionUsage::RELATED_JSON_ONLY:
+      return mPagedData[i].jsonFileName;
+    case SelectionUsage::RELATED_VIDEO_ONLY:
+      return mPagedData[i].vidName;
+    default: {
+      LOG_W("unsupport type[%d]", (int)usage);
+      return "";
+    }
   }
-  return mPagedData[i].name; // fall back to json base name
 }
 
-int ScenesListModel::GetRate(const QModelIndex& index) const {
-  int i{-1};
-  if (!mPagedData.isLocalIndexValid(index, i)) {
-    return 0;
-  }
-  return mPagedData[i].rate;
-}
-
-QString ScenesListModel::baseName(const QModelIndex& index) const {
+QString ScenesListModel::baseName(const QModelIndex& index, SelectionUsage /*usage*/) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mPagedData[i].name;
+  // baseName independent with usage
+  return PathTool::GetBaseName(mPagedData[i].jsonFileName);
 }
 
+// return value will append with suffix slash
 QString ScenesListModel::absolutePath(const QModelIndex& index) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
   return mPagedData[i].GetAbsolutePath(mRootPath);
+}
+
+QStringList ScenesListModel::RelativePath2JsonFile(const QModelIndexList& indexes) const {
+  // Given: full="/home/to/a.json", root="/home"
+  // relativePathsOfJson="to/a.json"
+  QStringList relativePathsOfJson;
+  relativePathsOfJson.reserve(indexes.size());
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const QString& fullPath = GetJson(index);
+    relativePathsOfJson.push_back(PathTool::relativePath(fullPath, N));
+  }
+  return relativePathsOfJson;
+}
+
+QStringList ScenesListModel::RelativePath2RelatedFiles(const QModelIndexList& indexes) const {
+  const QStringList& relativePathsOfJson{RelativePath2JsonFile(indexes)};
+  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
 }
 
 bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, const bool bSubdirectories) {
@@ -197,6 +220,14 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, co
   return true;
 }
 
+int ScenesListModel::GetRate(const QModelIndex& index) const {
+  int i{-1};
+  if (!mPagedData.isLocalIndexValid(index, i)) {
+    return 0;
+  }
+  return mPagedData[i].rate;
+}
+
 QStringList ScenesListModel::GetImgs(const QModelIndex& index) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
@@ -205,48 +236,28 @@ QStringList ScenesListModel::GetImgs(const QModelIndex& index) const {
   return mPagedData[i].GetImagesAbsPathList(mRootPath);
 }
 
+QString ScenesListModel::GetVid(const QModelIndex& index) const {
+  return filePath(index, SelectionUsage::RELATED_VIDEO_ONLY);
+}
+
 QStringList ScenesListModel::GetVids(const QModelIndex& index) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mPagedData[i].GetVideosAbsPath(mRootPath);
+  return mPagedData[i].GetVideosFullPathWithFallback(mRootPath);
 }
 
 QString ScenesListModel::GetJson(const QModelIndex& index) const {
+  return filePath(index, SelectionUsage::RELATED_JSON_ONLY);
+}
+
+QString ScenesListModel::GetScn(const QModelIndex& index) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return {};
   }
-  return mPagedData[i].GetJsonAbsPath(mRootPath);
-}
-
-QString ScenesListModel::GetScn(const QModelIndex& index) const {
-  QString folderPath = absolutePath(index);
-  if (folderPath.isEmpty()) {
-    return {};
-  }
-  folderPath.chop(1);
-  return SceneInfoManager::ScnMgr::GetScnAbsFilePath(folderPath);
-}
-
-QStringList ScenesListModel::rel2fileNames(const QModelIndexList& indexes) const {
-  // full: "/home/to/a.json"
-  // root: "/home"
-  // rel2fileNames: "to/a.json"
-  QStringList relativePaths2FileName;
-  relativePaths2FileName.reserve(indexes.size());
-  const int N = rootPath().size();
-  for (const QModelIndex& index : indexes) {
-    const QString& fullPath = GetJson(index);
-    relativePaths2FileName.push_back(PathTool::relativePath(fullPath, N));
-  }
-  return relativePaths2FileName;
-}
-
-QStringList ScenesListModel::relativePath2RelatedFiles(const QModelIndexList& indexes) const {
-  const QStringList& jsonFileNames{rel2fileNames(indexes)};
-  return BatchRenameBy::GetFilesNeedProcess(rootPath(), jsonFileNames);
+  return mPagedData[i].GetSceneFullPath(mRootPath);
 }
 
 std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> ScenesListModel::movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const {
@@ -339,16 +350,4 @@ int ScenesListModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
   const auto rowElementsRmv = mPagedData.GetRangeListEraser();
   const int rowRmvedCnt{onRowsRangeListRemoved(indexes, rowElementsRmv)};
   return rowRmvedCnt;
-}
-
-int ScenesListModel::AddRemoveTags(const QModelIndexList& rowIndexes, const QString& tagString, bool bAdd) {
-  if (rowIndexes.isEmpty()) {
-    return 0;
-  }
-  int cnt{0};
-  QStringList tagsList = tagString.split(JsonHelper::ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);
-  for (const QModelIndex& ind: rowIndexes) {
-    cnt += JsonHelper::AddRemoveTagsIntoJsonFieldValue(GetJson(ind), tagsList, bAdd);
-  }
-  return cnt;
 }

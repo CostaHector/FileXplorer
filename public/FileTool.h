@@ -9,7 +9,7 @@
 
 namespace FileTool {
 QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines = 100);
-QString StringTextReader(const QString& textPath, bool* bReadOk=nullptr);
+QString StringTextReader(const QString& textPath, bool* bReadOk=nullptr, bool bToLF=false);
 QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk=nullptr);
 bool StringTextWriter(const QString& fileName, const QString& content = "", const QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
 bool ByteArrayTextWriter(const QString& fileName, const QByteArray& ba);

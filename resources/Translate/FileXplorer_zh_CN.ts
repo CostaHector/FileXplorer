@@ -1083,7 +1083,7 @@
 <context>
     <name>JsonActions</name>
     <message>
-        <location filename="../../Actions/JsonActions.cpp" line="+41"/>
+        <location filename="../../Actions/JsonActions.cpp" line="+7"/>
         <source>Save</source>
         <translatorcomment>写入变更到json文件中</translatorcomment>
         <translation>保存变更</translation>
@@ -2122,7 +2122,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+61"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+60"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2259,11 +2259,6 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+4"/>
         <source>Movie Rate</source>
         <translation>按评分</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Created Time</source>
-        <translation>按创建时间</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2670,6 +2665,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+6"/>
         <source>Preview Panel</source>
         <translation>预览面板</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Tag Editor Bar</source>
+        <translation>标签编辑栏</translation>
     </message>
     <message>
         <location line="+6"/>

@@ -4,7 +4,6 @@
 #include "StyleSheet.h"
 #include "JsonActions.h"
 #include "ViewActions.h"
-#include "ActionsContainerWid.h"
 #include "JsonOpMemoryKey.h"
 
 
@@ -85,12 +84,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mUpdateFieldTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(mUpdateFieldTb->layout(), Qt::AlignmentFlag::AlignLeft);
 
-  {
-    ActionsContainerWid* _mTagsContainer = new ActionsContainerWid{Qt::Orientation::Vertical, 3, this};
-    _mTagsContainer->AddActions(inst.mTagsJson, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    mTagsContainer = _mTagsContainer;
-  }
-
   addAction(ViewActions::GetInst()._JSON_VIEW);
   addSeparator();
   addAction(inst._SAVE_CURRENT_CHANGES);
@@ -110,8 +103,6 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   addWidget(mUpdateFieldTb);
   addSeparator();
   addAction(inst._CHECK_SAMPLEMD5_AND_VIDNAME_CONSISTENCY);
-  addSeparator();
-  addWidget(mTagsContainer);
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }
