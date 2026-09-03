@@ -1,6 +1,7 @@
 #include "FileXplorer.h"
 #include "FolderPreviewSwitcher.h"
 #include "ViewSwitchHelper.h"
+#include "TagsHelper.h"
 #include "ViewTypeTool.h"
 #include "ViewActions.h"
 
@@ -55,6 +56,15 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_previewFolder->RegisterVolumeWidget(m_previewHtmlDock->GetVolumeWidget());
   addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
 
+  m_tagEditor = new ActionsContainerWid{Qt::Orientation::Horizontal, 1, this};
+  m_tagEditor->AddActions(TagsHelper::GetInst().GetActions(), Qt::ToolButtonTextBesideIcon);
+  m_tagEditor->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+  m_tagEditorSideBar = new QToolBar{"TagEditor SideBar", this};
+  m_tagEditorSideBar->setOrientation(Qt::Orientation::Vertical);
+  m_tagEditorSideBar->addWidget(m_tagEditor);
+  addToolBar(Qt::ToolBarArea::RightToolBarArea, m_tagEditorSideBar);
+
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
   setMenuWidget(m_ribbonMenu);
   setStatusBar(m_statusBar);
@@ -71,6 +81,7 @@ void FileXplorer::closeEvent(QCloseEvent* event) {
   setConfig(PathKey::STARTUP_PATH, m_fsPanel->m_fsModel->rootPath());
   setConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR, ViewActions::GetInst()._NAVIGATION_PANE->isChecked());
   setConfig(CompoVisKey::SHOW_PREVIEW_DOCKER, ViewActions::GetInst()._PREVIEW_PANEL->isChecked());
+  setConfig(CompoVisKey::SHOW_TAG_EDITOR_SIDEBAR, ViewActions::GetInst()._TAG_EDITOR_SIDEBAR->isChecked());
   setConfig(BehaviorKey::FILESYSTEM_STRUCTURE, (int)FileOpActs::GetInst().GetCurFileStructurePolicy());
 
   m_previewFolder->saveSizeHint();
@@ -130,6 +141,11 @@ void FileXplorer::InitComponentVisibility() {
     m_previewHtmlDock->setHidden(true);
   }
 
+  const bool showTagEditorSideBar = getConfig(CompoVisKey::SHOW_TAG_EDITOR_SIDEBAR).toBool();
+  if (!showTagEditorSideBar) {
+    m_tagEditorSideBar->setHidden(true);
+  }
+
   const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};
   m_previewSwitcher->onSwitchByPreviewType(initialPreviewType);
 }
@@ -138,6 +154,7 @@ void FileXplorer::subscribe() {
   auto& vA = ViewActions::GetInst();
   connect(vA._NAVIGATION_PANE, &QAction::toggled, m_naviSideBarDock, &QWidget::setVisible);
   connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
+  connect(vA._TAG_EDITOR_SIDEBAR, &QAction::toggled, m_tagEditorSideBar, &QToolBar::setVisible);
 
   connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
 

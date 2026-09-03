@@ -275,6 +275,7 @@
         <file alias="ANIMATION_ENABLE">View/ANIMATION_ENABLE.svg</file>
         <file alias="ROOT_DECORATION">View/ROOT_DECORATION.svg</file>
         <file alias="ICON_SIZE">View/ICON_SIZE.svg</file>
+        <file alias="TAG_EDITOR">View/TAG_EDITOR.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>

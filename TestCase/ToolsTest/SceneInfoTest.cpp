@@ -19,22 +19,22 @@ class SceneInfoTest : public PlainTestSuite {
   }
 
   void basic_memeber_test() {
-    const SceneInfo noImgInfolhs{"/", "Britain", QStringList{}, "vid", 100, 99, "2000"};
+    const SceneInfo noImgInfolhs{"/", "Britain", QStringList{}, "vid", 100, 99, "Britain.json"};
     QCOMPARE(noImgInfolhs.GetAbsolutePath("Path/to/Root"), "Path/to/Root/");
     QCOMPARE(noImgInfolhs.GetFirstImageAbsPath("Path/to/Root"), "");
     QCOMPARE(noImgInfolhs.GetThumbnailImageAbsPath("Path/to/Root"), "Path/to/Root/Britain_tn.jpg");
 
-    const SceneInfo lhs{"", "Britain", {"img1", "img2"}, "vid", 100, 99, "2000"};
+    const SceneInfo lhs{"", "Britain", {"img1", "img2"}, "vid", 100, 99, "Britain.json"};
     const SceneInfo lhs_pretend_deep_copy{lhs};
     QCOMPARE(lhs, lhs_pretend_deep_copy);
 
-    const SceneInfo rhs{"/", "Britain", {"img1", "img2"}, "vid", 100, 99, "2000"};
+    const SceneInfo rhs{"/", "Britain", {"img1", "img2"}, "vid", 100, 99, "Britain.json"};
     QVERIFY(lhs < rhs);  // rel2scn differ
     QCOMPARE(rhs.GetAbsolutePath("Path/to/Root"), "Path/to/Root/");
     QCOMPARE(rhs.GetFirstImageAbsPath("Path/to/Root"), "Path/to/Root/img1");
     QCOMPARE(rhs.GetThumbnailImageAbsPath("Path/to/Root"), "Path/to/Root/Britain_tn.jpg");
 
-    const SceneInfo rhs2{"", "America", {"img1", "img2"}, "vid", 100, 99, "2000"};
+    const SceneInfo rhs2{"", "America", {"img1", "img2"}, "vid", 100, 99, "America.json"};
     QVERIFY(!(lhs < rhs2));  // rel2scn equal, but name differ
 
     QByteArray buffer;
@@ -52,9 +52,9 @@ class SceneInfoTest : public PlainTestSuite {
   }
 
   void scene_sort_function_ok() {
-    SceneInfo si1{"/", "The U.S.", {}, {}, 100 * 1024, 98, "1980"};
-    SceneInfo si2{"/", "France", {}, {}, 200 * 1024, 95, "1960"};
-    SceneInfo si3{"/Asia", "Singapore", {}, {}, 150 * 1024, 96, "2000"};
+    SceneInfo si1{"/", "The U.S.", {}, {}, 100 * 1024, 98, "The U.S..json"};
+    SceneInfo si2{"/", "France", {}, {}, 200 * 1024, 95, "France.json"};
+    SceneInfo si3{"/Asia", "Singapore", {}, {}, 150 * 1024, 96, "Singapore.json"};
 
     SceneInfoList siList{si1, si2, si3};
 
@@ -74,30 +74,22 @@ class SceneInfoTest : public PlainTestSuite {
     // 95(2) < 96(3) < 98(1)
     std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::RATE_ROLE));
     QCOMPARE(siList, (SceneInfoList{si2, si3, si1}));
-
-    // 1960(2) < 1980(1) < 2000(3)
-    std::sort(siList.begin(), siList.end(), SceneInfo::getCompareFunc(SceneInfo::Role::UPLOADED_ROLE));
-    QCOMPARE(siList, (SceneInfoList{si2, si1, si3}));
   }
 
   void exception_test_ok() {
     QVERIFY(tDir.ClearAll());
     using namespace SceneHelper;
     SceneInfoList marvelRootPathScenes{
-        SceneInfo{"",                                                                                    //
-                  "Chris\n \r\nEvans",                                                                   //
+        SceneInfo{"", "Chris\n \r\nEvans",                                                                   //
                   {"Chris Evans.jpg"},                                                                   //
                   "",                                                                                    //
                   120 * 1024 * 1024,                                                                     //
-                  97,                                                                                    //
-                  ""},                                                                                   //
-        SceneInfo{"",                                                                                    //
-                  "Michael Fassbender",                                                                  //
+                  97, "Chris\n \r\nEvans.json"},                                                                                   //
+        SceneInfo{"", "Michael Fassbender",                                                                  //
                   {"Michael Fassbender 0.jpg", "Michael Fassbender 1.jpg", "Michael Fassbender 2.jpg"},  //
                   {"Michael Fassbender.mp4"},                                                            //
                   290 * 1024 * 1024,                                                                     //
-                  99,                                                                                    //
-                  ""},                                                                                   //
+                  99, "Michael Fassbender.json"},                                                                                   //
     };
     QVERIFY(marvelRootPathScenes.size() > 1);
 
@@ -242,29 +234,23 @@ class SceneInfoTest : public PlainTestSuite {
     using namespace SceneHelper;
 
     SceneInfoList marvelRootPathScenes{
-        SceneInfo{"",                                            //
-                  "Chris Evans",                                 //
+        SceneInfo{"", "Chris Evans",                             //
                   {"Chris Evans.jpg"},                           //
                   "",                                            //
                   120 * 1024 * 1024,                             //
-                  97,                                            //
-                  ""},                                           //
-        SceneInfo{"",                                            //
-                  "Henry Cavill",                                //
+                  97, "Chris Evans.json"},                       //
+        SceneInfo{"", "Henry Cavill",                            //
                   {"Henry Cavill 1.jpg", "Henry Cavill 2.jpg"},  //
                   {"Henry Cavill Biology.mp4"},                  //
                   140 * 1024 * 1024,                             //
-                  99,                                            //
-                  ""},                                           //
+                  99, "Henry Cavill.json"},                      //
     };
     SceneInfoList forbesXMenPathScenes{
-        SceneInfo{"",                 //
-                  "Jane Grey",        //
-                  {"Jane Grey.jpg"},  //
-                  "Jane Grey.mp4",    //
-                  100 * 1024 * 1024,  //
-                  75,                 //
-                  ""},                //
+        SceneInfo{"", "Jane Grey",        //
+                  {"Jane Grey.jpg"},      //
+                  "Jane Grey.mp4",        //
+                  100 * 1024 * 1024,      //
+                  75, "Jane Grey.json"},  //
     };
 
     QString rootScnAbsFilePath = tDir.itemPath(tDir.baseName() + ".scn");

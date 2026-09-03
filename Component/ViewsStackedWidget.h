@@ -19,6 +19,7 @@
 #include "ViewTypeTool.h"
 #include "FdBasedDb.h"
 #include "MimeDataHelper.h"
+#include "SelectionUsage.h"
 
 class ViewSwitchHelper;
 
@@ -80,18 +81,18 @@ class ViewsStackedWidget : public QStackedWidget {
   bool hasSelection() const;
   QString getRootPath() const;
 
-  QString getFilePath(const QModelIndex& ind) const;
-  QModelIndexList getSelectedRows() const;
-  QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
-  QStringList getFilePaths() const;
-  QStringList getFilePrepaths() const;
-  std::pair<QStringList, QStringList> getFilePrepathsAndName(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr) const;
-  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction) const;
-  QStringList getFullRecords() const;
-  int getSelectedRowsCount() const;
-  QString getCurFilePath() const;
-  QString getCurFileName() const;
-  QFileInfo getFileInfo(const QModelIndex& ind) const;
+  QString getFilePath(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QModelIndexList getSelectedRows(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getFilePaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getFilePrepaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  std::pair<QStringList, QStringList> getFilePrepathsAndName(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getFullRecords(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  int getSelectedRowsCount(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QString getCurFilePath(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QString getCurFileName(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QFileInfo getFileInfo(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
 
  public:
   struct Anchor {

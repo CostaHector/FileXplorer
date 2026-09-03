@@ -11,7 +11,6 @@ ActionsContainerWid::ActionsContainerWid(Qt::Orientation arrangeOrientation, int
   setWidget(mWid);
   setWidgetResizable(true);
   setContentsMargins(0, 0, 0, 0);
-  setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
   setAlignment(Qt::AlignLeft);
 }
 

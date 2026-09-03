@@ -933,9 +933,9 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(kakaScnInd.data(Qt::DisplayRole).toString(), "Kaka");
       const QModelIndexList selectedRowsIndexes{kakaScnInd};
       const QStringList filePrepaths{lvl1Path, lvl1Path, lvl1Path, lvl1Path, lvl1Path}; // scn included
-      const QString fileName{"Kaka.mp4"};
+      const QString fileName{"Kaka.json"};
       const QStringList fileNames{jpgName, jsonName, mp4Name, psonName, "Kaka.scn"}; // sort by ascii ascending
-      const QString filePath{mTDir.itemPath("lvl0/Kaka/Kaka.mp4")};
+      const QString filePath{mTDir.itemPath("lvl0/Kaka/Kaka.json")};
       const QStringList filePaths{filePath};
 
       QModelIndex leftTop, rightDown;
@@ -960,7 +960,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       m_fsPanel.GetCurView()->setCurrentIndex(kakaScnInd);
       QCOMPARE(m_fsPanel.getCurFilePath(), filePath);
       QCOMPARE(m_fsPanel.getCurFileName(), fileName);
-      QCOMPARE(m_fsPanel.getFileInfo(kakaScnInd), mp4FileInfo);
+      QCOMPARE(m_fsPanel.getFileInfo(kakaScnInd), jsonFileInfo);
+      QCOMPARE(m_fsPanel.getFileInfo(kakaScnInd, SelectionUsage::RELATED_VIDEO_ONLY), mp4FileInfo);
     }
   }
 };

@@ -1,8 +1,6 @@
 #include "RibbonScene.h"
 #include "SceneInPageActions.h"
-#include "JsonActions.h"
 #include "ViewActions.h"
-#include "ActionsContainerWid.h"
 
 RibbonScene::RibbonScene(const QString& title, QWidget* parent) //
   : QToolBar{title, parent}                                   //
@@ -32,11 +30,6 @@ RibbonScene::RibbonScene(const QString& title, QWidget* parent) //
 
   m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
   addWidget(m_scenePageControl);
-  addSeparator();
-
-  ActionsContainerWid* tagsContainer = new ActionsContainerWid{Qt::Orientation::Vertical, 3, this};
-  tagsContainer->AddActions(JsonActions::GetInst().mTagsScene, Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  addWidget(tagsContainer);
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }

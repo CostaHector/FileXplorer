@@ -10,6 +10,7 @@
 #include "CurrentRowPreviewer.h"
 #include "StackedAddressAndSearchToolBar.h"
 #include "CustomStatusBar.h"
+#include "ActionsContainerWid.h"
 
 class FileXplorer : public QMainWindow {
 public:
@@ -23,6 +24,9 @@ public:
 
   QDockWidget* m_naviSideBarDock{nullptr};
   PreviewDockWidget* m_previewHtmlDock{nullptr};
+
+  ActionsContainerWid* m_tagEditor{nullptr};
+  QToolBar* m_tagEditorSideBar{nullptr};
 
   CurrentRowPreviewer* m_previewFolder{nullptr};
   FolderPreviewSwitcher* m_previewSwitcher{nullptr};

@@ -63,7 +63,6 @@ class SceneInPageActions : public QObject {
   QAction* _BY_MOVIE_PATH{nullptr};
   QAction* _BY_MOVIE_SIZE{nullptr};
   QAction* _BY_RATE{nullptr};
-  QAction* _BY_UPLOADED_TIME{nullptr};
 
   QAction* _REVERSE_RESULT{nullptr};
 

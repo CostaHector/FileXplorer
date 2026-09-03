@@ -2,7 +2,7 @@
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "FileTool.h"
-#include "RateHelper.h"
+#include "RelatedHelper.h"
 #include "RecycleCfmDlg.h"
 #include "BatchRenameBy.h"
 #include "FileOperatorPub.h"
@@ -159,7 +159,7 @@ bool FileImageViewer::RecycleCurrentImageAndItsRelated() {
   const QString currentImageAbsPath = GetImageAbsPath();
 
   QString jsonPath;
-  if (!RateHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
+  if (!RelatedHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
     // no json find no need recycle, only recycle itself
     return RecycleCurrentImage();
   }

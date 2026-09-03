@@ -94,6 +94,13 @@ ViewActions::ViewActions(QObject* parent) : QObject{parent} {
   _PREVIEW_PANEL->setToolTip(
       QString("<b>%1 (%2)</b><br/> Show or hide the preview pane.").arg(_PREVIEW_PANEL->text(), _PREVIEW_PANEL->shortcut().toString()));
 
+  const bool bShowTagEditor{getConfig(CompoVisKey::SHOW_TAG_EDITOR_SIDEBAR).toBool()};
+  _TAG_EDITOR_SIDEBAR = new (std::nothrow) QAction{QIcon{":img/TAG_EDITOR"}, tr("Tag Editor Bar"), this};
+  _TAG_EDITOR_SIDEBAR->setCheckable(true);
+  _TAG_EDITOR_SIDEBAR->setChecked(bShowTagEditor);
+  _TAG_EDITOR_SIDEBAR->setToolTip(
+      QString("<b>%1 (%2)</b><br/> Show or hide the tag editor sidebar.").arg(_TAG_EDITOR_SIDEBAR->text(), _TAG_EDITOR_SIDEBAR->shortcut().toString()));
+
   _SYS_VIDEO_PLAYERS = new (std::nothrow) QAction(QIcon(":img/SYSTEM_APPLICATION_VIDEO"), tr("Play in System Application"), this);
   _SYS_VIDEO_PLAYERS->setShortcut(QKeySequence(Qt::ShiftModifier | Qt::Key_Return));
   _SYS_VIDEO_PLAYERS->setShortcutVisibleInContextMenu(true);

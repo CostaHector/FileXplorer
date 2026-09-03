@@ -10,6 +10,7 @@ class ViewActions : public QObject {
   Q_OBJECT
 public:
   static ViewActions& GetInst();
+  bool isTagSideBarVisible() const { return _TAG_EDITOR_SIDEBAR != nullptr && _TAG_EDITOR_SIDEBAR->isChecked(); }
 
   QAction* _NAVIGATION_PANE{nullptr};
 
@@ -28,6 +29,7 @@ public:
   QList<QAction*> _VIEWS_NAVIGATE;
 
   QAction* _PREVIEW_PANEL{nullptr};
+  QAction* _TAG_EDITOR_SIDEBAR{nullptr};
 
   QAction* _SYS_VIDEO_PLAYERS{nullptr};
   QAction* _HAR_VIEW{nullptr};

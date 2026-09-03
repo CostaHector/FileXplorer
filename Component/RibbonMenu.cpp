@@ -286,6 +286,7 @@ QToolBar* RibbonMenu::LeafView() const {
   leafViewWid->addActions(viewInst._VIEWS_NAVIGATE);
   leafViewWid->addSeparator();
   leafViewWid->addAction(viewInst._PREVIEW_PANEL);
+  leafViewWid->addAction(viewInst._TAG_EDITOR_SIDEBAR);
   leafViewWid->addSeparator();
   leafViewWid->addAction(viewInst._HAR_VIEW);
   leafViewWid->addSeparator();

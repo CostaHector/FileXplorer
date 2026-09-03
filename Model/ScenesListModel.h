@@ -2,9 +2,10 @@
 #define SCENESLISTMODEL_H
 
 #include "QAbstractListModelPub.h"
-#include "SceneInfoManager.h"
+#include "SceneInfo.h"
 #include "PaginatedList.h"
 #include "JsonFieldBoundary.h"
+#include "SelectionUsage.h"
 #include <QSet>
 #include <QFileInfo>
 
@@ -27,19 +28,22 @@ class ScenesListModel : public QAbstractListModelPub {
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
-  QFileInfo fileInfo(const QModelIndex& index) const;
-  QString filePath(const QModelIndex& index) const;
-  QString fileName(const QModelIndex& index) const;
-  int GetRate(const QModelIndex& index) const;
-  QString baseName(const QModelIndex& index) const;
+  /* Anchor: SceneInfo */
+  QFileInfo fileInfo(const QModelIndex& index, SelectionUsage usage = SelectionUsage::DEFAULT) const;
+  QString filePath(const QModelIndex& index, SelectionUsage usage = SelectionUsage::DEFAULT) const;
+  QString fileName(const QModelIndex& index, SelectionUsage usage = SelectionUsage::DEFAULT) const;
+  QString baseName(const QModelIndex& index, SelectionUsage usage = SelectionUsage::DEFAULT) const;
   QString absolutePath(const QModelIndex& index) const;
+  QStringList RelativePath2JsonFile(const QModelIndexList& indexes) const;
+  QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes) const;
+
+  int GetRate(const QModelIndex& index) const;
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
+  QString GetVid(const QModelIndex& index) const;
   QString GetJson(const QModelIndex& index) const;
   QString GetScn(const QModelIndex& index) const;
 
-  QStringList rel2fileNames(const QModelIndexList& indexes) const;
-  QStringList relativePath2RelatedFiles(const QModelIndexList& indexes) const;
   std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> movieRate2Jsons(const QModelIndexList& indexes, QModelIndexList& nonRate0Indexes) const;
 
   bool isLocalIndexValid(const QModelIndex& localIndex, int& localInd) const { return mPagedData.isLocalIndexValid(localIndex, localInd); }
@@ -56,7 +60,6 @@ class ScenesListModel : public QAbstractListModelPub {
   bool onDisableImageDecorationChanged(bool bDisabled);
   bool onSubdirectoriesToggled(bool bDisabled);
   int createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist);
-  int AddRemoveTags(const QModelIndexList& rowIndexes, const QString& tagString, bool bAdd);
 
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);

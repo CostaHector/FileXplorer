@@ -41,14 +41,6 @@ class RateHelperTest : public PlainTestSuite {
   void init() { GlobalMockObject::reset(); }
   void cleanup() { GlobalMockObject::verify(); }
 
-  void getBaseNameForImage_ok() {
-    QCOMPARE(RateHelper::getBaseNameForImage("a"), "a");
-    QCOMPARE(RateHelper::getBaseNameForImage("a 1"), "a");
-    QCOMPARE(RateHelper::getBaseNameForImage("a - 1"), "a");
-    QCOMPARE(RateHelper::getBaseNameForImage("a - 99"), "a");
-    QCOMPARE(RateHelper::getBaseNameForImage("a - 99999999999"), "a - 99999999999");
-  }
-
   void ratingCalculation_ok() {
     constexpr int DEV_X = 99;
     constexpr int DEV_Y = 999;

@@ -6,6 +6,7 @@
 #include "StyleSheetEditDelegate.h"
 #include "RenameActions.h"
 #include "ViewHelper.h"
+#include "TagsHelper.h"
 #include "PathTool.h"
 
 #include <QDir>
@@ -548,8 +549,6 @@ void JsonTableView::subscribe() {
   connect(inst._TAGS_FIELD_APPEND, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::APPEND); });
   connect(inst._TAGS_FIELD_RMV, &QAction::triggered, this, [this]() { onSetCastOrTags(JsonModelField::FIELD_OP_TYPE::TAGS, JsonModelField::FIELD_OP_MODE::REMOVE); });
 
-  connect(&inst, &JsonActions::reqAddRmvTagsJson, this, &JsonTableView::onAddRemoveTags);
-
   connect(inst._INFER_CAST_FROM_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(false); });
   connect(inst._INFER_CAST_FROM_UPPERCASE_SELECTION, &QAction::triggered, this, [this]() { onAppendFromSelection(true); });
 
@@ -566,7 +565,7 @@ void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
   const JsonPr& json = _JsonModel->GetJsonPr(srcModelInd);
   const QString jsonAbsPath = json.GetJsonFileAbsPath();
 
-  JsonActions::GetInst().UpdateTagsActionCheckedStatusJson(json.m_Tags.toSortedList());
+  TagsHelper::GetInst().UpdateTagsActionCheckedStatus(json.m_Tags.toSortedList());
   emit currentJsonSelectedChanged(jsonAbsPath, jsonAbsPath, json.GetImagesAbsPath(), {json.GetVideoAbsPath()});
 }
 

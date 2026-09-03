@@ -58,7 +58,7 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   return buffer;
 }
 
-QString StringTextReader(const QString& textPath, bool* bReadOk) {
+QString StringTextReader(const QString& textPath, bool* bReadOk, bool bToLF) {
   QFile file(textPath);
   if (!file.exists()) {
     LOG_D("File[%s] not found", qPrintable(textPath));
@@ -77,7 +77,9 @@ QString StringTextReader(const QString& textPath, bool* bReadOk) {
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   QString contents(stream.readAll());
-  contents.replace("\r\n", "\n");
+  if (bToLF) {
+    contents.replace("\r\n", "\n");
+  }
   file.close();
   if (bReadOk != nullptr) {
     *bReadOk = true;

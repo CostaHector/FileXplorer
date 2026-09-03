@@ -12,10 +12,6 @@
 
 namespace SceneInfoManager {
 
-QString ScnMgr::GetScnAbsFilePath(const QString& folderPath) {
-  return folderPath + '/' + PathTool::fileName(folderPath) + ".scn";
-}
-
 JsonOp::Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
   JsonOp::Counter counter;
   if (!QFileInfo(path).isDir()) {
@@ -62,11 +58,13 @@ int ScnMgr::UpdateScnFiles(const QString& rootPath) {
   int scnTotalCnt = 0;
   while (jsonIt.hasNext()) {
     QString jsonAbsPath = jsonIt.next();
-    QVariantHash jsonHash = JsonHelper::MovieJsonLoader(jsonAbsPath);
-    if (jsonHash.isEmpty()) {
+    const QVariantHash jsonHash = JsonHelper::MovieJsonLoader(jsonAbsPath);
+    if (jsonHash.isEmpty() || !jsonHash.contains("Name")) {
       continue;
     }
-    folder2Scenes[PathTool::absolutePath(jsonAbsPath)].push_back(SceneInfo::fromJsonVariantHash(jsonHash));
+    const QString jsonLocatedIn = PathTool::absolutePath(jsonAbsPath);
+    const QString jsonFileName = PathTool::fileName(jsonAbsPath);
+    folder2Scenes[jsonLocatedIn].push_back(SceneInfo::fromJsonVariantHash(jsonHash, jsonFileName));
     ++scnTotalCnt;
   }
 
@@ -77,12 +75,12 @@ int ScnMgr::UpdateScnFiles(const QString& rootPath) {
 
   int scnFilesGeneratedCnt = 0;
   for (auto it = folder2Scenes.cbegin(); it != folder2Scenes.cend(); ++it) {
-    const QString& scnAbsFolderPath = it.key();
+    const QString& scnLocatedIn = it.key();
     const SceneInfoList& scenes = it.value();
 
-    LOG_D("%d scenes(s) under[%s] are found to generate a scn file", scenes.size(), qPrintable(scnAbsFolderPath));
-    const QString& scnAbsFilePath{GetScnAbsFilePath(scnAbsFolderPath)};
-    if (!SceneHelper::SaveScenesListToBinaryFile(scnAbsFilePath, scenes)) {
+    LOG_D("%d scenes(s) under[%s] are found to generate a scn file", scenes.size(), qPrintable(scnLocatedIn));
+    const QString& scnFullPath{SceneInfo::GetSceneFullPathStatic(scnLocatedIn)};
+    if (!SceneHelper::SaveScenesListToBinaryFile(scnFullPath, scenes)) {
       continue;
     }
     ++scnFilesGeneratedCnt;

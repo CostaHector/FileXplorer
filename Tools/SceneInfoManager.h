@@ -10,7 +10,6 @@ namespace SceneInfoManager {
 class ScnMgr {
  public:
   using PATH_2_JSON_DICTS = QMap<QString, QList<QVariantHash>>;
-  static QString GetScnAbsFilePath(const QString& folderPath);
   JsonOp::Counter operator()(const QString& rootPath);  // will update json contents, than generated scn from refreshed jsons
   static int UpdateScnFiles(const QString& rootPath);
   static int ClearScnFiles(const QString& rootPath);

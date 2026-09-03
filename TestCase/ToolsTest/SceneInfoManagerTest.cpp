@@ -280,7 +280,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene1["VidName"] = "captain_america.mp4";
       scene1["Size"] = 1024 * 1024 * 500;  // 500MB
       scene1["Rate"] = 85;
-      scene1["Uploaded"] = "20241212 12:50:50";
 
       // 创建目录
       QVERIFY(tDir.mkpath("Marvel"));
@@ -300,7 +299,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       QCOMPARE(parsedScene.vidName, "captain_america.mp4");
       QCOMPARE(parsedScene.vidSize, 1024 * 1024 * 500);
       QCOMPARE(parsedScene.rate, 85);
-      QCOMPARE(parsedScene.uploaded, "20241212 12:50:50");
 
       tDir.ClearAll();
     }
@@ -312,7 +310,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene1["VidName"] = "iron_man.mp4";
       scene1["Size"] = 1024 * 1024 * 700;
       scene1["Rate"] = 92;
-      scene1["Uploaded"] = "20241212 13:00:00";
 
       QVariantHash scene2;
       scene2["Name"] = "Thor";
@@ -320,7 +317,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene2["VidName"] = "thor.mp4";
       scene2["Size"] = 1024 * 1024 * 800;
       scene2["Rate"] = 88;
-      scene2["Uploaded"] = "20241212 14:00:00";
 
       QVariantHash scene3;  // 没有图片的场景
       scene3["Name"] = "Hulk";
@@ -328,7 +324,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
       scene3["VidName"] = "hulk.mp4";
       scene3["Size"] = 1024 * 1024 * 900;
       scene3["Rate"] = 0;  // 未评分
-      scene3["Uploaded"] = "20241212 15:00:00";
 
       // 创建目录
       QVERIFY(tDir.mkpath("Avengers"));
@@ -373,8 +368,8 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     QString scenesUnderRootPath = tDir.path();
     QString scenesUnderSubPath = tDir.itemPath("Avengers");
 
-    const QString rootScnAbsFilePath{ScnMgr::GetScnAbsFilePath(scenesUnderRootPath)};
-    const QString avengersScnAbsFilePath{ScnMgr::GetScnAbsFilePath(scenesUnderSubPath)};
+    const QString rootScnAbsFilePath{SceneInfo::GetSceneFullPathStatic(scenesUnderRootPath)};
+    const QString avengersScnAbsFilePath{SceneInfo::GetSceneFullPathStatic(scenesUnderSubPath)};
 
     QString name0 = "The Last Fight";
     QVariantHash scene0;
@@ -383,7 +378,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     scene0["VidName"] = name0 + ".mp4";
     scene0["Size"] = 1024 * 1024 * 500;
     scene0["Rate"] = 10;  // 10 in 10
-    scene0["Uploaded"] = "20221212 13:00:00";
     QVERIFY(JsonHelper::DumpJsonDict(scene0, tDir.itemPath(name0 + ".json")));
 
     QString name1 = "Iron Man";
@@ -393,7 +387,6 @@ SuperHero和XMen, SuperHero下有两个非空dict;  XMen下有一个空dict, 一
     scene1["VidName"] = name1 + ".mp4";
     scene1["Size"] = 1024 * 1024 * 700;
     scene1["Rate"] = 9;  // 9 in 10
-    scene1["Uploaded"] = "20241212 13:00:00";
     QVERIFY(JsonHelper::DumpJsonDict(scene1, tDir.itemPath("Avengers/" + name1 + ".json")));
 
     QCOMPARE(ScnMgr::UpdateScnFiles(tDir.path()), 2);  // 2 scn files

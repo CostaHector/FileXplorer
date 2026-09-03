@@ -201,28 +201,27 @@ QString JsonTableModel::fullInfo(const QModelIndex& index) const {
   return mCachedJsons[row].GetJsonBA();
 }
 
-QStringList JsonTableModel::rel2fileNames(const QModelIndexList& indexes) const {
-  // full: "/home/to/a.json"
-  // root: "/home"
-  // rel2fileNames: "to/a.json"
+QStringList JsonTableModel::RelativePath2JsonFile(const QModelIndexList& indexes) const {
+  // Given: full="/home/to/a.json", root="/home"
+  // relativePathsOfJson="to/a.json"
   QStringList relativePaths2FileName;
   relativePaths2FileName.reserve(indexes.size());
   const int N = rootPath().size();
   for (const QModelIndex& index : indexes) {
-    int row = index.row();
+    const int row = index.row();
     if (row < 0 || row >= rowCount()) {
       LOG_W("row: %d out of range", row);
       return {};
     }
     const QString& fullPath = mCachedJsons[row].GetJsonFileAbsPath();
-    relativePaths2FileName.push_back(fullPath.mid(N + 1));
+    relativePaths2FileName.push_back(PathTool::relativePath(fullPath, N));
   }
   return relativePaths2FileName;
 }
 
-QStringList JsonTableModel::relativePath2RelatedFiles(const QModelIndexList& indexes) const {
-  const QStringList& jsonFileNames{rel2fileNames(indexes)};
-  return BatchRenameBy::GetFilesNeedProcess(rootPath(), jsonFileNames);
+QStringList JsonTableModel::RelativePath2RelatedFiles(const QModelIndexList& indexes) const {
+  const QStringList& relativePathsOfJson{RelativePath2JsonFile(indexes)};
+  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
 }
 
 bool JsonTableModel::setModified(int row, bool modified) {

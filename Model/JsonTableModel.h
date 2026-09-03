@@ -18,14 +18,15 @@ class JsonTableModel : public QAbstractTableModelPub {
   int setRootPath(const QString& path, bool isForce = false);
   int forceReloadPath();
 
+  /* Anchor: Json */
   QFileInfo fileInfo(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
   QString fileBaseName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   QString fullInfo(const QModelIndex& index) const;
-  QStringList rel2fileNames(const QModelIndexList& indexes) const;
-  QStringList relativePath2RelatedFiles(const QModelIndexList& indexes) const;
+  QStringList RelativePath2JsonFile(const QModelIndexList& indexes) const;
+  QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes) const;
 
   int SetStudio(const QModelIndexList& rowIndexes, const QString& studio);
   int SetCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);

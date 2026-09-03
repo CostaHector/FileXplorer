@@ -18,16 +18,29 @@ constexpr quint32 SceneInfo::MAGIC_NUMBER;  // "LMSC" = "Local Media Scene Cache
 constexpr quint16 SceneInfo::CURRENT_VERSION;
 constexpr quint16 SceneInfo::MIN_SUPPORTED_VERSION;
 
-SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash) {
-  return {
-      "",                                           //
+SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash, const QString& _jsonFileName) {
+  return SceneInfo {
       varHash.value("Name", "").toString(),         //
       varHash.value("ImgName", "").toStringList(),  //
       varHash.value("VidName", "").toString(),      //
       varHash.value("Size", 0).toLongLong(),        //
       varHash.value("Rate", 0).toInt(),             //
-      varHash.value("Uploaded", "").toString(),     //
+      _jsonFileName
   };
+}
+
+QString SceneInfo::GetSceneFullPathStatic(const QString& folderPath) {
+  return PathTool::Path2Join(folderPath, PathTool::fileName(folderPath) + ".scn");
+}
+
+QString SceneInfo::GetSceneFullPath(const QString& rootPath) const {
+  QString folderPath = GetAbsolutePath(rootPath);
+  if (folderPath.isEmpty() || folderPath.back() != "/") {
+    LOG_W("Scene folder path[%s] invalid", qPrintable(folderPath));
+    return "";
+  }
+  folderPath.chop(1);
+  return GetSceneFullPathStatic(folderPath);
 }
 
 QString SceneInfo::GetAbsolutePath(const QString& rootPath) const {
@@ -54,43 +67,51 @@ QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {
   return imgsAbsPathList;
 }
 
-QString SceneInfo::GetVideoAbsPath(const QString& rootPath) const {
+QString SceneInfo::GetVideoFullPath(const QString& rootPath) const {
   if (vidName.isEmpty()) {
     return "";
   }
   return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName);
 }
 
-QStringList SceneInfo::GetVideosAbsPath(const QString& rootPath) const {
-  if (vidName.isEmpty()) {
-    static auto GetVideosListUnderPath = [](const QString& path) -> QStringList {
-      QDir subDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
-      subDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
-      QStringList vids;
-      for (const QFileInfo& vidInfo : subDir.entryInfoList()) {
-        if (vidInfo.size() < 10 * 1024 * 1024) {  // 10MiB
-          continue;
-        }
-        vids.push_back(vidInfo.filePath());
-      }
-      return vids;
-    };
-
-    const QString dvdPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "VIDEO_TS");
-    if (QFileInfo(dvdPath).isDir()) {
-      return GetVideosListUnderPath(dvdPath);
+QStringList GetVideosListUnderPath(const QString& path) {
+  QDir subDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files};
+  subDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET);
+  QStringList vids;
+  for (const QFileInfo& vidInfo : subDir.entryInfoList()) {
+    if (vidInfo.size() < 10 * 1024 * 1024) {  // 10MiB
+      continue;
     }
-    const QString videosPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "Videos");
-    if (QFileInfo(videosPath).isDir()) {
-      return GetVideosListUnderPath(videosPath);
-    }
-    return {};
+    vids.push_back(vidInfo.filePath());
   }
-  return {PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, vidName)};
+  return vids;
+}
+
+QStringList SceneInfo::GetVideosFullPathWithFallback(const QString& rootPath) const {
+  QString vid = GetVideoFullPath(rootPath);
+  if (!vid.isEmpty()) {
+    return {vid};
+  }
+
+  QStringList vids;
+  const QString dvdPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "VIDEO_TS");
+  const QString videosPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "Videos");
+  const QString vidsPath = PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, "Vids");
+  if (QFileInfo(dvdPath).isDir()) {
+    vids += GetVideosListUnderPath(dvdPath);
+    return vids;
+  } else if (QFileInfo(videosPath).isDir()) {
+    vids += GetVideosListUnderPath(videosPath);
+    return vids;
+  } else if (QFileInfo(vidsPath).isDir()) {
+    vids += GetVideosListUnderPath(vidsPath);
+    return vids;
+  }
+  return vids;
 }
 
 QString SceneInfo::GetJsonAbsPath(const QString& rootPath) const {
-  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + ".json");
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, jsonFileName);
 }
 
 SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneInfo::Role dim) {
@@ -101,8 +122,6 @@ SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneInfo::Role dim) {
       return &SceneInfo::lessThanVidSize;
     case SceneInfo::Role::RATE_ROLE:
       return &SceneInfo::lessThanRate;
-    case SceneInfo::Role::UPLOADED_ROLE:
-      return &SceneInfo::lessThanUploaded;
     default:
       LOG_D("Sort Role[%d] not support", dim);
       return &SceneInfo::lessThanName;
@@ -114,8 +133,7 @@ bool SceneInfo::operator<(const SceneInfo& other) const {
 }
 
 bool SceneInfo::operator==(const SceneInfo& rhs) const {
-  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate &&
-         uploaded == rhs.uploaded;
+  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate;
 }
 
 bool SceneInfo::less(const SceneInfo& self, const SceneInfo& other) {
@@ -134,12 +152,8 @@ bool SceneInfo::lessThanRate(const SceneInfo& self, const SceneInfo& other) {
   return self.rate < other.rate;
 }
 
-bool SceneInfo::lessThanUploaded(const SceneInfo& self, const SceneInfo& other) {
-  return self.uploaded < other.uploaded;
-}
-
 bool SceneInfo::GetNameFromStream(QDataStream& stream) {
-  stream >> rel2scn >> name;
+  stream >> name;
   return stream.status() == QDataStream::Ok;
 }
 bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate) {
@@ -254,7 +268,7 @@ SceneInfoList ParseAScnFile(const QString& scnFileFullPath, const QString& rel) 
   for (int i = 0; i < scenesCount && !stream.atEnd(); ++i) {
     SceneInfo scene;
     stream >> scene;
-    scene.rel2scn = rel;
+    scene.InitRel2Scn(rel);
 
     if (stream.status() != QDataStream::Ok) {
       LOG_W("Error reading scene data at index %d from file[%s], status:%d", i, qPrintable(scnFileFullPath), stream.status());
