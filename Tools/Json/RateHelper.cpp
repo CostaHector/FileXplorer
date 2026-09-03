@@ -1,11 +1,10 @@
 #include "RateHelper.h"
-#include "PathTool.h"
 #include "JsonHelper.h"
-#include "ItemsPileCategory.h"
 #include "PublicVariable.h"
 #include "Logger.h"
 #include "JsonModelField.h"
 #include "JsonFieldBoundary.h"
+#include "RelatedHelper.h"
 #include <QPainter>
 #include <QFile>
 #include <QDirIterator>
@@ -45,18 +44,6 @@ bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, b
   return true;
 }
 
-QSet<QString> RateHelper::GetRelatedJsonAbsPaths(const QStringList& paths) {
-  QSet<QString> uniqueJsons;
-  for (const QString& path : paths) {
-    QString jsonPath;
-    if (!RateHelper::getJsonPathFromFile(path, jsonPath)) { // no json related
-      continue;
-    }
-    uniqueJsons.insert(jsonPath);
-  }
-  return uniqueJsons;
-}
-
 bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int* newRateValue) {
   if (delta == 0) {
     return false;
@@ -94,7 +81,7 @@ bool RateHelper::AdjustJsonRateValueCore(const QString& jsonPath, int delta, int
 
 bool RateHelper::SetFileRate(const QString& fileAbsPath, int rate) {
   QString jsonPath;
-  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
+  if (!RelatedHelper::getJsonPathFromFile(fileAbsPath, jsonPath)) {
     LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
@@ -102,7 +89,7 @@ bool RateHelper::SetFileRate(const QString& fileAbsPath, int rate) {
 }
 
 int RateHelper::SetFilesRate(const QStringList& fileAbsPathList, int rate) {
-  const QSet<QString> uniqueJsons{RateHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
+  const QSet<QString> uniqueJsons{RelatedHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
   if (uniqueJsons.isEmpty()) {
     return 0;
   }
@@ -137,7 +124,7 @@ bool RateHelper::AdjustFileRate(const QString& fileAbsPath, int delta, int* newR
     return false;
   }
   QString jsonPath;
-  if (!getJsonPathFromFile(fileAbsPath, jsonPath)) {
+  if (!RelatedHelper::getJsonPathFromFile(fileAbsPath, jsonPath)) {
     LOG_W("JSON file not found by[%s]", qPrintable(fileAbsPath));
     return false;
   }
@@ -145,7 +132,7 @@ bool RateHelper::AdjustFileRate(const QString& fileAbsPath, int delta, int* newR
 }
 
 int RateHelper::AdjustFilesRate(const QStringList& fileAbsPathList, int delta) {
-  const QSet<QString> uniqueJsons{RateHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
+  const QSet<QString> uniqueJsons{RelatedHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
   if (uniqueJsons.isEmpty()) {
     return 0;
   }
@@ -172,74 +159,6 @@ int RateHelper::AdjustFileRateRecursively(const QString& folderAbsPath, int delt
   LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) rate value have been [%d]", succeedCnt, totalCnt, delta);
 
   return succeedCnt;
-}
-
-bool RateHelper::getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPath) {
-  jsonPath.clear();
-
-  QString baseName, ext;
-  std::tie(baseName, ext) = PathTool::GetBaseNameExt(fileAbsPath);
-  const int choppedSize{1 + baseName.size() + ext.size()};
-  if (fileAbsPath.size() < choppedSize) {
-    return false;
-  }
-  const QString dirPath{fileAbsPath.chopped(choppedSize)};
-  if (baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
-    baseName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
-  }
-
-  static const ItemsPileCategory::T_DOT_EXT_2_TYPE& dotExt2TypeHash = ItemsPileCategory::GetTypeFromDotExtension();
-  const ItemsPileCategory::SCENE_COMPONENT_TYPE fileType = dotExt2TypeHash.value(ext.toLower(), ItemsPileCategory::OTHER);
-
-  bool bFindJson{false};
-
-  QString tempJsonPath;
-  switch (fileType) {
-    case ItemsPileCategory::JSON: {
-      tempJsonPath = fileAbsPath;
-      break;
-    }
-    case ItemsPileCategory::VID: {
-      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName);
-      break;
-    }
-    case ItemsPileCategory::IMG: {
-      // same name.JSON
-      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName);
-      if (bFindJson = QFile::exists(tempJsonPath)) {
-        jsonPath.swap(tempJsonPath);
-        break;
-      }
-      // name without number.JSON
-      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, getBaseNameForImage(baseName));
-      break;
-    }
-    case ItemsPileCategory::OTHER: {
-      // folder -> folder/folder.json
-      tempJsonPath = PathTool::JoinJsonAbsFilePath(dirPath, baseName + "/" + baseName);
-      break;
-    }
-    default: {
-      LOG_W("Unsupported file type: %s", qPrintable(fileAbsPath));
-      return false;
-    }
-  }
-
-  if (!bFindJson) {
-    if (bFindJson = QFile::exists(tempJsonPath)) {
-      jsonPath.swap(tempJsonPath);
-    }
-  }
-  return bFindJson;
-}
-
-QString RateHelper::getBaseNameForImage(const QString& imageBaseName) {
-  using namespace ItemsPileCategory;
-  const QRegularExpressionMatch match = IMG_PILE_NAME_PATTERN.match(imageBaseName);
-  if (match.hasMatch()) {
-    return match.captured(1);
-  }
-  return imageBaseName;
 }
 
 QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder) {

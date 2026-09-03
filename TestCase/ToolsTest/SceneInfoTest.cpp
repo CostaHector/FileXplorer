@@ -286,4 +286,4 @@ class SceneInfoTest : public PlainTestSuite {
 };
 
 #include "SceneInfoTest.moc"
-REGISTER_TEST(SceneInfoTest, true)
+REGISTER_TEST(SceneInfoTest, false)

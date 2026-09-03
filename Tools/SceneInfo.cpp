@@ -153,7 +153,7 @@ bool SceneInfo::lessThanRate(const SceneInfo& self, const SceneInfo& other) {
 }
 
 bool SceneInfo::GetNameFromStream(QDataStream& stream) {
-  stream >> rel2scn >> name;
+  stream >> name;
   return stream.status() == QDataStream::Ok;
 }
 bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate) {

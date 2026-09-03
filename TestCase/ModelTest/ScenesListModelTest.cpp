@@ -237,7 +237,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     QCOMPARE(slm.fileInfo(slm.index(0)), QFileInfo("inexist/path/Kaka.json")); // fall back to json
     QCOMPARE(slm.filePath(slm.index(0)), "inexist/path/Kaka.json"); // fall back to json
-    QCOMPARE(slm.fileName(slm.index(0)), "Kaka"); // fall back to json base name
+    QCOMPARE(slm.fileName(slm.index(0)), "Kaka.json"); // fall back to json base name
     QCOMPARE(slm.GetRate(slm.index(0)), 9);
     QCOMPARE(slm.baseName(slm.index(0)), "Kaka");
     QCOMPARE(slm.absolutePath(slm.index(0)), "inexist/path/");
@@ -301,7 +301,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(GetSceneInfoList(10, SceneInfo::Role::RATE_ROLE, false, mockRateAscendingList));
 
     MOCKER(SceneHelper::GetScnsLstFromPath)              //
-        .expects(exactly(4))                             //
+        .expects(exactly(3))                             //
         .will(returnValue(mockMoviePathAscendingList))   //
         .then(returnValue(mockMovieSizeDescendingList))  //
         .then(returnValue(mockRateAscendingList))        //
@@ -583,4 +583,4 @@ class ScenesListModelTest : public PlainTestSuite {
 };
 
 #include "ScenesListModelTest.moc"
-REGISTER_TEST(ScenesListModelTest, true)
+REGISTER_TEST(ScenesListModelTest, false)

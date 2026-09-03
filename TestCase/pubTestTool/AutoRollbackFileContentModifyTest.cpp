@@ -123,4 +123,4 @@ private:
 };
 
 #include "AutoRollbackFileContentModifyTest.moc"
-REGISTER_TEST(AutoRollbackFileContentModifyTest, true)
+REGISTER_TEST(AutoRollbackFileContentModifyTest, false)

@@ -20,14 +20,10 @@ class RateHelper {
   static int ratingAtPosition(const QPoint& pos, const QRect& visualRect);
 
   static constexpr int RATING_BAR_X = 32, RATING_BAR_HEIGHT = 32;
-  static QSet<QString> GetRelatedJsonAbsPaths(const QStringList& paths);
-  static bool getJsonPathFromFile(const QString& fileAbsPath, QString& jsonPath);
 
  private:
   static bool SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
   static bool AdjustJsonRateValueCore(const QString& jsonPath, int delta = 1, int* newRateValue = nullptr);
-
-  static QString getBaseNameForImage(const QString& imagePath);
 
   static QPixmap GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder = false);
 };

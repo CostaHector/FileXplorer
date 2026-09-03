@@ -56,6 +56,7 @@
 #include "JsonRenameRegex.h"
 #include "RateActions.h"
 #include "RateHelper.h"
+#include "RelatedHelper.h"
 #include "TagsHelper.h"
 #include "JsonHelper.h"
 #include "RecycleCfmDlg.h"
@@ -364,11 +365,11 @@ int FileXplorerEvent::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck)
   }
   int cnt{0};
   QStringList tagsList = tags.split(JsonHelper::ELEMENT_JOINER, Qt::SplitBehaviorFlags::SkipEmptyParts);
-  QSet<QString> jsonPaths = RateHelper::GetRelatedJsonAbsPaths(paths);
+  QSet<QString> jsonPaths = RelatedHelper::GetRelatedJsonAbsPaths(paths);
   for (const QString& jsonPath: jsonPaths) {
     cnt += JsonHelper::AddRemoveTagsIntoJsonFieldValue(jsonPath, tagsList, bCheckOrUncheck);
   }
-  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d json(s) affected", bCheckOrUncheck, cnt, paths.size());
+  LOG_OK_P("Add/Remove Tags", "[op=%d] %d/%d json(s) affected", bCheckOrUncheck, cnt, jsonPaths.size());
   return cnt > 0;
 }
 

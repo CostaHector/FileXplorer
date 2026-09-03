@@ -9,7 +9,7 @@
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
 #include "FileTool.h"
-#include "RateHelper.h"
+#include "RelatedHelper.h"
 #include "TagsHelper.h"
 #include "JsonParser.h"
 
@@ -298,7 +298,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   if (ViewActions::GetInst().isTagSideBarVisible()) {
     static QString lastTimeJsonPath;
     QString jsonPath;
-    if (RateHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
+    if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
       if (jsonPath == lastTimeJsonPath) {
         return;
       }
