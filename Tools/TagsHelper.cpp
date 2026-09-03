@@ -99,8 +99,8 @@ std::pair<int, int> TagsHelper::UpdateTagsActionCheckedStatus(const QStringList&
   auto itChecked{mCurrentCheckedActions.begin()};
   while (itChecked != mCurrentCheckedActions.end()) {
     QAction* pCheckedAct = *itChecked;
-
-    auto itCheckedTags = checkedTagsId.find(pCheckedAct->text());
+    const QString tagId = pCheckedAct->property(TAG_ID_PROPERTY).toString();
+    auto itCheckedTags = checkedTagsId.find(tagId);
     if (itCheckedTags == checkedTagsId.end()) {
       // remove from mCurrentCheckedActions
       pCheckedAct->setChecked(false);
