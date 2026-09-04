@@ -236,8 +236,7 @@ int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) con
     LOG_WARN_P("Cannot rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
     return 0;
   }
-  RateActions* rateActions = mVideoWidget->GetRateActions();
-  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
+  return RateActions::onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
 }
 
 int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {

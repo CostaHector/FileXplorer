@@ -66,6 +66,10 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   addToolBar(Qt::ToolBarArea::RightToolBarArea, m_tagEditorSideBar);
 
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
+
+  m_fsPanel->BindRatingStarsWidget(m_ribbonMenu->GetRatingStarsWidget());
+  m_fsPanel->BindTagEditorSideBar(m_tagEditorSideBar);
+
   setMenuWidget(m_ribbonMenu);
   setStatusBar(m_statusBar);
 

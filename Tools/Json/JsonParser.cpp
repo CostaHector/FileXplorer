@@ -306,12 +306,31 @@ QStringList GetTagsFromJsonFile(const QString& jsonFullPath) {
   if (!bReadResult) {
     return {};
   }
-  int md5Index = contents.indexOf(R"("Tags":)");
-  if (md5Index == -1) {
+  int tagsIndex = contents.indexOf(R"("Tags":)");
+  if (tagsIndex == -1) {
     return {};
   }
-  md5Index += sizeof(R"("Tags":)");
-  return parseStringArray(contents, md5Index);
+  tagsIndex += sizeof(R"("Tags":)");
+  return parseStringArray(contents, tagsIndex);
+}
+
+std::pair<int, QStringList> GetRateAndTagsFromJsonFile(const QString& jsonFullPath, int defaultRateValue) {
+  bool bReadResult{false};
+  QByteArray contents{FileTool::ByteArrayReader(jsonFullPath, &bReadResult)};
+  if (!bReadResult) {
+    return {defaultRateValue, {}};
+  }
+  int rateIndex = contents.indexOf(R"("Rate":)");
+  if (rateIndex == -1) {
+    return {defaultRateValue, {}};
+  }
+  rateIndex += sizeof(R"("Rate":)");
+  int tagsIndex = contents.indexOf(R"("Tags":)");
+  if (tagsIndex == -1) {
+    return {};
+  }
+  tagsIndex += sizeof(R"("Tags":)");
+  return {parseNumber<int>(contents, rateIndex), parseStringArray(contents, tagsIndex)};
 }
 
 }

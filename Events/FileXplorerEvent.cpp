@@ -332,8 +332,7 @@ bool FileXplorerEvent::onRateMovie(int newRate) const {
 
 bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
   const QString rootPath{_contentPane->getRootPath()};
-  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-  return rateInst.onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
+  return RateActions::onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
 }
 
 bool FileXplorerEvent::onAdjustRateMovie(int delta) const {

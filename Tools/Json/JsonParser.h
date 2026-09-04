@@ -20,6 +20,7 @@ int GetRateFromJsonFile(const QString& jsonFullPath, int defaultRateValue=0);
 qint64 GetSizeFromJsonFile(const QString& jsonFullPath, qint64 defaultSizeValue=0);
 QByteArray GetMD5FromJsonFile(const QString& jsonFullPath);
 QStringList GetTagsFromJsonFile(const QString& jsonFullPath);
+std::pair<int, QStringList> GetRateAndTagsFromJsonFile(const QString& jsonFullPath, int defaultRateValue=0);
 }
 
 #endif // JSONPARSER_H

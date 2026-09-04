@@ -7,6 +7,7 @@
 
 class LogFloatingPreviewer;
 class ScenePageControl;
+class RatingStarsWidget;
 
 class RibbonMenu : public QTabWidget {
   Q_OBJECT
@@ -26,7 +27,12 @@ class RibbonMenu : public QTabWidget {
   void Subscribe();
   void AfterSubscribeInitialSettings();
 
-  ScenePageControl* GetScenePageControlWidget() const;
+  ScenePageControl* GetScenePageControlWidget() const {
+    return _registerUnderRibbonScene;
+  }
+  RatingStarsWidget* GetRatingStarsWidget() const {
+    return _ratingStarsWid;
+  }
 
  public slots:
   void on_expandStackedWidget(bool bExpand);
@@ -46,6 +52,7 @@ class RibbonMenu : public QTabWidget {
   QToolBar* m_leafCast{nullptr};
   QToolBar* m_leafScenes{nullptr};
   mutable ScenePageControl* _registerUnderRibbonScene{nullptr};
+  mutable RatingStarsWidget* _ratingStarsWid{nullptr};
   QToolBar* m_leafJson{nullptr};
   QToolBar* m_leafMedia{nullptr};
 

@@ -60,7 +60,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mDisableAutoHideToolBar->setChecked(isAutoHideDisabled);
 
   mRateActions = new (std::nothrow) RateActions(this);
-  mRateMenu = mRateActions->GetRateMenu(this);
+  mRateMenu = mRateActions->GetVideoWidRateMenu(this);
 
   mContextMenu = new QMenu{tr("Player Menu"), this};
   mContextMenu->setToolTipsVisible(true);

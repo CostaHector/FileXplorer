@@ -12,7 +12,7 @@
 #include "RelatedHelper.h"
 #include "TagsHelper.h"
 #include "JsonParser.h"
-
+#include "RatingStarsWidget.h"
 #include <QRegularExpression>
 #include <QCache>
 
@@ -295,7 +295,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     _previewFolder->operator()(fi.absoluteFilePath());
   }
 
-  if (ViewActions::GetInst().isTagSideBarVisible()) {
+  if (_tagEditorSideBar!=nullptr && !_tagEditorSideBar->isHidden()) {
     static QString lastTimeJsonPath;
     QString jsonPath;
     if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
@@ -303,7 +303,9 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
         return;
       }
       lastTimeJsonPath = jsonPath;
-      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(JsonParser::GetTagsFromJsonFile(jsonPath));
+      const auto& pr = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+      if (_ratingStarsWid != nullptr) _ratingStarsWid->freshRating(pr.first);
+      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(pr.second);
     } else {
       TagsHelper::GetInst().UpdateTagsActionCheckedStatus(QStringList{});
     }
