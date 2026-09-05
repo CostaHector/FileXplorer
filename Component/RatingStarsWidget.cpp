@@ -7,6 +7,35 @@
 #include <QMouseEvent>
 #include <cmath>
 
+RatingStarsWidget* RatingStarsWidget::GInstance(RatingStarsWidget* pInitValue, bool bReset) {
+  static RatingStarsWidget* pInstance = pInitValue;
+  if (bReset) {
+    pInstance = pInitValue;
+    return nullptr;
+  }
+  if (pInstance == nullptr) {
+    if (pInitValue == nullptr) {
+      LOG_W("Instance not init at all");
+    } else {
+      pInstance = pInitValue;
+      LOG_W("Instance should init before here. adjust init position");
+    }
+  }
+  return pInstance;
+}
+
+RatingStarsWidget::RatingStarsWidget(QWidget *parent)
+  : QWidget(parent), m_starPath{GetStarPath()} {
+  auto& rateActionInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
+  addActions(rateActionInst.GetRateActionsList());
+
+  m_menu = rateActionInst.GetRibbonRateMenu(this);
+  setMouseTracking(true);
+  setMinimumWidth(20 * starCount()); // each star at least width=20. and reserver for current rate
+
+  connect(&rateActionInst, &RateActions::RateMovieReq, this, &RatingStarsWidget::freshRating);
+}
+
 QPainterPath RatingStarsWidget::GetStarPath() const {
   QPainterPath starPath;
   // 构建归一化星形路径
@@ -23,18 +52,6 @@ QPainterPath RatingStarsWidget::GetStarPath() const {
   }
   starPath.closeSubpath();
   return starPath;
-}
-
-RatingStarsWidget::RatingStarsWidget(QWidget *parent)
-  : QWidget(parent), m_starPath{GetStarPath()} {
-  auto& rateActionInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-  addActions(rateActionInst.GetRateActionsList());
-
-  m_menu = rateActionInst.GetRibbonRateMenu(this);
-  setMouseTracking(true);
-  setMinimumWidth(20 * starCount()); // each star at least width=20. and reserver for current rate
-
-  connect(&rateActionInst, &RateActions::RateMovieReq, this, &RatingStarsWidget::freshRating);
 }
 
 void RatingStarsWidget::freshRating(int value) {

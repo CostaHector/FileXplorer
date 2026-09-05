@@ -10,7 +10,6 @@
 #include <QTimer>
 #include "AutoHideLabel.h"
 #include "ClickableSlider.h"
-#include "VolumeWidget.h"
 #include "ToolBarWidget.h"
 #include "InteractiveVideoWidget.h"
 
@@ -31,7 +30,6 @@ public:
   int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
-  bool RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -81,7 +79,6 @@ private:
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
 
-  bool mIsVolumeWidgetRegistered{false};
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };
 #endif // BASICVIDEOVIEW_H

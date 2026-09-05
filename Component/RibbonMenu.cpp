@@ -80,12 +80,11 @@ QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
   ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{attached}};
   CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
 
-  _ratingStarsWid = new (std::nothrow) RatingStarsWidget(attached);
-  CHECK_NULLPTR_RETURN_NULLPTR(_ratingStarsWid);
-
   menuRibbonCornerWid->addWidget(mActSearcher);
   menuRibbonCornerWid->addSeparator();
-  menuRibbonCornerWid->addWidget(_ratingStarsWid);
+  if (auto* p = RatingStarsWidget::GInstance()) {
+    menuRibbonCornerWid->addWidget(p);
+  }
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   menuRibbonCornerWid->addSeparator();
@@ -317,7 +316,6 @@ QToolBar* RibbonMenu::LeafJson() const {
 QToolBar* RibbonMenu::LeafScenesTools() const {
   auto* sceneTB = new (std::nothrow) RibbonScene{"Leaf Scene"};
   CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
-  _registerUnderRibbonScene = sceneTB->GetScenePageControl();
   return sceneTB;
 }
 

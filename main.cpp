@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
   FileXplorer fileExplorer{args, nullptr};
 
-  FileXplorerEvent commonEvent{fileExplorer.m_fsPanel, fileExplorer.m_statusBar};
+  FileXplorerEvent commonEvent{fileExplorer.m_fsPanel};
   commonEvent.subscribe();
 
   ExtraEvents extraViewVisibility{fileExplorer.m_fsPanel};

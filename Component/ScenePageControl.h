@@ -13,6 +13,7 @@ class QLabel;
 class ScenePageControl: public QToolBar {
   Q_OBJECT
  public:
+  static ScenePageControl* GInstance(ScenePageControl* pInitValue=nullptr, bool bReset=false);
   explicit ScenePageControl(const QString &title = "Pagination display", QWidget *parent = nullptr);
   void subscribe();
 

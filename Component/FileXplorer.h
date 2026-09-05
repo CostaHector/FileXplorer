@@ -4,29 +4,23 @@
 #include <QMainWindow>
 #include "NavigationToolBar.h"
 #include "RibbonMenu.h"
-#include "ViewSwitchToolBar.h"
 #include "ViewsStackedWidget.h"
 #include "PreviewDockWidget.h"
 #include "CurrentRowPreviewer.h"
 #include "StackedAddressAndSearchToolBar.h"
-#include "CustomStatusBar.h"
-#include "ActionsContainerWid.h"
 
 class FileXplorer : public QMainWindow {
 public:
   explicit FileXplorer(const QStringList& args, QWidget* parent = nullptr);
+  virtual ~FileXplorer();
+
   static QString GetInitialPathFromArgs(const QStringList& args);
   void RestoreWindowStateAndSetupUI();
   void InitComponentVisibility();
   void subscribe();
 
-  ViewSwitchToolBar* m_viewSwitcher{nullptr};
-
   QDockWidget* m_naviSideBarDock{nullptr};
   PreviewDockWidget* m_previewHtmlDock{nullptr};
-
-  ActionsContainerWid* m_tagEditor{nullptr};
-  QToolBar* m_tagEditorSideBar{nullptr};
 
   CurrentRowPreviewer* m_previewFolder{nullptr};
   FolderPreviewSwitcher* m_previewSwitcher{nullptr};
@@ -39,14 +33,14 @@ public:
   NavigationToolBar* m_navigationToolBar{nullptr};
   RibbonMenu* m_ribbonMenu{nullptr};
 
-  CustomStatusBar* m_statusBar{nullptr};
-
  protected:
   void keyPressEvent(QKeyEvent* ev) override;
   void closeEvent(QCloseEvent* event) override;
   void showEvent(QShowEvent *event) override;
 
 private:
+  void initGlobalInstance();
+  void releaseGlobalInstance();
   void onViewWidgetChanged(ViewTypeTool::ViewType viewType);
 };
 #endif  // FILEXPLORER_H

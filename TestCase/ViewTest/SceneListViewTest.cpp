@@ -104,7 +104,7 @@ private slots:
 
   void default_constructor_ok() {
     Configuration().clear();
-    SceneListView sceneView{nullptr, nullptr, nullptr, nullptr};
+    SceneListView sceneView{nullptr, nullptr, nullptr};
     sceneView.InitListView();
     QCOMPARE(sceneView.viewMode(), QListView::ViewMode::IconMode);  // default ok
     QCOMPARE(sceneView.flow(), QListView::Flow::LeftToRight);
@@ -113,7 +113,6 @@ private slots:
     // all memebers should be nullptr.
     QVERIFY(sceneView._sceneModel == nullptr);
     QVERIFY(sceneView._sceneSortProxyModel == nullptr);
-    QVERIFY(sceneView._scenePageControl == nullptr);
     QVERIFY(sceneView._OPEN_CORRESPONDING_FOLDER == nullptr);
     QVERIFY(sceneView.mAlignDelegate == nullptr);
     // call onClickEvent with invalid index should not crash down
@@ -124,8 +123,7 @@ private slots:
   void update_json_update_scene_slot_ok() {
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel};
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     {  // 2. setRootPath on a test directory ok
@@ -180,11 +178,10 @@ private slots:
     QWidget wid;
     ScenesListModel sceneModel{"ScenesListView", &wid};
     SceneSortProxyModel sceneProxyModel{&wid};
-    ScenePageControl pageControlToolbar{"Pagination display", &wid};
     QCOMPARE(sceneModel.isSortProxyInited(), false);
     QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
 
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar, &wid};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel, &wid};
     QCOMPARE(sceneModel.isSortProxyInited(), true);  // first init
     QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
     QVERIFY(sceneView.mSortRoleConn);  // connection ok
@@ -211,8 +208,7 @@ private slots:
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel};
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
 
@@ -267,8 +263,7 @@ private slots:
   void open_folder_ok() {
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel};
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
     QVERIFY(QFile::exists(scnAbsPath));
@@ -295,8 +290,7 @@ private slots:
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel};
     sceneView.InitListView();
     sceneView.setFlow(QListView::Flow::LeftToRight);
     sceneView.setFixedSize(RateHelper::RATING_BAR_HEIGHT * 9, RateHelper::RATING_BAR_HEIGHT * 3);  // show two item in one row
@@ -509,8 +503,7 @@ private slots:
 
     ScenesListModel sceneModel{"ScenesListView"};
     SceneSortProxyModel sceneProxyModel;
-    ScenePageControl pageControlToolbar;
-    SceneListView sceneView{&sceneModel, &sceneProxyModel, &pageControlToolbar};
+    SceneListView sceneView{&sceneModel, &sceneProxyModel};
     sceneView.InitListView();
     QCOMPARE(sceneModel.rowCount(), 0);
 

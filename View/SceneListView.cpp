@@ -7,6 +7,7 @@
 #include "PathTool.h"
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
+#include "ScenePageControl.h"
 #include "BatchRenameBy.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
@@ -25,19 +26,13 @@
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
                              SceneSortProxyModel* sceneSortProxyModel,
-                             ScenePageControl* scenePageControl,
                              QWidget* parent) //
-  : CustomListView{"SCENES_TABLE", parent}
-  , //
-  _sceneModel{sceneModel}
-  , //
+  : CustomListView{"SCENES_TABLE", parent}, //
+  _sceneModel{sceneModel}, //
   _sceneSortProxyModel{sceneSortProxyModel}
-  ,                                   //
-  _scenePageControl{scenePageControl} //
 {
   CHECK_NULLPTR_RETURN_VOID(_sceneModel)
   CHECK_NULLPTR_RETURN_VOID(sceneSortProxyModel)
-  CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
   _sceneSortProxyModel->setSourceModel(_sceneModel);
   setModel(_sceneSortProxyModel);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
@@ -92,9 +87,11 @@ void SceneListView::subscribe() {
   connect(_OPEN_CORRESPONDING_FOLDER, &QAction::triggered, this, &SceneListView::onOpenCorrespondingFolder);
   connect(this, &QListView::iconSizeChanged, _sceneModel, &QAbstractListModelPub::onIconSizeChange);
 
-  connect(_scenePageControl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
-  connect(_scenePageControl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
-  connect(_sceneModel, &ScenesListModel::pagesCountChanged, _scenePageControl, &ScenePageControl::onPagesCountChanged);
+  if (auto* pScenePageCtrl = ScenePageControl::GInstance()) {
+    connect(pScenePageCtrl, &ScenePageControl::currentPageIndexChanged, _sceneModel, &ScenesListModel::onPageIndexChanged);
+    connect(pScenePageCtrl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
+    connect(_sceneModel, &ScenesListModel::pagesCountChanged, pScenePageCtrl, &ScenePageControl::onPagesCountChanged);
+  }
   SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
   {
     // initial signal-slot connection

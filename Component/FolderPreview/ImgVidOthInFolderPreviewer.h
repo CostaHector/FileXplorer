@@ -26,7 +26,6 @@ public:
   inline bool NeedUpdateOthers() const { return m_bOthVisible; }
 
   void subscribe();
-  void RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
 private:
   void onImgBtnClicked(bool checked);

@@ -16,11 +16,6 @@ CurrentRowPreviewer::CurrentRowPreviewer(QWidget* parent)  //
   }
 }
 
-void CurrentRowPreviewer::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
-  CHECK_NULLPTR_RETURN_VOID(pVolumeWidget);
-  _volumeWidgetInDocker = pVolumeWidget;
-}
-
 void CurrentRowPreviewer::UpdatePreview() {
   using namespace PreviewTypeTool;
   if (mCurrentSrcFrom == SRC_FROM::FILE_SYSTEM_VIEW) {
@@ -93,7 +88,6 @@ bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E 
     case PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY: {
       m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", this};
       CHECK_NULLPTR_RETURN_FALSE(m_fileFolderPreviewStackedWid);
-      m_fileFolderPreviewStackedWid->RegisterVolumeWidget(_volumeWidgetInDocker);
       AddView(previewType, m_fileFolderPreviewStackedWid);
       break;
     }

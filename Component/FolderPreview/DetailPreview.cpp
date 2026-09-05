@@ -59,8 +59,3 @@ void DetailPreview::UpdateWhenSelectAFile(const QString& pth) {
   setHtml("");
   setHtml(detailHtmls);
 }
-
-void DetailPreview::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
-  CHECK_FALSE_RETURN_VOID(pVolumeWidget);
-  mBasicVideoView->RegisterVolumeWidget(pVolumeWidget);
-}

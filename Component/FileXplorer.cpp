@@ -11,15 +11,48 @@
 #include "BehaviorKey.h"
 #include "SizeTool.h"
 #include "Configuration.h"
+#include "CustomStatusBar.h"
+#include "RatingStarsWidget.h"
+#include "ScenePageControl.h"
+#include "TagEditorSideBar.h"
 
 #include "StyleSheet.h"
 #include <QFileInfo>
 
+void FileXplorer::initGlobalInstance() {
+  auto* m_volumeWid = new VolumeWidget{QBoxLayout::Direction::LeftToRight, this};
+  VolumeWidget::GInstance(m_volumeWid, true);
+
+  auto* m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
+  CustomStatusBar::GInstance(m_statusBar, true);
+
+  auto* mRatingStarsWid = new (std::nothrow) RatingStarsWidget(this);
+  RatingStarsWidget::GInstance(mRatingStarsWid, true);
+
+  auto* m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
+  ScenePageControl::GInstance(m_scenePageControl, true);
+
+  auto* m_tagEditorSideBar = new (std::nothrow) TagEditorSideBar{"TagEditor SideBar", this};
+  TagEditorSideBar::GInstance(m_tagEditorSideBar, true);
+}
+
+void FileXplorer::releaseGlobalInstance() {
+  VolumeWidget::GInstance(nullptr, true);
+  CustomStatusBar::GInstance(nullptr, true);
+  RatingStarsWidget::GInstance(nullptr, true);
+  ScenePageControl::GInstance(nullptr, true);
+  TagEditorSideBar::GInstance(nullptr, true);
+}
+
+FileXplorer::~FileXplorer() {
+  releaseGlobalInstance();
+}
+
 FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   : QMainWindow(parent)                                            //
 {
-  m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
-  const ViewTypeTool::ViewType initialViewType{m_viewSwitcher->GetCurViewType()};
+  // 1. new widget compenent begin
+  initGlobalInstance();
 
   m_previewFolder = new (std::nothrow) CurrentRowPreviewer{this}; // previewer in docker
 
@@ -27,55 +60,61 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_stackedBar = new (std::nothrow) StackedAddressAndSearchToolBar{"AddressToolbar", this}; // searchToolBar
   m_navigationToolBar = new (std::nothrow) NavigationToolBar{"NavigationToolBar", this};     // left navigation bar
   m_ribbonMenu = new (std::nothrow) RibbonMenu{this};                                        // ribbon menu
-  m_statusBar = new (std::nothrow) CustomStatusBar{this}; // status bar
 
   m_fsPanel = new (std::nothrow) ViewsStackedWidget{m_previewFolder, this}; // main widget
-  m_fsPanel->BindLogger(m_statusBar);
-  m_statusBar->addViewSwitcherToRightCorner(m_viewSwitcher);
 
-  m_viewSwitchHelper = new (std::nothrow)
-      ViewSwitchHelper{m_stackedBar, m_fsPanel, m_ribbonMenu->GetScenePageControlWidget(), m_navigationToolBar, this}; // view/searchToolBar switcher
-  m_viewSwitchHelper->onSwitchByViewType(initialViewType);
+  m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_navigationToolBar, this}; // view/searchToolBar switcher
 
-  const QString& defaultPath = GetInitialPathFromArgs(args);
-  m_fsPanel->onActionAndViewNavigate(defaultPath, true);
+  {
+    m_naviSideBarDock = new (std::nothrow) QDockWidget{"Navigation Sidebar", this};
+    auto pNaviTitle = new QLabel{"Navi", this};
+    pNaviTitle->setFixedHeight(12);
+    m_naviSideBarDock->setTitleBarWidget(pNaviTitle);
+    m_naviSideBarDock->setWidget(m_navigationToolBar);
+    m_naviSideBarDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
+    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, m_naviSideBarDock);
+  }
+  {
+    m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this}; // docker
+    m_previewHtmlDock->setWidget(m_previewFolder);
+    m_previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
+    addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
 
-  setCentralWidget(m_fsPanel);
 
-  m_naviSideBarDock = new (std::nothrow) QDockWidget{"Navigation Sidebar", this};
-  auto title = new QLabel{"Navi", this};
-  title->setFixedHeight(12);
-  m_naviSideBarDock->setTitleBarWidget(title);
-  m_naviSideBarDock->setWidget(m_navigationToolBar);
-  m_naviSideBarDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
-  addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, m_naviSideBarDock);
-
-  m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this}; // docker
-  m_previewHtmlDock->setWidget(m_previewFolder);
-  m_previewHtmlDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-  m_previewFolder->RegisterVolumeWidget(m_previewHtmlDock->GetVolumeWidget());
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, m_previewHtmlDock);
-
-  m_tagEditor = new ActionsContainerWid{Qt::Orientation::Horizontal, 1, this};
-  m_tagEditor->AddActions(TagsHelper::GetInst().GetActions(), Qt::ToolButtonTextBesideIcon);
-  m_tagEditor->setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-  m_tagEditorSideBar = new QToolBar{"TagEditor SideBar", this};
-  m_tagEditorSideBar->setOrientation(Qt::Orientation::Vertical);
-  m_tagEditorSideBar->addWidget(m_tagEditor);
-  addToolBar(Qt::ToolBarArea::RightToolBarArea, m_tagEditorSideBar);
-
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
-
-  m_fsPanel->BindRatingStarsWidget(m_ribbonMenu->GetRatingStarsWidget());
-  m_fsPanel->BindTagEditorSideBar(m_tagEditorSideBar);
-
-  setMenuWidget(m_ribbonMenu);
-  setStatusBar(m_statusBar);
-
+  }
+  // 1. new widget component end
   InitComponentVisibility();
-  subscribe();
 
+  // 2. set the initial value begin
+  {
+    ViewTypeTool::ViewType initialViewType = ViewTypeTool::DEFAULT_VIEW_TYPE;
+    if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+      initialViewType = pStatusBar->_GetCurViewType();
+    }
+    m_viewSwitchHelper->onSwitchByViewType(initialViewType);
+
+    const QString& defaultPath = GetInitialPathFromArgs(args);
+    m_fsPanel->onActionAndViewNavigate(defaultPath, true);
+
+    const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};
+    m_previewSwitcher->onSwitchByPreviewType(initialPreviewType);
+  }
+  // 2. set the initial value end
+
+  // 3. place component begin
+  setMenuWidget(m_ribbonMenu);
+  if (auto* pTagEditorSideBar = TagEditorSideBar::GInstance()) {
+    addToolBar(Qt::ToolBarArea::RightToolBarArea, pTagEditorSideBar);
+  }
+  addToolBar(Qt::ToolBarArea::TopToolBarArea, m_stackedBar);
+  // 3. place component end
+  setCentralWidget(m_fsPanel);
+  if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+    setStatusBar(pStatusBar);
+  }
+
+  // 4. subscribe and ui size location setting
+  subscribe();
   RestoreWindowStateAndSetupUI();
 }
 
@@ -145,25 +184,24 @@ void FileXplorer::InitComponentVisibility() {
     m_previewHtmlDock->setHidden(true);
   }
 
-  const bool showTagEditorSideBar = getConfig(CompoVisKey::SHOW_TAG_EDITOR_SIDEBAR).toBool();
-  if (!showTagEditorSideBar) {
-    m_tagEditorSideBar->setHidden(true);
+  if (auto *pTagEditorSideBar = TagEditorSideBar::GInstance()) {
+    const bool showTagEditorSideBar = getConfig(CompoVisKey::SHOW_TAG_EDITOR_SIDEBAR).toBool();
+    if (!showTagEditorSideBar) {
+      pTagEditorSideBar->setHidden(true);
+    }
+    connect(ViewActions::GetInst()._TAG_EDITOR_SIDEBAR, &QAction::toggled, pTagEditorSideBar, &QToolBar::setVisible);
   }
-
-  const PreviewTypeTool::PREVIEW_TYPE_E initialPreviewType{m_previewHtmlDock->GetCurrentPreviewType()};
-  m_previewSwitcher->onSwitchByPreviewType(initialPreviewType);
 }
 
 void FileXplorer::subscribe() {
   auto& vA = ViewActions::GetInst();
   connect(vA._NAVIGATION_PANE, &QAction::toggled, m_naviSideBarDock, &QWidget::setVisible);
   connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
-  connect(vA._TAG_EDITOR_SIDEBAR, &QAction::toggled, m_tagEditorSideBar, &QToolBar::setVisible);
-
-  connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
-
   connect(m_previewHtmlDock, &PreviewDockWidget::previewTypeChanged, m_previewSwitcher, &FolderPreviewSwitcher::onSwitchByPreviewType);
 
+  if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+    connect(pStatusBar, &CustomStatusBar::_viewTypeChanged, this, &FileXplorer::onViewWidgetChanged);
+  }
   // connect(m_previewFolder, &CurrentRowPreviewer::reqWindowsTitleChange, m_previewHtmlDock, &PreviewDockWidget::onWindowsTitleChanged);
 }
 

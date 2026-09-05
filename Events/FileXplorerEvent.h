@@ -17,7 +17,7 @@ class Archiver;
 
 class FileXplorerEvent : public QObject {
 public:
-  FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger);
+  FileXplorerEvent(ViewsStackedWidget* view);
   void subscribe();
 
 private:

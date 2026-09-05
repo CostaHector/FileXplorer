@@ -73,14 +73,14 @@
 
 using namespace ViewTypeTool;
 
-FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger)
+FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view)
   : QObject{view} { //
   CHECK_NULLPTR_RETURN_VOID(view)
   CHECK_NULLPTR_RETURN_VOID(view->m_fsModel)
-  CHECK_NULLPTR_RETURN_VOID(logger)
+  CHECK_NULLPTR_RETURN_VOID(CustomStatusBar::GInstance())
   _contentPane = view;
   _fileSysModel = view->m_fsModel;
-  _logger = logger;
+  _logger = CustomStatusBar::GInstance();
 
   m_clipboard = QApplication::clipboard();
 }

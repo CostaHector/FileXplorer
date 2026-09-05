@@ -20,6 +20,7 @@ constexpr short ENLARGE_TIMES = 100;
 class VolumeWidget : public QWidget {
   Q_OBJECT
 public:
+  static VolumeWidget* GInstance(VolumeWidget* pInitValue=nullptr, bool bReset=false);
   explicit VolumeWidget(QBoxLayout::Direction direction = QBoxLayout::Direction::LeftToRight, QWidget* parent = nullptr);
   ~VolumeWidget();
 

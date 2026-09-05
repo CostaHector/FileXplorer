@@ -7,6 +7,7 @@ class QMenu;
 
 class RatingStarsWidget : public QWidget {
 public:
+  static RatingStarsWidget* GInstance(RatingStarsWidget* pInitValue=nullptr, bool bReset=false);
   explicit RatingStarsWidget(QWidget *parent = nullptr);
 
   void freshRating(int value);

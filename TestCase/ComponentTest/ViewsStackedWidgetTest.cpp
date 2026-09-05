@@ -5,7 +5,7 @@
 #include "ViewsStackedWidget.h"
 #include "EndToExposePrivateMember.h"
 #include "StackedAddressAndSearchToolBar.h"
-
+#include "CustomStatusBar.h"
 #include "ViewSwitchHelper.h"
 #include "TDir.h"
 #include "SceneInfoManager.h"
@@ -96,7 +96,6 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     viewStkWid.BindDatabaseSearchToolBar(nullptr);
     viewStkWid.BindAdvanceSearchToolBar(nullptr);
     viewStkWid.BindCastSearchToolBar(nullptr);
-    viewStkWid.BindLogger(nullptr);
 
     viewStkWid.disconnectSelectionChanged();
   }
@@ -115,13 +114,11 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     CurrentRowPreviewer m_previewFolder{&wid};                               // previewer in docker
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
-    ScenePageControl m_scenePageControl{"Pagination display", &wid};
-        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
+    NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
-    lo.addWidget(&m_scenePageControl);
 
     QVERIFY(m_fsPanel.m_fsModel != nullptr);
 
@@ -211,19 +208,11 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     CurrentRowPreviewer m_previewFolder{&wid};                               // previewer in docker
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
-    ScenePageControl m_scenePageControl{"Pagination display", &wid};
-    CustomStatusBar m_statusBar{&wid};
-        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
+    NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
-    lo.addWidget(&m_scenePageControl);
-    lo.addWidget(&m_statusBar);
-
-    QVERIFY(m_fsPanel._logger == nullptr);
-    m_fsPanel.BindLogger(&m_statusBar);
-    QVERIFY(m_fsPanel._logger != nullptr);
 
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::TABLE);  // default
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
@@ -250,7 +239,6 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QVERIFY(sigCnt >= 1);
       // QCOMPARE(spy.takeFirst(), (QVariantList{workPath}));
       spy.clear();
-      // const QString textInStatusBar = m_statusBar.GetText();
       // QVERIFY(textInStatusBar.contains("Total 2 item(s) |"));  // "Kaka.jpg" "Cristiano Ronaldo & Kaka.jpg"
       // QCOMPARE(m_fsPanel.m_fsModel->rowCount(rootInd), 2);
       QCOMPARE(m_fsPanel.m_fsModel->nameFilterDisables(), false);
@@ -327,23 +315,16 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     CurrentRowPreviewer m_previewFolder{&wid};                               // previewer in docker
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
-    ScenePageControl m_scenePageControl{"Pagination display", &wid};
-    CustomStatusBar m_statusBar{&wid};
-    ViewSwitchToolBar m_viewSwitcher{"View Switcher", &m_statusBar};
-        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
-    m_statusBar.addPermanentWidget(&m_viewSwitcher);
+    NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &navigationToolbar, &wid};  // view/searchToolBar switcher
+    ViewSwitchToolBar m_viewSwitcher{"View Switcher", &wid};
 
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
-    lo.addWidget(&m_scenePageControl);
-    lo.addWidget(&m_statusBar);
 
     // 主动模仿FileXplorer连接
     connect(&m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, &m_viewSwitchHelper, &ViewSwitchHelper::onSwitchByViewType);
-    m_fsPanel.BindLogger(&m_statusBar);
-
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
 
     m_fsPanel.m_fsModel->sort(0, Qt::AscendingOrder);
@@ -513,22 +494,16 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     CurrentRowPreviewer m_previewFolder{&wid};                               // previewer in docker
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
-    ScenePageControl m_scenePageControl{"Pagination display", &wid};
-    CustomStatusBar m_statusBar{&wid};
-    ViewSwitchToolBar m_viewSwitcher{"View Switcher", &m_statusBar};
-        NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
-    m_statusBar.addPermanentWidget(&m_viewSwitcher);
+    NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &navigationToolbar, &wid};  // view/searchToolBar switcher
+    ViewSwitchToolBar m_viewSwitcher{"View Switcher", &wid};
 
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
-    lo.addWidget(&m_scenePageControl);
-    lo.addWidget(&m_statusBar);
 
     // 主动模仿FileXplorer连接
     connect(&m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, &m_viewSwitchHelper, &ViewSwitchHelper::onSwitchByViewType);
-    m_fsPanel.BindLogger(&m_statusBar);
     m_fsPanel.m_fsModel->sort(0, Qt::AscendingOrder);
 
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::TABLE);
