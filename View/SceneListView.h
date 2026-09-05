@@ -3,7 +3,6 @@
 
 #include "CustomListView.h"
 #include "SceneSortProxyModel.h"
-#include "ScenePageControl.h"
 #include "SceneStyleDelegate.h"
 #include "VideoTierTool.h"
 
@@ -14,7 +13,6 @@ class SceneListView : public CustomListView {
 public:
   explicit SceneListView(ScenesListModel* sceneModel,
                          SceneSortProxyModel* sceneSortProxyModel,
-                         ScenePageControl* scenePageControl,
                          QWidget* parent = nullptr);
   ~SceneListView();
 
@@ -52,7 +50,6 @@ private:
   ScenesListModel* _sceneModel{nullptr};
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   SceneStyleDelegate* mAlignDelegate{nullptr};
-  ScenePageControl* _scenePageControl{nullptr};
 
   QMetaObject::Connection mSortRoleConn;
   QMetaObject::Connection mSortOrderReverseConn;

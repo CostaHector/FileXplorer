@@ -2,7 +2,8 @@
 #include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include "DualIconCheckableAction.h"
-#include "NotificatorMacro.h"
+#include "VideoPlayerActions.h"
+#include "Logger.h"
 #include <cmath>
 
 namespace VolumeIterate {
@@ -54,6 +55,23 @@ short nextLevelInLinearScale(short target) {
 
 constexpr int VolumeWidget::MIN_VOLUME, VolumeWidget::MAX_VOLUME;
 
+VolumeWidget* VolumeWidget::GInstance(VolumeWidget* pInitValue, bool bReset) {
+  static VolumeWidget* pInstance = pInitValue;
+  if (bReset) {
+    pInstance = pInitValue;
+    return nullptr;
+  }
+  if (pInstance == nullptr) {
+    if (pInitValue == nullptr) {
+      LOG_W("Instance not init at all");
+    } else {
+      pInstance = pInitValue;
+      LOG_W("Instance should init before here. adjust init position");
+    }
+  }
+  return pInstance;
+}
+
 VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : QWidget{parent} {
   const bool bMuteVolume = GetInitIsMuted();
   mMuteAct = DualIconCheckableAction::CreateMuteAction(this, bMuteVolume);
@@ -76,7 +94,13 @@ VolumeWidget::VolumeWidget(QBoxLayout::Direction direction, QWidget* parent) : Q
   mLayout->addWidget(mVolumeSlider);
   mLayout->addWidget(mVolumeValLabel);
 
-  connect(mMuteAct, &QAction::toggled, this, &VolumeWidget::mutedStateToggled);
+  {
+    connect(mMuteAct, &QAction::toggled, this, &VolumeWidget::mutedStateToggled);
+    auto& vpActs = VideoPlayerActions::GetInst();
+    connect(vpActs.mVolumePlus, &QAction::triggered, this, &VolumeWidget::reqLogVolumeIncrease);
+    connect(vpActs.mVolumeMinus, &QAction::triggered, this, &VolumeWidget::reqLogVolumeDecrease);
+  }
+
   mVolumeSlider->regMouseEventProcessor(std::bind(&VolumeWidget::onMouseEventProcessor, this, std::placeholders::_1));
 }
 

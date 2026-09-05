@@ -1,5 +1,6 @@
 ﻿#include "FileSystemModel.h"
 #include "PathTool.h"
+#include "CustomStatusBar.h"
 #include "FileSystemModelField.h"
 #include "PublicMacro.h"
 #include <QMimeData>
@@ -26,11 +27,6 @@ void FileSystemModel::setThumbnailAsDecoration(bool bEnableUse) {
   emit layoutAboutToBeChanged();
   emit dataChanged(index(0, 0), index(ROW_CNT - 1, 0), {Qt::DecorationRole});
   emit layoutChanged();
-}
-
-void FileSystemModel::BindLogger(CustomStatusBar* pLogger) const {
-  CHECK_NULLPTR_RETURN_VOID(pLogger)
-  _mPLogger = pLogger;
 }
 
 QString FileSystemModel::fullInfo(const QModelIndex& curIndex) const {
@@ -166,7 +162,7 @@ QVariant FileSystemModel::headerData(int section, Qt::Orientation orientation, i
 }
 
 void FileSystemModel::whenDirectoryLoaded(const QString& path) {
-  if (_mPLogger != nullptr) {
-    _mPLogger->onPathInfoChanged(rowCount(GetRootIndex()), 0);
+  if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+    pStatusBar->onPathInfoChanged(rowCount(GetRootIndex()), 0);
   }
 }

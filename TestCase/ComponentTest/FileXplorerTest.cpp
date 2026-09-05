@@ -8,7 +8,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "FileXplorer.h"
 #include "EndToExposePrivateMember.h"
-
+#include "CustomStatusBar.h"
 #include "ViewActions.h"
 
 #include <QFileInfo>
@@ -75,20 +75,18 @@ class FileXplorerTest : public PlainTestSuite {
   void default_status_ok() {
     Configuration().clear();
 
-    const QString existPath{QFileInfo{__FILE__}.absolutePath()};
-    QStringList args{"a.exe", existPath};
-
     QCOMPARE(getConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR).toBool(), true);
     QCOMPARE(getConfig(CompoVisKey::SHOW_PREVIEW_DOCKER).toBool(), true);
     QCOMPARE(getConfig(CompoVisKey::FOLDER_PREVIEW_TYPE).toInt(), ((int)PreviewTypeTool::PREVIEW_TYPE_E::CATEGORY));
 
+    const QString existPath{QFileInfo{__FILE__}.absolutePath()};
+    QStringList args{"a.exe", existPath};
+
     auto& viewActInst = ViewActions::GetInst();
     viewActInst._TABLE_VIEW->setChecked(true);
-
     // no configuration
     {
       FileXplorer fe{args, nullptr};
-      QVERIFY(fe.m_viewSwitcher != nullptr);
       QVERIFY(fe.m_previewHtmlDock != nullptr);
       QVERIFY(fe.m_previewFolder != nullptr);
       QVERIFY(fe.m_previewSwitcher != nullptr);
@@ -98,7 +96,9 @@ class FileXplorerTest : public PlainTestSuite {
       QVERIFY(fe.m_navigationToolBar != nullptr);
       QVERIFY(fe.m_naviSideBarDock != nullptr);
       QVERIFY(fe.m_ribbonMenu != nullptr);
-      QVERIFY(fe.m_statusBar != nullptr);
+
+      QVERIFY(CustomStatusBar::GInstance() != nullptr);
+      QCOMPARE(CustomStatusBar::GInstance()->_GetCurViewType(), ViewTypeTool::ViewType::TABLE);
 
       QVERIFY(fe.m_fsPanel->m_fsModel != nullptr);
       QCOMPARE(fe.m_fsPanel->m_fsModel->rootPath(), existPath);

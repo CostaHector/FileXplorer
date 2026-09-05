@@ -1,4 +1,5 @@
 #include "RibbonScene.h"
+#include "ScenePageControl.h"
 #include "SceneInPageActions.h"
 #include "ViewActions.h"
 
@@ -28,8 +29,9 @@ RibbonScene::RibbonScene(const QString& title, QWidget* parent) //
   addActions(ag._ARCHIVE_AG->actions());
   addSeparator();
 
-  m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
-  addWidget(m_scenePageControl);
+  if (auto* p = ScenePageControl::GInstance()) {
+    addWidget(p);
+  }
 
   setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }

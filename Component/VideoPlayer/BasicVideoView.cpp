@@ -80,25 +80,16 @@ BasicVideoView::~BasicVideoView() {
   // }
 }
 
-bool BasicVideoView::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
-  CHECK_NULLPTR_RETURN_FALSE(pVolumeWidget)
-  if (mIsVolumeWidgetRegistered) {
-    LOG_W("Already registered, cannot register again");
-    return false;
-  }
-  mIsVolumeWidgetRegistered = true;
-  connect(pVolumeWidget, &VolumeWidget::mutedStateToggled, this, [this](bool bMute){
+void BasicVideoView::subscribe() {
+  connect(VolumeWidget::GInstance(), &VolumeWidget::mutedStateToggled, this, [this](bool bMute){
     mOperationStatusLbl->setAutoHideText(bMute ? "Mute" : "Unmute");
     mPlayer->setMuted(bMute);
   });
-  connect(pVolumeWidget, &VolumeWidget::sliderVolumeChanged, this, [this](int volumeVal){
+  connect(VolumeWidget::GInstance(), &VolumeWidget::sliderVolumeChanged, this, [this](int volumeVal){
     mOperationStatusLbl->setAutoHideText(QString::asprintf("Volume: %d", volumeVal));
     mPlayer->setVolume(volumeVal);
   });
-  return true;
-}
 
-void BasicVideoView::subscribe() {
   connect(this, &BasicVideoView::userMousePressOrKeyPressHappened, mVideoWidget, &InteractiveVideoWidget::onUserMouseClickOrKeyPressEvent);
 
   connect(mVideoWidget->mGrabFrame, &QAction::triggered, this, &BasicVideoView::onGrabCurrentFrame);
@@ -236,8 +227,7 @@ int BasicVideoView::rateAllVideoSameLevelAsCurrentVideo(bool bOverrideForce) con
     LOG_WARN_P("Cannot rate", "Media folder[%s] of file[%s] not exist", qPrintable(sameLevelPath), qPrintable(curMedia));
     return 0;
   }
-  RateActions* rateActions = mVideoWidget->GetRateActions();
-  return rateActions->onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
+  return RateActions::onRateMoviesRecursively(sameLevelPath, bOverrideForce, nullptr); // no need modal widget
 }
 
 int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {

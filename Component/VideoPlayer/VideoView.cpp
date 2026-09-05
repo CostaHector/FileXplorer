@@ -103,7 +103,3 @@ bool VideoView::registerFullScreenToggleCallback(TFuncFullScreenToggleCallback f
   connect(GetBasicVideoView(), &BasicVideoView::reqFullscreenModeChange, mFullScreenCallback);
   return true;
 }
-
-bool VideoView::RegisterVolumeWidget(VolumeWidget* pVolumeWidget) {
-  return mBasicVideoView->RegisterVolumeWidget(pVolumeWidget);
-}

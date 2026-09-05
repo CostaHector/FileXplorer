@@ -19,7 +19,6 @@ public:
   friend class FolderPreviewSwitcher;
   friend class ViewSwitchHelper;
   explicit CurrentRowPreviewer(QWidget* parent = nullptr);
-  void RegisterVolumeWidget(VolumeWidget* pVolumeWidget);
 
   PreviewTypeTool::PREVIEW_TYPE_E GetCurrentViewE() const { return mCurrentPreviewType; }
 
@@ -102,7 +101,6 @@ private:
   QStringList m_sceneimgPthLst;
   QStringList m_scenevidsLst;
 
-  VolumeWidget* _volumeWidgetInDocker{nullptr};
   ImagesInFolderBrowser* m_imgInFolderBrowser{nullptr};
   ImagesInFolderSlider* m_imgInFolderLabels{nullptr};
   FileFolderPreviewer* m_fileFolderPreviewStackedWid{nullptr};

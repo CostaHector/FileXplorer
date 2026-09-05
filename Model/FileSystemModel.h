@@ -1,7 +1,6 @@
 #ifndef FILESYSTEMMODEL_H
 #define FILESYSTEMMODEL_H
 
-#include "CustomStatusBar.h"
 #include "SelectionsRangeHelper.h"
 #include "Logger.h"
 #include <QFileSystemModel>
@@ -15,7 +14,6 @@ public:
     return mRootIndex = QFileSystemModel::setRootPath(path);
   }
   void setThumbnailAsDecoration(bool bEnableUse);
-  void BindLogger(CustomStatusBar* logger) const;
 
   QString fullInfo(const QModelIndex& curIndex) const;
 
@@ -79,9 +77,6 @@ public:
 
 public slots:
   void whenDirectoryLoaded(const QString& path);
-
-protected:
-  mutable CustomStatusBar* _mPLogger{nullptr};
 
 private:
   void EmitBeforeDecorationRoleRevert(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {

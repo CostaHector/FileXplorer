@@ -2,7 +2,6 @@
 #include "PublicMacro.h"
 #include "RateHelper.h"
 #include "JsonFieldBoundary.h"
-#include "MenuToolButton.h"
 #include "NotificatorMacro.h"
 #include "VideoPlayerKey.h"
 #include "Configuration.h"
@@ -24,18 +23,19 @@ RateActions::RateActions(QObject* parent)
   RATE_AGS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(RATE_AGS);
   RATE_AGS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
-
-  ALL_RATE_ACTIONS_LIST.reserve(JsonFieldBoundary::RATE_BUTT_V - JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
   for (int rate = JsonFieldBoundary::RATE_BUTT_V - 1; rate >= JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V; --rate) {
     QAction* pAct = new (std::nothrow) QAction{QIcon(RateHelper::GetRatePixmap(rate)), //
                                                QString::number(rate) + tr(" score"),   //
                                                this};
     CHECK_NULLPTR_RETURN_VOID(pAct);
     pAct->setData(rate);
-    const int keypad = (rate == 10) ? Qt::Key_Plus : (Qt::Key_0 + rate);
+    // keypad 2 rate map
+    // key- -> 0
+    // key+ -> 10
+    // key1~key9 -> 1~9
+    const int keypad = (1 <= rate && rate < 10) ? (Qt::Key_0 + rate) : (rate == 0 ? Qt::Key_Minus : Qt::Key_Plus);
     pAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::KeypadModifier | keypad));
     RATE_AGS->addAction(pAct);
-    ALL_RATE_ACTIONS_LIST.push_back(pAct);
   }
 
   _RATE_RECURSIVELY = new (std::nothrow) QAction{QIcon{":img/LIKE_RECURSIVELY"}, tr("Rate All (Recursive)"), this};
@@ -71,38 +71,34 @@ RateActions::RateActions(QObject* parent)
   subscribe();
 }
 
-QMenu* RateActions::GetRateMenu(QWidget* notNullParent) const {
+QMenu* RateActions::GetVideoWidRateMenu(QWidget* notNullParent) const {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
   QMenu* rateMenu = new (std::nothrow) QMenu{tr("Rate"), notNullParent};
+  CHECK_NULLPTR_RETURN_NULLPTR(rateMenu);
   rateMenu->setIcon(QIcon{":img/LIKE"});
   rateMenu->setToolTip("Rate for your movie");
-  rateMenu->addSection("Specify a rate value");
-  rateMenu->addActions(GetAllRateActionsList());
+  rateMenu->addActions(GetRateActionsList());
   rateMenu->addSeparator();
-  rateMenu->addSection("Adjust +1/-1 rate point");
   rateMenu->addActions(GetAdjustRateActions());
-  rateMenu->addAction(_INCREASING_RATING_RECURSIVELY);
-  rateMenu->addAction(_DECREASING_RATING_RECURSIVELY);
   rateMenu->addSeparator();
-  rateMenu->addSection("Recursively rate all videos with user specified value");
   rateMenu->addAction(_RATE_RECURSIVELY);
   rateMenu->addAction(_RATE_RECURSIVELY_OVERRIDE);
   rateMenu->setToolTipsVisible(true);
   return rateMenu;
 }
 
-QWidget* RateActions::GetRateToolButton(QWidget* notNullParent) const {
+QMenu* RateActions::GetRibbonRateMenu(QWidget* notNullParent) const {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
-  QMenu* pDropdownMenu = GetRateMenu(notNullParent);
-  CHECK_NULLPTR_RETURN_NULLPTR(pDropdownMenu);
-  MenuToolButton* rateToolButton = new (std::nothrow) MenuToolButton(pDropdownMenu,                           //
-                                                                     QToolButton::InstantPopup,               //
-                                                                     Qt::ToolButtonStyle::ToolButtonIconOnly, //
-                                                                     IMAGE_SIZE::TABS_ICON_IN_MENU_16,
-                                                                     notNullParent);
-  CHECK_NULLPTR_RETURN_NULLPTR(rateToolButton);
-  rateToolButton->SetCaption(QIcon{":img/LIKE"}, tr("Rate"), "Rate for your movie");
-  return rateToolButton;
+  QMenu* rateMenu = new (std::nothrow) QMenu{tr("Rate"), notNullParent};
+  CHECK_NULLPTR_RETURN_NULLPTR(rateMenu);
+  rateMenu->setIcon(QIcon{":img/LIKE"});
+  rateMenu->setToolTip("Rate for your movie");
+  rateMenu->addActions(GetAdjustRateActions());
+  rateMenu->addSeparator();
+  rateMenu->addAction(_RATE_RECURSIVELY);
+  rateMenu->addAction(_RATE_RECURSIVELY_OVERRIDE);
+  rateMenu->setToolTipsVisible(true);
+  return rateMenu;
 }
 
 void RateActions::subscribe() {
@@ -127,7 +123,7 @@ bool RateActions::onRateActionTriggered(const QAction* pActTriggered) {
   return true;
 }
 
-int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) const {
+int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) {
   const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
   message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";

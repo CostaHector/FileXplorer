@@ -3,7 +3,6 @@
 
 #include <QStackedWidget>
 #include "AdvanceSearchToolBar.h"
-#include "CustomStatusBar.h"
 #include "NavigationAndAddressBar.h"
 #include "CurrentRowPreviewer.h"
 
@@ -42,7 +41,6 @@ class ViewsStackedWidget : public QStackedWidget {
   void BindDatabaseSearchToolBar(MovieDBSearchToolBar* dbSearchBar);
   void BindAdvanceSearchToolBar(AdvanceSearchToolBar* advanceSearchBar);
   void BindCastSearchToolBar(CastDatabaseSearchToolBar* castSearchBar);
-  void BindLogger(CustomStatusBar* logger);
 
   bool on_cellDoubleClicked(const QModelIndex& clickedIndex);
   void connectSelectionChanged(ViewTypeTool::ViewType vt);
@@ -131,8 +129,6 @@ class ViewsStackedWidget : public QStackedWidget {
   JsonTableView* m_jsonTableView{nullptr};
 
   CurrentRowPreviewer* _previewFolder{nullptr};
-
-  CustomStatusBar* _logger{nullptr};
 
   ViewTypeTool::ViewType GetVt() const {
     return mVt;

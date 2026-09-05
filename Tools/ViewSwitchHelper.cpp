@@ -9,18 +9,15 @@ using namespace ViewTypeTool;
 
 ViewSwitchHelper::ViewSwitchHelper(StackedAddressAndSearchToolBar* navigation,
                                    ViewsStackedWidget* view,
-                                   ScenePageControl* scenePageControl,
                                    NavigationToolBar* navigationToolBar,
                                    QObject* parent)  //
     : QObject{parent},                               //
       _navigation{navigation},                       //
       _view{view},                                   //
-      _scenePageControl{scenePageControl},           //
       _navigationToolBar{navigationToolBar}          //
 {                                                    //
   CHECK_NULLPTR_RETURN_VOID(_navigation)
   CHECK_NULLPTR_RETURN_VOID(_view)
-  CHECK_NULLPTR_RETURN_VOID(_scenePageControl)
   CHECK_NULLPTR_RETURN_VOID(_navigationToolBar)
 }
 
@@ -169,7 +166,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
       if (_view->m_sceneTableView == nullptr) {
         _view->m_scenesModel = new ScenesListModel{"SCENES_TABLE"};
         _view->m_sceneProxyModel = new SceneSortProxyModel;
-        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _scenePageControl, _view);
+        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _view);
         _view->m_sceneTableView->InitListView();
         _view->AddView(viewType, _view->m_sceneTableView);
       }

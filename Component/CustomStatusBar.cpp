@@ -3,6 +3,23 @@
 #include "ViewActions.h"
 #include <QStyle>
 
+CustomStatusBar* CustomStatusBar::GInstance(CustomStatusBar* pInitValue, bool bReset) {
+  static CustomStatusBar* pInstance = pInitValue;
+  if (bReset) {
+    pInstance = pInitValue;
+    return nullptr;
+  }
+  if (pInstance == nullptr) {
+    if (pInitValue == nullptr) {
+      LOG_W("Instance not init at all");
+    } else {
+      pInstance = pInitValue;
+      LOG_W("Instance should init before here. adjust init position");
+    }
+  }
+  return pInstance;
+}
+
 CustomStatusBar::CustomStatusBar(QWidget* parent)  //
   : QStatusBar{parent} {
   for (int labelIndex = ITEMS; labelIndex < BUTT; ++labelIndex) {
@@ -19,7 +36,13 @@ CustomStatusBar::CustomStatusBar(QWidget* parent)  //
   addAction(viewInst._VIEW_BACK_TO);
   addAction(viewInst._VIEW_FORWARD_TO);
 
+  // right-down corner permanent widget
+  m_viewSwitcher = new (std::nothrow) ViewSwitchToolBar{"ViewSwitcherToolBar", this};
+  addPermanentWidget(m_viewSwitcher);
+
   setContentsMargins(0, 0, 0, 0);
+
+  connect(m_viewSwitcher, &ViewSwitchToolBar::viewTypeChanged, this, &CustomStatusBar::_viewTypeChanged);
 }
 
 void CustomStatusBar::onPathInfoChanged(const int count, const int index) {
@@ -44,11 +67,4 @@ void CustomStatusBar::onMsgChanged(const QString& text, const STATUS_ALERT_LEVEL
 
 QString CustomStatusBar::GetText() const {
   return mLabelsLst[ITEMS]->text() + mLabelsLst[SELECTED]->text() + mLabelsLst[MSG]->text();
-}
-
-bool CustomStatusBar::addViewSwitcherToRightCorner(QToolBar* viewsSwitcherTb) {
-  // right-down corner permanent widget
-  CHECK_NULLPTR_RETURN_FALSE(viewsSwitcherTb);
-  addPermanentWidget(viewsSwitcherTb);
-  return true;
 }

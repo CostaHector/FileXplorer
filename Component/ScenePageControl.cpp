@@ -6,6 +6,23 @@
 #include <QIntValidator>
 #include <QLabel>
 
+ScenePageControl* ScenePageControl::GInstance(ScenePageControl* pInitValue, bool bReset) {
+  static ScenePageControl* pInstance = pInitValue;
+  if (bReset) {
+    pInstance = pInitValue;
+    return nullptr;
+  }
+  if (pInstance == nullptr) {
+    if (pInitValue == nullptr) {
+      LOG_W("Instance not init at all");
+    } else {
+      pInstance = pInitValue;
+      LOG_W("Instance should init before here. adjust init position");
+    }
+  }
+  return pInstance;
+}
+
 ScenePageControl::ScenePageControl(const QString& title, QWidget* parent)
   : QToolBar{title, parent} {
   _THE_FRONT_PAGE = new (std::nothrow) QAction(QIcon(":img/PAGINATION_START"), tr("First Page"), this);

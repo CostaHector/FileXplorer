@@ -4,6 +4,7 @@
 #include <QToolButton>
 #include "ActionsRecorder.h"
 #include "ActionsSearcher.h"
+#include "RatingStarsWidget.h"
 
 #include "ArchiveFilesActions.h"
 #include "FileRenameRulerActions.h"
@@ -17,7 +18,6 @@
 #include "ThumbnailActions.h"
 #include "MultiPar2Actions.h"
 #include "LogActions.h"
-#include "RateActions.h"
 #include "RibbonCastDB.h"
 #include "RibbonJson.h"
 #include "RibbonMovieDB.h"
@@ -74,20 +74,20 @@ RibbonMenu::RibbonMenu(QWidget* parent)
 }
 
 QToolBar* RibbonMenu::GetMenuRibbonCornerWid(QWidget* attached) {
-  ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{attached}};
-  CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
-
   QToolBar* menuRibbonCornerWid{new (std::nothrow) QToolBar{"corner tools", attached}};
   CHECK_NULLPTR_RETURN_NULLPTR(menuRibbonCornerWid);
 
-  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-  auto* rateToolButton = rateInst.GetRateToolButton(menuRibbonCornerWid);
+  ActionsSearcher* mActSearcher{new (std::nothrow) ActionsSearcher{attached}};
+  CHECK_NULLPTR_RETURN_NULLPTR(mActSearcher);
 
   menuRibbonCornerWid->addWidget(mActSearcher);
   menuRibbonCornerWid->addSeparator();
+  if (auto* p = RatingStarsWidget::GInstance()) {
+    menuRibbonCornerWid->addWidget(p);
+  }
+  menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_rightClickActions()._SEARCH_IN_NET_EXPLORER);
   menuRibbonCornerWid->addSeparator();
-  menuRibbonCornerWid->addWidget(rateToolButton);
   menuRibbonCornerWid->addSeparator();
   menuRibbonCornerWid->addAction(g_LogActions()._LOG_FILE);
   menuRibbonCornerWid->addSeparator();
@@ -316,7 +316,6 @@ QToolBar* RibbonMenu::LeafJson() const {
 QToolBar* RibbonMenu::LeafScenesTools() const {
   auto* sceneTB = new (std::nothrow) RibbonScene{"Leaf Scene"};
   CHECK_NULLPTR_RETURN_NULLPTR(sceneTB);
-  _registerUnderRibbonScene = sceneTB->GetScenePageControl();
   return sceneTB;
 }
 
@@ -391,10 +390,6 @@ void RibbonMenu::Subscribe() {
 void RibbonMenu::AfterSubscribeInitialSettings() {
   setCurrentIndex(getConfig(CompoVisKey::MENU_RIBBON_CURRENT_TAB_INDEX).toInt());
   QTimer::singleShot(0, this, [this]() { updateStackedWidgetHeight(_EXPAND_RIBBONS->isChecked(), false); });
-}
-
-ScenePageControl* RibbonMenu::GetScenePageControlWidget() const {
-  return _registerUnderRibbonScene;
 }
 
 void RibbonMenu::on_expandStackedWidget(bool bExpand) {

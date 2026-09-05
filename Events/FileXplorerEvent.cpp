@@ -73,14 +73,14 @@
 
 using namespace ViewTypeTool;
 
-FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view, CustomStatusBar* logger)
+FileXplorerEvent::FileXplorerEvent(ViewsStackedWidget* view)
   : QObject{view} { //
   CHECK_NULLPTR_RETURN_VOID(view)
   CHECK_NULLPTR_RETURN_VOID(view->m_fsModel)
-  CHECK_NULLPTR_RETURN_VOID(logger)
+  CHECK_NULLPTR_RETURN_VOID(CustomStatusBar::GInstance())
   _contentPane = view;
   _fileSysModel = view->m_fsModel;
-  _logger = logger;
+  _logger = CustomStatusBar::GInstance();
 
   m_clipboard = QApplication::clipboard();
 }
@@ -332,8 +332,7 @@ bool FileXplorerEvent::onRateMovie(int newRate) const {
 
 bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
   const QString rootPath{_contentPane->getRootPath()};
-  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-  return rateInst.onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
+  return RateActions::onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
 }
 
 bool FileXplorerEvent::onAdjustRateMovie(int delta) const {

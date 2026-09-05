@@ -75,11 +75,8 @@ class FileSystemModelTest : public PlainTestSuite {
 
     model->setFilter(INITIAL_DIR_FILTERS);
     model->sort(0, Qt::AscendingOrder);
-    QVERIFY(model->_mPLogger == nullptr);
     QCOMPARE(model->supportedDropActions(), (Qt::MoveAction | Qt::CopyAction | Qt::LinkAction));
     QCOMPARE(model->supportedDragActions(), (Qt::MoveAction | Qt::CopyAction | Qt::LinkAction));
-    model->BindLogger(nullptr);  // should not crash down
-    QVERIFY(model->_mPLogger == nullptr);
 
     view->setModel(model);
     view->setSortingEnabled(true);
@@ -333,12 +330,7 @@ class FileSystemModelTest : public PlainTestSuite {
   }
 
   void data_retrieve_correct() {
-    CustomStatusBar customStatusBar;
-
     FileSystemModel fsModel;
-    QVERIFY(fsModel._mPLogger == nullptr);
-    fsModel.BindLogger(&customStatusBar);
-
     QCOMPARE(fsModel.headerData(0, Qt::Vertical, Qt::ItemDataRole::TextAlignmentRole).toInt(), (int)Qt::AlignRight);
 
     fsModel.m_draggedHoverIndex = fsModel.index(0, 0);

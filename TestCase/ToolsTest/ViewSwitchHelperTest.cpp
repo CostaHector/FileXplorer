@@ -17,13 +17,11 @@ class ViewSwitchHelperTest : public PlainTestSuite {
     CurrentRowPreviewer m_previewFolder{&wid};                               // previewer in docker
     StackedAddressAndSearchToolBar m_stackedBar{"searchToolBarTest", &wid};  // searchToolBar
     ViewsStackedWidget m_fsPanel{&m_previewFolder, &wid};                    // main widget
-    ScenePageControl m_scenePageControl{"Pagination display", &wid};
     NavigationToolBar navigationToolbar{"NavigationToolBar", &wid};
-    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &m_scenePageControl, &navigationToolbar, &wid};  // view/searchToolBar switcher
+    ViewSwitchHelper m_viewSwitchHelper{&m_stackedBar, &m_fsPanel, &navigationToolbar, &wid};  // view/searchToolBar switcher
     lo.addWidget(&m_previewFolder);
     lo.addWidget(&m_stackedBar);
     lo.addWidget(&m_fsPanel);
-    lo.addWidget(&m_scenePageControl);
 
     QVERIFY(m_fsPanel.m_fsModel != nullptr);
 

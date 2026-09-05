@@ -54,7 +54,7 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
 
     QList<QAction*> acts;
     acts.reserve(20);
-    acts += rateInst.GetActionGroup()->actions();
+    acts += rateInst.GetRateActionsList();
     acts.push_back(NewSeperatorAction(this));
     acts += rateInst.GetAdjustRateActions();
     acts.push_back(NewSeperatorAction(this));

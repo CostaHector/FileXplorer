@@ -6,13 +6,15 @@
 #include "HarFiles.h"
 #include "FileImageViewer.h"
 #include "ViewTypeTool.h"
+#include "CustomStatusBar.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
 #include "FileTool.h"
 #include "RelatedHelper.h"
 #include "TagsHelper.h"
 #include "JsonParser.h"
-
+#include "RatingStarsWidget.h"
+#include "TagEditorSideBar.h"
 #include <QRegularExpression>
 #include <QCache>
 
@@ -194,19 +196,6 @@ void ViewsStackedWidget::BindCastSearchToolBar(CastDatabaseSearchToolBar* castSe
   _castSearchBar = castSearchBar;
 }
 
-void ViewsStackedWidget::BindLogger(CustomStatusBar* logger) {
-  if (logger == nullptr) {
-    LOG_W("Bind CustomStatusBar for contentPanel and FileSystemModel failed. nullptr passed here");
-    return;
-  }
-  if (_logger != nullptr) {
-    LOG_W("Don't rebind to _logger");
-    return;
-  }
-  _logger = logger;
-  m_fsModel->BindLogger(_logger);
-}
-
 auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -> bool {
   if (!clickedIndex.isValid()) {
     LOG_ERR_NP("Current Index invalid", "double Click skip");
@@ -276,8 +265,10 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     return;
   }
   const QFileInfo fi = getFileInfo(current);
-  if (_logger != nullptr && fi.isFile()) {
-    _logger->onMsgChanged(DataFormatter::formatFileSizeWithBytes(fi.size()));
+  if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+    if (fi.isFile()) {
+      pStatusBar->onMsgChanged(DataFormatter::formatFileSizeWithBytes(fi.size()));
+    }
   }
 
   auto vt = GetVt();
@@ -295,7 +286,10 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     _previewFolder->operator()(fi.absoluteFilePath());
   }
 
-  if (ViewActions::GetInst().isTagSideBarVisible()) {
+  if (auto* pTagEditorSideBar = TagEditorSideBar::GInstance()) {
+    if (pTagEditorSideBar->isHidden()) {
+      return;
+    }
     static QString lastTimeJsonPath;
     QString jsonPath;
     if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
@@ -303,7 +297,10 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
         return;
       }
       lastTimeJsonPath = jsonPath;
-      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(JsonParser::GetTagsFromJsonFile(jsonPath));
+      const auto& pr = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+
+      if (auto* p = RatingStarsWidget::GInstance()) p->freshRating(pr.first);
+      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(pr.second);
     } else {
       TagsHelper::GetInst().UpdateTagsActionCheckedStatus(QStringList{});
     }
@@ -311,8 +308,8 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
 }
 
 void ViewsStackedWidget::on_selectionChanged(const QItemSelection& selected, const QItemSelection& /* deselected */) {
-  if (_logger != nullptr) {
-    _logger->onPathInfoChanged(getSelectedRowsCount(), 1);
+  if (auto* pStatusBar = CustomStatusBar::GInstance()) {
+    pStatusBar->onPathInfoChanged(getSelectedRowsCount(), 1);
   }
 }
 

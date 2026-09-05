@@ -74,6 +74,17 @@ private slots:
     QCOMPARE(JsonParser::GetTagsFromJsonFile("valid.json"), (QStringList{}));
   }
 
+  void GetRateAndTagsFromJsonFile_ok () {
+    bool bReadOk = true;
+    MOCKER(FileTool::ByteArrayReader).expects(exactly(3)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk)))
+        .will(returnValue(QByteArray{R"({"Rate": 8,"Hot": [],"Tags": ["A", "B"],"Hot": []})"}))
+        .then(returnValue(QByteArray{R"({"Rate": 10,"Tags": ["C"]})"}))
+        .then(returnValue(QByteArray{R"({})"}));
+    QCOMPARE(JsonParser::GetRateAndTagsFromJsonFile("valid.json", 0), (std::make_pair(8, QStringList{"A", "B"})));
+    QCOMPARE(JsonParser::GetRateAndTagsFromJsonFile("valid.json", 0), (std::make_pair(10, QStringList{"C"})));
+    QCOMPARE(JsonParser::GetRateAndTagsFromJsonFile("valid.json", 0), (std::make_pair(0, QStringList{})));
+  }
+
   void JsonFileReadFailed() {
     bool bReadOk = false;
     MOCKER(FileTool::ByteArrayReader).expects(exactly(1)).with(any(), outBoundP(&bReadOk, sizeof(bReadOk))).will(returnValue(QByteArray{"{}"}));
