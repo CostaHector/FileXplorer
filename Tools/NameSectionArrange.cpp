@@ -2,9 +2,13 @@
 #include <QRegularExpression>
 
 QString ChopPostfix(const QString& baseName) {
+  QString result = baseName;
+  // 0.
+  static const QRegularExpression _tnPattern{"_tn$", QRegularExpression::PatternOption::CaseInsensitiveOption};
+  result.remove(_tnPattern);
+
   // 1. resolution/date
   static const QRegularExpression resDatePattern{" (?:2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD|\\d{4} - \\d{2} - \\d{2}|\\d{8}|\\d{4})$", QRegularExpression::PatternOption::CaseInsensitiveOption};
-  QString result = baseName;
   result.remove(resDatePattern);
 
   // 2. "Part/Scene/Pt./Sc./Pt/Sc \d{1,2}" no need chop
