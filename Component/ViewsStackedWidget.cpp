@@ -292,18 +292,16 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     }
     static QString lastTimeJsonPath;
     QString jsonPath;
+    std::pair<int, QStringList> rateTagsPair{JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, QStringList()};
     if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
       if (jsonPath == lastTimeJsonPath) {
         return;
       }
       lastTimeJsonPath = jsonPath;
-      const auto& pr = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
-
-      if (auto* p = RatingStarsWidget::GInstance()) p->freshRating(pr.first);
-      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(pr.second);
-    } else {
-      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(QStringList{});
+      rateTagsPair = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
     }
+    if (auto* p = RatingStarsWidget::GInstance()) p->freshRating(rateTagsPair.first);
+    TagsHelper::GetInst().UpdateTagsActionCheckedStatus(rateTagsPair.second);
   }
 }
 
