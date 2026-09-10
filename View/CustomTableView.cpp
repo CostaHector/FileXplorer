@@ -217,9 +217,9 @@ void CustomTableView::InitTableView() {
 
   setTextElideMode(_TEXT_ELIDE_MODE_MENU->GetTextElideMode());
 
-  ShowOrHideColumnCore();
   m_horHeader->InitFilterEditors();
   m_horHeader->RestoreHeaderState();
+  ShowOrHideColumnCore();
 
   if (m_defaultShowBackgroundImage) {
     using namespace StyleKey;

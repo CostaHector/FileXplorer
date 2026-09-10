@@ -9,6 +9,7 @@ public:
 private slots:
   void ChopPostfix_ok() {
     QCOMPARE(ChopPostfix("Not exist postfix"), "Not exist postfix");
+    QCOMPARE(ChopPostfix("X - Men 2160p_tn"), "X - Men");
     QCOMPARE(ChopPostfix("X - Men 2160p"), "X - Men");
     QCOMPARE(ChopPostfix("X - Men 4K"), "X - Men");
     QCOMPARE(ChopPostfix("Captain America 2020 - 04 - 01"), "Captain America");
@@ -101,13 +102,16 @@ private slots:
   void arrangeSwapper12_chopPostfix_ok() {
     NameSectionArrange nss(1, 2, false, true);
     QStringList actual = nss.BatchSwapper({
+      "Fox - Michael Fassbender, Jane Grey - XMen 2020 4k_tn",
         "Fox - Michael Fassbender, Jane Grey - XMen 2020 4k",
         "Fox - Michael Fassbender, Jane Grey - XMen scene 1 2020",
         "Fox - Michael Fassbender, Jane Grey - XMen part 1 4k",
         "Fox - Michael Fassbender, Jane Grey - XMen part 1 1", // number need chop
         "Fox - Michael Fassbender, Jane Grey - XMen part 1 1080p 1", //
     });
-    const QStringList expect{"Fox - XMen - Michael Fassbender, Jane Grey 2020 4k",
+    const QStringList expect{
+                            "Fox - XMen - Michael Fassbender, Jane Grey 2020 4k_tn",
+                            "Fox - XMen - Michael Fassbender, Jane Grey 2020 4k",
                              "Fox - XMen scene 1 - Michael Fassbender, Jane Grey 2020",
                              "Fox - XMen part 1 - Michael Fassbender, Jane Grey 4k",
                              "Fox - XMen part 1 - Michael Fassbender, Jane Grey 1",
