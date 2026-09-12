@@ -6,13 +6,14 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include "FileStructurePolicy.h"
 
 class FileSystemModel;
 
 namespace ViewHelper {
 bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton mousebutton);
 
-bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to);
+bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& to, const FileStructurePolicy::FileStuctureModeE mode);
 
 void changeDropAction(QDropEvent* event);
 

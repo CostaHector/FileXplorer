@@ -141,7 +141,7 @@ private slots:
 
     MOCKER(ViewHelper::onDropMimeData)
         .expects(exactly(1))                                 //
-        .with(any(), Qt::DropAction::CopyAction, folderPath) //
+        .with(any(), Qt::DropAction::CopyAction, folderPath, any()) //
         .will(returnValue(true));
 
     QMimeData urlsMimeData;

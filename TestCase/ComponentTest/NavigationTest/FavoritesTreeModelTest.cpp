@@ -473,6 +473,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     QModelIndex groupChild1_nonGroup1{model.index(1, 0, childGroup1Index)};
     {
       // root: drop only
+      QVERIFY(!model.isFolderAccessable(rootIndex));
       QVERIFY(model.flags(rootIndex).testFlag(Qt::ItemFlag::ItemIsDropEnabled));
       QVERIFY(!model.flags(rootIndex).testFlag(Qt::ItemFlag::ItemIsDragEnabled));
       QVERIFY(model.canDropOn(rootIndex));
@@ -496,8 +497,8 @@ class FavoritesTreeModelTest : public PlainTestSuite {
     }
 
     {
-      QCOMPARE(model.supportedDropActions(), (Qt::MoveAction | Qt::CopyAction));
-      QCOMPARE(model.supportedDragActions(), (Qt::MoveAction | Qt::CopyAction));
+      QCOMPARE(model.supportedDropActions(), (Qt::MoveAction | Qt::LinkAction | Qt::TargetMoveAction));
+      QCOMPARE(model.supportedDragActions(), (Qt::MoveAction | Qt::LinkAction | Qt::TargetMoveAction));
       QCOMPARE(model.mimeTypes().size(), 1);
     }
 
@@ -515,20 +516,20 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       // IgnoreAction永远为真
       QVERIFY(model.canDropMimeData(&emptyData, Qt::DropAction::IgnoreAction, -1, 0, rootIndex));
       // supportedDropActions不匹配
-      QVERIFY(!model.canDropMimeData(&emptyData, Qt::DropAction::LinkAction, -1, 0, rootIndex));
+      QVERIFY(!model.canDropMimeData(&emptyData, Qt::DropAction::CopyAction, -1, 0, rootIndex));
       // 无MimeType
-      QVERIFY(!model.canDropMimeData(&emptyData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
+      QVERIFY(!model.canDropMimeData(&emptyData, Qt::DropAction::TargetMoveAction, -1, 0, rootIndex));
 
       // 不检查内容, 只检查标志
       QMimeData validData;
       validData.setData(FavoritesTreeModel::MIME_TYPE, QByteArray{});
       // canDropOn为false
-      QVERIFY(!model.canDropMimeData(&validData, Qt::DropAction::MoveAction, -1, 0, nonGroup0Index));
+      QVERIFY(!model.canDropMimeData(&validData, Qt::DropAction::TargetMoveAction, -1, 0, nonGroup0Index));
 
       // 空白处: 允许
-      QVERIFY(model.canDropMimeData(&validData, Qt::DropAction::MoveAction, childGroup1Index.row(), childGroup1Index.column(), rootIndex));
+      QVERIFY(model.canDropMimeData(&validData, Qt::DropAction::TargetMoveAction, childGroup1Index.row(), childGroup1Index.column(), rootIndex));
       // group项上: 允许
-      QVERIFY(model.canDropMimeData(&validData, Qt::DropAction::MoveAction, -1, 0, childGroup1Index));
+      QVERIFY(model.canDropMimeData(&validData, Qt::DropAction::TargetMoveAction, -1, 0, childGroup1Index));
     }
 
     // dropMimeData
@@ -538,17 +539,17 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QVERIFY(model.dropMimeData(&emptyData, Qt::DropAction::IgnoreAction, -1, 0, rootIndex));
 
       // 列号只能首列0
-      QVERIFY(!model.dropMimeData(&emptyData, Qt::DropAction::MoveAction, -1, 1, rootIndex));
+      QVERIFY(!model.dropMimeData(&emptyData, Qt::DropAction::TargetMoveAction, -1, 1, rootIndex));
 
       // 没有MIME_TYPE
-      QVERIFY(!model.dropMimeData(&emptyData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
+      QVERIFY(!model.dropMimeData(&emptyData, Qt::DropAction::TargetMoveAction, -1, 0, rootIndex));
     }
 
     {  // mimeData, dropMimeData to 子结点 failed 避免嵌套结构(父不能往子里面放, 子能往放父里面)
       QMimeData* mimeData = model.mimeData({childGroup1Index});
       QVERIFY(mimeData != nullptr);
       QVERIFY(mimeData->hasFormat(FavoritesTreeModel::MIME_TYPE));
-      QVERIFY(!model.dropMimeData(mimeData, Qt::DropAction::MoveAction, -1, 0, groupChild1_group0Index));
+      QVERIFY(!model.dropMimeData(mimeData, Qt::DropAction::TargetMoveAction, -1, 0, groupChild1_group0Index));
       QCOMPARE(model.rowCount(), 2);
     }
 
@@ -556,7 +557,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QMimeData* mimeData = model.mimeData({childGroup1Index});
       QVERIFY(mimeData != nullptr);
       QVERIFY(mimeData->hasFormat(FavoritesTreeModel::MIME_TYPE));
-      QVERIFY(!model.dropMimeData(mimeData, Qt::DropAction::MoveAction, -1, 0, childGroup1Index));
+      QVERIFY(!model.dropMimeData(mimeData, Qt::DropAction::TargetMoveAction, -1, 0, childGroup1Index));
       QCOMPARE(model.rowCount(), 2);
     }
 
@@ -594,7 +595,7 @@ class FavoritesTreeModelTest : public PlainTestSuite {
       QCOMPARE(nonGroup0Index.data().toString(), "nonGroup0");
       QCOMPARE(childGroup1Index.data().toString(), "groupChild1");
       QCOMPARE(model.rowCount(), 2);
-      QVERIFY(model.dropMimeData(mimeData, Qt::DropAction::MoveAction, -1, 0, rootIndex));
+      QVERIFY(model.dropMimeData(mimeData, Qt::DropAction::TargetMoveAction, -1, 0, rootIndex));
       QCOMPARE(model.rowCount(), 4);
       QCOMPARE(model.index(0, 0, rootIndex).data().toString(), "groupChild1");
       if (r0ParentAddress < r10ParentAddress) {

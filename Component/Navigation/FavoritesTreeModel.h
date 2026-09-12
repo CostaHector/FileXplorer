@@ -21,11 +21,12 @@ class FavoritesTreeModel : public QAbstractTreeModelPub<FavTreeNode> {
   Qt::DropActions supportedDragActions() const override;
   QStringList mimeTypes() const override;
   QMimeData* mimeData(const QModelIndexList& indexes) const override;
+  Qt::DropAction GetDropAction(const QMimeData* data, const QModelIndex& hoverIndex) const;
   bool canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) const override;
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) override;
 
-  FavTreeNode* addPath(const QString& name, const QString& path, const QModelIndex& parentIndex = {});
-  FavTreeNode* addPath(const QString& name, const QString& path, FavTreeNode* parent = nullptr);
+  FavTreeNode* addPath(const QString& name, const QString& path, const QModelIndex& parentIndex = {}, int insertAt = -1);
+  FavTreeNode* addPath(const QString& name, const QString& path, FavTreeNode* parent = nullptr, int insertAt = -1);
 
   QString filePath(const QModelIndex& parentIndex) const;
 
@@ -38,7 +39,7 @@ class FavoritesTreeModel : public QAbstractTreeModelPub<FavTreeNode> {
  private:
   int handleExternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent);
   int handleInternalDrop(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent);
-
+  bool isFolderAccessable(const QModelIndex& index) const;
   // "NFLF" = "Navigation Favorites Links File"
 
   QString GetBelongToName() const { return m_belongToName; }

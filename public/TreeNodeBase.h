@@ -51,6 +51,17 @@ public:
     }
     return child;
   }
+  Derived* insertRow(Derived* child, int insertAt = -1) { // -1 also means after end
+    if (child) {
+      if (insertAt < 0 || insertAt > childs.size()) {
+        childs.append(child);
+      } else {
+        childs.insert(insertAt, child);
+      }
+      child->pParent = derived();
+    }
+    return child;
+  }
   Derived* takeRow(int row) {
     if (0 <= row && row < childsCount()) {
       return childs.takeAt(row);

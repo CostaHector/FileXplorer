@@ -380,15 +380,15 @@ class FavoritesTreeViewTest : public PlainTestSuite {
       urlsMimeData.setText("2 urls");
       QList<QUrl> urlsList{QUrl::fromLocalFile(__FILE__), QUrl::fromLocalFile(__FILE__)};
       urlsMimeData.setUrls(urlsList);
-      QDragEnterEvent dragEnter{dragEnterPos, Qt::CopyAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier};
+      QDragEnterEvent dragEnter{dragEnterPos, Qt::LinkAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier};
       pView->dragEnterEvent(&dragEnter);
       QCOMPARE(dragEnter.isAccepted(), true);
 
-      QDragMoveEvent dragMove{dragEnterPos, Qt::CopyAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier};
+      QDragMoveEvent dragMove{dragEnterPos, Qt::LinkAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier};
       pView->dragMoveEvent(&dragMove);
       QCOMPARE(dragMove.isAccepted(), true);
 
-      QDropEvent dropInto(dragEnterPos, Qt::CopyAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+      QDropEvent dropInto(dragEnterPos, Qt::LinkAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
       pView->dropEvent(&dropInto);
       QCOMPARE(dropInto.isAccepted(), true);
     }
@@ -400,15 +400,15 @@ class FavoritesTreeViewTest : public PlainTestSuite {
       QMimeData* internalMimeData = pView->mFavModel->mimeData({srcIndex});
       QVERIFY(internalMimeData != nullptr);
 
-      QDragEnterEvent dragEnter{dropPos, Qt::MoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier};
+      QDragEnterEvent dragEnter{dropPos, Qt::TargetMoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier};
       pView->dragEnterEvent(&dragEnter);
       QCOMPARE(dragEnter.isAccepted(), true);
 
-      QDragMoveEvent dragMove{dropPos, Qt::MoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier};
+      QDragMoveEvent dragMove{dropPos, Qt::TargetMoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier};
       pView->dragMoveEvent(&dragMove);
       QCOMPARE(dragMove.isAccepted(), true);
 
-      QDropEvent dropInto(dropPos, Qt::MoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier);
+      QDropEvent dropInto(dropPos, Qt::TargetMoveAction, internalMimeData, Qt::LeftButton, Qt::NoModifier);
       pView->dropEvent(&dropInto);
       QCOMPARE(dropInto.isAccepted(), true);
     }
