@@ -1,9 +1,9 @@
 #include "FavoritesTreeModel.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "PublicVariable.h"
 #include "PathTool.h"
 #include "SystemPath.h"
+#include "ViewHelper.h"
 #include <QMimeData>
 #include <QUrl>
 #include <QFileInfo>
@@ -115,19 +115,19 @@ Qt::ItemFlags FavoritesTreeModel::flags(const QModelIndex& index) const {
     return Qt::ItemIsDropEnabled;
   }
   // group: drag and drop
-  if (isGroup(index)) {
+  if (isGroup(index) || isFolderAccessable(index)) {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
   }
-  // nongroup, drag only
+  // nongroup and non folder, drag only
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 }
 
 Qt::DropActions FavoritesTreeModel::supportedDropActions() const {
-  return Qt::MoveAction | Qt::CopyAction;
+  return Qt::MoveAction | Qt::LinkAction | Qt::TargetMoveAction;
 }
 
 Qt::DropActions FavoritesTreeModel::supportedDragActions() const {
-  return Qt::MoveAction | Qt::CopyAction;
+  return Qt::MoveAction | Qt::LinkAction | Qt::TargetMoveAction;
 }
 
 QStringList FavoritesTreeModel::mimeTypes() const {
@@ -203,27 +203,45 @@ bool FavoritesTreeModel::canDropMimeData(const QMimeData* data, Qt::DropAction a
       return false;
     }
   }
-
   return true;
+}
+
+Qt::DropAction FavoritesTreeModel::GetDropAction(const QMimeData* data, const QModelIndex& hoverIndex) const {
+  if (data->hasUrls()) {
+    // 移动选中文件
+    if (isFolderAccessable(hoverIndex)) {
+      return Qt::DropAction::MoveAction;
+    }
+    // 创建链接
+    return Qt::DropAction::LinkAction;
+  } else if (data->hasFormat(MIME_TYPE)) {
+    // 排序
+    return Qt::DropAction::TargetMoveAction;
+  }
+  return Qt::DropAction::IgnoreAction;
 }
 
 // 处理拖放
 bool FavoritesTreeModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& dstParent) {
+  // row=-1: 拖动到dstParent项上
+  // row>0: 拖动到dstParent的子项之间
   if (action == Qt::IgnoreAction) {
     return true;
   }
   if (column > 0) {
     return false;
   }
-
-  if (data->hasFormat(MIME_TYPE)) {
-    // 处理自定义 MIME 类型（内部拖放）
-    return handleInternalDrop(data, action, row, column, dstParent) > 0;
-  } else if (data->hasUrls()) {
-    // 处理外部 URL 拖放（如资源管理器中的文件夹）
+  if (data->hasUrls()) {
+    // 移动选中文件: 处理外部 URL 拖放（如FileSystemmView/资源管理器中的文件夹）
+    if (row == -1 && isFolderAccessable(dstParent)) {
+      return ViewHelper::onDropMimeData(data, action, filePath(dstParent), FileStructurePolicy::FileStuctureModeE::PRESERVE);
+    }
+    // 创建链接
     return handleExternalDrop(data, action, row, column, dstParent) > 0;
+  } else if (data->hasFormat(MIME_TYPE)) {
+    // 排序: 处理自定义 MIME 类型（TreeView内部拖放以此进行排序）
+    return handleInternalDrop(data, action, row, column, dstParent) > 0;
   }
-
   return false;
 }
 
@@ -241,7 +259,11 @@ QString FavoritesTreeModel::filePath(const QModelIndex& parentIndex) const {
   return item->value().fullPath;
 }
 
-FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex) {
+bool FavoritesTreeModel::isFolderAccessable(const QModelIndex& index) const {
+  return QFileInfo{filePath(index)}.isDir();
+}
+
+FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, const QModelIndex& parentIndex, int insertAt) {
   FavTreeNode* parentItem = nullptr;
   if (parentIndex.isValid()) {
     parentItem = itemFromIndex(parentIndex);
@@ -250,10 +272,10 @@ FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& pat
       return nullptr;
     }
   }
-  return addPath(name, path, parentItem);
+  return addPath(name, path, parentItem, insertAt);
 }
 
-FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, FavTreeNode* parentItem) {
+FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& path, FavTreeNode* parentItem, int insertAt) {
   if (parentItem) {
     if (!parentItem->value().isGroup) {
       LOG_D("Cannot insert under non-group item");
@@ -265,7 +287,7 @@ FavTreeNode* FavoritesTreeModel::addPath(const QString& name, const QString& pat
   QModelIndex parentIndex = indexFromItem(parentItem);
   beginInsertRows(parentIndex, parentItem->rowCount(), parentItem->rowCount());
 
-  auto childNode = parentItem->appendRow(FavTreeNode::create(FavoriteItemData{name, path}));
+  auto childNode = parentItem->insertRow(FavTreeNode::create(FavoriteItemData{name, path}), insertAt);
   endInsertRows();
   setDirty();
   return childNode;
@@ -303,7 +325,7 @@ int FavoritesTreeModel::handleExternalDrop(const QMimeData* data, Qt::DropAction
       fullPath = fi.absolutePath();
     }
     const QString nameTextShown{PathTool::GetBaseName(fullPath)};
-    FavTreeNode* addedItem = addPath(nameTextShown, fullPath, dstParent);
+    FavTreeNode* addedItem = addPath(nameTextShown, fullPath, dstParent, row);
     if (addedItem != nullptr) {
       addedCount++;
     }

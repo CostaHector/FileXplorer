@@ -22,4 +22,6 @@ constexpr FileStuctureModeE DEFAULT_FILE_STRUCTURE_MODE = FileStuctureModeE::QUE
 
 }  // namespace FileStructurePolicy
 
+#undef FILE_STRUCTURE_MODE_FIELD_MAPPING
+
 #endif  // FILESTRUCTUREPOLICY_H

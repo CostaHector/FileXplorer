@@ -194,6 +194,9 @@ bool CustomTableView::ShowOrHideColumnCore() {
     return false;
   }
   for (int c = 0; c < tableColumnsCount; ++c) {
+    if (isColumnHidden(c) == (switches[c] == '0')) {
+      continue;
+    }
     setColumnHidden(c, switches[c] == '0');
   }
   return true;

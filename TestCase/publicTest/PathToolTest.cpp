@@ -139,6 +139,18 @@ private slots:
     QCOMPARE(rels, expectRels);
   }
 
+  void test_GetLAndRels_1_path_1_1level() {
+    const QStringList paths{"E:/12"};
+    const QString expectCommonPrepath = "E:";
+    const QStringList expectRels{"12"};
+
+    QString prepath;
+    QStringList rels;
+    std::tie(prepath, rels) = GetLAndRels(paths);
+    QCOMPARE(prepath, expectCommonPrepath);
+    QCOMPARE(rels, expectRels);
+  }
+
   void test_GetLAndRels_BuiltInFileSystem_SelectionPath() {
     const QStringList paths{"E:/115/0303/12", "E:/115/0303/12.txt", "E:/115/0303/34.txt"};
     const QString expectCommonPrepath = "E:/115/0303";

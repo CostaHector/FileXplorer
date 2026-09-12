@@ -109,9 +109,9 @@ inline bool IsAllAscii(const QString& path) {
 int VideoDurationGetter::GetLengthQuick(const QString& vidPath) const {
 #ifdef _WIN32
   // Windows and all ascii. use mediainfo, otherwise use ffmpeg
-  if (IsAllAscii(vidPath)) {
+  if (IsAllAscii(vidPath) && !vidPath.endsWith("flv", Qt::CaseInsensitive)) {
     static auto& inst = QMediaInfo::GetInst();
-    return inst.DurationLengthQuick(vidPath);
+    int dur = inst.DurationLengthQuick(vidPath);
   }
 #endif
   return ReadAVideoByFFmpeg(vidPath);

@@ -40,7 +40,7 @@ bool onMouseSidekeyBackwardForward(Qt::KeyboardModifiers mods, Qt::MouseButton m
   return false;
 }
 
-bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest) {
+bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QString& dest, const FileStructurePolicy::FileStuctureModeE mode) {
   CHECK_NULLPTR_RETURN_FALSE(data);
   if (!data->hasUrls()) {
     return true;
@@ -48,7 +48,7 @@ bool onDropMimeData(const QMimeData* data, const Qt::DropAction action, const QS
   const QList<QUrl>& urls = data->urls();
   LOG_W("DropAction[%d] %d item(s) will be dropped in path[%s].", action, urls.size(), qPrintable(dest));
   using namespace ComplexOperation;
-  int ret = DoDropAction(action, urls, dest, ComplexOperation::FileStuctureModeE::PRESERVE);
+  int ret = DoDropAction(action, urls, dest, mode);
   if (ret < 0) {
     LOG_WARN_NP("[Failed] Drop into partial", dest);
     return false;
@@ -129,7 +129,7 @@ void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* 
   }
   changeDropAction(event);
   const QString dropToDestPath{ind.isValid() ? m_fsm->filePath(ind) : m_fsm->rootPath()};
-  onDropMimeData(event->mimeData(), event->dropAction(), dropToDestPath);
+  onDropMimeData(event->mimeData(), event->dropAction(), dropToDestPath, FileStructurePolicy::FileStuctureModeE::PRESERVE);
   LOG_D("DropEvent[%d] finished with %d url(s)", event->dropAction(), event->mimeData()->urls().size());
   event->accept();
 }

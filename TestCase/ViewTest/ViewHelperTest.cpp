@@ -49,17 +49,17 @@ class ViewHelperTest : public PlainTestSuite {
 
   void onDropMimeData_ok() {
     // nullptr
-    QCOMPARE(ViewHelper::onDropMimeData(nullptr, Qt::DropAction::CopyAction, "path/to/destPath"), false);
+    QCOMPARE(ViewHelper::onDropMimeData(nullptr, Qt::DropAction::CopyAction, "path/to/destPath", FileStructurePolicy::FileStuctureModeE::PRESERVE), false);
 
     // no urls
     QMimeData noUrlMimedata;
     QCOMPARE(noUrlMimedata.hasUrls(), false);
-    QCOMPARE(ViewHelper::onDropMimeData(&noUrlMimedata, Qt::DropAction::CopyAction, "path/to/destPath"), true);
+    QCOMPARE(ViewHelper::onDropMimeData(&noUrlMimedata, Qt::DropAction::CopyAction, "path/to/destPath", FileStructurePolicy::FileStuctureModeE::PRESERVE), true);
 
     // dest path inexist, copy failed
     QMimeData urlMimedata;
     urlMimedata.setUrls({QUrl::fromLocalFile(__FILE__)});
-    QCOMPARE(ViewHelper::onDropMimeData(&urlMimedata, Qt::DropAction::CopyAction, "path/to/destPath"), false);
+    QCOMPARE(ViewHelper::onDropMimeData(&urlMimedata, Qt::DropAction::CopyAction, "path/to/destPath", FileStructurePolicy::FileStuctureModeE::PRESERVE), false);
   }
 };
 

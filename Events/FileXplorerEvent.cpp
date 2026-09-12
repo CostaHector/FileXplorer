@@ -16,6 +16,7 @@
 #include "PropertiesWindow.h"
 #include "DuplicatesImagesFinder.h"
 #include "ViewsStackedWidget.h"
+#include "ViewHelper.h"
 #include "RenameWidget_LongPath.h"
 #include "RenameWidget_ArrangeSection.h"
 #include "RenameWidget_ConsecutiveFileNo.h"
@@ -1167,18 +1168,13 @@ bool FileXplorerEvent::on_Paste() {
       return true;
     }
   }
-  Qt::DropAction dropAction = GetCutCopyModeFromNativeMimeData(*pMimeData);
-  int ret = DoDropAction(dropAction, pMimeData->urls(), rTo, fileStructMode);
-  if (ret < 0) {
-    LOG_ERR_NP("Paste operation partially failed", rTo);
-    return false;
-  }
-  LOG_OK_NP("Paste operation all succeed", rTo);
+  const Qt::DropAction dropAction = GetCutCopyModeFromNativeMimeData(*pMimeData);
+  const bool dropRet = ViewHelper::onDropMimeData(pMimeData, dropAction, rTo, fileStructMode);
   _fileSysModel->ClearCopyAndCutDict();
   if (_contentPane->m_searchSrcModel != nullptr) {
     _contentPane->m_searchSrcModel->ClearCopyAndCutDict();
   }
-  return true;
+  return dropRet;
 }
 
 bool FileXplorerEvent::on_NameStandardize() {

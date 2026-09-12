@@ -203,7 +203,7 @@ void AddressELineEdit::dropEvent(QDropEvent* event) {
   ViewHelper::changeDropAction(event);
   const QString& to = pathFromCursorAction(m_pathActionsTB->actionAt(event->pos()));
   LOG_D("Drop items to path[%s]", qPrintable(to));
-  ViewHelper::onDropMimeData(event->mimeData(), event->dropAction(), to);
+  ViewHelper::onDropMimeData(event->mimeData(), event->dropAction(), to, FileStructurePolicy::FileStuctureModeE::PRESERVE);
   event->accept();
 }
 

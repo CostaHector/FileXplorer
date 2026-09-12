@@ -232,12 +232,34 @@ bool FavoritesTreeView::isNoSelectionOrExactlyOneGroup(QModelIndex* grpOrRootSrc
   return isExactlyOneGroupSelected(grpOrRootSrcIndex);
 }
 
+bool updateDropAction(QDropEvent& event, Qt::DropAction oldDropAction) {
+  // return true when need further process
+  switch (event.dropAction()) {
+    case Qt::DropAction::CopyAction:
+    case Qt::DropAction::MoveAction:
+    case Qt::DropAction::LinkAction:
+    case Qt::DropAction::TargetMoveAction:
+      event.setDropAction(oldDropAction);
+      return true;
+    default:
+      event.setDropAction(Qt::DropAction::IgnoreAction);
+      return false;
+  }
+}
+
 void FavoritesTreeView::dragEnterEvent(QDragEnterEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   const QMimeData* mimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(mimeData);
-  if (mimeData->hasFormat(FavoritesTreeModel::MIME_TYPE) || mimeData->hasUrls()) {
-    event->acceptProposedAction();
+  QModelIndex proxyIndex = indexAt(event->pos());
+  QModelIndex srcIndex = mFavProxyModel->mapToSource(proxyIndex);
+  if (!mFavModel->canDropOn(srcIndex)) {
+    event->ignore();
+    return;
+  }
+  Qt::DropAction oldDropAction = mFavModel->GetDropAction(mimeData, srcIndex);
+  if (updateDropAction(*event, oldDropAction)) {
+    event->accept();
     return;
   }
   QTreeView::dragEnterEvent(event);
@@ -247,14 +269,15 @@ void FavoritesTreeView::dragMoveEvent(QDragMoveEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   const QMimeData* mimeData = event->mimeData();
   CHECK_NULLPTR_RETURN_VOID(mimeData);
-  if (mimeData->hasFormat(FavoritesTreeModel::MIME_TYPE) || mimeData->hasUrls()) {
-    QModelIndex proxyIndex = indexAt(event->pos());
-    QModelIndex srcIndex = mFavProxyModel->mapToSource(proxyIndex);
-    if (mFavModel->canDropOn(srcIndex)) {
-      event->acceptProposedAction();
-    } else {
-      event->ignore();
-    }
+  QModelIndex proxyIndex = indexAt(event->pos());
+  QModelIndex srcIndex = mFavProxyModel->mapToSource(proxyIndex);
+  if (!mFavModel->canDropOn(srcIndex)) {
+    event->ignore();
+    return;
+  }
+  Qt::DropAction oldDropAction = mFavModel->GetDropAction(mimeData, srcIndex);
+  if (updateDropAction(*event, oldDropAction)) {
+    event->accept();
     return;
   }
   QTreeView::dragMoveEvent(event);
@@ -262,5 +285,15 @@ void FavoritesTreeView::dragMoveEvent(QDragMoveEvent* event) {
 
 void FavoritesTreeView::dropEvent(QDropEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
+  const QMimeData* mimeData = event->mimeData();
+  CHECK_NULLPTR_RETURN_VOID(mimeData);
+  QModelIndex proxyIndex = indexAt(event->pos());
+  QModelIndex srcIndex = mFavProxyModel->mapToSource(proxyIndex);
+  if (!mFavModel->canDropOn(srcIndex)) {
+    event->ignore();
+    return;
+  }
+  Qt::DropAction oldDropAction = mFavModel->GetDropAction(mimeData, srcIndex);
+  updateDropAction(*event, oldDropAction);
   QTreeView::dropEvent(event);
 }

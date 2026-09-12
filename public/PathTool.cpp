@@ -290,7 +290,13 @@ QStringList GetRels(int prefixLen, const QStringList& lAbsPathList) {
 
 std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList) {
   if (lAbsPathList.isEmpty()) {
-    return {"", lAbsPathList};
+    return {"", QStringList{}};
+  }
+  // "E:/a.txt" => {"E:", "a.txt"}
+  if (lAbsPathList.size() == 1) {
+    QString prePath;
+    QString fileName = PathTool::GetPrepathAndFileName(lAbsPathList.front(), prePath);
+    return {prePath, QStringList{fileName}};
   }
   const QString& prefixPath = longestCommonPrefix(lAbsPathList);
   // "/home/rel2entry" => rel2EntryN = 5+1
