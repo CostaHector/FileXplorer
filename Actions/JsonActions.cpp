@@ -15,6 +15,10 @@ JsonActions::JsonActions(QObject* parent) //
   _SYNC_NAME_FIELD_BY_FILENAME->setToolTip(
       QString("<b>%1 (%2)</b><br/>Sync Name Field from json file base name.") //
           .arg(_SYNC_NAME_FIELD_BY_FILENAME->text(), _SYNC_NAME_FIELD_BY_FILENAME->shortcut().toString()));
+  _SYNC_FILENAME_BY_NAME_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/FILENAME_FROM_JSON_NAME"), tr("Sync File Name"));
+  _SYNC_FILENAME_BY_NAME_FIELD->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Sync json related files name from Name Field.") //
+          .arg(_SYNC_FILENAME_BY_NAME_FIELD->text(), _SYNC_FILENAME_BY_NAME_FIELD->shortcut().toString()));
 
   _RELOAD_JSON_FROM_FROM_DISK = new (std::nothrow) QAction(QIcon(":/JsonEditor/RELOAD_FROM_DISK"), tr("Reload from disk"), this);
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
@@ -45,6 +49,11 @@ JsonActions::JsonActions(QObject* parent) //
   _INIT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST"), tr("Init Cast/Studio"), this);
   _INIT_STUDIO_CAST_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/>Init Cast/Studio Fields if empty.") //
                                     .arg(_INIT_STUDIO_CAST_FIELD->text(), _INIT_STUDIO_CAST_FIELD->shortcut().toString()));
+  _INFER_BASENAME = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Name Hint"), this);
+  _INFER_BASENAME->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
+  _INFER_BASENAME->setToolTip(QString("<b>%1 (%2)</b><br/> Give you Name hint append with cast") //
+                                     .arg(_INFER_BASENAME->text(), _INFER_BASENAME->shortcut().toString()));
+
   _INFER_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Cast/Studio Hint"), this);
   _INFER_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
   _INFER_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint") //

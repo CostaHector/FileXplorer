@@ -80,6 +80,7 @@ bool JsonPr::WriteIntoFiles() const {
   const QByteArray& ba{GetJsonBA()};
   bool writeResult{FileTool::ByteArrayTextWriter(jsonPath, ba)};
   if (writeResult) {
+    hintBaseName.clear();
     hintCast.clear();
     hintStudio.clear();
     bModified = false;
@@ -275,6 +276,17 @@ bool JsonPr::SetCastOrTags(const QString& val, JsonModelField::FIELD_OP_TYPE fie
   return true;
 }
 
+bool JsonPr::HintBaseName() const {
+  // return true when hint is necessary
+  const QStringList& castLst = m_Cast.toSortedList();
+  hintBaseName = NameTool::ComposeNameWithinLimit(m_Name, castLst, 999);
+  if (hintBaseName == m_Name) {
+    hintBaseName.clear();
+    return false;
+  }
+  return true;
+}
+
 void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const {
   static StudiosManager& studioMgr = StudiosManager::getInst();
   hintStudio = studioMgr(m_Name);
@@ -305,6 +317,10 @@ void JsonPr::HintForCastStudio(const QString& selectedText, bool& studioChanged,
     castChanged = false;
     hintCast.clear();
   }
+}
+
+void JsonPr::RejectBaseNameHint() {
+  hintBaseName.clear();
 }
 
 void JsonPr::RejectCastHint() {

@@ -26,12 +26,14 @@ class JsonTableModel : public QAbstractTableModelPub {
   QString absolutePath(const QModelIndex& index) const;
   QString fullInfo(const QModelIndex& index) const;
   QStringList RelativePath2JsonFile(const QModelIndexList& indexes) const;
-  QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes) const;
+  QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes, QMap<QString, QString>* pFile2Json=nullptr) const;
+  QMap<QString, QStringList> RelativePath2JsonFile2CastList(const QModelIndexList& indexes) const;
 
   int SetStudio(const QModelIndexList& rowIndexes, const QString& studio);
   int SetCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);
   int AddCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);
   int RmvCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& oneElement);
+  int HintBaseName(const QModelIndexList& rowIndexes);
   int InitCastAndStudio(const QModelIndexList& rowIndexes);
   int HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence);
   int FormatCast(const QModelIndexList& rowIndexes);

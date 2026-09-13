@@ -17,7 +17,7 @@ public:
   QAction* _SAVE_CURRENT_CHANGES{nullptr};
 
   // **Sync cache/file system**
-  QAction* _SYNC_NAME_FIELD_BY_FILENAME{nullptr};
+  QAction* _SYNC_NAME_FIELD_BY_FILENAME{nullptr}, *_SYNC_FILENAME_BY_NAME_FIELD{nullptr};
   QAction* _RELOAD_JSON_FROM_FROM_DISK{nullptr};
   QAction* _EXPORT_CAST_STUDIO_TO_DICTION{nullptr};
 
@@ -27,6 +27,7 @@ public:
 
   // **Studio/Cast/Tags Field Operation**
   QAction* _INIT_STUDIO_CAST_FIELD{nullptr};
+  QAction* _INFER_BASENAME{nullptr};
   QAction* _INFER_CAST_STUDIO{nullptr};
   QAction* _FORMAT_STUDIO_CAST_FIELD{nullptr};
   QAction* _SET_CONTENTS_FIXED{nullptr};

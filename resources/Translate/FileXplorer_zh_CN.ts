@@ -476,7 +476,7 @@
 <context>
     <name>FavoritesTreeModel</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+276"/>
+        <location filename="../../Component/Navigation/FavoritesTreeModel.cpp" line="+298"/>
         <source>Work</source>
         <translation>工作</translation>
     </message>
@@ -1095,6 +1095,11 @@
         <translation>更新Name字段</translation>
     </message>
     <message>
+        <location line="+4"/>
+        <source>Sync File Name</source>
+        <translation>更新相关文件名</translation>
+    </message>
+    <message>
         <location line="+5"/>
         <source>Reload from disk</source>
         <translation>从磁盘重新加载</translation>
@@ -1116,7 +1121,12 @@
         <translation>小写</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+10"/>
+        <source>Name Hint</source>
+        <translation>推断名称</translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -1186,12 +1196,12 @@
         <translation>更新大小字段</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-31"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+42"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -1809,12 +1819,12 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RateActions</name>
     <message>
-        <location filename="../../Actions/RateActions.cpp" line="+31"/>
+        <location filename="../../Actions/RateActions.cpp" line="+28"/>
         <source> score</source>
         <translation> 分</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Rate All (Recursive)</source>
         <translation>​递归评分（仅未评分）</translation>
     </message>
@@ -1846,7 +1856,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+10"/>
-        <location line="+28"/>
+        <location line="+16"/>
         <source>Rate</source>
         <translation>评分</translation>
     </message>
@@ -2019,6 +2029,14 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
 </context>
 <context>
+    <name>RenameWidget_CastElider</name>
+    <message>
+        <location filename="../../Component/RenameWidgets/RenameWidget_CastElider.cpp" line="+24"/>
+        <source>Json file basename MAX length:</source>
+        <translation>Json文件基础名最大长度</translation>
+    </message>
+</context>
+<context>
     <name>RenameWidget_ConsecutiveFileNo</name>
     <message>
         <location filename="../../Component/RenameWidgets/RenameWidget_ConsecutiveFileNo.cpp" line="+44"/>
@@ -2055,7 +2073,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RenameWidget_LongPath</name>
     <message>
-        <location filename="../../Component/RenameWidgets/RenameWidget_LongPath.cpp" line="+13"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_LongPath.cpp" line="+9"/>
         <source>Drop Section:</source>
         <translation>丢弃段号:</translation>
     </message>
@@ -2122,7 +2140,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonJson</name>
     <message>
-        <location filename="../../Component/RibbonJson.cpp" line="+60"/>
+        <location filename="../../Component/RibbonJson.cpp" line="+69"/>
         <source>Studio</source>
         <translation>厂商</translation>
     </message>
@@ -2279,7 +2297,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+49"/>
+        <location filename="../../View/SceneListView.cpp" line="+44"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -2287,7 +2305,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../../Component/ScenePageControl.cpp" line="+11"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+28"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>

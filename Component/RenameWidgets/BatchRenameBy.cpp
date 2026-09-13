@@ -21,7 +21,7 @@ Return:
         "pattern/Jensen Ackles.mp4",        //
         "pattern/Jensen Ackles.pson",       //
 */
-QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames) {
+QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames, QMap<QString, QString>* pFile2Json) {
   QStringList filesNeedRename;
   QString relPath;
   QString jsonFileName;
@@ -78,14 +78,17 @@ QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonName
       const QString extraContent = fileBaseName.mid(jsonBaseName.size());
       if (extraContent.isEmpty()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
         continue;
       }
       if (extraContent == PathTool::THUMBNAIL_FILE_ABBR) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
         continue;
       }
       if (JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
         continue;
       }
     }

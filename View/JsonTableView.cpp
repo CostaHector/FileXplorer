@@ -8,6 +8,7 @@
 #include "ViewHelper.h"
 #include "TagsHelper.h"
 #include "PathTool.h"
+#include "RenameWidget_CastElider.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -165,6 +166,19 @@ int JsonTableView::onSetStudio() {
   const int cnt = _JsonModel->SetStudio(indexes, studio);
 
   LOG_OK_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
+  return indexes.size();
+}
+
+int JsonTableView::onHintBaseName() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip hint base name");
+    return 0;
+  }
+
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const int cnt = _JsonModel->HintBaseName(indexes);
+
+  LOG_OK_P("Base name has been hint", "%d/%d row(s)", cnt, indexes.size());
   return indexes.size();
 }
 
@@ -513,6 +527,29 @@ int JsonTableView::onCheckSampleMD5AndVidNameConsistency() const {
   return inconsistentCount;
 }
 
+int JsonTableView::onSyncRelatedFileNameByNameFields() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "skip hint base name");
+    return 0;
+  }
+  const QModelIndexList& srcIndexes = selectedRowsSource(JsonModelField::Name);
+  QMap<QString, QString> relatedFile2Json;
+  const QStringList relNames = _JsonModel->RelativePath2RelatedFiles(srcIndexes, &relatedFile2Json);
+  const QString currentPath = _JsonModel->rootPath();
+  QMap<QString, QStringList> relativeJson2Cast = _JsonModel->RelativePath2JsonFile2CastList(srcIndexes);
+  RenameWidget_CastElider pCastElider{this};
+  pCastElider.init();
+  pCastElider.setModal(true);
+  pCastElider.initCoreName2CastListMap(relativeJson2Cast);
+  pCastElider.initRelatedFile2Json(relatedFile2Json);
+  pCastElider.InitTextEditContent(currentPath, relNames);
+  // AfterJsonFilesNameRenamed
+  if (pCastElider.exec() != QDialog::Accepted) {
+    LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", relNames.size());
+  }
+  return 0;
+}
+
 void JsonTableView::subscribe() {
   addActions(g_renameAg().GetGeneralRenameActions());
 
@@ -526,6 +563,9 @@ void JsonTableView::subscribe() {
 
   connect(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, [this]() { onSelectionCaseOperation(true); });
   connect(inst._LOWER_ALL_WORDS, &QAction::triggered, this, [this]() { onSelectionCaseOperation(false); });
+
+  connect(inst._INFER_BASENAME, &QAction::triggered, this, &JsonTableView::onHintBaseName);
+  connect(inst._SYNC_FILENAME_BY_NAME_FIELD, &QAction::triggered, this, &JsonTableView::onSyncRelatedFileNameByNameFields);
 
   connect(inst._INFER_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
   connect(inst._FORMAT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onFormatCast);

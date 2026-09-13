@@ -21,6 +21,7 @@ class JsonTableView : public CustomTableView {
   int onSyncNameField();
   int onExportCastStudioToDictonary();
   int onSetStudio();
+  int onHintBaseName();
   int onInitCastAndStudio();
   int onHintCastAndStudio();
   int onFormatCast();
@@ -34,6 +35,7 @@ class JsonTableView : public CustomTableView {
   int onAppendFromSelection(bool isUpperCaseSentence);
   int onSelectionCaseOperation(bool isTitle);
   int onCheckSampleMD5AndVidNameConsistency() const;
+  int onSyncRelatedFileNameByNameFields();
 
   enum class EDITOR_WIDGET_TYPE {
     LINE_EDIT = 0,

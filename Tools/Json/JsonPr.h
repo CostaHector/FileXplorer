@@ -32,6 +32,7 @@ struct JsonPr {
 #undef JSON_KEY_ITEM
 
   QString jsonFileName;
+  mutable QString hintBaseName;
   mutable QString hintCast;
   mutable QString hintStudio;
   mutable bool bModified{false};
@@ -53,8 +54,10 @@ struct JsonPr {
   bool ClearCastStudioValue();      // clear cast/studio
   bool SetStudio(const QString& studio);
   bool SetCastOrTags(const QString& val, JsonModelField::FIELD_OP_TYPE fieldType, JsonModelField::FIELD_OP_MODE fieldMode);
+  bool HintBaseName() const;
   void HintForCastStudio(const QString& selectedText, bool& studioChanged, bool& castChanged) const;
 
+  void RejectBaseNameHint();
   void RejectCastHint();
   void RejectStudioHint();
 

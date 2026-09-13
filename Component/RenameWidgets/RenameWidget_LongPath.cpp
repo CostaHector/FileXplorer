@@ -3,10 +3,6 @@
 #include "FileOsWalker.h"
 #include <QLabel>
 
-RenameWidget_LongPath::RenameWidget_LongPath(QWidget* parent)  //
-  : AdvanceRenamer{parent}                                   //
-{ }
-
 QToolBar* RenameWidget_LongPath::InitControlTB() {
   auto* chopSectionTb = new (std::nothrow) QToolBar{"Drop Control Toolbar", this};
   CHECK_NULLPTR_RETURN_NULLPTR(chopSectionTb);

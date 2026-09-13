@@ -64,7 +64,17 @@ class BatchRenameByTest : public PlainTestSuite {
   void GetFilesNeedProcess_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     QStringList patterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns)};
+    QMap<QString, QString> file2Json;
+    QMap<QString, QString> expectFile2Json {
+      {"Chris Evans 2.png", "Chris Evans.json"},
+      {"Chris Evans.jpg", "Chris Evans.json"},
+      {"Chris Evans.json", "Chris Evans.json"},
+      {"Chris Evans_tn.jpg", "Chris Evans.json"},
+      {"Jensen Ackles.mp4", "Jensen Ackles.mp4"},
+      {"Jensen Ackles.pson", "Jensen Ackles.mp4"},
+      {"Michael Fassbender.json", "Michael Fassbender.json"},
+    };
+    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Json)};
     const QStringList beforeSelectedNames{
         "Chris Evans 2.png",        //
         "Chris Evans.jpg",          //
@@ -75,6 +85,7 @@ class BatchRenameByTest : public PlainTestSuite {
         "Michael Fassbender.json",  //
     };
     QCOMPARE(beforeSelectedNames, filesNeedRename);
+    QCOMPARE(expectFile2Json, file2Json);
   }
 
   void GetFilesNeedRename_subdirectory_ok() {

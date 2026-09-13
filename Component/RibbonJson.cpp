@@ -42,6 +42,15 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   mInitFormatStudioCastField->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(mInitFormatStudioCastField->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  mInferNameTb = new (std::nothrow) QToolBar{"Hint/Sync Names", this};
+  CHECK_NULLPTR_RETURN_VOID(mInferNameTb);
+  mInferNameTb->addAction(inst._INFER_BASENAME);
+  mInferNameTb->addAction(inst._SYNC_FILENAME_BY_NAME_FIELD);
+  mInferNameTb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+  mInferNameTb->setOrientation(Qt::Orientation::Vertical);
+  mInferNameTb->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  SetLayoutAlightment(mInferNameTb->layout(), Qt::AlignmentFlag::AlignLeft);
+
   mInferStudioCastFromSelection = new (std::nothrow) QToolBar{"Infer studio/cast", this};
   CHECK_NULLPTR_RETURN_VOID(mInferStudioCastFromSelection);
   mInferStudioCastFromSelection->addAction(inst._INFER_CAST_STUDIO);
@@ -93,6 +102,7 @@ RibbonJson::RibbonJson(const QString& title, QWidget* parent) //
   addWidget(mFieldCaseOperTb);
   addSeparator();
   addWidget(mInitFormatStudioCastField);
+  addWidget(mInferNameTb);
   addWidget(mInferStudioCastFromSelection);
   addSeparator();
   addWidget(mStudioMenu);

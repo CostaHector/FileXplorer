@@ -232,6 +232,23 @@ class NameToolTest : public PlainTestSuite {
     QCOMPARE(te.textCursor().selectedText(), QString{"Hello"} + NEW_LINE_UNICODE + " World");
   }
 
+  void ComposeNameWithinLimit_ok() {
+    // skip if coreName contains ", etc"
+    QCOMPARE(NameTool::ComposeNameWithinLimit("Marvel - Chris Evans, etc", QStringList{"Chris Evans","Chris Hemsworth"}, 100),
+             "Marvel - Chris Evans, etc");
+
+    // skip if coreName contains all actors in castList
+    QCOMPARE(NameTool::ComposeNameWithinLimit("Marvel - Chris Evans, Chris Hemsworth", QStringList{"Chris Evans","Chris Hemsworth"}, 100),
+             "Marvel - Chris Evans, Chris Hemsworth");
+
+    // max json baseName length long enough
+    QCOMPARE(NameTool::ComposeNameWithinLimit("Marvel", QStringList{"Chris Evans","Chris Hemsworth"}, 100),
+             "Marvel - Chris Evans, Chris Hemsworth");
+
+    // max json baseName length not long enough
+    QCOMPARE(NameTool::ComposeNameWithinLimit("Marvel", QStringList{"Chris Evans","Chris Hemsworth"}, 30),
+             "Marvel - Chris Evans, etc");
+  }
  private:
   NameTool m_nameTool;
 };
