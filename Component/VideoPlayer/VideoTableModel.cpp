@@ -163,29 +163,31 @@ int VideoTableModel::updateDurationFields(const QModelIndexList& indexes) {
   }
   int minRow{INT_MAX}, maxRow{-1};
   int affectedRows{0};
-
-  VideoDurationGetter mi;
-  if (!mi.StartToGet()) {
-    return -1;
-  }
   for (const QModelIndex& ind : indexes) {
     const int row = ind.row();
     if (row < 0 || row >= rowCount()) {
       LOG_W("row[%d] out of range", row);
       continue;
     }
+    VideoBasicInfo& item = mVideosInfo[row];
+    if (item.duration > 0) {
+      continue;
+    }
+    const QString& mediaFullPath = GetMediaFullPath(ind);
+    const int newDuration = VideoDurationGetter::GetDurationFromJsonFirst(mediaFullPath);
+    if (newDuration <= 0 || item.duration == newDuration) {
+      continue;
+    }
+    item.duration = newDuration;
+    ++affectedRows;
     if (row > maxRow) {
       maxRow = row;
     }
     if (row < minRow) {
       minRow = row;
     }
-    auto& item = mVideosInfo[ind.row()];
-    const QString& mediaFullPath = GetMediaFullPath(ind);
-    item.duration = mi.GetLengthQuick(mediaFullPath);
-    ++affectedRows;
   }
-  if (maxRow < 0 || minRow > maxRow) {
+  if (!(0 <= minRow && minRow <= maxRow)) {
     return 0;
   }
   const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::DURATION_FIELD, {});
@@ -221,7 +223,7 @@ int VideoTableModel::rateSelectedMovies(const QModelIndexList& indexes, int newR
       minRow = row;
     }
   }
-  if (maxRow < 0 || minRow > maxRow) {
+  if (!(0 <= minRow && minRow <= maxRow)) {
     return 0;
   }
   const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::SCORE_FIELD, {});
@@ -258,7 +260,7 @@ int VideoTableModel::adjustRateSelectedMovies(const QModelIndexList& indexes, in
       minRow = row;
     }
   }
-  if (maxRow < 0 || minRow > maxRow) {
+  if (!(0 <= minRow && minRow <= maxRow)) {
     return 0;
   }
   const QModelIndex& frontInd = sibling(minRow, VideoBasicInfo::SCORE_FIELD, {});

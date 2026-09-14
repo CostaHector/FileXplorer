@@ -170,7 +170,9 @@ void VideoTableView::PlayNextVideo() {
 
 void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   const QModelIndex srcIndex = mProxyModel->mapToSource(proIndex);
-  mVideoModel->updateDurationFields({srcIndex});
+  if (bPlayInstantly) {
+    mVideoModel->updateDurationFields({srcIndex});
+  }
   const QString& mediaFullPath = mVideoModel->GetMediaFullPath(srcIndex);
   emit reqPlayMedia(mediaFullPath, bPlayInstantly);
 }
