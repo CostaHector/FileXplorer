@@ -101,7 +101,7 @@ int CastDBView::onAppendCasts() {
     LOG_ERR_NP("Table dirty", "submit before load from file-system structure");
     return false;
   }
-  const QString exampleText = "Example:\n Guardiola, Pep\nHuge Jackman, Wolverine";
+  const QString exampleText = "Example:\n Guardiola, Pep\nHugh Jackman, Wolverine";
   bool ok = false;
   QString perfsText;
 #ifdef RUNNING_UNIT_TESTS

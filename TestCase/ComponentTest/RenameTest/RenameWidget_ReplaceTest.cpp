@@ -44,14 +44,14 @@ class RenameWidget_ReplaceTest : public PlainTestSuite {
 
     pReplace.InitTextEditContent(replacePath, selectFileNames);
     QCOMPARE(pReplace.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pReplace.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pReplace.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pReplace.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pReplace.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pReplace.m_relNameTE->toPlainText();
     const QString& sOldName = pReplace.m_oBaseTE->toPlainText();
     const QString& sOldExt = pReplace.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 
@@ -116,13 +116,13 @@ class RenameWidget_ReplaceTest : public PlainTestSuite {
 
     pDelete.InitTextEditContent(deletePath, selectFileNames);
     QCOMPARE(pDelete.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pDelete.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pDelete.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pDelete.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pDelete.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     const QString& sPathLeftNoRoot = pDelete.m_relNameTE->toPlainText();
     const QString& sOldName = pDelete.m_oBaseTE->toPlainText();
     const QString& sOldExt = pDelete.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 

@@ -60,14 +60,14 @@ class RenameWidget_NumerizeTest : public PlainTestSuite {
     QCOMPARE(pNumerize.GetSelectedFilesFullPath(), expectsFullNames);
 
     QCOMPARE(pNumerize.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pNumerize.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pNumerize.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pNumerize.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pNumerize.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pNumerize.m_relNameTE->toPlainText();
     const QString& sOldName = pNumerize.m_oBaseTE->toPlainText();
     const QString& sOldExt = pNumerize.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 

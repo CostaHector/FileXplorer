@@ -33,7 +33,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   int SetCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);
   int AddCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& sentence);
   int RmvCastOrTags(const QModelIndexList& rowIndexes, const JsonModelField::FIELD_E keyEnum, const QString& oneElement);
-  int HintBaseName(const QModelIndexList& rowIndexes);
+  int ComposeNameWithCast(const QModelIndexList& rowIndexes);
   int InitCastAndStudio(const QModelIndexList& rowIndexes);
   int HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence);
   int FormatCast(const QModelIndexList& rowIndexes);
@@ -58,6 +58,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   }
   static constexpr int DATA_TYPE_ROLE = Qt::UserRole + 1;
  private:
+  int setRootPathCore(QVector<JsonPr>& sortedAscendingCachedJsons);
   int JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, JsonModelField::FIELD_E field, const int ITERATE_FOLDER_FIRST_LIMIT=50);
   QHash<QString, QString> GetVidBaseName2FullPath() const;
   bool setModified(int row, bool modified);

@@ -8,7 +8,7 @@
 class RenameNamesUnique {
  public:
   RenameNamesUnique(const QString& pre,
-                    const QStringList& relNameList,
+                    const QStringList& relNameList, // e.g. "/" or "/pre/"
                     const QStringList& oldCompleteNameList,
                     const QStringList& oldSuffixList,
                     const QStringList& newCompleteNameList,

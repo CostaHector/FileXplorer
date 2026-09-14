@@ -11,14 +11,14 @@ JsonActions::JsonActions(QObject* parent) //
                                         .arg(_SAVE_CURRENT_CHANGES->text(), _SAVE_CURRENT_CHANGES->shortcut().toString()));//
 
   // **Sync cache/file system**
-  _SYNC_NAME_FIELD_BY_FILENAME = new (std::nothrow) QAction(QIcon(":/JsonEditor/NAME_FROM_JSON_FILENAME"), tr("Sync Json Name Value"));
-  _SYNC_NAME_FIELD_BY_FILENAME->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Sync Name Field from json file base name.") //
-          .arg(_SYNC_NAME_FIELD_BY_FILENAME->text(), _SYNC_NAME_FIELD_BY_FILENAME->shortcut().toString()));
-  _SYNC_FILENAME_BY_NAME_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/FILENAME_FROM_JSON_NAME"), tr("Sync File Name"));
-  _SYNC_FILENAME_BY_NAME_FIELD->setToolTip(
-      QString("<b>%1 (%2)</b><br/>Sync json related files name from Name Field.") //
-          .arg(_SYNC_FILENAME_BY_NAME_FIELD->text(), _SYNC_FILENAME_BY_NAME_FIELD->shortcut().toString()));
+  _SYNC_NAME_FIELD_FROM_FILENAME = new (std::nothrow) QAction(QIcon(":/JsonEditor/NAME_FROM_JSON_FILENAME"), tr("Set Name from File Name"));
+  _SYNC_NAME_FIELD_FROM_FILENAME->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Set the JSON \"Name\" field to this file's base name.")
+          .arg(_SYNC_NAME_FIELD_FROM_FILENAME->text(), _SYNC_NAME_FIELD_FROM_FILENAME->shortcut().toString()));
+  _SYNC_FILE_NAMES_WITH_NAME_CAST = new (std::nothrow) QAction(QIcon(":/JsonEditor/FILENAME_FROM_JSON_NAME"), tr("Sync File Names from Name && Cast"));
+  _SYNC_FILE_NAMES_WITH_NAME_CAST->setToolTip(
+      QString("<b>%1 (%2)</b><br/>Rename this JSON and all related files by composing their names from the \"Name\" and \"Cast\" fields.") //
+          .arg(_SYNC_FILE_NAMES_WITH_NAME_CAST->text(), _SYNC_FILE_NAMES_WITH_NAME_CAST->shortcut().toString()));
 
   _RELOAD_JSON_FROM_FROM_DISK = new (std::nothrow) QAction(QIcon(":/JsonEditor/RELOAD_FROM_DISK"), tr("Reload from disk"), this);
   _RELOAD_JSON_FROM_FROM_DISK->setShortcut(QKeySequence(Qt::KeyboardModifier::NoModifier | Qt::Key::Key_F5));
@@ -33,38 +33,37 @@ JsonActions::JsonActions(QObject* parent) //
           .arg(_EXPORT_CAST_STUDIO_TO_DICTION->text(), _EXPORT_CAST_STUDIO_TO_DICTION->shortcut().toString()));
 
   // **Case Control**
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD = new (std::nothrow) QAction(QIcon{":/JsonEditor/CASE_TITLE"}, tr("Title"), this);
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setShortcutVisibleInContextMenu(true);
-  _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize first letter of each word in a sentence.")
-                                                        .arg(_CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->text(), _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->shortcut().toString()));
+  _CAPITALIZE_FIRST_LETTER_IN_SELECTION = new (std::nothrow) QAction(QIcon{":/JsonEditor/CASE_TITLE"}, tr("Capitalize First Letter"), this);
+  _CAPITALIZE_FIRST_LETTER_IN_SELECTION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_U));
+  _CAPITALIZE_FIRST_LETTER_IN_SELECTION->setShortcutVisibleInContextMenu(true);
+  _CAPITALIZE_FIRST_LETTER_IN_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Capitalize the first letter of each word in the selected text; leave the remaining letters unchanged.")
+                                                        .arg(_CAPITALIZE_FIRST_LETTER_IN_SELECTION->text(), _CAPITALIZE_FIRST_LETTER_IN_SELECTION->shortcut().toString()));
 
-  _LOWER_ALL_WORDS = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase"), this);
-  _LOWER_ALL_WORDS->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
-  _LOWER_ALL_WORDS->setShortcutVisibleInContextMenu(true);
-  _LOWER_ALL_WORDS->setToolTip(QString("<b>%1 (%2)</b><br/> Lowercase a sentence.") //
-                                   .arg(_LOWER_ALL_WORDS->text(), _LOWER_ALL_WORDS->shortcut().toString()));
+  _LOWER_ALL_LETTERS_IN_SELECTION = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase All Letters"), this);
+  _LOWER_ALL_LETTERS_IN_SELECTION->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_L));
+  _LOWER_ALL_LETTERS_IN_SELECTION->setShortcutVisibleInContextMenu(true);
+  _LOWER_ALL_LETTERS_IN_SELECTION->setToolTip(QString("<b>%1 (%2)</b><br/> Convert the selected text to lowercase.") //
+                                   .arg(_LOWER_ALL_LETTERS_IN_SELECTION->text(), _LOWER_ALL_LETTERS_IN_SELECTION->shortcut().toString()));
 
   // **Studio/Cast/Tags Field Operation**
   _INIT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/CAST"), tr("Init Cast/Studio"), this);
   _INIT_STUDIO_CAST_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/>Init Cast/Studio Fields if empty.") //
                                     .arg(_INIT_STUDIO_CAST_FIELD->text(), _INIT_STUDIO_CAST_FIELD->shortcut().toString()));
-  _INFER_BASENAME = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Name Hint"), this);
-  _INFER_BASENAME->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
-  _INFER_BASENAME->setToolTip(QString("<b>%1 (%2)</b><br/> Give you Name hint append with cast") //
-                                     .arg(_INFER_BASENAME->text(), _INFER_BASENAME->shortcut().toString()));
+  _COMPOSE_NAME_WITH_CAST = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Compose Name with Cast"), this);
+  _COMPOSE_NAME_WITH_CAST->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
+  _COMPOSE_NAME_WITH_CAST->setToolTip(QString("<b>%1 (%2)</b><br/> Compose the \"Name\" field with \"Cast\" field as: Name - Cast1, Cast2, ...") //
+                                     .arg(_COMPOSE_NAME_WITH_CAST->text(), _COMPOSE_NAME_WITH_CAST->shortcut().toString()));
 
-  _INFER_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Cast/Studio Hint"), this);
-  _INFER_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
-  _INFER_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Give you cast/studio hint") //
-                                       .arg(_INFER_CAST_STUDIO->text(), _INFER_CAST_STUDIO->shortcut().toString()));
+  _EXTRACT_CAST_STUDIO = new (std::nothrow) QAction(QIcon(":/JsonEditor/AI_IDEA"), tr("Extract Cast && Studio"), this);
+  _EXTRACT_CAST_STUDIO->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_H));
+  _EXTRACT_CAST_STUDIO->setToolTip(QString("<b>%1 (%2)</b><br/> Infer the Cast list and Studio name from the selected text and the current \"Name\" field.") //
+                                       .arg(_EXTRACT_CAST_STUDIO->text(), _EXTRACT_CAST_STUDIO->shortcut().toString()));
 
-  _FORMAT_STUDIO_CAST_FIELD = new (std::nothrow) QAction(QIcon(":/JsonEditor/FORMAT_PAINTER"), tr("Format Cast/Studio"), this);
-  _FORMAT_STUDIO_CAST_FIELD->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
-  _FORMAT_STUDIO_CAST_FIELD->setShortcutVisibleInContextMenu(true);
-  _FORMAT_STUDIO_CAST_FIELD->setToolTip(QString("<b>%1 (%2)</b><br/> Format Cast/Studio Field."
-                                 "e.g., A,B -> A, B.")
-                             .arg(_FORMAT_STUDIO_CAST_FIELD->text(), _FORMAT_STUDIO_CAST_FIELD->shortcut().toString()));
+  _SORT_DEDUP_CAST = new (std::nothrow) QAction(QIcon(":/JsonEditor/FORMAT_PAINTER"), tr("Sort && Dedupe Cast"), this);
+  _SORT_DEDUP_CAST->setShortcut(QKeySequence(Qt::KeyboardModifier::AltModifier | Qt::Key::Key_I));
+  _SORT_DEDUP_CAST->setShortcutVisibleInContextMenu(true);
+  _SORT_DEDUP_CAST->setToolTip(QString("<b>%1 (%2)</b><br/> Sort the \"Cast\" field and remove duplicates.<br/>e.g., A,B,A -> A, B")
+                             .arg(_SORT_DEDUP_CAST->text(), _SORT_DEDUP_CAST->shortcut().toString()));
 
   _SET_CONTENTS_FIXED = new (std::nothrow) QAction(QIcon(":/JsonEditor/ANCHOR_DROP"), tr("Mark Contents Fixed"), this);
   _SET_CONTENTS_FIXED->setToolTip(QString("<b>%1 (%2)</b><br/> Mark selection record(s) fixed and will no longer changed when request hint on studio/cast field") //

@@ -79,36 +79,37 @@ QStringList RenameWidget_CastElider::RenameCore(const QStringList& replaceeList)
   for (int i = 0; i < replaceeList.size(); ++i) {
     // json相关文件的相对路径
     const QString& relativePath2relatedFile = relativePathAt(i);
+    const QString& noLeadSlashRelativePath2relatedFile = relativePath2relatedFile.mid(1);
 
-    itFile2Json = m_relatedFile2Json.find(relativePath2relatedFile);
+    itFile2Json = m_relatedFile2Json.find(noLeadSlashRelativePath2relatedFile);
     if (itFile2Json == m_relatedFile2Json.cend()) {
       newNames.push_back("");
-      LOG_W("Related json file not found using related file key[%s]", qPrintable(relativePath2relatedFile));
+      LOG_W("Related json file not found using related file key[%s]", qPrintable(noLeadSlashRelativePath2relatedFile));
       continue;
     }
     // json自身文件相对路径
-    const QString& relativeJsonFilePath = itFile2Json.value();
-
-    itRelativeJson2Cast = m_relativeJson2CastList.find(relativeJsonFilePath);
+    const QString& noLeadingSlashRelativeJsonFilePath = itFile2Json.value();
+    const QString& relativeJsonFilePath = '/' + noLeadingSlashRelativeJsonFilePath;
+    itRelativeJson2Cast = m_relativeJson2CastList.find(noLeadingSlashRelativeJsonFilePath);
     if (itRelativeJson2Cast == m_relativeJson2CastList.cend()) {
       newNames.push_back("");
-      LOG_W("Cast list not found using relative json path key[%s]", qPrintable(relativeJsonFilePath));
+      LOG_W("Cast list not found using relative json path key[%s]", qPrintable(noLeadingSlashRelativeJsonFilePath));
       continue;
     }
     const QStringList& castList = itRelativeJson2Cast.value();
 
-    // pre                           =       pre
-    // pre/Marvel Films 2.jpg        =       relativePath2relatedFile
-    // pre/Marvel Films.json         =       relativeJsonFilePath
+    // /pre/                          =       pre
+    // /pre/Marvel Films 2.jpg        =       relativePath2relatedFile
+    // /pre/Marvel Films.json         =       relativeJsonFilePath
     // e.g."
-    // relativePath2relatedFile = "pre/Marvel Films 2.jpg":
+    // relativePath2relatedFile = "/pre/Marvel Films 2.jpg":
     // newName:
     // [coreNameStartAt, coreNameEndAt)    +     castList            + [coreNameEndAt, end)
     // "Marvel Films"                      + " - cast 1, cast 2"     + " 2.jpg"
     // Marvel Films - cast 1, cast 2 2.jpg
     // Marvel Films - cast 1, cast.json
     const QString& pre = preAt(i);
-    const int coreNameStartAt = pre.isEmpty() ? 0 : pre.size() + 1;
+    const int coreNameStartAt = pre.size();
     const int coreNameEndAt = relativeJsonFilePath.size() - (sizeof(".json") - 1);
     const QString& coreName = relativePath2relatedFile.mid(coreNameStartAt, coreNameEndAt - coreNameStartAt);
 

@@ -16,7 +16,7 @@ class FileOsWalker {
   QList<bool> isFiles;
   QStringList filesFullPath;
 
-  const QString mPrepathWithSlash;
+  const QString mPrepathWithoutSlash;
   const int N;
 
  private:

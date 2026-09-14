@@ -39,14 +39,14 @@ class RenameWidget_LongPathTest : public PlainTestSuite {
 
     pLongPath.InitTextEditContent(longPath, selectFileNames);
     QCOMPARE(pLongPath.mSelectedNames, (QStringList{"Part A - Part B"}));
-    QCOMPARE(pLongPath.mRelToNameWithNoRoot, (QStringList{"", "Part A - Part B", "Part A - Part B"}));
+    QCOMPARE(pLongPath.mRelToNameWithNoRoot, (QStringList{"/", "/Part A - Part B/", "/Part A - Part B/"}));
     QCOMPARE(pLongPath.mNames, (QStringList{"Part A - Part B", "Img A - Img B - Img C - Img D", "json A - json B - json C - json D"}));
     QCOMPARE(pLongPath.mExts, (QStringList{"", ".jpg", ".json"}));
 
     const QString& sPathLeftNoRoot = pLongPath.m_relNameTE->toPlainText();
     const QString& sOldName = pLongPath.m_oBaseTE->toPlainText();
     const QString& sOldExt = pLongPath.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nPart A - Part B\nPart A - Part B");
+    QCOMPARE(sPathLeftNoRoot, "/\n/Part A - Part B/\n/Part A - Part B/");
     QCOMPARE(sOldName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
     QCOMPARE(sOldExt, "\n.jpg\n.json");
 

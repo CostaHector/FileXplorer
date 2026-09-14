@@ -34,7 +34,7 @@ class RenameWidget_PrependParentFolderNameTest : public PlainTestSuite {
     // m_recursiveCB->checked(true) already set in initExclusiveSetting
     pPrepend.InitTextEditContent(prependPath, selectFileNames);
     QCOMPARE(pPrepend.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pPrepend.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pPrepend.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pPrepend.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pPrepend.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     {
@@ -44,7 +44,7 @@ class RenameWidget_PrependParentFolderNameTest : public PlainTestSuite {
       const QString& sNewName = pPrepend.m_nBaseTE->toPlainText();
       const QString& sNewExt = pPrepend.m_nExtTE->toPlainText();
 
-      QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+      QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
       QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
       QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
       QCOMPARE(sNewName, "super\nsuper Chris Evans\nsuper Chris Evans\nHenry Cavill");

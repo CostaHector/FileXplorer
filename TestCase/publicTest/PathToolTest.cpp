@@ -217,7 +217,7 @@ private slots:
     // path without slash
     QCOMPARE(GetRelPathFromRootRelName(0, "path with no slash"), "");
     // rootPathLen too large
-    QCOMPARE(GetRelPathFromRootRelName(225, "C:/home/Huge Jackman"), "");
+    QCOMPARE(GetRelPathFromRootRelName(225, "C:/home/Hugh Jackman"), "");
   }
 
   void test_RelativePath2File_ok() {

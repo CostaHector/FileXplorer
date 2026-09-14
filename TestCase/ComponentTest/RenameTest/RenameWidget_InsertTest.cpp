@@ -40,13 +40,13 @@ class RenameWidget_InsertTest : public PlainTestSuite {
 
     pInsert.InitTextEditContent(insertPath, selectFileNames);
     QCOMPARE(pInsert.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pInsert.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pInsert.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pInsert.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pInsert.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
     const QString& sPathLeftNoRoot = pInsert.m_relNameTE->toPlainText();
     const QString& sOldName = pInsert.m_oBaseTE->toPlainText();
     const QString& sOldExt = pInsert.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 

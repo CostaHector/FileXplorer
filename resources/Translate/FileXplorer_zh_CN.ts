@@ -1089,15 +1089,9 @@
         <translation>保存变更</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Sync Json Name Value</source>
-        <translatorcomment>根据json文件名更新Name字段</translatorcomment>
-        <translation>更新Name字段</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Sync File Name</source>
-        <translation>更新相关文件名</translation>
+        <location line="+11"/>
+        <source>Sync File Names from Name &amp;&amp; Cast</source>
+        <translation>同步相关文件名为Name&amp;&amp;Cast</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1110,23 +1104,7 @@
         <translation>导出到字典</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Title</source>
-        <translation>首字母大写</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Lowercase</source>
-        <translatorcomment>选中段落小写化</translatorcomment>
-        <translation>小写</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Name Hint</source>
-        <translation>推断名称</translation>
-    </message>
-    <message>
-        <location line="+17"/>
+        <location line="+39"/>
         <source>Mark Contents Fixed</source>
         <translation>固定内容</translation>
     </message>
@@ -1176,17 +1154,7 @@
         <translation>清除标签</translation>
     </message>
     <message>
-        <location line="-69"/>
-        <source>Cast/Studio Hint</source>
-        <translation>推测可能的演员/制片厂</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Format Cast/Studio</source>
-        <translation>格式化演员/制片厂</translation>
-    </message>
-    <message>
-        <location line="+15"/>
+        <location line="-49"/>
         <source>Update duration</source>
         <translation>更新时长字段</translation>
     </message>
@@ -1196,12 +1164,42 @@
         <translation>更新大小字段</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-30"/>
         <source>Init Cast/Studio</source>
         <translation>初始化演员/厂商</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="-35"/>
+        <source>Set Name from File Name</source>
+        <translation>同步Name字段为文件basename</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Capitalize First Letter</source>
+        <translation>选中文本首字母大写</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Lowercase All Letters</source>
+        <translation>选中文本小写</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Compose Name with Cast</source>
+        <translation>组合Name和Cast</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Extract Cast &amp;&amp; Studio</source>
+        <translation>推断Cast&amp;&amp;Studio</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Sort &amp;&amp; Dedupe Cast</source>
+        <translation>Cast排序&amp;&amp;去重</translation>
+    </message>
+    <message>
+        <location line="+28"/>
         <source>Set Studio</source>
         <translation>设置厂商</translation>
     </message>
@@ -2033,7 +2031,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     <message>
         <location filename="../../Component/RenameWidgets/RenameWidget_CastElider.cpp" line="+24"/>
         <source>Json file basename MAX length:</source>
-        <translation>Json文件基础名最大长度</translation>
+        <translation>Json文件基础名最大长度:</translation>
     </message>
 </context>
 <context>

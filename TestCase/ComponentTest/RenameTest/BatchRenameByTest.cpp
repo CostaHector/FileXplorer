@@ -1,9 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "BeginToExposePrivateMember.h"
 #include "BatchRenameBy.h"
-#include "EndToExposePrivateMember.h"
 
 #include "RenamerKey.h"
 #include "Configuration.h"
@@ -20,13 +18,13 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace BatchRenameBy;
+    using namespace BatchRenameBy;
 
 class BatchRenameByTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir mTDir;
- private slots:
+private slots:
   void initTestCase() {  //
     QVERIFY(mTDir.IsValid());
     //  space 0x20
@@ -36,14 +34,14 @@ class BatchRenameByTest : public PlainTestSuite {
     // 小写字母
     const QList<FsNodeEntry> nodesEntries  //
         {
-            {"replace/pattern/Chris Evans 2.png", false, ""},        //
-            {"replace/pattern/Chris Evans.jpg", false, ""},          //
-            {"replace/pattern/Chris Evans.json", false, ""},         //
-            {"replace/pattern/Chris Evans_tn.jpg", false, ""},       //
-            {"replace/pattern/Chris Hemsworth_a.pson", false, ""},   //
-            {"replace/pattern/Jensen Ackles.mp4", false, ""},        //
-            {"replace/pattern/Jensen Ackles.pson", false, ""},       //
-            {"replace/pattern/Michael Fassbender.json", false, ""},  //
+        {"replace/pattern/Chris Evans 2.png", false, ""},        //
+        {"replace/pattern/Chris Evans.jpg", false, ""},          //
+        {"replace/pattern/Chris Evans.json", false, ""},         //
+        {"replace/pattern/Chris Evans_tn.jpg", false, ""},       //
+        {"replace/pattern/Chris Hemsworth_a.pson", false, ""},   //
+        {"replace/pattern/Jensen Ackles.mp4", false, ""},        //
+        {"replace/pattern/Jensen Ackles.pson", false, ""},       //
+        {"replace/pattern/Michael Fassbender.json", false, ""},  //
         };
 
     QCOMPARE(mTDir.createEntries(nodesEntries), 8);
@@ -64,17 +62,18 @@ class BatchRenameByTest : public PlainTestSuite {
   void GetFilesNeedProcess_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     QStringList patterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    QMap<QString, QString> file2Json;
-    QMap<QString, QString> expectFile2Json {
-      {"Chris Evans 2.png", "Chris Evans.json"},
-      {"Chris Evans.jpg", "Chris Evans.json"},
-      {"Chris Evans.json", "Chris Evans.json"},
-      {"Chris Evans_tn.jpg", "Chris Evans.json"},
-      {"Jensen Ackles.mp4", "Jensen Ackles.mp4"},
-      {"Jensen Ackles.pson", "Jensen Ackles.mp4"},
-      {"Michael Fassbender.json", "Michael Fassbender.json"},
-    };
-    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Json)};
+    QMap<QString, QString> file2Pattern;
+    QMap<QString, QString> expectFile2Pattern
+        {
+         {"Chris Evans 2.png", "Chris Evans.json"},
+         {"Chris Evans.jpg", "Chris Evans.json"},
+         {"Chris Evans.json", "Chris Evans.json"},
+         {"Chris Evans_tn.jpg", "Chris Evans.json"},
+         {"Jensen Ackles.mp4", "Jensen Ackles.mp4"},
+         {"Jensen Ackles.pson", "Jensen Ackles.mp4"},
+         {"Michael Fassbender.json", "Michael Fassbender.json"},
+         };
+    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Pattern)};
     const QStringList beforeSelectedNames{
         "Chris Evans 2.png",        //
         "Chris Evans.jpg",          //
@@ -85,13 +84,22 @@ class BatchRenameByTest : public PlainTestSuite {
         "Michael Fassbender.json",  //
     };
     QCOMPARE(beforeSelectedNames, filesNeedRename);
-    QCOMPARE(expectFile2Json, file2Json);
+    QCOMPARE(expectFile2Pattern, file2Pattern);
   }
 
   void GetFilesNeedRename_subdirectory_ok() {
     QString workPath = mTDir.itemPath("replace");
     QStringList patterns{"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"};
-    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns)};
+    QMap<QString, QString> file2Pattern;
+    QMap<QString, QString> expectFile2Pattern
+        {
+         {"pattern/Chris Evans 2.png", "pattern/Chris Evans.json"},
+         {"pattern/Chris Evans.jpg", "pattern/Chris Evans.json"},
+         {"pattern/Chris Evans.json", "pattern/Chris Evans.json"},
+         {"pattern/Chris Evans_tn.jpg", "pattern/Chris Evans.json"},
+         {"pattern/Jensen Ackles.mp4", "pattern/Jensen Ackles.mp4"},
+         {"pattern/Jensen Ackles.pson", "pattern/Jensen Ackles.mp4"},
+         };
     const QStringList beforeSelectedNames{
         "pattern/Chris Evans 2.png",        //
         "pattern/Chris Evans.jpg",          //
@@ -100,7 +108,9 @@ class BatchRenameByTest : public PlainTestSuite {
         "pattern/Jensen Ackles.mp4",        //
         "pattern/Jensen Ackles.pson",       //
     };
+    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Pattern)};
     QCOMPARE(beforeSelectedNames, filesNeedRename);
+    QCOMPARE(expectFile2Pattern, file2Pattern);
   }
 
   void ReplaceQueryAndConfirm_ok() {

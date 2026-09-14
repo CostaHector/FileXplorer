@@ -25,11 +25,21 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace JsonTestPrecoditionTools;
+    using namespace JsonTestPrecoditionTools;
+
+JsonPr JsonPrConstruct(const QString& jsonFilePrePath, const QString& _jsonFileName,//
+                       const QString& _nameField, const QStringList& _castField) {
+  JsonPr jpr;
+  jpr.m_Prepath = jsonFilePrePath;
+  jpr.jsonFileName = _jsonFileName;
+  jpr.m_Name = _nameField;
+  jpr.m_Cast = SortedUniqStrLst{_castField};
+  return jpr;
+}
 
 class JsonTableModelTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir mTDir;
   static constexpr int mJsonsFileCountInitial = 2;
 
@@ -63,7 +73,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(model.data(model.index(1, JsonModelField::Duration), Qt::DisplayRole).toString(), "00:00:03");  // 3600ms
   }
 
- private slots:
+private slots:
   void initTestCase() {
     QVERIFY(mTDir.IsValid());
     QCOMPARE(mTDir.createEntries(nodes), nodes.size());
@@ -174,9 +184,9 @@ class JsonTableModelTest : public PlainTestSuite {
 
     const QString rootPath{mTDir.itemPath("set_root_path")};
     QList<FsNodeEntry> rootPathNodes{
-        {"set_root_path/a.json", false, contentsAJson},
-        {"set_root_path/b.json", false, contentsBJson},
-    };
+                                     {"set_root_path/a.json", false, contentsAJson},
+                                     {"set_root_path/b.json", false, contentsBJson},
+                                     };
     QCOMPARE(mTDir.createEntries(rootPathNodes), 2);
     OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("set_root_path")).removeRecursively());
@@ -277,7 +287,7 @@ class JsonTableModelTest : public PlainTestSuite {
     QCOMPARE(ind.siblingAtColumn(JsonModelField::Cast).data(Qt::DisplayRole).toString(), "");
     QCOMPARE(ind.siblingAtColumn(JsonModelField::Tags).data(Qt::DisplayRole).toString(), "");
     // modified red
-    QCOMPARE(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QBrush(Qt::GlobalColor::red));
+    QCOMPARE(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QColor(Qt::GlobalColor::red));
 
     // mark fixed: can init/hint/set/rmv/add/clear
     QCOMPARE(jtm.SetRecordContentsFixed({ind}, true), 1);
@@ -351,8 +361,8 @@ class JsonTableModelTest : public PlainTestSuite {
     "Detail": "This is just a json example."
 })"};
     QList<FsNodeEntry> rootPathNodes{
-        {"property_retrieve/a.json", false, contentsAJson},
-    };
+                                     {"property_retrieve/a.json", false, contentsAJson},
+                                     };
     QCOMPARE(mTDir.createEntries(rootPathNodes), 1);
 
     const QString rootPath{mTDir.itemPath("property_retrieve")};
@@ -820,11 +830,11 @@ class JsonTableModelTest : public PlainTestSuite {
 
   void UpdateJsonKeyValuePair_ok() {
     const QList<FsNodeEntry> updateJsonKeyValuePairFolderNodes{
-      {"updateJsonKeyValuePair/unwant.json", false, "content in unwant.json"},
-      {"updateJsonKeyValuePair/noNeedUpdate.json", false, "content in noNeedUpdate.json"},
-      {"updateJsonKeyValuePair/NeedUpdateImgName.json", false, "content in NeedUpdateImgName.json"},
-      {"updateJsonKeyValuePair/NeedUpdateVidName.json", false, "content in NeedUpdateVidName.json"},
-    };
+                                                               {"updateJsonKeyValuePair/unwant.json", false, "content in unwant.json"},
+                                                               {"updateJsonKeyValuePair/noNeedUpdate.json", false, "content in noNeedUpdate.json"},
+                                                               {"updateJsonKeyValuePair/NeedUpdateImgName.json", false, "content in NeedUpdateImgName.json"},
+                                                               {"updateJsonKeyValuePair/NeedUpdateVidName.json", false, "content in NeedUpdateVidName.json"},
+                                                               };
     QCOMPARE(mTDir.createEntries(updateJsonKeyValuePairFolderNodes), 4);
     OnScopeExit {
       QVERIFY(QDir(mTDir.itemPath("updateJsonKeyValuePair")).removeRecursively());
@@ -884,6 +894,101 @@ class JsonTableModelTest : public PlainTestSuite {
     proxyModel.setFilterKeyColumn(1);         // only filter for second column
     proxyModel.setFilterFixedString("col0");  // col0 not in second column at all
     QCOMPARE(proxyModel.rowCount(), 0);       // no row match
+  }
+
+  // 以下用例不依赖临时测试路径mTDir
+  void PropertyAccessCorrect() {
+    JsonTableModel jtm;
+    jtm.mRootPath = "InexistRootPath";
+
+    QVector<JsonPr> jprList
+        {
+         JsonPrConstruct("InexistRootPath/pre", "Marvel - Captain American.json", "Marvel - Captain American", QStringList{"Chris Evans", "Chris Hemsworth"}),
+         JsonPrConstruct("InexistRootPath", "20th Century Fox - X MEN.json", "20th Century Fox - X MEN", QStringList{"Hugh Jackman", "Michael Fassbender"}),
+         JsonPrConstruct("InexistRootPath", "DC Comics - Supermen - Actor 1.json", "DC Comics - Supermen - Actor 1", QStringList{"Actor 1"}),
+         };
+    jtm.setRootPathCore(jprList);
+
+    QModelIndexList all3Row{jtm.index(0, 0), jtm.index(1, 0), jtm.index(2, 0)};
+
+    // RelativePath2JsonFile
+    {
+      QStringList expectRelativePath2Json{"pre/Marvel - Captain American.json", "20th Century Fox - X MEN.json"}, actualRelativePath2Json;
+      actualRelativePath2Json = jtm.RelativePath2JsonFile(QModelIndexList{});
+      QVERIFY(actualRelativePath2Json.isEmpty());
+
+      actualRelativePath2Json = jtm.RelativePath2JsonFile(QModelIndexList{jtm.index(0, 0), jtm.index(1, 0)});
+      QCOMPARE(actualRelativePath2Json, expectRelativePath2Json);
+    }
+    // RelativePath2RelatedFiles
+    {
+      QMap<QString, QString> file2Json;
+      QStringList expectRelativePath2Json{"pre/Marvel - Captain American.json", "20th Century Fox - X MEN.json"}, actualRelativePath2Json;
+      actualRelativePath2Json = jtm.RelativePath2RelatedFiles(QModelIndexList{}, &file2Json); // no selection
+      QVERIFY(actualRelativePath2Json.isEmpty());
+      QVERIFY(file2Json.isEmpty());
+
+      actualRelativePath2Json = jtm.RelativePath2RelatedFiles(QModelIndexList{jtm.index(0, 0), jtm.index(1, 0)}, &file2Json); // QDir{InexistRootPath}.entryList() return empty
+      QVERIFY(actualRelativePath2Json.isEmpty());
+      QVERIFY(file2Json.isEmpty());
+    }
+    // RelativePath2JsonFile2CastList
+    {
+      QMap<QString, QStringList> expectJson2CastList {
+                                                     {"pre/Marvel - Captain American.json", QStringList{"Chris Evans", "Chris Hemsworth"}},
+                                                     {"20th Century Fox - X MEN.json", QStringList{"Hugh Jackman", "Michael Fassbender"}},
+                                                     };
+      QMap<QString, QStringList> actualJson2CastList;
+      actualJson2CastList = jtm.RelativePath2JsonFile2CastList(QModelIndexList{});
+      QVERIFY(actualJson2CastList.isEmpty());
+
+      actualJson2CastList = jtm.RelativePath2JsonFile2CastList(QModelIndexList{jtm.index(0, 0), jtm.index(1, 0)});
+      QCOMPARE(actualJson2CastList, expectJson2CastList);
+    }
+    // ComposeNameWithCast
+    {
+      QSignalSpy dataChangedSig{&jtm, &JsonTableModel::dataChanged};
+      QSignalSpy headerDataChangedSig{&jtm, &JsonTableModel::headerDataChanged};
+
+      QCOMPARE(jtm.ComposeNameWithCast(QModelIndexList{}), 0);
+      // expect first 2 row updated, the last row not updated
+      QCOMPARE(jtm.ComposeNameWithCast(all3Row), 2);
+      QCOMPARE(dataChangedSig.count(), 1);
+      QCOMPARE(headerDataChangedSig.count(), 1);
+      dataChangedSig.clear();
+      headerDataChangedSig.clear();
+
+      QCOMPARE(jtm.data(jtm.index(0, JsonModelField::Name), Qt::DisplayRole).toString(), "Marvel - Captain American - Chris Evans, Chris Hemsworth");
+      QCOMPARE(jtm.data(jtm.index(1, JsonModelField::Name), Qt::DisplayRole).toString(), "20th Century Fox - X MEN - Hugh Jackman, Michael Fassbender");
+      QCOMPARE(jtm.data(jtm.index(2, JsonModelField::Name), Qt::DisplayRole).toString(), "DC Comics - Supermen - Actor 1");
+
+      QCOMPARE(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QColor(Qt::GlobalColor::red));
+      QCOMPARE(jtm.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QColor(Qt::GlobalColor::red));
+      QVERIFY(jtm.headerData(2, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole) != QColor(Qt::GlobalColor::red));
+
+      MOCKER(FileTool::ByteArrayTextWriter).expects(exactly(3))//
+          .will(returnValue(true)) // Marvel write ok, set bModified=false
+          .then(returnValue(false)) // 20th Century Fox write failed, bModified remains true
+          .then(returnValue(true)); // 20th Century Fox write ok, set bModified=false
+
+      QCOMPARE(jtm.SaveCurrentChanges(all3Row), -1);
+      QVERIFY(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole) != QColor(Qt::GlobalColor::red));
+      QCOMPARE(jtm.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole), QColor(Qt::GlobalColor::red));
+      QVERIFY(jtm.headerData(2, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole) != QColor(Qt::GlobalColor::red));
+      QCOMPARE(dataChangedSig.count(), 1);
+      QCOMPARE(headerDataChangedSig.count(), 1);
+      dataChangedSig.clear();
+      headerDataChangedSig.clear();
+
+      QCOMPARE(jtm.SaveCurrentChanges(all3Row), 1);
+      QVERIFY(jtm.headerData(0, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole) != QColor(Qt::GlobalColor::red));
+      QVERIFY(jtm.headerData(1, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole)!= QColor(Qt::GlobalColor::red));
+      QVERIFY(jtm.headerData(2, Qt::Orientation::Vertical, Qt::ItemDataRole::ForegroundRole) != QColor(Qt::GlobalColor::red));
+      QCOMPARE(dataChangedSig.count(), 1);
+      QCOMPARE(headerDataChangedSig.count(), 1);
+      dataChangedSig.clear();
+      headerDataChangedSig.clear();
+    }
   }
 };
 

@@ -65,7 +65,7 @@ class AdvanceRenamer : public QDialog {
   }
   QString relativePathAt(int i) const {
     if (i < 0 || i >= mNames.size()) return "";
-    return mRelToNameWithNoRoot[i].isEmpty() ? fileNameAt(i) : mRelToNameWithNoRoot[i] + '/' + fileNameAt(i);
+    return mRelToNameWithNoRoot[i] + fileNameAt(i);
   }
 
   QCheckBox* m_nameExtIndependent{nullptr};
@@ -74,7 +74,7 @@ class AdvanceRenamer : public QDialog {
 
   QString mWorkPath;
   QStringList mSelectedNames;
-  QStringList mRelToNameWithNoRoot;  // (no root) relative path to file
+  QStringList mRelToNameWithNoRoot;  // (no root) relative path to file. e.g. "/" or "/pre/"
   QStringList mSelectedFilesFullPath;
 
   QStringList mNames;  // with extension or without

@@ -71,9 +71,9 @@ class CastDBViewTest : public PlainTestSuite {
     }
 
     {
-      CastDbViewMocker::MockMultiLineInput() = std::pair<bool, QString>{false, "Guardiola, Pep\nHuge Jackman, Wolverine"};
+      CastDbViewMocker::MockMultiLineInput() = std::pair<bool, QString>{false, "Guardiola, Pep\nHugh Jackman, Wolverine"};
       QCOMPARE(castView.onAppendCasts(), 0);
-      CastDbViewMocker::MockMultiLineInput() = std::pair<bool, QString>{true, "Guardiola, Pep\nHuge Jackman, Wolverine"};
+      CastDbViewMocker::MockMultiLineInput() = std::pair<bool, QString>{true, "Guardiola, Pep\nHugh Jackman, Wolverine"};
       QCOMPARE(castView.onAppendCasts(), 2);
       QCOMPARE(castModel.rowCount(), 2);
       QVERIFY(!castModel.isDirty());
@@ -81,7 +81,7 @@ class CastDBViewTest : public PlainTestSuite {
 
       QModelIndexList indexesNames{GetIndexessAtOneRow(castModel, 0, 2, CastDbModelField::Name)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesNames,  //
-                                                 QStringList{"Guardiola", "Huge Jackman"}));
+                                                 QStringList{"Guardiola", "Hugh Jackman"}));
       QModelIndexList indexesAkas{GetIndexessAtOneRow(castModel, 0, 2, CastDbModelField::ALIAS)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(castModel, indexesAkas,  //
                                                  QStringList{"Pep", "Wolverine"}));

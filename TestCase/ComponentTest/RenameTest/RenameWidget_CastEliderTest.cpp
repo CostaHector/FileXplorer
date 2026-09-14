@@ -61,13 +61,7 @@ private slots:
 
   void onJsonBaseNameMaxLengthChanged_ok() {
     Configuration().clear();
-    const QString currentPath{
-#ifdef _WIN32
-          "C:/home/random_path"
-#else
-          "/home/random_path"
-#endif
-    };
+    const QString currentPath{"/home/random_path"};
     QStringList relNames
         {
          // change {Chris Hemsworth, Natalie Portman}
@@ -125,20 +119,20 @@ private slots:
     // batch count: 2 4 4 1
     // preAt ok
     {
-      QCOMPARE(ce.preAt(0), "pre/underpre");
-      QCOMPARE(ce.preAt(1), "pre/underpre");
+      QCOMPARE(ce.preAt(0), "/pre/underpre/");
+      QCOMPARE(ce.preAt(1), "/pre/underpre/");
 
-      QCOMPARE(ce.preAt(2), "pre");
-      QCOMPARE(ce.preAt(3), "pre");
-      QCOMPARE(ce.preAt(4), "pre");
-      QCOMPARE(ce.preAt(5), "pre");
+      QCOMPARE(ce.preAt(2), "/pre/");
+      QCOMPARE(ce.preAt(3), "/pre/");
+      QCOMPARE(ce.preAt(4), "/pre/");
+      QCOMPARE(ce.preAt(5), "/pre/");
 
-      QCOMPARE(ce.preAt(6), "");
-      QCOMPARE(ce.preAt(7), "");
-      QCOMPARE(ce.preAt(8), "");
-      QCOMPARE(ce.preAt(9), "");
+      QCOMPARE(ce.preAt(6), "/");
+      QCOMPARE(ce.preAt(7), "/");
+      QCOMPARE(ce.preAt(8), "/");
+      QCOMPARE(ce.preAt(9), "/");
 
-      QCOMPARE(ce.preAt(10), "");
+      QCOMPARE(ce.preAt(10), "/");
     }
     // fileNameAt ok
     {
@@ -159,20 +153,20 @@ private slots:
     }
     // relativePathAt ok
     {
-      QCOMPARE(ce.relativePathAt(0), "pre/underpre/Marvel Studios - Thor.json");
-      QCOMPARE(ce.relativePathAt(1), "pre/underpre/Marvel Studios - Thor_tn.jpg");
+      QCOMPARE(ce.relativePathAt(0), "/pre/underpre/Marvel Studios - Thor.json");
+      QCOMPARE(ce.relativePathAt(1), "/pre/underpre/Marvel Studios - Thor_tn.jpg");
 
-      QCOMPARE(ce.relativePathAt(2), "pre/Marvel Studios - Captain America The First Avenger.json");
-      QCOMPARE(ce.relativePathAt(3), "pre/Marvel Studios - Captain America The First Avenger 0.jpg");
-      QCOMPARE(ce.relativePathAt(4), "pre/Marvel Studios - Captain America The First Avenger 1.png");
-      QCOMPARE(ce.relativePathAt(5), "pre/Marvel Studios - Captain America The First Avenger.mp4");
+      QCOMPARE(ce.relativePathAt(2), "/pre/Marvel Studios - Captain America The First Avenger.json");
+      QCOMPARE(ce.relativePathAt(3), "/pre/Marvel Studios - Captain America The First Avenger 0.jpg");
+      QCOMPARE(ce.relativePathAt(4), "/pre/Marvel Studios - Captain America The First Avenger 1.png");
+      QCOMPARE(ce.relativePathAt(5), "/pre/Marvel Studios - Captain America The First Avenger.mp4");
 
-      QCOMPARE(ce.relativePathAt(6), "Marvel Studios - Iron Man.json");
-      QCOMPARE(ce.relativePathAt(7), "Marvel Studios - Iron Man 0.jpg");
-      QCOMPARE(ce.relativePathAt(8), "Marvel Studios - Iron Man 1.png");
-      QCOMPARE(ce.relativePathAt(9), "Marvel Studios - Iron Man.mp4");
+      QCOMPARE(ce.relativePathAt(6), "/Marvel Studios - Iron Man.json");
+      QCOMPARE(ce.relativePathAt(7), "/Marvel Studios - Iron Man 0.jpg");
+      QCOMPARE(ce.relativePathAt(8), "/Marvel Studios - Iron Man 1.png");
+      QCOMPARE(ce.relativePathAt(9), "/Marvel Studios - Iron Man.mp4");
 
-      QCOMPARE(ce.relativePathAt(10), "Marvel Studios - Avengers Infinity War (2018) - Robert Downey Jr, Chris Hemsworth, Chris Evans.json");
+      QCOMPARE(ce.relativePathAt(10),"/Marvel Studios - Avengers Infinity War (2018) - Robert Downey Jr, Chris Hemsworth, Chris Evans.json");
     }
 
     // init calue ok

@@ -33,8 +33,8 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
     const QString pre = QDir(mWorkPath).absoluteFilePath("rename12To45Basic");
     const QSet<QString>& occupied =                  //
         RenameNamesUnique::getOccupiedPostPath(pre,  //
-                                               {"", ""}, {"1", "2"}, true);
-    const QSet<QString> expect{"1", "2"};
+                                               {"/", "/"}, {"1", "2"}, true);
+    const QSet<QString> expect{"/1", "/2"};
     QCOMPARE(occupied, expect);
   }
 
@@ -42,8 +42,8 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
     const QString pre = QDir(mWorkPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
     const QSet<QString>& occupied =                  //
         RenameNamesUnique::getOccupiedPostPath(pre,  //
-                                               {"dirName", "dirName"}, {"dirName", "file1"}, true);
-    const QSet<QString> expect{"dirName", "dirName/file1", "dirName/dirName"};
+                                               {"/dirName/", "/dirName/"}, {"dirName", "file1"}, true);
+    const QSet<QString> expect{"/dirName", "/dirName/file1", "/dirName/dirName"};
     QCOMPARE(occupied, expect);
   }
 
@@ -85,8 +85,8 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
 
   void occupiedNameOfrenameDiretoryNameShouldNotConflict() {
     const QString pre = QDir(mWorkPath).absoluteFilePath("renameDiretoryNameShouldNotConflict");
-    const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"", "dirName", "dirName"}, {"dirName", "file1", "dirName"}, true);
-    const QSet<QString> actual{"dirName", "dirName/file1", "dirName/dirName"};
+    const QSet<QString>& occupied = RenameNamesUnique::getOccupiedPostPath(pre, {"/", "/dirName/", "/dirName/"}, {"dirName", "file1", "dirName"}, true);
+    const QSet<QString> actual{"/dirName", "/dirName/file1", "/dirName/dirName"};
     QCOMPARE(occupied, actual);
   }
 
@@ -132,7 +132,7 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
 
   void test_getRenameCommands_two_level_basic() {
     RenameNamesUnique sameLevelRenameCheck{"C:/home",
-                                           {"", "path", "path"},  //
+                                           {"/", "/path/", "/path/"},  //
                                            {"path", "A.mp4", "b.mp4"},
                                            {"", "", ""},  //
                                            {"PATH", "A.mp4", "B.MP4"},
@@ -150,8 +150,8 @@ class RenameUnqiueCheckTest : public PlainTestSuite {
     QCOMPARE(actualCmds.size(), 2);
     BATCH_COMMAND_LIST_TYPE expectAns  //
         {
-            ACMD::GetInstRENAME("C:/home/path", "b.mp4", "B.MP4"),  //
-            ACMD::GetInstRENAME("C:/home", "path", "PATH"),         //
+            ACMD::GetInstRENAME("C:/home/path/", "b.mp4", "B.MP4"),  //
+            ACMD::GetInstRENAME("C:/home/", "path", "PATH"),         //
         };                                                          //
     QCOMPARE(actualCmds, expectAns);
   }

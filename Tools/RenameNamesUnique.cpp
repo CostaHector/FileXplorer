@@ -37,21 +37,24 @@ RenameNamesUnique::RenameNamesUnique(const QString& pre,
 }
 
 QSet<QString> RenameNamesUnique::getOccupiedPostPath(const QString& pre, const QStringList& leftRoots, const QStringList& leftNames, bool includeSub) {
-  // m_pre + '/' + (rel2Names + '/' + (filename = basename + '.' + extension))
-  // i.e.. m_pre + '/' + postPath
+  // m_pre + (rel2Names + (filename = basename + '.' + extension))
+  // i.e.. m_pre + postPath
   // only filename is viable
   // rel2Names is not viable. when directory name need change. directory would just become filename
   // m_occupiedNames only need to store postPath
-  const QStringList itemsInPre = QDir{pre}.entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort);
-  QSet<QString> occupied{itemsInPre.cbegin(), itemsInPre.cend()};
+  QSet<QString> occupied;
+  for (const QString& directItem: QDir{pre}.entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort)) {
+    occupied.insert(join2Path("/", directItem));
+  }
+
   if (!includeSub) {
     return occupied;
   }
   for (int i = 0; i < leftNames.size(); ++i) {
-    QFileInfo fi{pre + '/' + leftRoots[i]};
+    QFileInfo fi{pre + leftRoots[i]};
     if (fi.isDir()) {
       const QStringList& itemsInLeftRoot =
-          join2Path(leftRoots[i], QDir(pre + '/' + leftRoots[i]).entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort));
+          join2Path(leftRoots[i], QDir(pre + leftRoots[i]).entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::NoSort));
       occupied.unite(QSet<QString>{itemsInLeftRoot.cbegin(), itemsInLeftRoot.cend()});
 
       continue;
@@ -62,16 +65,19 @@ QSet<QString> RenameNamesUnique::getOccupiedPostPath(const QString& pre, const Q
 }
 
 QString RenameNamesUnique::join2Path(const QString& rel2Name, const QString& name) {
-  return rel2Name.isEmpty() ? name : rel2Name + '/' + name;
+  return rel2Name + name;
 }
 
 QStringList RenameNamesUnique::join2Path(const QString& rel2Name, const QStringList& names) {
   if (rel2Name.isEmpty()) {
     return names;
   }
-  QStringList needPushFront{names};
-  std::for_each(needPushFront.begin(), needPushFront.end(), [&rel2Name](QString& s) { s = rel2Name + '/' + s; });
-  return needPushFront;
+  QStringList relativePaths;
+  relativePaths.reserve(names.size());
+  for (const QString& name: names) {
+    relativePaths.push_back(join2Path(rel2Name, name));
+  }
+  return relativePaths;
 }
 
 bool RenameNamesUnique::CheckConflict(QSet<QString> occupied, const QStringList& leftRoots, const QStringList& leftNames, const QStringList& rightNames, QStringList& conflictNames) {
@@ -112,11 +118,7 @@ BATCH_COMMAND_LIST_TYPE RenameNamesUnique::getRenameCommands() const {
     if (m_leftNames[i] == m_rightNames[i]) {
       continue;
     }
-    QString prePath{m_pre};
-    if (!m_relNameList[i].isEmpty()) {
-      prePath += '/';
-      prePath += m_relNameList[i];
-    }
+    QString prePath{m_pre + m_relNameList[i]};
     cmds.append(ACMD::GetInstRENAME(prePath, m_leftNames[i], m_rightNames[i]));
   }
   return {cmds.crbegin(), cmds.crend()};  // rename files first, than its folders;

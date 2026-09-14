@@ -11,7 +11,7 @@ static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d
 
 /*
 Given: path=".../replace"
-Given: jsonNames={"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"}
+Given: jsonNames={"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"}, can be json, mp4, pson, etc.
 Given: json mp4 jpg png files exist and are under ".../replace/pattern".
 Return:
         "pattern/Chris Evans 2.png",        //
@@ -21,7 +21,7 @@ Return:
         "pattern/Jensen Ackles.mp4",        //
         "pattern/Jensen Ackles.pson",       //
 */
-QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames, QMap<QString, QString>* pFile2Json) {
+QStringList GetFilesNeedProcess(const QString& path, const QStringList& patternNames, QMap<QString, QString>* pFile2Pattern) {
   QStringList filesNeedRename;
   QString relPath;
   QString jsonFileName;
@@ -44,7 +44,7 @@ QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonName
   };
 
   QDir sameLevelDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
-  for (const QString& rel2Json : jsonNames) {
+  for (const QString& rel2Json : patternNames) {
     jsonFileName = PathTool::GetPrepathAndFileName(rel2Json, relPath);
     const bool isRel{!relPath.isEmpty()};
     jsonLevelPath = path;
@@ -78,17 +78,17 @@ QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonName
       const QString extraContent = fileBaseName.mid(jsonBaseName.size());
       if (extraContent.isEmpty()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
-        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
+        if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;
       }
       if (extraContent == PathTool::THUMBNAIL_FILE_ABBR) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
-        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
+        if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;
       }
       if (JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
-        if (pFile2Json) (*pFile2Json)[filesNeedRename.back()] = rel2Json;
+        if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;
       }
     }

@@ -10,7 +10,7 @@ enum class RnmResult {
   ALL_SUCCEED = 1,
 };
 
-QStringList GetFilesNeedProcess(const QString& path, const QStringList& jsonNames, QMap<QString, QString>* pFile2Json=nullptr);
+QStringList GetFilesNeedProcess(const QString& path, const QStringList& patternNames, QMap<QString, QString>* pFile2Pattern=nullptr);
 RnmResult InsertQueryAndConfirm(const QString& workPath,           //
                                 const QStringList& selectedNames,  //
                                 const QString& defStrInsert = "",  //

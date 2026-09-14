@@ -33,13 +33,13 @@ class RenameWidget_SwapFileNamesTest : public PlainTestSuite {
 
     pReverse.InitTextEditContent(reversePath, selectFileNames);
     QCOMPARE(pReverse.mSelectedNames, (QStringList{"Henry Cavill 0.jpg", "Henry Cavill 1.jpg"}));
-    QCOMPARE(pReverse.mRelToNameWithNoRoot, (QStringList{"", ""}));
+    QCOMPARE(pReverse.mRelToNameWithNoRoot, (QStringList{"/", "/"}));
     QCOMPARE(pReverse.mNames, (QStringList{"Henry Cavill 0", "Henry Cavill 1"}));
     QCOMPARE(pReverse.mExts, (QStringList{".jpg", ".jpg"}));
     const QString& sPathLeftNoRoot = pReverse.m_relNameTE->toPlainText();
     const QString& sOldName = pReverse.m_oBaseTE->toPlainText();
     const QString& sOldExt = pReverse.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/");
     QCOMPARE(sOldName, "Henry Cavill 0\nHenry Cavill 1");
     QCOMPARE(sOldExt, ".jpg\n.jpg");
 
