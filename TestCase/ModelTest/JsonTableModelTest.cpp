@@ -337,19 +337,22 @@ private slots:
     const QModelIndex ind = jtm.index(0, JsonModelField::Duration);
     QCOMPARE(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
     QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 1);
+    QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 0); // not change
     QVERIFY(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
 
     MOCKER(VideoDurationGetter::GetLengthQuickStatic)
-        .expects(exactly(1))
+        .expects(exactly(2))
         .with(any(), mTDir.itemPath("duration_check/duration_test.mp4"))
         .will(returnValue(10 * 60 * 1000));  // 10min
     QCOMPARE(ind.siblingAtColumn(JsonModelField::Duration).data(Qt::DisplayRole).toString(), "00:00:00");
     QCOMPARE(jtm.UpdateDurationField({ind}, 1), 1);
+    QCOMPARE(jtm.UpdateDurationField({ind}, 1), 0); // not change
     QCOMPARE(ind.siblingAtColumn(JsonModelField::Duration).data(Qt::DisplayRole).toString(), "00:10:00");
 
-    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));  // 10min
+    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(2)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));  // 10min
     QCOMPARE(ind.siblingAtColumn(JsonModelField::MD5).data(Qt::DisplayRole).toString(), "");
     QCOMPARE(jtm.UpdateMD5Field({ind}, 1), 1);
+    QCOMPARE(jtm.UpdateMD5Field({ind}, 1), 0); // not change
     QCOMPARE(ind.siblingAtColumn(JsonModelField::MD5).data(Qt::DisplayRole).toString(), "AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD");
   }
 
