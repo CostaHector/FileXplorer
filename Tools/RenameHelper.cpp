@@ -153,11 +153,20 @@ QStringList PrependParentFolderNameToFileName(const QStringList& parentFolders, 
       ansNames.push_back(completeNames[i]);
       continue;
     }
-    QString prepath{parentFolders[i]};
+    int startIndex = 0, len = parentFolders[i].size();
+    if (parentFolders[i].startsWith('/')) {
+      ++startIndex;
+      --len;
+    }
+    if (parentFolders[i].endsWith('/')) {
+      --len;
+    }
+    QString prepath = parentFolders[i].mid(startIndex, len);
+    prepath.replace('/', ' ');
     if (prepath.isEmpty()) {
       ansNames.append(completeNames[i]);  // not parent folder
     } else {
-      ansNames.push_back(prepath.replace('/', ' ') + ' ' + completeNames[i]);
+      ansNames.push_back(prepath + ' ' + completeNames[i]);
     }
   }
   return ansNames;

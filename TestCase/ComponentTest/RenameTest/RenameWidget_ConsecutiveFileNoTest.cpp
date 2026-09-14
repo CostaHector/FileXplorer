@@ -37,7 +37,7 @@ class RenameWidget_ConsecutiveFileNoTest : public PlainTestSuite {
 
     pConse.InitTextEditContent(consecutivePath, selectFileNames);
     QCOMPARE(pConse.mSelectedNames, (QStringList{"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"}));
-    QCOMPARE(pConse.mRelToNameWithNoRoot, (QStringList{"", "", "", ""}));
+    QCOMPARE(pConse.mRelToNameWithNoRoot, (QStringList{"/", "/", "/", "/"}));
     QCOMPARE(pConse.mNames, (QStringList{"Chris Pine 0.jpg", "Chris Pine 5.jpg", "Chris Pine 11.jpg", "Chris Hemsworth 13.jpg"}));
     QCOMPARE(pConse.mExts, (QStringList{"", "", "", ""}));
 

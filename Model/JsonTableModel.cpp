@@ -38,6 +38,12 @@ QVariant JsonTableModel::data(const QModelIndex& index, int role) const {
     }
   } else if (role == Qt::ForegroundRole) {
     switch (col) {
+      case JsonModelField::FIELD_E::Name: {
+        if (!item.hintNameWithCast.isEmpty()) {
+          return QColor{Qt::GlobalColor::red};
+        }
+        break;
+      }
       case JsonModelField::FIELD_E::Cast: {
         if (!item.hintCast.isEmpty()) {
           return QColor{Qt::GlobalColor::red};
@@ -84,7 +90,7 @@ QVariant JsonTableModel::headerData(int section, Qt::Orientation orientation, in
     }
     case Qt::ForegroundRole: {
       if (orientation == Qt::Vertical && (0 <= section && section < rowCount()) && mCachedJsons[section].bModified) {
-        return QBrush(Qt::GlobalColor::red);
+        return QColor(Qt::GlobalColor::red);
       }
       break;
     }
@@ -139,11 +145,14 @@ int JsonTableModel::setRootPath(const QString& path, bool isForce) {
     tempCachedJsons.append(JsonPr::fromJsonFile(it.filePath()));
   }
   std::sort(tempCachedJsons.begin(), tempCachedJsons.end());
+  return setRootPathCore(tempCachedJsons);
+}
 
+int JsonTableModel::setRootPathCore(QVector<JsonPr>& sortedAscendingCachedJsons) {
   const int befRowCnt = mCachedJsons.size();
-  const int afterRowCnt = tempCachedJsons.size();
+  const int afterRowCnt = sortedAscendingCachedJsons.size();
   RowsCountBeginChange(befRowCnt, afterRowCnt);
-  mCachedJsons.swap(tempCachedJsons);
+  mCachedJsons.swap(sortedAscendingCachedJsons);
   RowsCountEndChange();
   return afterRowCnt;
 }
@@ -219,9 +228,27 @@ QStringList JsonTableModel::RelativePath2JsonFile(const QModelIndexList& indexes
   return relativePaths2FileName;
 }
 
-QStringList JsonTableModel::RelativePath2RelatedFiles(const QModelIndexList& indexes) const {
+QStringList JsonTableModel::RelativePath2RelatedFiles(const QModelIndexList& indexes, QMap<QString, QString>* pFile2Json) const {
   const QStringList& relativePathsOfJson{RelativePath2JsonFile(indexes)};
-  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
+  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson, pFile2Json);
+}
+
+QMap<QString, QStringList> JsonTableModel::RelativePath2JsonFile2CastList(const QModelIndexList& indexes) const {
+  QMap<QString, QStringList> nameField2CastField;
+
+  const int N = rootPath().size();
+  for (const QModelIndex& index : indexes) {
+    const int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range", row);
+      return {};
+    }
+    const JsonPr& pr = mCachedJsons[row];
+    const QString& fullPath = pr.GetJsonFileAbsPath();
+    nameField2CastField[PathTool::relativePath(fullPath, N)] = pr.m_Cast.toSortedList();
+  }
+
+  return nameField2CastField;
 }
 
 bool JsonTableModel::setModified(int row, bool modified) {
@@ -456,6 +483,42 @@ int JsonTableModel::InitCastAndStudio(const QModelIndexList& rowIndexes) {
   return affecteRows;
 }
 
+int JsonTableModel::ComposeNameWithCast(const QModelIndexList& rowIndexes) {
+  int baseNameCnt{0};
+  int row{-1};
+  int nameMinRow{INT_MAX}, nameMaxRow{-1};
+  for (const QModelIndex& ind : rowIndexes) {
+    row = ind.row();
+    if (row < 0 || row >= rowCount()) {
+      LOG_W("row: %d out of range [0,%d)", row, rowCount());
+      return baseNameCnt;
+    }
+    auto& item = mCachedJsons[row];
+    if (!item.BuildNameHintWithCast()) {
+      continue;
+    }
+    item.m_Name = item.hintNameWithCast;
+    setModifiedNoEmit(row, true);
+    if (row > nameMaxRow) {
+      nameMaxRow = row;
+    }
+    if (row < nameMinRow) {
+      nameMinRow = row;
+    }
+    ++baseNameCnt;
+  }
+  if (nameMaxRow < 0 || nameMinRow > nameMaxRow) {
+    LOG_W("Name Field of %d row(s) NO hint at all", rowIndexes.size());
+  } else {
+    const QModelIndex& nameFrontInd = sibling(nameMinRow, JsonModelField::FIELD_E::Name, {});
+    const QModelIndex& nameBackInd = sibling(nameMaxRow, JsonModelField::FIELD_E::Name, {});
+    emit dataChanged(nameFrontInd, nameBackInd, {Qt::ForegroundRole | Qt::DisplayRole});
+    emit headerDataChanged(Qt::Vertical, nameMinRow, nameMaxRow);
+    LOG_D("Name Field of %d/%d row(s) range [%d, %d) hint ok", baseNameCnt, rowIndexes.size(), nameMinRow, nameMaxRow);
+  }
+  return baseNameCnt;
+}
+
 int JsonTableModel::HintCastAndStudio(const QModelIndexList& rowIndexes, const QString& sentence) {
   int studioCnt{0}, castCnt{0};
   int row{-1};
@@ -684,7 +747,7 @@ int JsonTableModel::AfterJsonFilesNameRenamed(const QModelIndexList& indexes) {
 }
 
 int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
-  int cnt{0};
+  int cnt{0}, failedCnt{0};
   int row{-1};
   int minRow{INT_MAX}, maxRow{-1};
   for (const QModelIndex& ind : rowIndexes) {
@@ -698,7 +761,8 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
     }
     if (!mCachedJsons[row].WriteIntoFiles()) {
       LOG_W("Write into local file[%s] failed", qPrintable(mCachedJsons[row].GetJsonFileAbsPath()));
-      return -1;
+      ++failedCnt;
+      continue;
     }
     if (row > maxRow) {
       maxRow = row;
@@ -717,7 +781,7 @@ int JsonTableModel::SaveCurrentChanges(const QModelIndexList& rowIndexes) {
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole | Qt::ForegroundRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   LOG_D("Changes of %d/%d row(s) range [%d, %d) saved ok", cnt, rowIndexes.size(), minRow, maxRow);
-  return cnt;
+  return failedCnt > 0 ? -1 : cnt;
 }
 
 std::pair<int, int> JsonTableModel::ExportCastStudioToLocalDictionaryFile(const QModelIndexList& rowIndexes) const {

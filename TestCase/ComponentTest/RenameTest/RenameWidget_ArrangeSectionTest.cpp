@@ -51,14 +51,14 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
 
     pArrange.InitTextEditContent(arrangePath, selectFileNames);
     QCOMPARE(pArrange.mSelectedNames, (QStringList{"Part A - Part B"}));
-    QCOMPARE(pArrange.mRelToNameWithNoRoot, (QStringList{"", "Part A - Part B", "Part A - Part B"}));
+    QCOMPARE(pArrange.mRelToNameWithNoRoot, (QStringList{"/", "/Part A - Part B/", "/Part A - Part B/"}));
     QCOMPARE(pArrange.mNames, (QStringList{"Part A - Part B", "Img A - Img B - Img C - Img D", "json A - json B - json C - json D"}));
     QCOMPARE(pArrange.mExts, (QStringList{"", ".jpg", ".json"}));
 
     const QString& sPathLeftNoRoot = pArrange.m_relNameTE->toPlainText();
     const QString& sOldName = pArrange.m_oBaseTE->toPlainText();
     const QString& sOldExt = pArrange.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nPart A - Part B\nPart A - Part B");
+    QCOMPARE(sPathLeftNoRoot, "/\n/Part A - Part B/\n/Part A - Part B/");
     QCOMPARE(sOldName, "Part A - Part B\nImg A - Img B - Img C - Img D\njson A - json B - json C - json D");
     QCOMPARE(sOldExt, "\n.jpg\n.json");
 

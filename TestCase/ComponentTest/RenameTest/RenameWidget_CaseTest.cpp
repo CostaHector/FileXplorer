@@ -37,14 +37,14 @@ class RenameWidget_CaseTest : public PlainTestSuite {
 
     pCase.InitTextEditContent(casePath, selectFileNames);
     QCOMPARE(pCase.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
-    QCOMPARE(pCase.mRelToNameWithNoRoot, (QStringList{"", "super", "super", ""}));
+    QCOMPARE(pCase.mRelToNameWithNoRoot, (QStringList{"/", "/super/", "/super/", "/"}));
     QCOMPARE(pCase.mNames, (QStringList{"super", "Chris Evans", "Chris Evans", "Henry Cavill"}));
     QCOMPARE(pCase.mExts, (QStringList{"", ".jpg", ".pson", ".jpg"}));
 
     const QString& sPathLeftNoRoot = pCase.m_relNameTE->toPlainText();
     const QString& sOldName = pCase.m_oBaseTE->toPlainText();
     const QString& sOldExt = pCase.m_oExtTE->toPlainText();
-    QCOMPARE(sPathLeftNoRoot, "\nsuper\nsuper\n");
+    QCOMPARE(sPathLeftNoRoot, "/\n/super/\n/super/\n/");
     QCOMPARE(sOldName, "super\nChris Evans\nChris Evans\nHenry Cavill");
     QCOMPARE(sOldExt, "\n.jpg\n.pson\n.jpg");
 

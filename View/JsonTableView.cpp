@@ -8,6 +8,7 @@
 #include "ViewHelper.h"
 #include "TagsHelper.h"
 #include "PathTool.h"
+#include "RenameWidget_CastElider.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -513,6 +514,43 @@ int JsonTableView::onCheckSampleMD5AndVidNameConsistency() const {
   return inconsistentCount;
 }
 
+int JsonTableView::onComposeNameWithCast() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("nothing selected", "Skip compose name with cast");
+    return 0;
+  }
+
+  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const int cnt = _JsonModel->ComposeNameWithCast(indexes);
+
+  LOG_OK_P("Compose name with cast", "%d/%d row(s)", cnt, indexes.size());
+  return indexes.size();
+}
+
+int JsonTableView::onSyncRelatedFileNameWithNameCast() {
+  if (!selectionModel()->hasSelection()) {
+    LOG_INFO_NP("Nothing selected", "Skip Sync related files");
+    return 0;
+  }
+  const QModelIndexList& srcIndexes = selectedRowsSource(JsonModelField::Name);
+  QMap<QString, QString> relatedFile2Json;
+  const QStringList relNames = _JsonModel->RelativePath2RelatedFiles(srcIndexes, &relatedFile2Json);
+  const QString currentPath = _JsonModel->rootPath();
+  QMap<QString, QStringList> relativeJson2Cast = _JsonModel->RelativePath2JsonFile2CastList(srcIndexes);
+  RenameWidget_CastElider pCastElider{this};
+  pCastElider.init();
+  pCastElider.setModal(true);
+  pCastElider.initCoreName2CastListMap(relativeJson2Cast);
+  pCastElider.initRelatedFile2Json(relatedFile2Json);
+  pCastElider.InitTextEditContent(currentPath, relNames);
+  // AfterJsonFilesNameRenamed
+  if (RenameWidget_CastElider::execCore(&pCastElider) != QDialog::Accepted) {
+    LOG_INFO_P("[Cancel] Sync related files", "User cancel rename %d item(s)", relNames.size());
+    return 0;
+  }
+  return srcIndexes.size();
+}
+
 void JsonTableView::subscribe() {
   addActions(g_renameAg().GetGeneralRenameActions());
 
@@ -520,15 +558,18 @@ void JsonTableView::subscribe() {
 
   connect(inst._SAVE_CURRENT_CHANGES, &QAction::triggered, this, &JsonTableView::onSaveCurrentChanges);
 
-  connect(inst._SYNC_NAME_FIELD_BY_FILENAME, &QAction::triggered, this, &JsonTableView::onSyncNameField);
+  connect(inst._SYNC_NAME_FIELD_FROM_FILENAME, &QAction::triggered, this, &JsonTableView::onSyncNameField);
   connect(inst._RELOAD_JSON_FROM_FROM_DISK, &QAction::triggered, _JsonModel, &JsonTableModel::forceReloadPath);
   connect(inst._EXPORT_CAST_STUDIO_TO_DICTION, &QAction::triggered, this, &JsonTableView::onExportCastStudioToDictonary);
 
-  connect(inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD, &QAction::triggered, this, [this]() { onSelectionCaseOperation(true); });
-  connect(inst._LOWER_ALL_WORDS, &QAction::triggered, this, [this]() { onSelectionCaseOperation(false); });
+  connect(inst._CAPITALIZE_FIRST_LETTER_IN_SELECTION, &QAction::triggered, this, [this]() { onSelectionCaseOperation(true); });
+  connect(inst._LOWER_ALL_LETTERS_IN_SELECTION, &QAction::triggered, this, [this]() { onSelectionCaseOperation(false); });
 
-  connect(inst._INFER_CAST_STUDIO, &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
-  connect(inst._FORMAT_STUDIO_CAST_FIELD, &QAction::triggered, this, &JsonTableView::onFormatCast);
+  connect(inst._COMPOSE_NAME_WITH_CAST, &QAction::triggered, this, &JsonTableView::onComposeNameWithCast);
+  connect(inst._SYNC_FILE_NAMES_WITH_NAME_CAST, &QAction::triggered, this, &JsonTableView::onSyncRelatedFileNameWithNameCast);
+
+  connect(inst._EXTRACT_CAST_STUDIO , &QAction::triggered, this, &JsonTableView::onHintCastAndStudio);
+  connect(inst._SORT_DEDUP_CAST, &QAction::triggered, this, &JsonTableView::onFormatCast);
   connect(inst._UPDATE_SIZE_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileSize);
   connect(inst._UPDATE_DURATION_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateDuration);
   connect(inst._UPDATE_MD5_FIELD, &QAction::triggered, this, &JsonTableView::onUpdateFileMD5);

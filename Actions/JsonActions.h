@@ -17,18 +17,19 @@ public:
   QAction* _SAVE_CURRENT_CHANGES{nullptr};
 
   // **Sync cache/file system**
-  QAction* _SYNC_NAME_FIELD_BY_FILENAME{nullptr};
+  QAction* _SYNC_NAME_FIELD_FROM_FILENAME{nullptr}, *_SYNC_FILE_NAMES_WITH_NAME_CAST{nullptr};
   QAction* _RELOAD_JSON_FROM_FROM_DISK{nullptr};
   QAction* _EXPORT_CAST_STUDIO_TO_DICTION{nullptr};
 
   // **Case Control**
-  QAction* _CAPITALIZE_FIRST_LETTER_OF_EACH_WORD{nullptr};
-  QAction* _LOWER_ALL_WORDS{nullptr};
+  QAction* _CAPITALIZE_FIRST_LETTER_IN_SELECTION{nullptr};
+  QAction* _LOWER_ALL_LETTERS_IN_SELECTION{nullptr};
 
   // **Studio/Cast/Tags Field Operation**
   QAction* _INIT_STUDIO_CAST_FIELD{nullptr};
-  QAction* _INFER_CAST_STUDIO{nullptr};
-  QAction* _FORMAT_STUDIO_CAST_FIELD{nullptr};
+  QAction* _COMPOSE_NAME_WITH_CAST{nullptr};
+  QAction* _EXTRACT_CAST_STUDIO{nullptr};
+  QAction* _SORT_DEDUP_CAST{nullptr};
   QAction* _SET_CONTENTS_FIXED{nullptr};
   QAction* _SET_CONTENTS_UNFIXED{nullptr};
 

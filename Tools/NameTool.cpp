@@ -14,6 +14,10 @@ const QRegularExpression NameTool::NAME_COMP(FREQUENT_NAME_PATTER);
 const QString NameTool::INVALID_CHARS("*?\"<>|");
 const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), INVALID_CHARS.cend());
 
+constexpr const char NameTool::COMMA_SPACE_EXT[];
+constexpr const int NameTool::COMMA_SPACE_EXT_LEN;
+constexpr const char* NameTool::COMMA_SPACE;
+
 constexpr char NameTool::CELL_NEW_LINE;
 constexpr char NameTool::CSV_COMMA;
 const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|\s*,\s*|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
@@ -54,6 +58,36 @@ QStringList NameTool::castFromUpperCaseSentence(const QString& s) const {
   ans.sort();
   ans.removeDuplicates();
   return ans;
+}
+
+bool isAllCastInsideCoreName(const QString& coreName, const QStringList& castLst) {
+  if (coreName.contains(NameTool::COMMA_SPACE_EXT)) {
+    return true;
+  }
+  for (const QString& oneActor: castLst) {
+    if (!coreName.contains(oneActor)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+QString NameTool::ComposeNameWithinLimit(const QString& coreName, const QStringList& actors, const int kMaxLen) {
+  if (isAllCastInsideCoreName(coreName, actors)) {
+    return coreName;
+  }
+  const QString prefix = coreName + " - ";
+  // 大多数情况下足够
+  const QString fullName = prefix + actors.join(COMMA_SPACE);
+  if (fullName.size() <= kMaxLen) {
+    return fullName;
+  }
+  const QString suffix = COMMA_SPACE_EXT;
+  const int maximumActorsIndex = fullName.lastIndexOf(COMMA_SPACE, kMaxLen - COMMA_SPACE_EXT_LEN);
+  if (maximumActorsIndex == -1 || maximumActorsIndex <= prefix.size()) {
+    return coreName; // cannot append cast to name
+  }
+  return fullName.left(maximumActorsIndex) + suffix;
 }
 
 QString NameTool::CapitaliseFirstLetterKeepOther(const QString& sentence) {

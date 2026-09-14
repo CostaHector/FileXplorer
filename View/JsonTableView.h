@@ -35,6 +35,9 @@ class JsonTableView : public CustomTableView {
   int onSelectionCaseOperation(bool isTitle);
   int onCheckSampleMD5AndVidNameConsistency() const;
 
+  int onComposeNameWithCast();
+  int onSyncRelatedFileNameWithNameCast();
+
   enum class EDITOR_WIDGET_TYPE {
     LINE_EDIT = 0,
     PLAIN_TEXT_EDIT,

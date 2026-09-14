@@ -39,9 +39,9 @@ Movie
     Chris Evans.jpg
     Chris Evans 2.jpg
     Chris Evans.pson   9
-  Huge Jackman
-    Huge Jackman.jpg
-    Huge Jackman.pson  8
+  Hugh Jackman
+    Hugh Jackman.jpg
+    Hugh Jackman.pson  8
   Kaka
     Kaka.jpg
     Kaka.pson          10
@@ -57,8 +57,8 @@ escape folder
        {"Movie/Chris Evans/Chris Evans 2.jpg", false, ""},
        {"Movie/Chris Evans/Chris Evans.pson", false, CastValues2PsonStr("Chris Evans", 9, "", "", "Movie", -1, -1, "", "", "Chris Evans 2.jpg\nChris Evans.jpg", "")},
 
-       {"Movie/Huge Jackman/Huge Jackman.jpg", false, ""},
-       {"Movie/Huge Jackman/Huge Jackman.pson", false, CastValues2PsonStr("Huge Jackman", 8, "", "", "Movie", -1, -1, "", "", "Huge Jackman.jpg", "")},
+       {"Movie/Hugh Jackman/Hugh Jackman.jpg", false, ""},
+       {"Movie/Hugh Jackman/Hugh Jackman.pson", false, CastValues2PsonStr("Hugh Jackman", 8, "", "", "Movie", -1, -1, "", "", "Hugh Jackman.jpg", "")},
 
        {"Movie/Kaka/Kaka.jpg", false, ""},
        {"Movie/Kaka/Kaka.pson", false, CastValues2PsonStr("Kaka", 10, "", "", "Movie", -1, -1, "", "", "Kaka.jpg", "")},
@@ -70,14 +70,14 @@ escape folder
       {
        {"Kaka", {"Movie", QSet<QString>{"Kaka.jpg"}, 10}},
        {"Chris Evans", {"Movie", QSet<QString>{"Chris Evans.jpg", "Chris Evans 2.jpg"}, 9}},
-       {"Huge Jackman", {"Movie", QSet<QString>{"Huge Jackman.jpg"}, 8}},
+       {"Hugh Jackman", {"Movie", QSet<QString>{"Hugh Jackman.jpg"}, 8}},
        {"Ricky Martin", {"Music", QSet<QString>{"Ricky Martin.jpg"}, 10}},
        };
 
   const QString mPerfAkaMultiLineText {
       "Kaka|Ricardo Izecson dos Santos Leite\n"
       "Chris Evans,Cevans and Christopher Robert Evans\n"
-      "Huge Jackman, Wolverine\n"
+      "Hugh Jackman, Wolverine\n"
       "Ricky Martin, Enrique Martin Morales"
   };
   // itself
@@ -85,13 +85,13 @@ escape folder
       { //
        {"Kaka", "Ricardo Izecson dos Santos Leite"},
        {"Chris Evans", "Cevans,Christopher Robert Evans"},
-       {"Huge Jackman", "Wolverine"},
+       {"Hugh Jackman", "Wolverine"},
        {"Ricky Martin", "Enrique Martin Morales"},
        };
   // others
   const QString mPerfOtherOrNoneAkaMultiLineText {
       "Chris Evans, Captain America\n"
-      "Huge Jackman\n"
+      "Hugh Jackman\n"
       "Ricky Martin, Enrique Martin Morales\n"
       "Jake Gyllenhaal,Jacob Benjamin Gyllenhaal\n"
       "Brad Pitt,William Bradley Pitt\n"
@@ -100,7 +100,7 @@ escape folder
   const QMap<QString, QString> mPerf2OtherAkaMaps // 6
       { //
           {"Chris Evans", "Captain America"},
-          {"Huge Jackman", ""},
+          {"Hugh Jackman", ""},
           {"Ricky Martin", "Enrique Martin Morales"},
           {"Jake Gyllenhaal", "Jacob Benjamin Gyllenhaal"},
           {"Brad Pitt", "William Bradley Pitt"},
@@ -212,7 +212,7 @@ private slots:
       using namespace CastDbModelField;
       QVERIFY(perfDb.QueryPK(DB_TABLE::PERFORMERS, ENUM_2_STR(Name), pkNames));
     }
-    QSet<QString> expectNames{"Kaka", "Chris Evans", "Huge Jackman", "Ricky Martin"};
+    QSet<QString> expectNames{"Kaka", "Chris Evans", "Hugh Jackman", "Ricky Martin"};
     QCOMPARE(pkNames, expectNames);
 
     QList<QSqlRecord> records;

@@ -15,6 +15,7 @@ class RibbonJson : public QToolBar {
   QToolBar* mFieldCaseOperTb{nullptr};
 
   QToolBar* mInitFormatStudioCastField{nullptr};
+  QToolBar* mInferNameTb{nullptr};
   QToolBar* mInferStudioCastFromSelection{nullptr};
 
   MenuToolButton* mStudioMenu{nullptr};

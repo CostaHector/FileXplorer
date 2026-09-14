@@ -23,9 +23,9 @@ class FileOsWalkerTest : public PlainTestSuite {
     const bool includeDirectory = true;
     fow(rels, includeDirectory);
 
-    const QStringList relToNames{"",                       //
-                                 "ABC - DEF - name sc.1",  //
-                                 ""};
+    const QStringList relToNames{"/",                       //
+                                 "/ABC - DEF - name sc.1/",  //
+                                 "/"};
     const QStringList completeNames{"ABC - DEF - name sc.1",  //
                                     "ABC - DEF - name sc.1",  //
                                     "ABC - DEF - name sc.1"};
@@ -45,8 +45,8 @@ class FileOsWalkerTest : public PlainTestSuite {
     FileOsWalker fow{mRootpath, false};
     fow(rels, includeDirectory);
 
-    const QStringList relToNames{"",  //
-                                 ""};
+    const QStringList relToNames{"/",  //
+                                 "/"};
     const QStringList completeNames{"ABC - DEF - name sc.1",  //
                                     "ABC - DEF - name sc.1"};
     const QStringList suffixs{"", ".txt"};
@@ -65,9 +65,9 @@ class FileOsWalkerTest : public PlainTestSuite {
     const bool includeDirectory = true;
     fow(rels, includeDirectory);
 
-    const QStringList relToNames{"",                               //
-                                 "ABC - DEF - name sc.1",          //
-                                 ""};                              //
+    const QStringList relToNames{"/",                               //
+                                 "/ABC - DEF - name sc.1/",          //
+                                 "/"};                              //
     const QStringList completeNames{"ABC - DEF - name sc.1",       //
                                     "ABC - DEF - name sc.1.m",     //
                                     "ABC - DEF - name sc.1.txt"};  //
@@ -90,7 +90,7 @@ class FileOsWalkerTest : public PlainTestSuite {
     bool includingSub = true;
     fow({"Z", "a"}, includingSub);
 
-    QCOMPARE(fow.relToNames, (QStringList{"", "Z", "Z", ""}));
+    QCOMPARE(fow.relToNames, (QStringList{"/", "/Z/", "/Z/", "/"}));
     QCOMPARE(fow.completeNames, (QStringList{"Z", "Ability Dictionary.txt", "abc.txt", "a"}));
     QCOMPARE(fow.suffixs, (QStringList{"", "", "", ""}));
     QCOMPARE(fow.isFiles, (QList<bool>{false, true, true, false}));

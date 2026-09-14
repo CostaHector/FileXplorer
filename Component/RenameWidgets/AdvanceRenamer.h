@@ -55,13 +55,26 @@ class AdvanceRenamer : public QDialog {
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
+  QString preAt(int i) const {
+    if (i < 0 || i >= mNames.size()) return "";
+    return mRelToNameWithNoRoot[i];
+  }
+  QString fileNameAt(int i) const {
+    if (i < 0 || i >= mNames.size()) return "";
+    return mNames[i] + mExts[i];
+  }
+  QString relativePathAt(int i) const {
+    if (i < 0 || i >= mNames.size()) return "";
+    return mRelToNameWithNoRoot[i] + fileNameAt(i);
+  }
+
   QCheckBox* m_nameExtIndependent{nullptr};
   QCheckBox* m_recursiveCB{nullptr};
   StateLabel* regexValidLabel{nullptr};
 
   QString mWorkPath;
   QStringList mSelectedNames;
-  QStringList mRelToNameWithNoRoot;  // (no root) relative path to file
+  QStringList mRelToNameWithNoRoot;  // (no root) relative path to file. e.g. "/" or "/pre/"
   QStringList mSelectedFilesFullPath;
 
   QStringList mNames;  // with extension or without

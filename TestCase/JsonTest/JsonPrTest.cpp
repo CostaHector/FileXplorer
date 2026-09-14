@@ -60,6 +60,18 @@ class JsonPrTest : public PlainTestSuite {
 
   void cleanup() { GlobalMockObject::verify(); }
 
+  void HintBaseName_ok() {
+    JsonPr jpr;
+    QVERIFY(jpr.hintNameWithCast.isEmpty());
+    QVERIFY(!jpr.BuildNameHintWithCast()); // unchange
+    QVERIFY(jpr.hintNameWithCast.isEmpty());
+
+    jpr.m_Name = "Marvel";
+    jpr.m_Cast = SortedUniqStrLst{QStringList{"Chris Evans", "Chris Hemsworth"}};
+    QVERIFY(jpr.BuildNameHintWithCast()); // changed
+    QCOMPARE(jpr.hintNameWithCast, "Marvel - Chris Evans, Chris Hemsworth");
+  }
+
   void HintForCastStudio_ok() {  //
     JsonPr jpr;
     bool studioChange{true}, castChanged{true};
@@ -109,6 +121,11 @@ class JsonPrTest : public PlainTestSuite {
       jpr.HintForCastStudio(sentence, studioChange, castChanged);
       QCOMPARE(studioChange, true);
       QCOMPARE(castChanged, true);
+
+      QVERIFY(jpr.BuildNameHintWithCast());
+      QCOMPARE(jpr.hintNameWithCast, "Marvel Films- Read Madrid - A1 C1, G1, A1 B1 - B1 D1");
+      jpr.RejectBaseNameHint();
+      QCOMPARE(jpr.hintNameWithCast, "");
 
       QCOMPARE(jpr.hintCast, "A1 B1,A1 C1");  // hint cast no need sorted
       jpr.RejectCastHint();
@@ -194,9 +211,11 @@ class JsonPrTest : public PlainTestSuite {
 
     // 4. Write without deprecated key ProductionStudio, Performers should ok, hint filed should be cleared
     // Tags/Cast/Hot should be sorted and unique before write into json file
+    jPr.hintNameWithCast = "SuperMan - Henry Cavill [2020] - Chris Evans,Henry Cavill";
     jPr.hintCast = "Lalala..";
     jPr.hintStudio = "BLA.BLA..";
     QVERIFY(jPr.WriteIntoFiles());
+    QVERIFY(jPr.hintNameWithCast.isEmpty());
     QVERIFY(jPr.hintCast.isEmpty());
     QVERIFY(jPr.hintStudio.isEmpty());
 

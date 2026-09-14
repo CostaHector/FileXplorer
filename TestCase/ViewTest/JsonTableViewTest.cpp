@@ -6,6 +6,7 @@
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
+#include "RenameWidget_CastElider.h"
 
 #include "VideoDurationGetter.h"
 #include "JsonActions.h"
@@ -78,8 +79,8 @@ class JsonTableViewTest : public PlainTestSuite {
     QVERIFY(!jsonView.CurrentIndexSource().isValid());
     QVERIFY(jsonView.selectedRowsSource(JsonModelField::Name).isEmpty());
 
-    emit inst._CAPITALIZE_FIRST_LETTER_OF_EACH_WORD->triggered();
-    emit inst._LOWER_ALL_WORDS->triggered();
+    emit inst._CAPITALIZE_FIRST_LETTER_IN_SELECTION->triggered();
+    emit inst._LOWER_ALL_LETTERS_IN_SELECTION->triggered();
     QCOMPARE(jsonView.onSelectionCaseOperation(true), -1);
     QCOMPARE(jsonView.onSelectionCaseOperation(false), -1);
 
@@ -103,6 +104,8 @@ class JsonTableViewTest : public PlainTestSuite {
     QCOMPARE(jsonView.onHintCastAndStudio(), 0);
     QCOMPARE(jsonView.onFormatCast(), 0);
     QCOMPARE(jsonView.onClearStudio(), 0);
+    QCOMPARE(jsonView.onComposeNameWithCast(), 0);
+    QCOMPARE(jsonView.onSyncRelatedFileNameWithNameCast(), 0);
 
     QCOMPARE(jsonView.onAppendFromSelection(true), -1);
     QCOMPARE(jsonView.onAppendFromSelection(false), -1);
@@ -539,6 +542,15 @@ class JsonTableViewTest : public PlainTestSuite {
     jsonView.selectionModel()->select({jsonProxyModel.index(1, JsonModelField::Prepath), jsonProxyModel.index(1, JsonModelField::Detail)},
                                       QItemSelectionModel::SelectionFlag::Deselect);
     QCOMPARE(jsonView.onReqUnfixSelectionRecordContents(), 1);
+
+    jsonView.selectAll();
+    QCOMPARE(jsonView.onComposeNameWithCast(), 2);
+
+    MOCKER(RenameWidget_CastElider::execCore).expects(exactly(2))
+        .will(returnValue((int)QDialog::Rejected))
+        .then(returnValue((int)QDialog::Accepted));
+    QCOMPARE(jsonView.onSyncRelatedFileNameWithNameCast(), 0);
+    QCOMPARE(jsonView.onSyncRelatedFileNameWithNameCast(), 2);
   }
 
   void onUpdateDuration_ok() {

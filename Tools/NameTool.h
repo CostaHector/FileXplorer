@@ -15,6 +15,8 @@ class NameTool {
   QStringList castFromSentence(const QString& s) const;
   QStringList castFromUpperCaseSentence(const QString& s) const;
 
+  static QString ComposeNameWithinLimit(const QString& coreName, const QStringList& actors, const int kMaxLen = 240);
+
   static QString CapitaliseFirstLetterKeepOther(const QString& sentence);
   static QString CapitaliseFirstLetterLowerOther(const QString& sentence);
   static QString ToggleSentenceCase(const QString& sentence);
@@ -41,6 +43,10 @@ class NameTool {
   static QString CastTagSentenceParse2Str(const QString& sentense, bool bElementUnique);
   static QStringList CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast);
   static QString CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast);
+
+  static constexpr const char COMMA_SPACE_EXT[] = ", etc";
+  static constexpr const int COMMA_SPACE_EXT_LEN = sizeof(COMMA_SPACE_EXT) - 1;
+  static constexpr const char* COMMA_SPACE = ", ";
 
   static constexpr char CSV_COMMA = ',';
   static constexpr char CELL_NEW_LINE = '\n';

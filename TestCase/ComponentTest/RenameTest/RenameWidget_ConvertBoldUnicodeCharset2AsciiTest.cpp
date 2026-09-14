@@ -34,7 +34,7 @@ class RenameWidget_ConvertBoldUnicodeCharset2AsciiTest : public PlainTestSuite {
 
     pCovert.InitTextEditContent(unicodePath, selectFileNames);
     QCOMPARE(pCovert.mSelectedNames, (QStringList{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"}));
-    QCOMPARE(pCovert.mRelToNameWithNoRoot, (QStringList{"", "", ""}));
+    QCOMPARE(pCovert.mRelToNameWithNoRoot, (QStringList{"/", "/", "/"}));
     QCOMPARE(pCovert.mNames, (QStringList{"𝗔𝗕𝗖.txt", "𝘅𝘆𝘇.txt", "def.txt"}));
     QCOMPARE(pCovert.mExts, (QStringList{"", "", ""}));
 

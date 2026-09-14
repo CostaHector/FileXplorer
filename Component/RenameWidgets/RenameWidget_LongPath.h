@@ -8,7 +8,7 @@
 class RenameWidget_LongPath : public AdvanceRenamer {
   Q_OBJECT
  public:
-  explicit RenameWidget_LongPath(QWidget* parent = nullptr);
+  using AdvanceRenamer::AdvanceRenamer;
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
