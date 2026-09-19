@@ -9,7 +9,7 @@
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
     : QToolBar{title, parent}                                        //
 {
-  auto& inst = g_dbAct();
+  auto& inst = MovieDBActions::GetInst();
 
   m_dbControlTB = new (std::nothrow) QToolBar{"DB Control", this};
   CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);

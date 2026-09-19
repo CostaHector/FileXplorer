@@ -53,7 +53,7 @@ void MovieDBView::subscribe() {
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::whereClauseChanged, _dbModel, &SqlTableModelPub::SetFilterAndSelect);
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::movieTableChanged, this, &MovieDBView::setCurrentMovieTable);
 
-  auto& inst = g_dbAct();
+  auto& inst = MovieDBActions::GetInst();
   // control actions
   connect(inst.SUBMIT, &QAction::triggered, this, &MovieDBView::onSubmit);
   connect(inst._MODEL_REPOPULATE, &QAction::triggered, _dbModel, &FdBasedDbModel::repopulate);
@@ -132,21 +132,30 @@ bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userS
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = tblPeerPath;
   }
-  const QString caption{QString{"Choose a path %1(subdirectory of [%2]) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
+
+  const bool bAllowOutsidePath{MovieDBActions::GetInst().isAllowPathOutsideTableMount()};
+  QString caption{QString{"Select a directory %1"}.arg(usageMsg)};
+  if (!bAllowOutsidePath) {
+    caption += QString{"(must be under [%1])"}.arg(tblPeerPath);
+  }
+  caption += QString{" for table[%1]"}.arg(curTblName);
 
   QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
   if (selectPath.isEmpty()) {
-    LOG_WARN_NP("User cancel insert, path is not directory", selectPath);
+    LOG_INFO_NP("Directory selection canceled by user; no path selected", selectPath);
     return false;
   }
-  if (!selectPath.startsWith(tblPeerPath)) {
-    LOG_WARN_P("Path user selected not start with table name", "selectPath:%s\ntblPeerPath:%s", qPrintable(selectPath), qPrintable(tblPeerPath));
+
+  if (!bAllowOutsidePath && !selectPath.startsWith(tblPeerPath)) {
+    LOG_WARN_P("Selected path is outside the table mount path, which is not allowed by current settings",
+               "selectedPath=%s, tableMountPath=%s",
+               qPrintable(selectPath), qPrintable(tblPeerPath));
     return false;
   }
 
   Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, selectPath);
   userSelected.swap(selectPath);
-  LOG_D("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
+  LOG_D("[%s] User selectPath[%s] tableMountPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
   return true;
 }
 
@@ -164,7 +173,7 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
   }
 
   QString selectPath;
-  if (!GetAPathFromUserSelect("and scan videos/jsons from", selectPath)) {
+  if (!GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath)) {
     return false;
   }
   const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};

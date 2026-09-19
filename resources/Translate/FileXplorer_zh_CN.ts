@@ -1091,7 +1091,7 @@
     <message>
         <location line="+11"/>
         <source>Sync File Names from Name &amp;&amp; Cast</source>
-        <translation>同步相关文件名为Name&amp;&amp;Cast</translation>
+        <translation>更新相关文件名</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1171,7 +1171,7 @@
     <message>
         <location line="-35"/>
         <source>Set Name from File Name</source>
-        <translation>同步Name字段为文件basename</translation>
+        <translation>更新Name字段</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1422,7 +1422,12 @@
         <translation>从Json文件导入</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+3"/>
+        <source>Allow Paths Outside Table Mount</source>
+        <translation>允许表格挂载点之外的路径</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Delete Where</source>
         <translation>删除</translation>
     </message>

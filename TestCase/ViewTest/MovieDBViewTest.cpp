@@ -3,6 +3,7 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "MovieDBView.h"
+#include "MovieDBActions.h"
 #include "EndToExposePrivateMember.h"
 
 #include "Logger.h"
@@ -11,7 +12,6 @@
 #include "TDir.h"
 #include "MountHelper.h"
 #include "MovieDBModelField.h"
-#include "MovieDBActions.h"
 #include "VideoDurationGetter.h"
 
 #include <QInputDialog>
@@ -85,9 +85,17 @@ private slots:
       QVERIFY(tableName2ToPath2Ok);
       QVERIFY(tableName3ToPath3Ok);
     }
+    if (MovieDBActions::GetInst().isAllowPathOutsideTableMount()) {
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    }
   }
 
-  void cleanupTestCase() { Configuration().clear(); }
+  void cleanupTestCase() {
+    Configuration().clear();
+    if (MovieDBActions::GetInst().isAllowPathOutsideTableMount()) {
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    }
+  }
 
   void init() {
     GlobalMockObject::reset();
@@ -325,6 +333,12 @@ private slots:
 
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
+    {
+      QCOMPARE(MovieDBActions::GetInst().isAllowPathOutsideTableMount(), false);
+      QString selectPath;
+      QVERIFY(movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      QCOMPARE(selectPath, path2);
+    }
     QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName2), 2);
     QCOMPARE(dbModel.rowCount(), 2);
@@ -448,7 +462,7 @@ private slots:
     MOCKER(FdBasedDbModel::setDataStatic).expects(never());
 
     movieView.selectionModel()->clear();
-    auto& inst = g_dbAct();
+    auto& inst = MovieDBActions::GetInst();
     emit inst.SET_STUDIO->triggered();
     emit inst.SET_CAST->triggered();
     emit inst.APPEND_CAST->triggered();
@@ -903,10 +917,6 @@ private slots:
 })"}};
     QCOMPARE(mTDir.createEntries(ScanJsonsFolderNodes), ScanJsonsFolderNodes.size());
 
-    MOCKER(QFileDialog::getExistingDirectory)
-        .stubs()
-        .will(returnValue(path3));
-
     QVERIFY(!QFile::exists(dbName));
     QWidget parent;
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
@@ -920,11 +930,29 @@ private slots:
     QVERIFY(fdDb.IsTableExist(tableName3));
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName3);
 
-    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
-        .stubs()
-        .will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::JSONS));
-    QCOMPARE(fdDb.CountRow(tableName3), 1); // only 1 json will be inserted into table
+    const QString outsideMountPath{"Path/OutSide/TheMountPoint"};
+    MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(outsideMountPath)).then(returnValue(outsideMountPath)).then(returnValue(path3));
+    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
+    {
+      // user select a path outside the mount point
+      QVERIFY(!MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+      QString selectPath;
+      QVERIFY(!movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      QVERIFY(selectPath.isEmpty());
+
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(true);
+      QVERIFY(MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+      QVERIFY(movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      QCOMPARE(selectPath, outsideMountPath);
+    }
+
+    MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    QVERIFY(!MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+    {
+      // user select a path inside the mount point
+      QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::JSONS));
+      QCOMPARE(fdDb.CountRow(tableName3), 1); // only 1 json will be inserted into table
+    }
   }
 };
 // todo: testcase too large. need extract

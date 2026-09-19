@@ -1,7 +1,7 @@
 #include "MovieDBActions.h"
 #include "PublicMacro.h"
 
-MovieDBActions& g_dbAct() {
+MovieDBActions& MovieDBActions::GetInst() {
   static MovieDBActions ins;
   return ins;
 }
@@ -41,9 +41,17 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   SCAN_JSONS = new (std::nothrow) QAction(QIcon(":img/SCAN_VIDEOS"), tr("Import from JSON"), this);
   CHECK_NULLPTR_RETURN_VOID(SCAN_JSONS);
   SCAN_JSONS->setToolTip("Scan json file(s) in a specified path and insert each key field value current table.");
+  _ALLOW_PATH_OUTSIDE_TABLE_MOUNT = new (std::nothrow) QAction(tr("Allow Paths Outside Table Mount"), this);
+  CHECK_NULLPTR_RETURN_VOID(_ALLOW_PATH_OUTSIDE_TABLE_MOUNT);
+  _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setCheckable(true);
+  _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+  _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setToolTip("When enabled, videos/JSONs can be scanned from directories outside the current table mount path.\n"
+      "When disabled, the selected directory must be under the current table mount path.");
+
   SCAN_FILES = new QActionGroup{this};
   SCAN_FILES->addAction(SCAN_VIDEOS);
   SCAN_FILES->addAction(SCAN_JSONS);
+  SCAN_FILES->addAction(_ALLOW_PATH_OUTSIDE_TABLE_MOUNT);
 
   DELETE_FROM_TABLE = new (std::nothrow) QAction(QIcon(":img/DELETE_FROM_TABLE"), tr("Delete Where"), this);
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
