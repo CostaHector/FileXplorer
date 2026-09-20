@@ -83,3 +83,7 @@ void FileSystemTableView::keyPressEvent(QKeyEvent* e) {
   }
   QTableView::keyPressEvent(e);
 }
+
+void FileSystemTableView::startDrag(Qt::DropActions supportedActions) {
+  ViewHelper::startDragCore(this, supportedActions);
+}

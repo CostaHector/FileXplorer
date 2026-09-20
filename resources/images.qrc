@@ -130,6 +130,7 @@
         <file alias="ITEMS_ORGANIZER">FileOperation/ITEMS_ORGANIZER.svg</file>
         <file alias="FOLDER_OPEN">FileOperation/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">FileOperation/SELECT_FOLDER.svg</file>
+        <file alias="DRAG_PIXMAP">FileOperation/DRAG_PIXMAP.svg</file>
         <file alias="STUDIOS_LIST_FILE">FileOperation/STUDIOS_LIST_FILE.svg</file>
         <file alias="CAST_LIST_FILE">FileOperation/CAST_LIST_FILE.svg</file>
         <file alias="CAST_AKA_LIST_FILE">FileOperation/CAST_AKA_LIST_FILE.svg</file>

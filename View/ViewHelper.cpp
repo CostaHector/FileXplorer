@@ -139,6 +139,32 @@ void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event) {
   event->accept();
 }
 
+void startDragCore(QAbstractItemView* view, Qt::DropActions supportedActions) {
+  if (!view->selectionModel()->hasSelection()) {
+    return;
+  }
+  const QModelIndexList& selectedRows = view->selectionModel()->selectedRows();
+  QMimeData *data = view->model()->mimeData(selectedRows);
+  const int selectedRowCnt = selectedRows.size();
+
+  QPixmap pixmap{QPixmap{":img/DRAG_PIXMAP"}.scaled(128, 128)};
+
+  QPainter painter(&pixmap);
+  painter.setRenderHint(QPainter::TextAntialiasing);
+  painter.setPen(Qt::black);
+  QFont font;
+  font.setPointSize(16);
+  painter.setFont(font);
+  painter.drawText(pixmap.rect(), Qt::AlignCenter, QString::number(selectedRowCnt));
+  painter.end();
+
+  QDrag* drag = new QDrag(view);
+  drag->setMimeData(data);
+  drag->setPixmap(pixmap);
+  drag->setHotSpot(QPoint(0, 0));  // 落在鼠标右下，不遮挡目标
+  drag->exec(supportedActions, Qt::CopyAction);
+}
+
 bool keyPressEventCore(QKeyEvent *e) {
   // return true when no need further process
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier && e->key() == Qt::Key_Delete) {
