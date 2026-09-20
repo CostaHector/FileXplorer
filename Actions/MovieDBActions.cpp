@@ -151,9 +151,11 @@ void MovieDBActions::subscribe() {
 void MovieDBActions::onScanFilesAgTriggered(const QAction* pScanFilesAct) {
   if (pScanFilesAct == SCAN_VIDEOS) {
     emit reqScanFiles(MovieDBModelField::ScanFilesTypeE::VIDEOS);
+    return;
   }
   if (pScanFilesAct == SCAN_JSONS) {
     emit reqScanFiles(MovieDBModelField::ScanFilesTypeE::JSONS);
+    return;
   }
   LOG_W("ScanFilesAction unknown");
 }

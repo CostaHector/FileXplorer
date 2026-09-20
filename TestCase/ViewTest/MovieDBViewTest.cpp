@@ -335,8 +335,7 @@ private slots:
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
     {
       QCOMPARE(MovieDBActions::GetInst().isAllowPathOutsideTableMount(), false);
-      QString selectPath;
-      QVERIFY(movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      const QString selectPath{movieView.GetAPathFromUserSelect(tableName2, "Scan VIDEOS")};
       QCOMPARE(selectPath, path2);
     }
     QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
@@ -936,13 +935,12 @@ private slots:
     {
       // user select a path outside the mount point
       QVERIFY(!MovieDBActions::GetInst().isAllowPathOutsideTableMount());
-      QString selectPath;
-      QVERIFY(!movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      QString selectPath{movieView.GetAPathFromUserSelect(tableName3, "Scan JSONS")};
       QVERIFY(selectPath.isEmpty());
 
       MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(true);
       QVERIFY(MovieDBActions::GetInst().isAllowPathOutsideTableMount());
-      QVERIFY(movieView.GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath));
+      selectPath = movieView.GetAPathFromUserSelect(tableName3, "Scan JSONS");
       QCOMPARE(selectPath, outsideMountPath);
     }
 

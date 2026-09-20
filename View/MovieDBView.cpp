@@ -124,39 +124,36 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   return true;
 }
 
-bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const {
-  const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
-
-  const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
+QString MovieDBView::GetAPathFromUserSelect(const QString& curTblName, const QString& usageMsg) {
+  const bool bAllowOutsidePath{MovieDBActions::GetInst().isAllowPathOutsideTableMount()};
+  const QString& tablePeerPath = MountPathTableNameMapper::toMountPath(curTblName);
   QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.toVariant()).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
-    lastPath = tblPeerPath;
+    lastPath = MountPathTableNameMapper::isMountPointOnline(tablePeerPath) ? tablePeerPath : "";
   }
 
-  const bool bAllowOutsidePath{MovieDBActions::GetInst().isAllowPathOutsideTableMount()};
-  QString caption{QString{"Select a directory %1"}.arg(usageMsg)};
+  QString caption{QString{"[%1] Select a directory"}.arg(usageMsg)};
   if (!bAllowOutsidePath) {
-    caption += QString{"(must be under [%1])"}.arg(tblPeerPath);
+    caption += QString{"(must be under [%1])"}.arg(tablePeerPath);
   }
   caption += QString{" for table[%1]"}.arg(curTblName);
 
-  QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
-  if (selectPath.isEmpty()) {
-    LOG_INFO_NP("Directory selection canceled by user; no path selected", selectPath);
-    return false;
+  const QString userSelected = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
+  if (userSelected.isEmpty()) {
+    LOG_INFO_NP("Directory selection canceled by user; no path selected", userSelected);
+    return "";
   }
 
-  if (!bAllowOutsidePath && !selectPath.startsWith(tblPeerPath)) {
+  if (!bAllowOutsidePath && !userSelected.startsWith(tablePeerPath)) {
     LOG_WARN_P("Selected path is outside the table mount path, which is not allowed by current settings",
                "selectedPath=%s, tableMountPath=%s",
-               qPrintable(selectPath), qPrintable(tblPeerPath));
-    return false;
+               qPrintable(userSelected), qPrintable(tablePeerPath));
+    return "";
   }
 
-  Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, selectPath);
-  userSelected.swap(selectPath);
-  LOG_D("[%s] User selectPath[%s] tableMountPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
-  return true;
+  Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, userSelected);
+  LOG_D("[%s] User selectPath[%s] tableMountPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tablePeerPath));
+  return userSelected;
 }
 
 bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesType) {
@@ -172,14 +169,14 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
     return false;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("for [scanning videos/jsons]", selectPath)) {
+  const QString itemsType{MovieDBModelField::ScanFilesType2Str(filesType)};
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Scan " + itemsType)};
+  if (selectPath.isEmpty()) {
     return false;
   }
-  const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
+  const QString hintTemplate{itemsType + " under path:\n[%1]\n will be inserted into Table: [%2]"};
   const QString confirmInsertIntoMsg{hintTemplate.arg(selectPath, _movieDbSearchBar->GetCurrentTableName())};
-  QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
-  if (cfmInsertIntoBtn != QMessageBox::StandardButton::Yes) {
+  if (QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg) != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("User cancel insert", selectPath);
     return false;
   }
@@ -195,7 +192,7 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
       break;
     }
     default:
-      break;
+      return -1;
   }
 
   if (retCnt < 0) {
@@ -422,8 +419,8 @@ bool MovieDBView::onAuditATable() {
     return false;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("used to Audit", selectPath)) {
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Audit")};
+  if (selectPath.isEmpty()) {
     return false;
   }
 
@@ -541,9 +538,9 @@ int MovieDBView::onUpdateByJson() {
     return -1;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("read field(s) from json file to update", selectPath)) {
-    return -1;
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Update by Json")};
+  if (selectPath.isEmpty()) {
+    return false;
   }
 
   const int retCnt = _fdBasedDb.UpdateStudioCastTagsByJson(curTblName, selectPath);
