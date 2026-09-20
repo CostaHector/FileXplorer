@@ -6,8 +6,6 @@
 
 #include "ViewActions.h"
 #include "ViewHelper.h"
-#include "RateHelper.h"
-#include "NotificatorMacro.h"
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
