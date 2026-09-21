@@ -7,43 +7,49 @@ class NameSectionArrangeTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-  void ChopPostfix_ok() {
-    QCOMPARE(ChopPostfix("Not exist postfix"), "Not exist postfix");
-    QCOMPARE(ChopPostfix("X - Men 2160p_tn"), "X - Men");
-    QCOMPARE(ChopPostfix("X - Men 2160p"), "X - Men");
-    QCOMPARE(ChopPostfix("X - Men 4K"), "X - Men");
-    QCOMPARE(ChopPostfix("Captain America 2020 - 04 - 01"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America 20200401"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America 2020"), "Captain America");
+  void ChopPostfixEachOneTime_ok() {
+    QCOMPARE(ChopPostfixEachOneTime("Not exist postfix"), "Not exist postfix");
+    QCOMPARE(ChopPostfixEachOneTime("X - Men 2160p_tn"), "X - Men");
+    QCOMPARE(ChopPostfixEachOneTime("X - Men 2160p"), "X - Men");
+    QCOMPARE(ChopPostfixEachOneTime("X - Men 4K"), "X - Men");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 2020 - 04 - 01"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 20200401"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 2020"), "Captain America");
 
     // "Part/Scene/Pt./Sc./Pt/Sc \d{1,2}" no need chop. otherwise need chop
-    QCOMPARE(ChopPostfix("Captain America Part 1 2020"), "Captain America Part 1");
-    QCOMPARE(ChopPostfix("Captain America Pt. 1 2020"), "Captain America Pt. 1");
-    QCOMPARE(ChopPostfix("Captain America Pt 1 2020"), "Captain America Pt 1");
-    QCOMPARE(ChopPostfix("Captain America Part1 2020"), "Captain America Part1");
-    QCOMPARE(ChopPostfix("Captain America Pt.1 2020"), "Captain America Pt.1");
-    QCOMPARE(ChopPostfix("Captain America Pt1 2020"), "Captain America Pt1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Part 1 2020"), "Captain America Part 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Pt. 1 2020"), "Captain America Pt. 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Pt 1 2020"), "Captain America Pt 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Part1 2020"), "Captain America Part1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Pt.1 2020"), "Captain America Pt.1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Pt1 2020"), "Captain America Pt1");
 
-    QCOMPARE(ChopPostfix("Captain America Scene 1 2020"), "Captain America Scene 1");
-    QCOMPARE(ChopPostfix("Captain America Sc. 1 2020"), "Captain America Sc. 1");
-    QCOMPARE(ChopPostfix("Captain America Sc 1 2020"), "Captain America Sc 1");
-    QCOMPARE(ChopPostfix("Captain America Scene1 2020"), "Captain America Scene1");
-    QCOMPARE(ChopPostfix("Captain America Sc.1 2020"), "Captain America Sc.1");
-    QCOMPARE(ChopPostfix("Captain America Sc1 2020"), "Captain America Sc1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Scene 1 2020"), "Captain America Scene 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Sc. 1 2020"), "Captain America Sc. 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Sc 1 2020"), "Captain America Sc 1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Scene1 2020"), "Captain America Scene1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Sc.1 2020"), "Captain America Sc.1");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America Sc1 2020"), "Captain America Sc1");
 
-    QCOMPARE(ChopPostfix("Captain America 1 2020"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America - 1 2020"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America 12 2020"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America - 12 2020"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 1 2020"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America - 1 2020"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 12 2020"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America - 12 2020"), "Captain America");
 
-    QCOMPARE(ChopPostfix("Captain America 4K 1"), "Captain America");
-    QCOMPARE(ChopPostfix("Captain America 1080p 1"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 4K 1"), "Captain America");
+    QCOMPARE(ChopPostfixEachOneTime("Captain America 1080p 1"), "Captain America");
 
     // example:
-    QCOMPARE(ChopPostfix("Fox - Michael Fassbender, Jane Grey - XMen 2020 4k"), "Fox - Michael Fassbender, Jane Grey - XMen");
-    QCOMPARE(ChopPostfix("Fox - Michael Fassbender, Jane Grey - XMen scene 1 2020"), "Fox - Michael Fassbender, Jane Grey - XMen scene 1");
-    QCOMPARE(ChopPostfix("Fox - Michael Fassbender, Jane Grey - XMen part 1 4k"), "Fox - Michael Fassbender, Jane Grey - XMen part 1");
-    QCOMPARE(ChopPostfix("Fox - Michael Fassbender, Jane Grey - XMen part 1 1"), "Fox - Michael Fassbender, Jane Grey - XMen part 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender, Jane Grey - XMen 2020 4k"), "Fox - Michael Fassbender, Jane Grey - XMen");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender, Jane Grey - XMen scene 1 2020"), "Fox - Michael Fassbender, Jane Grey - XMen scene 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender, Jane Grey - XMen part 1 4k"), "Fox - Michael Fassbender, Jane Grey - XMen part 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender, Jane Grey - XMen part 1 1"), "Fox - Michael Fassbender, Jane Grey - XMen part 1");
+
+
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender - Scene 1 2024 4K 0_tn"), "Fox - Michael Fassbender - Scene 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender - Scene 1 4K 2024 0_tn"), "Fox - Michael Fassbender - Scene 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender - Scene 1 0 4K 2024_tn"), "Fox - Michael Fassbender - Scene 1");
+    QCOMPARE(ChopPostfixEachOneTime("Fox - Michael Fassbender - 4K 2024 Scene 1 0_tn"), "Fox - Michael Fassbender - 4K 2024 Scene 1");
   }
 
   void SubscriptsStr2Int_ok() {

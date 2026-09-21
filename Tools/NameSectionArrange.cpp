@@ -1,29 +1,84 @@
 #include "NameSectionArrange.h"
 #include <QRegularExpression>
 
-QString ChopPostfix(const QString& baseName) {
+namespace {
+enum ResultType {
+  Unchanged = 0,
+  Changed = 1,
+  QUIT_NOW = 2,
+};
+static_assert(ResultType::Unchanged == 0, "Unchanged must be 0");
+ResultType ChopResolution(QString& before) {
+  static const QRegularExpression resolutionPattern{" (?:2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD)$", QRegularExpression::PatternOption::CaseInsensitiveOption};
+  QRegularExpressionMatch matchResult;
+  if ((matchResult = resolutionPattern.match(before)).hasMatch()) {
+    before.chop(matchResult.capturedLength());
+    return ResultType::Changed;
+  }
+  return ResultType::Unchanged;
+}
+ResultType ChopDate(QString& before) {
+  static const QRegularExpression datePattern{" (?:\\d{4} - \\d{2} - \\d{2}|\\d{8}|\\d{4})$", QRegularExpression::PatternOption::CaseInsensitiveOption};
+  QRegularExpressionMatch matchResult;
+  if ((matchResult = datePattern.match(before)).hasMatch()) {
+    before.chop(matchResult.capturedLength());
+    return ResultType::Changed;
+  }
+  return ResultType::Unchanged;
+}
+ResultType ChopNumber(QString& before) {
+  // 不匹配partScenePattern且匹配了numberPattern
+  // 2. "Part/Scene/Pt./Sc./Pt/Sc \d{1,2}" no need chop
+  static const QRegularExpression partScenePattern{" (?:Part|Scene|Pt\\.?|Sc\\.?) ?\\d{1,2}$", QRegularExpression::PatternOption::CaseInsensitiveOption};
+  if (partScenePattern.match(before).hasMatch()) {
+    return ResultType::QUIT_NOW;
+  }
+  // 3. 删除末尾的数字（以及前面可能的分隔符 "- "）
+  static const QRegularExpression numberPattern{" (?:- )?\\d{1,2}$"};
+  QRegularExpressionMatch matchResult;
+  if ((matchResult = numberPattern.match(before)).hasMatch()) {
+    before.chop(matchResult.capturedLength());
+    return ResultType::Changed;
+  }
+  return ResultType::Unchanged;
+}
+}
+
+QString ChopPostfixEachOneTime(const QString& baseName) {
   QString result = baseName;
   // 0.
   static const QRegularExpression _tnPattern{"_tn$", QRegularExpression::PatternOption::CaseInsensitiveOption};
   result.remove(_tnPattern);
 
-  // 1. resolution/date
-  static const QRegularExpression resDatePattern{" (?:2160p|1080p|360p|480p|720p|810p|4K|FHD|HD|SD|\\d{4} - \\d{2} - \\d{2}|\\d{8}|\\d{4})$", QRegularExpression::PatternOption::CaseInsensitiveOption};
-  result.remove(resDatePattern);
+  // 输入中 日期相关, 分辨率相关, 编号相关在输入末尾各自最多出现一次
+  // 要求:
+  // 1. ChopResolution/ChopDate/ChopNumber
+  //    当返回了Changed时, 该func就无需再次调用
+  //    当返回了QUIT_NOW时, 退出全部处理
+  // 2. 最终处理结果与func调用顺序无关
+  using FuncType = ResultType(*)(QString&);
+  FuncType funcs[]{ChopResolution, ChopDate, ChopNumber};
+  static constexpr int FUNC_CNT{sizeof(funcs)/sizeof(funcs[0])};
+  ResultType funcsResult[FUNC_CNT]{ResultType::Unchanged};
 
-  // 2. "Part/Scene/Pt./Sc./Pt/Sc \d{1,2}" no need chop
-  static const QRegularExpression keywordPattern{" (?:Part|Scene|Pt\\.?|Sc\\.?) ?\\d{1,2}$", QRegularExpression::PatternOption::CaseInsensitiveOption};
-  if (keywordPattern.match(result).hasMatch()) {
-    return result;  // 保留关键词和数字，只删除了年份
+  for (int j = 0; j < FUNC_CNT; ++j) {
+    bool bStringModifiedInThisLoop{false};
+    for (int i = 0; i < FUNC_CNT; ++i) {
+      if (funcsResult[i] == ResultType::Changed) {
+        continue;
+      }
+      funcsResult[i] = funcs[i](result);
+      if (funcsResult[i] == ResultType::QUIT_NOW) {
+        return result;
+      }
+      if (funcsResult[i] == ResultType::Changed) {
+        bStringModifiedInThisLoop = true;
+      }
+    }
+    if (!bStringModifiedInThisLoop) {
+      break;
+    }
   }
-
-  // 3. 删除末尾的数字（以及前面可能的分隔符 "- "）
-  static const QRegularExpression numberPattern{" (?:- )?\\d{1,2}$"};
-  result.remove(numberPattern);
-
-  // 4. resolution/date again
-  result.remove(resDatePattern);
-
   return result;
 }
 
@@ -85,7 +140,7 @@ QStringList NameSectionArrange::BatchSwapper(const QStringList& lst) {
 }
 
 QString NameSectionArrange::operator()(const QString& baseName) {
-  const int postfixStartIndex = m_chopPostfix ? ChopPostfix(baseName).size() : baseName.size();
+  const int postfixStartIndex = m_chopPostfix ? ChopPostfixEachOneTime(baseName).size() : baseName.size();
   const QStringList& section = baseName.left(postfixStartIndex).split('-');
   if (m_seq == INDEX_ARR && m_seq.size() == section.size()) {
     return baseName;
