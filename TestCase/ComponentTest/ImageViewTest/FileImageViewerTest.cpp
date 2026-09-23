@@ -168,7 +168,7 @@ private slots:
 
     MOCKER(QDesktopServices::openUrl).expects(exactly(1)).with(eq(expectUrlOpened)).will(returnValue(true));
     MOCKER(FileTool::RevealInSystemExplorer).expects(exactly(1)).with(eq(imgAbsPathReveal)).will(returnValue(true));
-    MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(eq(imgAbsPathCopied)).will(returnValue(true));
+    MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(eq(imgAbsPathCopied), any()).will(returnValue(true));
 
     viewer._OPEN_IN_SYSTEM_APPLICATION->triggered();
     viewer._REVEAL_IN_FILE_EXPLORER->triggered();

@@ -24,7 +24,7 @@ class FdBasedDb : public DbManager {
   static const QString SELECT_DURATION_STUDIO_CAST_TAGS_TEMPLATE;
   static const QString UPDATE_STUDIO_CAST_TAGS_TEMPLATE;
 
-  enum class QUERY_KEY_INFO_FIELED {
+  enum class QUERY_KEY_INFO_FIELD {
     PrePathLeft = 0,
     PrePathRight,
     Name,

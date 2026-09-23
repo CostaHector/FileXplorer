@@ -58,7 +58,7 @@ public:
   int onAppendMultiSelectionToCastDbReq(); // append selections to DB_TABLE::PERFORMERS
 
   static QString FormatSearchSentence(QString text);
-  static QString GetSearchResultParagraphDisplay(const QString& searchText);
+  static QString GetSearchResultParagraphDisplay(const QString& searchText, QList<QSqlRecord>* pSqlRecordList = nullptr);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
   static QString& UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const QSize& newSize);
 
@@ -104,6 +104,7 @@ private:
 
   int mCurIconSizeIndex{14};
   QSize mIconSize;
+  QList<QSqlRecord> m_sqlRecordList;
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

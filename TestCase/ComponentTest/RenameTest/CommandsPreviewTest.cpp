@@ -24,7 +24,7 @@ private slots:
     const QString contentsInBrowser{"This is a test text"};
     MOCKER(FileTool::CopyTextToSystemClipboard) //
         .expects(exactly(1))
-        .with(eq(contentsInBrowser)) //
+        .with(eq(contentsInBrowser), any()) //
         .will(returnValue(true));    //
 
     CommandsPreview preview("TestPreview CopyText");

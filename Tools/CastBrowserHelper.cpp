@@ -7,7 +7,6 @@
 #include "PublicVariable.h"
 #include "StringTool.h"
 #include "ImageTool.h"
-#include "DvdFileInfo.h"
 
 #include <QDir>
 #include <QSqlField>
