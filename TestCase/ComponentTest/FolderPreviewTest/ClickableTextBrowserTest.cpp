@@ -4,8 +4,10 @@
 #include "BeginToExposePrivateMember.h"
 #include "ClickableTextBrowser.h"
 #include "EndToExposePrivateMember.h"
+#include "DetailBrowserHelper.h"
 
 #include "ImageTool.h"
+#include "FileTool.h"
 #include "BrowserKey.h"
 #include "Configuration.h"
 #include "ClipboardGuard.h"
@@ -13,8 +15,13 @@
 #include "MouseKeyboardEventHelper.h"
 using namespace MouseKeyboardEventHelper;
 
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
-QString setCurSelection(ClickableTextBrowser& browser, const int selectBegIndex, const int selectEndIndex) {
+        QString setCurSelection(ClickableTextBrowser& browser, const int selectBegIndex, const int selectEndIndex) {
   QTextCursor cursor = browser.textCursor();
   cursor.setPosition(selectBegIndex);
   cursor.setPosition(selectEndIndex, QTextCursor::KeepAnchor);
@@ -38,8 +45,11 @@ QStringList setMultiCurSelection(ClickableTextBrowser& browser, const QList<std:
 
 class ClickableTextBrowserTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
+public:
+private slots:
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
+
   void test_search_ok() {
     QCOMPARE(ClickableTextBrowser::FormatSearchSentence("A and B"), "%A%B%");
     QCOMPARE(ClickableTextBrowser::FormatSearchSentence("A, B"), "%A%B%");
@@ -207,12 +217,14 @@ class ClickableTextBrowserTest : public PlainTestSuite {
       QCOMPARE(browser.toPlainText().count(textWhenNothing), 2);
 
       QList<QSqlRecord> mockReturnList{
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to", "A long description Hello world.mp4", 999),
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to/reference", "A reference to Hello world.mp4", 1),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/", "to/", "A long description Hello world.mp4", 999),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/to/", "reference/", "A reference to Hello world.mp4", 1),
       };
       UserSpecifiedBrowerInteractMock::mockSqlRecordList() = mockReturnList;
       QCOMPARE(setCurSelection(browser, 0, 11), "Hello world");
+      QCOMPARE(browser.m_sqlRecordList.size(), 0);
       browser.onSearchSelectionReq();
+      QCOMPARE(browser.m_sqlRecordList.size(), 2);
 
       const QString htmlContentWhenSearchReturn2Lines = browser.toPlainText();
       QVERIFY(htmlContentWhenSearchReturn2Lines != initalPlainTextContent);
@@ -220,12 +232,19 @@ class ClickableTextBrowserTest : public PlainTestSuite {
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
+
+      browser.onSearchSelectionReq(); // each call will append records to m_sqlRecordList
+      QCOMPARE(browser.m_sqlRecordList.size(), 2 + 2);
     }
+
+    // m_sqlRecordList cleared when setHtml called
+    browser.setHtml("");
+    QCOMPARE(browser.m_sqlRecordList.size(), 0);
   }
   void advance_chooseable_search_ok() {
     UserSpecifiedBrowerInteractMock::mockSqlRecordList().clear();
@@ -267,8 +286,8 @@ class ClickableTextBrowserTest : public PlainTestSuite {
       QCOMPARE(browser.toPlainText().count(textWhenNothing), 2);
 
       QList<QSqlRecord> mockReturnList{
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to", "A long description Hello world.mp4", 999),
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to/reference", "A reference to Hello world.mp4", 1),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/", "to/", "A long description Hello world.mp4", 999),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/to/", "reference/", "A reference to Hello world.mp4", 1),
       };
       UserSpecifiedBrowerInteractMock::mockSqlRecordList() = mockReturnList;
       QCOMPARE(setCurSelection(browser, 0, 11), "Hello world");
@@ -280,11 +299,11 @@ class ClickableTextBrowserTest : public PlainTestSuite {
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
     }
   }
 
@@ -317,8 +336,8 @@ class ClickableTextBrowserTest : public PlainTestSuite {
       QCOMPARE(browser.toPlainText().count("Not in database"), 2);
 
       QList<QSqlRecord> mockReturnList{
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to", "A long description Hello world.mp4", 999),
-          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("", "/home/to/reference", "A reference to Hello world.mp4", 1),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/", "to/", "A long description Hello world.mp4", 999),
+          SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/to/", "reference/", "A reference to Hello world.mp4", 1),
       };
       UserSpecifiedBrowerInteractMock::mockSqlRecordList() = mockReturnList;
       QCOMPARE(setMultiCurSelection(browser, {{0, 5}, {6, 11}}), (QStringList{"Hello", "world"}));
@@ -331,11 +350,11 @@ class ClickableTextBrowserTest : public PlainTestSuite {
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
     }
   }
 
@@ -371,8 +390,10 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     QCOMPARE(browser.mCastVideosVisisble, true);
     QCOMPARE(browser.mCastImagesVisisble, true);
 
-    QUrl clickHideShowVidUrl{"hideRelatedVideos"};
-    QUrl clickHideShowImgUrl{"hideRelatedImages"};
+    QUrl clickHideShowVidUrl{UrlAnchorTemplate::HIDE_RELATED_VIDEOS};
+    QUrl clickHideShowImgUrl{UrlAnchorTemplate::HIDE_RELATED_IMAGES};
+    QUrl clickCopyIndex0RecordUrl{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(0)};
+    QUrl clickCopyIndex2RecordUrl{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(2)};
 
     QVERIFY(browser.onAnchorClicked(clickHideShowVidUrl));
     QCOMPARE(browser.mCastVideosVisisble, false);
@@ -393,6 +414,24 @@ class ClickableTextBrowserTest : public PlainTestSuite {
     QCOMPARE(browser.mCastVideosVisisble, true);
     QCOMPARE(browser.mCastImagesVisisble, true);
     QCOMPARE(browser.toPlainText(), "bodyvidTitle▼vidListStrimgTitle▼imgListStr");
+
+    const QString expectCopyContents{"/home/to/file1.mp4\t0'0'0'999\t00:00:00.000\t"};
+    MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(expectCopyContents, true).will(returnValue(true));
+    // empty records
+    QVERIFY(browser.m_sqlRecordList.isEmpty());
+    QVERIFY(!browser.onAnchorClicked(clickCopyIndex0RecordUrl));
+    QList<QSqlRecord> recordsInSearch {
+      // /home/to/file1.mp4  ("/home/", "to/", "file1.mp4")
+      // /home/to/reference/file2.mp4
+        SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/", "to/", "file1.mp4", 999),
+        SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/to/", "reference/", "file2.mp4", 1),
+    };
+    browser.m_sqlRecordList.swap(recordsInSearch);
+    QCOMPARE(browser.m_sqlRecordList.size(), 2);
+    // copied here
+    QVERIFY(browser.onAnchorClicked(clickCopyIndex0RecordUrl));
+    // out of range
+    QVERIFY(!browser.onAnchorClicked(clickCopyIndex2RecordUrl));
   }
 
   void mouser_event_ok() {

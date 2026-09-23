@@ -349,11 +349,11 @@ private slots:
 
     median = RMFComponent::FromPath("C:/A/C.mp4"); // 2 slash
     QCOMPARE(median.joinItself(), "C:/A/C.mp4");
-    QCOMPARE(median.joinParentPathItself(), "C:/A");
+    QCOMPARE(median.joinParentPathItself(), "C:/A/");
 
     median = RMFComponent::FromPath("C:/long/enough/a.mp4"); // 3 slash
     QCOMPARE(median.joinItself(), "C:/long/enough/a.mp4");
-    QCOMPARE(median.joinParentPathItself(), "C:/long/enough");
+    QCOMPARE(median.joinParentPathItself(), "C:/long/enough/");
 
     median = RMFComponent::FromPath("/a.mp4"); // 1 slash
     QCOMPARE(median.joinItself(), "/a.mp4");
@@ -361,11 +361,11 @@ private slots:
 
     median = RMFComponent::FromPath("/tmp/a.mp4"); // 2 slash
     QCOMPARE(median.joinItself(), "/tmp/a.mp4");
-    QCOMPARE(median.joinParentPathItself(), "/tmp");
+    QCOMPARE(median.joinParentPathItself(), "/tmp/");
 
     median = RMFComponent::FromPath("/tmp/FileXplorer-xxxx/a.mp4");
     QCOMPARE(median.joinItself(), "/tmp/FileXplorer-xxxx/a.mp4");
-    QCOMPARE(median.joinParentPathItself(), "/tmp/FileXplorer-xxxx");
+    QCOMPARE(median.joinParentPathItself(), "/tmp/FileXplorer-xxxx/");
   }
 
   void test_GetPrepathAndFileName() {

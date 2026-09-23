@@ -52,13 +52,8 @@ struct RMFComponent {
   }
   static QString joinParentPath(QString root, const QString& middle) {
     root += middle;
-    int n = root.size();
-    if (n > 2 && root[n - 1] == '/' && root[n - 2] != ':') {
-      root.chop(1);
-    }
     return root;
   }
-  static QString stdStyleSubstring(const QString& str, int start, int end) { return str.mid(start, end - start); }
   static RMFComponent FromPath(const QString& input);
 };
 

@@ -7,6 +7,7 @@
 #include "CastBrowserHelper.h"
 #include "EndToExposePrivateMember.h"
 #include "SqlRecordTestHelper.h"
+#include "DetailBrowserHelper.h"
 
 class CastBrowserHelperTest : public PlainTestSuite {
   Q_OBJECT
@@ -65,11 +66,11 @@ class CastBrowserHelperTest : public PlainTestSuite {
 
     QVERIFY(parts.body.contains("Henry Cavill"));
 
-    QVERIFY(parts.vidPart[0].contains("hideRelatedVideos"));
+    QVERIFY(parts.vidPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_VIDEOS));
     QVERIFY(parts.vidPart[1].contains("Movie1.mp4"));
     QVERIFY(parts.vidPart[1].contains("Movie2.mp4"));
 
-    QVERIFY(parts.imgPart[0].contains("hideRelatedImages"));
+    QVERIFY(parts.imgPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_IMAGES));
     QVERIFY(parts.imgPart[1].contains("host/MovieStar/Henry Cavill/Image1.jpg"));
     QVERIFY(parts.imgPart[1].contains("host/MovieStar/Henry Cavill/Image2.jpg"));
   }

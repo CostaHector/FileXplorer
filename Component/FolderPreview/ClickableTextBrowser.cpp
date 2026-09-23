@@ -1,6 +1,5 @@
 #include "ClickableTextBrowser.h"
 #include "BrowserActions.h"
-#include "DataFormatter.h"
 #include "FdBasedDb.h"
 #include "CastBaseDb.h"
 #include "BrowserKey.h"
@@ -13,21 +12,16 @@
 #include "FileTool.h"
 #include "StringTool.h"
 #include "ImageTool.h"
-#include "PathTool.h"
-
-#include <QKeySequence>
+#include "DetailBrowserHelper.h"
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QSqlField>
 #include <QDrag>
 #include <QMimeData>
-#include <QApplication>
-#include <QClipboard>
 
 constexpr int ClickableTextBrowser::MIN_SINGLE_SEARCH_PATTERN_LEN;
 constexpr int ClickableTextBrowser::MIN_EACH_KEYWORD_LEN;
-const QString ClickableTextBrowser::WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT = "[%1] Not in database";
 
 ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
     : QTextBrowser{parent} {
@@ -95,34 +89,18 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
     return FileTool::OpenLocalFile(url.toLocalFile());
   }
   bool hideOrShowRelated{false};
-  if (url.toString() == "hideRelatedVideos") {
-    hideOrShowRelated = true;
-    mCastVideosVisisble = !mCastVideosVisisble;
-  } else if (url.toString() == "hideRelatedImages") {
-    hideOrShowRelated = true;
-    mCastImagesVisisble = !mCastImagesVisisble;
-  } else if (url.scheme() == "copyline") {
-    bool ok = false;
-    const int idx = url.path().toInt(&ok);
-    if (!ok || idx < 0 || idx >= m_sqlRecordList.size()) {
-      LOG_W("copyline: invalid index[%s]", qPrintable(url.path()));
-      return false;
+  const QString& urlSchema = url.scheme();
+  const QString& urlPath = url.path();
+  if (urlSchema == UrlSchema::HIDE_RELATED) {
+    if (urlPath == "Videos") {
+      mCastVideosVisisble = !mCastVideosVisisble;
+      UpdateHtmlContents();
+    } else if (urlPath == "Images") {
+      mCastImagesVisisble = !mCastImagesVisisble;
+      UpdateHtmlContents();
     }
-    const QSqlRecord& record = m_sqlRecordList[idx];
-    QString copiedContent = PathTool::RMFComponent::join(
-        record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathLeft).value().toString(),
-        record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathRight).value().toString(),
-        record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Name).value().toString());
-    copiedContent += '\t';
-    copiedContent += DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong());
-    copiedContent += '\t';
-    copiedContent += DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Duration).value().toInt());
-    copiedContent += '\t';
-    copiedContent += record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::SampleMD5).value().toString();
-    FileTool::CopyTextToSystemClipboard(copiedContent, true);
-  }
-  if (hideOrShowRelated) {
-    UpdateHtmlContents();
+  } else if (urlSchema == UrlSchema::COPY_LINE) {
+    return DetailBrowserHelper::AppendSqlRecordToClipboard(m_sqlRecordList, url.path());
   }
   return true;
 }
@@ -243,47 +221,9 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
   return insertOrUpdateCnt;
 }
 
-QString ClickableTextBrowser::GetSearchResultParagraphDisplay(const QString& whereText, QList<QSqlRecord>* pSqlRecordList) {
-  QList<QSqlRecord> records;
-#ifdef RUNNING_UNIT_TESTS
-  records = UserSpecifiedBrowerInteractMock::mockSqlRecordList();
-#else
-  FdBasedDb movieDbManager{SystemPath::VIDS_DATABASE(), "EXIST_THEN_QRY_MOVIE_DB"};
-  QString qryCmd = FdBasedDb::QUERY_KEY_INFO_TEMPLATE.arg(DB_TABLE::MOVIES, whereText);
-  if (!movieDbManager.QueryForTest(qryCmd, records)) {
-    return QString{"<b>Query command failed</b>[%1]"}.arg(qryCmd);
-  }
-#endif
-  if (records.isEmpty()) {
-    return "<b>" + WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT.arg(whereText) + "</b>";
-  }
-
-  QString searchResult;
-  searchResult.reserve(512);
-  searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(whereText);
-  searchResult += "<table border='1' cellpadding='4' style='border-collapse: collapse;'>";
-  searchResult += "<thead><tr><th>cp</th><th>Size</th><th>Name</th><th>Duration</th><th>MD5Sample</th><th>Path</th></tr></thead>";
-  searchResult += "<tbody>";
-
-  for (int i = 0; i < records.size(); ++i) {
-    const QSqlRecord& record = records[i];
-    searchResult += "<tr>";
-    searchResult += QString{"<td><a href='copyline:%1'>cp</a></td>"}.arg(i);
-    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong()));
-    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Name).value().toString());
-    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Duration).value().toInt()));
-    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::SampleMD5).value().toString());
-    searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathRight).value().toString());
-    searchResult += "</tr>";
-  }
-
-  searchResult += "</tbody></table>";
-
-  if (pSqlRecordList) {
-    pSqlRecordList->swap(records);
-  }
-
-  return searchResult;
+void ClickableTextBrowser::setHtml(const QString &text) {
+  QTextBrowser::setHtml(text);
+  m_sqlRecordList.clear();
 }
 
 void ClickableTextBrowser::mouseDoubleClickEvent(QMouseEvent* e) {
@@ -370,7 +310,7 @@ void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searc
   para.reserve(512);
   para += "<br/>";
   para += R"(<font size="+2">)";
-  para += GetSearchResultParagraphDisplay(searchText, &m_sqlRecordList);
+  para += DetailBrowserHelper::GetSearchResultParagraphDisplay(searchText, &m_sqlRecordList);
   para += "</font>";
   cursor.insertHtml(para);
 }

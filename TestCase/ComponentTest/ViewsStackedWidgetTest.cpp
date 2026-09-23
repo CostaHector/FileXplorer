@@ -849,7 +849,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QStringList fileNamesMovie{mp4Name};
       const QModelIndexList selectedRowsMovie{movieInd};
       const QStringList filePathsMovie{mp4FileAbsPath};
-      const QStringList filePrepathsMovie{lvl1Path};
+      const QStringList filePrepathsMovie{lvl1Path + '/'};
       const QList<QUrl> expectUrls{QUrl::fromLocalFile(mp4FileAbsPath)};
       const std::pair<QStringList, QStringList> expectPreAndNameMovie{filePrepathsMovie, fileNamesMovie};
 

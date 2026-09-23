@@ -90,10 +90,10 @@ QSqlRecord GetAMovieRecordUsedInBrowser(const QString& prePathLeft, const QStrin
   rec.append(QSqlField(ENUM_2_STR(PrePathRight), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Name), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Size), QVariant::LongLong));
-  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathLeft, prePathLeft);
-  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELED::PrePathRight, prePathRight);
-  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Name, name);
-  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELED::Size, sz);
+  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathLeft, prePathLeft);
+  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathRight, prePathRight);
+  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Name, name);
+  rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size, sz);
   return rec;
 }
 

@@ -5,6 +5,7 @@
 #include "PathTool.h"
 #include "FileTool.h"
 #include "PublicVariable.h"
+#include "DetailBrowserHelper.h"
 #include "StringTool.h"
 #include "ImageTool.h"
 
@@ -118,9 +119,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
 
   // Videos here
   const int vidCnt{vidsLst.size()};
-  QString vidsPartHead{R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedVideos"> %1 )" + QString::number(vidCnt)
-                       + R"( Related Videos</a></h3>)"
-                         "\n"};
+  QString vidsPartHead{R"(<h3 style="margin:10px 0 5px 0;">)" + DetailBrowserHelper::GetHideRelatedVideosHref(vidCnt) + "</h3>\n"};
   QString vidsPartBody;
   vidsPartBody.reserve(50 * vidCnt);
   vidsPartBody += R"(<div style="margin-top:15px;">)"
@@ -135,9 +134,7 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
   // Images here
   const QString imgPrePath{imgHost + '/' + orientation + '/' + castName};
   const int imgsCnt{imgsLst.size()};
-  QString imgsPartHead{R"(<h3 style="margin:10px 0 5px 0;"><a href="hideRelatedImages"> %1 )" + QString::number(imgsCnt)
-                       + R"( Related Images</a></h3>)"
-                         "\n"};
+  QString imgsPartHead{R"(<h3 style="margin:10px 0 5px 0;">)" + DetailBrowserHelper::GetHideRelatedImagesHref(imgsCnt) + "</h3>\n"};
   QString imgsPartBody;
   imgsPartBody.reserve(50 * imgsCnt);
   imgsPartBody += R"(<div style="margin-top:20px;">)"

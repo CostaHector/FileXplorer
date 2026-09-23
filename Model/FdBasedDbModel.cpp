@@ -39,7 +39,8 @@ QString FdBasedDbModel::absolutePath(const QModelIndex& curIndex) const {
   }
   const QModelIndex& preLeft = curIndex.siblingAtColumn(MovieDBModelField::PrePathLeft);
   const QModelIndex& preRight = curIndex.siblingAtColumn(MovieDBModelField::PrePathRight);
-  return PathTool::RMFComponent::joinParentPath(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(), data(preRight, Qt::ItemDataRole::DisplayRole).toString());
+  return PathTool::RMFComponent::joinParentPath(data(preLeft, Qt::ItemDataRole::DisplayRole).toString(),
+                                                data(preRight, Qt::ItemDataRole::DisplayRole).toString());
 }
 
 QString FdBasedDbModel::fileName(const QModelIndex& curIndex) const {
