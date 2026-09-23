@@ -56,7 +56,6 @@ public:
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
   static QString& UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const QSize& newSize);
 
-  void setHtml(const QString &text);
   /* for cast preview only below */
   void SetCastHtmlParts(const CastHtmlParts& castHtmls) {mCastHtmls = castHtmls;}
   void UpdateHtmlContents() { setHtml(mCastHtmls.fullHtml(mCastVideosVisisble, mCastImagesVisisble)); }
@@ -98,7 +97,6 @@ private:
 
   int mCurIconSizeIndex{14};
   QSize mIconSize;
-  QList<QSqlRecord> m_sqlRecordList;
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

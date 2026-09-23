@@ -24,11 +24,22 @@ constexpr const char* COPY_LINE_INDEX = "copy-line:%1";
 }
 
 namespace DetailBrowserHelper {
+inline QString ToBase64Url(const QString& s) {
+  return QString::fromLatin1(
+      s.toUtf8().toBase64(QByteArray::Base64UrlEncoding
+                          | QByteArray::OmitTrailingEquals));
+}
+
+inline QString FromBase64Url(const QString& s) {
+  return QString::fromUtf8(
+      QByteArray::fromBase64(s.toLatin1(), QByteArray::Base64UrlEncoding));
+}
 QString GetHideRelatedImagesHref(int count);
 QString GetHideRelatedVideosHref(int count);
 QString GetCopyLineHref(int lineIndex);
-bool AppendSqlRecordToClipboard(const QList<QSqlRecord>& recordsLst, const QString& lineIndexStr);
-QString GetSearchResultParagraphDisplay(const QString& searchText, QList<QSqlRecord>* pSqlRecordList = nullptr);
+QString GetCopyLineHref(const QString& base64UrlPath);
+bool AppendSqlRecordToClipboard(const QString& base64UrlPath);
+QString GetSearchResultParagraphDisplay(const QString& searchText);
 };
 
 #endif // DETAILBROWSERHELPER_H

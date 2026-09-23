@@ -222,9 +222,7 @@ private slots:
       };
       UserSpecifiedBrowerInteractMock::mockSqlRecordList() = mockReturnList;
       QCOMPARE(setCurSelection(browser, 0, 11), "Hello world");
-      QCOMPARE(browser.m_sqlRecordList.size(), 0);
       browser.onSearchSelectionReq();
-      QCOMPARE(browser.m_sqlRecordList.size(), 2);
 
       const QString htmlContentWhenSearchReturn2Lines = browser.toPlainText();
       QVERIFY(htmlContentWhenSearchReturn2Lines != initalPlainTextContent);
@@ -237,14 +235,7 @@ private slots:
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
-
-      browser.onSearchSelectionReq(); // each call will append records to m_sqlRecordList
-      QCOMPARE(browser.m_sqlRecordList.size(), 2 + 2);
     }
-
-    // m_sqlRecordList cleared when setHtml called
-    browser.setHtml("");
-    QCOMPARE(browser.m_sqlRecordList.size(), 0);
   }
   void advance_chooseable_search_ok() {
     UserSpecifiedBrowerInteractMock::mockSqlRecordList().clear();
@@ -378,7 +369,7 @@ private slots:
     QCOMPARE(browser.onAppendMultiSelectionToCastDbReq(), 2);
   }
 
-  void hideOrShowRelatedVideosImages_ok() {
+  void onAnchorClicked_ok() {
     Configuration().clear();
     setConfig(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_VIDEOS, true);
     setConfig(BrowserKey::CAST_PREVIEW_BROWSER_SHOW_RELATED_IMAGES, true);
@@ -392,9 +383,6 @@ private slots:
 
     QUrl clickHideShowVidUrl{UrlAnchorTemplate::HIDE_RELATED_VIDEOS};
     QUrl clickHideShowImgUrl{UrlAnchorTemplate::HIDE_RELATED_IMAGES};
-    QUrl clickCopyIndex0RecordUrl{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(0)};
-    QUrl clickCopyIndex2RecordUrl{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(2)};
-
     QVERIFY(browser.onAnchorClicked(clickHideShowVidUrl));
     QCOMPARE(browser.mCastVideosVisisble, false);
     QCOMPARE(browser.mCastImagesVisisble, true);
@@ -416,22 +404,10 @@ private slots:
     QCOMPARE(browser.toPlainText(), "bodyvidTitle▼vidListStrimgTitle▼imgListStr");
 
     const QString expectCopyContents{"/home/to/file1.mp4\t0'0'0'999\t00:00:00.000\t"};
+    const QString base64UrlPath = DetailBrowserHelper::ToBase64Url(expectCopyContents);
+    QUrl copySchemaAndPathLink{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(base64UrlPath)};
     MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(expectCopyContents, true).will(returnValue(true));
-    // empty records
-    QVERIFY(browser.m_sqlRecordList.isEmpty());
-    QVERIFY(!browser.onAnchorClicked(clickCopyIndex0RecordUrl));
-    QList<QSqlRecord> recordsInSearch {
-      // /home/to/file1.mp4  ("/home/", "to/", "file1.mp4")
-      // /home/to/reference/file2.mp4
-        SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/", "to/", "file1.mp4", 999),
-        SqlRecordTestHelper::GetAMovieRecordUsedInBrowser("/home/to/", "reference/", "file2.mp4", 1),
-    };
-    browser.m_sqlRecordList.swap(recordsInSearch);
-    QCOMPARE(browser.m_sqlRecordList.size(), 2);
-    // copied here
-    QVERIFY(browser.onAnchorClicked(clickCopyIndex0RecordUrl));
-    // out of range
-    QVERIFY(!browser.onAnchorClicked(clickCopyIndex2RecordUrl));
+    QVERIFY(browser.onAnchorClicked(copySchemaAndPathLink));
   }
 
   void mouser_event_ok() {

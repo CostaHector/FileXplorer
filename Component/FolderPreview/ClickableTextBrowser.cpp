@@ -100,7 +100,7 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
       UpdateHtmlContents();
     }
   } else if (urlSchema == UrlSchema::COPY_LINE) {
-    return DetailBrowserHelper::AppendSqlRecordToClipboard(m_sqlRecordList, url.path());
+    return DetailBrowserHelper::AppendSqlRecordToClipboard(url.path());
   }
   return true;
 }
@@ -221,11 +221,6 @@ int ClickableTextBrowser::onAppendMultiSelectionToCastDbReq() {
   return insertOrUpdateCnt;
 }
 
-void ClickableTextBrowser::setHtml(const QString &text) {
-  QTextBrowser::setHtml(text);
-  m_sqlRecordList.clear();
-}
-
 void ClickableTextBrowser::mouseDoubleClickEvent(QMouseEvent* e) {
   CHECK_NULLPTR_RETURN_VOID(e);
   if (e->button() == Qt::LeftButton) {
@@ -310,7 +305,7 @@ void ClickableTextBrowser::SearchAndAppendParagraphOfResult(const QString& searc
   para.reserve(512);
   para += "<br/>";
   para += R"(<font size="+2">)";
-  para += DetailBrowserHelper::GetSearchResultParagraphDisplay(searchText, &m_sqlRecordList);
+  para += DetailBrowserHelper::GetSearchResultParagraphDisplay(searchText);
   para += "</font>";
   cursor.insertHtml(para);
 }
