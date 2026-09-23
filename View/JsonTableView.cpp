@@ -32,7 +32,6 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
   _JsonProxyModel->setFilterKeyColumn(JsonModelField::Name);  // only filter the specified name row; set -1 to filter all column if needed
 
   setModel(_JsonProxyModel);
-  setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::AnyKeyPressed);
 
   auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JsonModelField::Detail, this};
   CHECK_NULLPTR_RETURN_VOID(detailColumnDelegator);

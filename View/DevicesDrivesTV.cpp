@@ -89,7 +89,6 @@ DevicesDrivesTV::DevicesDrivesTV(QWidget* parent)  //
   CHECK_NULLPTR_RETURN_VOID(mProgressStyleDelegate);
 
   setItemDelegateForColumn(DeviceDriverDBModelField::ROOT_PATH, mProgressStyleDelegate);
-  setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
 
   InitTableView();
   ReadSettings();
@@ -114,4 +113,8 @@ void DevicesDrivesTV::ReadSettings() {
 void DevicesDrivesTV::showEvent(QShowEvent* event) {
   CustomTableView::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
+}
+
+void DevicesDrivesTV::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultEditTrigger = QAbstractItemView::NoEditTriggers;
 }

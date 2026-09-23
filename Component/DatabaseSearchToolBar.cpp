@@ -155,6 +155,14 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
   return drpTbl;
 }
 
+void MovieDBSearchToolBar::RemoveATable(const QString& tableName) {
+  int specifiedIndex = m_tablesCB->findText(tableName);
+  if (specifiedIndex == -1) {
+    return;
+  }
+  m_tablesCB->removeItem(specifiedIndex);
+}
+
 void MovieDBSearchToolBar::AddATable(const QString& newTableName) {
   m_tablesCB->addItem(newTableName);
   m_tablesCB->setCurrentIndex(m_tablesCB->count() - 1); // todo this line mat can be removed

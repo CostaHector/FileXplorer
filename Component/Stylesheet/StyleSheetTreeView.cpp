@@ -17,7 +17,6 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   mStyleSheetEditDelegate = new StyleSheetEditDelegate{StyleItemData::Role::DATA_TYPE_ROLE, StyleItemData::EDITABLE_COLUMN, this};
   setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);
 
-  setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::DoubleClicked);
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);
 
@@ -43,6 +42,7 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
 
 void StyleSheetTreeView::initExclusivePreferenceSetting() {
   CustomTreeView::m_defaultExpandAll = true;
+  CustomTreeView::m_defaultEditTriggers = QAbstractItemView::EditTrigger::EditKeyPressed | QAbstractItemView::EditTrigger::DoubleClicked;
 }
 
 void StyleSheetTreeView::subscribe() {

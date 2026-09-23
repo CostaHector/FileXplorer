@@ -25,7 +25,6 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
   setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
-  setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   {
     const QString iconSizeMenuName{GetName() + " " + CustomListView::tr("Icon size")};
@@ -174,6 +173,7 @@ void CustomListView::onUniformItemSizedToggled(const bool bUniform) {
 
 void CustomListView::InitListView() {
   initExclusivePreferenceSetting();
+  setEditTriggers(m_defaultEditTrigger);
 
   // top2bottom, list
   _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(GetName() + "/FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());

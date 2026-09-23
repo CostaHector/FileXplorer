@@ -29,6 +29,7 @@ class CustomTreeView : public QTreeView {
  protected:
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
+  EditTriggers m_defaultEditTriggers{EditTrigger::EditKeyPressed};
   bool m_defaultExpandAll{false}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
 

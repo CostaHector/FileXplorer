@@ -33,6 +33,7 @@ class CustomTableView : public QTableView {
   void scrollContentsBy(int dx, int dy) override;
   void contextMenuEvent(QContextMenuEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
+  EditTriggers m_defaultEditTrigger{EditTrigger::EditKeyPressed};
   bool m_defaultShowHorizontalHeader{true}, m_defaultShowVerticalHeader{true}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
 

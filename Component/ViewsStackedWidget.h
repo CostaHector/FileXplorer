@@ -16,7 +16,6 @@
 #include "CastDBView.h"
 
 #include "ViewTypeTool.h"
-#include "FdBasedDb.h"
 #include "MimeDataHelper.h"
 #include "SelectionUsage.h"
 
@@ -106,7 +105,6 @@ class ViewsStackedWidget : public QStackedWidget {
   FileSystemTreeView* m_fsTreeView{nullptr};
 
   MovieDBSearchToolBar* _movieSearchBar{nullptr};
-  FdBasedDb* mMovieDb{nullptr};
   FdBasedDbModel* m_movieDbModel{nullptr};
   MovieDBView* m_movieView{nullptr};
 

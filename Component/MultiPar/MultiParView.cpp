@@ -6,8 +6,6 @@
 
 MultiParView::MultiParView(ParVerifyInfomationList &&resultList, const QString &instName, QWidget *parent)
   : CustomTableView{instName, parent} {
-  setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-
   mMultiParModel = new (std::nothrow) MultiParModel{std::move(resultList), this};
   CHECK_NULLPTR_RETURN_VOID(mMultiParModel);
 
@@ -43,6 +41,10 @@ MultiParView::MultiParView(ParVerifyInfomationList &&resultList, const QString &
 
 void MultiParView::setFilter(const QString &filter) {
   mSortFilterProxy->setFilterFixedString(filter);
+}
+
+void MultiParView::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultEditTrigger = EditTrigger::NoEditTriggers;
 }
 
 void MultiParView::subscribe() {

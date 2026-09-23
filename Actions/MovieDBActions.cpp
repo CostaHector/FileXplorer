@@ -7,7 +7,7 @@ MovieDBActions& MovieDBActions::GetInst() {
 }
 
 MovieDBActions::MovieDBActions(QObject* parent)  //
-    : QObject{parent}                            //
+  : QObject{parent}                            //
 {
   SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), tr("Submit"), this);
   CHECK_NULLPTR_RETURN_VOID(SUBMIT);
@@ -46,7 +46,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setCheckable(true);
   _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
   _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setToolTip("When enabled, videos/JSONs can be scanned from directories outside the current table mount path.\n"
-      "When disabled, the selected directory must be under the current table mount path.");
+                                              "When disabled, the selected directory must be under the current table mount path.");
 
   SCAN_FILES = new QActionGroup{this};
   SCAN_FILES->addAction(SCAN_VIDEOS);
@@ -57,14 +57,18 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(DELETE_FROM_TABLE);
   DELETE_FROM_TABLE->setToolTip("DELETE FROM `DB_TABLE::MOVIES` WHERE CLAUSE");
 
-  UNION_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), tr("Union Into"), this);
-  CHECK_NULLPTR_RETURN_VOID(UNION_TABLE);
-  UNION_TABLE->setToolTip(
-      "Merge data from T1 and T2 into MOVIES table: "
-      "Conflicting rows (by PRIMARY/UNIQUE key) will be replaced, "
-      "non-conflicting existing rows in MOVIES are preserved. "
-      "\nSQL: REPLACE INTO `DB_TABLE::MOVIES` SELECT * FROM `T1` UNION SELECT * FROM `T2`;"
-      );
+  RECONSTRUCT_MOVIES_TABLE = new (std::nothrow) QAction(QIcon(":img/UNION"), tr("Rebuild Movies"), this);
+  CHECK_NULLPTR_RETURN_VOID(RECONSTRUCT_MOVIES_TABLE);
+  RECONSTRUCT_MOVIES_TABLE->setToolTip(
+      "Rebuild table [DB_TABLE::MOVIES] from all disk tables.\n"
+      "\n"
+      "Steps:\n"
+      "  1. DROP TABLE IF EXISTS `DB_TABLE::MOVIES`\n"
+      "  2. CREATE TABLE `DB_TABLE::MOVIES` AS\n"
+      "       SELECT * FROM disk1 UNION ALL SELECT * FROM disk2 UNION ALL ...\n"
+      "  3. CREATE INDEX on SampleMD5 / PrePathLeft / PrePathRight / Name\n"
+      "\n"
+      "Warning: the old [DB_TABLE::MOVIES] table will be dropped and its content replaced.");
 
   AUDIT_A_TABLE = new (std::nothrow) QAction(QIcon(":img/AUDIT"), tr("Audit This Table"), this);
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
@@ -79,7 +83,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
   DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);
   DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(UNION_TABLE);
+  DB_CONTROL_ACTIONS->addAction(RECONSTRUCT_MOVIES_TABLE);
   DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
   DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
 

@@ -14,6 +14,9 @@ public:
 signals:
   void showCliOutputReq(const QByteArray& cliOutput);
 
+protected:
+  void initExclusivePreferenceSetting() override;
+
 private:
   void subscribe();
   void onSelectionChange(const QModelIndex& proIndex);

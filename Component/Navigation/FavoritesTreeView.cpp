@@ -15,7 +15,6 @@ FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
   setModel(mFavProxyModel);
   registerProxyModel(mFavProxyModel);
 
-  setEditTriggers(QAbstractItemView::NoEditTriggers);
   setDragDropMode(QAbstractItemView::DragDrop);
 
   setAcceptDrops(true);
@@ -296,4 +295,8 @@ void FavoritesTreeView::dropEvent(QDropEvent* event) {
   Qt::DropAction oldDropAction = mFavModel->GetDropAction(mimeData, srcIndex);
   updateDropAction(*event, oldDropAction);
   QTreeView::dropEvent(event);
+}
+
+void FavoritesTreeView::initExclusivePreferenceSetting() {
+  CustomTreeView::m_defaultEditTriggers = EditTrigger::NoEditTriggers;
 }

@@ -139,9 +139,9 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     }
     case ViewType::MOVIE: {
       if (_view->m_movieView == nullptr) {
-        _view->mMovieDb = new (std::nothrow) FdBasedDb{SystemPath::VIDS_DATABASE(), SystemPath::MovieDBConnection(), _view},
-        _view->m_movieDbModel = new (std::nothrow) FdBasedDbModel{_view, _view->mMovieDb->GetDb()};
-        _view->m_movieView = new (std::nothrow) MovieDBView(_view->m_movieDbModel, _view->_movieSearchBar, *(_view->mMovieDb), _view);
+        FdBasedDb* pMovieDb = new (std::nothrow) FdBasedDb{SystemPath::VIDS_DATABASE(), SystemPath::MovieDBConnection(), _view};
+        _view->m_movieDbModel = new (std::nothrow) FdBasedDbModel{_view, pMovieDb->GetDb()};
+        _view->m_movieView = new (std::nothrow) MovieDBView(*pMovieDb, _view->m_movieDbModel, _view->_movieSearchBar, _view);
         _view->AddView(viewType, _view->m_movieView);
       }
       viewIndex = _view->m_name2ViewIndex[viewType];

@@ -25,7 +25,7 @@ public:
   QAction* DROP_A_TABLE{nullptr};
 
   QAction* DELETE_FROM_TABLE{nullptr};
-  QAction* UNION_TABLE{nullptr};
+  QAction* RECONSTRUCT_MOVIES_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
   QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 

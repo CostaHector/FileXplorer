@@ -14,7 +14,6 @@ VideoTableView::VideoTableView(QWidget* parent) : CustomTableView{"VIEDO_TABLE_V
   mProxyModel->setSourceModel(mVideoModel);
   setModel(mProxyModel);
 
-  setEditTriggers(QAbstractItemView::SelectedClicked);
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
   InitTableView();
@@ -290,4 +289,5 @@ int VideoTableView::onRecycleVideoAndRelated() {
 void VideoTableView::initExclusivePreferenceSetting() {
   CustomTableView::m_defaultShowHorizontalHeader = true;
   CustomTableView::m_defaultShowVerticalHeader = false;
+  CustomTableView::m_defaultEditTrigger = QAbstractItemView::SelectedClicked;
 }
