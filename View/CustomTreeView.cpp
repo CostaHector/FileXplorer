@@ -1,5 +1,4 @@
 #include "CustomTreeView.h"
-#include "ViewHelper.h"
 #include "DoubleRowHeader.h"
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
@@ -9,6 +8,7 @@
 #include "ViewItemDelegate.h"
 #include <QSortFilterProxyModel>
 #include <QPainter>
+#include <QContextMenuEvent>
 
 #include "RowHeightRegistry.h"
 extern template struct RowHeightRegistry<CustomTreeView>;
@@ -31,7 +31,6 @@ CustomTreeView::CustomTreeView(const QString& instName, QWidget* parent)  //
   setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
-  setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   m_itemDelegate = new ViewItemDelegate{this};
   setItemDelegate(m_itemDelegate);
@@ -234,6 +233,8 @@ void CustomTreeView::onStyleChanged() {
 
 void CustomTreeView::InitTreeView() {  //
   initExclusivePreferenceSetting();
+  setEditTriggers(m_defaultEditTriggers);
+
   if (m_defaultExpandAll) {
     expandAll();
   }

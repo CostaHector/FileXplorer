@@ -146,7 +146,7 @@ bool JsonPr::UpdateVideoSizeField(QString videoAbsPath) {
     return false;
   }
   qint64 newSize = FileTool::GetFileSize(videoAbsPath);
-  if (m_Size == newSize) {
+  if (newSize == 0 || m_Size == newSize) {
     return false;
   }
   m_Size = newSize;
@@ -163,7 +163,7 @@ bool JsonPr::UpdateDurationField(QString videoAbsPath) {
   }
   VideoDurationGetter mi;
   int newDuration = VideoDurationGetter::GetLengthQuickStatic(mi, videoAbsPath);
-  if (newDuration <= 0) {
+  if (newDuration <= 0 || m_Duration == newDuration) { // when unchange skip
     return false;
   }
   m_Duration = newDuration;
@@ -178,12 +178,16 @@ bool JsonPr::UpdateVideoMD5Field(QString videoAbsPath) {
     LOG_D("Video correspond to json file[%s] not found", qPrintable(jsonFileName));
     return false;
   }
-
+  QByteArray newMD5;
   if (videoAbsPath.endsWith(".dvd", Qt::CaseInsensitive)) {
-    m_MD5 = DvdFileInfo::ReadTotalMD5FromDvdFile(videoAbsPath);
+    newMD5 = DvdFileInfo::ReadTotalMD5FromDvdFile(videoAbsPath);
   } else {
-    m_MD5 = MD5Calculator::GetFileMD5(videoAbsPath, BytesRangeTool::BytesRangeE::SAMPLED_128_KB);
+    newMD5 = MD5Calculator::GetFileMD5(videoAbsPath, BytesRangeTool::BytesRangeE::SAMPLED_128_KB);
   }
+  if (newMD5.isEmpty() || m_MD5 == newMD5) {
+    return false;
+  }
+  m_MD5 = newMD5;
   return true;
 }
 

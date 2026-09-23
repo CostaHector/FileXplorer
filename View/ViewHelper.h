@@ -22,7 +22,7 @@ void dragMoveEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDragMov
 void dropEventCore(QAbstractItemView* view, FileSystemModel* m_fsm, QDropEvent* event);
 void dragLeaveEventCore(FileSystemModel* m_fsm, QDragLeaveEvent* event);
 
-void mouseMoveEventCore(QAbstractItemView* view, QMouseEvent* event);
+void startDragCore(QAbstractItemView* view, Qt::DropActions supportedActions);
 
 bool keyPressEventCore(QKeyEvent* e);
 }  // namespace View

@@ -9,6 +9,7 @@
 class MovieDBActions : public QObject {
   Q_OBJECT
 public:
+  static MovieDBActions& GetInst();
   explicit MovieDBActions(QObject* parent = nullptr);
   QWidget* GetScanFilesToolButton(QWidget* notNullParent) const;
 
@@ -24,7 +25,7 @@ public:
   QAction* DROP_A_TABLE{nullptr};
 
   QAction* DELETE_FROM_TABLE{nullptr};
-  QAction* UNION_TABLE{nullptr};
+  QAction* RECONSTRUCT_MOVIES_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
   QActionGroup* DB_CONTROL_ACTIONS{nullptr};
 
@@ -41,13 +42,14 @@ public:
   QAction *SET_CAST{nullptr}, *APPEND_CAST{nullptr}, *REMOVE_CAST{nullptr};
   QAction *SET_TAGS{nullptr}, *APPEND_TAGS{nullptr}, *REMOVE_TAGS{nullptr};
 
+  bool isAllowPathOutsideTableMount() const { return _ALLOW_PATH_OUTSIDE_TABLE_MOUNT->isChecked(); }
+
 private:
   void subscribe();
   void onScanFilesAgTriggered(const QAction* pScanFilesAct);
 
-  QAction* SCAN_VIDEOS{nullptr}, *SCAN_JSONS{nullptr};
+  QAction* SCAN_VIDEOS{nullptr}, *SCAN_JSONS{nullptr}, *_ALLOW_PATH_OUTSIDE_TABLE_MOUNT{nullptr};
   QActionGroup* SCAN_FILES{nullptr};
 };
 
-MovieDBActions& g_dbAct();
 #endif  // MOVIEDBACTIONS_H

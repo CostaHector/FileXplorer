@@ -91,12 +91,12 @@ private slots:
       // only contains [0-9a-zA-Z_ ] char
       MOCKER(FileTool::CopyTextToSystemClipboard) //
           .expects(exactly(1))                    //
-          .with(eq(QString{"video 1 ai mp4"}))    //
+          .with(eq(QString{"video 1 ai mp4"}), any())    //
           .will(returnValue(true))
           .id("index0_Copy");
       MOCKER(FileTool::CopyTextToSystemClipboard) //
           .expects(exactly(1))                    //
-          .with(eq(QString{"inexist video 1 mp4"}))    //
+          .with(eq(QString{"inexist video 1 mp4"}), any())    //
           .after("index0_Copy")
           .will(returnValue(true));
       // "video 1 ai mp4"

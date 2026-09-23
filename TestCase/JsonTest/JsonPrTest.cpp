@@ -14,8 +14,10 @@
 #include "PathTool.h"
 #include "PublicMacro.h"
 #include "JsonTestPrecoditionTools.h"
+#include "FileTool.h"
 #include "MD5Calculator.h"
 #include "VideoDurationGetter.h"
+#include "UserInteractiveMock.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -420,31 +422,38 @@ class JsonPrTest : public PlainTestSuite {
   }
 
   void UpdateDurationField_ok() {
-    QString videoPath{__FILE__};
-    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
-    MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(1)).will(returnValue(60 * 1000));
     JsonPr jpr;
     QCOMPARE(jpr.FindVideoAbsPath(), "");
-    QCOMPARE(jpr.UpdateVideoSizeField(), false);
-    QCOMPARE(jpr.UpdateDurationField(), false);
-    QCOMPARE(jpr.UpdateVideoMD5Field(), false);
+    QCOMPARE(jpr.UpdateVideoSizeField(""), false);
+    QCOMPARE(jpr.UpdateDurationField(""), false);
+    QCOMPARE(jpr.UpdateVideoMD5Field(""), false);
 
+    MOCKER((UserInteractiveMock::FILE_EXIST_TYPE)QFile::exists).expects(exactly(6)).will(returnValue(true));
+    MOCKER(FileTool::GetFileSize).expects(exactly(2)).will(returnValue((qint64)1024)); // 1kB
+    MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(2)).will(returnValue(60 * 1000)); // 60s
+    MOCKER(MD5Calculator::GetFileMD5).expects(exactly(2)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
+
+    QString existVideoPathMocked{"AnExistVideo.mp4"};
     QCOMPARE(jpr.m_Size, 0);
-    QCOMPARE(jpr.UpdateVideoSizeField(videoPath), true);
+    QCOMPARE(jpr.UpdateVideoSizeField(existVideoPathMocked), true); // 1st FileTool::GetFileSize
     QVERIFY(jpr.m_Size > 0);
+    QCOMPARE(jpr.UpdateVideoSizeField(existVideoPathMocked), false); // 2st FileTool::GetFileSize unchange
 
     QCOMPARE(jpr.m_Duration, 0);
-    QCOMPARE(jpr.UpdateDurationField(videoPath), true);
+    QCOMPARE(jpr.UpdateDurationField(existVideoPathMocked), true); // 1st GetLengthQuickStatic
     QCOMPARE(jpr.m_Duration, 60 * 1000);
+    QCOMPARE(jpr.UpdateDurationField(existVideoPathMocked), false); // 2nd GetLengthQuickStatic unchange
 
     QCOMPARE(jpr.m_MD5, QString());
-    QCOMPARE(jpr.UpdateVideoMD5Field(videoPath), true);
+    QCOMPARE(jpr.UpdateVideoMD5Field(existVideoPathMocked), true); // 1st GetFileMD5
     QCOMPARE(jpr.m_MD5, QString("AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"));
+    QCOMPARE(jpr.UpdateVideoMD5Field(existVideoPathMocked), false); // 2st GetFileMD5 unchange
   }
 
   void FindVideoAbsPath_ok() {
     MOCKER(MD5Calculator::GetFileMD5).expects(exactly(1)).will(returnValue(QByteArray{"AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD"}));
     MOCKER(VideoDurationGetter::GetLengthQuickStatic).expects(exactly(1)).will(returnValue(60 * 1000));
+
     JsonPr jpr{"any random file.json"};  // no video at all
     QCOMPARE(jpr.FindVideoAbsPath(), "");
     QCOMPARE(jpr.UpdateVideoSizeField(), false);

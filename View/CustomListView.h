@@ -27,6 +27,7 @@ signals:
   void wheelEvent(QWheelEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
+  EditTriggers m_defaultEditTrigger{EditTrigger::EditKeyPressed};
   bool m_defaultFlowLeft2Right{false}, m_defaultViewModeIcon{false}, m_defaultWrapping{false};
 
  private:

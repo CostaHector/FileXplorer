@@ -9,8 +9,6 @@
 
 ConfigsTableView::ConfigsTableView(const QString &instName, QWidget *parent)
   : CustomTableView{instName, parent} {
-  setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
-
   m_cfgModel = new (std::nothrow) ConfigsModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_cfgModel);
 

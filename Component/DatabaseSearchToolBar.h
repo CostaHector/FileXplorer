@@ -51,6 +51,7 @@ public:
   }
   QString GetMovieTableMountPath() const;
   QString AskUserDropWhichTable();
+  void RemoveATable(const QString& tableName);
   void AddATable(const QString& newTableName);
   void InitTables(const QStringList& tbls);
   void InitCurrentIndex();

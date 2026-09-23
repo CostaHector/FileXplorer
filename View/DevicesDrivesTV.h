@@ -41,6 +41,8 @@ class DevicesDrivesTV : public CustomTableView {
   void showEvent(QShowEvent* event) override;
 
  private:
+  void initExclusivePreferenceSetting() override;
+
   DiskInfoList mDisks;
   QStandardItemModel* mDevModel{nullptr};
   QStyledItemDelegate* mProgressStyleDelegate{nullptr};

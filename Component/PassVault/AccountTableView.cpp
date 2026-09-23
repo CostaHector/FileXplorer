@@ -21,7 +21,6 @@ AccountTableView::AccountTableView(QWidget* parent)
   mSortProxyModel->BindAccountsList(mPwdModel->mAccountsList);
 
   setModel(mSortProxyModel);
-  setEditTriggers(QAbstractItemView::EditKeyPressed);
   InitTableView();
   Subscribe();
 }

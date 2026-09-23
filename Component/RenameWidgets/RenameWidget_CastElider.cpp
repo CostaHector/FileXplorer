@@ -45,7 +45,7 @@ void RenameWidget_CastElider::InitExtraMemberWidget() {
 void RenameWidget_CastElider::InitExtraCommonVariable() {
   windowTitleFormat = QString("Cast Elider | %1 item(s) under [%2]");
   setWindowTitle(windowTitleFormat);
-  setWindowIcon(QIcon(":img/LONG_PATH_FINDER"));
+  setWindowIcon(QIcon(":/JsonEditor/FILENAME_FROM_JSON_NAME"));
 }
 
 bool RenameWidget_CastElider::onJsonBaseNameMaxLengthChanged(const QString& maxNameLengthStr) {

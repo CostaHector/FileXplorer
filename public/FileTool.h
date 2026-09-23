@@ -19,7 +19,7 @@ bool OpenLocalFile(const QString& localFilePath);
 bool OpenLocalImageFile(const QString& localFilePath);
 bool OpenLocalFileUsingDesktopService(const QString& localFilePath);
 bool RevealInSystemExplorer(const QString& localFilePath);
-bool CopyTextToSystemClipboard(const QString& text);
+bool CopyTextToSystemClipboard(const QString& text, bool bAppend = false);
 bool IsTorrentFile(const QString& localFilePath);
 bool OpenLocalTorrentFile(const QString& localFilePath);
 bool IsTorrentTxtFile(const QString& localFilePath);

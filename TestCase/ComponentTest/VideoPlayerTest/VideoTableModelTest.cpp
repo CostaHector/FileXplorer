@@ -7,8 +7,14 @@
 #include "EndToExposePrivateMember.h"
 
 #include "TDir.h"
+#include "VideoDurationGetter.h"
 
 #include <QSignalSpy>
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class VideoTableModelTest : public PlainTestSuite {
   Q_OBJECT
@@ -34,6 +40,9 @@ class VideoTableModelTest : public PlainTestSuite {
   void cleanupTestCase() {  //
     mDir.ClearAll();
   }
+
+  void init() { GlobalMockObject::reset(); }
+  void cleanup() { GlobalMockObject::verify(); }
 
   void default_ok() {
     VideoTableModel videoModel;
@@ -113,16 +122,21 @@ class VideoTableModelTest : public PlainTestSuite {
     VideoTableModel videoModel;
     QCOMPARE(videoModel.setRootPath(mWorkPath, VideoTableModel::VideoFindMode::INCLUDING_SUBDIRECTORY), 6);
     QCOMPARE(videoModel.rowCount(), 6);
-    QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
 
+    QSignalSpy dataChangedSpy{&videoModel, &VideoTableModel::dataChanged};
     QCOMPARE(videoModel.updateDurationFields({}), 0);
     QCOMPARE(dataChangedSpy.count(), 0);
 
+    MOCKER(VideoDurationGetter::GetDurationFromJsonFirst).expects(exactly(2)).will(returnValue(60 * 1000)); // 1min
     QModelIndexList indexes;
     indexes.reserve(2);
     indexes.push_back(videoModel.index(1, VideoBasicInfo::FILE_NAME));
     indexes.push_back(videoModel.index(3, VideoBasicInfo::FILE_NAME));
-    QCOMPARE(videoModel.updateDurationFields(indexes), 2);
+    QCOMPARE(videoModel.updateDurationFields(indexes), 2); // changed
+    QCOMPARE(videoModel.updateDurationFields(indexes), 0); // unchange
+
+    QCOMPARE(videoModel.index(1, VideoBasicInfo::DURATION_FIELD).data(Qt::DisplayRole).toString(), "00:01:00");
+    QCOMPARE(videoModel.index(3, VideoBasicInfo::DURATION_FIELD).data(Qt::DisplayRole).toString(), "00:01:00");
 
     QModelIndex durationFieldBegInd{indexes.front().siblingAtColumn(VideoBasicInfo::DURATION_FIELD)};
     QModelIndex durationFieldEndInd{indexes.back().siblingAtColumn(VideoBasicInfo::DURATION_FIELD)};

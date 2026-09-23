@@ -20,14 +20,14 @@
 #include <QMessageBox>
 #include <QInputDialog>
 
-MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
+MovieDBView::MovieDBView(FdBasedDb& movieDb_,
+                         FdBasedDbModel* model_,              //
                          MovieDBSearchToolBar* dbSearchBar_,  //
-                         FdBasedDb& movieDb_,
                          QWidget* parent)      //
     : CustomTableView{"MOVIE_TABLE", parent},  //
       _fdBasedDb{movieDb_},                    //
-      _movieDbSearchBar{dbSearchBar_},
-      _dbModel{model_} {
+      _dbModel{model_},
+      _movieDbSearchBar{dbSearchBar_} {
   CHECK_NULLPTR_RETURN_VOID(model_);
   CHECK_NULLPTR_RETURN_VOID(dbSearchBar_);
 
@@ -41,7 +41,6 @@ MovieDBView::MovieDBView(FdBasedDbModel* model_,              //
   }
 
   setModel(_dbModel);
-  setEditTriggers(QAbstractItemView::EditKeyPressed);  // only F2 works.
 
   InitMoviesTables();
   _movieDbSearchBar->InitCurrentIndex();
@@ -53,7 +52,7 @@ void MovieDBView::subscribe() {
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::whereClauseChanged, _dbModel, &SqlTableModelPub::SetFilterAndSelect);
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::movieTableChanged, this, &MovieDBView::setCurrentMovieTable);
 
-  auto& inst = g_dbAct();
+  auto& inst = MovieDBActions::GetInst();
   // control actions
   connect(inst.SUBMIT, &QAction::triggered, this, &MovieDBView::onSubmit);
   connect(inst._MODEL_REPOPULATE, &QAction::triggered, _dbModel, &FdBasedDbModel::repopulate);
@@ -64,7 +63,7 @@ void MovieDBView::subscribe() {
   connect(&inst, &MovieDBActions::reqScanFiles, this, &MovieDBView::onScanFilesUnderPath);
 
   connect(inst.DELETE_FROM_TABLE, &QAction::triggered, this, &MovieDBView::onDeleteFromTable);
-  connect(inst.UNION_TABLE, &QAction::triggered, this, &MovieDBView::onUnionTables);
+  connect(inst.RECONSTRUCT_MOVIES_TABLE, &QAction::triggered, this, &MovieDBView::onReconstructTotalMovieTable);
   connect(inst.AUDIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onAuditATable);
   // extra function actions
   connect(inst.READ_DURATION_BY_VIDEO, &QAction::triggered, this, &MovieDBView::onSetDurationByVideo);
@@ -124,30 +123,36 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
   return true;
 }
 
-bool MovieDBView::GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const {
-  const QString& curTblName = _movieDbSearchBar->GetCurrentTableName();  // 16 GUID
-
-  const QString& tblPeerPath = _movieDbSearchBar->GetMovieTableMountPath();  // mount path
+QString MovieDBView::GetAPathFromUserSelect(const QString& curTblName, const QString& usageMsg) {
+  const bool bAllowOutsidePath{MovieDBActions::GetInst().isAllowPathOutsideTableMount()};
+  const QString& tablePeerPath = MountPathTableNameMapper::toMountPath(curTblName);
   QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.toVariant()).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
-    lastPath = tblPeerPath;
-  }
-  const QString caption{QString{"Choose a path %1(subdirectory of [%2]) for table[%3]"}.arg(usageMsg).arg(tblPeerPath).arg(curTblName)};
-
-  QString selectPath = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
-  if (selectPath.isEmpty()) {
-    LOG_WARN_NP("User cancel insert, path is not directory", selectPath);
-    return false;
-  }
-  if (!selectPath.startsWith(tblPeerPath)) {
-    LOG_WARN_P("Path user selected not start with table name", "selectPath:%s\ntblPeerPath:%s", qPrintable(selectPath), qPrintable(tblPeerPath));
-    return false;
+    lastPath = MountPathTableNameMapper::isMountPointOnline(tablePeerPath) ? tablePeerPath : "";
   }
 
-  Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, selectPath);
-  userSelected.swap(selectPath);
-  LOG_D("[%s] User selectPath[%s] PeerPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tblPeerPath));
-  return true;
+  QString caption{QString{"[%1] Select a directory"}.arg(usageMsg)};
+  if (!bAllowOutsidePath) {
+    caption += QString{"(must be under [%1])"}.arg(tablePeerPath);
+  }
+  caption += QString{" for table[%1]"}.arg(curTblName);
+
+  const QString userSelected = QFileDialog::getExistingDirectory(nullptr, caption, lastPath, QFileDialog::ShowDirsOnly);
+  if (userSelected.isEmpty()) {
+    LOG_INFO_NP("Directory selection canceled by user; no path selected", userSelected);
+    return "";
+  }
+
+  if (!bAllowOutsidePath && !userSelected.startsWith(tablePeerPath)) {
+    LOG_WARN_P("Selected path is outside the table mount path, which is not allowed by current settings",
+               "selectedPath=%s, tableMountPath=%s",
+               qPrintable(userSelected), qPrintable(tablePeerPath));
+    return "";
+  }
+
+  Configuration().setValue(PathKey::DB_INSERT_VIDS_FROM.name, userSelected);
+  LOG_D("[%s] User selectPath[%s] tableMountPath[%s]", qPrintable(usageMsg), qPrintable(userSelected), qPrintable(tablePeerPath));
+  return userSelected;
 }
 
 bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesType) {
@@ -163,14 +168,14 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
     return false;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("and scan videos/jsons from", selectPath)) {
+  const QString itemsType{MovieDBModelField::ScanFilesType2Str(filesType)};
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Scan " + itemsType)};
+  if (selectPath.isEmpty()) {
     return false;
   }
-  const QString hintTemplate{"item(s) under path:\n[%1]\n will be inserted into Table: [%2]"};
+  const QString hintTemplate{itemsType + " under path:\n[%1]\n will be inserted into Table: [%2]"};
   const QString confirmInsertIntoMsg{hintTemplate.arg(selectPath, _movieDbSearchBar->GetCurrentTableName())};
-  QMessageBox::StandardButton cfmInsertIntoBtn = QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg);
-  if (cfmInsertIntoBtn != QMessageBox::StandardButton::Yes) {
+  if (QMessageBox::question(this, "CONFIRM INSERT INTO?", confirmInsertIntoMsg) != QMessageBox::StandardButton::Yes) {
     LOG_INFO_NP("User cancel insert", selectPath);
     return false;
   }
@@ -186,7 +191,7 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
       break;
     }
     default:
-      break;
+      return -1;
   }
 
   if (retCnt < 0) {
@@ -241,8 +246,7 @@ bool MovieDBView::onCreateATable() {
     return false;
   }
 
-  QStringList candidates = MountPathTableNameMapper::CandidateTableNamesList();
-  candidates.push_back(DB_TABLE::MOVIES);
+  const QStringList& candidates = MountPathTableNameMapper::CandidateTableNamesList();
   const QString tableNameInputTitle = "Input an unique table name";
   const QString tableNameInputHintMsg{QString("Here is the %1 mount points that you can use as table name:\n%2")  //
                                           .arg(candidates.size())
@@ -343,55 +347,96 @@ int MovieDBView::onDeleteFromTable() {
   return affectedRows;
 }
 
-bool MovieDBView::onUnionTables() {
+bool MovieDBView::onReconstructTotalMovieTable() {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
     LOG_ERR_NP("[Abort] Open db failed, See detail in log", con.lastError().text());
     return false;
   }
 
-  const QStringList& tbs = con.tables();
-  if (!tbs.contains(DB_TABLE::MOVIES)) {
-    LOG_INFO_NP("Destination table not exist. Create it at first", DB_TABLE::MOVIES);
-    return false;
-  }
-
-  const int SRC_TABLE_CNT = tbs.size() - 1;
-  if (SRC_TABLE_CNT <= 1) {
-    LOG_INFO_NP("No need union", "Only one table find(except destination table)");
-    return false;
-  }
-  const QString confirmUnionTitle = "Confirm Union?";
-  const QString confirmUnionHintMsg{QString{"All %1 tables into Table[%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
-  QMessageBox::StandardButton cfmUnionBtn =
-      QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-  if (cfmUnionBtn != QMessageBox::StandardButton::Yes) {
-    LOG_INFO_NP("[Skip] User cancel union tables", "return");
-    return false;
-  }
-
+  QStringList allTables{con.tables()};
   QStringList unionSrcTbs;
-  unionSrcTbs.reserve(SRC_TABLE_CNT);
-  for (const QString& srcTable : tbs) {
+  for (const QString& srcTable : allTables) {
     if (srcTable == DB_TABLE::MOVIES) {
+      continue;
+    }
+    if (srcTable.startsWith("sqlite_", Qt::CaseInsensitive)) {
       continue;
     }
     unionSrcTbs << (QString{"SELECT * FROM `%1`"}.arg(srcTable));
   }
+  if (unionSrcTbs.isEmpty()) {
+    LOG_W("No source table to merge into [%s]", qPrintable(DB_TABLE::MOVIES));
+    return false;
+  }
+  const QString unionStr{unionSrcTbs.join(" UNION ALL ")};
+  const QString confirmUnionTitle = "Confirm Reconstruct?";
+  const QString confirmUnionHintMsg{QString{"Merge %1 disk table(s) into [%2].\n"
+                                            "Old table [%2] will be dropped and rebuilt with 4 new indexes."}
+                                        .arg(unionSrcTbs.size())
+                                        .arg(DB_TABLE::MOVIES)};
+  if (QMessageBox::question(this, confirmUnionTitle, confirmUnionHintMsg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::StandardButton::Yes) {
+    LOG_INFO_NP("[Skip] User cancel reconstruct tables", "return");
+    return false;
+  }
 
-  // REPLACE INTO `MOVIES` SELECT * FROM `A568` UNION SELECT * FROM `AASAD`;
-  const QString unionStr{unionSrcTbs.join(" UNION ")};
-  const QString unionCmd{QString{"REPLACE INTO `%1` %2"}.arg(DB_TABLE::MOVIES).arg(unionStr)};
-  QSqlQuery unionTableQry{con};
-  if (!unionTableQry.exec(unionCmd)) {
-    const QString title{QString{"[Failed] Union %1 table(s) into [%2]"}.arg(SRC_TABLE_CNT).arg(DB_TABLE::MOVIES)};
-    const QString msg{QString{"cmd[%1] failed[%2]"}.arg(unionTableQry.executedQuery()).arg(unionTableQry.lastError().text())};
-    LOG_ERR_NP(title, msg);
+  // way1: REPLACE INTO `MOVIES` SELECT * FROM `A568` UNION SELECT * FROM `AASAD`;
+  // way2: INSERT INTO `MOVIES` SELECT * FROM `A568` UNION ALL SELECT * FROM `AASAD`;
+  // way3(Recommend): CREATE TABLE `MOVIES` AS SELECT * FROM `A568` UNION ALL SELECT * FROM `AASAD`
+
+  _dbModel->setTable("");
+  _dbModel->clear();
+
+  if (!con.transaction()) {
+    LOG_ERR_NP("[Abort] Begin transaction failed", con.lastError().text());
+    return false;
+  }
+
+  bool oldMovieTableRemoved{false};
+
+  QSqlQuery q{con};
+  // 1. 删除旧总表
+  if (allTables.contains(DB_TABLE::MOVIES, Qt::CaseInsensitive)) {
+    if (!q.exec(QString{"DROP TABLE IF EXISTS `%1`"}.arg(DB_TABLE::MOVIES))) {
+      LOG_ERR_NP("[Failed] Drop old table", q.lastError().text());
+      con.rollback();
+      return false;
+    }
+    oldMovieTableRemoved = true;
+  }
+
+  // 2. CTAS 批量重建（无约束、无索引；索引随后单独建）
+  const QString createCmd = QString{"CREATE TABLE `%1` AS %2"}.arg(DB_TABLE::MOVIES, unionStr);
+  if (!q.exec(createCmd)) {
+    LOG_ERR_NP("[Failed] Create table from union", q.lastError().text());
     con.rollback();
     return false;
   }
-  unionTableQry.finish();
-  LOG_OK_NP("Union into succeed", DB_TABLE::MOVIES);
+
+  // 3. 建立独立索引
+  using namespace MovieDBModelField;
+  static const QStringList indexNeededLst{ENUM_2_STR(SampleMD5), ENUM_2_STR(PrePathLeft), ENUM_2_STR(PrePathRight), ENUM_2_STR(Name), ENUM_2_STR(Cast)};
+  for (const QString& col : indexNeededLst) {
+    const QString idxName = QString{"idx_%1_%2"}.arg(DB_TABLE::MOVIES, col);
+    const QString idxCmd  = QString{"CREATE INDEX `%1` ON `%2`(`%3`)"}.arg(idxName, DB_TABLE::MOVIES, col);
+    if (!q.exec(idxCmd)) {
+      LOG_ERR_NP("[Failed] Create index", q.lastError().text());
+      con.rollback();
+      return false;
+    }
+  }
+
+  if (!con.commit()) {
+    LOG_ERR_NP("[Failed] Commit reconstruct", con.lastError().text());
+    con.rollback();
+    return false;
+  }
+
+  if (oldMovieTableRemoved) {
+    _movieDbSearchBar->RemoveATable(DB_TABLE::MOVIES);
+  }
+  _movieDbSearchBar->AddATable(DB_TABLE::MOVIES);
+  LOG_OK_NP("Reconstruct succeed", DB_TABLE::MOVIES);
   return true;
 }
 
@@ -413,8 +458,8 @@ bool MovieDBView::onAuditATable() {
     return false;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("used to Audit", selectPath)) {
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Audit")};
+  if (selectPath.isEmpty()) {
     return false;
   }
 
@@ -532,9 +577,9 @@ int MovieDBView::onUpdateByJson() {
     return -1;
   }
 
-  QString selectPath;
-  if (!GetAPathFromUserSelect("read field(s) from json file to update", selectPath)) {
-    return -1;
+  const QString selectPath{GetAPathFromUserSelect(curTblName, "Update by Json")};
+  if (selectPath.isEmpty()) {
+    return false;
   }
 
   const int retCnt = _fdBasedDb.UpdateStudioCastTagsByJson(curTblName, selectPath);
@@ -679,4 +724,8 @@ bool MovieDBView::IsHasSelection(const QString& msg) const {
     return false;
   }
   return true;
+}
+
+void MovieDBView::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultEditTrigger = EditTrigger::NoEditTriggers;
 }

@@ -84,7 +84,7 @@ private slots:
     QCOMPARE(mTDir.createEntries(nodes), nodes.size());
     QSet<QString> movieNames{"Chris Evans.mp4", "Chris Hemsworth.mp4", "Chris Pine.mp4", "Michael Fassbender.mp4"};
     QSet<QString> movieSizes{"0'0'0'11", "0'0'0'15", "0'0'0'10", "0'0'0'18"};
-    QSet<QString> absolutePathSet{mTDir.path(), mTDir.path(), mTDir.path(), mTDir.path()};
+    QSet<QString> absolutePathSet{mTDir.path() + '/', mTDir.path() + '/', mTDir.path() + '/', mTDir.path() + '/'};
 
     FdBasedDb movieDb{dbName, connName};
     QVERIFY(movieDb.IsValid());

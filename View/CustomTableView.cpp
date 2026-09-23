@@ -6,10 +6,8 @@
 #include "StyleKey.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
-#include "NotificatorMacro.h"
 #include "ViewHelper.h"
 #include "RowHeightRegistry.h"
-#include "InputDialogHelper.h"
 
 #include <QPainter>
 #include <QContextMenuEvent>
@@ -36,9 +34,7 @@ CustomTableView::CustomTableView(const QString& instName, QWidget* parent)
 
   setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
   setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
-
   setDragDropMode(QAbstractItemView::NoDragDrop);
-  setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   {
     const QString textElideModeMenuName{GetName() + " " + CustomTableView::tr("Text elide mode")};
@@ -208,6 +204,7 @@ void CustomTableView::onStyleChanged() {
 
 void CustomTableView::InitTableView() {
   initExclusivePreferenceSetting();
+  setEditTriggers(m_defaultEditTrigger);
 
   const bool showHorHeader = Configuration().value(m_showHorizontalHeaderKey, m_defaultShowHorizontalHeader).toBool();
   const bool showVertHeader = Configuration().value(m_showVerticalHeaderKey, m_defaultShowVerticalHeader).toBool();

@@ -22,6 +22,7 @@ class FavoritesTreeView : public CustomTreeView {
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dragMoveEvent(QDragMoveEvent* event) override;
   void dropEvent(QDropEvent* event) override;
+  void initExclusivePreferenceSetting() override;
 
  private:
   void subscribe();

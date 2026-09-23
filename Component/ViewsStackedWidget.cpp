@@ -286,22 +286,27 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
     _previewFolder->operator()(fi.absoluteFilePath());
   }
 
-  if (auto* pTagEditorSideBar = TagEditorSideBar::GInstance()) {
-    if (pTagEditorSideBar->isHidden()) {
+  static QString lastTimeJsonPath;
+  QString jsonPath;
+  std::pair<int, QStringList> rateTagsPair{JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, QStringList()};
+  if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
+    if (jsonPath == lastTimeJsonPath) {
       return;
     }
-    static QString lastTimeJsonPath;
-    QString jsonPath;
-    std::pair<int, QStringList> rateTagsPair{JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, QStringList()};
-    if (RelatedHelper::getJsonPathFromFile(fi.absoluteFilePath(), jsonPath)) {
-      if (jsonPath == lastTimeJsonPath) {
-        return;
-      }
-      lastTimeJsonPath = jsonPath;
-      rateTagsPair = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+    lastTimeJsonPath = jsonPath;
+    rateTagsPair = JsonParser::GetRateAndTagsFromJsonFile(jsonPath, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
+  }
+
+  if (auto* pTagEditorSideBar = TagEditorSideBar::GInstance()) {
+    if (!pTagEditorSideBar->isHidden()) {
+      TagsHelper::GetInst().UpdateTagsActionCheckedStatus(rateTagsPair.second);
     }
-    if (auto* p = RatingStarsWidget::GInstance()) p->freshRating(rateTagsPair.first);
-    TagsHelper::GetInst().UpdateTagsActionCheckedStatus(rateTagsPair.second);
+  }
+
+  if (auto* pRatingStarInst = RatingStarsWidget::GInstance()) {
+    if (!pRatingStarInst->isHidden()) {
+      pRatingStarInst->freshRating(rateTagsPair.first);
+    }
   }
 }
 

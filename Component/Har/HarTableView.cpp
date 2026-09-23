@@ -20,7 +20,6 @@ HarTableView::HarTableView(QWidget* parent)
   setModel(mSortFilterProxy);
   registerProxyModel(mSortFilterProxy);
 
-  setEditTriggers(QAbstractItemView::NoEditTriggers);
   InitTableView();
 
   mEXPORT_TO = new (std::nothrow) QAction{QIcon{":img/EXPORT_TO"}, tr("Export Selections to"), this};
@@ -39,6 +38,10 @@ QString HarTableView::GetWinTitleStr(const QString& harFile) const {
     title += harFile;
   }
   return title;
+}
+
+void HarTableView::initExclusivePreferenceSetting() {
+  CustomTableView::m_defaultEditTrigger = EditTrigger::NoEditTriggers;
 }
 
 int HarTableView::operator()(const QString& harAbsPath) {

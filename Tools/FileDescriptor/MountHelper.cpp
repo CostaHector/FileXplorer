@@ -332,6 +332,11 @@ GUID_2_PNTS_SET& Guids2MntPntSet(bool forceRefresh) {
 
 #include <QRegularExpression>
 namespace MountPathTableNameMapper {
+bool isMountPointOnline(const QString& mountPoint) {
+  const QStorageInfo storage(mountPoint);
+  // 路径对应一个有效的挂载点 && 文件系统已准备好进行读写
+  return storage.isValid() && storage.isReady();
+}
 
 QString toTableName(const QString& mountPath, bool* bConversionOk) {
   static const QRegularExpression validMountPath{"^(C:|/mnt)/DISKS/[a-zA-Z0-9]+$"};

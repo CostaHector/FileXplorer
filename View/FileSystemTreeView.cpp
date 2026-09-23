@@ -22,7 +22,6 @@ FileSystemTreeView::FileSystemTreeView(FileSystemModel* fsmModel, QWidget* paren
 
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
-  setEditTriggers(QAbstractItemView::NoEditTriggers);  // only F2 works. QAbstractItemView.NoEditTriggers
 
   setDragDropMode(QAbstractItemView::DragDrop);
   setAcceptDrops(true);
@@ -55,6 +54,7 @@ void FileSystemTreeView::subscribe() {
 
 void FileSystemTreeView::initExclusivePreferenceSetting() {
   CustomTreeView::m_defaultShowBackgroundImage = true;
+  CustomTreeView::m_defaultEditTriggers = QAbstractItemView::NoEditTriggers;
 }
 
 void FileSystemTreeView::dropEvent(QDropEvent* event) {

@@ -255,7 +255,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../../View/CustomListView.cpp" line="+31"/>
+        <location filename="../../View/CustomListView.cpp" line="+30"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -298,7 +298,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../../View/CustomTableView.cpp" line="+44"/>
+        <location filename="../../View/CustomTableView.cpp" line="+40"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -356,7 +356,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+41"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+40"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -489,7 +489,7 @@
 <context>
     <name>FavoritesTreeView</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+31"/>
+        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+30"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -920,7 +920,7 @@
 <context>
     <name>HarTableView</name>
     <message>
-        <location filename="../../Component/Har/HarTableView.cpp" line="+26"/>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+25"/>
         <source>Export Selections to</source>
         <translation>导出选中</translation>
     </message>
@@ -1091,7 +1091,7 @@
     <message>
         <location line="+11"/>
         <source>Sync File Names from Name &amp;&amp; Cast</source>
-        <translation>同步相关文件名为Name&amp;&amp;Cast</translation>
+        <translation>更新相关文件名</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1171,7 +1171,7 @@
     <message>
         <location line="-35"/>
         <source>Set Name from File Name</source>
-        <translation>同步Name字段为文件basename</translation>
+        <translation>更新Name字段</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1422,17 +1422,22 @@
         <translation>从Json文件导入</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+3"/>
+        <source>Allow Paths Outside Table Mount</source>
+        <translation>允许表格挂载点之外的路径</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Delete Where</source>
         <translation>删除</translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Union Into</source>
-        <translation>合并</translation>
+        <source>Rebuild Movies</source>
+        <translation>重建总表</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+13"/>
         <source>Audit This Table</source>
         <translation>审计</translation>
     </message>
@@ -1576,7 +1581,7 @@
 <context>
     <name>MultiParView</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+25"/>
+        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+23"/>
         <source>Repair Broken File</source>
         <translation>修复损坏文件</translation>
     </message>
@@ -1601,7 +1606,7 @@
         <translation>在系统应用中打开</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+61"/>
         <source>Confirm Recovery Source File Name?</source>
         <translation>确认恢复源文件名称吗?</translation>
     </message>
@@ -2344,7 +2349,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+30"/>
+        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+29"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
@@ -2595,7 +2600,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>VideoTableView</name>
     <message>
-        <location filename="../../Component/VideoPlayer/VideoTableView.cpp" line="+24"/>
+        <location filename="../../Component/VideoPlayer/VideoTableView.cpp" line="+23"/>
         <source>Rename related(replace)</source>
         <translation>重命名相关文件(替换)</translation>
     </message>

@@ -10,9 +10,9 @@
 
 class MovieDBView : public CustomTableView {
 public:
-  MovieDBView(FdBasedDbModel* model_,              //
-              MovieDBSearchToolBar* dbSearchBar,  //
-              FdBasedDb& movieDb_,                 //
+  MovieDBView(FdBasedDb& movieDb_,
+              FdBasedDbModel* model_,              //
+              MovieDBSearchToolBar* dbSearchBar_,  //
               QWidget* parent = nullptr);
 
   void subscribe();
@@ -28,7 +28,7 @@ public:
   bool onDropATable();
   int onDeleteFromTable();
 
-  bool onUnionTables();
+  bool onReconstructTotalMovieTable();
   bool onAuditATable();
   bool onSetDurationByVideo();
   int onExportToJson();
@@ -43,16 +43,15 @@ public:
   QList<qint64> GetSelectionFileSizes() const;
   QList<int> GetSelectionDurations() const;
 
-
   // should not call ~destructure after getDb() and pass to QSqlTableModel
 private:
-  bool GetAPathFromUserSelect(const QString& usageMsg, QString& userSelected) const;
+  void initExclusivePreferenceSetting() override;
+  static QString GetAPathFromUserSelect(const QString& curTblName, const QString& usageMsg);
   bool IsHasSelection(const QString& msg = "") const;
 
+  FdBasedDb& _fdBasedDb;
   FdBasedDbModel* _dbModel{nullptr};
   MovieDBSearchToolBar* _movieDbSearchBar{nullptr};
-
-  FdBasedDb& _fdBasedDb;
 
   bool m_isHeaderStateAlreadyInited{false};
   QStringList m_studioCandidates;

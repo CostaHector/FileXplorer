@@ -264,7 +264,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.onUpdateDurationFields(), 0);  // no selection
 
     videoTv.selectAll();
-    QCOMPARE(videoTv.onUpdateDurationFields(), 3);
+    QCOMPARE(videoTv.onUpdateDurationFields(), 0); // inexist update failed.
   }
 
   void onRecycleVideoAndRelated_ok() {

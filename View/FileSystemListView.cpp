@@ -27,6 +27,7 @@ FileSystemListView::FileSystemListView(FileSystemModel* fsmModel, QWidget* paren
   setAcceptDrops(true);
   setDragEnabled(true);
   setDropIndicatorShown(true);
+  setSelectionRectVisible(true);
 
   PushFrontExclusiveActions(GetRightClickMenuActions(this));
 

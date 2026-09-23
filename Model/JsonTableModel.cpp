@@ -674,7 +674,11 @@ int JsonTableModel::JsonFieldValueUpdateCore(const QModelIndexList& rowIndexes, 
     } else {
       vidFullPath.clear();
     }
-    affectedRows += (int)(mCachedJsons[row].*func)(vidFullPath);
+    bool bChanged = (mCachedJsons[row].*func)(vidFullPath);
+    if (!bChanged) {
+      continue;
+    }
+    ++affectedRows;
     setModifiedNoEmit(row, true);
     if (row > maxRow) {
       maxRow = row;

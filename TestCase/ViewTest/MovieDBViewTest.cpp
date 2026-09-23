@@ -3,6 +3,7 @@
 
 #include "BeginToExposePrivateMember.h"
 #include "MovieDBView.h"
+#include "MovieDBActions.h"
 #include "EndToExposePrivateMember.h"
 
 #include "Logger.h"
@@ -11,7 +12,6 @@
 #include "TDir.h"
 #include "MountHelper.h"
 #include "MovieDBModelField.h"
-#include "MovieDBActions.h"
 #include "VideoDurationGetter.h"
 
 #include <QInputDialog>
@@ -85,9 +85,17 @@ private slots:
       QVERIFY(tableName2ToPath2Ok);
       QVERIFY(tableName3ToPath3Ok);
     }
+    if (MovieDBActions::GetInst().isAllowPathOutsideTableMount()) {
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    }
   }
 
-  void cleanupTestCase() { Configuration().clear(); }
+  void cleanupTestCase() {
+    Configuration().clear();
+    if (MovieDBActions::GetInst().isAllowPathOutsideTableMount()) {
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    }
+  }
 
   void init() {
     GlobalMockObject::reset();
@@ -118,7 +126,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     QVERIFY(dbToolBar.m_tablesCB != nullptr);
     QCOMPARE(dbToolBar.m_tablesCB->count(), 0);
@@ -149,7 +157,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     // 1 create a table
     // 1.1 user cancel
@@ -191,7 +199,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     // 1. create tableName1 ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
@@ -222,53 +230,67 @@ private slots:
     QCOMPARE(movieView.onCountRow(), 3);
   }
 
-  void union_tableName1_and_tableName2_into_dstTable_ok() {
+  void onReconstructTotalMovieTable_tableName1_and_tableName2_into_dstTable_ok() {
     QVERIFY(!QFile::exists(dbName));
     QWidget parent;
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
+
+    QCOMPARE(dbToolBar.m_tablesCB->findText(DB_TABLE::MOVIES), -1);
+    QVERIFY(!fdDb.IsTableExist(DB_TABLE::MOVIES));
+    QVERIFY(!fdDb.IsTableExist(tableName1));
 
     // 1. create tableName1 ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
     QVERIFY(movieView.onCreateATable());
     QVERIFY(fdDb.IsTableExist(tableName1));
+    QCOMPARE(dbToolBar.m_tablesCB->findText(tableName1), 0);
+    QCOMPARE(dbToolBar.m_tablesCB->currentText(), tableName1);
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName1);
+    QCOMPARE(fdDb.CountRow(tableName1), 0);
+    QCOMPARE(dbModel.tableName(), tableName1);
+    QCOMPARE(dbModel.rowCount(), 0);
+
 
     // 2 union multi-table into `DB_TABLE::MOVIES` ok and insert items from specified path into table ok
-    // 2.1 destination table `DB_TABLE::MOVIES` not exist
-    QVERIFY(!fdDb.IsTableExist(DB_TABLE::MOVIES));
-    QVERIFY(!movieView.onUnionTables());
-
-    // 2.2 only 1 table(except `DB_TABLE::MOVIES`) no need union at all
-    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, DB_TABLE::MOVIES);
-    QVERIFY(movieView.onCreateATable());
-    QCOMPARE(dbToolBar.m_tablesCB->findText(DB_TABLE::MOVIES), dbToolBar.m_tablesCB->count() - 1);
+    // 2.1 only 1 table(except `DB_TABLE::MOVIES`) still need union
+    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
+        .stubs()
+        .will(returnValue(QMessageBox::StandardButton::Yes)) // onReconstructTotalMovieTable 1 accept
+        .then(returnValue(QMessageBox::StandardButton::No)) // onReconstructTotalMovieTable 2 cancelled
+        .then(returnValue(QMessageBox::StandardButton::Yes)); // onReconstructTotalMovieTable 3 accept
+    QVERIFY(movieView.onReconstructTotalMovieTable()); // onReconstructTotalMovieTable 1 accept
     QVERIFY(fdDb.IsTableExist(DB_TABLE::MOVIES));
+    QCOMPARE(dbToolBar.m_tablesCB->findText(DB_TABLE::MOVIES), 1); // append to last
+    QCOMPARE(dbToolBar.m_tablesCB->currentText(), DB_TABLE::MOVIES);
+    QCOMPARE(dbToolBar.m_tablesCB->itemText(1), DB_TABLE::MOVIES);
     QCOMPARE(fdDb.CountRow(DB_TABLE::MOVIES), 0);
     QCOMPARE(dbModel.tableName(), DB_TABLE::MOVIES);
     QCOMPARE(dbModel.rowCount(), 0);
-    QVERIFY(!movieView.onUnionTables());
 
-    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
-        .stubs()
-        .will(returnValue(QMessageBox::StandardButton::No))
-        .then(returnValue(QMessageBox::StandardButton::Yes));
-    // 2.3 user cancel, skip
+    // 2.2 user cancel, skip
     // once create table, m_tablesCB will insert it at the bottom, then update currentText to new table name
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
-    QCOMPARE(dbToolBar.m_tablesCB->findText(tableName2), dbToolBar.m_tablesCB->count() - 1);
-    QCOMPARE(dbToolBar.m_tablesCB->currentText(), tableName2);
-    QCOMPARE(fdDb.CountRow(tableName2), 0);
     QVERIFY(fdDb.IsTableExist(tableName2));
+    QCOMPARE(dbToolBar.m_tablesCB->findText(tableName2), 2);
+    QCOMPARE(dbToolBar.m_tablesCB->currentText(), tableName2);
+    QCOMPARE(dbToolBar.m_tablesCB->itemText(2), tableName2);
+    QCOMPARE(fdDb.CountRow(tableName2), 0);
     QCOMPARE(dbModel.tableName(), tableName2);
-    QVERIFY(!movieView.onUnionTables());  // No
+    QCOMPARE(dbModel.rowCount(), 0);
+    QVERIFY(!movieView.onReconstructTotalMovieTable());  // onReconstructTotalMovieTable 2 cancelled
 
-    // 2.4 union 2 empty tables into DB_TABLE::MOVIES ok, still 0 rows
-    QVERIFY(movieView.onUnionTables());  // Yes
+    // 2.3 union 2 empty tables into DB_TABLE::MOVIES ok, still 0 rows
+    QVERIFY(movieView.onReconstructTotalMovieTable());  // onReconstructTotalMovieTable 3 accept
+    QVERIFY(fdDb.IsTableExist(DB_TABLE::MOVIES));
+    QCOMPARE(dbToolBar.m_tablesCB->findText(DB_TABLE::MOVIES), 2); // append to last
+    QCOMPARE(dbToolBar.m_tablesCB->currentText(), DB_TABLE::MOVIES);
+    QCOMPARE(dbToolBar.m_tablesCB->itemText(2), DB_TABLE::MOVIES);
     QCOMPARE(fdDb.CountRow(DB_TABLE::MOVIES), 0);
+    QCOMPARE(dbModel.tableName(), DB_TABLE::MOVIES);
 
     MOCKER(QFileDialog::getExistingDirectory)
         .stubs()  //
@@ -288,7 +310,7 @@ private slots:
       QCOMPARE(movieView.onCountRow(), 3);
     }
     // 2.4.1 union(3 tableName1, 0 tableName2) => 3 DB_TABLE::MOVIES
-    QVERIFY(movieView.onUnionTables());
+    QVERIFY(movieView.onReconstructTotalMovieTable());
     QCOMPARE(fdDb.CountRow(DB_TABLE::MOVIES), 3 + 0);
 
     // 2.5.0 insert 2 videos into tableName2
@@ -304,7 +326,7 @@ private slots:
       QCOMPARE(movieView.onCountRow(), 2);
     }
     // 2.5.1 union(3 tableName1, 2 tableName2) => 5 DB_TABLE::MOVIES
-    QVERIFY(movieView.onUnionTables());
+    QVERIFY(movieView.onReconstructTotalMovieTable());
     QCOMPARE(fdDb.CountRow(DB_TABLE::MOVIES), 3 + 2);
   }
 
@@ -314,7 +336,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     // 1. create tableName2 ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
@@ -325,6 +347,11 @@ private slots:
 
     MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(path2));
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
+    {
+      QCOMPARE(MovieDBActions::GetInst().isAllowPathOutsideTableMount(), false);
+      const QString selectPath{movieView.GetAPathFromUserSelect(tableName2, "Scan VIDEOS")};
+      QCOMPARE(selectPath, path2);
+    }
     QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(fdDb.CountRow(tableName2), 2);
     QCOMPARE(dbModel.rowCount(), 2);
@@ -358,7 +385,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     // 1. create tableName2 ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
@@ -396,7 +423,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -431,7 +458,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -448,7 +475,7 @@ private slots:
     MOCKER(FdBasedDbModel::setDataStatic).expects(never());
 
     movieView.selectionModel()->clear();
-    auto& inst = g_dbAct();
+    auto& inst = MovieDBActions::GetInst();
     emit inst.SET_STUDIO->triggered();
     emit inst.SET_CAST->triggered();
     emit inst.APPEND_CAST->triggered();
@@ -464,7 +491,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -515,7 +542,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -582,7 +609,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -636,7 +663,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
     QVERIFY(movieView.onCreateATable());
@@ -739,7 +766,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
         .stubs()                                               //
@@ -786,7 +813,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
         .stubs()                                               //
@@ -852,7 +879,7 @@ private slots:
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName2);
@@ -903,16 +930,12 @@ private slots:
 })"}};
     QCOMPARE(mTDir.createEntries(ScanJsonsFolderNodes), ScanJsonsFolderNodes.size());
 
-    MOCKER(QFileDialog::getExistingDirectory)
-        .stubs()
-        .will(returnValue(path3));
-
     QVERIFY(!QFile::exists(dbName));
     QWidget parent;
     MovieDBSearchToolBar dbToolBar{"MovieViewSearchToolBarTest", &parent};
     FdBasedDb fdDb{dbName, connName};
     FdBasedDbModel dbModel{&parent, fdDb.GetDb()};
-    MovieDBView movieView{&dbModel, &dbToolBar, fdDb, &parent};
+    MovieDBView movieView{fdDb, &dbModel, &dbToolBar, &parent};
 
     // 1. create tableName3 ok
     UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName3);
@@ -920,11 +943,28 @@ private slots:
     QVERIFY(fdDb.IsTableExist(tableName3));
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName3);
 
-    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question)
-        .stubs()
-        .will(returnValue(QMessageBox::StandardButton::Yes));
-    QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::JSONS));
-    QCOMPARE(fdDb.CountRow(tableName3), 1); // only 1 json will be inserted into table
+    const QString outsideMountPath{"Path/OutSide/TheMountPoint"};
+    MOCKER(QFileDialog::getExistingDirectory).stubs().will(returnValue(outsideMountPath)).then(returnValue(outsideMountPath)).then(returnValue(path3));
+    MOCKER((UserInteractiveMock::QUESTION_TYPE)QMessageBox::question).stubs().will(returnValue(QMessageBox::StandardButton::Yes));
+    {
+      // user select a path outside the mount point
+      QVERIFY(!MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+      QString selectPath{movieView.GetAPathFromUserSelect(tableName3, "Scan JSONS")};
+      QVERIFY(selectPath.isEmpty());
+
+      MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(true);
+      QVERIFY(MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+      selectPath = movieView.GetAPathFromUserSelect(tableName3, "Scan JSONS");
+      QCOMPARE(selectPath, outsideMountPath);
+    }
+
+    MovieDBActions::GetInst()._ALLOW_PATH_OUTSIDE_TABLE_MOUNT->setChecked(false);
+    QVERIFY(!MovieDBActions::GetInst().isAllowPathOutsideTableMount());
+    {
+      // user select a path inside the mount point
+      QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::JSONS));
+      QCOMPARE(fdDb.CountRow(tableName3), 1); // only 1 json will be inserted into table
+    }
   }
 };
 // todo: testcase too large. need extract

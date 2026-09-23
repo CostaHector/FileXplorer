@@ -5,7 +5,7 @@
 
 bool SubscriptsStr2Int(const QString& subscripts, QList<int>& sortedIndLst);
 bool SubscriptsDigitChar2Int(const QString& subscripts, QList<int>& sortedIndLst);
-QString ChopPostfix(const QString& baseName);
+QString ChopPostfixEachOneTime(const QString& baseName);
 
 class NameSectionArrange {
  public:

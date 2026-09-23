@@ -117,7 +117,7 @@ void MovieDBSearchToolBar::extraSignalSubscribe() {
 }
 
 QString MovieDBSearchToolBar::GetMovieTableMountPath() const {
-  return MountPathTableNameMapper::toMountPath(m_tablesCB->currentText());
+  return MountPathTableNameMapper::toMountPath(GetCurrentTableName());
 }
 
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {
@@ -153,6 +153,14 @@ QString MovieDBSearchToolBar::AskUserDropWhichTable() {
     return "";
   }
   return drpTbl;
+}
+
+void MovieDBSearchToolBar::RemoveATable(const QString& tableName) {
+  int specifiedIndex = m_tablesCB->findText(tableName);
+  if (specifiedIndex == -1) {
+    return;
+  }
+  m_tablesCB->removeItem(specifiedIndex);
 }
 
 void MovieDBSearchToolBar::AddATable(const QString& newTableName) {

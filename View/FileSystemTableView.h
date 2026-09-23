@@ -19,6 +19,8 @@ class FileSystemTableView : public CustomTableView {
   void dragLeaveEvent(QDragLeaveEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
 
+  void startDrag(Qt::DropActions supportedActions) override;
+
  private:
   FileSystemModel* _fsModel{nullptr};
 };

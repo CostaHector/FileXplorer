@@ -9,14 +9,9 @@
 #include <QMenu>
 #include <QToolBar>
 #include "CastBrowserHelper.h"
-#include <QSqlRecord>
 
 #ifdef RUNNING_UNIT_TESTS
 namespace UserSpecifiedBrowerInteractMock {
-inline QList<QSqlRecord>& mockSqlRecordList() {
-  static QList<QSqlRecord> sqlRecordsList;
-  return sqlRecordsList;
-}
 inline std::pair<bool, QString>& mockMultiLinePerfsText() {
   static std::pair<bool, QString> acceptAndPerfTextSentencePair;
   return acceptAndPerfTextSentencePair;
@@ -58,10 +53,10 @@ public:
   int onAppendMultiSelectionToCastDbReq(); // append selections to DB_TABLE::PERFORMERS
 
   static QString FormatSearchSentence(QString text);
-  static QString GetSearchResultParagraphDisplay(const QString& searchText);
   static QString BuildMultiKeywordLikeCondition(const QStringList& keywords, bool& pNeedSearchDb);
   static QString& UpdateImagesSizeInHtmlSrc(QString& htmlSrc, const QSize& newSize);
 
+  void setHtml(const QString &text);
   /* for cast preview only below */
   void SetCastHtmlParts(const CastHtmlParts& castHtmls) {mCastHtmls = castHtmls;}
   void UpdateHtmlContents() { setHtml(mCastHtmls.fullHtml(mCastVideosVisisble, mCastImagesVisisble)); }
@@ -98,12 +93,12 @@ private:
   QList<QTextEdit::ExtraSelection> mMultiSelections;  // 存储多个选区
   static constexpr int MIN_SINGLE_SEARCH_PATTERN_LEN{2 + 4}; // "%keyword%"
   static constexpr int MIN_EACH_KEYWORD_LEN{4};       // "%" + "keyword" + "%"
-  static const QString WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT;
   CastHtmlParts mCastHtmls;
   bool mCastVideosVisisble{true}, mCastImagesVisisble{true};
 
   int mCurIconSizeIndex{14};
   QSize mIconSize;
+  QList<QSqlRecord> m_sqlRecordList;
 };
 
 #endif  // CLICKABLETEXTBROWSER_H

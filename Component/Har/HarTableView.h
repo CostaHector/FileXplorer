@@ -16,6 +16,9 @@ public:
 signals:
   void pixmapByteArrayChanged(const QByteArray& pm, const QString& noDotFormatStr);
 
+protected:
+  void initExclusivePreferenceSetting() override;
+
 private:
   void subscribe();
   bool PreviewImage(const QModelIndex& current);

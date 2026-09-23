@@ -42,6 +42,7 @@ GUID_2_PNTS_SET& MockGuids2MntPntSet();
 }  // namespace MountHelper
 
 namespace MountPathTableNameMapper {
+bool isMountPointOnline(const QString& mountPoint);
 QString toTableName(const QString& mountPath, bool* bConversionOk = nullptr);
 QString toMountPath(const QString& tableName, bool* bConversionOk = nullptr);
 QStringList CandidateTableNamesList();

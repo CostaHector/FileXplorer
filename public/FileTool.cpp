@@ -210,14 +210,19 @@ bool RevealInSystemExplorer(const QString& localFilePath) {
   return true;
 }
 
-bool CopyTextToSystemClipboard(const QString& text) {
+bool CopyTextToSystemClipboard(const QString& text, bool bAppend) {
   QClipboard* pClipboard = QApplication::clipboard();
   if (pClipboard == nullptr) {
     LOG_WARN_NP("Cannot copy", "pClipboard copied succeed");
     return false;
   }
-  pClipboard->setText(text);
-  LOG_OK_P("Copied succeed", "%d char(s)", text.size());
+  if (bAppend) {
+    pClipboard->setText(pClipboard->text() + "\n" + text);
+    LOG_OK_P("Copied Append succeed", "%d char(s)", text.size());
+  } else {
+    pClipboard->setText(text);
+    LOG_OK_P("Copied Set succeed", "%d char(s)", text.size());
+  }
   return true;
 }
 
