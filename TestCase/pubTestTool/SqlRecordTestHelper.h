@@ -18,6 +18,7 @@ bool CheckRecordIfEqual(const QSqlRecord& expectRec,
 #undef PSON_KEY_ITEM
                         bool fullMatch = false);
 QSqlRecord GetAMovieRecordUsedInBrowser(const QString& prePathLeft, const QString& prePathRight, const QString& name, qint64 sz);
+QSqlRecord GetAMovieRecordFromDb(const QString& sampleMd5, const QString& prePathLeft, const QString& prePathRight, const QString& name, qint64 sz);
 
 }  // namespace SqlRecordTestHelper
 

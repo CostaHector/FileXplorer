@@ -24,6 +24,7 @@ extern const QString VID_LINK_TEMPLATE;
 
 QString GenerateSingleImageInHtml(const QString& imagePath, const QString& altText, const QSize& ICON_SIZE);
 QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE={480, 360});
+QString GetWindowTitleName(const QSqlRecord& record);
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE);
 }
 

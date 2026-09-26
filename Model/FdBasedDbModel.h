@@ -31,12 +31,7 @@ public:
 
   QString fileName(const QModelIndex& curIndex) const;
 
-  QString filePath(const QModelIndex& curIndex) const {  //
-    if (!curIndex.isValid()) {
-      return {};
-    }
-    return QDir{absolutePath(curIndex)}.absoluteFilePath(fileName(curIndex));
-  }
+  QString filePath(const QModelIndex& curIndex) const;
 
   QFileInfo fileInfo(const QModelIndex& curIndex) const {  //
     if (!curIndex.isValid()) {

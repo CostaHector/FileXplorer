@@ -630,7 +630,6 @@ private slots:
       QVERIFY(!tDir.exists("Famous Disposable"));
     }
   }
-
 };
 
 #include "SceneListViewTest.moc"

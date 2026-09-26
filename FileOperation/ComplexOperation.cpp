@@ -106,7 +106,7 @@ BATCH_COMMAND_LIST_TYPE ComplexLink::To(const QStringList& selectionAbsFilePaths
 BATCH_COMMAND_LIST_TYPE ComplexMerge::Merge(const QString& src, const QString& dest) {
   ComplexMove cm;
   const QStringList files{
-      QDir{src}.entryList({}, QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsLast | QDir::SortFlag::Name)};
+      QDir{src}.entryList({}, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot, QDir::SortFlag::DirsLast | QDir::SortFlag::Name)};
   QStringList selectionAbsFilePaths;
   selectionAbsFilePaths.reserve(files.size());
   for (const QString& fileName : files) {

@@ -9,6 +9,7 @@
 #include "MovieDBModelField.h"
 
 class MovieDBView : public CustomTableView {
+  Q_OBJECT
 public:
   MovieDBView(FdBasedDb& movieDb_,
               FdBasedDbModel* model_,              //
@@ -43,9 +44,14 @@ public:
   QList<qint64> GetSelectionFileSizes() const;
   QList<int> GetSelectionDurations() const;
 
+signals:
+  void currentRecordChanged(const QSqlRecord& newRecord);
+
   // should not call ~destructure after getDb() and pass to QSqlTableModel
 private:
   void initExclusivePreferenceSetting() override;
+  void EmitCurrentCastRecordChanged(const QModelIndex& current, const QModelIndex& /*previous*/);
+
   static QString GetAPathFromUserSelect(const QString& curTblName, const QString& usageMsg);
   bool IsHasSelection(const QString& msg = "") const;
 

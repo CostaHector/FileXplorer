@@ -16,9 +16,11 @@ public:
   void SaveSettings();
 
   void StopVideoPlay();
-  void operator()(const QSqlRecord& record, const QString& imgHost);  // cast view
-  void operator()(const QString& pth);                                // file system view
-  void operator()(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
+
+  bool DisplayFileInformation(const QString& pth);                               // file system view
+  bool DisplayMovieInformation(const QSqlRecord& record);                        // movie view
+  bool DisplayCastInformation(const QSqlRecord& record, const QString& imgHost); // cast view
+  bool DisplayJsonInformation(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);           // scene view
 
   inline void BeforeDisplayAFileDetail() {
     if (m_curIndex != PANE_TYPE::DETAIL) {

@@ -1,8 +1,6 @@
 #include <QtTest/QtTest>
 
-
 #include "PlainTestSuite.h"
-#include "Logger.h"
 #include "BeginToExposePrivateMember.h"
 #include "CurrentRowPreviewer.h"
 #include "EndToExposePrivateMember.h"
@@ -61,43 +59,46 @@ private slots:
 
     // 1. FILE_SYSTEM_VIEW
     QString testPath = "/test/path";
-    previewer(testPath);
+    previewer.DisplayFileSystemRecord(testPath);
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
     QCOMPARE(previewer.GetCurPath(), testPath);
 
     // 2. CAST
     QSqlRecord record;
     QString imageHost = "hostpath";
-    previewer(record, imageHost);
-    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST);
+    previewer.DisplayCastRecord(record, imageHost);
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST_DB);
 
     // 3. SCENE
     QString name = "Scene1";
     QString jsonAbsPath = name + ".json";
     QStringList imgPthLst;
     QStringList vidsLst;
-    previewer(name, jsonAbsPath, imgPthLst, vidsLst);
-    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
+    previewer.DisplayJsonRecord(name, jsonAbsPath, imgPthLst, vidsLst);
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::JSON_OR_SCENE);
 
     // 4. multi toggle ok
-    previewer(record, "another_host_path");
-    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST);
+    previewer.DisplayCastRecord(record, "another_host_path");
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::CAST_DB);
 
-    previewer("Scene2", jsonAbsPath, {}, {});
-    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::SCENE);
+    previewer.DisplayMovieRecord(record);
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::MOVIE_DB);
+
+    previewer.DisplayJsonRecord("Scene2", jsonAbsPath, {}, {});
+    QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::JSON_OR_SCENE);
 
     QCOMPARE(previewer.NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
     QCOMPARE(previewer.InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
     QCOMPARE(previewer.setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD), true);
     QVERIFY(previewer.m_imgInFolderBrowser != nullptr);
-    previewer("/another/pathProgressiveLoad");
+    previewer.DisplayFileSystemRecord("/another/pathProgressiveLoad");
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
 
     QCOMPARE(previewer.NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
     QCOMPARE(previewer.InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
     QCOMPARE(previewer.setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E::CAROUSEL), true);
     QVERIFY(previewer.m_imgInFolderLabels != nullptr);
-    previewer("/another/pathCarousel");
+    previewer.DisplayFileSystemRecord("/another/pathCarousel");
     QCOMPARE(previewer.mCurrentSrcFrom, CurrentRowPreviewer::SRC_FROM::FILE_SYSTEM_VIEW);
   }
 };

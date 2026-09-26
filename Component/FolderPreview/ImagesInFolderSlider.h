@@ -14,7 +14,7 @@ public:
   explicit ImagesInFolderSlider(QWidget* parent = nullptr);
   ~ImagesInFolderSlider() { ResetImgsList(nullptr); }
 
-  void operator()(const QString& folderPath);
+  void DisplayFileInformation(const QString& folderPath);
 
   void ResetImgsList(FilesListBase* pImgsList = nullptr);
 

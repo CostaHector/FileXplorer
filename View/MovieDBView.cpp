@@ -15,7 +15,7 @@
 #include "PathTool.h"
 #include <QSqlError>
 #include <QSqlQuery>
-
+#include <QSqlRecord>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -51,6 +51,8 @@ MovieDBView::MovieDBView(FdBasedDb& movieDb_,
 void MovieDBView::subscribe() {
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::whereClauseChanged, _dbModel, &SqlTableModelPub::SetFilterAndSelect);
   connect(_movieDbSearchBar, &MovieDBSearchToolBar::movieTableChanged, this, &MovieDBView::setCurrentMovieTable);
+
+  connect(selectionModel(), &QItemSelectionModel::currentRowChanged, this, &MovieDBView::EmitCurrentCastRecordChanged);
 
   auto& inst = MovieDBActions::GetInst();
   // control actions
@@ -728,4 +730,12 @@ bool MovieDBView::IsHasSelection(const QString& msg) const {
 
 void MovieDBView::initExclusivePreferenceSetting() {
   CustomTableView::m_defaultEditTrigger = EditTrigger::NoEditTriggers;
+}
+
+void MovieDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const QModelIndex& /*previous*/) {
+  if (!current.isValid()) {
+    return;
+  }
+  const auto& record = _dbModel->record(current.row());
+  emit currentRecordChanged(record);
 }

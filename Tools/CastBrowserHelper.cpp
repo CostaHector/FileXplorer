@@ -10,7 +10,6 @@
 #include "ImageTool.h"
 
 #include <QDir>
-#include <QSqlField>
 #include <QDateTime>
 
 QString CastHtmlParts::fullHtml(bool castVideosVisisble, bool castImagesVisisble) const {
@@ -92,11 +91,15 @@ QString GetDetailDescription(const QString& fileAbsPath, const QSize& ICON_SIZE)
   return detail;
 }
 
+QString GetWindowTitleName(const QSqlRecord& record) {
+  return record.value(CastDbModelField::Name).toString();
+}
+
 CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost, const QSize& ICON_SIZE) {
-  const QString castName{record.field(CastDbModelField::Name).value().toString()};
-  const QString orientation{record.field(CastDbModelField::Ori).value().toString()};
-  const QStringList& vidsLst{StringTool::GetImgsVidsListFromField(record.field(CastDbModelField::Vids).value().toString())};
-  const QStringList& imgsLst{StringTool::GetImgsVidsListFromField(record.field(CastDbModelField::Imgs).value().toString())};
+  const QString castName{record.value(CastDbModelField::Name).toString()};
+  const QString orientation{record.value(CastDbModelField::Ori).toString()};
+  const QStringList& vidsLst{StringTool::GetImgsVidsListFromField(record.value(CastDbModelField::Vids).toString())};
+  const QStringList& imgsLst{StringTool::GetImgsVidsListFromField(record.value(CastDbModelField::Imgs).toString())};
 
   static const QString CAST_BRIEF_INTRODUCTION_TEMPLATE //
       {R"(
@@ -111,11 +114,11 @@ CastHtmlParts GetCastHtmlParts(const QSqlRecord& record, const QString& imgHost,
   htmlSrc.reserve(CAST_BRIEF_INTRODUCTION_TEMPLATE.size() + 200);
   htmlSrc += CAST_BRIEF_INTRODUCTION_TEMPLATE                                         //
                  .arg(castName)                                                       //
-                 .arg(record.field(CastDbModelField::Rate).value().toInt())    //
+                 .arg(record.value(CastDbModelField::Rate).toInt())    //
                  .arg(orientation)                                                    //
-                 .arg(record.field(CastDbModelField::Tags).value().toString()) //
-                 .arg(record.field(CastDbModelField::ALIAS).value().toString())  //
-                 .arg(record.field(CastDbModelField::Detail).value().toString());
+                 .arg(record.value(CastDbModelField::Tags).toString()) //
+                 .arg(record.value(CastDbModelField::ALIAS).toString())  //
+                 .arg(record.value(CastDbModelField::Detail).toString());
 
   // Videos here
   const int vidCnt{vidsLst.size()};

@@ -7,7 +7,7 @@ class ImagesInFolderBrowser : public ClickableTextBrowser {
   explicit ImagesInFolderBrowser(QWidget* parent = nullptr);
   void wheelEvent(QWheelEvent *event) override;
 
-  bool operator()(const QString& path);
+  bool DisplayFileInformation(const QString& path);
   void subscribe();
 
   QStringList InitImgsList(const QString& dirPath) const;

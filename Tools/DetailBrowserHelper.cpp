@@ -1,5 +1,4 @@
 #include "DetailBrowserHelper.h"
-#include "Logger.h"
 #include "FdBasedDb.h"
 #include "FileTool.h"
 #include "PathTool.h"

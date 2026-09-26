@@ -16,7 +16,7 @@ bool FolderPreviewSwitcher::onSwitchByPreviewType(PreviewTypeTool::PREVIEW_TYPE_
       return false;
     }
   }
-  _folderPreview->operator()(_folderPreview->GetCurPath());
+  _folderPreview->DisplayFileSystemRecord(_folderPreview->GetCurPath());
   _folderPreview->setCurrentPreviewType(viewType);
   return true;
 }

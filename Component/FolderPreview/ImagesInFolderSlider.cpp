@@ -38,7 +38,7 @@ ImagesInFolderSlider::ImagesInFolderSlider(QWidget* parent)
 #endif
 }
 
-void ImagesInFolderSlider::operator()(const QString& folderPath) {
+void ImagesInFolderSlider::DisplayFileInformation(const QString& folderPath) {
   disableTimer();
   m_inFolderImgIndex = 0;
   getImgsPathAndVidsCount(folderPath);

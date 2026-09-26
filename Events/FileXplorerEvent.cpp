@@ -1057,7 +1057,7 @@ bool FileXplorerEvent::on_Merge(const bool isReverse) {
     return false;
   }
 
-  static const auto GetMergeFromToPath = [](const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2, bool isReverse) -> std::pair<QString, QString> {
+  static const auto  GetMergeFromToPath = [](const QFileSystemModel* fsm, QModelIndex ind1, QModelIndex ind2, bool isReverse) -> std::pair<QString, QString> {
     QString fromPath{fsm->filePath(ind1)};
     QString toPath{fsm->filePath(ind2)};
     const bool shouldSwap = (ind1.row() < ind2.row()) ? isReverse : !isReverse;
