@@ -44,9 +44,8 @@ ClickableTextBrowser::ClickableTextBrowser(QWidget* parent)  //
   connect(inst.SEARCH_MULTIPLE_TEXTS, &QAction::triggered, this, &ClickableTextBrowser::onSearchMultiSelectionReq);
   connect(inst.CLEAR_ALL_SELECTIONS, &QAction::triggered, this, &ClickableTextBrowser::ClearAllSelections);
   connect(inst.EDITOR_MODE, &QAction::triggered, this, [this](bool bEditable) { setReadOnly(!bEditable); });
-  connect(inst.COPY_SELECTED_TEXT, &QAction::triggered, this, [this](){
-    FileTool::CopyTextToSystemClipboard(GetMultiSelectedTexts().join(' '));
-  });
+  connect(inst.COPY_CUR_SELECTED_TEXT, &QAction::triggered, this, [this](){ FileTool::CopyTextToSystemClipboard(GetCurrentSelectedText()); });
+  connect(inst.COPY_ALL_SELECTED_TEXT, &QAction::triggered, this, [this](){ FileTool::CopyTextToSystemClipboard(GetMultiSelectedTexts().join(' ')); });
   connect(inst.ADD_SELECTIONS_2_CAST_TABLE, &QAction::triggered, this, &ClickableTextBrowser::onAppendMultiSelectionToCastDbReq);
   connect(this, &QTextBrowser::anchorClicked, this, &ClickableTextBrowser::onAnchorClicked);
 
@@ -282,7 +281,7 @@ void ClickableTextBrowser::AppendASelection(const QTextCursor& cursor) {
   if (!cursor.hasSelection()) {
     return;  // ignore empty selection
   }
-  static const QColor selectionColor{"#99D1FF"};
+  static constexpr QColor selectionColor{0xB8, 0xE6, 0xB8}; // default color: 99D1FF
   static const QBrush selectionBrush{selectionColor};
   QTextEdit::ExtraSelection extra;
   extra.cursor = cursor;

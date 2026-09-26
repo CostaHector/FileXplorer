@@ -27,7 +27,7 @@ public:
 
   QAction *ADD_SELECTIONS_2_CAST_TABLE{nullptr};
 
-  QAction* COPY_SELECTED_TEXT{nullptr};
+  QAction* COPY_CUR_SELECTED_TEXT{nullptr}, *COPY_ALL_SELECTED_TEXT{nullptr};
 private:
   explicit BrowserActions(QObject *parent=nullptr);
 };

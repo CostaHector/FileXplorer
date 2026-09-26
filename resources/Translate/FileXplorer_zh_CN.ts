@@ -160,8 +160,13 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Copy Selected Text</source>
-        <translation>复制选中文本</translation>
+        <source>Copy Current Selected Text</source>
+        <translation>复制当前选中文本</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Copy All Selected Text</source>
+        <translation>复制所有选中文本</translation>
     </message>
 </context>
 <context>

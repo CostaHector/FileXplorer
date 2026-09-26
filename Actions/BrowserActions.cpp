@@ -7,7 +7,6 @@
 
 BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
   SEARCH_CUR_TEXT = new QAction{QIcon{":img/SEARCH"}, tr("Search Current Text"), this};
-  SEARCH_CUR_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_1));
   SEARCH_CUR_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Search for currently selected text in database"}//
                                   .arg(SEARCH_CUR_TEXT->text(), SEARCH_CUR_TEXT->shortcut().toString()));
 
@@ -21,7 +20,7 @@ BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
                                        .arg(ADVANCED_TEXT_SEARCH->text(), ADVANCED_TEXT_SEARCH->shortcut().toString()));
 
   CLEAR_ALL_SELECTIONS = new QAction{QIcon{":img/SELECT_NONE"}, tr("Clear All Selections"), this};
-  CLEAR_ALL_SELECTIONS->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_2));
+  CLEAR_ALL_SELECTIONS->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_3));
   CLEAR_ALL_SELECTIONS->setToolTip(QString{"<b>%1 (%2)</b><br/>Clear all text selections in current browser"}//
                                        .arg(CLEAR_ALL_SELECTIONS->text(), CLEAR_ALL_SELECTIONS->shortcut().toString()));
 
@@ -35,16 +34,22 @@ BrowserActions::BrowserActions(QObject *parent) : QObject{parent} {
   ADD_SELECTIONS_2_CAST_TABLE->setToolTip(QString{"<b>%1 (%2)</b><br/>Add current multi-selection text as casts name to `CAST` Table"}//
                                              .arg(ADD_SELECTIONS_2_CAST_TABLE->text(), ADD_SELECTIONS_2_CAST_TABLE->shortcut().toString()));
 
-  COPY_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, tr("Copy Selected Text"), this};
-  COPY_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_3));
-  COPY_SELECTED_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Copy the selected text to system clipboard"}//
-                                              .arg(COPY_SELECTED_TEXT->text(), COPY_SELECTED_TEXT->shortcut().toString()));
+  COPY_CUR_SELECTED_TEXT = new QAction{QIcon{":img/COPY_TEXT"}, tr("Copy Current Selected Text"), this};
+  COPY_CUR_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_1));
+  COPY_CUR_SELECTED_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Copy the selected text to system clipboard"}//
+                                              .arg(COPY_CUR_SELECTED_TEXT->text(), COPY_CUR_SELECTED_TEXT->shortcut().toString()));
+
+  COPY_ALL_SELECTED_TEXT = new QAction{QIcon{":img/COPY_ALL_TEXT"}, tr("Copy All Selected Text"), this};
+  COPY_ALL_SELECTED_TEXT->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_2));
+  COPY_ALL_SELECTED_TEXT->setToolTip(QString{"<b>%1 (%2)</b><br/>Copy all selected text(s) to system clipboard"}//
+                                     .arg(COPY_ALL_SELECTED_TEXT->text(), COPY_ALL_SELECTED_TEXT->shortcut().toString()));
 }
 
 QMenu* BrowserActions::GetSearchInDBMenu(QWidget* parent) {
   QMenu* pMenu = new (std::nothrow) QMenu{"Browser search menu", parent};
   CHECK_NULLPTR_RETURN_NULLPTR(pMenu)
-  pMenu->addAction(COPY_SELECTED_TEXT);
+  pMenu->addAction(COPY_CUR_SELECTED_TEXT);
+  pMenu->addAction(COPY_ALL_SELECTED_TEXT);
   pMenu->addSeparator();
   pMenu->addAction(SEARCH_CUR_TEXT);
   pMenu->addAction(SEARCH_MULTIPLE_TEXTS);
@@ -64,7 +69,8 @@ QToolBar* BrowserActions::GetSearchInDBToolbar(QWidget* parent) {
   floatingSearchTb->addAction(SEARCH_MULTIPLE_TEXTS);
   floatingSearchTb->addAction(ADVANCED_TEXT_SEARCH);
   floatingSearchTb->addSeparator();
-  floatingSearchTb->addAction(COPY_SELECTED_TEXT);
+  floatingSearchTb->addAction(COPY_CUR_SELECTED_TEXT);
+  floatingSearchTb->addAction(COPY_ALL_SELECTED_TEXT);
   floatingSearchTb->addAction(EDITOR_MODE);
   floatingSearchTb->addSeparator();
   floatingSearchTb->addAction(CLEAR_ALL_SELECTIONS);
