@@ -23,29 +23,37 @@ void CurrentRowPreviewer::UpdatePreview() {
       case PREVIEW_TYPE_E::NONE: // no preview
         return;
       case PREVIEW_TYPE_E::CATEGORY:
-        m_fileFolderPreviewStackedWid->operator()(m_curPath);
+        m_fileFolderPreviewStackedWid->DisplayFileInformation(m_curPath);
         return;
       case PREVIEW_TYPE_E::PROGRESSIVE_LOAD:
-        m_imgInFolderBrowser->operator()(m_curPath);
+        m_imgInFolderBrowser->DisplayFileInformation(m_curPath);
         return;
       case PREVIEW_TYPE_E::CAROUSEL:
-        m_imgInFolderLabels->operator()(m_curPath);
+        m_imgInFolderLabels->DisplayFileInformation(m_curPath);
         return;
       default:
         LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
-  } else if (mCurrentSrcFrom == SRC_FROM::CAST) {
+  } else if (mCurrentSrcFrom == SRC_FROM::CAST_DB) {
     switch (mCurrentPreviewType) {
       case PREVIEW_TYPE_E::CATEGORY:
-        m_fileFolderPreviewStackedWid->operator()(m_curRecord, m_curImageHostPath);
+        m_fileFolderPreviewStackedWid->DisplayCastInformation(m_curRecord, m_curImageHostPath);
         return;
       default:
         LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
     }
-  } else if (mCurrentSrcFrom == SRC_FROM::SCENE) {
+  } else if (mCurrentSrcFrom == SRC_FROM::JSON_OR_SCENE) {
     switch (mCurrentPreviewType) {
       case PREVIEW_TYPE_E::CATEGORY:
-        m_fileFolderPreviewStackedWid->operator()(m_sceneName, m_sceneJsonAbsFilePath, m_sceneimgPthLst, m_scenevidsLst);
+        m_fileFolderPreviewStackedWid->DisplayJsonInformation(m_sceneName, m_sceneJsonAbsFilePath, m_sceneimgPthLst, m_scenevidsLst);
+        return;
+      default:
+        LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));
+    }
+  } else if (mCurrentSrcFrom == SRC_FROM::MOVIE_DB) {
+    switch (mCurrentPreviewType) {
+      case PREVIEW_TYPE_E::CATEGORY:
+        m_fileFolderPreviewStackedWid->DisplayMovieInformation(m_curRecord);
         return;
       default:
         LOG_W("SrcFrom[%d], Current previewer[%s] is not supported", int(mCurrentSrcFrom), c_str(mCurrentPreviewType));

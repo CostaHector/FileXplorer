@@ -283,7 +283,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   }
 
   if (_previewFolder != nullptr && !_previewFolder->isHidden()) {
-    _previewFolder->operator()(fi.absoluteFilePath());
+    _previewFolder->DisplayFileSystemRecord(fi.absoluteFilePath());
   }
 
   static QString lastTimeJsonPath;
@@ -329,31 +329,23 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
     case ViewType::TABLE:
     case ViewType::TREE:
     case ViewType::SEARCH: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
-                                                        &ViewsStackedWidget::on_fsmCurrentRowChanged);
+      mCurrentChangedConn = ViewsStackedWidget::connect(curView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &ViewsStackedWidget::on_fsmCurrentRowChanged);
+      break;
+    }
+    case ViewType::MOVIE: {
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_movieView, &MovieDBView::currentRecordChanged, _previewFolder, &CurrentRowPreviewer::DisplayMovieRecord);
       break;
     }
     case ViewType::SCENE: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(
-          m_sceneTableView, &SceneListView::currentSceneChanged,
-          _previewFolder,  //
-          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
-              &CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_sceneTableView, &SceneListView::currentSceneChanged, _previewFolder, &CurrentRowPreviewer::DisplayJsonRecord);
       break;
     }
     case ViewType::CAST: {
-      mCurrentChangedConn =
-          ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged,
-                                      _previewFolder,  //
-                                      static_cast<void (CurrentRowPreviewer::*)(const QSqlRecord&, const QString)>(&CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged, _previewFolder, &CurrentRowPreviewer::DisplayCastRecord);
       break;
     }
     case ViewType::JSON: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(
-          m_jsonTableView, &JsonTableView::currentJsonSelectedChanged,
-          _previewFolder,  //
-          static_cast<void (CurrentRowPreviewer::*)(const QString&, const QString&, const QStringList&, const QStringList&)>(
-              &CurrentRowPreviewer::operator()));
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_jsonTableView, &JsonTableView::currentJsonSelectedChanged, _previewFolder, &CurrentRowPreviewer::DisplayJsonRecord);
       break;
     }
     default: {

@@ -3,6 +3,8 @@
 #include "PublicMacro.h"
 #include "MovieDBModelField.h"
 #include "FdBasedDb.h"
+#include "PathTool.h"
+#include "JsonHelper.h"
 #include <QSqlField>
 #include <QVariant>
 #include <QDebug>
@@ -84,8 +86,8 @@ bool CheckRecordIfEqual(const QSqlRecord& actualRec,
 }
 
 QSqlRecord GetAMovieRecordUsedInBrowser(const QString& prePathLeft, const QString& prePathRight, const QString& name, qint64 sz) {
-  using namespace MovieDBModelField;
   QSqlRecord rec;
+  using namespace MovieDBModelField;
   rec.append(QSqlField(ENUM_2_STR(PrePathLeft), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(PrePathRight), QVariant::String));
   rec.append(QSqlField(ENUM_2_STR(Name), QVariant::String));
@@ -94,6 +96,32 @@ QSqlRecord GetAMovieRecordUsedInBrowser(const QString& prePathLeft, const QStrin
   rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::PrePathRight, prePathRight);
   rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Name, name);
   rec.setValue((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size, sz);
+  return rec;
+}
+
+QSqlRecord GetAMovieRecordFromDb(const QString& sampleMd5, const QString& prePathLeft, const QString& prePathRight, const QString& name, qint64 sz) {
+  QSqlRecord rec;
+  using namespace MovieDBModelField;
+  rec.append(QSqlField(ENUM_2_STR(SampleMD5), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(PrePathLeft), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(PrePathRight), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(Name), QVariant::String));
+  rec.append(QSqlField(ENUM_2_STR(Size), QVariant::LongLong));
+  rec.append(QSqlField(ENUM_2_STR(Duration), QVariant::Int));     //
+  rec.append(QSqlField(ENUM_2_STR(Studio), QVariant::String));       //
+  rec.append(QSqlField(ENUM_2_STR(Cast),QVariant::String));         //
+  rec.append(QSqlField(ENUM_2_STR(Tags), QVariant::String));        //
+  rec.append(QSqlField(ENUM_2_STR(Rate),QVariant::Int));         //
+  rec.append(QSqlField(ENUM_2_STR(Detail),QVariant::String));       //
+  rec.append(QSqlField(ENUM_2_STR(PathHash),QVariant::String));     //
+  rec.append(QSqlField(ENUM_2_STR(InLocal),QVariant::Int));
+  const QString fullPath = PathTool::RMFComponent::join(sampleMd5, prePathLeft, prePathRight);
+  rec.setValue((int)MovieDBModelField::FIELD_E::SampleMD5, sampleMd5);
+  rec.setValue((int)MovieDBModelField::FIELD_E::PrePathLeft, prePathLeft);
+  rec.setValue((int)MovieDBModelField::FIELD_E::PrePathRight, prePathRight);
+  rec.setValue((int)MovieDBModelField::FIELD_E::Name, name);
+  rec.setValue((int)MovieDBModelField::FIELD_E::Size, sz);
+  rec.setValue((int)MovieDBModelField::FIELD_E::PathHash, JsonHelper::CalcFileHash(fullPath));
   return rec;
 }
 

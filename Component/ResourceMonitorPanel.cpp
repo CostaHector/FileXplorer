@@ -4,6 +4,7 @@
 #include "SystemPath.h"
 #include "ResourceMonitor.h"
 #include "FileLeafAction.h"
+#include "FileTool.h"
 #include "StyleSheet.h"
 
 QByteArray UsageReport::toByteArray() const {
@@ -219,7 +220,18 @@ bool ResourceMonitorPanel::onExportUsageToLocalFile() {
   QString cpuMemoryCsvFile = SystemPath::HomePath();
   cpuMemoryCsvFile += "/Downloads/";
   cpuMemoryCsvFile += mExportCSVName;
-  QFileDialog::saveFileContent(mUsageReports, cpuMemoryCsvFile);
+  const QString filePath = QFileDialog::getSaveFileName(
+      this,
+      "Export CPU/Memory Reports",
+      cpuMemoryCsvFile,
+      "CSV Files (*.csv);;All Files (*)");
+  if (filePath.isEmpty()) {
+    LOG_INFO_P("Skip", "User cancelled");
+    return false;
+  }
+  if (!FileTool::ByteArrayBinaryWriter(filePath, mUsageReports)) {
+    return false;
+  }
   LOG_INFO_P("Export cpu/memory reports to", "size:%d, path:%s", mUsageReports.size(), qPrintable(cpuMemoryCsvFile));
   InitReportFileName();
   return true;

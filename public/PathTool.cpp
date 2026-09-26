@@ -218,10 +218,27 @@ RMFComponent RMFComponent::FromPath(const QString& input) {
     // C:/C.mp4 => "", "C:/", "C.mp4"
     return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
   }
+  // way1: 更简单, 但不保证middlePart中包含有效的文本信息, 可能middlePart="VIDEO_TS", middlePart="vids"
   // C:/A/B.mp4 => "C:/", "A/", "B.mp4", [secondTolastSlashIndex + 1, lastSlashIndex]
-  return {input.left(secondTolastSlashIndex + 1),
-          input.mid(secondTolastSlashIndex + 1, lastSlashIndex - secondTolastSlashIndex),
-          input.mid(lastSlashIndex + 1)};
+  // return {input.left(secondTolastSlashIndex + 1),
+  //         input.mid(secondTolastSlashIndex + 1, lastSlashIndex - secondTolastSlashIndex),
+  //         input.mid(lastSlashIndex + 1)};
+  // way2: 优化vids, VIDEO_TS文件夹下的文件记录的显示, middlePart尽可能保留两段
+  // ("C:", "Folder/vid/", "aaa.mp4")
+  // ("C:", "Folder/VIDEO_TS/", "aaa.vob")
+  const int thirdToLastSlashIndex = input.lastIndexOf('/', secondTolastSlashIndex - 1); // 找到倒数第三个/的位置
+  if (thirdToLastSlashIndex == -1) {
+    // C:/A/B.mp4 => "", "C:/A/", "B.mp4"
+    return {"", input.left(lastSlashIndex + 1), input.mid(lastSlashIndex + 1)};
+  }
+  // C:/A/B/C.mp4 => "C:/", "A/B/", "C.mp4"
+  // [thirdToLastSlashIndex + 1, lastSlashIndex + 1)
+  // start = thirdToLastSlashIndex + 1, length = lastSlashIndex + 1 - (thirdToLastSlashIndex + 1) = lastSlashIndex - thirdToLastSlashIndex
+  return {
+      input.left(thirdToLastSlashIndex + 1),                                        //
+      input.mid(thirdToLastSlashIndex + 1, lastSlashIndex - thirdToLastSlashIndex), //
+      input.mid(lastSlashIndex + 1)                                                 //
+  };
 }
 // get last 3 part of a file abs path
 QString GetEffectiveName(const QString& itemPath) {

@@ -53,8 +53,6 @@ private:
 
   QMetaObject::Connection mSortRoleConn;
   QMetaObject::Connection mSortOrderReverseConn;
-
-  mutable QModelIndex mLastClickedIndex;
 };
 
 #endif  // SCENELISTVIEW_H

@@ -6,6 +6,7 @@
 #include "ResourceMonitorPanel.h"
 #include "EndToExposePrivateMember.h"
 #include "SystemPath.h"
+#include "FileTool.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -116,7 +117,13 @@ private slots:
                                        + "/Downloads/" //
                                        + "usage_monitor_2026_01_01 00_00_00.123_to_2026_01_01 00_00_02.456.csv"};
     MOCKER(get_timestamp).stubs().will(invoke(invoke_get_timestamp));
-    MOCKER(QFileDialog::saveFileContent).expects(once()).with(spy(content), eq(expectCsvAbsFilePath));
+    MOCKER(QFileDialog::getSaveFileName).expects(exactly(2))
+        .will(returnValue(QString{""})) // cancel save
+        .then(returnValue(expectCsvAbsFilePath));
+    MOCKER(FileTool::ByteArrayBinaryWriter)//
+        .expects(exactly(1))//
+        .with(eq(expectCsvAbsFilePath), spy(content))//
+        .will(returnValue(true));
     gTimeArray = "2026/01/01 00:00:00.123";
 
     ResourceMonitorPanel rmp;
@@ -127,7 +134,8 @@ private slots:
     rmp.onTimeout();
     gTimeArray = "2026/01/01 00:00:02.456";
 
-    rmp.onExportUsageToLocalFile();
+    QVERIFY(!rmp.onExportUsageToLocalFile()); // user cancel
+    QVERIFY(rmp.onExportUsageToLocalFile()); // user accept and saved ok
     const QString contentStr = QString::fromUtf8(content);
     QVERIFY(contentStr.startsWith("Time,Memory(kB),CPU(%)\n"));
     QVERIFY(contentStr.contains("\n2026/01/01 00:00:01.000,"));

@@ -30,7 +30,7 @@ void ImagesInFolderBrowser::wheelEvent(QWheelEvent *event) {
   ClickableTextBrowser::wheelEvent(event);
 }
 
-bool ImagesInFolderBrowser::operator()(const QString& path) {
+bool ImagesInFolderBrowser::DisplayFileInformation(const QString& path) {
   QPixmapCache::clear(); // release memory occupied before
   m_curImgCntIndex = 0;
   m_imgsLst.clear();

@@ -60,7 +60,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     ImagesInFolderBrowser browser;
     browser.mIconSize = QSize{400, 300};
     browser.setFixedSize(500, 500);
-    QVERIFY(browser(notImagePath));
+    QVERIFY(browser.DisplayFileInformation(notImagePath));
 
     // here verital scrollbar should not show
     QScrollBar* verticalScrollBar = browser.verticalScrollBar();
@@ -81,7 +81,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     ImagesInFolderBrowser browser;
     browser.mIconSize = QSize{400, 300};
     browser.setFixedSize(500, 500);
-    QVERIFY(browser(svgImagePath));
+    QVERIFY(browser.DisplayFileInformation(svgImagePath));
 
     QScrollBar* verticalScrollBar = browser.verticalScrollBar();
     QVERIFY(verticalScrollBar != nullptr);  // 确保滚动条存在
@@ -101,7 +101,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     ImagesInFolderBrowser browser;
     browser.mIconSize = QSize{200, 200};
     browser.setFixedSize(256, 256);
-    QVERIFY(browser(itemsFolderPath));
+    QVERIFY(browser.DisplayFileInformation(itemsFolderPath));
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
     QVERIFY(browser.m_curImgCntIndex > 0);
@@ -152,7 +152,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     ImagesInFolderBrowser browser;
     browser.mIconSize = QSize{200, 200};
     browser.setFixedSize(256, 256);
-    QVERIFY(browser(itemsFolderPath));
+    QVERIFY(browser.DisplayFileInformation(itemsFolderPath));
     QCOMPARE(browser.m_dirPath, itemsFolderPath);
     QCOMPARE(browser.m_imgsLst.size(), SVG_IMG_COUNT);
     browser.show();
@@ -217,7 +217,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     QCOMPARE(slider.m_inFolderImgIndex, 0 * ImagesInFolderSlider::MAX_LABEL_CNT);
     QCOMPARE(slider.m_nextImgTimer->isActive(), false);
     QCOMPARE(slider.m_nextImgTimer->interval(), ImagesInFolderSlider::SLIDE_TO_NEXT_IMG_TIME_INTERVAL);
-    slider(svgImagePath);
+    slider.DisplayFileInformation(svgImagePath);
 
     QVERIFY(slider.m_imgsUnderAPath != nullptr);
     QCOMPARE(slider.m_imgsUnderAPath->size(), 1);
@@ -228,7 +228,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     // change path to a not image file, memory release ok
     QString notImagePath = mDir.absoluteFilePath("path/FileNotAImage.mp4");
     QVERIFY(QFile::exists(notImagePath));
-    slider(notImagePath);
+    slider.DisplayFileInformation(notImagePath);
     QCOMPARE(slider.m_imgsUnderAPath, nullptr);
     QCOMPARE(slider.m_nextImgTimer->isActive(), false);
 
@@ -244,7 +244,7 @@ class ImagesInFolderBrowserTest : public PlainTestSuite {
     QCOMPARE(slider.m_inFolderImgIndex, 0 * ImagesInFolderSlider::MAX_LABEL_CNT);
     QCOMPARE(slider.m_nextImgTimer->isActive(), false);
     QCOMPARE(slider.m_nextImgTimer->interval(), ImagesInFolderSlider::SLIDE_TO_NEXT_IMG_TIME_INTERVAL);
-    slider(itemsFolderPath);
+    slider.DisplayFileInformation(itemsFolderPath);
 
     QVERIFY(slider.m_imgsUnderAPath != nullptr);
     QCOMPARE(slider.m_imgsUnderAPath->size(), SVG_IMG_COUNT);

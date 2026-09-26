@@ -108,6 +108,7 @@ void SceneListView::subscribe() {
   connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
   connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
 
+  connect(SceneListView::selectionModel(), &QItemSelectionModel::currentChanged, this, &SceneListView::onClickEvent);
   connect(this, &SceneListView::sceneGridClicked, mAlignDelegate, &SceneStyleDelegate::onSceneClicked);
   connect(mAlignDelegate, &SceneStyleDelegate::cellVisualUpdateRequested, this, &SceneListView::onCellVisualUpdateRequested);
 }
@@ -261,10 +262,6 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
   if (event->button() == Qt::MouseButton::LeftButton) {
     const QPoint pos = event->pos();
     const QModelIndex proIndex = indexAt(pos); // here no need use mapToSource
-    if (mLastClickedIndex != proIndex) {
-      onClickEvent(proIndex);
-    }
-    mLastClickedIndex = proIndex;
     const QRect imageRect{mAlignDelegate->GetRatingAreaRect(visualRect(proIndex))};
     emit sceneGridClicked(proIndex, imageRect, pos);
   }

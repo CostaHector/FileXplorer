@@ -22,8 +22,7 @@ public:
 
   PreviewTypeTool::PREVIEW_TYPE_E GetCurrentViewE() const { return mCurrentPreviewType; }
 
-  void operator()(const QString& path) {
-    emit reqWindowsTitleChange(path);
+  void DisplayFileSystemRecord(const QString& path) {
     mCurrentSrcFrom = SRC_FROM::FILE_SYSTEM_VIEW;
     m_curPath = path;
     if (isTimerDisabled()) {
@@ -34,9 +33,8 @@ public:
     m_nextFolderTimer.start();
   }
 
-  void operator()(const QSqlRecord& newRecord, const QString imageHostPath) {
-    emit reqWindowsTitleChange(imageHostPath);
-    mCurrentSrcFrom = SRC_FROM::CAST;
+  void DisplayCastRecord(const QSqlRecord& newRecord, const QString imageHostPath) {
+    mCurrentSrcFrom = SRC_FROM::CAST_DB;
     m_curRecord = newRecord;
     m_curImageHostPath = imageHostPath;
     if (isTimerDisabled()) {
@@ -47,9 +45,19 @@ public:
     m_nextFolderTimer.start();
   }
 
-  void operator()(const QString& name, const QString& jsonAbsPath, const QStringList& imgPthLst, const QStringList& vidsLst) {
-    emit reqWindowsTitleChange(name);
-    mCurrentSrcFrom = SRC_FROM::SCENE;
+  void DisplayMovieRecord(const QSqlRecord& newRecord) {
+    mCurrentSrcFrom = SRC_FROM::MOVIE_DB;
+    m_curRecord = newRecord;
+    if (isTimerDisabled()) {
+      UpdatePreview();
+      return;
+    }
+    m_nextFolderTimer.stop();
+    m_nextFolderTimer.start();
+  }
+
+  void DisplayJsonRecord(const QString& name, const QString& jsonAbsPath, const QStringList& imgPthLst, const QStringList& vidsLst) {
+    mCurrentSrcFrom = SRC_FROM::JSON_OR_SCENE;
     m_sceneName = name;
     m_sceneJsonAbsFilePath = jsonAbsPath;
     m_sceneimgPthLst = imgPthLst;
@@ -71,8 +79,6 @@ public:
   void saveSizeHint() const;
 
   bool NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const;
-signals:
-  void reqWindowsTitleChange(const QString& newTitle);
 
 public slots:
   bool InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E previewType);
@@ -92,8 +98,9 @@ private:
 
   /*For File System View*/
   QString m_curPath;
-  /*For Cast View*/
+  /*For Cast/MovieDB View*/
   QSqlRecord m_curRecord;
+  /*For Cast View*/
   QString m_curImageHostPath;
   /*For Scene View*/
   QString m_sceneName;
@@ -117,8 +124,9 @@ private:
 
   enum class SRC_FROM {
     FILE_SYSTEM_VIEW,
-    SCENE, // scene or json
-    CAST,
+    JSON_OR_SCENE, // scene or json
+    CAST_DB,
+    MOVIE_DB,
   };
   SRC_FROM mCurrentSrcFrom{SRC_FROM::FILE_SYSTEM_VIEW};
 };
