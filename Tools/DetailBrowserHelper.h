@@ -15,12 +15,14 @@ inline QList<QSqlRecord>& mockSqlRecordList() {
 namespace UrlSchema {
 constexpr const char* HIDE_RELATED = "hide-related";
 constexpr const char* COPY_LINE = "copy-line";
+constexpr const char* CLEAR_CLIPBOARD = "clear-clipboard";
 }
 
 namespace UrlAnchorTemplate {
-constexpr const char* HIDE_RELATED_IMAGES = "hide-related:Images";
-constexpr const char* HIDE_RELATED_VIDEOS = "hide-related:Videos";
-constexpr const char* COPY_LINE_INDEX = "copy-line:%1";
+constexpr const char* HIDE_RELATED_IMAGES_URL = "hide-related:Images";
+constexpr const char* HIDE_RELATED_VIDEOS_URL = "hide-related:Videos";
+constexpr const char* COPY_LINE_URL = "copy-line:%1";
+constexpr const char* CLEAR_CLIPBOARD_URL = "clear-clipboard:";
 }
 
 namespace DetailBrowserHelper {
@@ -36,9 +38,10 @@ inline QString FromBase64Url(const QString& s) {
 }
 QString GetHideRelatedImagesHref(int count);
 QString GetHideRelatedVideosHref(int count);
-QString GetCopyLineHref(int lineIndex);
 QString GetCopyLineHref(const QString& base64UrlPath);
+QString GetClearClipboardHref();
 bool AppendSqlRecordToClipboard(const QString& base64UrlPath);
+bool ClearTextInClipboard();
 QString GetSearchResultParagraphDisplay(const QString& searchText);
 };
 

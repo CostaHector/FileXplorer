@@ -100,6 +100,8 @@ bool ClickableTextBrowser::onAnchorClicked(const QUrl& url) {
     }
   } else if (urlSchema == UrlSchema::COPY_LINE) {
     return DetailBrowserHelper::AppendSqlRecordToClipboard(url.path());
+  } else if (urlSchema == UrlSchema::CLEAR_CLIPBOARD) {
+    return DetailBrowserHelper::ClearTextInClipboard();
   }
   return true;
 }
