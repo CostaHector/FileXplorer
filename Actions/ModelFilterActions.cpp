@@ -53,7 +53,7 @@ ModelFilterActions::ModelFilterActions(ModelFilterE modelE, QObject* parent) //
           {HIDDEN, QDir::Hidden},
           {NO_DOT, QDir::NoDot},
           {NO_DOT_DOT, QDir::NoDotDot},
-          {CASE_SENSITIVE, QDir::CaseSensitive}
+          {CASE_SENSITIVE, QDir::CaseSensitive} // only used in QFileSystemModel setNameFilter. not used in navigation
       };
   mFilterAct2FilterFlag.swap(tempFilterAct2FilterFlag);
   const QString dirFilterKeyName = GetMemoryKeyName(BehaviorKey::DIR_FILTER_ON_SWITCH_ENABLE.name);

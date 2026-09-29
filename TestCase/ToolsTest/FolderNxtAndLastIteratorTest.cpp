@@ -1,4 +1,3 @@
-#include <QCoreApplication>
 #include <QtTest>
 #include "PlainTestSuite.h"
 
@@ -6,7 +5,6 @@
 #include "FolderNxtAndLastIterator.h"
 #include "EndToExposePrivateMember.h"
 
-#include "PublicVariable.h"
 #include "TDir.h"
 
 class FolderNxtAndLastIteratorTest : public PlainTestSuite {
@@ -22,7 +20,7 @@ private slots:
         {"a/img 0.jpg", false, ""},  //
         {"0/img 2.gif", false, ""},  //
         {"0/img 3.mp4", false, ""},  //
-        {"b/img 4.webp", false, ""}, //
+        {"B/img 4.webp", false, ""}, // sort flag=Name|DirFirst|CaseInsensitive
         {"img 6.png", false, ""},    //
         {"img 5.png", false, ""},    //
     };
@@ -33,7 +31,7 @@ private slots:
     const QStringList expectsFolders{
         "0", //
         "a", //
-        "b", //
+        "B", //
     };
 
     const QString pth = mTDir.path();
@@ -47,20 +45,20 @@ private slots:
     QCOMPARE(folderIt.mSameLevelPaths, expectsFolders);
 
     QCOMPARE(folderIt.next(pth, "0"), "a");
-    QCOMPARE(folderIt.next(pth, "a"), "b");
-    QCOMPARE(folderIt.next(pth, "b"), "0");
+    QCOMPARE(folderIt.next(pth, "a"), "B");
+    QCOMPARE(folderIt.next(pth, "B"), "0");
 
-    QCOMPARE(folderIt.last(pth, "0"), "b");
+    QCOMPARE(folderIt.last(pth, "0"), "B");
     QCOMPARE(folderIt.last(pth, "a"), "0");
-    QCOMPARE(folderIt.last(pth, "b"), "a");
+    QCOMPARE(folderIt.last(pth, "B"), "a");
 
     // remove folder "a", iterator will jump it
     const QString folderAPath{mTDir.itemPath("a")};
     QString pathInTrash;
     QVERIFY(QFile::moveToTrash(folderAPath, &pathInTrash));
     QVERIFY(!QFile::exists(folderAPath));
-    QCOMPARE(folderIt.next(pth, "0"), "b");
-    QCOMPARE(folderIt.last(pth, "b"), "0");
+    QCOMPARE(folderIt.next(pth, "0"), "B");
+    QCOMPARE(folderIt.last(pth, "B"), "0");
 
     // restore folder "a"
     QVERIFY(QFile::rename(pathInTrash, folderAPath));
@@ -72,7 +70,7 @@ private slots:
         "0/img 2.gif",  //
         "a/img 0.jpg",  //
         "a/img 1.jpg",  //
-        "b/img 4.webp", //
+        "B/img 4.webp", //
         "img 5.png",    //
         "img 6.png",    //
     };
@@ -89,12 +87,12 @@ private slots:
 
       QCOMPARE(imgIt.next(pth, "0/img 2.gif"), "a/img 0.jpg");
       QCOMPARE(imgIt.next(pth, "a/img 0.jpg"), "a/img 1.jpg");
-      QCOMPARE(imgIt.next(pth, "b/img 4.webp"), "img 5.png");
+      QCOMPARE(imgIt.next(pth, "B/img 4.webp"), "img 5.png");
       QCOMPARE(imgIt.next(pth, "img 6.png"), "0/img 2.gif");
 
       QCOMPARE(imgIt.last(pth, "a/img 0.jpg"), "0/img 2.gif");
       QCOMPARE(imgIt.last(pth, "a/img 1.jpg"), "a/img 0.jpg");
-      QCOMPARE(imgIt.last(pth, "img 5.png"), "b/img 4.webp");
+      QCOMPARE(imgIt.last(pth, "img 5.png"), "B/img 4.webp");
       QCOMPARE(imgIt.last(pth, "0/img 2.gif"), "img 6.png");
 
       imgIt.setIncludingSubDirectory(false);

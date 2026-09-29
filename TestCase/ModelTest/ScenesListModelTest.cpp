@@ -19,8 +19,6 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace SceneInfoManager;
-
 bool checkIndexMatch(const QAbstractListModel& srcModel, int srcR, const QSortFilterProxyModel& proModel, int proR) {
   QVariant src = srcModel.data(srcModel.index(srcR), Qt::DisplayRole);
   QVariant dst = proModel.data(proModel.index(proR, 0), Qt::DisplayRole);
