@@ -2,7 +2,7 @@
 #define SCENESORTPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "SceneInfoManager.h"
+#include "SceneInfo.h"
 
 class SceneSortProxyModel : public QSortFilterProxyModel {
   Q_OBJECT

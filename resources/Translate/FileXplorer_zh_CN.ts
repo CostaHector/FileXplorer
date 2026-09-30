@@ -134,7 +134,7 @@
         <translation>搜索当前选中</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Search Multiple Texts</source>
         <translation>多子串搜索</translation>
     </message>
@@ -160,8 +160,13 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Copy Selected Text</source>
-        <translation>复制选中文本</translation>
+        <source>Copy Current Selected Text</source>
+        <translation>复制当前选中文本</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Copy All Selected Text</source>
+        <translation>复制所有选中文本</translation>
     </message>
 </context>
 <context>
@@ -2151,7 +2156,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RibbonMenu</name>
     <message>
-        <location filename="../../Component/RibbonMenu.cpp" line="+46"/>
+        <location filename="../../Component/RibbonMenu.cpp" line="+47"/>
         <source>&amp;FILE</source>
         <translation>文件(&amp;F)</translation>
     </message>
@@ -2344,6 +2349,34 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+4"/>
         <source>Always On</source>
         <translation>总是显示</translation>
+    </message>
+</context>
+<context>
+    <name>ShadowRenamerActions</name>
+    <message>
+        <location filename="../../Actions/ShadowRenamerActions.cpp" line="+13"/>
+        <source>Create Staging Files</source>
+        <translation>创建影子文件</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Apply Staging to Videos</source>
+        <translation>应用当前变更</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Show Staging Statistics</source>
+        <translation>展示统计数据</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Recycle Synced Staging Files</source>
+        <translation>回收已变更</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Recycle No-Sync-Needed Staging Files</source>
+        <translation>回收无需变更</translation>
     </message>
 </context>
 <context>

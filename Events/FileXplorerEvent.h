@@ -105,6 +105,10 @@ private:
 
   void on_RMV_FOLDER_BY_KEYWORD();
 
+  bool on_shadowRenamerActionsCreate();
+  bool on_shadowRenamerActionsSyncBack();
+  bool on_shadowRenamerActionsShadowPath();
+
   FileSystemModel* _fileSysModel{nullptr};
   ViewsStackedWidget* _contentPane{nullptr};
 

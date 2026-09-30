@@ -22,6 +22,7 @@
 #include "RibbonJson.h"
 #include "RibbonMovieDB.h"
 #include "RibbonScene.h"
+#include "ShadowRenamerActions.h"
 #include "SizeChangeAnimation.h"
 #include "MenuToolButton.h"
 #include "BehaviorKey.h"
@@ -373,6 +374,12 @@ QToolBar* RibbonMenu::LeafMediaTools() const {
   }
   archiveVidsTB->addSeparator();
   archiveVidsTB->addAction(fileOpAgInst._TS_FILES_MERGE);
+  archiveVidsTB->addSeparator();
+  {
+    const auto& inst = ShadowRenamerActions::GetInst();
+    archiveVidsTB->addWidget(inst.GetShadowFilesToolBar(archiveVidsTB));
+    archiveVidsTB->addWidget(inst.GetShadowFilesRecycleToolBar(archiveVidsTB));
+  }
   archiveVidsTB->addSeparator();
   {
     auto& inst = MultiPar2Actions::GetInst();

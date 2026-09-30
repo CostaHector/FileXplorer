@@ -217,7 +217,12 @@ bool CopyTextToSystemClipboard(const QString& text, bool bAppend) {
     return false;
   }
   if (bAppend) {
-    pClipboard->setText(pClipboard->text() + "\n" + text);
+    QString newContent{pClipboard->text()};
+    if (!newContent.isEmpty()) {
+      newContent += '\n';
+    }
+    newContent += text;
+    pClipboard->setText(newContent);
     LOG_OK_P("Copied Append succeed", "%d char(s)", text.size());
   } else {
     pClipboard->setText(text);

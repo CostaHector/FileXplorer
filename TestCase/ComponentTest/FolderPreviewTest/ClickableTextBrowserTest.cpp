@@ -381,8 +381,8 @@ private slots:
     QCOMPARE(browser.mCastVideosVisisble, true);
     QCOMPARE(browser.mCastImagesVisisble, true);
 
-    QUrl clickHideShowVidUrl{UrlAnchorTemplate::HIDE_RELATED_VIDEOS};
-    QUrl clickHideShowImgUrl{UrlAnchorTemplate::HIDE_RELATED_IMAGES};
+    QUrl clickHideShowVidUrl{UrlAnchorTemplate::HIDE_RELATED_VIDEOS_URL};
+    QUrl clickHideShowImgUrl{UrlAnchorTemplate::HIDE_RELATED_IMAGES_URL};
     QVERIFY(browser.onAnchorClicked(clickHideShowVidUrl));
     QCOMPARE(browser.mCastVideosVisisble, false);
     QCOMPARE(browser.mCastImagesVisisble, true);
@@ -405,7 +405,7 @@ private slots:
 
     const QString expectCopyContents{"/home/to/file1.mp4\t0'0'0'999\t00:00:00.000\t"};
     const QString base64UrlPath = DetailBrowserHelper::ToBase64Url(expectCopyContents);
-    QUrl copySchemaAndPathLink{QString{UrlAnchorTemplate::COPY_LINE_INDEX}.arg(base64UrlPath)};
+    QUrl copySchemaAndPathLink{QString{UrlAnchorTemplate::COPY_LINE_URL}.arg(base64UrlPath)};
     MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(expectCopyContents, true).will(returnValue(true));
     QVERIFY(browser.onAnchorClicked(copySchemaAndPathLink));
   }

@@ -251,7 +251,7 @@ private slots:
     QCOMPARE(model.mVerifyInfoList[ind1.row()].m_statusE, ParVerifyInfomation::Par2StatusE::READY_TO_RENAME);
 
     QCOMPARE(model.syncBuiltInSrcFileListInPar2(inds0_4), 1);
-    needReverifyIndexes = model.ProcessOldNewPar2Names(inds0_4);
+    needReverifyIndexes = model.ProcessOldNewPar2Names(inds0_4); // here will generate 2 files(readyToRenameFile8888.txt.par2,readyToRenameFile8888.txt.vol0+1.par2) in trashbin
     QCOMPARE(needReverifyIndexes, (QModelIndexList{ind1}));
 
     MOCKER(MultiParTools::IsMultiPar2Available).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));

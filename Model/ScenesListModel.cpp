@@ -7,7 +7,6 @@
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "BatchRenameBy.h"
-#include "JsonHelper.h"
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>

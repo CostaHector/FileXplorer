@@ -11,27 +11,30 @@ namespace DetailBrowserHelper {
 const QString WHEN_SEARCH_RETURN_EMPTY_LIST_HINT_TEXT = "[%1] Not in database";
 
 QString GetHideRelatedVideosHref(int count) {
-  return QString{R"(<a href="%1">)"}.arg(UrlAnchorTemplate::HIDE_RELATED_VIDEOS)
+  return QString{R"(<a href="%1">)"}.arg(UrlAnchorTemplate::HIDE_RELATED_VIDEOS_URL)
   + " %1 "
       + QString{"%1 Related Videos</a>"}.arg(count);
 }
 QString GetHideRelatedImagesHref(int count) {
-  return QString{R"(<a href="%1">)"}.arg(UrlAnchorTemplate::HIDE_RELATED_IMAGES)
+  return QString{R"(<a href="%1">)"}.arg(UrlAnchorTemplate::HIDE_RELATED_IMAGES_URL)
   + " %1 "
       + QString{"%1 Related Images</a>"}.arg(count);
 }
 
-QString GetCopyLineHref(int lineIndex) {
-  return QString{R"(<a href="%1">cp</a>)"}.arg(UrlAnchorTemplate::COPY_LINE_INDEX).arg(lineIndex);
+QString GetCopyLineHref(const QString& base64UrlPath) {
+  return QString{R"(<a href="%1">cp</a>)"}.arg(UrlAnchorTemplate::COPY_LINE_URL).arg(base64UrlPath);
 }
 
-QString GetCopyLineHref(const QString& base64UrlPath) {
-  return QString{R"(<a href="%1">cp</a>)"}.arg(UrlAnchorTemplate::COPY_LINE_INDEX).arg(base64UrlPath);
+QString GetClearClipboardHref() {
+  return QString{R"(<a href="%1">clr</a>)"}.arg(UrlAnchorTemplate::CLEAR_CLIPBOARD_URL);
 }
 
 bool AppendSqlRecordToClipboard(const QString& base64UrlPath) {
-  FileTool::CopyTextToSystemClipboard(FromBase64Url(base64UrlPath), true);
-  return true;
+  return FileTool::CopyTextToSystemClipboard(FromBase64Url(base64UrlPath), true);
+}
+
+bool ClearTextInClipboard() {
+  return FileTool::CopyTextToSystemClipboard("", false);
 }
 
 QString GetSearchResultParagraphDisplay(const QString& whereText) {
@@ -53,7 +56,15 @@ QString GetSearchResultParagraphDisplay(const QString& whereText) {
   searchResult.reserve(512);
   searchResult += QString{"<b>%1 record(s) found</b> by key[%2]. They are:"}.arg(records.size()).arg(whereText);
   searchResult += "<table border='1' cellpadding='4' style='border-collapse: collapse;'>";
-  searchResult += "<thead><tr><th>cp</th><th>Size</th><th>Name</th><th>Duration</th><th>MD5Sample</th><th>Path</th></tr></thead>";
+  searchResult += "<thead><tr>";
+  searchResult += QString{"<th>%1</th>"}.arg(DetailBrowserHelper::GetClearClipboardHref()); // clear clipboard
+  searchResult += "<th>Size</th>";
+  searchResult += "<th>Name</th>";
+  searchResult += "<th>Duration</th>";
+  searchResult += "<th>MD5Sample</th>";
+  searchResult += "<th>Path</th>";
+  searchResult += "</tr></thead>";
+
   searchResult += "<tbody>";
   for (int i = 0; i < records.size(); ++i) {
     const QSqlRecord& record = records[i];

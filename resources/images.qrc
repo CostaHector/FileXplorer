@@ -211,6 +211,7 @@
 
         <!--Browser Icon here-->
         <file alias="COPY_TEXT">Browser/COPY_TEXT.svg</file>
+        <file alias="COPY_ALL_TEXT">Browser/COPY_ALL_TEXT.svg</file>
         <file alias="FILE_FIRST_16_BYTES">Browser/FILE_FIRST_16_BYTES.svg</file>
         <file alias="FILE_RATIO_128KB">Browser/FILE_RATIO_128KB.svg</file>
         <file alias="FILE_RATIO_512KB">Browser/FILE_RATIO_512KB.svg</file>

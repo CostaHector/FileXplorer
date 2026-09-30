@@ -18,7 +18,6 @@ class FolderNxtAndLastIterator {
   static FolderNxtAndLastIterator GetInstsNaviImages(bool bIncludingSubDir);
 
   bool operator()(const QString& parentPath, bool bForce = false);
-  bool operator()(const QString& parentPath, const QStringList& itemsList);
 
   QString next(const QString& parentPath, const QString& curItemName) { return lastNextCore(parentPath, curItemName, NaviDirection::NEXT); }
   QString last(const QString& parentPath, const QString& curItemName) { return lastNextCore(parentPath, curItemName, NaviDirection::PREV); }
@@ -28,9 +27,19 @@ class FolderNxtAndLastIterator {
 
  private:
   QString lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction = NaviDirection::NEXT);
-  QString GetDestinationPath(const QString& parentPath, const QString& curItemName, NaviDirection direction) const;
+  QString GetDestinationItem(const QString& parentPath, const QString& curItemName, NaviDirection direction) const;
   QString m_lastTimeParentPath;
-  QStringList mSameLevelPaths;
+
+  bool operator()(const QString& parentPath, QStringList& itemsListDisposable); // test only
+  void initSameLevelPaths(QStringList& itemsListDisposable) {
+    mSameLevelPaths.swap(itemsListDisposable);
+    mSameLevelPathsLowercase.clear();
+    mSameLevelPathsLowercase.reserve(mSameLevelPaths.size());
+    for (const QString& s: mSameLevelPaths) {
+      mSameLevelPathsLowercase.push_back(s.toLower());
+    }
+  }
+  QStringList mSameLevelPaths, mSameLevelPathsLowercase;
 
   const QStringList mNameFilters;
   const QDir::Filters mDirFilters;

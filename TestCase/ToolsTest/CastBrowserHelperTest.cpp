@@ -66,11 +66,11 @@ class CastBrowserHelperTest : public PlainTestSuite {
 
     QVERIFY(parts.body.contains("Henry Cavill"));
 
-    QVERIFY(parts.vidPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_VIDEOS));
+    QVERIFY(parts.vidPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_VIDEOS_URL));
     QVERIFY(parts.vidPart[1].contains("Movie1.mp4"));
     QVERIFY(parts.vidPart[1].contains("Movie2.mp4"));
 
-    QVERIFY(parts.imgPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_IMAGES));
+    QVERIFY(parts.imgPart[0].contains(UrlAnchorTemplate::HIDE_RELATED_IMAGES_URL));
     QVERIFY(parts.imgPart[1].contains("host/MovieStar/Henry Cavill/Image1.jpg"));
     QVERIFY(parts.imgPart[1].contains("host/MovieStar/Henry Cavill/Image2.jpg"));
   }
