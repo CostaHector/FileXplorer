@@ -63,6 +63,9 @@
 #include "RecycleCfmDlg.h"
 #include "RowHeightRegistry.h"
 
+#include "ShadowRenamer.h"
+#include "ShadowRenamerActions.h"
+
 #include <QApplication>
 #include <QInputDialog>
 #include <QTextStream>
@@ -632,6 +635,15 @@ void FileXplorerEvent::subscribe() {
   }
 
   connect(&TagsHelper::GetInst(), &TagsHelper::reqAddRmvTags, this, &FileXplorerEvent::onAddRemoveTags);
+
+  {
+    auto& inst = ShadowRenamerActions::GetInst();
+    connect(inst.CREATE_STAGING_FILES, &QAction::triggered, this, &FileXplorerEvent::on_shadowRenamerActionsCreate);
+    connect(inst.SYNC_STAGING_TO_VIDEO, &QAction::triggered, this, &FileXplorerEvent::on_shadowRenamerActionsSyncBack);
+    connect(inst.SHOW_STAGING_STATISTICS, &QAction::triggered, this, &FileXplorerEvent::on_shadowRenamerActionsShadowPath);
+    connect(inst.RECYCLE_SYNCED_STAGING_FILE, &QAction::triggered, this, &FileXplorerEvent::on_shadowRenamerActionsShadowPath);
+    connect(inst.RECYCLE_NO_NEED_SYNC_FILE, &QAction::triggered, this, &FileXplorerEvent::on_shadowRenamerActionsShadowPath);
+  }
 }
 
 struct AutoSwitchPath {
@@ -1403,6 +1415,98 @@ void FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD() {
   }
   FolderNameContainKeyRmv rirbk{keyword};
   FileXplorerEvent::on_RemoveRedundantItem(rirbk);
+}
+
+bool FileXplorerEvent::on_shadowRenamerActionsCreate() {
+  const auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    LOG_WARN_NP("[Abort] Current View type not support Create Shadow for Videos", ViewTypeTool::c_str(vt));
+    return false;
+  }
+  const QString sourcePath = _fileSysModel->rootPath();
+  QString title{"Create Shadow Path"};
+  QString msg{"Source: " + sourcePath};
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{""}, title, msg, "", "")) {
+    LOG_INFO_P("Skip Create Shadow", "User canceled[%s] under[%s]", qPrintable(title), qPrintable(sourcePath));
+    return true;
+  }
+  using namespace ShadowRenamer;
+  const int shadowFileCnt = onCreateStagingFile(sourcePath);
+  LOG_OE_P(shadowFileCnt > 0, "Create Staging Files", "Cnt: %d", shadowFileCnt);
+  return shadowFileCnt > 0;
+}
+
+bool FileXplorerEvent::on_shadowRenamerActionsSyncBack() {
+  const auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    LOG_WARN_NP("[Abort] Current View type not support Shadow Name Sync Back to Videos", ViewTypeTool::c_str(vt));
+    return false;
+  }
+  const QString shadowFolder = _fileSysModel->rootPath();
+  using namespace ShadowRenamer;
+  bool bIsShadowFolder{false};
+  QString sourcePath;
+  std::tie(bIsShadowFolder, sourcePath) = ChopShadowPostFix(shadowFolder);
+  if (!bIsShadowFolder) {
+    LOG_WARN_NP("Not a shadow folder", shadowFolder);
+    return false;
+  }
+  if (!QFile::exists(sourcePath)) {
+    LOG_WARN_P("No need sync", "Source folder[%s] inexist", qPrintable(sourcePath));
+    return false;
+  }
+  QString title{"Sync shadow files to videos"};
+  QString msg {shadowFolder + "\n->\n" + sourcePath};
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{""}, title, msg, "", "")) {
+    LOG_INFO_P("Skip Sync Back", "User canceled[%s] under[%s]", qPrintable(title), qPrintable(sourcePath));
+    return true;
+  }
+
+  const std::pair<bool, SyncDetails> syncBackResult = SyncSourceFileByShadowFile(shadowFolder, sourcePath);
+  const bool bProcedureOk = syncBackResult.first;
+  LOG_OE_NP(bProcedureOk, "Sync Back", syncBackResult.second.logStr());
+  return bProcedureOk;
+}
+
+bool FileXplorerEvent::on_shadowRenamerActionsShadowPath() {
+  QAction* action = qobject_cast<QAction*>(sender());
+  if (action == nullptr) {
+    return false;
+  }
+  const auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    LOG_WARN_NP("[Abort] Current View type not support Shadow Rename Operations", ViewTypeTool::c_str(vt));
+    return false;
+  }
+  const QString shadowPath = _fileSysModel->rootPath();
+  using namespace ShadowRenamer;
+  if (!isStagingFileFolder(shadowPath)) {
+    LOG_WARN_NP("Not a shadow folder", shadowPath);
+    return false;
+  }
+  const auto& inst = ShadowRenamerActions::GetInst();
+  if (action == inst.SHOW_STAGING_STATISTICS) {
+    const SyncDetails showStatistics = onShowStagingStatistics(shadowPath);
+    LOG_OK_NP("See Statistics in log", showStatistics.logStr());
+    return true;
+  }
+
+  const QString title{action->text()};
+  const QString msg{"Under: " + shadowPath};
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question, QIcon{""}, title, msg, "", "")) {
+    LOG_INFO_P("Skip", "User canceled[%s] under[%s]", qPrintable(title), qPrintable(shadowPath));
+    return true;
+  }
+  if (action == inst.RECYCLE_SYNCED_STAGING_FILE) {
+    std::pair<bool, int> recycleRet = onRecycleAlreadySyncedStagingFile(shadowPath);
+    LOG_OE_P(recycleRet.first, "Recycle Already Synced Staging File", "Cnt: %d", recycleRet.second);
+    return true;
+  } else if (action == inst.RECYCLE_NO_NEED_SYNC_FILE) {
+    std::pair<bool, int> recycleRet = onRecycleNoNeedSyncStagingFile(shadowPath);
+    LOG_OE_P(recycleRet.first, "Recycle No Need Sync Staging File", "Cnt: %d", recycleRet.second);
+    return true;
+  }
+  return false;
 }
 
 bool FileXplorerEvent::QueryKeepStructureOrFlatten(ComplexOperation::FileStuctureModeE& mode) {

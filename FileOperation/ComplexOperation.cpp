@@ -1,6 +1,5 @@
 ﻿#include "ComplexOperation.h"
 #include "PathTool.h"
-#include "PublicVariable.h"
 #include "Logger.h"
 #include "UndoRedo.h"
 
