@@ -2,7 +2,6 @@
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "PathTool.h"
-#include "PublicVariable.h"
 #include "FileTool.h"
 #include "Logger.h"
 #include <QFileInfo>
@@ -72,7 +71,7 @@ int CreateShadowFileUsingNameAsContent(const QString &folderFullPathContainsVide
   }
   int shadowFilesCnt{0};
   const int prePathLen = folderFullPathContainsVideosNeedRename.size() + 1;
-  QDirIterator it{folderFullPathContainsVideosNeedRename, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{folderFullPathContainsVideosNeedRename, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   QDir shadowPathDir{shadowPath};
   while (it.hasNext()) {
     const QString fileFullPath = it.next();
@@ -132,7 +131,7 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
 
   QDir oldPathDir{folderFullPathContainsVideosNeedRename};
   const int prePathLen = shadowPath.size() + 1;
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     bool bReadOk{false};
@@ -214,19 +213,23 @@ int onCreateStagingFile(const QString& srcPath) {
   return CreateShadowFileUsingNameAsContent(srcPath, stagingFolder);
 }
 
-SyncDetails onShowStagingStatistics(const QString& shadowPath) {
+SyncDetails onShowStagingStatistics(const QString& shadowPath, QMap<QString, QStringList>* pTitle2Items) {
   if (!isStagingFileFolder(shadowPath)) {
     LOG_W("Path[%s] not match shadow pattern", qPrintable(shadowPath));
-    return SyncDetails{};
+    return {};
   }
-  QStringList pendingSyncList, alreadySyncedList, noNeedSyncList, noCorrespondList;
   int parsedCount{0};
 
   QString oldSrcVidFileName; // relative
   SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
 
+  QStringList pendingSyncList;
+  QStringList alreadySyncedList;
+  QStringList noNeedSyncList;
+  QStringList noCorrespondList;
+
   const int prePathLen = shadowPath.size() + 1;
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
@@ -249,13 +252,13 @@ SyncDetails onShowStagingStatistics(const QString& shadowPath) {
     const QString new2Old = shadowFileFullPath.mid(prePathLen) + '\t' + oldSrcVidFileName;
     switch (shadowFileStatus) {
       case SHADOW_STATUS::PENDING_SYNC:
-        pendingSyncList.append(new2Old);
+        pendingSyncList.append(oldSrcVidFileName);
         break;
       case SHADOW_STATUS::ALREADY_SYNCED:
         alreadySyncedList.append(new2Old);
         break;
       case SHADOW_STATUS::NO_NEED_SYNC:
-        noNeedSyncList.append(new2Old);
+        noNeedSyncList.append(oldSrcVidFileName);
         break;
       case SHADOW_STATUS::NO_CORRESPOND_FILE:
         noCorrespondList.append(new2Old);
@@ -265,22 +268,15 @@ SyncDetails onShowStagingStatistics(const QString& shadowPath) {
         break;
     }
   }
-  QString logStr;
-  logStr += '\n';
-  logStr += QString("[PENDING_SYNC] %1 file(s) as follows:\n").arg(pendingSyncList.size());
-  logStr += pendingSyncList.join('\n');
-  logStr += '\n';
-  logStr += QString("[ALREADY_SYNCED] %1 file(s) as follows:\n").arg(alreadySyncedList.size());
-  logStr += alreadySyncedList.join('\n');
-  logStr += '\n';
-  logStr += QString("[NO_NEED_SYNC] %1 file(s) as follows:\n").arg(noNeedSyncList.size());
-  logStr += noNeedSyncList.join('\n');
-  logStr += '\n';
-  logStr += QString("[NO_CORRESPOND_FILE] %1 file(s) as follows:\n").arg(noCorrespondList.size());
-  logStr += noCorrespondList.join('\n');
-  logStr += '\n';
-  LOG_W("%s", qPrintable(logStr));
-  return SyncDetails{parsedCount, pendingSyncList.size(), alreadySyncedList.size(), noNeedSyncList.size(), noCorrespondList.size(), 0};
+  const SyncDetails ret{parsedCount, pendingSyncList.size(), alreadySyncedList.size(), noNeedSyncList.size(), noCorrespondList.size(), 0};
+  LOG_W("%s", qPrintable(ret.logStr()));
+  if (pTitle2Items != nullptr) {
+    (*pTitle2Items)["PENDING_SYNC"] = std::move(pendingSyncList);
+    (*pTitle2Items)["ALREADY_SYNCED"] = std::move(alreadySyncedList);
+    (*pTitle2Items)["NO_NEED_SYNC"] = std::move(noNeedSyncList);
+    (*pTitle2Items)["NO_CORRESPOND_FILE"] = std::move(noCorrespondList);
+  }
+  return ret;
 }
 
 std::pair<bool, int> recycleStagingFileWithGivenStatus(const QString& shadowPath, int removeStatusBits) {
@@ -290,7 +286,7 @@ std::pair<bool, int> recycleStagingFileWithGivenStatus(const QString& shadowPath
   QString oldSrcVidFileName; // relative
   SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
 
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {

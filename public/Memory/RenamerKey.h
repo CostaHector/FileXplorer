@@ -74,6 +74,8 @@ constexpr KV NUMERIAZER_NO_FORMAT{"RenamerKey/NUMERIAZER_NO_FORMAT", //
 constexpr KV NUMERIAZER_NO_FORMAT_DEFAULT_INDEX{"RenamerKey/NUMERIAZER_NO_FORMAT_DEFAULT_INDEX", Var{0}, GeneralDataType::Type::PLAIN_INT, GeneralIntChecker};
 
 constexpr KV JSON_BASENAME_DEFAULT_MAX_LENGTH{"RenamerKey/JSON_BASENAME_DEFAULT_MAX_LENGTH", Var{240}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<0, 255>};
+
+constexpr KV OPEN_SOURCE_ON_DOUBLE_CLICK_SW{"RenamerKey/OPEN_SOURCE_ON_DOUBLE_CLICK_SW", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 } // namespace RenamerKey
 
 #endif // RENAMERKEY_H

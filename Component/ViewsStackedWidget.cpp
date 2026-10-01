@@ -10,6 +10,7 @@
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
 #include "ShadowRenamer.h"
+#include "ShadowRenamerActions.h"
 #include "FileTool.h"
 #include "RelatedHelper.h"
 #include "TagsHelper.h"
@@ -204,7 +205,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   }
   const SelectionUsage usage {GetVt() == ViewTypeTool::ViewType::SCENE ? SelectionUsage::RELATED_VIDEO_ONLY : SelectionUsage::DEFAULT};
   QFileInfo fi = getFileInfo(clickedIndex, usage);
-  const QString absItemPath{fi.absoluteFilePath()};
+  QString absItemPath{fi.absoluteFilePath()};
   LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
     LOG_ERR_NP("path not exist", absItemPath);
@@ -234,6 +235,10 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
   // FileSystemView: change file system view path to directory.
   // Non-FileSystemView: open in QDesktopService;
 
+  if (ShadowRenamerActions::GetInst().isOpenSourceOnDoubleClick()) {
+    absItemPath = ShadowRenamer::GetVideoForPlayPath(absItemPath);
+  }
+
   if (fi.isFile()) {
     if (FileImageViewer::IsFileImage(fi)) {
       return FileTool::OpenLocalImageFile(absItemPath);
@@ -245,11 +250,6 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       return true;
     } else if (FileTool::IsTorrentFile(absItemPath)) {
       return FileTool::OpenLocalTorrentFile(absItemPath);
-    } else if (TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(absItemPath))) {
-      const QString vidFullPath = ShadowRenamer::GetVideoForPlayPath(absItemPath);
-      if (vidFullPath != absItemPath) {
-        return FileTool::OpenLocalFileUsingDesktopService(vidFullPath);
-      }
     }
   } else if (fi.isDir()) {
     ViewTypeTool::ViewType vt = GetVt();

@@ -85,7 +85,7 @@ inline std::pair<bool, QString> ChopShadowPostFix(const QString& shadowPath) {
 }
 
 int onCreateStagingFile(const QString& srcPath);
-SyncDetails onShowStagingStatistics(const QString& shadowPath);
+SyncDetails onShowStagingStatistics(const QString& shadowPath, QMap<QString, QStringList>* pTitle2Items = nullptr);
 
 inline bool IsStatusInRemoveBits(int removeStatusBits, SHADOW_STATUS status) {
   return (removeStatusBits & (int)status) != 0;

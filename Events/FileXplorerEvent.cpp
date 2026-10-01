@@ -65,6 +65,7 @@
 
 #include "ShadowRenamer.h"
 #include "ShadowRenamerActions.h"
+#include "StagingStatisticsDialog.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -1486,8 +1487,12 @@ bool FileXplorerEvent::on_shadowRenamerActionsShadowPath() {
   }
   const auto& inst = ShadowRenamerActions::GetInst();
   if (action == inst.SHOW_STAGING_STATISTICS) {
-    const SyncDetails showStatistics = onShowStagingStatistics(shadowPath);
+    QMap<QString, QStringList> title2Items;
+    const SyncDetails showStatistics = onShowStagingStatistics(shadowPath, &title2Items);
     LOG_OK_NP("See Statistics in log", showStatistics.logStr());
+    StagingStatisticsDialog dlg{std::move(title2Items), nullptr};
+    dlg.setModal(true);
+    dlg.exec();
     return true;
   }
 
