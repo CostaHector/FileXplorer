@@ -5,6 +5,8 @@
 #include "TDir.h"
 #include "UndoRedo.h"
 
+#define SHADOW_ID "_SHADOW"
+
 using namespace ShadowRenamer;
 class ShadowRenamerTest : public PlainTestSuite {
   Q_OBJECT
@@ -23,12 +25,12 @@ private slots:
       {"directly/captain american.mp4", false, "any contents1"},
       {"directly/x-men.mp4", false, "any contents2"},
       {"directly/noCorrespondingVideo.mp4", false, "any contents no corresponding video1"},
-      {"directlyShadow", true, ""},
+      {"directly" SHADOW_ID, true, ""},
       // videos under folder indirectly shadow rename
       {"indirectly/Marvel/captain american.mp4", false, "any contents3"},
       {"indirectly/forbes/x-men/wolverine.mp4", false, "any contents4"},
       {"indirectly/no/noCorrespondingVideo.mp4", false, "any contents no corresponding video2"},
-      {"indirectlyShadow", true, ""},
+      {"indirectly" SHADOW_ID, true, ""},
     };
     QCOMPARE(mTDir.createEntries(nodes), nodes.size());
 
@@ -41,26 +43,34 @@ private slots:
     const int whenCreateShadowFolderFailedRet = -1;
     QCOMPARE(onCreateStagingFile("ZX2:/inexist/folder"), whenCreateShadowFolderFailedRet);
     const std::pair<bool, SyncDetails> whenNoShadowPathRet{true, {}};
-    QCOMPARE(ShadowRenamer::SyncSourceFileByShadowFile("ZX2:/inexist/folderShadow", "ZX2:/inexist/folder"), whenNoShadowPathRet);
+    QCOMPARE(ShadowRenamer::SyncSourceFileByShadowFile("ZX2:/inexist/folder" SHADOW_ID, "ZX2:/inexist/folder"), whenNoShadowPathRet);
+  }
+
+  void helperFunction_ok() {
+    QCOMPARE(GetStagingFileFolder("C:/home/to/a/random/folder"), "C:/home/to/a/random/folder" SHADOW_ID);
+    QCOMPARE(isStagingFileFolder("C:/home/to/a/random/folder"), false);
+    QCOMPARE(isStagingFileFolder("C:/home/to/a/random/folder" SHADOW_ID), true);
+    QCOMPARE(ChopShadowPostFix("C:/home/to/a/random/folder"), (std::pair<bool, QString>{false, ""}));
+    QCOMPARE(ChopShadowPostFix("C:/home/to/a/random/folder" SHADOW_ID), (std::pair<bool, QString>{true, "C:/home/to/a/random/folder"}));
   }
 
   void directlyShadow_ok() {
     const QString sourceFolder{mTDir.itemPath("directly")};
-    const QString shadowFolder{mTDir.itemPath("directlyShadow")};
+    const QString shadowFolder{mTDir.itemPath("directly" SHADOW_ID)};
     QVERIFY(ShadowRenamer::CheckPathValid(sourceFolder, shadowFolder));
     QCOMPARE(ShadowRenamer::CreateShadowFileUsingNameAsContent(sourceFolder, shadowFolder), 3);
     QCOMPARE(GetStagingFileFolder(sourceFolder), shadowFolder);
     QCOMPARE(ShadowRenamer::onCreateStagingFile(sourceFolder), -1); // shadowFolder not empty, reject it
 
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directlyShadow")), (SyncDetails{3, 3, 0, 0, 0, 0}));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directly" SHADOW_ID)), (SyncDetails{3, 3, 0, 0, 0, 0}));
 
     // video文件丢失 修改影子文件 同步后需要记录
     QVERIFY(QFile::exists(mTDir.itemPath("directly/noCorrespondingVideo.mp4")));
     QVERIFY(QFile::remove(mTDir.itemPath("directly/noCorrespondingVideo.mp4")));
     QVERIFY(!QFile::exists(mTDir.itemPath("directly/noCorrespondingVideo.mp4")));
 
-    QVERIFY(mTDir.checkFileContents("directlyShadow/captain american.mp4", QSet<QString>{JoinShadowFileContent("captain american.mp4", SHADOW_STATUS::PENDING_SYNC)}));
-    QVERIFY(mTDir.checkFileContents("directlyShadow/x-men.mp4", QSet<QString>{JoinShadowFileContent("x-men.mp4", SHADOW_STATUS::PENDING_SYNC)}));
+    QVERIFY(mTDir.checkFileContents("directly" SHADOW_ID "/captain american.mp4", QSet<QString>{JoinShadowFileContent("captain american.mp4", SHADOW_STATUS::PENDING_SYNC)}));
+    QVERIFY(mTDir.checkFileContents("directly" SHADOW_ID "/x-men.mp4", QSet<QString>{JoinShadowFileContent("x-men.mp4", SHADOW_STATUS::PENDING_SYNC)}));
 
     bool bProcedureOk{false};
     ShadowRenamer::SyncDetails detail;
@@ -68,8 +78,8 @@ private slots:
 
     {
       // 对影子文件改名
-      QVERIFY(QFile::rename(mTDir.itemPath("directlyShadow/captain american.mp4"), mTDir.itemPath("directlyShadow/Captain American - Steve.mp4")));
-      QVERIFY(QFile::rename(mTDir.itemPath("directlyShadow/noCorrespondingVideo.mp4"), mTDir.itemPath("directlyShadow/After Renamed noCorrespondingVideo.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/captain american.mp4"), mTDir.itemPath("directly" SHADOW_ID "/Captain American - Steve.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/noCorrespondingVideo.mp4"), mTDir.itemPath("directly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")));
 
       // 反向同步时, 1.更新video文件名, 2.更新shadow文件内容中的source和status两个部分
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
@@ -82,7 +92,7 @@ private slots:
       QCOMPARE(detail.newSyncedCnt, 1);
       QVERIFY(!detail.isFinished());
       const SyncDetails expectRet{3, 0, 1, 1, 1, 0};
-      QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directlyShadow")), expectRet);
+      QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directly" SHADOW_ID)), expectRet);
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder); // do it again
       QVERIFY(bProcedureOk);
       QCOMPARE(detail, expectRet);
@@ -91,19 +101,19 @@ private slots:
       QVERIFY(!mTDir.exists("directly/captain american.mp4"));
       QVERIFY(mTDir.exists("directly/Captain American - Steve.mp4"));
       // 2. 更新shadow文件内容中的source和status两个部分
-      QVERIFY(mTDir.checkFileContents("directlyShadow/Captain American - Steve.mp4", QSet<QString>{JoinShadowFileContent("Captain American - Steve.mp4", SHADOW_STATUS::ALREADY_SYNCED)}));
-      QVERIFY(mTDir.checkFileContents("directlyShadow/x-men.mp4", QSet<QString>{JoinShadowFileContent("x-men.mp4", SHADOW_STATUS::NO_NEED_SYNC)}));
+      QVERIFY(mTDir.checkFileContents("directly" SHADOW_ID "/Captain American - Steve.mp4", QSet<QString>{JoinShadowFileContent("Captain American - Steve.mp4", SHADOW_STATUS::ALREADY_SYNCED)}));
+      QVERIFY(mTDir.checkFileContents("directly" SHADOW_ID "/x-men.mp4", QSet<QString>{JoinShadowFileContent("x-men.mp4", SHADOW_STATUS::NO_NEED_SYNC)}));
     }
 
     // 移除无效的影子文件
-    QVERIFY(QFile::exists(mTDir.itemPath("directlyShadow/After Renamed noCorrespondingVideo.mp4")));
-    QVERIFY(QFile::remove(mTDir.itemPath("directlyShadow/After Renamed noCorrespondingVideo.mp4")));
-    QVERIFY(!QFile::exists(mTDir.itemPath("directlyShadow/After Renamed noCorrespondingVideo.mp4")));
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directlyShadow")), (SyncDetails{2, 0, 1, 1, 0, 0}));
+    QVERIFY(QFile::exists(mTDir.itemPath("directly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")));
+    QVERIFY(QFile::remove(mTDir.itemPath("directly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")));
+    QVERIFY(!QFile::exists(mTDir.itemPath("directly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directly" SHADOW_ID)), (SyncDetails{2, 0, 1, 1, 0, 0}));
     {
       // 将已经同步过了的影子文件改到另一个新名字, sync时不会生效
-      QVERIFY(QFile::rename(mTDir.itemPath("directlyShadow/Captain American - Steve.mp4"), mTDir.itemPath("directlyShadow/Captain American - Chris Evans.mp4")));
-      QVERIFY(QFile::rename(mTDir.itemPath("directlyShadow/x-men.mp4"), mTDir.itemPath("directlyShadow/X - MEN - Michael Fassbender.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/Captain American - Steve.mp4"), mTDir.itemPath("directly" SHADOW_ID "/Captain American - Chris Evans.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/x-men.mp4"), mTDir.itemPath("directly" SHADOW_ID "/X - MEN - Michael Fassbender.mp4")));
 
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
       QVERIFY(bProcedureOk);
@@ -118,26 +128,26 @@ private slots:
       QVERIFY(mTDir.exists("directly/Captain American - Steve.mp4"));
       QVERIFY(mTDir.exists("directly/X - MEN - Michael Fassbender.mp4"));
     }
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directlyShadow")), (SyncDetails{2, 0, 2, 0, 0, 0}));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directly" SHADOW_ID)), (SyncDetails{2, 0, 2, 0, 0, 0}));
   }
 
   void indirectlyShadow_ok() {
     const QString sourceFolder{mTDir.itemPath("indirectly")};
-    const QString shadowFolder{mTDir.itemPath("indirectlyShadow")};
+    const QString shadowFolder{mTDir.itemPath("indirectly" SHADOW_ID)};
     QVERIFY(ShadowRenamer::CheckPathValid(sourceFolder, shadowFolder));
     QCOMPARE(ShadowRenamer::CreateShadowFileUsingNameAsContent(sourceFolder, shadowFolder), 3);
     QCOMPARE(GetStagingFileFolder(sourceFolder), shadowFolder);
     QCOMPARE(ShadowRenamer::onCreateStagingFile(sourceFolder), -1); // shadowFolder not empty, reject it
 
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectlyShadow")), (SyncDetails{3, 3, 0, 0, 0, 0}));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), (SyncDetails{3, 3, 0, 0, 0, 0}));
 
     // video文件丢失 修改影子文件 同步后需要记录
     QVERIFY(QFile::exists(mTDir.itemPath("indirectly/no/noCorrespondingVideo.mp4")));
     QVERIFY(QFile::remove(mTDir.itemPath("indirectly/no/noCorrespondingVideo.mp4")));
     QVERIFY(!QFile::exists(mTDir.itemPath("indirectly/no/noCorrespondingVideo.mp4")));
 
-    QVERIFY(mTDir.checkFileContents("indirectlyShadow/Marvel/captain american.mp4", QSet<QString>{JoinShadowFileContent("Marvel/captain american.mp4", SHADOW_STATUS::PENDING_SYNC)}));
-    QVERIFY(mTDir.checkFileContents("indirectlyShadow/forbes/x-men/wolverine.mp4", QSet<QString>{JoinShadowFileContent("forbes/x-men/wolverine.mp4", SHADOW_STATUS::PENDING_SYNC)}));
+    QVERIFY(mTDir.checkFileContents("indirectly" SHADOW_ID "/Marvel/captain american.mp4", QSet<QString>{JoinShadowFileContent("Marvel/captain american.mp4", SHADOW_STATUS::PENDING_SYNC)}));
+    QVERIFY(mTDir.checkFileContents("indirectly" SHADOW_ID "/forbes/x-men/wolverine.mp4", QSet<QString>{JoinShadowFileContent("forbes/x-men/wolverine.mp4", SHADOW_STATUS::PENDING_SYNC)}));
 
     bool bProcedureOk{false};
     ShadowRenamer::SyncDetails detail;
@@ -145,8 +155,8 @@ private slots:
 
     {
       // 对影子文件改名
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/Marvel/captain american.mp4"), mTDir.itemPath("indirectlyShadow/Marvel/Captain American - Steve.mp4")));
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/no/noCorrespondingVideo.mp4"), mTDir.itemPath("indirectlyShadow/no/After Renamed noCorrespondingVideo.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/captain american.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/Captain American - Steve.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/no/noCorrespondingVideo.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")));
 
       // 反向同步时, 1.更新video文件名, 2.更新shadow文件内容中的source和status两个部分
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
@@ -159,7 +169,7 @@ private slots:
       QCOMPARE(detail.newSyncedCnt, 1);
       QVERIFY(!detail.isFinished());
       const SyncDetails expectRet{3, 0, 1, 1, 1, 0};
-      QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectlyShadow")), expectRet);
+      QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), expectRet);
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder); // do it again
       QVERIFY(bProcedureOk);
       QCOMPARE(detail, expectRet);
@@ -168,22 +178,22 @@ private slots:
       QVERIFY(!mTDir.exists("indirectly/Marvel/captain american.mp4"));
       QVERIFY(mTDir.exists("indirectly/Marvel/Captain American - Steve.mp4"));
       // 2. 更新shadow文件内容中的source和status两个部分
-      QVERIFY(mTDir.checkFileContents("indirectlyShadow/Marvel/Captain American - Steve.mp4", QSet<QString>{JoinShadowFileContent("Marvel/Captain American - Steve.mp4", SHADOW_STATUS::ALREADY_SYNCED)}));
-      QVERIFY(mTDir.checkFileContents("indirectlyShadow/forbes/x-men/wolverine.mp4", QSet<QString>{JoinShadowFileContent("forbes/x-men/wolverine.mp4", SHADOW_STATUS::NO_NEED_SYNC)}));
+      QVERIFY(mTDir.checkFileContents("indirectly" SHADOW_ID "/Marvel/Captain American - Steve.mp4", QSet<QString>{JoinShadowFileContent("Marvel/Captain American - Steve.mp4", SHADOW_STATUS::ALREADY_SYNCED)}));
+      QVERIFY(mTDir.checkFileContents("indirectly" SHADOW_ID "/forbes/x-men/wolverine.mp4", QSet<QString>{JoinShadowFileContent("forbes/x-men/wolverine.mp4", SHADOW_STATUS::NO_NEED_SYNC)}));
     }
 
     // 移除无效的影子文件
-    QVERIFY(QFile::exists(mTDir.itemPath("indirectlyShadow/no/After Renamed noCorrespondingVideo.mp4")));
-    QVERIFY(QFile::remove(mTDir.itemPath("indirectlyShadow/no/After Renamed noCorrespondingVideo.mp4")));
-    QVERIFY(!QFile::exists(mTDir.itemPath("indirectlyShadow/no/After Renamed noCorrespondingVideo.mp4")));
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectlyShadow")), (SyncDetails{2, 0, 1, 1, 0, 0}));
+    QVERIFY(QFile::exists(mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")));
+    QVERIFY(QFile::remove(mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")));
+    QVERIFY(!QFile::exists(mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), (SyncDetails{2, 0, 1, 1, 0, 0}));
     {
       // 将已经同步过了的影子文件改到另一个新名字, sync时不会生效
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/Marvel/Captain American - Steve.mp4"), mTDir.itemPath("indirectlyShadow/Marvel/Captain American - Chris Evans.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/Captain American - Steve.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/Captain American - Chris Evans.mp4")));
 
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/forbes/x-men/wolverine.mp4"), mTDir.itemPath("indirectlyShadow/forbes/x-men/Wolverine - Hugh Jackman.mp4")));
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/forbes/x-men"), mTDir.itemPath("indirectlyShadow/forbes/X - MEN")));
-      QVERIFY(QFile::rename(mTDir.itemPath("indirectlyShadow/forbes"), mTDir.itemPath("indirectlyShadow/Forbes")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/forbes/x-men/wolverine.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/forbes/x-men/Wolverine - Hugh Jackman.mp4")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/forbes/x-men"), mTDir.itemPath("indirectly" SHADOW_ID "/forbes/X - MEN")));
+      QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/forbes"), mTDir.itemPath("indirectly" SHADOW_ID "/Forbes")));
 
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
       QVERIFY(bProcedureOk);
@@ -198,7 +208,21 @@ private slots:
       QVERIFY(mTDir.exists("indirectly/Marvel/Captain American - Steve.mp4"));
       QVERIFY(mTDir.exists("indirectly/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
     }
-    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectlyShadow")), (SyncDetails{2, 0, 2, 0, 0, 0}));
+    QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), (SyncDetails{2, 0, 2, 0, 0, 0}));
+  }
+
+  void GetVideoForPlayPath_ok() {
+    // precondition file should exist
+    const QString shadowVidRelPath{"indirectly" SHADOW_ID "/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"};
+    QVERIFY(mTDir.exists(shadowVidRelPath));
+    const QString shadowVidFullPath{mTDir.itemPath(shadowVidRelPath)};
+    const QString vidForPlayPath{mTDir.itemPath("indirectly/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4")};
+    QCOMPARE(GetVideoForPlayPath(shadowVidFullPath), vidForPlayPath);
+
+    const QString notShadowVidRelPath{"indirectly/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"};
+    QVERIFY(mTDir.exists(notShadowVidRelPath));
+    const QString notShadowVidFullPath{mTDir.itemPath(notShadowVidRelPath)};
+    QCOMPARE(GetVideoForPlayPath(notShadowVidFullPath), notShadowVidFullPath);
   }
 
   void onShowStagingStatistics_ok() {
@@ -218,27 +242,29 @@ private slots:
 
     const std::pair<bool, int> alreadySyncReturn{true, 2};
     const std::pair<bool, int> noNeedSyncReturn{true, 0};
-    QVERIFY(mTDir.exists("directlyShadow/Captain American - Chris Evans.mp4"));
-    QVERIFY(mTDir.exists("directlyShadow/X - MEN - Michael Fassbender.mp4"));
-    QCOMPARE(onRecycleAlreadySyncedStagingFile(mTDir.itemPath("directlyShadow")), alreadySyncReturn);
-    QVERIFY(!mTDir.exists("directlyShadow/Captain American - Chris Evans.mp4"));
-    QVERIFY(!mTDir.exists("directlyShadow/X - MEN - Michael Fassbender.mp4"));
-    QCOMPARE(onRecycleNoNeedSyncStagingFile(mTDir.itemPath("directlyShadow")), noNeedSyncReturn);
+    QVERIFY(mTDir.exists("directly" SHADOW_ID "/Captain American - Chris Evans.mp4"));
+    QVERIFY(mTDir.exists("directly" SHADOW_ID "/X - MEN - Michael Fassbender.mp4"));
+    QCOMPARE(onRecycleAlreadySyncedStagingFile(mTDir.itemPath("directly" SHADOW_ID)), alreadySyncReturn);
+    QVERIFY(!mTDir.exists("directly" SHADOW_ID "/Captain American - Chris Evans.mp4"));
+    QVERIFY(!mTDir.exists("directly" SHADOW_ID "/X - MEN - Michael Fassbender.mp4"));
+    QCOMPARE(onRecycleNoNeedSyncStagingFile(mTDir.itemPath("directly" SHADOW_ID)), noNeedSyncReturn);
     QVERIFY(UndoRedo::GetInst().on_Undo());
-    QVERIFY(mTDir.exists("directlyShadow/Captain American - Chris Evans.mp4"));
-    QVERIFY(mTDir.exists("directlyShadow/X - MEN - Michael Fassbender.mp4"));
+    QVERIFY(mTDir.exists("directly" SHADOW_ID "/Captain American - Chris Evans.mp4"));
+    QVERIFY(mTDir.exists("directly" SHADOW_ID "/X - MEN - Michael Fassbender.mp4"));
 
-    QVERIFY(mTDir.exists("indirectlyShadow/Marvel/Captain American - Chris Evans.mp4"));
-    QVERIFY(mTDir.exists("indirectlyShadow/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
-    QCOMPARE(onRecycleAlreadySyncedStagingFile(mTDir.itemPath("indirectlyShadow")), alreadySyncReturn);
-    QVERIFY(!mTDir.exists("indirectlyShadow/Marvel/Captain American - Chris Evans.mp4"));
-    QVERIFY(!mTDir.exists("indirectlyShadow/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
-    QCOMPARE(onRecycleNoNeedSyncStagingFile(mTDir.itemPath("indirectlyShadow")), noNeedSyncReturn);
+    QVERIFY(mTDir.exists("indirectly" SHADOW_ID "/Marvel/Captain American - Chris Evans.mp4"));
+    QVERIFY(mTDir.exists("indirectly" SHADOW_ID "/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
+    QCOMPARE(onRecycleAlreadySyncedStagingFile(mTDir.itemPath("indirectly" SHADOW_ID)), alreadySyncReturn);
+    QVERIFY(!mTDir.exists("indirectly" SHADOW_ID "/Marvel/Captain American - Chris Evans.mp4"));
+    QVERIFY(!mTDir.exists("indirectly" SHADOW_ID "/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
+    QCOMPARE(onRecycleNoNeedSyncStagingFile(mTDir.itemPath("indirectly" SHADOW_ID)), noNeedSyncReturn);
     QVERIFY(UndoRedo::GetInst().on_Undo());
-    QVERIFY(mTDir.exists("indirectlyShadow/Marvel/Captain American - Chris Evans.mp4"));
-    QVERIFY(mTDir.exists("indirectlyShadow/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
+    QVERIFY(mTDir.exists("indirectly" SHADOW_ID "/Marvel/Captain American - Chris Evans.mp4"));
+    QVERIFY(mTDir.exists("indirectly" SHADOW_ID "/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"));
   }
 };
 
+
+#undef SHADOW_ID
 #include "ShadowRenamerTest.moc"
 REGISTER_TEST(ShadowRenamerTest, false)

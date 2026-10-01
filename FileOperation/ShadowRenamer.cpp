@@ -120,9 +120,11 @@ PENDING_SYNC ──────用户改影子──────▶ 路径 != �
 */
 
 bool IsTreatAsShadowFile(const QString& shadowFileFullPath) {
-   // 260 char(s) * 4 bytes each UTF8
-  return QFile{shadowFileFullPath}.size() < 260 * 4;
+  // 260 char(s) * 4 bytes each UTF8
+  // space+an int number
+  return QFile{shadowFileFullPath}.size() < 260 * 4 + 8;
 }
+
 std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPath, const QString &folderFullPathContainsVideosNeedRename) {
   SyncDetails detail;
   QString oldSrcVidFileName; // relative

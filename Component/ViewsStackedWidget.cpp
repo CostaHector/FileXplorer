@@ -9,6 +9,7 @@
 #include "CustomStatusBar.h"
 #include "DataFormatter.h"
 #include "ScenesListModel.h"
+#include "ShadowRenamer.h"
 #include "FileTool.h"
 #include "RelatedHelper.h"
 #include "TagsHelper.h"
@@ -244,6 +245,11 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
       return true;
     } else if (FileTool::IsTorrentFile(absItemPath)) {
       return FileTool::OpenLocalTorrentFile(absItemPath);
+    } else if (TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(absItemPath))) {
+      const QString vidFullPath = ShadowRenamer::GetVideoForPlayPath(absItemPath);
+      if (vidFullPath != absItemPath) {
+        return FileTool::OpenLocalFileUsingDesktopService(vidFullPath);
+      }
     }
   } else if (fi.isDir()) {
     ViewTypeTool::ViewType vt = GetVt();

@@ -4,6 +4,8 @@
 #include <QString>
 class QDir;
 
+#define SHADOW_ID "_SHADOW"
+
 namespace ShadowRenamer {
 bool CheckPathValid(const QString& folderFullPathContainsVideosNeedRename, const QString& shadowPath);
 
@@ -60,16 +62,26 @@ struct SyncDetails {
 std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString& shadowPath, const QString& folderFullPathContainsVideosNeedRename);
 
 inline QString GetStagingFileFolder(const QString& srcPath) {
-  return srcPath + "Shadow";
+  return srcPath + SHADOW_ID;
 }
 inline bool isStagingFileFolder(const QString& shadowPath) {
-  return shadowPath.endsWith("Shadow", Qt::CaseSensitive);
+  return shadowPath.endsWith(SHADOW_ID, Qt::CaseSensitive);
+}
+inline QString GetVideoForPlayPath(QString vidFullPath) {
+  if (!IsTreatAsShadowFile(vidFullPath)) {
+    return vidFullPath;
+  }
+  const int lastIndex = vidFullPath.lastIndexOf(SHADOW_ID "/");
+  if (lastIndex == -1) {
+    return vidFullPath;
+  }
+  return vidFullPath.remove(lastIndex, sizeof(SHADOW_ID) - 1);
 }
 inline std::pair<bool, QString> ChopShadowPostFix(const QString& shadowPath) {
   if (!isStagingFileFolder(shadowPath)) {
     return {false, ""};
   }
-  return {true, shadowPath.left(shadowPath.size() - (sizeof("Shadow") - 1))};
+  return {true, shadowPath.left(shadowPath.size() - (sizeof(SHADOW_ID) - 1))};
 }
 
 int onCreateStagingFile(const QString& srcPath);
@@ -83,4 +95,6 @@ std::pair<bool, int> onRecycleNoNeedSyncStagingFile(const QString& shadowPath);
 std::pair<bool, int> onRecycleAlreadySyncedStagingFile(const QString& shadowPath);
 };
 
+
+#undef SHADOW_ID
 #endif // SHADOWRENAMER_H
