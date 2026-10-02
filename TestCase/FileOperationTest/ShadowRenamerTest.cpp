@@ -81,6 +81,14 @@ private slots:
       QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/captain american.mp4"), mTDir.itemPath("directly" SHADOW_ID "/Captain American - Steve.mp4")));
       QVERIFY(QFile::rename(mTDir.itemPath("directly" SHADOW_ID "/noCorrespondingVideo.mp4"), mTDir.itemPath("directly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")));
 
+      // GetVideoForPlayPath NO_NEED_SYNC PENDING_SYNC: ok
+      // 影子文件改名后, 未SyncBack同步, 要能正确获得对应的原文件
+      {
+        QCOMPARE(GetVideoForPlayPath(mTDir.itemPath("directly" SHADOW_ID "/Captain American - Steve.mp4")),
+                                     mTDir.itemPath("directly/captain american.mp4"));
+      }
+
+
       // 反向同步时, 1.更新video文件名, 2.更新shadow文件内容中的source和status两个部分
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
       QVERIFY(bProcedureOk);
@@ -91,6 +99,10 @@ private slots:
       QCOMPARE(detail.noCorrespondingCnt, 1);
       QCOMPARE(detail.newSyncedCnt, 1);
       QVERIFY(!detail.isFinished());
+      // GetVideoForPlayPath NO_CORRESPOND_FILE: itself
+      QCOMPARE(GetVideoForPlayPath(mTDir.itemPath("indirectly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4")),
+                                   mTDir.itemPath("indirectly" SHADOW_ID "/After Renamed noCorrespondingVideo.mp4"));
+
       const SyncDetails expectRet{3, 0, 1, 1, 1, 0};
       QCOMPARE(onShowStagingStatistics(mTDir.itemPath("directly" SHADOW_ID)), expectRet);
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder); // do it again
@@ -158,6 +170,13 @@ private slots:
       QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/captain american.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/Captain American - Steve.mp4")));
       QVERIFY(QFile::rename(mTDir.itemPath("indirectly" SHADOW_ID "/no/noCorrespondingVideo.mp4"), mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")));
 
+      // GetVideoForPlayPath NO_NEED_SYNC PENDING_SYNC: ok
+      // 影子文件改名后, 未SyncBack同步, 要能正确获得对应的原文件
+      {
+        QCOMPARE(GetVideoForPlayPath(mTDir.itemPath("indirectly" SHADOW_ID "/Marvel/Captain American - Steve.mp4")),
+                                     mTDir.itemPath("indirectly/Marvel/captain american.mp4"));
+      }
+
       // 反向同步时, 1.更新video文件名, 2.更新shadow文件内容中的source和status两个部分
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder);
       QVERIFY(bProcedureOk);
@@ -168,6 +187,11 @@ private slots:
       QCOMPARE(detail.noCorrespondingCnt, 1);
       QCOMPARE(detail.newSyncedCnt, 1);
       QVERIFY(!detail.isFinished());
+
+      // GetVideoForPlayPath NO_CORRESPOND_FILE: itself
+      QCOMPARE(GetVideoForPlayPath(mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4")),
+                                   mTDir.itemPath("indirectly" SHADOW_ID "/no/After Renamed noCorrespondingVideo.mp4"));
+
       const SyncDetails expectRet{3, 0, 1, 1, 1, 0};
       QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), expectRet);
       std::tie(bProcedureOk, detail) = ShadowRenamer::SyncSourceFileByShadowFile(shadowFolder, sourceFolder); // do it again
@@ -211,8 +235,9 @@ private slots:
     QCOMPARE(onShowStagingStatistics(mTDir.itemPath("indirectly" SHADOW_ID)), (SyncDetails{2, 0, 2, 0, 0, 0}));
   }
 
-  void GetVideoForPlayPath_ok() {
+  void GetVideoForPlayPath_for_ALREADY_SYNCED_ok() {
     // precondition file should exist
+    // GetVideoForPlayPath ALREADY_SYNCED ok
     const QString shadowVidRelPath{"indirectly" SHADOW_ID "/Forbes/X - MEN/Wolverine - Hugh Jackman.mp4"};
     QVERIFY(mTDir.exists(shadowVidRelPath));
     const QString shadowVidFullPath{mTDir.itemPath(shadowVidRelPath)};
