@@ -648,16 +648,16 @@ void FileXplorerEvent::subscribe() {
 }
 
 struct AutoSwitchPath {
-  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath)//
-    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && fsm != nullptr && filesCnt > 100},
+  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath, bool bForceRefresh = false)//
+    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && (filesCnt > 100 || bForceRefresh)},
     mFsm{fsm},
     mRootPath{recoverPath}  {
-    if (mIsNeedSwitchAway) {
+    if (mFsm != nullptr && mIsNeedSwitchAway) {
       mFsm->setRootPath("");
     }
   }
   ~AutoSwitchPath() {
-    if (mIsNeedSwitchAway && mFsm != nullptr) {
+    if (mFsm != nullptr && mIsNeedSwitchAway) {
       mFsm->setRootPath(mRootPath);
     }
   }
@@ -684,8 +684,7 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
   }
-
-  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath};
+  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath, renameWid.isCaseChangedOnly()};
   renameWid.init();
   renameWid.setModal(true);
   renameWid.InitTextEditContent(currentPath, preNames);
@@ -762,17 +761,9 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
 }
 
 bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
-  if (!_contentPane->IsCurFSView()) {
-    LOG_WARN_NP("[Skip] Refresh", _contentPane->GetCurViewName());
-    return false;
-  }
-  QAbstractItemView* fsView = _contentPane->GetCurView();
-  CHECK_NULLPTR_RETURN_FALSE(fsView)
-
-  const QString& path = _fileSysModel->rootPath();
-  _fileSysModel->setRootPath("");
-  fsView->setRootIndex(_fileSysModel->setRootPath(path));
-  LOG_OK_NP("Refresh filesytemmodel of path: ", path);
+  const auto vt = _contentPane->GetVt();
+  const QString currentPath = _contentPane->getRootPath();
+  AutoSwitchPath asp{vt, _fileSysModel, 0, currentPath, true};
   return true;
 }
 
