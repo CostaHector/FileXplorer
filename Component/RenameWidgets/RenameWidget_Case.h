@@ -9,7 +9,7 @@ class RenameWidget_Case : public AdvanceRenamer {
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
-
+  bool isCaseChangedOnly() const override { return true; }
   QStringList RenameCore(const QStringList& replaceeList) override;
 };
 

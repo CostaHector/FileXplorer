@@ -2,7 +2,6 @@
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "PathTool.h"
-#include "PublicVariable.h"
 #include "FileTool.h"
 #include "Logger.h"
 #include <QFileInfo>
@@ -72,7 +71,7 @@ int CreateShadowFileUsingNameAsContent(const QString &folderFullPathContainsVide
   }
   int shadowFilesCnt{0};
   const int prePathLen = folderFullPathContainsVideosNeedRename.size() + 1;
-  QDirIterator it{folderFullPathContainsVideosNeedRename, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{folderFullPathContainsVideosNeedRename, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   QDir shadowPathDir{shadowPath};
   while (it.hasNext()) {
     const QString fileFullPath = it.next();
@@ -120,17 +119,50 @@ PENDING_SYNC ──────用户改影子──────▶ 路径 != �
 */
 
 bool IsTreatAsShadowFile(const QString& shadowFileFullPath) {
-   // 260 char(s) * 4 bytes each UTF8
-  return QFile{shadowFileFullPath}.size() < 260 * 4;
+  // 260 char(s) * 4 bytes each UTF8
+  // space+an int number
+  return QFile{shadowFileFullPath}.size() < 260 * 4 + 8;
 }
+
+QString GetVideoForPlayPath(const QString& vidFullPath) {
+  if (!IsTreatAsShadowFile(vidFullPath)) {
+    return vidFullPath;
+  }
+  if (vidFullPath.endsWith(".json", Qt::CaseInsensitive)) {
+    return vidFullPath;
+  }
+  // vidFullPath 可能是生成的影子文件, 但是已经对影子文件重命名过
+  bool bReadOk{false};
+  const QString oldRel2VidPathAndStatusStr = FileTool::StringTextReader(vidFullPath, &bReadOk);
+  QString oldRel2VidPath; // relative
+  SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
+  std::tie(oldRel2VidPath, shadowFileStatus) = ParseShadowFileContent(oldRel2VidPathAndStatusStr);
+  if (!bReadOk || oldRel2VidPath.isEmpty() || shadowFileStatus == SHADOW_STATUS::NO_CORRESPOND_FILE) {
+    return vidFullPath;
+  }
+#define SHADOW_ID "_SHADOW"
+  const int lastIndex = vidFullPath.lastIndexOf(SHADOW_ID "/");
+  if (lastIndex == -1) {
+    return vidFullPath;
+  }
+  if (shadowFileStatus == SHADOW_STATUS::ALREADY_SYNCED) {
+    // "a_Shadow/file.mp4"
+    // "a/file.mp4" left(lastIndex) + mid(lastIndex+7)
+    return vidFullPath.left(lastIndex) + vidFullPath.mid(lastIndex + (sizeof(SHADOW_ID) - 1));
+  }
+#undef SHADOW_ID
+  // SHADOW_STATUS::PENDING_SYNC or SHADOW_STATUS::NO_NEED_SYNC
+  return vidFullPath.left(lastIndex) + '/' + oldRel2VidPath;
+}
+
 std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPath, const QString &folderFullPathContainsVideosNeedRename) {
   SyncDetails detail;
-  QString oldSrcVidFileName; // relative
+  QString oldRel2VidPath; // relative
   SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
 
   QDir oldPathDir{folderFullPathContainsVideosNeedRename};
   const int prePathLen = shadowPath.size() + 1;
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     bool bReadOk{false};
@@ -138,14 +170,14 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
       LOG_W("File is not shadow[%s]", qPrintable(shadowFileFullPath));
       continue;
     }
-    const QString oldContentAlsoFileName = FileTool::StringTextReader(shadowFileFullPath, &bReadOk);
+    const QString oldRel2VidPathAndStatusStr = FileTool::StringTextReader(shadowFileFullPath, &bReadOk);
     if (!bReadOk) {
       LOG_W("Shadow file[%s] read failed", qPrintable(shadowFileFullPath));
       return {false, detail};
     }
-    std::tie(oldSrcVidFileName, shadowFileStatus) = ParseShadowFileContent(oldContentAlsoFileName);
-    if (oldSrcVidFileName.isEmpty()) {
-      LOG_W("Shadow file[%s] content[%s] is broken", qPrintable(shadowFileFullPath), qPrintable(oldContentAlsoFileName));
+    std::tie(oldRel2VidPath, shadowFileStatus) = ParseShadowFileContent(oldRel2VidPathAndStatusStr);
+    if (oldRel2VidPath.isEmpty()) {
+      LOG_W("Shadow file[%s] content[%s] is broken", qPrintable(shadowFileFullPath), qPrintable(oldRel2VidPathAndStatusStr));
       return {false, detail};
     }
     ++detail.shadowFilesCnt;
@@ -155,12 +187,12 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
     }
     QString newContentAlsoFileName;
     const QString newSrcVidFileName = shadowFileFullPath.mid(prePathLen);
-    if (newSrcVidFileName == oldSrcVidFileName) {
+    if (newSrcVidFileName == oldRel2VidPath) {
       // 影子文件所在的相对路径 和 内容路径部分一致 ->原文件名称无需同步
-      newContentAlsoFileName = JoinShadowFileContent(oldSrcVidFileName, SHADOW_STATUS::NO_NEED_SYNC);
+      newContentAlsoFileName = JoinShadowFileContent(oldRel2VidPath, SHADOW_STATUS::NO_NEED_SYNC);
       ++detail.noNeedSyncCnt;
     } else {
-      const QString oldSrcVidFileFullPath = PathTool::Path2Join(folderFullPathContainsVideosNeedRename, oldSrcVidFileName);
+      const QString oldSrcVidFileFullPath = PathTool::Path2Join(folderFullPathContainsVideosNeedRename, oldRel2VidPath);
       const QString newSrcVidFileFullPath = PathTool::Path2Join(folderFullPathContainsVideosNeedRename, newSrcVidFileName);
       const bool bOldSrcExists = QFileInfo(oldSrcVidFileFullPath).isFile();
       const bool bNewSrcExists = QFileInfo(newSrcVidFileFullPath).isFile();
@@ -173,7 +205,7 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
       } else if (!bOldSrcExists && !bNewSrcExists) {
         // 旧文件和新文件都不存在->源文件丢失。
         LOG_W("No source video correspond to shadow file[%s]", qPrintable(oldSrcVidFileFullPath));
-        newContentAlsoFileName = JoinShadowFileContent(oldSrcVidFileName, SHADOW_STATUS::NO_CORRESPOND_FILE);
+        newContentAlsoFileName = JoinShadowFileContent(oldRel2VidPath, SHADOW_STATUS::NO_CORRESPOND_FILE);
         ++detail.noCorrespondingCnt;
       } else {
         // 准备前置路径 同步原文件名称和路径结构为影子文件名称和路径结构
@@ -186,12 +218,12 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
           ++detail.newSyncedCnt;
         } else {
           ++detail.pendingSyncCnt;
-          newContentAlsoFileName = JoinShadowFileContent(oldSrcVidFileName, SHADOW_STATUS::PENDING_SYNC);
+          newContentAlsoFileName = JoinShadowFileContent(oldRel2VidPath, SHADOW_STATUS::PENDING_SYNC);
           LOG_W("Rename Src video file[%s->%s] failed", qPrintable(oldSrcVidFileFullPath), qPrintable(newSrcVidFileFullPath));
         }
       }
     }
-    if (newContentAlsoFileName == oldContentAlsoFileName) {
+    if (newContentAlsoFileName == oldRel2VidPathAndStatusStr) {
       continue;
     }
     if (!FileTool::StringTextWriter(shadowFileFullPath, newContentAlsoFileName, QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text)) {
@@ -212,19 +244,23 @@ int onCreateStagingFile(const QString& srcPath) {
   return CreateShadowFileUsingNameAsContent(srcPath, stagingFolder);
 }
 
-SyncDetails onShowStagingStatistics(const QString& shadowPath) {
+SyncDetails onShowStagingStatistics(const QString& shadowPath, QMap<QString, QStringList>* pTitle2Items) {
   if (!isStagingFileFolder(shadowPath)) {
     LOG_W("Path[%s] not match shadow pattern", qPrintable(shadowPath));
-    return SyncDetails{};
+    return {};
   }
-  QStringList pendingSyncList, alreadySyncedList, noNeedSyncList, noCorrespondList;
   int parsedCount{0};
 
-  QString oldSrcVidFileName; // relative
+  QString oldRel2VidPath; // relative
   SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
 
+  QStringList pendingSyncList;
+  QStringList alreadySyncedList;
+  QStringList noNeedSyncList;
+  QStringList noCorrespondList;
+
   const int prePathLen = shadowPath.size() + 1;
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
@@ -237,23 +273,23 @@ SyncDetails onShowStagingStatistics(const QString& shadowPath) {
       LOG_W("Shadow file [%s] read failed", qPrintable(shadowFileFullPath));
       continue;
     }
-    std::tie(oldSrcVidFileName, shadowFileStatus) = ParseShadowFileContent(content);
-    if (oldSrcVidFileName.isEmpty()) {
+    std::tie(oldRel2VidPath, shadowFileStatus) = ParseShadowFileContent(content);
+    if (oldRel2VidPath.isEmpty()) {
       LOG_W("Shadow file [%s] content [%s] is broken", qPrintable(shadowFileFullPath), qPrintable(content));
       continue;
     }
     ++parsedCount;
     // relativePath2ShadowFile \t FileContent
-    const QString new2Old = shadowFileFullPath.mid(prePathLen) + '\t' + oldSrcVidFileName;
+    const QString new2Old = shadowFileFullPath.mid(prePathLen) + '\t' + oldRel2VidPath;
     switch (shadowFileStatus) {
       case SHADOW_STATUS::PENDING_SYNC:
-        pendingSyncList.append(new2Old);
+        pendingSyncList.append(oldRel2VidPath);
         break;
       case SHADOW_STATUS::ALREADY_SYNCED:
         alreadySyncedList.append(new2Old);
         break;
       case SHADOW_STATUS::NO_NEED_SYNC:
-        noNeedSyncList.append(new2Old);
+        noNeedSyncList.append(oldRel2VidPath);
         break;
       case SHADOW_STATUS::NO_CORRESPOND_FILE:
         noCorrespondList.append(new2Old);
@@ -263,32 +299,25 @@ SyncDetails onShowStagingStatistics(const QString& shadowPath) {
         break;
     }
   }
-  QString logStr;
-  logStr += '\n';
-  logStr += QString("[PENDING_SYNC] %1 file(s) as follows:\n").arg(pendingSyncList.size());
-  logStr += pendingSyncList.join('\n');
-  logStr += '\n';
-  logStr += QString("[ALREADY_SYNCED] %1 file(s) as follows:\n").arg(alreadySyncedList.size());
-  logStr += alreadySyncedList.join('\n');
-  logStr += '\n';
-  logStr += QString("[NO_NEED_SYNC] %1 file(s) as follows:\n").arg(noNeedSyncList.size());
-  logStr += noNeedSyncList.join('\n');
-  logStr += '\n';
-  logStr += QString("[NO_CORRESPOND_FILE] %1 file(s) as follows:\n").arg(noCorrespondList.size());
-  logStr += noCorrespondList.join('\n');
-  logStr += '\n';
-  LOG_W("%s", qPrintable(logStr));
-  return SyncDetails{parsedCount, pendingSyncList.size(), alreadySyncedList.size(), noNeedSyncList.size(), noCorrespondList.size(), 0};
+  const SyncDetails ret{parsedCount, pendingSyncList.size(), alreadySyncedList.size(), noNeedSyncList.size(), noCorrespondList.size(), 0};
+  LOG_W("%s", qPrintable(ret.logStr()));
+  if (pTitle2Items != nullptr) {
+    (*pTitle2Items)["PENDING_SYNC"] = std::move(pendingSyncList);
+    (*pTitle2Items)["ALREADY_SYNCED"] = std::move(alreadySyncedList);
+    (*pTitle2Items)["NO_NEED_SYNC"] = std::move(noNeedSyncList);
+    (*pTitle2Items)["NO_CORRESPOND_FILE"] = std::move(noCorrespondList);
+  }
+  return ret;
 }
 
 std::pair<bool, int> recycleStagingFileWithGivenStatus(const QString& shadowPath, int removeStatusBits) {
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE recycleCmds;
 
-  QString oldSrcVidFileName; // relative
+  QString oldRel2VidPath; // relative
   SHADOW_STATUS shadowFileStatus{SHADOW_STATUS::NO_CORRESPOND_FILE};
 
-  QDirIterator it{shadowPath, TYPE_FILTER::VIDEO_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
+  QDirIterator it{shadowPath, {}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
@@ -302,8 +331,8 @@ std::pair<bool, int> recycleStagingFileWithGivenStatus(const QString& shadowPath
       continue;
     }
 
-    std::tie(oldSrcVidFileName, shadowFileStatus) = ParseShadowFileContent(content);
-    if (oldSrcVidFileName.isEmpty()) {
+    std::tie(oldRel2VidPath, shadowFileStatus) = ParseShadowFileContent(content);
+    if (oldRel2VidPath.isEmpty()) {
       LOG_W("Shadow file[%s] content[%s] is broken", qPrintable(shadowFileFullPath), qPrintable(content));
       continue;
     }

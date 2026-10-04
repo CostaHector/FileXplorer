@@ -36,6 +36,7 @@ class AdvanceRenamer : public QDialog {
   void onIncludingSub(int includingSubState);
   void onNameExtRespective(int bStateIndependent);
 
+  virtual bool isCaseChangedOnly() const { return false; }
   virtual void FilterNames(FileOsWalker& /*walker*/) const {}
   void UpdateNameAndExt();
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);

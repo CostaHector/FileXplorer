@@ -2378,6 +2378,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <source>Recycle No-Sync-Needed Staging Files</source>
         <translation>回收无需变更</translation>
     </message>
+    <message>
+        <location line="+6"/>
+        <source>Double-Click Opens Original</source>
+        <translation>双击打开源文件</translation>
+    </message>
 </context>
 <context>
     <name>StyleSheetTreeView</name>

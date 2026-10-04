@@ -201,12 +201,12 @@ void AdvanceRenamer::Subscribe() {
 }
 
 bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
-  const QStringList& relNameList = m_relNameTE->toPlainText().split(NAME_SEP);
-  const QStringList& oldCompleteNameList = m_oBaseTE->toPlainText().split(NAME_SEP);
-  const QStringList& oldSuffixList = m_oExtTE->toPlainText().split(NAME_SEP);
+  const QStringList relNameList = m_relNameTE->toPlainText().split(NAME_SEP);
+  const QStringList oldCompleteNameList = m_oBaseTE->toPlainText().split(NAME_SEP);
+  const QStringList oldSuffixList = m_oExtTE->toPlainText().split(NAME_SEP);
 
-  const QStringList& newCompleteNameList = m_nBaseTE->toPlainText().split(NAME_SEP);
-  const QStringList& newSuffixList = m_nExtTE->toPlainText().split(NAME_SEP);
+  const QStringList newCompleteNameList = m_nBaseTE->toPlainText().split(NAME_SEP);
+  const QStringList newSuffixList = m_nExtTE->toPlainText().split(NAME_SEP);
 
   RenameNamesUnique renameHelper{mWorkPath, relNameList, oldCompleteNameList, oldSuffixList, newCompleteNameList, newSuffixList, m_recursiveCB->isChecked()};
   renameHelper();
@@ -217,10 +217,10 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
   }
   // rename files first, than its folders;
   using namespace FileOperatorType;
-  const BATCH_COMMAND_LIST_TYPE& reversedcmds(renameHelper.getRenameCommands());
+  const BATCH_COMMAND_LIST_TYPE& renameCmds(renameHelper.getRenameCommands());
   if (isOnlyHelp) {
     QString cmds;
-    for (const ACMD& cmd : reversedcmds) {
+    for (const ACMD& cmd : renameCmds) {
       cmds += cmd.toStr();
       cmds += '\n';
     }
@@ -228,11 +228,11 @@ bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
     return true;
   }
   emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(reversedcmds)) {
+  if (!UndoRedo::GetInst().Do(renameCmds)) {
     LOG_ERR_NP("Batch commands partially failed", "See details in log");
     return false;
   }
-  LOG_OK_P("[Ok]Batch commands rename", "Commands count %d", reversedcmds.size());
+  LOG_OK_P("[Ok]Batch commands rename", "Commands count %d", renameCmds.size());
   return true;
 }
 

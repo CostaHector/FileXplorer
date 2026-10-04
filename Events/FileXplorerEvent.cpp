@@ -65,6 +65,7 @@
 
 #include "ShadowRenamer.h"
 #include "ShadowRenamerActions.h"
+#include "StagingStatisticsDialog.h"
 
 #include <QApplication>
 #include <QInputDialog>
@@ -553,7 +554,7 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst.SELECT_INVERT, &QAction::triggered, this, &FileXplorerEvent::on_SelectInvert);
 
     connect(fileOpInst._LONG_PATH_FINDER, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_LongPath pToLongPath{_contentPane};
+      RenameWidget_LongPath pToLongPath;
       on_Rename(pToLongPath);
     });
   }
@@ -574,47 +575,47 @@ void FileXplorerEvent::subscribe() {
   {
     auto& renameInst = g_renameAg();
     connect(renameInst._NUMERIZER, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Numerize pNumerize{_contentPane};
+      RenameWidget_Numerize pNumerize;
       on_Rename(pNumerize);
     });
     connect(renameInst._SECTIONS_ARRANGE, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_ArrangeSection pArrange{_contentPane};
+      RenameWidget_ArrangeSection pArrange;
       on_Rename(pArrange);
     });
     connect(renameInst._REVERSE_NAMES_LIST, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_SwapFileNames pReverse{_contentPane};
+      RenameWidget_SwapFileNames pReverse;
       on_Rename(pReverse);
     });
     connect(renameInst._CASE_NAME, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Case pCase{_contentPane};
+      RenameWidget_Case pCase;
       on_Rename(pCase);
     });
     connect(renameInst._STR_INSERTER, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Insert pInsert{_contentPane};
+      RenameWidget_Insert pInsert;
       on_Rename(pInsert);
     });
     connect(renameInst._STR_DELETER, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Delete pDelete{_contentPane};
+      RenameWidget_Delete pDelete;
       on_Rename(pDelete);
     });
     connect(renameInst._STR_REPLACER, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Replace pReplacer{_contentPane};
+      RenameWidget_Replace pReplacer;
       on_Rename(pReplacer);
     });
     connect(renameInst._CONTINUOUS_NUMBERING, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_ConsecutiveFileNo pNoConsecutive{_contentPane};
+      RenameWidget_ConsecutiveFileNo pNoConsecutive;
       on_Rename(pNoConsecutive);
     });
     connect(renameInst._CONVERT_UNICODE_TO_ASCII, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_ConvertBoldUnicodeCharset2Ascii pToAscii{_contentPane};
+      RenameWidget_ConvertBoldUnicodeCharset2Ascii pToAscii;
       on_Rename(pToAscii);
     });
     connect(renameInst._PREPEND_PARENT_FOLDER_NAMES, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_PrependParentFolderName pPrependName{_contentPane};
+      RenameWidget_PrependParentFolderName pPrependName;
       on_Rename(pPrependName);
     });
     connect(renameInst._DIGIT_CHAR_REPLACE_TO_ALPHA, &QAction::triggered, this, [this]() -> void {
-      RenameWidget_Digit2Alpha pDigitReplacedByAlpha{_contentPane};
+      RenameWidget_Digit2Alpha pDigitReplacedByAlpha;
       on_Rename(pDigitReplacedByAlpha);
     });
   }
@@ -647,16 +648,16 @@ void FileXplorerEvent::subscribe() {
 }
 
 struct AutoSwitchPath {
-  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath)//
-    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && fsm != nullptr && filesCnt > 100},
+  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath, bool bForceRefresh = false)//
+    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && (filesCnt > 100 || bForceRefresh)},
     mFsm{fsm},
     mRootPath{recoverPath}  {
-    if (mIsNeedSwitchAway) {
+    if (mFsm != nullptr && mIsNeedSwitchAway) {
       mFsm->setRootPath("");
     }
   }
   ~AutoSwitchPath() {
-    if (mIsNeedSwitchAway && mFsm != nullptr) {
+    if (mFsm != nullptr && mIsNeedSwitchAway) {
       mFsm->setRootPath(mRootPath);
     }
   }
@@ -683,8 +684,7 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
   }
-
-  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath};
+  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath, renameWid.isCaseChangedOnly()};
   renameWid.init();
   renameWid.setModal(true);
   renameWid.InitTextEditContent(currentPath, preNames);
@@ -761,17 +761,9 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
 }
 
 bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
-  if (!_contentPane->IsCurFSView()) {
-    LOG_WARN_NP("[Skip] Refresh", _contentPane->GetCurViewName());
-    return false;
-  }
-  QAbstractItemView* fsView = _contentPane->GetCurView();
-  CHECK_NULLPTR_RETURN_FALSE(fsView)
-
-  const QString& path = _fileSysModel->rootPath();
-  _fileSysModel->setRootPath("");
-  fsView->setRootIndex(_fileSysModel->setRootPath(path));
-  LOG_OK_NP("Refresh filesytemmodel of path: ", path);
+  const auto vt = _contentPane->GetVt();
+  const QString currentPath = _contentPane->getRootPath();
+  AutoSwitchPath asp{vt, _fileSysModel, 0, currentPath, true};
   return true;
 }
 
@@ -1486,8 +1478,12 @@ bool FileXplorerEvent::on_shadowRenamerActionsShadowPath() {
   }
   const auto& inst = ShadowRenamerActions::GetInst();
   if (action == inst.SHOW_STAGING_STATISTICS) {
-    const SyncDetails showStatistics = onShowStagingStatistics(shadowPath);
+    QMap<QString, QStringList> title2Items;
+    const SyncDetails showStatistics = onShowStagingStatistics(shadowPath, &title2Items);
     LOG_OK_NP("See Statistics in log", showStatistics.logStr());
+    StagingStatisticsDialog dlg{std::move(title2Items), nullptr};
+    dlg.setModal(true);
+    dlg.exec();
     return true;
   }
 
