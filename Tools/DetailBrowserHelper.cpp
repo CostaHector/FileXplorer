@@ -26,7 +26,7 @@ QString GetCopyLineHref(const QString& base64UrlPath) {
 }
 
 QString GetClearClipboardHref() {
-  return QString{R"(<a href="%1">clr</a>)"}.arg(UrlAnchorTemplate::CLEAR_CLIPBOARD_URL);
+  return QString{R"(<a href="%1">clear</a>)"}.arg(UrlAnchorTemplate::CLEAR_CLIPBOARD_URL);
 }
 
 bool AppendSqlRecordToClipboard(const QString& base64UrlPath) {
@@ -80,6 +80,7 @@ QString GetSearchResultParagraphDisplay(const QString& whereText) {
     copiedContent += record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::SampleMD5).value().toString();
     const QString base64UrlPath = DetailBrowserHelper::ToBase64Url(copiedContent);
 
+    // Copy/erase need/rename need/deduplicate need
     searchResult += "<tr>";
     searchResult += QString{"<td>%1</td>"}.arg(DetailBrowserHelper::GetCopyLineHref(base64UrlPath));
     searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong()));

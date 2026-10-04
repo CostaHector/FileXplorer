@@ -114,28 +114,27 @@ void SceneListView::subscribe() {
 }
 
 void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
+  const SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
+  if (!_sceneSortProxyModel->isSortProxyInited()) {
+    const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
+    const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
+    _sceneSortProxyModel->initSortSetting(initSortRole, bOrderReverse);
+  }
+  if (!_sceneModel->isSortProxyInited()) {
+    const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
+    const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
+    _sceneModel->initSortSetting(initSortRole, bOrderReverse);
+  }
   if (mSortRoleConn) {
     SceneInPageActions::disconnect(mSortRoleConn);
   }
   if (mSortOrderReverseConn) {
     SceneInPageActions::disconnect(mSortOrderReverseConn);
   }
-
-  const SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
   if (bPageByPage) { // locally
-    if (!_sceneSortProxyModel->isSortProxyInited()) {
-      const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
-      const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
-      _sceneSortProxyModel->initSortSetting(initSortRole, bOrderReverse);
-    }
     mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortRole);
     mSortOrderReverseConn = connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneSortProxyModel, &SceneSortProxyModel::setSortOrder);
   } else { // globally
-    if (!_sceneModel->isSortProxyInited()) {
-      const SceneInfo::Role initSortRole{sceneActInst.GetSortRole()};
-      const bool bOrderReverse{sceneActInst.GetSortOrderReverse()};
-      _sceneModel->initSortSetting(initSortRole, bOrderReverse);
-    }
     mSortRoleConn = connect(&sceneActInst, &SceneInPageActions::sceneSortDimensionChanged, _sceneModel, &ScenesListModel::setSortDimension);
     mSortOrderReverseConn = connect(&sceneActInst, &SceneInPageActions::sceneSortReverseOrderChanged, _sceneModel, &ScenesListModel::setSortResultReverse);
   }
