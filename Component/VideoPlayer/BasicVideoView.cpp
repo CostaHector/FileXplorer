@@ -52,7 +52,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mLeftLayout = new (std::nothrow) QVBoxLayout{this};
   mLeftLayout->addWidget(mVideoWidget);
   mLeftLayout->addWidget(mFunctionCtrlBar);
-  mLeftLayout->setContentsMargins(0, 0, 0, 0);
+  mLeftLayout->setContentsMargins(2, 0, 0, 0);
 
   subscribe();
   setWindowIcon(QIcon{":/VideoPlayer/VIDEO_PLAYER_BASIC"});
@@ -137,7 +137,7 @@ void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
 }
 
 bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly) {
-  if (!QFile::exists(filePath)) {
+  if (!QFileInfo(filePath).isFile()) {
     mCurrentPlayingMediaPath = "";
     setWindowTitle("");
     return false;
@@ -191,7 +191,7 @@ bool BasicVideoView::registerFullScreenToggleCallback(TFuncFullScreenToggleCallb
 
 bool BasicVideoView::rateCurrentVideo(int score) const {
   const QString curMedia = GetCurrentPlayingMediaPath();
-  if (!QFile::exists(curMedia)) {
+  if (!QFileInfo(curMedia).isFile()) {
     LOG_WARN_P("Cannot rate", "Media file[%s] not exist", qPrintable(curMedia));
     return false;
   }
@@ -338,7 +338,7 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
   } else {
     if (mPlayer->media().isNull()) {
       const QString pth = GetCurrentPlayingMediaPath();
-      if (!QFile::exists(pth)) {
+      if (!QFileInfo(pth).isFile()) {
         mOperationStatusLbl->setAutoHideText("Media inexist");
         return;
       }
