@@ -249,6 +249,11 @@ class NameToolTest : public PlainTestSuite {
     QCOMPARE(NameTool::ComposeNameWithinLimit("Marvel", QStringList{"Chris Evans","Chris Hemsworth"}, 30),
              "Marvel - Chris Evans, etc");
   }
+
+  void SanitizeFileName_ok() {
+    QCOMPARE(NameTool::SanitizeFileName("551839?w=640&tc=700.jpg"), "551839 w=640&tc=700.jpg");
+  }
+
  private:
   NameTool m_nameTool;
 };

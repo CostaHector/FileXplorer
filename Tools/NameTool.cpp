@@ -22,6 +22,11 @@ constexpr char NameTool::CELL_NEW_LINE;
 constexpr char NameTool::CSV_COMMA;
 const QRegularExpression NameTool::CAST_STR_SPLITTER{R"( & |&|\s*,\s*|\r\n|\n| and | fucks | fuck )", QRegularExpression::PatternOption::CaseInsensitiveOption};
 
+QString NameTool::SanitizeFileName(QString rawName) {
+  static const QRegularExpression reg{QString("[%1]").arg(QRegularExpression::escape(INVALID_CHARS))};
+  return rawName.replace(reg, " ");
+}
+
 QStringList NameTool::operator()(const QString& s) const {
   QStringList ans;
   foreach (QString nm, s.split(NameTool::FS_COMP)) {
