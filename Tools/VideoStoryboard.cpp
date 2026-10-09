@@ -106,19 +106,25 @@ bool VideoStoryboard::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) 
 
 bool VideoStoryboard::RenameVideoSourceFrameSavedByPotPlayer(const QString& path) const {
   // xxxx.mp4_20260818_155313.075.jpg
-  static constexpr const char SOURCE_FRAME_FORMAT_EXAMPLE[]{"_20260818_155313.075.jpg"};
-  static constexpr int SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof(SOURCE_FRAME_FORMAT_EXAMPLE)/sizeof(*SOURCE_FRAME_FORMAT_EXAMPLE) - 1};
-  const static QRegularExpression SOURCE_FRAME_NAME_PATTERN(R"(_\d{8}_\d{6}\.\d{3}\.jpg$)");
+  static constexpr int POT_PLAYER_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof("_20260818_155313.075.jpg") - 1};
+  const static QRegularExpression POT_PLAYER_SOURCE_FRAME_NAME_PATTERN(R"(_\d{8}_\d{6}\.\d{3}\.jpg$)");
+
+  static constexpr int BUILT_IN_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof("_010203.567.jpg") - 1};
+  const static QRegularExpression BUILT_IN_SOURCE_FRAME_NAME_PATTERN(R"(_\d{6}\.\d{3}\.jpg$)");
 
   QHash<QString, QStringList> sourceFrames;
   QDirIterator it{path, {"*.jpg"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     QString srcFrameImgName = it.fileName();
-    if (!SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
+    QString srcFrameVidName;
+    if (POT_PLAYER_SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
+      srcFrameVidName = srcFrameImgName.chopped(POT_PLAYER_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
+    } else if (BUILT_IN_SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
+      srcFrameVidName = srcFrameImgName.chopped(BUILT_IN_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
+    } else {
       continue;
     }
-    QString srcFrameVidName = srcFrameImgName.chopped(SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
     QString vidNameWithoutExtension = PathTool::GetBaseName(srcFrameVidName);
     sourceFrames[vidNameWithoutExtension].push_back(it.filePath());
   }

@@ -321,13 +321,13 @@ void BasicVideoView::onStopPlaying() {
 }
 
 bool BasicVideoView::onGrabCurrentFrame() {
-  int positionInSecond = mPlayer->position() / 1000;
-  if (positionInSecond < 0) {
+  int positionInMS = mPlayer->position();
+  if (positionInMS < 0) {
     return false;
   }
-  const int cnt = ImageTool::GrabFramesFromVideos({mCurrentPlayingMediaPath}, positionInSecond, ImageTool::DEFAULT_INTERVAL_SECOND, 1, false);
+  const int cnt = ImageTool::GrabFramesFromVideos({mCurrentPlayingMediaPath}, positionInMS, ImageTool::DEFAULT_INTERVAL_SECOND, 1, false);
   const bool bSucceed{cnt > 0};
-  LOG_OE_P(bSucceed, "Grab frame", "At position %d(s)\n%s", positionInSecond, qPrintable(mCurrentPlayingMediaPath));
+  LOG_OE_P(bSucceed, "Grab frame", "At position %d(s)\n%s", positionInMS, qPrintable(mCurrentPlayingMediaPath));
   return bSucceed;
 }
 
