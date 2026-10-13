@@ -50,6 +50,8 @@ class EmptyFolderRmv : public RedundantRmv {
  public:
   EmptyFolderRmv() : RedundantRmv() {}
   auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
+ private:
+  QStringList FindOutEmptyFolderOrAllSubFolderEmpty(const QString& folderPath) const;
 };
 
 class FolderNameContainKeyRmv : public RedundantRmv {

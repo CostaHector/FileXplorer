@@ -343,8 +343,8 @@ void FileOpActs::FolderFileCategoryProcess() {
       "2. If a folder contains only a SINGLE file and the difference between the file name length and the folder name length <= 5 characters.<br/>"
       "Move the file up one level (to the parent directory) and then delete the folder.");
   _RMV_EMPTY_FOLDER->setToolTip(
-      "<b>Remove Empty folders under current view path recusively</b><br/>"
-      "Only Empty folder will be removed");
+      "<b>Recursively remove empty folders under current view path</b><br/>"
+      "Only folders that contain no files and whose subfolders are all empty will be removed.");
   _RMV_FOLDER_BY_KEYWORD->setToolTip(
       "<b>Remove folders whose name contain the specified keyword under current view path </b><br/>"
       "1. skip if folder contains sub directory;<br/>"
