@@ -2,9 +2,9 @@
 #define IMAGEVIEWER_H
 
 #include <QScrollArea>
-#include <QLabel>
 #include <QMovie>
 #include <memory>
+#include "SelectableLabel.h"
 
 class QFileInfo;
 
@@ -35,7 +35,7 @@ protected:
   bool UpdatePixmapAndTitle();
   QPixmap GetPixmap(QString& winTitle) const;
   std::unique_ptr<QMovie> GetMovie(QString& winTitle) const;
-  const QLabel* GetLabel() const { return mLabel; }
+  const SelectableLabel* GetLabel() const { return mLabel; }
 
   void setFormatAndImgSizeBytes(const QString& noDotFormat, const qint64& imgSizeBytes) {
     mNoDotFormat = noDotFormat;
@@ -62,7 +62,7 @@ private:
   int mWidth = 404, mHeight = 250;
   const QString m_memoryKeyName;
 
-  QLabel* mLabel{nullptr};
+  SelectableLabel* mLabel{nullptr};
 
   std::unique_ptr<QMovie> mPMovie;
 };

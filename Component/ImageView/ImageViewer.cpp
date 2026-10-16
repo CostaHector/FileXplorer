@@ -22,7 +22,7 @@ ImageViewer::ImageViewer(const QString& memoryKeyName, QWidget* parent) //
   , m_memoryKeyName{memoryKeyName} {
   setIconSizeScaledIndex(IMAGE_SIZE::GetInitialScaledSize(GetName()));
 
-  mLabel = new (std::nothrow) QLabel{this};
+  mLabel = new (std::nothrow) SelectableLabel{this};
   CHECK_NULLPTR_RETURN_VOID(mLabel);
   mLabel->setAlignment(Qt::AlignCenter);
   mLabel->setContextMenuPolicy(Qt::CustomContextMenu);

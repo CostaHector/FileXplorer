@@ -1,0 +1,14 @@
+<svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.79 21.79">
+<defs><style>.cls-1{fill:#000000;}</style></defs>
+<title>selection</title>
+<g id="Layer_2" data-name="Layer 2">
+<g id="Layer_1-2" data-name="Layer 1">
+<path class="cls-1" d="M4.36,19.61H2.18V17.43H0V20.7a1.09,1.09,0,0,0,1.09,1.09H4.36Z"/>
+<rect class="cls-1" y="8.72" width="2.18" height="4.36"/>
+<path class="cls-1" d="M2.18,2.18H4.36V0H1.09A1.09,1.09,0,0,0,0,1.09V4.36H2.18Z"/>
+<rect class="cls-1" x="8.72" y="19.61" width="4.36" height="2.18"/>
+<rect class="cls-1" x="19.61" y="8.72" width="2.18" height="4.36"/>
+<path class="cls-1" d="M20.7,0H17.43V2.18h2.18V4.36h2.18V1.09A1.09,1.09,0,0,0,20.7,0Z"/>
+<path class="cls-1" d="M19.61,19.61H17.43v2.18H20.7a1.09,1.09,0,0,0,1.09-1.09V17.43H19.61Z"/>
+<rect class="cls-1" x="8.72" width="4.36" height="2.18"/></g></g>
+</svg>

@@ -66,6 +66,16 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
           .arg(m_recyleThisImageAndRelatedButton->text(),
                m_recyleThisImageAndRelatedButton->shortcut().toString())
       );
+
+  m_selectARect = mNaviToolBar->addAction(QIcon{":img/SELECT_A_RECT"}, "Select a Rect");
+  CHECK_NULLPTR_RETURN_VOID(m_selectARect);
+  m_selectARect->setCheckable(true);
+  m_selectARect->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_S));
+  m_selectARect->setShortcutVisibleInContextMenu(true);
+  m_selectARect->setToolTip(QString("<b>%1 (%2)</b><br/> Select a rectangle and save it to local.")
+                                   .arg(m_selectARect->text(),
+                                     m_selectARect->shortcut().toString()));
+
   mNaviToolBar->addSeparator();
   mNaviToolBar->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
 
@@ -83,6 +93,12 @@ void FileImageViewer::subscribe() {
 
   connect(m_recycleThisImageButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImage);
   connect(m_recyleThisImageAndRelatedButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImageAndItsRelated);
+
+  connect(m_selectARect, &QAction::toggled, GetLabel(), &SelectableLabel::setSelectionEnabled);
+  connect(GetLabel(), &SelectableLabel::selectionFinished, GetLabel(), [this](const QPixmap& selected, const QSize& srcSize) {
+    const QString sourceImageFullPath = GetImageAbsPath();
+    SelectableLabel::SaveSelectionRectImage(selected, srcSize, sourceImageFullPath);
+  });
 }
 
 QString FileImageViewer::GetImageAbsPath() const { //
