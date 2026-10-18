@@ -8,9 +8,7 @@
 
 #include <QScrollBar>
 #include <QFileInfo>
-#include <QShortcut>
 #include <QWheelEvent>
-#include <QShortcut>
 #include <QImageReader>
 
 bool ImageViewer::IsFileImage(const QFileInfo& fi) {
@@ -40,13 +38,6 @@ ImageViewer::ImageViewer(const QString& memoryKeyName, QWidget* parent) //
 
   setWindowIcon(QIcon{":img/IMAGE"});
   ReadSetting();
-  subscribe();
-}
-
-void ImageViewer::subscribe() {
-  if (QShortcut* escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this)) {
-    connect(escShortcut, &QShortcut::activated, this, &ImageViewer::close);
-  }
 }
 
 ImageViewer::~ImageViewer() {
@@ -85,6 +76,11 @@ void ImageViewer::wheelEvent(QWheelEvent* event) {
 
 void ImageViewer::keyPressEvent(QKeyEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
+  if (event->key() == Qt::Key_Escape) {
+    event->accept();
+    close();
+    return;
+  }
   QScrollBar* scrollBar{nullptr};
   if (event->modifiers() == Qt::NoModifier) {
     switch (event->key()) {

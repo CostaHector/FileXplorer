@@ -10,6 +10,7 @@
 #include "FileOpActs.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
+
 #include <QPixmap>
 #include <QMenu>
 
@@ -67,19 +68,18 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
                m_recyleThisImageAndRelatedButton->shortcut().toString())
       );
 
-  m_selectARect = mNaviToolBar->addAction(QIcon{":img/SELECT_A_RECT"}, "Select a Rect");
+  m_selectARect = mNaviToolBar->addAction(QIcon{":img/SELECT_A_RECT"}, "Selection");
   CHECK_NULLPTR_RETURN_VOID(m_selectARect);
   m_selectARect->setCheckable(true);
-  m_selectARect->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_S));
+  m_selectARect->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::AltModifier | Qt::Key_A));
   m_selectARect->setShortcutVisibleInContextMenu(true);
-  m_selectARect->setToolTip(QString("<b>%1 (%2)</b><br/> Select a rectangle and save it to local.")
-                                   .arg(m_selectARect->text(),
-                                     m_selectARect->shortcut().toString()));
+  m_selectARect->setToolTip(QString("<b>%1 (%2)</b><br/>Select a part of the picture.")
+                                   .arg(m_selectARect->text(), m_selectARect->shortcut().toString()));
 
   mNaviToolBar->addSeparator();
   mNaviToolBar->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
 
-  SetNavigateButtonNeedTransparent(mNaviToolBar);
+  // SetNavigateButtonNeedTransparent(mNaviToolBar);
 
   subscribe();
 }
@@ -95,10 +95,6 @@ void FileImageViewer::subscribe() {
   connect(m_recyleThisImageAndRelatedButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImageAndItsRelated);
 
   connect(m_selectARect, &QAction::toggled, GetLabel(), &SelectableLabel::setSelectionEnabled);
-  connect(GetLabel(), &SelectableLabel::selectionFinished, GetLabel(), [this](const QPixmap& selected, const QSize& srcSize) {
-    const QString sourceImageFullPath = GetImageAbsPath();
-    SelectableLabel::SaveSelectionRectImage(selected, srcSize, sourceImageFullPath);
-  });
 }
 
 QString FileImageViewer::GetImageAbsPath() const { //
@@ -107,8 +103,10 @@ QString FileImageViewer::GetImageAbsPath() const { //
 
 bool FileImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QString& rel2Img) {
   mParentPath = parentPath;
-  mRel2Image = rel2Img;
+  mRel2Image = rel2Img;  
   setFormatAndImgSizeBytes(PathTool::GetFormatInHar(mRel2Image), QFile{GetImageAbsPath()}.size());
+
+  GetLabel()->setSourceImageFileFullPath(GetImageAbsPath());
   return UpdatePixmapAndTitle();
 }
 

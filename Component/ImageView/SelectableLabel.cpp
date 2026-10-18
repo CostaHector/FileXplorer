@@ -6,73 +6,113 @@
 #include <QRect>
 #include <QFileDialog>
 #include "NotificatorMacro.h"
+#include "FaceRecognizeGuest.h"
 #include "PathTool.h"
+
+SelectableLabel::SelectableLabel(QWidget* parent) : QLabel{parent} {
+  mFrame = new SelectionFrame(this);
+  mFrame->hide();
+
+  connect(mFrame, &SelectionFrame::faceRecognizeRequested, this, &SelectableLabel::onFaceRecognizeRequested);
+  connect(mFrame, &SelectionFrame::closeRequested, this, &SelectableLabel::cancelSelection);
+  connect(mFrame, &SelectionFrame::saveRequested, this, &SelectableLabel::onSaveRequested);
+}
+
+void SelectableLabel::onSaveRequested() {
+  LazyUpdateRectSelectionImage();
+  if (mRectSelectedPixmap.isNull()) return;
+  // call save dialog then hide rectangle select frame.
+  SaveRectSelectionImage(mRectSelectedPixmap, mSourceImageFileFullPath);
+  cancelSelection();
+}
+
+void SelectableLabel::onFaceRecognizeRequested() {
+  LazyUpdateRectSelectionImage();
+  if (mRectSelectedPixmap.isNull()) return;
+  auto& inst = FaceRecognizeGuest::GetInst();
+  inst.PostRecognize(mRectSelectedPixmap, mFrame->GetFaceRecognizeResultLabel(), 5);
+}
 
 void SelectableLabel::setSelectionEnabled(bool on) {
   mSelectionEnabled = on;
   setCursor(on ? Qt::CrossCursor : Qt::ArrowCursor);
   if (!on) {
-    mSelecting = false;
-    update();
+    mIsDragging = false;
+    cancelSelection();
   }
 }
 
-void SelectableLabel::mousePressEvent(QMouseEvent *e) {
+void SelectableLabel::cancelSelection() {
+  mFrame->hide();
+  mRectSelectedPixmap = QPixmap();
+  update();
+}
+
+void SelectableLabel::mousePressEvent(QMouseEvent* e) {
   if (!mSelectionEnabled || e->button() != Qt::LeftButton) {
     QLabel::mousePressEvent(e);
     return;
   }
-  mSelecting = true;
+
+  mIsDragging = true;
   mOrigin = mCurrent = e->pos();
   update();
 }
 
-void SelectableLabel::mouseMoveEvent(QMouseEvent *e) {
-  if (!mSelecting) {
-    QLabel::mouseMoveEvent(e);
-    return;
-  }
+void SelectableLabel::mouseMoveEvent(QMouseEvent* e) {
+  if (!mIsDragging) { QLabel::mouseMoveEvent(e); return; }
   mCurrent = e->pos();
   update();
 }
 
-void SelectableLabel::mouseReleaseEvent(QMouseEvent *e) {
-  if (!mSelecting || e->button() != Qt::LeftButton) {
+void SelectableLabel::LazyUpdateRectSelectionImage() {
+  if (!mIsNeedUpdateRectSelectedPixmap) {
+    return;
+  }
+  mRectSelectedPixmap = pixmap(Qt::ReturnByValueConstant::ReturnByValue).copy(mRelativeRect);
+  mIsNeedUpdateRectSelectedPixmap = false;
+}
+
+void SelectableLabel::mouseReleaseEvent(QMouseEvent* e) {
+  if (!mIsDragging || e->button() != Qt::LeftButton) {
     QLabel::mouseReleaseEvent(e);
     return;
   }
-  mSelecting = false;
+  mIsDragging = false;          // 拖动结束
   mCurrent = e->pos();
   update();
 
-  const QRect sel = selectionRect();
-  if (sel.width() < 2 || sel.height() < 2) return;
+  const QRect visualSelRect = visSelectionRect().intersected(contentsRect());
+
+  const QRect pixRect = pixmapRectInLabel();
+  const QRect selInPix = visualSelRect.intersected(pixRect);
+  if (selInPix.isEmpty()) return;
 
   const QPixmap full = pixmap(Qt::ReturnByValueConstant::ReturnByValue);
   if (full.isNull()) return;
 
-  // 关键：pixmap 在 label 坐标系中的矩形
-  const QRect pixRect = pixmapRectInLabel();
-  if (pixRect.isEmpty()) return;
+  mRelativeRect = selInPix.translated(-pixRect.topLeft()).intersected(QRect(QPoint(0, 0), full.size()));
+  if (mRelativeRect.isEmpty()) return;
+  // 需要更新裁剪结果
+  mIsNeedUpdateRectSelectedPixmap = true;
 
-  // label 坐标 → pixmap 坐标：直接平移即可
-  QRect src = sel.translated(-pixRect.topLeft());
+  // 显示选区框
+  mFrame->setGeometry(visualSelRect);
+  mFrame->show();
+  mFrame->raise();
 
-  // 裁剪到 pixmap 有效范围内
-  src = src.intersected(QRect(QPoint(0, 0), full.size()));
-  if (src.isEmpty()) return;
-
-  emit selectionFinished(full.copy(src), src.size());
+  if (mFrame->IsAutoFaceRecognize()) {
+    onFaceRecognizeRequested();
+  }
 }
 
-void SelectableLabel::paintEvent(QPaintEvent *e) {
+void SelectableLabel::paintEvent(QPaintEvent* e) {
   QLabel::paintEvent(e);
-  if (!mSelecting) return;
-
+  if (!mIsDragging) return;                    // 固定框由 SelectionFrame 自绘
   QPainter p(this);
   p.setPen(QPen(QColor(255, 0, 0), 1, Qt::DashLine));
   p.setBrush(QColor(255, 0, 0, 40));
-  p.drawRect(selectionRect());
+  p.drawRect(visSelectionRect());
 }
 
 QRect SelectableLabel::pixmapRectInLabel() const {
@@ -81,18 +121,13 @@ QRect SelectableLabel::pixmapRectInLabel() const {
 
   const QRect cr = contentsRect();
   const QSize ps = pm.size();
-
-  // 如果用了 setScaledContents(true)，pixmap 会拉伸填满 contentsRect
   if (hasScaledContents()) return cr;
 
   const Qt::Alignment a = alignment();
-
-  // 水平
   int x = cr.x();
-  if (a & Qt::AlignRight)       x = cr.right()  - ps.width()  + 1;
+  if (a & Qt::AlignRight)        x = cr.right()  - ps.width()  + 1;
   else if (!(a & Qt::AlignLeft)) x = cr.x() + (cr.width()  - ps.width())  / 2;
 
-  // 垂直
   int y = cr.y();
   if (a & Qt::AlignBottom)       y = cr.bottom() - ps.height() + 1;
   else if (!(a & Qt::AlignTop))  y = cr.y() + (cr.height() - ps.height()) / 2;
@@ -100,23 +135,24 @@ QRect SelectableLabel::pixmapRectInLabel() const {
   return QRect(QPoint(x, y), ps);
 }
 
-bool SelectableLabel::SaveSelectionRectImage(const QPixmap& selected, const QSize& srcSize, const QString& sourceImageFullPath) {
+bool SelectableLabel::SaveRectSelectionImage(const QPixmap& rectSelectedImg, const QString& sourceImageFullPath) {
   // 文件名：宽x高.jpg
   QString sourceImagePrepath;
   const QString sourceImageFileName = PathTool::GetPrepathAndFileName(sourceImageFullPath, sourceImagePrepath);
   QString sourceImageFileBaseName, sourceImageDotExt;
   std::tie(sourceImageFileBaseName, sourceImageDotExt) = PathTool::GetBaseNameExt(sourceImageFileName);
+  const QSize srcSize{rectSelectedImg.size()};
   const QString dstImageFileName{QString{"%1 %2x%3%4"}
                                      .arg(sourceImageFileBaseName)
                                      .arg(srcSize.width()).arg(srcSize.height())
                                      .arg(sourceImageDotExt)};
   const QString recommendSaveToFullPath{PathTool::Path2Join(sourceImagePrepath, dstImageFileName)};
-  const QString actualSavedToPath = QFileDialog::getSaveFileName(nullptr, "Save to", recommendSaveToFullPath, tr("JPEG (*.jpg)"));
+  const QString actualSavedToPath = QFileDialog::getSaveFileName(nullptr, "Save to", recommendSaveToFullPath, "*" + sourceImageDotExt);
   if (actualSavedToPath.isEmpty()) {
     LOG_INFO_NP("Skip", "User cancel save");
     return false;
   }
-  const bool bSavedResult{selected.save(actualSavedToPath)};
+  const bool bSavedResult{rectSelectedImg.save(actualSavedToPath)};
   LOG_OE_NP(bSavedResult, "Save image", actualSavedToPath);
   return bSavedResult;
 }

@@ -10,10 +10,7 @@
 #include <QItemSelectionModel>
 #include <QMessageBox>
 #include <QSqlError>
-#include <QSqlField>
-#include <QSqlQuery>
 #include <QSqlRecord>
-#include <QFileDialog>
 
 int CastDBView::QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE = 100;
 void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int modifiedToValue) {
@@ -323,7 +320,7 @@ void CastDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const 
   if (!current.isValid()) {
     return;
   }
-  const auto& record = _castModel->record(current.row());
+  const QSqlRecord& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
 }
 
@@ -332,7 +329,7 @@ void CastDBView::RefreshCurrentRowHtmlContents() {
   if (!current.isValid()) {
     return;
   }
-  const auto& record = _castModel->record(current.row());
+  const QSqlRecord& record = _castModel->record(current.row());
   emit currentRecordChanged(record, mImageHost);
 }
 

@@ -67,6 +67,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Tools/Classify/*.cpp
     ${PARENT_DIR}/Tools/FileDescriptor/*.cpp
     ${PARENT_DIR}/Tools/Json/*.cpp
+    ${PARENT_DIR}/Tools/Network/*.cpp
     ${PARENT_DIR}/View/*.cpp
     # test only module sources
     main_ut.cpp
@@ -133,6 +134,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Classify
     ${PARENT_DIR}/Tools/FileDescriptor
     ${PARENT_DIR}/Tools/Json
+    ${PARENT_DIR}/Tools/Network
     ${PARENT_DIR}/third_party/mediaInfo/include # only MediaInfoDll.h suitable for win and linux.
     ${PARENT_DIR}/View
     pubTestTool
@@ -174,6 +176,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Tools/Classify/*.h
     ${PARENT_DIR}/Tools/FileDescriptor/*.h
     ${PARENT_DIR}/Tools/Json/*.h
+    ${PARENT_DIR}/Tools/Network/*.h
     ${PARENT_DIR}/View/*.h
     pubTestTool/*.h
     MockTool/*.h

@@ -6,7 +6,6 @@
 #include <QWidget>
 #include <QLayout>
 #include <QStyle>
-#include <unordered_set>
 
 namespace StyleSheet {
 void UpdateTitleBar(QWidget* widget) {

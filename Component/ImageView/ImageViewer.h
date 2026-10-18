@@ -45,7 +45,6 @@ protected:
   qint64 mImgSizeBytes{0};
 
 private:
-  void subscribe();
   void ReadSetting();
   QSize getDestSize(QSize sz) const;
 

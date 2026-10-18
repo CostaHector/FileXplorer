@@ -72,6 +72,8 @@
         <file alias="RATE_OF_REDUNDANCY_15">Media/RATE_OF_REDUNDANCY_15.svg</file>
         <file alias="RATE_OF_REDUNDANCY_20">Media/RATE_OF_REDUNDANCY_20.svg</file>
         <file alias="SELECT_A_RECT">Media/SELECT_A_RECT.svg</file>
+        <file alias="FACE_RECOGNIZE">Media/FACE_RECOGNIZE.svg</file>
+        <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
