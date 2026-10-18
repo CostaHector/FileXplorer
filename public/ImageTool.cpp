@@ -188,7 +188,7 @@ bool CreateThumbnailCore(const QString& srcImgAbsPath, const QString& dstThumbna
   return true;
 }
 
-int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist) {
+int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionMS, int intervalSecond, int framesCount, bool bSkipIfExist) {
   if (videosAbsPath.isEmpty()) {
     return 0;
   }
@@ -205,12 +205,13 @@ int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSeco
 
     bool bNeedGrab{false};
     for (int i = 0; i < framesCount; ++i) {
-      const int position = startPositionSecond + i * intervalSecond;
-      const QString destOutputImgPath{PathTool::GetFileNameExtRemoved(vidAbsPath) + " " + QString::number(position) + ".jpg"};
+      const int positionMs = startPositionMS + i * intervalSecond * 1000;
+      const QString timeStamp = QDateTime::fromMSecsSinceEpoch(positionMs, Qt::UTC).toString("HHmmss.zzz");
+      const QString destOutputImgPath{PathTool::GetFileNameExtRemoved(vidAbsPath) + "_" + timeStamp + ".jpg"};
       if (bSkipIfExist && QFile::exists(destOutputImgPath)) {
         continue;
       }
-      args << "-ss" << DataFormatter::formatDurationISO(position * 1000);
+      args << "-ss" << DataFormatter::formatDurationISO(positionMs);
       args << "-skip_frame" << "nokey";
       args << "-frames:v" << "1";
       args << "-q:v" << "2";

@@ -44,6 +44,8 @@ class NameTool {
   static QStringList CastTagSentenceRmvEle2Lst(const QString& sentense, const QString& cast);
   static QString CastTagSentenceRmvEle2Str(const QString& sentense, const QString& cast);
 
+  static QString SanitizeFileName(QString rawName);
+
   static constexpr const char COMMA_SPACE_EXT[] = ", etc";
   static constexpr const int COMMA_SPACE_EXT_LEN = sizeof(COMMA_SPACE_EXT) - 1;
   static constexpr const char* COMMA_SPACE = ", ";

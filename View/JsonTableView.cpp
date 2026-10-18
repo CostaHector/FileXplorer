@@ -601,7 +601,7 @@ void JsonTableView::subscribe() {
 }
 
 void JsonTableView::onSelectNewJsonLine(const QModelIndex& current) {
-  const QModelIndex& srcModelInd = _JsonProxyModel->mapToSource(current);
+  const QModelIndex srcModelInd = _JsonProxyModel->mapToSource(current);
   const JsonPr& json = _JsonModel->GetJsonPr(srcModelInd);
   const QString jsonAbsPath = json.GetJsonFileAbsPath();
 

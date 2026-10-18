@@ -23,7 +23,7 @@ public:
 signals:
   void crtVideoStoryBoard(int rowCnt, int colCnt, int widthPixel, bool bSkipIfExist);
   void extractImages(int startIndex, int endIndex, bool bSkipIfExist);
-  void grabFrames(int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist);
+  void grabFrames(int startPositionSecond, int intervalMs, int framesCount, bool bSkipIfExist);
 
 private:
   void subscribe();

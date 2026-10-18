@@ -63,19 +63,34 @@ auto ZeroOrOneItemFolderProc::CleanEmptyFolderCore(const QString& folderPath) ->
   return m_cmds.size();
 }
 
+QStringList EmptyFolderRmv::FindOutEmptyFolderOrAllSubFolderEmpty(const QString& folderPath) const {
+  // find out folderPath which meet:
+  // contain no files and whose subfolders are all empty
+  QDir dir{folderPath, "", QDir::SortFlag::Name | QDir::SortFlag::DirsFirst};
+  dir.setFilter(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden);
+  bool bAllSubFolderEmpty{true};
+  QStringList fullPathLst;
+  for (const QString& folderName: dir.entryList()) {
+    QStringList lst{FindOutEmptyFolderOrAllSubFolderEmpty(folderPath + '/' + folderName)};
+    if (lst.isEmpty()) {
+      bAllSubFolderEmpty = false;
+    } else {
+      fullPathLst += lst;
+    }
+  }
+  const bool bContainsNoFiles{dir.isEmpty(QDir::Filter::Files | QDir::Filter::Hidden)};
+  if (bContainsNoFiles && bAllSubFolderEmpty) {
+    fullPathLst.push_back(folderPath);
+  }
+  return fullPathLst;
+}
+
 auto EmptyFolderRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {
-  // as recursive calling, m_cmds will not clean automatically
-  QDir dir{folderPath, "", QDir::SortFlag::NoSort, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden};
-  if (dir.count() == 0) {
-    m_cmds.append(ACMD::GetInstMOVETOTRASH("", folderPath));
-    return 1;
+  QStringList fullPathLst {FindOutEmptyFolderOrAllSubFolderEmpty(folderPath)};
+  for (const QString& folderFullPath : fullPathLst) {
+    m_cmds.append(ACMD::GetInstMOVETOTRASH("", folderFullPath));
   }
-  dir.setFilter(QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot);
-  int totalCount = 0;
-  for (const QString& path : dir.entryList()) {
-    totalCount += CleanEmptyFolderCore(folderPath + '/' + path);
-  }
-  return totalCount;
+  return fullPathLst.size();
 }
 
 auto FolderNameContainKeyRmv::CleanEmptyFolderCore(const QString& folderPath) -> int {

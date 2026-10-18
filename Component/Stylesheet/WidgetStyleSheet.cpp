@@ -21,6 +21,11 @@ QWidget:disabled {
     background-color: %5;
 }
 
+SelectionFrame {
+    background-color: rgba(255, 0, 0, 40);
+    border: 1px dashed rgb(255, 0, 0);
+}
+
 QAbstractItemView {
     background-color: %6;
 }

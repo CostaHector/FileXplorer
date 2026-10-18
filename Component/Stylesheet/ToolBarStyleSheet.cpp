@@ -25,6 +25,11 @@ QLabel#statusMessageLabel[alertLevel="1"] {
     font-weight: bold;
 }
 
+QLabel[needFloatingAndCodeFontFamilyFlag="true"] {
+    background: transparent;
+    font-family: "%6";
+}
+
 QLineEdit {
     border: 1px solid #CCEBFF;
     margin: 1px;
@@ -90,6 +95,7 @@ QComboBox QAbstractItemView {
   QString comboBoxBg = inst.GetColorValue("Background/ComboBox", styleE);
   QString toolBarBg = inst.GetColorValue("Background/ToolBar", styleE);
   QString comboBoxBorderBg = inst.GetColorValue("Border/ComboBox", styleE);
+  QString codeFontFamily{FontCfg::GetFontFamilyCode()};
 
-  return styleSheet.arg(labelBg, lineEditBg, comboBoxBg, toolBarBg, comboBoxBorderBg);
+  return styleSheet.arg(labelBg, lineEditBg, comboBoxBg, toolBarBg, comboBoxBorderBg, codeFontFamily);
 }

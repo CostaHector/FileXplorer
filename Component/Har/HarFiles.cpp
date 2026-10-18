@@ -2,6 +2,7 @@
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "Logger.h"
+#include "NameTool.h"
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -162,7 +163,8 @@ int HarFiles::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
   int fileWriteCnt = 0;
   for (const int& rowIndex : selectedRows) {
     const HAR_FILE_ITEM& item = mHarItems[rowIndex];
-    const QString& dstAbsFilePath = dstDir.absoluteFilePath(item.name);
+    const QString fileValidName = NameTool::SanitizeFileName(item.name);
+    const QString dstAbsFilePath = dstDir.absoluteFilePath(fileValidName);
     if (!FileTool::ByteArrayBinaryWriter(dstAbsFilePath, item.content)) {
       continue;
     }

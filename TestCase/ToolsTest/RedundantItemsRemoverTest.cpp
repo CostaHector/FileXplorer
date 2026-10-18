@@ -19,6 +19,7 @@ class RedundantItemsRemoverTest : public FileSystemTestSuite {
     /*
 EmptyFolder
     // DeleteRandomEmptyFolder1
+    //  - SubDeleteRandomEmptyFolder1
     // DeleteRandomEmptyFolder2
     // KeepNonEmptyFolder
     //  - randomFile.txt
@@ -42,6 +43,8 @@ RedundantParentFolder
         << FileSystemNode{"DeleteRandomEmptyFolder1"}  //
         << FileSystemNode{"DeleteRandomEmptyFolder2"}  //
         << FileSystemNode{"KeepNonEmptyFolder"};
+    m_rootHelper.GetSubHelper("EmptyFolder").GetSubHelper("DeleteRandomEmptyFolder1")  //
+        << FileSystemNode{"SubDeleteRandomEmptyFolder1", true, ""};
     m_rootHelper.GetSubHelper("EmptyFolder").GetSubHelper("KeepNonEmptyFolder")  //
         << FileSystemNode{"randomFile.txt", false, ""};
 
@@ -70,18 +73,24 @@ RedundantParentFolder
   }
 
   void test_recycleEmptyFolder() {
-    // DeleteRandomEmptyFolder1
-    // DeleteRandomEmptyFolder2
+    // DeleteRandomEmptyFolder1                 --- recycle 1
+    //  - SubDeleteRandomEmptyFolder1           --- recycle 0
+    // DeleteRandomEmptyFolder2                 --- recycle 2
     // KeepNonEmptyFolder
     //  - randomFile.txt
     const QString EMPTY_TEST_DIR = mTestPath + "/EmptyFolder";
     QCOMPARE(QDir(EMPTY_TEST_DIR).entryList(QDir::Filter::AllEntries | QDir::Filter::NoDotAndDotDot).size(), 3);
     EmptyFolderRmv efr;
     const int recycleCmdCnt = efr(EMPTY_TEST_DIR);
-    QCOMPARE(recycleCmdCnt, 2);
-    QCOMPARE(efr.m_cmds.size(), 2);
-    QCOMPARE(efr.m_cmds[0].op, FileOperatorType::MOVETOTRASH);
-    QCOMPARE(efr.m_cmds[1].op, FileOperatorType::MOVETOTRASH);
+    QCOMPARE(recycleCmdCnt, 3);
+    QCOMPARE(efr.m_cmds.size(), 3);
+    using namespace FileOperatorType;
+    const BATCH_COMMAND_LIST_TYPE expectsCmds {
+      ACMD::GetInstMOVETOTRASH("", EMPTY_TEST_DIR + "/DeleteRandomEmptyFolder1/SubDeleteRandomEmptyFolder1"),
+      ACMD::GetInstMOVETOTRASH("", EMPTY_TEST_DIR + "/DeleteRandomEmptyFolder1"),
+      ACMD::GetInstMOVETOTRASH("", EMPTY_TEST_DIR + "/DeleteRandomEmptyFolder2"),
+    };
+    QCOMPARE(expectsCmds, efr.m_cmds);
   }
 
   void test_redundantParentFolder() {

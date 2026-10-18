@@ -44,6 +44,7 @@ private:
   QAction* mNavigateIntoSub{nullptr};
   QAction *m_prevButton{nullptr}, *m_nextButton{nullptr};
   QAction* m_recycleThisImageButton{nullptr}, *m_recyleThisImageAndRelatedButton{nullptr};
+  QAction* m_selectARect{nullptr};
 
   QAction *_OPEN_IN_SYSTEM_APPLICATION{nullptr}, *_REVEAL_IN_FILE_EXPLORER{nullptr}, *_COPY_FILE_NAME{nullptr};
   QMenu* mMenu{nullptr};

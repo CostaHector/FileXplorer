@@ -129,7 +129,8 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   CHECK_NULLPTR_RETURN_VOID(_SORT_RANGE_PAGE_BY_PAGE);
   _SORT_RANGE_PAGE_BY_PAGE->setCheckable(true);
   _SORT_RANGE_PAGE_BY_PAGE->setChecked(false);
-  _SORT_RANGE_PAGE_BY_PAGE->setToolTip("Sort each page independently when enabled. Otherwise sort entire list by default");
+  _SORT_RANGE_PAGE_BY_PAGE->setToolTip("Sort each page independently when enabled."
+                                       "Otherwise sort the entire list by default (rating changes will not re-sort in real time).");
 
   mSortOrderIntAction.init({{_BY_NAME, SceneInfo::Role::DEF_NAME_TEXT_ROLE},      //
                             {_BY_MOVIE_PATH, SceneInfo::Role::REL_PATH_ROLE},     //

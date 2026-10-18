@@ -30,7 +30,7 @@ bool CreateThumbnailCore(const QString& srcImgAbsPath, const QString& dstThumbna
 constexpr int EXPECT_THUMBNAIL_SIDE = 256;
 
 constexpr int DEFAULT_START_POSITION_SECOND = 5, DEFAULT_INTERVAL_SECOND = 5, DEFAULT_FRAMES_COUNT = 1;
-int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionSecond, int intervalSecond, int framesCount, bool bSkipIfExist = true);
+int GrabFramesFromVideos(const QStringList& videosAbsPath, int startPositionMS, int intervalSecond, int framesCount, bool bSkipIfExist = true);
 } // namespace ImageTool
 
 struct IMAGE_SIZE {

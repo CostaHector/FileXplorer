@@ -183,7 +183,7 @@ private slots:
 
     SceneListView sceneView{&sceneModel, &sceneProxyModel, &wid};
     QCOMPARE(sceneModel.isSortProxyInited(), true);  // first init
-    QCOMPARE(sceneProxyModel.isSortProxyInited(), true);
+    QCOMPARE(sceneProxyModel.isSortProxyInited(), false);
     QVERIFY(sceneView.mSortRoleConn);  // connection ok
     QVERIFY(sceneView.mSortOrderReverseConn);
 
