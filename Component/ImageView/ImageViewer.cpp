@@ -134,8 +134,12 @@ bool ImageViewer::UpdatePixmapAndTitle() {
   return true;
 }
 
-QSize ImageViewer::getDestSize(QSize sz) const {
-  if (sz.width() * mHeight >= sz.height() * mWidth) {
+bool ImageViewer::isScaledToWidth(const QSize& sz) const {
+  return sz.width() * mHeight >= sz.height() * mWidth;
+}
+
+QSize ImageViewer::getDestSize(const QSize& sz) const {
+  if (isScaledToWidth(sz)) {
     return {mWidth, (sz.height() * mWidth) / sz.width()};
   } else {
     return {(sz.width() * mHeight) / sz.height(), mHeight};
@@ -170,9 +174,12 @@ QPixmap ImageViewer::GetPixmap(QString& winTitle) const {
   }
 
   const Qt::TransformationMode transformMode{GetImageFileSize() < 10 * 1024 * 1024 ? Qt::SmoothTransformation : Qt::FastTransformation};
-  const QSize dstSz{getDestSize(oldSz)};
-  pm = pm.scaled(dstSz, Qt::IgnoreAspectRatio, transformMode);
-
+  if (isScaledToWidth(oldSz)) {
+    pm = pm.scaledToWidth(mWidth, transformMode);
+  } else {
+    pm = pm.scaledToHeight(mHeight, transformMode);
+  }
+  const QSize dstSz{pm.size()};
   winTitle += GetResolutionAndSizeInWinTitle(oldSz, dstSz);
   return pm;
 }

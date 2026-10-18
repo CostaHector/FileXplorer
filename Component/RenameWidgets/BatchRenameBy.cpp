@@ -4,11 +4,10 @@
 #include "RenameWidget_Insert.h"
 #include "RenameWidget_Numerize.h"
 #include "NotificatorMacro.h"
+#include "ItemsPileCategory.h"
 #include <QDir>
 
 namespace BatchRenameBy {
-static const QRegularExpression JSON_RELATED_FILE_BASENAME_PATTERN{"^( | - )(\\d{1,3})$"};
-
 /*
 Given: path=".../replace"
 Given: jsonNames={"pattern/Chris Evans.json", "pattern/Jensen Ackles.mp4"}, can be json, mp4, pson, etc.
@@ -86,7 +85,7 @@ QStringList GetFilesNeedProcess(const QString& path, const QStringList& patternN
         if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;
       }
-      if (JSON_RELATED_FILE_BASENAME_PATTERN.match(extraContent).hasMatch()) {
+      if (ItemsPileCategory::IMG_PILE_NAME_PATTERN.match(extraContent).hasMatch()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
         if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;

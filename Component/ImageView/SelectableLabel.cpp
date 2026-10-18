@@ -69,8 +69,38 @@ void SelectableLabel::LazyUpdateRectSelectionImage() {
   if (!mIsNeedUpdateRectSelectedPixmap) {
     return;
   }
-  mRectSelectedPixmap = pixmap(Qt::ReturnByValueConstant::ReturnByValue).copy(mRelativeRect);
   mIsNeedUpdateRectSelectedPixmap = false;
+
+  // 1. 获取当前显示的图（已缩放）
+  const QPixmap displayPm = pixmap(Qt::ReturnByValueConstant::ReturnByValue);
+  if (displayPm.isNull()) {
+    return;
+  }
+
+  // 2. 尝试从原始路径加载高清原图
+  QPixmap originalPm{mSourceImageFileFullPath};
+
+  if (originalPm.isNull()) {
+    // 如果源文件被删/移动，fallback to 缩放图裁剪
+    mRectSelectedPixmap = displayPm.copy(mRelativeRect);
+    return;
+  }
+
+  // 3. 计算缩放比例 (视你的缩放逻辑而定，通常是等比例的)
+  const double scaleX = static_cast<double>(originalPm.width()) / displayPm.width();
+  const double scaleY = static_cast<double>(originalPm.height()) / displayPm.height();
+
+  // 4. 将显示图的选区，映射到原图的选区
+  QRect originalRect{qRound(mRelativeRect.x() * scaleX),
+                     qRound(mRelativeRect.y() * scaleY),
+                     qRound(mRelativeRect.width() * scaleX),
+                     qRound(mRelativeRect.height() * scaleY)};
+
+  // 防止越界
+  originalRect = originalRect.intersected(originalPm.rect());
+
+  // 5. 从原图裁剪
+  mRectSelectedPixmap = originalPm.copy(originalRect);
 }
 
 void SelectableLabel::mouseReleaseEvent(QMouseEvent* e) {

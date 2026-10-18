@@ -46,7 +46,8 @@ protected:
 
 private:
   void ReadSetting();
-  QSize getDestSize(QSize sz) const;
+  bool isScaledToWidth(const QSize& sz) const;
+  QSize getDestSize(const QSize& sz) const;
 
   QString GetResolutionAndSizeInWinTitle(const QSize& oldSz, const QSize& dstSz) const;
   virtual QString GetPathInfoInWinTitle() const { return ""; }

@@ -103,6 +103,8 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
       // Screenshot of a movie "Golden Island part 1.mp4" named "Golden Island part 1 0.jpg",  "Golden Island part 1 1.jpg" should be in group "Golden
       // Island part 1"
       imgGrpName = matchResult.captured(1);
+    } else if (img.baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
+      imgGrpName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
     }
     // Image is neither a post nor a screenshot of a movie should be in a seperate group
     m_img2Name[imgGrpName].append(img.fullName);
