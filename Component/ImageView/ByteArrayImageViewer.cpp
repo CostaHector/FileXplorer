@@ -3,9 +3,10 @@
 #include "Logger.h"
 #include <QBuffer>
 
-bool ByteArrayImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat) {
+bool ByteArrayImageViewer::setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat, const QString& baseImageFullPath) {
   mDataFromArchive = dataByteArray;
   setFormatAndImgSizeBytes(noDotFormat, mDataFromArchive.size());
+  GetLabel()->setBaseImageFullPath(baseImageFullPath);
   return UpdatePixmapAndTitle();
 }
 

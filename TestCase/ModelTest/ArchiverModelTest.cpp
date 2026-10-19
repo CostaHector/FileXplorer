@@ -50,6 +50,8 @@ class ArchiverModelTest : public PlainTestSuite {
 
     // 验证行数
     QCOMPARE(model.rowCount(), mockItems.size());
+    QCOMPARE(model.m_paf.achiveFilePath(), "");
+    QCOMPARE(model.baseFileFullPath(0), "file1.txt"); // PathTool::Path2Join("", "file1.txt")
 
     // 验证列数
     QCOMPARE(model.columnCount(), 3);
@@ -110,6 +112,8 @@ class ArchiverModelTest : public PlainTestSuite {
 
     // 验证模型重置后行数为0（因为文件无效）
     QCOMPARE(model.rowCount(), 0);
+    QCOMPARE(model.baseFileFullPath(-1), ""); // out of range
+    QCOMPARE(model.baseFileFullPath(11), ""); // out of range
 
     // 再次设置根路径
     model.setRootPath("invalid_path");

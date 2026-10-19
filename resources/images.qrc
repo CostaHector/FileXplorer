@@ -74,6 +74,8 @@
         <file alias="SELECT_A_RECT">Media/SELECT_A_RECT.svg</file>
         <file alias="FACE_RECOGNIZE">Media/FACE_RECOGNIZE.svg</file>
         <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
+        <file alias="AUTO_SAVE">Media/AUTO_SAVE.svg</file>
+        <file alias="SILENT_SAVE">Media/SILENT_SAVE.svg</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>

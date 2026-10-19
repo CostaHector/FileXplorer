@@ -21,10 +21,14 @@ public:
   bool empty() const {return mHarItems.isEmpty();}
   void swap(HarFiles& rhs);
   const HAR_FILE_ITEM& operator[](int i) const;
+  void setHarAbsPath(const QString& harAbsPath) { mHarFilePath = harAbsPath; }
   bool operator()(const QString& harAbsPath);
+  QString harFileFullPath() const { return mHarFilePath; }
+  QString baseFileFullPath(int r) const;
+
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   static bool IsHarFile(const QFileInfo& fi);
-  void clear() {mHarItems.clear();}
+  void clear() { mHarItems.clear(); }
 private:
   bool ParseFilesInJsonByteArray(const QByteArray& jsonByteArray);
 

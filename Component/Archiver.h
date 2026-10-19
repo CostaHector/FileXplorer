@@ -1,6 +1,5 @@
 #ifndef ArchiveFilesPreview_H
 #define ArchiveFilesPreview_H
-#include "ArchiveFiles.h"
 #include "ArchiverModel.h"
 #include "CustomTableView.h"
 #include "ByteArrayImageViewer.h"

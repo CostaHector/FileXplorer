@@ -1,13 +1,15 @@
 #include "SelectableLabel.h"
+#include "ImageViewerActions.h"
+#include "NotificatorMacro.h"
+#include "FaceRecognizeGuest.h"
+#include "PathTool.h"
+
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPoint>
 #include <QRect>
 #include <QFileDialog>
-#include "NotificatorMacro.h"
-#include "FaceRecognizeGuest.h"
-#include "PathTool.h"
 
 SelectableLabel::SelectableLabel(QWidget* parent) : QLabel{parent} {
   mFrame = new SelectionFrame(this);
@@ -22,7 +24,8 @@ void SelectableLabel::onSaveRequested() {
   LazyUpdateRectSelectionImage();
   if (mRectSelectedPixmap.isNull()) return;
   // call save dialog then hide rectangle select frame.
-  SaveRectSelectionImage(mRectSelectedPixmap, mSourceImageFileFullPath);
+  const bool bSilentSave = ImageViewerActions::GetInst().isSilentSaveOnAutoSave();
+  SaveRectSelectionImage(mRectSelectedPixmap, mBaseImageFullPath, bSilentSave);
   cancelSelection();
 }
 
@@ -78,7 +81,7 @@ void SelectableLabel::LazyUpdateRectSelectionImage() {
   }
 
   // 2. 尝试从原始路径加载高清原图
-  QPixmap originalPm{mSourceImageFileFullPath};
+  QPixmap originalPm{mBaseImageFullPath};
 
   if (originalPm.isNull()) {
     // 如果源文件被删/移动，fallback to 缩放图裁剪
@@ -131,8 +134,11 @@ void SelectableLabel::mouseReleaseEvent(QMouseEvent* e) {
   mFrame->show();
   mFrame->raise();
 
-  if (mFrame->IsAutoFaceRecognize()) {
+  if (ImageViewerActions::GetInst().isRecognizeFaceOnSelectionComplete()) {
     onFaceRecognizeRequested();
+  }
+  if (ImageViewerActions::GetInst().isAutoSaveOnSelectionComplete()) {
+    onSaveRequested();
   }
 }
 
@@ -165,10 +171,15 @@ QRect SelectableLabel::pixmapRectInLabel() const {
   return QRect(QPoint(x, y), ps);
 }
 
-bool SelectableLabel::SaveRectSelectionImage(const QPixmap& rectSelectedImg, const QString& sourceImageFullPath) {
+bool SelectableLabel::SaveRectSelectionImage(const QPixmap& rectSelectedImg, const QString& sourceImageFullPath, bool bSilentSave) {
   // 文件名：宽x高.jpg
   QString sourceImagePrepath;
   const QString sourceImageFileName = PathTool::GetPrepathAndFileName(sourceImageFullPath, sourceImagePrepath);
+  if (sourceImageFileName.isEmpty()) {
+    LOG_WARN_NP("Cannot save. invalid prepath", sourceImageFileName);
+    return false;
+  }
+
   QString sourceImageFileBaseName, sourceImageDotExt;
   std::tie(sourceImageFileBaseName, sourceImageDotExt) = PathTool::GetBaseNameExt(sourceImageFileName);
   const QSize srcSize{rectSelectedImg.size()};
@@ -177,10 +188,16 @@ bool SelectableLabel::SaveRectSelectionImage(const QPixmap& rectSelectedImg, con
                                      .arg(srcSize.width()).arg(srcSize.height())
                                      .arg(sourceImageDotExt)};
   const QString recommendSaveToFullPath{PathTool::Path2Join(sourceImagePrepath, dstImageFileName)};
-  const QString actualSavedToPath = QFileDialog::getSaveFileName(nullptr, "Save to", recommendSaveToFullPath, "*" + sourceImageDotExt);
-  if (actualSavedToPath.isEmpty()) {
-    LOG_INFO_NP("Skip", "User cancel save");
-    return false;
+
+  QString actualSavedToPath;
+  if (bSilentSave) {
+    actualSavedToPath = recommendSaveToFullPath;
+  } else {
+    actualSavedToPath = QFileDialog::getSaveFileName(nullptr, "Save to", recommendSaveToFullPath, "*" + sourceImageDotExt);
+    if (actualSavedToPath.isEmpty()) {
+      LOG_INFO_P("Skip", "User skip save");
+      return false;
+    }
   }
   const bool bSavedResult{rectSelectedImg.save(actualSavedToPath)};
   LOG_OE_NP(bSavedResult, "Save image", actualSavedToPath);

@@ -26,8 +26,8 @@ private:
   const int mStartPositionMs{5000};
   const int mIntervalSecond{2};
   const int mFramesCount{2};
-  const QString mExistVidPathSceenshotAt5s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s 000005.000.jpg")}; // 5s
-  const QString mExistVidPathSceenshotAt7s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s 000007.000.jpg")}; // 5+2=7s
+  const QString mExistVidPathSceenshotAt5s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s_000005.000.jpg")}; // 5s
+  const QString mExistVidPathSceenshotAt7s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s_000007.000.jpg")}; // 5+2=7s
 
   TDir mTDir;
   QString src{mTDir.itemPath("FolderKaka/FolderKaka.png")};

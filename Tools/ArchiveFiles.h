@@ -7,7 +7,6 @@
 #include <QSet>
 #include <QString>
 #include <QVariant>
-#include "Logger.h"
 
 class ArchiveImagesRecusive;
 
@@ -53,6 +52,7 @@ class ArchiveFilesReader : public FilesListBase {
     m_items.clear();
   }
 
+  QString achiveFilePath() const { return m_fi.fileName(); }
   const QString& key(int i) const { return m_items[i].m_names; }
   qint64 beforeSize(int i) const { return m_items[i].m_beforeSize; }
   int afterSize(int i) const { return m_items[i].m_afterSize; }

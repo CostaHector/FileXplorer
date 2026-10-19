@@ -1,6 +1,4 @@
 #include "HarTableView.h"
-#include "CompoVisKey.h"
-#include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
@@ -45,8 +43,7 @@ void HarTableView::initExclusivePreferenceSetting() {
 }
 
 int HarTableView::operator()(const QString& harAbsPath) {
-  mHarAbsPath = harAbsPath;
-  emit windowTitleChanged(GetWinTitleStr(mHarAbsPath));
+  emit windowTitleChanged(GetWinTitleStr(harAbsPath));
   return mHarModel->setRootPath(harAbsPath);
 }
 
@@ -75,7 +72,8 @@ bool HarTableView::PreviewImage(const QModelIndex& current) {
     return false;
   }
   QString noDotFormatStr = PathTool::GetFormatInHar(entryItem.type);
-  emit pixmapByteArrayChanged(entryItem.content, noDotFormatStr);
+  QString notExistBaseFileFullPath = mHarModel->baseFileFullPath(srcIndex);
+  emit pixmapByteArrayChanged(entryItem.content, noDotFormatStr, notExistBaseFileFullPath);
   return true;
 }
 
@@ -85,7 +83,7 @@ int HarTableView::SaveSelectionFilesTo() const {
     return 0;
   }
 
-  const QString dstFolder{QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", mHarAbsPath)};
+  const QString dstFolder{QFileDialog::getExistingDirectory(nullptr, "Export selection(s) to", mHarModel->rootPath())};
   if (!QFileInfo{dstFolder}.isDir()) {
     LOG_W("dst folder[%s] not existed", qPrintable(dstFolder));
     return -1;

@@ -1,5 +1,7 @@
 #include "ArchiverModel.h"
 #include "DataFormatter.h"
+#include "PathTool.h"
+#include "NameTool.h"
 
 const QStringList ArchiverModel::ARCHIVE_HORIZONTAL_HEADER{"Name", "Compressed(B)", "Original(B)"};
 
@@ -56,4 +58,15 @@ const QByteArray& ArchiverModel::GetByteArrayData(int r) const {
     return EMPTY_BA;
   }
   return m_paf.value(r);
+}
+
+QString ArchiverModel::baseFileFullPath(int r) const {
+  if (r < 0 || r >= rowCount()) {
+    return "";
+  }
+  const QString qzFileFullPath = m_paf.achiveFilePath();
+  const QString prePath = PathTool::absolutePath(qzFileFullPath);
+  const QString rawName = m_paf.key(r);
+  const QString validName = NameTool::SanitizeFileName(rawName);
+  return PathTool::Path2Join(prePath, validName);
 }

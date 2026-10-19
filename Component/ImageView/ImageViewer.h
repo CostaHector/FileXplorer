@@ -44,6 +44,9 @@ protected:
   QString mNoDotFormat; // file extension without prefix dot
   qint64 mImgSizeBytes{0};
 
+  QToolBar* mNaviToolBar{nullptr};
+  QAction* m_selectARect{nullptr};
+
 private:
   void ReadSetting();
   bool isScaledToWidth(const QSize& sz) const;
@@ -63,7 +66,6 @@ private:
   const QString m_memoryKeyName;
 
   SelectableLabel* mLabel{nullptr};
-
   std::unique_ptr<QMovie> mPMovie;
 };
 

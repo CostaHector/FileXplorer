@@ -16,6 +16,7 @@ class ArchiverModel : public QAbstractTableModelPub {
 
   QString GetRelativeName(int r) const;
   const QByteArray& GetByteArrayData(int r) const;
+  QString baseFileFullPath(int r) const;
 
  private:
   ArchiveFilesReader m_paf;

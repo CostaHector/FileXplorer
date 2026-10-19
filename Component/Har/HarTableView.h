@@ -14,7 +14,7 @@ public:
   QString GetWinTitleStr(const QString& harFile) const;
 
 signals:
-  void pixmapByteArrayChanged(const QByteArray& pm, const QString& noDotFormatStr);
+  void pixmapByteArrayChanged(const QByteArray& pm, const QString& noDotFormatStr, const QString& baseFileFullPath);
 
 protected:
   void initExclusivePreferenceSetting() override;
@@ -24,7 +24,6 @@ private:
   bool PreviewImage(const QModelIndex& current);
   int SaveSelectionFilesTo() const;
 
-  QString mHarAbsPath;
   HarModel* mHarModel{nullptr};
   QSortFilterProxyModel* mSortFilterProxy{nullptr};
 

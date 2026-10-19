@@ -4,8 +4,6 @@
 #include <QLabel>
 #include <QShortcut>
 
-bool SelectionFrame::bAutoFaceRecognize = false;
-
 SelectionFrame::SelectionFrame(QWidget *parent) : QFrame{parent} {
   setAttribute(Qt::WA_StyledBackground, true);
 
@@ -21,12 +19,6 @@ SelectionFrame::SelectionFrame(QWidget *parent) : QFrame{parent} {
   pFaceRecognizeAction->setShortcut(QKeySequence(Qt::Key_F1));
   pFaceRecognizeAction->setToolTip(QString{"<b>%1 (%2)</b><br/>Identify the person in the selection."}
                                           .arg(pFaceRecognizeAction->text(), pFaceRecognizeAction->shortcut().toString()));
-
-  QAction* mAutoFaceRecognizeAct = mControlToolBar->addAction(QIcon{":img/FACE_RECOGNIZE_AUTO"}, "Auto Recognize");
-  mAutoFaceRecognizeAct->setCheckable(true);
-  mAutoFaceRecognizeAct->setChecked(bAutoFaceRecognize);
-  mAutoFaceRecognizeAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Automatically recognize the face after the selection is complete."}
-                                        .arg(mAutoFaceRecognizeAct->text(), mAutoFaceRecognizeAct->shortcut().toString()));
 
   QAction* pSaveImageRectSelection = mControlToolBar->addAction(QIcon{":img/SAVED"}, "Save Selection");
   pSaveImageRectSelection->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
@@ -50,5 +42,4 @@ SelectionFrame::SelectionFrame(QWidget *parent) : QFrame{parent} {
   connect(pFaceRecognizeAction, &QAction::triggered, this, &SelectionFrame::faceRecognizeRequested);
   connect(pSaveImageRectSelection,  &QAction::triggered, this, &SelectionFrame::saveRequested);
   connect(pCancelImageRectSelection, &QAction::triggered, this, &SelectionFrame::closeRequested);
-  connect(mAutoFaceRecognizeAct, &QAction::toggled, &SelectionFrame::setAutoFaceRecognize);
 }

@@ -10,7 +10,6 @@ class SelectionFrame : public QFrame {
 public:
   explicit SelectionFrame(QWidget* parent = nullptr);
   QLabel* GetFaceRecognizeResultLabel() const { return m_faceRecognizeResult; }
-  bool IsAutoFaceRecognize() const { return bAutoFaceRecognize; }
 
 signals:
   void faceRecognizeRequested();
@@ -26,9 +25,6 @@ protected:
 private:
   QLabel* m_faceRecognizeResult{nullptr};
   QToolBar* mControlToolBar{nullptr};
-
-  static void setAutoFaceRecognize(bool bAuto) { bAutoFaceRecognize = bAuto; }
-  static bool bAutoFaceRecognize;
 };
 
 #endif // SELECTIONFRAME_H

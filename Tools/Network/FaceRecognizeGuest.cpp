@@ -102,15 +102,10 @@ QString FaceRecognizeGuest::GetMatchResultStr(const QJsonArray &names, const QJs
     return QString::asprintf("No Match find at all [%d, %d]", names.size(), scores.size());
   }
   QString msg;
-  msg += QStringLiteral("Name").leftJustified(20, QLatin1Char(' '))
-         + QStringLiteral("Rate").rightJustified(4, QLatin1Char(' '))
-         + QLatin1Char('\n');
-
+  msg += "Rate Name\n";
   const int n = qMin(names.size(), scores.size());
   for (int i = 0; i < n; ++i) {
-    msg += names[i].toString().leftJustified(20, QLatin1Char(' '))
-    + QString::number(scores[i].toDouble(0), 'f', 2).rightJustified(11, QLatin1Char(' '))
-        + QLatin1Char('\n');
+    msg += QString::asprintf("%.2f %s\n", scores[i].toDouble(0), qPrintable(names[i].toString()));
   }
   return msg;
 }
