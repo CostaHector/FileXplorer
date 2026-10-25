@@ -2213,6 +2213,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+9"/>
+        <source>Open Movie Wall</source>
+        <translation>打开海报墙</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Create Thumbnail for Json</source>
         <translation>为json创建缩略图</translation>
     </message>
@@ -2310,7 +2315,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+44"/>
+        <location filename="../../View/SceneListView.cpp" line="+46"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>

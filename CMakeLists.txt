@@ -10,6 +10,9 @@ add_definitions(
     -DAPPLICATION_NAME="${PROJECT_NAME}"
     -DORGANIZATION_NAME="Costa"
 )
+if(WIN32)
+    add_definitions(-D_WIN32_WINNT=0x0A00)
+endif()
 
 SET(PASSVAULT_ENABLED ON)
 if (PASSVAULT_ENABLED)
@@ -98,12 +101,14 @@ set(SRV_HEADER_PATH
     Tools/Json
     Tools/Network
     third_party/mediaInfo/include # only MediaInfoDll.h is suitable for both win and linux.
+    third_party/cpp-httplib
     View
 )
 
 if(WIN32)
     list(APPEND SRV_HEADER_PATH third_party/ffmpeg/include)
     list(APPEND SRV_HEADER_PATH third_party/openssl/include)
+    list(APPEND SRV_HEADER_PATH third_party/cpp-httplib)
 endif()
 
 # only for quick access, not for target generation
@@ -190,7 +195,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi
+        ws2_32 # used in httplib
+    )
     target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ffmpeg/lib")
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)

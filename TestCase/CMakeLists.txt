@@ -18,6 +18,9 @@ add_definitions(
     -DPARENT_PATH_LEN=${RELATIVE_INDEX_START_AT}
     -DRUNNING_UNIT_TESTS=1
 )
+if(WIN32)
+    add_definitions(-D_WIN32_WINNT=0x0A00)
+endif()
 
 SET(PASSVAULT_ENABLED ON)
 if (PASSVAULT_ENABLED)
@@ -136,6 +139,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Tools/Json
     ${PARENT_DIR}/Tools/Network
     ${PARENT_DIR}/third_party/mediaInfo/include # only MediaInfoDll.h suitable for win and linux.
+    ${PARENT_DIR}/third_party/cpp-httplib
     ${PARENT_DIR}/View
     pubTestTool
     MockTool
@@ -144,6 +148,7 @@ set(SRV_HEADER_PATH
 if(WIN32)
     list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/third_party/ffmpeg/include)
     list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/third_party/openssl/include)
+    list(APPEND SRV_HEADER_PATH ${PARENT_DIR}/third_party/cpp-httplib)
 endif()
 
 # only for quick access, not for target generation
@@ -260,7 +265,9 @@ if(WIN32)
     # Desktop Window Manager API（桌面窗口管理器API）
     # Shell Lightweight Utility API（Shell轻量实用工具API）
     # Process Status API(Windows) cpu/memory usage
-    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Psapi dwmapi shlwapi
+        ws2_32 # used in httplib
+    )
     target_link_directories(${PROJECT_NAME} PRIVATE "${PARENT_DIR}/third_party/ffmpeg/lib")
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec avutil swscale)

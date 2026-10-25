@@ -20,6 +20,7 @@ class SceneInPageActions : public QObject {
 
   QAction* _UPDATE_JSON{nullptr};
   QAction* _UPDATE_SCN{nullptr};
+  QAction* _OPEN_MOVIE_WALL{nullptr};
   QAction* _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS{nullptr};
   QAction* _DISABLE_IMAGE_DECORATION{nullptr};
   QAction* _INCLUDEING_SUBDIRECTORIES{nullptr};

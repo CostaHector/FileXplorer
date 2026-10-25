@@ -30,6 +30,12 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
                                   "Processes all JSON files recursively within the selected directory.")
                               .arg(_UPDATE_SCN->text(), _UPDATE_SCN->shortcut().toString()));
 
+  _OPEN_MOVIE_WALL = new (std::nothrow) QAction(QIcon{":img/OPEN_MOVIE_WALL"}, tr("Open Movie Wall"));
+  CHECK_NULLPTR_RETURN_VOID(_OPEN_MOVIE_WALL);
+  _OPEN_MOVIE_WALL->setCheckable(true);
+  _OPEN_MOVIE_WALL->setToolTip(QString{"<b>%1 (%2)</b><br/>Browse the movies in current directory as a poster wall in your default browser."}
+          .arg(_OPEN_MOVIE_WALL->text(), _OPEN_MOVIE_WALL->shortcut().toString()));
+
   _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS = new (std::nothrow) QAction(QIcon{":img/THUMBNAIL_FOR_JSON"}, tr("Create Thumbnail for Json"), this);
   CHECK_NULLPTR_RETURN_VOID(_CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS);
   _CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS->setShortcutVisibleInContextMenu(true);

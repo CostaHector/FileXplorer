@@ -6,6 +6,8 @@
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "BatchRenameBy.h"
+#include "MovieWallServer.h"
+
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -209,6 +211,13 @@ QStringList ScenesListModel::RelativePath2RelatedFiles(const QModelIndexList& in
   return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
 }
 
+void ScenesListModel::bindMovieWallServer(MovieWallServer* _movieWallServer) {
+  _mMovieWallServer = _movieWallServer;
+  if (_mMovieWallServer != nullptr) {
+    _mMovieWallServer->setRootPath(rootPath(), mPagedData.GetSceneElementTypeList());
+  }
+}
+
 bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, const bool bSubdirectories) {
   if (mRootPath == rootPath && !bForce) {
     LOG_D("Scene ignore set same root path");
@@ -218,6 +227,10 @@ bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, co
 
   const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath, bSubdirectories)};
   mPagedData.setData(newEntryList);
+
+  if (_mMovieWallServer != nullptr) {
+    _mMovieWallServer->setRootPath(rootPath, mPagedData.GetSceneElementTypeList());
+  }
   return true;
 }
 
