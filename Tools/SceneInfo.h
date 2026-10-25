@@ -11,17 +11,18 @@ struct SceneInfo {
   static SceneInfo fromJsonVariantHash(const QVariantHash& varHash, const QString& _jsonFileName);
 
   SceneInfo() = default;
-  explicit SceneInfo(const QString& _name, const QStringList& _imgs, const QString& _vidName, const qint64& _vidSize, int _rate, const QString& _jsonFileName)//
-    : name{_name}, imgs{_imgs}, vidName{_vidName}, vidSize{_vidSize}, rate{_rate}, jsonFileName{_jsonFileName} {}
+  explicit SceneInfo(const QString& _name, const QStringList& _imgs, const QString& _vidName, const qint64& _vidSize, int _vidDuration, int _rate, const QString& _jsonFileName)//
+    : name{_name}, imgs{_imgs}, vidName{_vidName}, vidSize{_vidSize}, duration{_vidDuration}, rate{_rate}, jsonFileName{_jsonFileName} {}
 #ifdef RUNNING_UNIT_TESTS
-  explicit SceneInfo(const QString& _rel2scn, const QString& _name, const QStringList& _imgs, const QString& _vidName, const qint64& _vidSize, int _rate, const QString& _jsonFileName)//
-    : SceneInfo{_name, _imgs, _vidName, _vidSize, _rate, _jsonFileName} { InitRel2Scn(_rel2scn); }
+  explicit SceneInfo(const QString& _rel2scn, const QString& _name, const QStringList& _imgs, const QString& _vidName, const qint64& _vidSize, int _vidDuration, int _rate, const QString& _jsonFileName)//
+    : SceneInfo{_name, _imgs, _vidName, _vidSize, _vidDuration, _rate, _jsonFileName} { InitRel2Scn(_rel2scn); }
 #endif
   /* below member are read out from json file contents */
   QString name;      // name, value of key "Name". usually it is the baseName of json file
   QStringList imgs;  // img, value of key "ImgName"
   QString vidName;   // video, value of key "VidName"
   qint64 vidSize;    // video size, value of key "Size"
+  int duration;   // video duration, value of key "Duration"
   int rate;          // video rate, value of key "Rate"
   QString jsonFileName;
   /* above member are read out from json file contents */
@@ -35,6 +36,7 @@ struct SceneInfo {
     DEF_NAME_TEXT_ROLE = DEF_BEGIN_ROLE,  // name
     REL_PATH_ROLE = Qt::UserRole + 1,     // rel2scn + name
     VID_SIZE_ROLE,                        // vidSize
+    DURATION_ROLE,                        // duration
     RATE_ROLE,                            // rate
     INVALID_BUTT_ROLE,
   };
@@ -57,6 +59,7 @@ struct SceneInfo {
   static bool less(const SceneInfo& self, const SceneInfo& other);
   static bool lessThanName(const SceneInfo& self, const SceneInfo& other);
   static bool lessThanVidSize(const SceneInfo& self, const SceneInfo& other);
+  static bool lessThanDuration(const SceneInfo& self, const SceneInfo& other);
   static bool lessThanRate(const SceneInfo& self, const SceneInfo& other);
 
   bool GetNameFromStream(QDataStream& stream);
@@ -81,11 +84,11 @@ struct SceneInfo {
 };
 typedef QList<SceneInfo> SceneInfoList;
 inline QDataStream& operator<<(QDataStream& os, const SceneInfo& item) {
-  return os << item.name << item.imgs << item.vidName << item.vidSize << item.rate << item.jsonFileName;
+  return os << item.name << item.imgs << item.vidName << item.vidSize << item.duration << item.rate << item.jsonFileName;
 }
 
 inline QDataStream& operator>>(QDataStream& is, SceneInfo& item) {
-  return is >> item.name >> item.imgs >> item.vidName >> item.vidSize >> item.rate >> item.jsonFileName;
+  return is >> item.name >> item.imgs >> item.vidName >> item.vidSize >> item.duration >> item.rate >> item.jsonFileName;
 }
 
 namespace SceneHelper {

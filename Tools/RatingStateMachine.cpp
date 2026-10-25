@@ -95,9 +95,11 @@ void RatingStateMachine::ClickSameOneRateBarWhenShow(SceneStyleDelegate& delegat
     // 去修改json/scn 二进制
     if (QAbstractItemModel* model = const_cast<QAbstractItemModel*>(nowInd.model())) {
       bool bResult = model->setData(nowInd, mRateData.newRateValue, SceneInfo::Role::RATE_ROLE);
+      if (bResult) {
+        emit delegate.cellVisualUpdateRequested(nowInd);
+      }
     }
   }
-  emit delegate.cellVisualUpdateRequested(nowInd);
 }
 void RatingStateMachine::ClickSameOneNotRateBarWhenShow(SceneStyleDelegate& delegate,
                                                         const QModelIndex& nowInd,

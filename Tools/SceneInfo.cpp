@@ -20,11 +20,12 @@ constexpr quint16 SceneInfo::MIN_SUPPORTED_VERSION;
 
 SceneInfo SceneInfo::fromJsonVariantHash(const QVariantHash& varHash, const QString& _jsonFileName) {
   return SceneInfo {
-      varHash.value("Name", "").toString(),         //
-      varHash.value("ImgName", "").toStringList(),  //
-      varHash.value("VidName", "").toString(),      //
-      varHash.value("Size", 0).toLongLong(),        //
-      varHash.value("Rate", 0).toInt(),             //
+      varHash.value("Name", "").toString(),        //
+      varHash.value("ImgName", "").toStringList(), //
+      varHash.value("VidName", "").toString(),     //
+      varHash.value("Size", 0).toLongLong(),       //
+      varHash.value("Duration", 0).toInt(),        //
+      varHash.value("Rate", 0).toInt(),            //
       _jsonFileName
   };
 }
@@ -120,6 +121,8 @@ SceneInfo::CompareFunc SceneInfo::getCompareFunc(SceneInfo::Role dim) {
       return &SceneInfo::less;
     case SceneInfo::Role::VID_SIZE_ROLE:
       return &SceneInfo::lessThanVidSize;
+    case SceneInfo::Role::DURATION_ROLE:
+      return &SceneInfo::lessThanDuration;
     case SceneInfo::Role::RATE_ROLE:
       return &SceneInfo::lessThanRate;
     default:
@@ -133,7 +136,7 @@ bool SceneInfo::operator<(const SceneInfo& other) const {
 }
 
 bool SceneInfo::operator==(const SceneInfo& rhs) const {
-  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && rate == rhs.rate;
+  return rel2scn == rhs.rel2scn && name == rhs.name && imgs == rhs.imgs && vidName == rhs.vidName && vidSize == rhs.vidSize && duration == rhs.duration && rate == rhs.rate;
 }
 
 bool SceneInfo::less(const SceneInfo& self, const SceneInfo& other) {
@@ -148,6 +151,10 @@ bool SceneInfo::lessThanVidSize(const SceneInfo& self, const SceneInfo& other) {
   return self.vidSize < other.vidSize;
 }
 
+bool SceneInfo::lessThanDuration(const SceneInfo& self, const SceneInfo& other) {
+  return self.duration < other.duration;
+}
+
 bool SceneInfo::lessThanRate(const SceneInfo& self, const SceneInfo& other) {
   return self.rate < other.rate;
 }
@@ -157,7 +164,7 @@ bool SceneInfo::GetNameFromStream(QDataStream& stream) {
   return stream.status() == QDataStream::Ok;
 }
 bool SceneInfo::DeviateStreamFromNameToRateAndOverrideRate(QDataStream& stream, int newRate) {
-  stream >> imgs >> vidName >> vidSize;
+  stream >> imgs >> vidName >> vidSize >> duration;
   if (stream.status() != QDataStream::Ok) {
     LOG_W("Deviate pointer from name to rate failed");
     return false;
@@ -355,7 +362,7 @@ bool UpdateNameWithNewRate(const QString& scnFilePath, const QString& specifiedN
       continue;
     }
 
-    // 找到匹配记录，现在需要跳过imgs, vidName, vidSize字段到达rate字段, 写入新值
+    // 找到匹配记录，现在需要跳过imgs, vidName, vidSize, duration 字段到达rate字段, 写入新值
     bool reWrite = temp.DeviateStreamFromNameToRateAndOverrideRate(stream, newRate);
     file.close();
     if (!reWrite) {

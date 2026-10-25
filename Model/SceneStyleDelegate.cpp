@@ -1,8 +1,12 @@
 #include "SceneStyleDelegate.h"
 #include "PublicMacro.h"
-#include "ScenesListModel.h"
+#include "SceneInfo.h"
 #include "RateHelper.h"
 #include "ColorTools.h"
+#include "DataFormatter.h"
+#include "VideoTierTool.h"
+
+#include <QApplication>
 #include <QPainter>
 
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
@@ -17,40 +21,68 @@ void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QMo
 
 QString SceneStyleDelegate::displayText(const QVariant& value, const QLocale& loc) const {
   return QStyledItemDelegate::displayText(value, loc);
-  // const QString& text = value.toString();
-  // static constexpr int CHAR_LETTER_CNT = 40;
-  // if (text.size() <= CHAR_LETTER_CNT) {
-  //   return text;
-  // }
-  // return text.left(CHAR_LETTER_CNT / 2) + "..." + text.right(CHAR_LETTER_CNT / 2);
 }
 
-void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
+void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
+                               const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_VOID(painter);
-  // 1. plot basic image and text
-  QStyledItemDelegate::paint(painter, option, index);
-  // 2. only when index = curIndex and display = true. plot rating bar is needed
-  painter->save();
+
+  // 1. Icon and Name
+  {
+    QStyledItemDelegate::paint(painter, option, index);
+    // 1. Don't Draw Icon and Name
+    // QStyleOptionViewItem bgOpt = option;
+    // initStyleOption(&bgOpt, index);           // 保证 features、state 等字段完整
+    // bgOpt.icon = QIcon();
+    // bgOpt.features &= ~QStyleOptionViewItem::HasDecoration;
+    // bgOpt.text.clear();
+    // bgOpt.features &= ~QStyleOptionViewItem::HasDisplay;
+    // QStyle* style = bgOpt.widget ? bgOpt.widget->style() : QApplication::style();
+    // style->drawControl(QStyle::CE_ItemViewItem, &bgOpt, painter, bgOpt.widget);
+  }
+
+  // 2. Meta Info cover image below half
+  QStyleOptionViewItem opt = option;
+  initStyleOption(&opt, index);
+  if (QStyle* style = opt.widget != nullptr ? opt.widget->style() : QApplication::style()) {
+    constexpr int META_H = 28;
+    const QRect decoRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &opt, opt.widget);
+    const QRect metaRect(decoRect.left(), decoRect.bottom() - META_H + 1, decoRect.width(), META_H);
+    drawMeta (painter, metaRect, index);
+  }
+
+  // 3. Rating bar
   if (mRateMachine.status() == RatingState::SELECTED_SHOW && index == mRateMachine.curIndex()) {
     drawRatingGrid(painter, GetRatingAreaRect(option.rect), mRateMachine.oldRate(), mRateMachine.newRate());
   }
+
+  // 4. Current rate
   const int rating = index.data(SceneInfo::Role::RATE_ROLE).toInt();
   drawCurrentRateSquare(painter, option.rect, rating);
-  painter->restore();
 }
 
 void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating) {
   CHECK_NULLPTR_RETURN_VOID(painter);
   currentRateTextRect.setHeight(RateHelper::RATING_BAR_HEIGHT);
   currentRateTextRect.setWidth(RateHelper::RATING_BAR_X);
-  painter->fillRect(currentRateTextRect, ColorTools::GRAY_AND_HALF_TRANS); // gray and half transparent
+
+  painter->save();
+
+  QColor bg{VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(rating))};
+  bg.setAlpha(210);
+  painter->fillRect(currentRateTextRect, bg);
+
   painter->setPen(Qt::white);
   painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));
+
+  painter->restore();
 }
 
 void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating) {
   CHECK_NULLPTR_RETURN_VOID(painter);
   // 绘制半透明背景层
+  painter->save();
+
   painter->fillRect(rect, ColorTools::GRAY_AND_HALF_TRANS); // gray and half transparent
   const int EACH_LINE_WIDTH{rect.width() / 10};
 
@@ -89,6 +121,8 @@ void SceneStyleDelegate::drawRatingGrid(QPainter* painter, const QRect& rect, in
   // 白色 悬浮评分/旧评分
   painter->setPen(Qt::white);
   painter->drawText(hoverRectBar, Qt::AlignCenter, QString::asprintf("%d(%d)", hoverRating, rating));
+
+  painter->restore();
 }
 
 void SceneStyleDelegate::onSceneClicked(const QModelIndex& nowInd, const QRect& visualRect, const QPoint& clickedPnt) {
@@ -99,4 +133,19 @@ QRect SceneStyleDelegate::GetRatingAreaRect(QRect gridVisualRect) {
   gridVisualRect.setLeft(gridVisualRect.left() + RateHelper::RATING_BAR_X);
   gridVisualRect.setHeight(RateHelper::RATING_BAR_HEIGHT);
   return gridVisualRect;
+}
+
+void SceneStyleDelegate::drawMeta(QPainter* painter, const QRect& rect, const QModelIndex& index) {
+  painter->save();
+  painter->fillRect(rect, ColorTools::GRAY_AND_HALF_TRANS);
+
+  const int duration = index.data(SceneInfo::Role::DURATION_ROLE).toInt();
+  painter->setPen(QColor(0xCC, 0xCC, 0xCC));
+  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, DataFormatter::formatDurationISO(duration));
+
+  const qint64 vidSize = index.data(SceneInfo::Role::VID_SIZE_ROLE).toLongLong();
+  painter->setPen(QColor(0x99, 0x99, 0x99));
+  painter->drawText(rect, Qt::AlignRight | Qt::AlignVCenter, DataFormatter::formatFileSizeGMKB(vidSize));
+
+  painter->restore();
 }

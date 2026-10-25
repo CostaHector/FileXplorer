@@ -1,6 +1,5 @@
 #include "ScenesListModel.h"
 #include "SceneKey.h"
-#include "SceneInfoManager.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
@@ -60,11 +59,11 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
     }
     case Qt::ItemDataRole::DecorationRole: {
       if (m_bDisableImage) {
-        return {};
+        return GetDecorationPixmap(":img/IMAGE_BLOCKED");
       }
       QPixmap pm = GetDecorationPixmap(item.GetThumbnailImageAbsPath(mRootPath));
       if (pm.isNull()) {
-        pm = GetDecorationPixmap(":img/IMAGE_NOT_FOUND");
+        return GetDecorationPixmap(":img/IMAGE_NOT_FOUND");
       }
       return pm;
     }
@@ -79,6 +78,9 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
     }
     case SceneInfo::Role::VID_SIZE_ROLE: {
       return item.vidSize;
+    }
+    case SceneInfo::Role::DURATION_ROLE: {
+      return item.duration;
     }
     case SceneInfo::Role::RATE_ROLE: {
       return item.rate;
@@ -291,7 +293,7 @@ bool ScenesListModel::onDisableImageDecorationChanged(bool bDisabled) {
     return true;
   }
   m_bDisableImage = bDisabled;
-  emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole});
+  emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole | Qt::SizeHintRole});
   return true;
 }
 
