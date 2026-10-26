@@ -37,6 +37,8 @@ bool ItemsUnpacker::CanExtractOut(const QStringList& items) {
       case IMG: {
         if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
           noNumberName = result.captured(1);
+        } else if (baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
+          noNumberName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
         }
         break;
       }

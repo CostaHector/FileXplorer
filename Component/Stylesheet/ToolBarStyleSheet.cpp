@@ -26,6 +26,7 @@ QLabel#statusMessageLabel[alertLevel="1"] {
 }
 
 QLabel[needFloatingAndCodeFontFamilyFlag="true"] {
+    color: white;
     background: transparent;
     font-family: "%6";
 }

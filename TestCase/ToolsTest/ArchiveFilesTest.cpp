@@ -170,8 +170,10 @@ class ArchiveFilesTest : public PlainTestSuite {
 
     // 读取验证
     ArchiveFilesReader reader;
+    QCOMPARE(reader.achiveFilePath(), "");
     QVERIFY(reader.ReadAchiveFile(archivePath));
     QCOMPARE(reader.size(), 2);
+    QCOMPARE(reader.achiveFilePath(), archivePath);
 
     // 1.0 覆盖模式压缩一个新文件, 1 ignored video
     QCOMPARE(writer.CompressNow(tDir.path(), {"file3.txt", "file4.mp4"}, archivePath, false), 1);

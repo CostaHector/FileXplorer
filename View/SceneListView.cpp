@@ -20,6 +20,7 @@
 #include "JsonParser.h"
 #include "InputDialogHelper.h"
 
+#include <QDesktopServices>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -162,7 +163,7 @@ void SceneListView::setRootPath(const QString& rootPath) {
     return;
   }
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(rootPath, false, bSubdirectories);
+  _sceneModel->setRootPath(rootPath, bSubdirectories, false);
 }
 
 int SceneListView::onUpdateJsonFiles() {
@@ -201,7 +202,7 @@ int SceneListView::onUpdateScnFiles() {
   int scnFileCnt = ScnMgr::UpdateScnFiles(workPath);
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(workPath, true, bSubdirectories);
+  _sceneModel->setRootPath(workPath, bSubdirectories, true);
   return scnFileCnt;
 }
 
@@ -223,7 +224,7 @@ int SceneListView::onClearScnFiles() {
   int deleteCnt = ScnMgr::ClearScnFiles(workPath);
   LOG_OK_P("Delete scn file", "cnt: %d under[%s]", deleteCnt, qPrintable(workPath));
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(workPath, true, bSubdirectories);
+  _sceneModel->setRootPath(workPath, bSubdirectories, true);
   return deleteCnt;
 }
 

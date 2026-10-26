@@ -13,7 +13,7 @@ class HarMgrTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-  void initTestCase() { HarFilesMocker::mockHarFiles().clear(); }
+  void initTestCase() { HarFilesMocker::mockHarFiles("").clear(); }
 
   void default_ok() {
     HarMgr harMgr;
@@ -49,7 +49,7 @@ private slots:
     const QByteArray gifBa{FileTool::ByteArrayReader(":/image_test/sample_Blink_WhiteBlackRed")};
     QVERIFY(gifBa.size() > 0);
 
-    emit harMgr.m_harView->pixmapByteArrayChanged(gifBa, "gif");
+    emit harMgr.m_harView->pixmapByteArrayChanged(gifBa, "gif", ":/image_test/sample_Blink_WhiteBlackRed");
 
     QVERIFY(harMgr.m_imgPreview->mLabel->movie() != nullptr);
   }

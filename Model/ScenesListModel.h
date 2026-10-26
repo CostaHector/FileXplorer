@@ -21,7 +21,7 @@ class ScenesListModel : public QAbstractListModelPub {
   bool setSortDimension(SceneInfo::Role newSortDimension);
   bool setSortResultReverse(bool bResultReverse);
 
-  bool setRootPath(const QString& rootPath, const bool bForce = false, const bool bSubdirectories = true);
+  bool setRootPath(const QString& rootPath, bool bSubdirectories, bool bForce);
   inline QString rootPath() const { return mRootPath; }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
@@ -66,6 +66,7 @@ class ScenesListModel : public QAbstractListModelPub {
 
   QString mPattern;
   QString mRootPath;
+  bool m_bSubdirectories{false};
   PaginatedSceneList mPagedData;
   bool m_bSortProxyInited{false};
   bool m_bDisableImage{false};

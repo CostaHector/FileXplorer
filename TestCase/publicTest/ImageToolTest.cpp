@@ -23,11 +23,11 @@ private:
   QByteArray gifBa;
 
   const QString mExistVidPath{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s.mp4")};
-  const int mStartPositionSecond{5};
+  const int mStartPositionMs{5000};
   const int mIntervalSecond{2};
   const int mFramesCount{2};
-  const QString mExistVidPathSceenshotAt5s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s %1.jpg").arg(mStartPositionSecond)};
-  const QString mExistVidPathSceenshotAt7s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s %1.jpg").arg(mStartPositionSecond + mIntervalSecond)};
+  const QString mExistVidPathSceenshotAt5s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s_000005.000.jpg")}; // 5s
+  const QString mExistVidPathSceenshotAt7s{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH + QString("/Big Buck Bunny SampleVideo_360x240_1mb 13s_000007.000.jpg")}; // 5+2=7s
 
   TDir mTDir;
   QString src{mTDir.itemPath("FolderKaka/FolderKaka.png")};
@@ -171,16 +171,16 @@ private slots:
   }
 
   void GrabFramesFromVideos_ok() { //
-    QCOMPARE(ImageTool::GrabFramesFromVideos({}, mStartPositionSecond, mIntervalSecond, mFramesCount, true), 0);
-    QCOMPARE(ImageTool::GrabFramesFromVideos({"inexist video.mp4"}, mStartPositionSecond, mIntervalSecond, mFramesCount, true), 0);
+    QCOMPARE(ImageTool::GrabFramesFromVideos({}, mStartPositionMs, mIntervalSecond, mFramesCount, true), 0);
+    QCOMPARE(ImageTool::GrabFramesFromVideos({"inexist video.mp4"}, mStartPositionMs, mIntervalSecond, mFramesCount, true), 0);
 
     QVERIFY(!QFile::exists(mExistVidPathSceenshotAt5s));
     QVERIFY(!QFile::exists(mExistVidPathSceenshotAt7s));
-    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionSecond, mIntervalSecond, mFramesCount, true), 1);  // skip if exist
+    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionMs, mIntervalSecond, mFramesCount, true), 1);  // skip if exist
     QVERIFY(QFile::exists(mExistVidPathSceenshotAt5s));
     QVERIFY(QFile::exists(mExistVidPathSceenshotAt7s));
-    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionSecond, mIntervalSecond, mFramesCount, true), 0);  // skip if exist
-    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionSecond, mIntervalSecond, mFramesCount, false), 1); // override if exist
+    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionMs, mIntervalSecond, mFramesCount, true), 0);  // skip if exist
+    QCOMPARE(ImageTool::GrabFramesFromVideos({mExistVidPath}, mStartPositionMs, mIntervalSecond, mFramesCount, false), 1); // override if exist
   }
 };
 

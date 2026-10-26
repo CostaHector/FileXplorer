@@ -28,6 +28,8 @@ private:
   QShortcut* topShortcut{nullptr}, *bottomShortcut{nullptr};
 };
 
+class MovieWallServer;
+
 class NavigationAndAddressBar : public QToolBar {
   Q_OBJECT
 public:
@@ -56,10 +58,11 @@ public:
   }
 
   AddressELineEdit* m_addressLine{nullptr};
+  QAction* mOpenMovieWall{nullptr};
   PathUndoRedoer m_pathRD;
   FolderNxtAndLastIterator mFolderNxtLstIt;
-  QLineEdit* mFsSearchLE{nullptr};
   TypeFilterButton* m_fsFilterBtn{nullptr};
+  QLineEdit* mFsSearchLE{nullptr};
 
 private:
   bool onIteratorToAnotherFolderCore(bool isNext);
@@ -67,6 +70,9 @@ private:
   T_IntoNewPath m_IntoNewPath{nullptr};
   T_on_searchTextChanged m_on_searchTextChanged{nullptr};
   T_on_searchEnterKey m_on_searchEnterKey{nullptr};
+
+  bool onToggleMovieWall(bool bLauchServer);
+  MovieWallServer* mMovieWallServer{nullptr};
 };
 
 #endif  // NAVIGATIONANDADDRESSBAR_H

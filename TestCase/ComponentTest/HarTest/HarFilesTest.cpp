@@ -319,19 +319,25 @@ void HarFilesTest::test_EncodingTypes() {
 
   // 解析.har文件
   HarFiles harFiles;
+  QCOMPARE(harFiles.baseFileFullPath(-1), ""); // out of range
+
   QVERIFY(harFiles(harFilePath));
+  QCOMPARE(harFiles.harFileFullPath(), harFilePath);
 
   // 验证解析结果
   QCOMPARE(harFiles.size(), 3);
 
   // 验证base64编码
   QCOMPARE(harFiles[0].content, QByteArray("hello"));
+  QCOMPARE(harFiles.baseFileFullPath(0), mTDir.itemPath("image1.jpg"));
 
   // 验证literal编码
   QCOMPARE(harFiles[1].content, QByteArray("plain text content"));
+  QCOMPARE(harFiles.baseFileFullPath(1), mTDir.itemPath("image2.png"));
 
   // 验证默认编码（应为literal）
   QCOMPARE(harFiles[2].content, QByteArray("aGVsbG8=")); // 因为没有指定encoding，所以不进行base64解码
+  QCOMPARE(harFiles.baseFileFullPath(2), mTDir.itemPath("image3.gif"));
 }
 
 #include "HarFilesTest.moc"

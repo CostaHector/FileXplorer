@@ -8,6 +8,7 @@
 #include "FileImageViewer.h"
 #include "EndToExposePrivateMember.h"
 #include "ImageTool.h"
+#include "ImageViewerActions.h"
 #include "MouseKeyboardEventHelper.h"
 #include "ImageTestPrecoditionTools.h"
 
@@ -57,7 +58,6 @@ private slots:
     // 验证默认值
     QCOMPARE(viewer.GetCurImageSizeScale(), 1);
 
-    QVERIFY(viewer.mNavigateIntoSub != nullptr);
     QVERIFY(viewer.mMenu == nullptr);
     QVERIFY(viewer._OPEN_IN_SYSTEM_APPLICATION == nullptr);
     QVERIFY(viewer._REVEAL_IN_FILE_EXPLORER == nullptr);
@@ -109,9 +109,12 @@ private slots:
   }
 
   void img_Navigate_ok() {
+    auto& inst = ImageViewerActions::GetInst();
+    inst.NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT->setChecked(false);
+
     FileImageViewer viewer{"ThumbnailImageViewer_Navigate_ok"};
     // not including subdirectory
-    QVERIFY(!viewer.mNavigateIntoSub->isChecked());
+    QVERIFY(!inst.NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT->isChecked());
     QVERIFY(!viewer.mImgIt.IsIncludingSubDirectory());
 
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, pngName));
@@ -138,8 +141,8 @@ private slots:
       QCOMPARE(viewer.mRel2Image, gifName);
     }
 
-    viewer.mNavigateIntoSub->toggle();
-    QVERIFY(viewer.mNavigateIntoSub->isChecked());
+    inst.NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT->toggle();
+    QVERIFY(inst.NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT->isChecked());
     QVERIFY(viewer.mImgIt.IsIncludingSubDirectory());
 
     viewer.NavigateIntoSubdirectoryChanged(false);

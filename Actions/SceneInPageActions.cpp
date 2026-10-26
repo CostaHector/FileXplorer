@@ -114,6 +114,10 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_SIZE);
   _BY_MOVIE_SIZE->setCheckable(true);
 
+  _BY_MOVIE_DURATION = new (std::nothrow) QAction(tr("Movie Duration"), this);
+  CHECK_NULLPTR_RETURN_VOID(_BY_MOVIE_DURATION);
+  _BY_MOVIE_DURATION->setCheckable(true);
+
   _BY_RATE = new (std::nothrow) QAction(tr("Movie Rate"), this);
   CHECK_NULLPTR_RETURN_VOID(_BY_RATE);
   _BY_RATE->setCheckable(true);
@@ -135,6 +139,7 @@ SceneInPageActions::SceneInPageActions(QObject* parent)
   mSortOrderIntAction.init({{_BY_NAME, SceneInfo::Role::DEF_NAME_TEXT_ROLE},      //
                             {_BY_MOVIE_PATH, SceneInfo::Role::REL_PATH_ROLE},     //
                             {_BY_MOVIE_SIZE, SceneInfo::Role::VID_SIZE_ROLE},     //
+                            {_BY_MOVIE_DURATION, SceneInfo::Role::DURATION_ROLE},
                             {_BY_RATE, SceneInfo::Role::RATE_ROLE},
                             }, //
                            SceneInfo::DEF_SORT_ROLE,

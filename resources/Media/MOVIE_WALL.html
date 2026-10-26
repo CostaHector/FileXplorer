@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>Movie Wall</title>
+
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #1a1a1a; color: #eee;
+       font-family: system-ui, sans-serif; }
+h1 { font-size: 20px; margin: 0 0 12px; }
+
+/* 每列5个 */
+<!--.poster-wall {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}-->
+/* Flow: Left To Right */
+.poster-wall {
+  display: grid;
+  /* 每列至少 280px，剩余空间由 1fr 均分；放不下就自动换行 */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.poster {
+  background: #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 海报图片：宽度撑满卡片，高度按原图比例，不裁剪 */
+.poster img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #111;            /* 图片加载前的占位底色，避免闪白 */
+  cursor: pointer;             /* 提示可点击（双击开视频） */
+  user-select: none;           /* 双击时不选中图片 */
+  -webkit-user-drag: none;     /* 双击时不触发拖拽 */
+  transition: filter 0.15s;    /* 悬停提亮的过渡 */
+}
+
+.poster img:hover {
+  filter: brightness(1.08);    /* 轻微提亮，提示可交互 */
+}
+
+/* 中间层：时长 | 文件大小 | 星级 */
+.poster .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #222;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+/* 时长：固定 8 字符，不伸缩 */
+.poster .meta .duration {
+  flex: 0 0 auto;
+  color: #aaa;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;   /* 数字等宽，XX:XX:XX 不会抖动 */
+  letter-spacing: 0.2px;
+}
+
+/* 文件大小：唯一可伸缩的字段，太长省略 */
+.poster .meta .size {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* 评分区：星星 + 数值，整体不压缩 */
+.poster .meta .rating {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* 星星 */
+.poster .meta .stars {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.poster .meta .stars .star { display: inline-block; transition: transform 0.1s; }
+.poster .meta .stars .star:hover { transform: scale(1.25); }
+.poster .meta .stars .on  { color: #f5c518; }
+.poster .meta .stars .off { color: #555; }
+
+/* 数值：等宽、右对齐，0-9 和 10 占位一致，星星不会左右跳 */
+.poster .meta .score {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 1.6em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.poster .meta .score.none { color: #666; }   /* 0 */
+.poster .meta .score.low  { color: #e05c5c; } /* 1-4 */
+.poster .meta .score.mid  { color: #e0a63c; } /* 5-7 */
+.poster .meta .score.high { color: #4caf50; } /* 8-10 */
+
+/* 名称层：自动换行，不省略 */
+.poster .name {
+  padding: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: normal;        /* 覆盖 nowrap，允许换行 */
+  overflow-wrap: anywhere;    /* 长英文单词 / 无空格字符串也能断行 */
+  word-break: break-word;     /* 旧浏览器兜底 */
+  cursor: pointer;             /* 提示可点击播放 */
+}
+.poster .name:hover {
+  color: #fff;                 /* 悬停变白，暗示可交互 */
+}
+
+/* 路径导航栏 */
+/* ---------- 顶部工具栏 ---------- */
+.wall-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 4px;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+.wall-toolbar .wall-tool-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2e2e2e;
+  border: none;
+  color: #ddd;
+  height: 28px;
+  min-width: 32px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.wall-toolbar .wall-tool-btn:hover:not(:disabled)  { background: #3a3a3a; color: #fff; }
+.wall-toolbar .wall-tool-btn:active:not(:disabled) { background: #262626; }
+.wall-toolbar .wall-tool-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+@keyframes bounce {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+/* 文件夹遍历时已经到顶/底了 */
+.wall-tool-btn.btn-bounce { animation: bounce 0.3s ease; }
+/* toggle 按钮：未选中 = 普通按钮外观；选中 = 绿色高亮 */
+.wall-toolbar .wall-toggle-btn[aria-pressed="true"] {
+  background: #2f4a2f;
+  color: #8fd18f;
+}
+.wall-toolbar .wall-toggle-btn[aria-pressed="true"]:hover:not(:disabled) {
+  background: #3a5a3a;
+  color: #a8e0a8;
+}
+
+.wall-toolbar .wall-path-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+.wall-toolbar .wall-path-input:focus {
+  border-color: #555;
+  color: #eee;
+}
+.wall-toolbar .wall-path-input.input-invalid {
+  border-color: #e05c5c;
+  transition: border-color 0.15s;
+}
+
+/* ---------- 详情抽屉 + 缩略图轮盘 ---------- */
+.detail-backdrop {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.detail-backdrop.open {
+  opacity: 1; pointer-events: auto;
+}
+
+.detail-drawer {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 901;
+  height: 80vh;                /* 固定高度，不再用 max-height */
+  background: #202020;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+  overflow: hidden;            /* 防止圆角处内容溢出 */
+}
+.detail-drawer.open { transform: translateY(0); }
+
+/* 顶部拖拽把手，纯视觉提示，不实现拖拽 */
+.detail-drawer .handle {
+  width: 40px; height: 4px; margin: 8px auto 0;
+  background: #555; border-radius: 2px; flex: 0 0 auto;
+}
+
+.detail-drawer .head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex: 0 0 auto;
+}
+.detail-drawer .head .title {
+  font-size: 18px; font-weight: 600; color: #eee;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  cursor: pointer;             /* 提示可点击播放 */
+}
+.detail-drawer .head .title:hover {
+  color: #fff;
+}
+.detail-drawer .head .close-btn {
+  background: none; border: none; color: #aaa; font-size: 26px;
+  cursor: pointer; line-height: 1; padding: 0 4px;
+}
+.detail-drawer .head .close-btn:hover { color: #fff; }
+
+.detail-drawer .sub {
+  padding: 0 20px 12px; color: #888; font-size: 13px;
+  display: flex; gap: 16px; flex: 0 0 auto;
+}
+
+/* 中间层，负责让 hero 在抽屉内收缩 */
+.detail-drawer .gallery {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;      /* 关键：不设 0，hero 的 max-height 会被忽略 */
+  overflow: hidden;
+}
+
+/* 索引行：‹  3 / 7  › */
+.detail-drawer .index-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 4px 20px 8px;
+  color: #aaa;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.detail-drawer .index-bar .nav-btn {
+  background: #2e2e2e;
+  border: none;
+  color: #ddd;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.detail-drawer .index-bar .nav-btn:hover:not(:disabled) { background: #3a3a3a; }
+.detail-drawer .index-bar .nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* 大图区 */
+.detail-drawer .hero {
+  flex: 1 1 auto;
+  min-height: 0;               /* 关键：允许收缩，不再写死 200px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px 8px;
+  overflow: hidden;
+}
+.detail-drawer .hero img {
+  max-width: 100%;
+  max-height: 100%;            /* 相对 hero，而不是 50vh */
+  object-fit: contain;
+  border-radius: 8px;
+  background: #111;
+}
+
+/* 缩略图轮盘 */
+.detail-drawer .thumbstrip {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 8px 20px 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+.detail-drawer .thumbstrip::-webkit-scrollbar { height: 6px; }
+.detail-drawer .thumbstrip::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+.detail-drawer .thumbstrip img {
+  flex: 0 0 auto;
+  height: 56px;
+  width: auto;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.45;
+  border: 2px solid transparent;
+  object-fit: cover;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.detail-drawer .thumbstrip img:hover { opacity: 0.8; }
+.detail-drawer .thumbstrip img.active {
+  opacity: 1;
+  border-color: #f5c518;
+}
+
+
+/* ---------- 确认对话框 ---------- */
+.confirm-backdrop {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.confirm-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.confirm-dialog {
+  position: fixed; z-index: 1001;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  width: min(440px, 90vw);
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  padding: 20px 20px 14px;
+  color: #eee;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.confirm-dialog.open {
+  opacity: 1; pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.confirm-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+}
+.confirm-message {
+  font-size: 14px; line-height: 1.6; color: #ddd;
+  margin-bottom: 18px; white-space: pre-wrap;
+}
+.confirm-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+.confirm-btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+}
+.confirm-cancel { background: #333; color: #ddd; }
+.confirm-cancel:hover { background: #3d3d3d; }
+.confirm-ok { background: #3a7bd5; color: #fff; }
+.confirm-ok:hover { background: #4a8be5; }
+
+</style>
+</head>
+
+<body>
+<!-- 导航栏(包含子路径, 上一级, 路径输入框, 上一文件夹, 下一文件夹) -->
+<div class="wall-toolbar">
+  <button class="wall-tool-btn" id="backToBtn" title="Back to last path (Mouse BackButton)" disabled>
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="11,4 6,8 11,12"/>
+      <line x1="3" y1="4" x2="3" y2="12"/>
+    </svg>
+  </button>
+  <button class="wall-tool-btn" id="forwardToBtn" title="Forward to next path (Mouse ForwardButton)" disabled>
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="5,4 10,8 5,12"/>
+      <line x1="13" y1="4" x2="13" y2="12"/>
+    </svg>
+  </button>
+  <button class="wall-tool-btn wall-toggle-btn" id="subdirToggleBtn"
+          title="Include subdirectories" aria-pressed="false">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+         stroke="currentColor" stroke-width="1.5"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 4.5 V12 H14 V4.5 H7 L6 3 H2 Z"/>
+      <path d="M5.5 7.5 H10.5"/>
+      <path d="M5.5 10 H10.5"/>
+    </svg>
+  </button>
+  <button class="wall-tool-btn" id="levelUpBtn" title="Go to parent folder">..</button>
+  <input class="wall-path-input" id="pathInput" type="text" value="" spellcheck="false" list="pathHistoryList">
+  <datalist id="pathHistoryList"></datalist>
+  <button class="wall-tool-btn" id="prevFolderBtn" title="Previous folder (Ctrl+[)">
+  <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+       stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4,10 8,6 12,10"/>
+  </svg>
+  </button>
+  <button class="wall-tool-btn" id="nextFolderBtn" title="Next folder (Ctrl+])">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+        stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4,6 8,10 12,6"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 确认框 -->
+<div class="confirm-backdrop" id="confirmBackdrop"></div>
+<div class="confirm-dialog" id="confirmDialog" role="dialog" aria-modal="true">
+  <h2 class="confirm-title" id="confirmTitle"></h2>
+  <div class="confirm-message" id="confirmMessage"></div>
+  <div class="confirm-actions">
+    <button class="confirm-btn confirm-cancel" id="confirmCancel">Cancel</button>
+    <button class="confirm-btn confirm-ok" id="confirmOk">Continue</button>
+  </div>
+</div>
+
+
+<h1 id="wallTitle">Movie Wall</h1>
+<div class="poster-wall" id="wall"></div>
+
+<script>
+function stars(r) {
+  r = Math.max(0, Math.min(10, Math.round(Number(r) || 0)));
+  let out = '';
+  for (let i = 1; i <= 10; i++) {
+    out += `<span class="star ${i <= r ? 'on' : 'off'}" data-value="${i}">★</span>`;
+  }
+  return out;
+}
+
+function rateClass(r) {
+  if (r <= 0) return 'none';
+  if (r <= 4) return 'low';
+  if (r <= 7) return 'mid';
+  return 'high';
+}
+
+function ratingHtml(r) {
+  const v = Math.max(0, Math.min(10, Math.round(Number(r) || 0)));
+  return `<span class="stars">${stars(v)}</span>`
+       + `<span class="score ${rateClass(v)}">${v}</span>`;
+}
+
+function msToHMS(ms) {
+  const total = Math.max(0, Math.floor(Number(ms) || 0));
+  const s = Math.floor(total / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+}
+
+function formatFileSizeGMKB(total) {
+  const n = Number(total) || 0;
+  const G = 1024 * 1024 * 1024;
+  const M = 1024 * 1024;
+  const K = 1024;
+
+  const g = Math.floor(n / G);
+  const remG = n % G;
+  const m = Math.floor(remG / M);
+  const remM = remG % M;
+  const k = Math.floor(remM / K);
+  const b = remM % K;
+
+  return `${g}'${m}'${k}'${b}`;
+}
+
+// ---------- 路径历史记录（datalist） ----------
+const PATH_HISTORY_KEY = 'movieWall.pathHistory';
+const PATH_HISTORY_MAX = 20;
+
+function loadPathHistory() {
+  try {
+    const raw = localStorage.getItem(PATH_HISTORY_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string') : [];
+  } catch { return []; }
+}
+
+function pushPathHistory(path) {
+  if (!path) return;
+  // 去重 + 移到最前
+  const list = loadPathHistory().filter(p => p !== path);
+  list.unshift(path);
+  if (list.length > PATH_HISTORY_MAX) list.length = PATH_HISTORY_MAX;
+  try {
+    localStorage.setItem(PATH_HISTORY_KEY, JSON.stringify(list));
+  } catch { /* 隐私模式或配额满，降级为不持久化 */ }
+  renderPathHistory();
+}
+
+function renderPathHistory() {
+  const dl = document.getElementById('pathHistoryList');
+  if (!dl) return;
+  dl.innerHTML = loadPathHistory()
+    .map(p => `<option value="${escapeHtml(p)}"></option>`)
+    .join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+renderPathHistory();   // 首次渲染，把已有历史填充进 datalist
+
+// ---------- 路径撤销/重做 ----------
+class PathUndoRedoer {
+  constructor() {
+    this._undo = [];   // 数组末尾视为栈顶
+    this._redo = [];
+  }
+
+  // 普通导航成功后调用；和当前栈顶相同时不重复入栈
+  push(path) {
+    this._undo.push(path);
+    // 浏览器行为, 新导航清空 redo 栈
+    // this._redo.length = 0;
+  }
+
+  canUndo() { return this._undo.length > 1; }
+  canRedo() { return this._redo.length > 0; }
+
+  undo() {
+    if (!this.canUndo()) return '';
+    this._redo.push(this._undo.pop());
+    return this._undo[this._undo.length - 1];
+  }
+
+  redo() {
+    if (!this.canRedo()) return '';
+    const p = this._redo.pop();
+    this._undo.push(p);
+    return p;
+  }
+}
+
+const undoRedo = new PathUndoRedoer();
+
+function updateUndoRedoButtons() {
+  const backBtn = document.getElementById('backToBtn');
+  const fwdBtn  = document.getElementById('forwardToBtn');
+  if (backBtn) backBtn.disabled = !undoRedo.canUndo();
+  if (fwdBtn)  fwdBtn.disabled  = !undoRedo.canRedo();
+}
+
+async function doSetRootPath(path) {
+  try {
+    const res = await fetch('/api/setrootpath', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    });
+    const data = await res.json();
+    return data.ok === true;
+  } catch (err) {
+    console.error('[nav] request failed:', err);
+    return false;
+  }
+}
+
+async function load() {
+  const resp = await (await fetch('/api/movies')).json();
+  const movies = Array.isArray(resp.movies) ? resp.movies : [];
+  const rootPath = typeof resp.rootPath === 'string' ? resp.rootPath : '';
+  const subdir = !!resp.subdirectories;
+
+  // 1. 浏览器标签页标题
+  document.title = rootPath || 'Movie Wall';
+
+  // 2. 路径框
+  const input = document.getElementById('pathInput');
+  if (input) input.value = rootPath;
+
+  if (rootPath) pushPathHistory(rootPath); 
+
+  // 3. 页面大标题
+  const h1 = document.getElementById('wallTitle');
+  if (h1) h1.textContent = `Movie Wall: ${movies.length} items`;
+
+  const subdirBtn = document.getElementById('subdirToggleBtn');
+  if (subdirBtn) {
+    subdirBtn.setAttribute('aria-pressed', subdir ? 'true' : 'false');
+  }
+
+  // 4. 海报墙
+  const wall = document.getElementById('wall');
+  wall.innerHTML = movies.map(m => `
+    <div class="poster" data-id="${m.id}" data-rate="${m.rate}">
+      <img src="${m.thumbUrl}" loading="lazy" alt="">
+      <div class="meta">
+        <div class="duration" title="Video Duration">${msToHMS(m.duration)}</div>
+        <div class="size" title="Video Size">${formatFileSizeGMKB(m.vidSize)}</div>
+        <div class="rating">${ratingHtml(m.rate)}</div>
+      </div>
+      <div class="name" title="${m.name}">${m.name}</div>
+    </div>
+  `).join('');
+
+  return rootPath;
+}
+(async () => {
+  const p = await load();
+  if (p) undoRedo.push(p);   // 初始路径作为 undo 栈的基线
+  updateUndoRedoButtons();   // back 和 forward 初始都是 disabled
+})();
+
+// 点击标题/详情页标题 播放
+async function playVideo(id) {
+  try {
+    const res = await fetch('/api/openvideo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (!data.ok) console.warn('[video] failed:', data.error);
+  } catch (err) {
+    console.error('[video] request failed:', err);
+  }
+}
+
+// 事件委托：点击任意星星
+document.getElementById('wall').addEventListener('click', async (e) => {
+  // 1. 星星：立即改评分
+  const star = e.target.closest('.star');
+  if (star) {
+    const poster = star.closest('.poster');
+    if (!poster) return;
+    const id = Number(poster.dataset.id);
+    const newRate = Number(star.dataset.value);
+    const oldRate = Number(poster.dataset.rate);
+    if (newRate === oldRate) return;
+    try {
+      const res = await fetch('/api/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, rate: newRate }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        poster.dataset.rate = String(newRate);
+        poster.querySelector('.rating').innerHTML = ratingHtml(newRate);
+      } else {
+        console.warn('[rate] failed:', data.error);
+      }
+    } catch (err) {
+      console.error('[rate] request failed:', err);
+    }
+    return;
+  }
+
+  // 2. 卡片标题：播放视频
+  const nameEl = e.target.closest('.poster .name');
+  if (nameEl) {
+    const poster = nameEl.closest('.poster');
+    if (!poster) return;
+    playVideo(Number(poster.dataset.id));
+    return;
+  }
+
+  // 3. 海报图片：立即打开详情
+  const img = e.target.closest('.poster img');
+  if (!img) return;
+  const poster = img.closest('.poster');
+  openDetailDrawer(Number(poster.dataset.id));
+});
+
+/* 是否包含子路径按钮状态变更 */
+document.getElementById('subdirToggleBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  const current = btn.getAttribute('aria-pressed') === 'true';
+  const next = !current;
+
+  btn.disabled = true;   // 请求期间禁点，防连击
+
+  try {
+    const res = await fetch('/api/setsubdirectories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: next }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      await load();   // 重新拉数据，aria-pressed / h1 / 路径框 / 海报墙全部刷新
+    } else {
+      console.warn('[subdir] no change');
+    }
+  } catch (err) {
+    console.error('[subdir] failed:', err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ---------- 通用确认框 ----------
+// opts: { title, message, okText?, cancelText? } -> Promise<boolean>
+function showConfirm(opts) {
+  const {
+    title = 'Confirm',
+    message = '',
+    okText = 'Continue',
+    cancelText = 'Cancel',
+  } = opts || {};
+
+  return new Promise((resolve) => {
+    const backdrop  = document.getElementById('confirmBackdrop');
+    const dialog    = document.getElementById('confirmDialog');
+    const titleEl   = document.getElementById('confirmTitle');
+    const msgEl     = document.getElementById('confirmMessage');
+    const btnOk     = document.getElementById('confirmOk');
+    const btnCancel = document.getElementById('confirmCancel');
+
+    titleEl.textContent   = title;
+    msgEl.textContent     = message;
+    btnOk.textContent     = okText;
+    btnCancel.textContent = cancelText;
+
+    const cleanup = (result) => {
+      backdrop.classList.remove('open');
+      dialog.classList.remove('open');
+      backdrop.onclick  = null;
+      btnOk.onclick     = null;
+      btnCancel.onclick = null;
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') cleanup(false);
+      else if (e.key === 'Enter') cleanup(true);
+    };
+
+    backdrop.onclick  = () => cleanup(false);
+    btnCancel.onclick = () => cleanup(false);
+    btnOk.onclick     = () => cleanup(true);
+    document.addEventListener('keydown', onKey);
+
+    backdrop.classList.add('open');
+    dialog.classList.add('open');
+    setTimeout(() => btnOk.focus(), 50);
+  });
+}
+
+// ---------- 路径工具 ----------
+function normalizePath(p) {
+  return (p || '').replace(/\\/g, '/').replace(/\/+$/, '');
+}
+function countSlashes(p) {
+  if (!p) return 0;
+  let end = p.length;
+  while (end > 0 && (p[end - 1] === '/' || p[end - 1] === '\\')) end--;
+  let n = 0;
+  for (let i = 0; i < end; i++) {
+    if (p[i] === '/' || p[i] === '\\') n++;
+  }
+  return n;
+}
+function parentOf(p) {
+  const n = normalizePath(p);
+  const idx = n.lastIndexOf('/');
+  if (idx <= 0) return null;                  // 已经是根路径
+  const parent = n.substring(0, idx);
+  if (/^[A-Za-z]:$/.test(parent)) return parent + '/';
+  return parent;
+}
+
+// ---------- 统一导航入口 ----------
+async function navigateToPath(newPath) {
+  newPath = normalizePath(newPath);
+  if (!newPath) return;
+
+  const subdirBtn = document.getElementById('subdirToggleBtn');
+  const subdirOn  = subdirBtn && subdirBtn.getAttribute('aria-pressed') === 'true';
+
+  if (countSlashes(newPath) <= 3 && subdirOn) {
+    const ok = await showConfirm({
+      title: 'This May Take a While',
+      message: `The target path "${newPath}" is near the drive root, `
+             + `and "Include subdirectories" is enabled. `
+             + `Building the poster wall may take a while.`,
+    });
+    if (!ok) return;
+  }
+
+  const pathInput    = document.getElementById('pathInput');
+  const originalPath = pathInput ? pathInput.value : '';
+
+  const ok = await doSetRootPath(newPath);
+  if (ok) {
+    const p = await load();
+    undoRedo.push(p);
+    updateUndoRedoButtons();
+  } else {
+    if (pathInput) {
+      pathInput.value = originalPath;
+      pathInput.classList.add('input-invalid');
+      setTimeout(() => pathInput.classList.remove('input-invalid'), 800);
+    }
+    console.warn('[nav] path unchanged or failed:', newPath);
+  }
+}
+
+// ---------- levelUpBtn ----------
+document.getElementById('levelUpBtn').addEventListener('click', async () => {
+  const current = document.getElementById('pathInput').value;
+  const parent  = parentOf(current);
+  if (!parent) {
+    console.warn('[levelUp] already at root');
+    return;
+  }
+  await navigateToPath(parent);
+});
+
+// ---------- pathInput Enter ----------
+document.getElementById('pathInput').addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  await navigateToPath(document.getElementById('pathInput').value);
+});
+// ---------- 同级文件夹导航 ----------
+async function navigateSiblingFolder(isNext) {
+  const btn = document.getElementById(isNext ? 'nextFolderBtn' : 'prevFolderBtn');
+  if (!btn || btn.disabled) return;   // 请求期间按快捷键不重复发请求
+
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/navigatefolder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isNext }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      const p = await load();   // 刷新 pathInput、h1、海报墙
+      undoRedo.push(p);
+      updateUndoRedoButtons();
+    } else {
+      // data.ok=false：已到第一个/最后一个目录，什么都不做
+      btn.classList.add('btn-bounce');
+      setTimeout(() => btn.classList.remove('btn-bounce'), 300);
+    }
+  } catch (err) {
+    console.error('[nav] request failed:', err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// back / forward 回调
+document.getElementById('prevFolderBtn').addEventListener('click', () => navigateSiblingFolder(false));
+document.getElementById('nextFolderBtn').addEventListener('click', () => navigateSiblingFolder(true));
+document.addEventListener('keydown', (e) => {
+  // 只在纯 Ctrl + 括号时触发；Ctrl+Shift / Ctrl+Alt 等组合不拦截
+  if (!e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+
+  // 有确认框打开时，不触发导航，让确认框自己处理按键
+  const confirmDialog = document.getElementById('confirmDialog');
+  if (confirmDialog && confirmDialog.classList.contains('open')) return;
+
+  const isPrev = e.key === '[' || e.code === 'BracketLeft';
+  const isNext = e.key === ']' || e.code === 'BracketRight';
+  if (!isPrev && !isNext) return;
+
+  e.preventDefault();   // 防止浏览器把 Ctrl+[ 解释成 Esc 之类的默认行为
+  navigateSiblingFolder(isNext);
+});
+
+
+async function onBackTo() {
+  if (!undoRedo.canUndo()) return;
+  const target = undoRedo.undo();
+  updateUndoRedoButtons();
+
+  const ok = await doSetRootPath(target);
+  if (ok) {
+    await load();          // 不 push：栈在 undo() 时已经改了
+  } else {
+    undoRedo.redo();       // 请求失败，恢复栈
+    updateUndoRedoButtons();
+  }
+}
+
+async function onForwardTo() {
+  if (!undoRedo.canRedo()) return;
+  const target = undoRedo.redo();
+  updateUndoRedoButtons();
+
+  const ok = await doSetRootPath(target);
+  if (ok) {
+    await load();          // 不 push
+  } else {
+    undoRedo.undo();       // 恢复
+    updateUndoRedoButtons();
+  }
+}
+
+document.getElementById('backToBtn').addEventListener('click', onBackTo);
+document.getElementById('forwardToBtn').addEventListener('click', onForwardTo);
+
+
+// ---------- 详情抽屉 ----------
+const detailState = {
+  id: -1,
+  imgs: [],
+  idx: 0,
+};
+
+const detailBackdrop = document.createElement('div');
+detailBackdrop.className = 'detail-backdrop';
+document.body.appendChild(detailBackdrop);
+
+const detailDrawer = document.createElement('div');
+detailDrawer.className = 'detail-drawer';
+detailDrawer.innerHTML = `
+  <div class="handle"></div>
+  <div class="head">
+    <span class="title"></span>
+    <button class="close-btn" title="Close (Esc)">×</button>
+  </div>
+  <div class="sub"></div>
+  <div class="gallery">
+    <div class="index-bar">
+      <button class="nav-btn nav-prev" title="Previous (←)">‹</button>
+      <span class="index-text">0 / 0</span>
+      <button class="nav-btn nav-next" title="Next (→)">›</button>
+    </div>
+    <div class="hero"><img alt=""></div>
+    <div class="thumbstrip"></div>
+  </div>`;
+document.body.appendChild(detailDrawer);
+
+function renderDetailView() {
+  const total = detailState.imgs.length;
+  if (total === 0) return;
+  const idx = detailState.idx;
+
+  detailDrawer.querySelector('.index-text').textContent = `${idx + 1} / ${total}`;
+  detailDrawer.querySelector('.hero img').src = detailState.imgs[idx];
+
+  detailDrawer.querySelectorAll('.thumbstrip img').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+
+  const active = detailDrawer.querySelector('.thumbstrip img.active');
+  if (active) {
+    active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  detailDrawer.querySelector('.nav-prev').disabled = (idx <= 0);
+  detailDrawer.querySelector('.nav-next').disabled = (idx >= total - 1);
+}
+
+function setDetailIndex(newIdx) {
+  if (newIdx < 0 || newIdx >= detailState.imgs.length) return;  // 边界不响应
+  detailState.idx = newIdx;
+  renderDetailView();
+}
+
+function onDetailKey(e) {
+  if (e.key === 'Escape') { closeDetail(); return; }
+
+  if (e.key === 'ArrowLeft') {
+    if (detailState.idx <= 0) return;               // 首图不响应左键
+    e.preventDefault();
+    setDetailIndex(detailState.idx - 1);
+  } else if (e.key === 'ArrowRight') {
+    if (detailState.idx >= detailState.imgs.length - 1) return;  // 尾图不响应右键
+    e.preventDefault();
+    setDetailIndex(detailState.idx + 1);
+  }
+}
+
+function closeDetail() {
+  detailDrawer.classList.remove('open');
+  detailBackdrop.classList.remove('open');
+  document.removeEventListener('keydown', onDetailKey);
+
+  // 释放大图引用，避免闭包持有
+  detailState.id   = -1;
+  detailState.imgs = [];
+  detailState.idx  = 0;
+}
+
+async function openDetailDrawer(id) {
+  // 先打开空抽屉，视觉上立即响应
+  detailDrawer.querySelector('.title').textContent = 'Loading...';
+  detailDrawer.querySelector('.sub').textContent = '';
+  detailDrawer.querySelector('.index-text').textContent = '0 / 0';
+  detailDrawer.querySelector('.hero img').removeAttribute('src');
+  detailDrawer.querySelector('.thumbstrip').innerHTML = '';
+  detailDrawer.classList.add('open');
+  detailBackdrop.classList.add('open');
+  document.addEventListener('keydown', onDetailKey);
+
+  try {
+    const res = await fetch(`/api/detail/${id}`);
+    const d = await res.json();
+    if (d.ok === false) { closeDetail(); return; }
+
+    detailDrawer.querySelector('.title').textContent = d.name || '(untitled)';
+    detailDrawer.querySelector('.sub').innerHTML =
+        `<span>${msToHMS(d.duration)}</span>`
+      + `<span>${formatFileSizeGMKB(d.vidSize)}</span>`
+      + `<span>${d.rate} / 10</span>`;
+
+    detailState.id   = id;
+    detailState.imgs = d.imgs || [];
+    detailState.idx  = 0;
+
+    const thumbstrip = detailDrawer.querySelector('.thumbstrip');
+    thumbstrip.innerHTML = detailState.imgs
+      .map((src, i) => `<img src="${src}" data-idx="${i}" alt="">`)
+      .join('');
+
+    thumbstrip.querySelectorAll('img').forEach(img => {
+      img.addEventListener('click', () => {
+        setDetailIndex(Number(img.dataset.idx));
+      });
+    });
+
+    // 前后按钮也接上
+    detailDrawer.querySelector('.nav-prev').onclick = () => setDetailIndex(detailState.idx - 1);
+    detailDrawer.querySelector('.nav-next').onclick = () => setDetailIndex(detailState.idx + 1);
+
+    if (detailState.imgs.length === 0) {
+      detailDrawer.querySelector('.index-text').textContent = '0 / 0';
+    } else {
+      renderDetailView();
+    }
+  } catch (err) {
+    console.error('[detail] failed:', err);
+    closeDetail();
+  }
+}
+
+detailDrawer.querySelector('.head .title').addEventListener('click', () => {
+  if (detailState.id >= 0) playVideo(detailState.id);
+});
+detailBackdrop.addEventListener('click', closeDetail);
+detailDrawer.querySelector('.close-btn').addEventListener('click', closeDetail);
+
+</script>
+</body>
+</html>

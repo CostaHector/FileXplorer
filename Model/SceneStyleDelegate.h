@@ -24,6 +24,8 @@ class SceneStyleDelegate : public QStyledItemDelegate {
   static void drawRatingGrid(QPainter* painter, const QRect& rect, int rating, int hoverRating = 0);
   static void drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating);
 
+  static void drawMeta(QPainter* painter, const QRect& rect, const QModelIndex& index);
+
   RatingStateMachine mRateMachine;
 };
 

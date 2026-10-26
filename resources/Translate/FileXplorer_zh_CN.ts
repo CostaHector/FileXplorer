@@ -562,7 +562,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+194"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+195"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -925,7 +925,7 @@
 <context>
     <name>HarTableView</name>
     <message>
-        <location filename="../../Component/Har/HarTableView.cpp" line="+25"/>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+23"/>
         <source>Export Selections to</source>
         <translation>导出选中</translation>
     </message>
@@ -987,7 +987,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+27"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+25"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -2213,6 +2213,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+9"/>
+        <source>Open Movie Wall</source>
+        <translation>打开海报墙</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Create Thumbnail for Json</source>
         <translation>为json创建缩略图</translation>
     </message>
@@ -2283,6 +2288,11 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
     <message>
         <location line="+4"/>
+        <source>Movie Duration</source>
+        <translation>按时长</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Movie Rate</source>
         <translation>按评分</translation>
     </message>
@@ -2297,7 +2307,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>逐页排序</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+52"/>
         <source>Sort Role</source>
         <translation>按角色排序</translation>
     </message>
@@ -2305,7 +2315,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+44"/>
+        <location filename="../../View/SceneListView.cpp" line="+46"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -2354,7 +2364,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ShadowRenamerActions</name>
     <message>
-        <location filename="../../Actions/ShadowRenamerActions.cpp" line="+13"/>
+        <location filename="../../Actions/ShadowRenamerActions.cpp" line="+18"/>
         <source>Create Staging Files</source>
         <translation>创建影子文件</translation>
     </message>

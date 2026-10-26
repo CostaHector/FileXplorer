@@ -73,15 +73,15 @@ QString FolderNxtAndLastIterator::GetDestinationItem(const QString& parentPath, 
   if (direction == NaviDirection::NEXT) {
     QStringList::const_iterator it = std::upper_bound(beg, end, curItemNameLower);
     if (it == end) {
-      LOG_D("[%s] is already the last folder, wrapped to the first one", qPrintable(curItemName));
-      return mSameLevelPaths.front();
+      LOG_D("[%s] is already the last folder", qPrintable(curItemName));
+      return mWrapEnabled ? mSameLevelPaths.front() : curItemName;
     }
     return mSameLevelPaths[it - beg];
   } else {
     QStringList::const_iterator it = std::lower_bound(beg, end, curItemNameLower);
     if (it == beg) {
-      LOG_D("[%s] is already the first folder, wrapped to the last one", qPrintable(curItemName));
-      return mSameLevelPaths.back();
+      LOG_D("[%s] is already the first folder", qPrintable(curItemName));
+      return mWrapEnabled ? mSameLevelPaths.back() : curItemName;
     }
     return mSameLevelPaths[it - 1 - beg];
   }

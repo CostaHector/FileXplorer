@@ -2,7 +2,6 @@
 #include "DataFormatter.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
-#include "PublicVariable.h"
 #include "PathTool.h"
 #include "PublicMacro.h"
 #include "Configuration.h"
@@ -91,7 +90,8 @@ bool Archiver::onSelectNewItemRow(const QModelIndex& current, const QModelIndex&
   const QByteArray& dataByteArray = m_archiverModel->GetByteArrayData(newRow);
   ChangeWindowTitle(name, dataByteArray.size());
   if (ImageViewer::IsFileImage(name)) {
-    m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray, formatStr); // only update for images
+    const QString notExistBaseFileFullPath = m_archiverModel->baseFileFullPath(newRow);
+    m_thumbnailViewer->setPixmapByByteArrayData(dataByteArray, formatStr, notExistBaseFileFullPath); // only update for images
   }
   return true;
 }

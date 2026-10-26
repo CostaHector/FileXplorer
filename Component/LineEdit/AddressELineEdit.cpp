@@ -2,7 +2,6 @@
 #include "ViewHelper.h"
 #include "PublicMacro.h"
 #include "FileTool.h"
-#include "NotificatorMacro.h"
 #include "ImageTool.h"
 
 #include <QCompleter>

@@ -31,12 +31,12 @@ private slots:
   }
 
   void cleanupTestCase() { //
-    HarFilesMocker::mockHarFiles().clear();
+    HarFilesMocker::mockHarFiles("").clear();
   }
 
   void init() {
     GlobalMockObject::reset();
-    HarFilesMocker::mockHarFiles().clear();
+    HarFilesMocker::mockHarFiles("").clear();
   }
 
   void cleanup() { //
@@ -64,7 +64,7 @@ private slots:
 
   void har_behavior_correct() {
     // data mock
-    HarFiles& harInst = HarFilesMocker::mockHarFiles();
+    HarFiles& harInst = HarFilesMocker::mockHarFiles("");
     harInst.mHarItems = {
         {"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"}, //
         {"image.png", pngInvalidBa, "image/png", "http://example.com/image"},            //
@@ -73,7 +73,7 @@ private slots:
 
     HarTableView harView;
     QCOMPARE(harView.mHarModel->rowCount(), 0);
-    harView("ATestHarWith3Items.har");
+    QCOMPARE(harView("HarPrePath/ATestHarWith3Items.har"), 3);
     QCOMPARE(harView.mHarModel->rowCount(), 3);
 
     // GetWinTitleStr should be ok, todo
@@ -153,7 +153,7 @@ private slots:
       QModelIndex proxyPngIndex = harView.mSortFilterProxy->mapFromSource(sourcePngIndex);
       QVERIFY(harView.PreviewImage(proxyPngIndex));
       QCOMPARE(pixmapByteArrayChangedSpy.count(), 1);
-      QCOMPARE(pixmapByteArrayChangedSpy.takeLast(), (QVariantList{pngInvalidBa, QString{"png"}}));
+      QCOMPARE(pixmapByteArrayChangedSpy.takeLast(), (QVariantList{pngInvalidBa, QString{"png"}, QString{"HarPrePath/image.png"}}));
 
       // on valid "new added one.svg" true
       QModelIndex sourceSvgIndex = harView.mHarModel->index(2, 0);
@@ -161,7 +161,7 @@ private slots:
       QModelIndex proxySvgIndex = harView.mSortFilterProxy->mapFromSource(sourceSvgIndex);
       QVERIFY(harView.PreviewImage(proxySvgIndex));
       QCOMPARE(pixmapByteArrayChangedSpy.count(), 1);
-      QCOMPARE(pixmapByteArrayChangedSpy.takeLast(), (QVariantList{svgValidBa, QString{"svg"}}));
+      QCOMPARE(pixmapByteArrayChangedSpy.takeLast(), (QVariantList{svgValidBa, QString{"svg"}, QString{"HarPrePath/new added one.svg"}}));
     }
   }
 };

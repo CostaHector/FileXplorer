@@ -3,6 +3,7 @@
 #include "FileTool.h"
 #include "Logger.h"
 #include "NameTool.h"
+#include "PathTool.h"
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -59,7 +60,7 @@ bool HarFiles::IsHarFile(const QFileInfo& fi) {
 bool HarFiles::operator()(const QString& harAbsPath) {
   init();
   LOG_D("parse har file[%s] start...", qPrintable(harAbsPath));
-  mHarFilePath = harAbsPath;
+  setHarAbsPath(harAbsPath);
   const QByteArray& jsonByteArray = FileTool::ByteArrayReader(harAbsPath);
   if (jsonByteArray.isEmpty()) {
     return false;
@@ -145,6 +146,16 @@ bool HarFiles::ParseFilesInJsonByteArray(const QByteArray& jsonByteArray) {
   }
   LOG_D("har file parsed ok and %d file were found.", mHarItems.size());
   return true;
+}
+
+QString HarFiles::baseFileFullPath(int r) const {
+  if (r < 0 || r >= size()) {
+    LOG_W("row[%d] out of range", r);
+    return "";
+  }
+  const HAR_FILE_ITEM& item = mHarItems[r];
+  QString prepath = PathTool::absolutePath(mHarFilePath);
+  return PathTool::Path2Join(prepath, NameTool::SanitizeFileName(item.name));
 }
 
 int HarFiles::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {

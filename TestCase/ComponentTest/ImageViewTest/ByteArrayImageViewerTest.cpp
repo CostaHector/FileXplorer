@@ -65,12 +65,12 @@ private slots:
     ByteArrayImageViewer baViewer{"ByteArrayImageViewer"};
     QVERIFY(!baViewer.isCurImageGif());
 
-    QVERIFY(!baViewer.setPixmapByByteArrayData(QByteArray{}, "jpg"));
+    QVERIFY(!baViewer.setPixmapByByteArrayData(QByteArray{}, "jpg", "Path/to/file.jpg"));
     QVERIFY(!baViewer.isCurImageGif());
 
     {
       QVERIFY(baViewer.mLabel->pixmap(Qt::ReturnByValue).isNull());
-      QVERIFY(baViewer.setPixmapByByteArrayData(pngBa, "png"));
+      QVERIFY(baViewer.setPixmapByByteArrayData(pngBa, "png", pngPath));
       QVERIFY(!baViewer.isCurImageGif());
       QCOMPARE(baViewer.GetImageFileSize(), pngBa.size());
       QVERIFY(!baViewer.mLabel->pixmap(Qt::ReturnByValue).isNull());
@@ -83,7 +83,7 @@ private slots:
 
     {
       QVERIFY(baViewer.mLabel->movie() == nullptr);
-      QVERIFY(baViewer.setPixmapByByteArrayData(gifBa, "gif"));
+      QVERIFY(baViewer.setPixmapByByteArrayData(gifBa, "gif", gifPath));
       QVERIFY(baViewer.isCurImageGif());
       QCOMPARE(baViewer.GetImageFileSize(), gifBa.size());
       QVERIFY(baViewer.mLabel->movie() != nullptr);
@@ -101,7 +101,7 @@ private slots:
     ByteArrayImageViewer viewer("ByteArrayImageViewer_refreshPixmapSize_ok");
     viewer.setIconSizeScaledIndex(0);
 
-    QVERIFY(viewer.setPixmapByByteArrayData(gifBa, "gif"));
+    QVERIFY(viewer.setPixmapByByteArrayData(gifBa, "gif", gifPath));
     const QString winTitle1{viewer.windowTitle()};
 
     QVERIFY(viewer.setIconSizeScaledIndex(IMAGE_SIZE::ICON_SIZE_CANDIDATES_N - 1));

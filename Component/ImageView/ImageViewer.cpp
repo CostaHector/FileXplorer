@@ -1,5 +1,6 @@
 #include "ImageViewer.h"
 #include "ImageTool.h"
+#include "ImageViewerActions.h"
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "SizeTool.h"
@@ -28,6 +29,27 @@ ImageViewer::ImageViewer(const QString& memoryKeyName, QWidget* parent) //
   setWidget(mLabel);
   setWidgetResizable(true);
 
+
+  mNaviToolBar = new QToolBar{"Navi toolbar", this};
+  CHECK_NULLPTR_RETURN_VOID(mNaviToolBar);
+  mNaviToolBar->setProperty("needTransparentFlag", true);
+  m_selectARect = mNaviToolBar->addAction(QIcon{":img/SELECT_A_RECT"}, "Selection");
+  CHECK_NULLPTR_RETURN_VOID(m_selectARect);
+  m_selectARect->setCheckable(true);
+  m_selectARect->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::AltModifier | Qt::Key_A));
+  m_selectARect->setShortcutVisibleInContextMenu(true);
+  m_selectARect->setToolTip(QString("<b>%1 (%2)</b><br/>Select a part of the picture.")
+                                .arg(m_selectARect->text(), m_selectARect->shortcut().toString()));
+
+  {
+    auto& inst = ImageViewerActions::GetInst();
+    mNaviToolBar->addSeparator();
+    mNaviToolBar->addAction(inst.RECOGNIZE_FACE_ON_SELECTION_COMPLETE_ACT);
+    mNaviToolBar->addAction(inst.AUTO_SAVE_ON_SELECTION_COMPLETE_ACT);
+    mNaviToolBar->addAction(inst.SILENT_SAVE_ON_AUTO_SAVE_ACT);
+    mNaviToolBar->addSeparator();
+  }
+
   setAlignment(Qt::AlignCenter);
   setBackgroundRole(QPalette::Dark);
   if (this->parent() == nullptr) {
@@ -38,6 +60,8 @@ ImageViewer::ImageViewer(const QString& memoryKeyName, QWidget* parent) //
 
   setWindowIcon(QIcon{":img/IMAGE"});
   ReadSetting();
+
+  connect(m_selectARect, &QAction::toggled, mLabel, &SelectableLabel::setSelectionEnabled);
 }
 
 ImageViewer::~ImageViewer() {
@@ -134,8 +158,12 @@ bool ImageViewer::UpdatePixmapAndTitle() {
   return true;
 }
 
-QSize ImageViewer::getDestSize(QSize sz) const {
-  if (sz.width() * mHeight >= sz.height() * mWidth) {
+bool ImageViewer::isScaledToWidth(const QSize& sz) const {
+  return sz.width() * mHeight >= sz.height() * mWidth;
+}
+
+QSize ImageViewer::getDestSize(const QSize& sz) const {
+  if (isScaledToWidth(sz)) {
     return {mWidth, (sz.height() * mWidth) / sz.width()};
   } else {
     return {(sz.width() * mHeight) / sz.height(), mHeight};
@@ -170,9 +198,12 @@ QPixmap ImageViewer::GetPixmap(QString& winTitle) const {
   }
 
   const Qt::TransformationMode transformMode{GetImageFileSize() < 10 * 1024 * 1024 ? Qt::SmoothTransformation : Qt::FastTransformation};
-  const QSize dstSz{getDestSize(oldSz)};
-  pm = pm.scaled(dstSz, Qt::IgnoreAspectRatio, transformMode);
-
+  if (isScaledToWidth(oldSz)) {
+    pm = pm.scaledToWidth(mWidth, transformMode);
+  } else {
+    pm = pm.scaledToHeight(mHeight, transformMode);
+  }
+  const QSize dstSz{pm.size()};
   winTitle += GetResolutionAndSizeInWinTitle(oldSz, dstSz);
   return pm;
 }

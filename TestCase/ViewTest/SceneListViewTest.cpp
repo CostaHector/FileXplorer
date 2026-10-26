@@ -147,7 +147,7 @@ private slots:
 
     {
       // 3.2 update json, update scn, scn file generated ok
-      sceneModel.setRootPath(tDir.path());
+      sceneModel.setRootPath(tDir.path(), true, false);
       SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
       emit sceneActInst._UPDATE_JSON->triggered();
       emit sceneActInst._UPDATE_SCN->triggered();

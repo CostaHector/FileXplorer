@@ -13,8 +13,8 @@ public:
 
   void setSelectionEnabled(bool on);
   bool isSelectionEnabled() const { return mSelectionEnabled; }
-  void setSourceImageFileFullPath(const QString& srcImgFullPath) const { mSourceImageFileFullPath = srcImgFullPath; }
-  static bool SaveRectSelectionImage(const QPixmap& rectSelectedImg, const QString& sourceImageFullPath);
+  void setBaseImageFullPath(const QString& baseImageFullPath) const { mBaseImageFullPath = baseImageFullPath; }
+  static bool SaveRectSelectionImage(const QPixmap& rectSelectedImg, const QString& sourceImageFullPath, bool bSilentSave);
 
 signals:
   void rectSelectionFinished(const QPixmap& rectSelectedImg);
@@ -38,7 +38,7 @@ private:
   bool   mIsDragging       = false;      // 仅表示"正在拖动"
   QPoint mOrigin, mCurrent;
 
-  mutable QString mSourceImageFileFullPath;
+  mutable QString mBaseImageFullPath;
   SelectionFrame* mFrame = nullptr;
 
   void LazyUpdateRectSelectionImage();

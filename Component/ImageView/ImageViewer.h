@@ -44,9 +44,13 @@ protected:
   QString mNoDotFormat; // file extension without prefix dot
   qint64 mImgSizeBytes{0};
 
+  QToolBar* mNaviToolBar{nullptr};
+  QAction* m_selectARect{nullptr};
+
 private:
   void ReadSetting();
-  QSize getDestSize(QSize sz) const;
+  bool isScaledToWidth(const QSize& sz) const;
+  QSize getDestSize(const QSize& sz) const;
 
   QString GetResolutionAndSizeInWinTitle(const QSize& oldSz, const QSize& dstSz) const;
   virtual QString GetPathInfoInWinTitle() const { return ""; }
@@ -62,7 +66,6 @@ private:
   const QString m_memoryKeyName;
 
   SelectableLabel* mLabel{nullptr};
-
   std::unique_ptr<QMovie> mPMovie;
 };
 

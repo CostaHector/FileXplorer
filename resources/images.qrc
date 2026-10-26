@@ -33,6 +33,7 @@
         <file alias="DUPLICATE_VIDEOS_FINDER">Media/DUPLICATE_VIDEOS_FINDER.png</file>
         <file alias="UPDATE_SCN_FILE">Media/UPDATE_SCN_FILE.svg</file>
         <file alias="UPDATE_JSON">Media/UPDATE_JSON.svg</file>
+        <file alias="OPEN_MOVIE_WALL">Media/OPEN_MOVIE_WALL.svg</file>
         <file alias="VIDEO_ARCHIVE">Media/VIDEO_ARCHIVE.svg</file>
         <file alias="ARCHIVE_ARCHIVAL">Media/ARCHIVE_ARCHIVAL.svg</file>
         <file alias="ARCHIVE_NORMAL">Media/ARCHIVE_NORMAL.svg</file>
@@ -60,6 +61,7 @@
         <file alias="PLAY_ALL_VIDEO">Media/PLAY_ALL_VIDEO.ico</file>
         <file alias="LIKE">Media/LIKE.svg</file>
         <file alias="LIKE_RECURSIVELY">Media/LIKE_RECURSIVELY.svg</file>
+        <file alias="IMAGE_BLOCKED">Media/IMAGE_BLOCKED.svg</file>
         <file alias="IMAGE_NOT_FOUND">Media/IMAGE_NOT_FOUND.svg</file>
         <file alias="INCREASING_RATING">Media/INCREASING_RATING.svg</file>
         <file alias="DECREASING_RATING">Media/DECREASING_RATING.svg</file>
@@ -74,6 +76,9 @@
         <file alias="SELECT_A_RECT">Media/SELECT_A_RECT.svg</file>
         <file alias="FACE_RECOGNIZE">Media/FACE_RECOGNIZE.svg</file>
         <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
+        <file alias="AUTO_SAVE">Media/AUTO_SAVE.svg</file>
+        <file alias="SILENT_SAVE">Media/SILENT_SAVE.svg</file>
+        <file alias="MOVIE_WALL">Media/MOVIE_WALL.html</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
@@ -130,7 +135,6 @@
         <file alias="CP_TO_COMMAND_PATH">FileOperation/CP_TO_COMMAND_PATH.png</file>
         <file alias="PACK_FOLDERS">FileOperation/PACK_FOLDERS.svg</file>
         <file alias="UNPACK_FOLDERS">FileOperation/UNPACK_FOLDERS.svg</file>
-        <file alias="ITEMS_ORGANIZER">FileOperation/ITEMS_ORGANIZER.svg</file>
         <file alias="FOLDER_OPEN">FileOperation/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">FileOperation/SELECT_FOLDER.svg</file>
         <file alias="DRAG_PIXMAP">FileOperation/DRAG_PIXMAP.svg</file>

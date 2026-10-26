@@ -12,8 +12,8 @@ class HarModelTest : public PlainTestSuite {
   Q_OBJECT
 public:
 private slots:
-  void init() { HarFilesMocker::mockHarFiles().clear(); }
-  void cleanupTestCase() { HarFilesMocker::mockHarFiles().clear(); }
+  void init() { HarFilesMocker::mockHarFiles("").clear(); }
+  void cleanupTestCase() { HarFilesMocker::mockHarFiles("").clear(); }
 
   void initialize_ok() {
     HarModel hm;
@@ -32,7 +32,7 @@ private slots:
   }
 
   void setRootPath_ok() {
-    HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
+    HarFiles& mockFiles = HarFilesMocker::mockHarFiles("");
     mockFiles.mHarItems = {
         {"file1.txt", QByteArray("Content1"), "text/plain", "http://example.com/file1"},   //
         {"image.png", QByteArray("PNG content"), "image/png", "http://example.com/image"}, //
@@ -58,7 +58,7 @@ private slots:
   }
 
   void data_retrieve_ok() {
-    HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
+    HarFiles& mockFiles = HarFilesMocker::mockHarFiles("");
     mockFiles.mHarItems = {{"document.pdf", QByteArray("PDF content"), "application/pdf", "http://example.com/doc"}};
     HarModel hm;
     hm.setRootPath("test.har");
@@ -99,7 +99,7 @@ private slots:
     TDir tDir;
     QVERIFY(tDir.IsValid());
 
-    HarFiles& mockFiles = HarFilesMocker::mockHarFiles();
+    HarFiles& mockFiles = HarFilesMocker::mockHarFiles("");
     mockFiles.mHarItems = {{"file1.txt", QByteArray("Content in file1"), "text/plain", ""}, //
                            {"image.png", QByteArray("Content in image"), "image/png", ""}};
 

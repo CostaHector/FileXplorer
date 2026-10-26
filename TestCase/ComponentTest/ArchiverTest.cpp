@@ -123,6 +123,9 @@ class ArchiverTest : public PlainTestSuite {
     // 初始状态验证
     int initialScale = archiver.m_thumbnailViewer->GetCurImageSizeScale();
     QCOMPARE(archiver.m_ImageSizeScale->value(), initialScale);
+    const SelectableLabel* pSelectableLabel = archiver.m_thumbnailViewer->GetLabel();
+    QVERIFY(pSelectableLabel != nullptr);
+    QCOMPARE(pSelectableLabel->mBaseImageFullPath, "image.jpg"); // Path2Join("", "image.jpg")
 
     // 改变滑块值, 发射valueChanged, m_ImageSizeHint更新, m_thumbnailViewer更新
     QSignalSpy sliderSpy(archiver.m_ImageSizeScale, &QSlider::valueChanged);

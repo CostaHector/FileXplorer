@@ -4,6 +4,7 @@
 #include "FileTool.h"
 #include "RelatedHelper.h"
 #include "RecycleCfmDlg.h"
+#include "ImageViewerActions.h"
 #include "BatchRenameBy.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
@@ -27,15 +28,11 @@ void SetNavigateButtonNeedTransparent(QToolBar* toolBar) {
 }
 
 FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) //
-  : ImageViewer{memoryKeyName, parent} {
-  mNaviToolBar = new QToolBar{"Navi toolbar", this};
-  CHECK_NULLPTR_RETURN_VOID(mNaviToolBar);
-  mNaviToolBar->setProperty("needTransparentFlag", true);
+  : ImageViewer{memoryKeyName, parent},
+  mImgIt{FolderNxtAndLastIterator::GetInstsNaviImages(ImageViewerActions::GetInst().isNavigateIntoSubFoldersWhenIterate())} {
 
-  mNavigateIntoSub = mNaviToolBar->addAction(QIcon{":img/INCLUDEING_SUBDIRS"}, "Navigate Into Subdirectory");
-  CHECK_NULLPTR_RETURN_VOID(mNavigateIntoSub);
-  mNavigateIntoSub->setCheckable(true);
-  mNavigateIntoSub->setChecked(mImgIt.IsIncludingSubDirectory());
+  auto& inst = ImageViewerActions::GetInst();
+  mNaviToolBar->addAction(inst.NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT);
 
   m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "<");
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
@@ -68,14 +65,6 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
                m_recyleThisImageAndRelatedButton->shortcut().toString())
       );
 
-  m_selectARect = mNaviToolBar->addAction(QIcon{":img/SELECT_A_RECT"}, "Selection");
-  CHECK_NULLPTR_RETURN_VOID(m_selectARect);
-  m_selectARect->setCheckable(true);
-  m_selectARect->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::AltModifier | Qt::Key_A));
-  m_selectARect->setShortcutVisibleInContextMenu(true);
-  m_selectARect->setToolTip(QString("<b>%1 (%2)</b><br/>Select a part of the picture.")
-                                   .arg(m_selectARect->text(), m_selectARect->shortcut().toString()));
-
   mNaviToolBar->addSeparator();
   mNaviToolBar->addActions(FileOpActs::GetInst().UNDO_REDO_RIBBONS->actions());
 
@@ -89,12 +78,10 @@ void FileImageViewer::subscribe() {
 
   connect(m_prevButton, &QAction::triggered, this, &FileImageViewer::NavigateImagePrevious);
   connect(m_nextButton, &QAction::triggered, this, &FileImageViewer::NavigateImageNext);
-  connect(mNavigateIntoSub, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
+  connect(ImageViewerActions::GetInst().NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
 
   connect(m_recycleThisImageButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImage);
   connect(m_recyleThisImageAndRelatedButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImageAndItsRelated);
-
-  connect(m_selectARect, &QAction::toggled, GetLabel(), &SelectableLabel::setSelectionEnabled);
 }
 
 QString FileImageViewer::GetImageAbsPath() const { //
@@ -106,7 +93,7 @@ bool FileImageViewer::setPixmapByAbsFilePath(const QString& parentPath, const QS
   mRel2Image = rel2Img;  
   setFormatAndImgSizeBytes(PathTool::GetFormatInHar(mRel2Image), QFile{GetImageAbsPath()}.size());
 
-  GetLabel()->setSourceImageFileFullPath(GetImageAbsPath());
+  GetLabel()->setBaseImageFullPath(GetImageAbsPath());
   return UpdatePixmapAndTitle();
 }
 

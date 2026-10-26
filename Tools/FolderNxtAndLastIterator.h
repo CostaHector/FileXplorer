@@ -24,6 +24,7 @@ class FolderNxtAndLastIterator {
 
   void setIncludingSubDirectory(bool bInclude) { mIncludingSubDirectory = bInclude; }
   bool IsIncludingSubDirectory() const {return mIncludingSubDirectory;}
+  void setWrapEnabled(bool bWrappEnabled) { mWrapEnabled = bWrappEnabled; }
 
  private:
   QString lastNextCore(const QString& parentPath, const QString& curItemName, NaviDirection direction = NaviDirection::NEXT);
@@ -44,6 +45,7 @@ class FolderNxtAndLastIterator {
   const QStringList mNameFilters;
   const QDir::Filters mDirFilters;
   bool mIncludingSubDirectory;
+  bool mWrapEnabled{true};
 };
 
 #endif  // FOLDERNXTANDLASTITERATOR_H

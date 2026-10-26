@@ -1,12 +1,12 @@
 #include "ScenesListModel.h"
 #include "SceneKey.h"
-#include "SceneInfoManager.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
 #include "RateHelper.h"
 #include "ImageTool.h"
 #include "PathTool.h"
 #include "BatchRenameBy.h"
+
 #include <QObject>
 #include <QPixmap>
 #include <QDirIterator>
@@ -60,11 +60,11 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
     }
     case Qt::ItemDataRole::DecorationRole: {
       if (m_bDisableImage) {
-        return {};
+        return GetDecorationPixmap(":img/IMAGE_BLOCKED");
       }
       QPixmap pm = GetDecorationPixmap(item.GetThumbnailImageAbsPath(mRootPath));
       if (pm.isNull()) {
-        pm = GetDecorationPixmap(":img/IMAGE_NOT_FOUND");
+        return GetDecorationPixmap(":img/IMAGE_NOT_FOUND");
       }
       return pm;
     }
@@ -79,6 +79,9 @@ QVariant ScenesListModel::data(const QModelIndex& index, int role) const {
     }
     case SceneInfo::Role::VID_SIZE_ROLE: {
       return item.vidSize;
+    }
+    case SceneInfo::Role::DURATION_ROLE: {
+      return item.duration;
     }
     case SceneInfo::Role::RATE_ROLE: {
       return item.rate;
@@ -207,15 +210,21 @@ QStringList ScenesListModel::RelativePath2RelatedFiles(const QModelIndexList& in
   return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
 }
 
-bool ScenesListModel::setRootPath(const QString& rootPath, const bool bForce, const bool bSubdirectories) {
-  if (mRootPath == rootPath && !bForce) {
-    LOG_D("Scene ignore set same root path");
+bool ScenesListModel::setRootPath(const QString& rootPath, bool bSubdirectories, bool bForce) {
+  // 初始 ("", true)
+  // 设置 ("", anyValue) false
+  // 设置 ("path1", anyValue) true
+  // 设置 ("path1", !anyValue) true
+  if (!bForce && mRootPath == rootPath && m_bSubdirectories == bSubdirectories) {
+    LOG_D("Ignore. Not force and same root path and bSubdirectory");
     return false;
   }
   mRootPath = rootPath;
+  m_bSubdirectories = bSubdirectories;
 
-  const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath, bSubdirectories)};
+  const SceneInfoList& newEntryList{SceneHelper::GetScnsLstFromPath(mRootPath, m_bSubdirectories)};
   mPagedData.setData(newEntryList);
+
   return true;
 }
 
@@ -291,12 +300,12 @@ bool ScenesListModel::onDisableImageDecorationChanged(bool bDisabled) {
     return true;
   }
   m_bDisableImage = bDisabled;
-  emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole});
+  emit dataChanged(index(0), index(cnt - 1), {Qt::DecorationRole | Qt::SizeHintRole});
   return true;
 }
 
 bool ScenesListModel::onSubdirectoriesToggled(bool bSubdirectories) {
-  return setRootPath(rootPath(), true, bSubdirectories);
+  return setRootPath(rootPath(), bSubdirectories, false);
 }
 
 int ScenesListModel::createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist) {

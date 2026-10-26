@@ -8,7 +8,7 @@ public:
   using ImageViewer::ImageViewer;
 
 public slots:
-  bool setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat);
+  bool setPixmapByByteArrayData(const QByteArray& dataByteArray, const QString& noDotFormat, const QString& baseImageFullPath);
   static QPixmap GetPixmapCoreStatic(const QByteArray& rawData, const char* noDotFormat);
   static std::unique_ptr<QMovie> GetMovieCoreStatic(QByteArray& rawData, const QString& noDotFormat, QSize& movieSize);
 

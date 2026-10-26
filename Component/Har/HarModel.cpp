@@ -8,7 +8,7 @@ int HarModel::setRootPath(const QString& harFileAbsPath) {
   int before = rowCount();
 
 #ifdef RUNNING_UNIT_TESTS
-  HarFiles rhs = HarFilesMocker::mockHarFiles();
+  HarFiles rhs = HarFilesMocker::mockHarFiles(harFileAbsPath);
 #else
   HarFiles rhs;
   rhs(harFileAbsPath);
@@ -21,7 +21,6 @@ int HarModel::setRootPath(const QString& harFileAbsPath) {
 
   return after;
 }
-
 
 QVariant HarModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) {
@@ -58,4 +57,8 @@ int HarModel::SaveToLocal(QString dstRootpath, const QList<int>& selectedRows) {
 
 const HAR_FILE_ITEM& HarModel::GetHarEntryItem(const int rowIndex) const {
   return mHarParser[rowIndex];
+}
+
+QString HarModel::baseFileFullPath(const QModelIndex& index) const {
+  return mHarParser.baseFileFullPath(index.row());
 }

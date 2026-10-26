@@ -6,8 +6,9 @@
 #include <QItemSelectionModel>
 
 namespace HarFilesMocker {
-inline HarFiles& mockHarFiles() {
+inline HarFiles& mockHarFiles(const QString& harAbsPath) {
   static HarFiles harFiles;
+  harFiles.setHarAbsPath(harAbsPath);
   return harFiles;
 }
 }  // namespace HarFilesMocker
@@ -17,6 +18,7 @@ class HarModel : public QAbstractTableModelPub {
   using QAbstractTableModelPub::QAbstractTableModelPub;
 
   int setRootPath(const QString& harFileAbsPath);
+  QString rootPath() const { return mHarParser.harFileFullPath(); }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mHarParser.size(); }
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return HAR_VERTICAL_HEAD.size(); }
@@ -42,6 +44,7 @@ class HarModel : public QAbstractTableModelPub {
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
 
+  QString baseFileFullPath(const QModelIndex& index) const;
   int SaveToLocal(QString dstRootpath = "", const QList<int>& selectedRows = {});
   const HAR_FILE_ITEM& GetHarEntryItem(const int rowIndex) const;
 
