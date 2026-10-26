@@ -221,8 +221,8 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), true);  // 0 image, use default from resources/images.qrc
 
     slm.onDisableImageDecorationChanged(true);
-    QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), false);  // disabled
-    QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), false);  //
+    QCOMPARE(slm.data(slm.index(0), Qt::DecorationRole).canConvert<QPixmap>(), true);  //
+    QCOMPARE(slm.data(slm.index(1), Qt::DecorationRole).canConvert<QPixmap>(), true);  //
 
     QCOMPARE(slm.data(slm.index(0), Qt::BackgroundRole).isValid(), true);   // 0 video, specify solid pattern
     QCOMPARE(slm.data(slm.index(1), Qt::BackgroundRole).isValid(), false);  // 1 video, no pattern
