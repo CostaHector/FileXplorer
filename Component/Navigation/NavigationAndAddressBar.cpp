@@ -1,9 +1,12 @@
 #include "NavigationAndAddressBar.h"
 #include "AddressBarActions.h"
 #include "RightClickMenuActions.h"
+#include "MovieWallServer.h"
 #include "PublicMacro.h"
+
 #include <QLayout>
 #include <QKeySequence>
+#include <QDesktopServices>
 
 SplitToolButton::SplitToolButton(QWidget* parent) : QToolButton{parent} {
   topShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketLeft}, this};
@@ -49,6 +52,9 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
   CHECK_NULLPTR_RETURN_VOID(m_addressLine)
   m_addressLine->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
 
+  m_fsFilterBtn = new (std::nothrow) TypeFilterButton{ModelFilterE::FILE_SYSTEM, this};
+  CHECK_NULLPTR_RETURN_VOID(m_fsFilterBtn)
+
   mFsSearchLE = new (std::nothrow) QLineEdit{this};
   CHECK_NULLPTR_RETURN_VOID(mFsSearchLE)
   mFsSearchLE->addAction(QIcon(":img/SEARCH"), QLineEdit::LeadingPosition);
@@ -61,9 +67,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
 
-  m_fsFilterBtn = new (std::nothrow) TypeFilterButton{ModelFilterE::FILE_SYSTEM, this};
-  CHECK_NULLPTR_RETURN_VOID(m_fsFilterBtn)
-
   mLastNextFolderTb = new (std::nothrow) SplitToolButton{this};
   CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
   mLastNextFolderTb->setText(tr("Folder Iterater"));
@@ -73,11 +76,20 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
+
   addWidget(m_addressLine);
   addAction(g_rightClickActions()._FORCE_REFRESH_FILESYSTEMMODEL);
+  mOpenMovieWall = addAction(QIcon{":img/OPEN_MOVIE_WALL"}, tr("Open Movie Wall"));
+  CHECK_NULLPTR_RETURN_VOID(mOpenMovieWall);
+  mOpenMovieWall->setCheckable(true);
+  mOpenMovieWall->setChecked(false);
+  mOpenMovieWall->setToolTip(QString{"<b>%1 (%2)</b><br/>Browse the movies in current directory as a poster wall in your default browser."}
+                                 .arg(mOpenMovieWall->text(), mOpenMovieWall->shortcut().toString()));
   addSeparator();
+
   addWidget(mLastNextFolderTb);
   addSeparator();
+
   addWidget(m_fsFilterBtn);
   addSeparator();
   addWidget(mFsSearchLE);
@@ -114,6 +126,8 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
 
   connect(mFsSearchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
   connect(mFsSearchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);
+
+  connect(mOpenMovieWall, &QAction::toggled, this, &NavigationAndAddressBar::onToggleMovieWall);
 }
 
 bool NavigationAndAddressBar::onBackward() {
@@ -157,9 +171,9 @@ bool NavigationAndAddressBar::onUpTo() {
 }
 
 bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
-  const QFileInfo fi{m_addressLine->pathFromLineEdit()};
-  const QString parentPath = fi.absolutePath();
-  const QString curDirName = fi.fileName();
+  QString parentPath;
+  QString curDirName = PathTool::GetPrepathAndFileName(m_addressLine->pathFromLineEdit(), parentPath);
+
   const QString& newDir = isNext ? mFolderNxtLstIt.next(parentPath, curDirName) : mFolderNxtLstIt.last(parentPath, curDirName);
   if (newDir.isEmpty()) {
     LOG_D("skip empty dir[%s]", qPrintable(parentPath));
@@ -169,7 +183,7 @@ bool NavigationAndAddressBar::onIteratorToAnotherFolderCore(bool isNext) {
     LOG_D("skip same dir[%s/%s]", qPrintable(parentPath), qPrintable(curDirName));
     return false;
   }
-  const QString& newPath = parentPath + '/' + newDir;
+  const QString newPath = PathTool::Path2Join(parentPath, newDir);
   bool intoRes{false};
   if (m_IntoNewPath != nullptr) {
     intoRes = m_IntoNewPath(newPath, true);
@@ -196,6 +210,20 @@ bool NavigationAndAddressBar::onSearchTextChanged() {
 bool NavigationAndAddressBar::onSearchTextReturnPressed() {
   if (m_on_searchEnterKey != nullptr) {
     m_on_searchEnterKey(mFsSearchLE->text());
+  }
+  return true;
+}
+
+bool NavigationAndAddressBar::onToggleMovieWall(bool bLauchServer) {
+  if (mMovieWallServer == nullptr) {
+    mMovieWallServer = new MovieWallServer{this};
+  }
+  mMovieWallServer->setRootPath(m_addressLine->pathFromLineEdit());
+  if (bLauchServer) {
+    mMovieWallServer->start(MovieWallServer::DEFAULT_MOVIE_WALL_PORT);
+    QDesktopServices::openUrl(QUrl(mMovieWallServer->urlAddress()));
+  } else {
+    mMovieWallServer->stop();
   }
   return true;
 }

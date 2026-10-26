@@ -12,8 +12,6 @@
 extern template class PaginatedList<SceneInfo>;
 using PaginatedSceneList = PaginatedList<SceneInfo>;
 
-class MovieWallServer;
-
 class ScenesListModel : public QAbstractListModelPub {
   Q_OBJECT
  public:
@@ -22,9 +20,8 @@ class ScenesListModel : public QAbstractListModelPub {
   bool initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse);
   bool setSortDimension(SceneInfo::Role newSortDimension);
   bool setSortResultReverse(bool bResultReverse);
-  void bindMovieWallServer(MovieWallServer* _movieWallServer);
 
-  bool setRootPath(const QString& rootPath, const bool bForce = false, const bool bSubdirectories = true);
+  bool setRootPath(const QString& rootPath, bool bSubdirectories, bool bForce);
   inline QString rootPath() const { return mRootPath; }
 
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
@@ -67,9 +64,9 @@ class ScenesListModel : public QAbstractListModelPub {
  private:
   bool ModifySceneInfoRateValue(const QModelIndex& index, int newRate);
 
-  MovieWallServer* _mMovieWallServer{nullptr};
   QString mPattern;
   QString mRootPath;
+  bool m_bSubdirectories{false};
   PaginatedSceneList mPagedData;
   bool m_bSortProxyInited{false};
   bool m_bDisableImage{false};

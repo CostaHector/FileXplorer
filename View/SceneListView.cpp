@@ -1,7 +1,6 @@
 #include "SceneListView.h"
 #include "NotificatorMacro.h"
 #include "ScenesListModel.h"
-#include "MovieWallServer.h"
 #include "PlayVideo.h"
 #include "PublicMacro.h"
 #include "NotificatorMacro.h"
@@ -102,7 +101,6 @@ void SceneListView::subscribe() {
 
   connect(&sceneActInst, &SceneInPageActions::sortImplementerChanged, this, &SceneListView::toggleSortRequestImplementer);
   connect(&sceneActInst, &SceneInPageActions::disableImageDecorationChanged, _sceneModel, &ScenesListModel::onDisableImageDecorationChanged);
-  connect(sceneActInst._OPEN_MOVIE_WALL, &QAction::toggled, this, &SceneListView::onToggleMovieWall);
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
   connect(sceneActInst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS, &QAction::triggered, this, &SceneListView::onCreateFrontImageThumbnail);
@@ -165,21 +163,7 @@ void SceneListView::setRootPath(const QString& rootPath) {
     return;
   }
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(rootPath, false, bSubdirectories);
-}
-
-bool SceneListView::onToggleMovieWall(bool bLauchServer) {
-  if (mMovieWallServer == nullptr) {
-    mMovieWallServer = new MovieWallServer{this};
-  }
-  _sceneModel->bindMovieWallServer(bLauchServer ? mMovieWallServer : nullptr);
-  if (bLauchServer) {
-    mMovieWallServer->start(MovieWallServer::DEFAULT_MOVIE_WALL_PORT);
-    QDesktopServices::openUrl(QUrl(mMovieWallServer->urlAddress()));
-  } else {
-    mMovieWallServer->stop();
-  }
-  return true;
+  _sceneModel->setRootPath(rootPath, bSubdirectories, false);
 }
 
 int SceneListView::onUpdateJsonFiles() {
@@ -218,7 +202,7 @@ int SceneListView::onUpdateScnFiles() {
   int scnFileCnt = ScnMgr::UpdateScnFiles(workPath);
   LOG_OE_P(scnFileCnt >= 0, "Scn file updated", "count: %d, workPath[%s]", scnFileCnt, qPrintable(workPath));
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(workPath, true, bSubdirectories);
+  _sceneModel->setRootPath(workPath, bSubdirectories, true);
   return scnFileCnt;
 }
 
@@ -240,7 +224,7 @@ int SceneListView::onClearScnFiles() {
   int deleteCnt = ScnMgr::ClearScnFiles(workPath);
   LOG_OK_P("Delete scn file", "cnt: %d under[%s]", deleteCnt, qPrintable(workPath));
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
-  _sceneModel->setRootPath(workPath, true, bSubdirectories);
+  _sceneModel->setRootPath(workPath, bSubdirectories, true);
   return deleteCnt;
 }
 

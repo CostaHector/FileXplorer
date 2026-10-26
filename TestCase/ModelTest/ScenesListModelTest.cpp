@@ -155,7 +155,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.mPagedData.GetPerPageEleCnt(), 40);
     QSignalSpy pgCntSpy{&slm, &ScenesListModel::pagesCountChanged};
 
-    QCOMPARE(slm.setRootPath("inexist/path0"), true);  // GetScnsLstFromPath: 1, emit pagesCountChanged
+    QCOMPARE(slm.setRootPath("inexist/path0", true, false), true);  // GetScnsLstFromPath: 1, emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                       // 1 item
     QCOMPARE(pgCntSpy.count(), 1);
     QCOMPARE(pgCntSpy.takeLast(), (QVariantList{1}));  // 1 page = floor(1/40)
@@ -171,18 +171,18 @@ class ScenesListModelTest : public PlainTestSuite {
       QCOMPARE(relJsonArr, expectRelJsonArr);
     }
 
-    QCOMPARE(slm.setRootPath("inexist/path0"), false);  // again and not force->ignore, no emit pagesCountChanged
+    QCOMPARE(slm.setRootPath("inexist/path0", true, false), false);  // again and not force->ignore, no emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                        // 1 item
     QCOMPARE(pgCntSpy.count(), 0);
     slm.onScenesCountsPerPageChanged(1);
     QCOMPARE(pgCntSpy.count(), 0);  // 1 / 1 = 1
 
-    QCOMPARE(slm.setRootPath("inexist/path0", true), true);  // GetScnsLstFromPath: 2, no emit pagesCountChanged
+    QCOMPARE(slm.setRootPath("inexist/path0", true, true), true);  // GetScnsLstFromPath: 2, no emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                             // 1 item
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);                // 1 page = floor(1/1)
     QCOMPARE(pgCntSpy.count(), 0);
 
-    QCOMPARE(slm.setRootPath("inexist/path1"), true);  // GetScnsLstFromPath: 3, emit pagesCountChanged
+    QCOMPARE(slm.setRootPath("inexist/path1", true, false), true);  // GetScnsLstFromPath: 3, emit pagesCountChanged
     QCOMPARE(slm.rowCount(), 1);                       // 1 item in page 0
     QCOMPARE(pgCntSpy.count(), 1);
     QCOMPARE(pgCntSpy.takeLast(), (QVariantList{2}));  // 2 page = floor(2 / 1)
@@ -207,7 +207,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     setConfig(SceneKey::CNT_EACH_PAGE, 40);
     ScenesListModel slm{"ScenesListModelData"};
-    QCOMPARE(slm.setRootPath("inexist/path"), true);
+    QCOMPARE(slm.setRootPath("inexist/path", true, false), true);
 
     QCOMPARE(slm.rowCount(), 2);
     QCOMPARE(slm.mPagedData.GetPageCnt(), 1);
@@ -274,7 +274,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     setConfig(SceneKey::CNT_EACH_PAGE, 40);
     ScenesListModel slm{"ScenesListModelData"};
-    QCOMPARE(slm.setRootPath("inexist/path"), true);
+    QCOMPARE(slm.setRootPath("inexist/path", true, false), true);
 
     QCOMPARE(slm.rowCount(), 1);
     QModelIndex kakaInd = slm.index(0);
@@ -308,7 +308,7 @@ class ScenesListModelTest : public PlainTestSuite {
     SceneSortProxyModel sspm;
     sspm.setSourceModel(&slm);
     {  // REL_PATH_ROLE
-      QCOMPARE(slm.setRootPath("any/inexists/path1"), true);
+      QCOMPARE(slm.setRootPath("any/inexists/path1", true, false), true);
       QCOMPARE(slm.rowCount(), 10);
       // 升
       sspm.setSortRole(SceneInfo::Role::REL_PATH_ROLE);
@@ -335,7 +335,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     // 测试MOVIE_SIZE排序
     {
-      QCOMPARE(slm.setRootPath("any/inexists/path2"), true);
+      QCOMPARE(slm.setRootPath("any/inexists/path2", true, false), true);
       QCOMPARE(slm.rowCount(), 10);
 
       // 降序排序
@@ -355,7 +355,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     // 测试RATE排序
     {
-      QCOMPARE(slm.setRootPath("any/inexists/path3"), true);
+      QCOMPARE(slm.setRootPath("any/inexists/path3", true, false), true);
       // 升序排序
       sspm.setSortRole(SceneInfo::Role::RATE_ROLE);
       QVERIFY(checkIndexMatch(slm, 0, sspm, 0));
@@ -400,7 +400,7 @@ class ScenesListModelTest : public PlainTestSuite {
     // signal pagesCountChanged emit when call setRootPath ok
     {
       QSignalSpy pagesCntChanged(&slm, &ScenesListModel::pagesCountChanged);
-      QCOMPARE(slm.setRootPath("any/inexists/path"), true);
+      QCOMPARE(slm.setRootPath("any/inexists/path", true, false), true);
       QCOMPARE(pagesCntChanged.count(), 1);
       QCOMPARE(pagesCntChanged.takeLast(), (QVariantList{1}));  // floor(6 / 1024)
     }
@@ -509,7 +509,7 @@ class ScenesListModelTest : public PlainTestSuite {
     // global rate descending
     ScenesListModel slm{"ScenesListViewGlobalSort"};
     slm.initSortSetting(SceneInfo::Role::RATE_ROLE, true);
-    QCOMPARE(slm.setRootPath("inexist/GlobalSortPath"), true);
+    QCOMPARE(slm.setRootPath("inexist/GlobalSortPath", true, false), true);
     QCOMPARE(slm.rowCount(), 4);
 
     // in first page
@@ -555,7 +555,7 @@ class ScenesListModelTest : public PlainTestSuite {
     setConfig(SceneKey::CNT_EACH_PAGE, 4);
     ScenesListModel slm{"RowRemovedTest"};
     QSignalSpy pagesCntChanged(&slm, &ScenesListModel::pagesCountChanged);
-    QCOMPARE(slm.setRootPath("inexist/RowRemovePath"), true);
+    QCOMPARE(slm.setRootPath("inexist/RowRemovePath", true, false), true);
     QCOMPARE(slm.rowCount(), 4);
     QCOMPARE(pagesCntChanged.count(), 1);
     QCOMPARE(pagesCntChanged.takeLast(), (QVariantList{2}));  // floor(6 / 4)=2

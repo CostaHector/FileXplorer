@@ -14,9 +14,6 @@ RibbonScene::RibbonScene(const QString& title, QWidget* parent) //
   addAction(ag._UPDATE_SCN);
   addSeparator();
 
-  addAction(ag._OPEN_MOVIE_WALL);
-  addSeparator();
-
   addAction(ag._DISABLE_IMAGE_DECORATION);
   addAction(ag._INCLUDEING_SUBDIRECTORIES);
   addSeparator();

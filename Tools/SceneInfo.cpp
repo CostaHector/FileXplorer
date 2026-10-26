@@ -53,10 +53,14 @@ QString SceneInfo::GetThumbnailImageAbsPath(const QString& rootPath) const {
 }
 
 QString SceneInfo::GetFirstImageAbsPath(const QString& rootPath) const {
-  if (imgs.isEmpty()) {
+  return GetImageAtIndex(rootPath, 0);
+}
+
+QString SceneInfo::GetImageAtIndex(const QString& rootPath, int i) const {
+  if (i < 0 || i >= imgs.size()) {
     return "";
   }
-  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgs.front());
+  return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, imgs[i]);
 }
 
 QStringList SceneInfo::GetImagesAbsPathList(const QString& rootPath) const {

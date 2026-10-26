@@ -27,8 +27,6 @@ class PaginatedList {
   }
 
   void setData(SceneElementTypeList newEntryList);
-  SceneElementTypeList* GetSceneElementTypeList() { return &mDataList; }
-
   bool setPerPageEleCnt(int newPerPage);
   bool setCurPageIndex(int newPageIndex);
   const SceneElementType& operator[](int localIndex) const { return constBeginCurPage()[localIndex]; }

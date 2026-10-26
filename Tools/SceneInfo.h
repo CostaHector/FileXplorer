@@ -45,6 +45,7 @@ struct SceneInfo {
   QString GetAbsolutePath(const QString& rootPath) const;
   QString GetThumbnailImageAbsPath(const QString& rootPath) const;
   QString GetFirstImageAbsPath(const QString& rootPath) const;
+  QString GetImageAtIndex(const QString& rootPath, int i) const;
   QStringList GetImagesAbsPathList(const QString& rootPath) const;
   QString GetVideoFullPath(const QString& rootPath) const;
   QStringList GetVideosFullPathWithFallback(const QString& rootPath) const;

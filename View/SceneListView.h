@@ -7,7 +7,6 @@
 #include "VideoTierTool.h"
 
 class ScenesListModel;
-class MovieWallServer;
 
 class SceneListView : public CustomListView {
   Q_OBJECT
@@ -18,7 +17,6 @@ public:
   ~SceneListView();
 
   void setRootPath(const QString& rootPath);
-  bool onToggleMovieWall(bool bLauchServer);
   int onUpdateJsonFiles();
   int onUpdateScnFiles();
   int onCreateFrontImageThumbnail();
@@ -53,7 +51,6 @@ private:
   SceneSortProxyModel* _sceneSortProxyModel{nullptr};
   SceneStyleDelegate* mAlignDelegate{nullptr};
 
-  MovieWallServer* mMovieWallServer{nullptr};
   QMetaObject::Connection mSortRoleConn;
   QMetaObject::Connection mSortOrderReverseConn;
 };

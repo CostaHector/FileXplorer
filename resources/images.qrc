@@ -78,6 +78,7 @@
         <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
         <file alias="AUTO_SAVE">Media/AUTO_SAVE.svg</file>
         <file alias="SILENT_SAVE">Media/SILENT_SAVE.svg</file>
+        <file alias="MOVIE_WALL">Media/MOVIE_WALL.html</file>
 
         <!--TopSideToolBar Icons here-->
         <file alias="LANGUAGE">TopSideToolBarIcons/LANGUAGE.svg</file>
@@ -134,7 +135,6 @@
         <file alias="CP_TO_COMMAND_PATH">FileOperation/CP_TO_COMMAND_PATH.png</file>
         <file alias="PACK_FOLDERS">FileOperation/PACK_FOLDERS.svg</file>
         <file alias="UNPACK_FOLDERS">FileOperation/UNPACK_FOLDERS.svg</file>
-        <file alias="ITEMS_ORGANIZER">FileOperation/ITEMS_ORGANIZER.svg</file>
         <file alias="FOLDER_OPEN">FileOperation/FOLDER_OPEN.svg</file>
         <file alias="SELECT_FOLDER">FileOperation/SELECT_FOLDER.svg</file>
         <file alias="DRAG_PIXMAP">FileOperation/DRAG_PIXMAP.svg</file>
