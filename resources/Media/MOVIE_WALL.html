@@ -183,7 +183,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 }
 
 .wall-toolbar .wall-path-input {
-  flex: 1 1 auto;
+  flex: 3 1 0;          /* grow=3, shrink=1, basis=0 */
   min-width: 0;
   height: 28px;
   padding: 0 8px;
@@ -202,6 +202,44 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 .wall-toolbar .wall-path-input.input-invalid {
   border-color: #e05c5c;
   transition: border-color 0.15s;
+}
+
+.wall-toolbar .wall-search-input {
+  flex: 1 1 0;          /* grow=1, shrink=1, basis=0 */
+  min-width: 120px;
+  height: 28px;
+  padding: 0 8px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+.wall-toolbar .wall-search-input:focus {
+  border-color: #555;
+  color: #eee;
+}
+.wall-toolbar .wall-search-input::placeholder {
+  color: #666;
+}
+
+/* 搜索高亮 */
+.poster .name mark {
+  background: rgba(245, 197, 24, 0.35);
+  color: #f5c518;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* 空状态 */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 60px 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
 }
 
 /* ---------- 详情抽屉 + 缩略图轮盘 ---------- */
@@ -404,7 +442,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 </head>
 
 <body>
-<!-- 导航栏(包含子路径, 上一级, 路径输入框, 上一文件夹, 下一文件夹) -->
+<!-- 导航栏(包含子路径, 上一级, 路径输入框, 上一文件夹, 下一文件夹, 搜索) -->
 <div class="wall-toolbar">
   <button class="wall-tool-btn" id="backToBtn" title="Back to last path (Mouse BackButton)" disabled>
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -445,6 +483,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
       <polyline points="4,6 8,10 12,6"/>
     </svg>
   </button>
+  <input class="wall-search-input" id="searchInput" type="search" placeholder="Search..." spellcheck="false">
 </div>
 
 <!-- 确认框 -->
@@ -582,13 +621,13 @@ class PathUndoRedoer {
   }
 }
 
-const undoRedo = new PathUndoRedoer();
+const g_undoRedo = new PathUndoRedoer();
 
 function updateUndoRedoButtons() {
   const backBtn = document.getElementById('backToBtn');
   const fwdBtn  = document.getElementById('forwardToBtn');
-  if (backBtn) backBtn.disabled = !undoRedo.canUndo();
-  if (fwdBtn)  fwdBtn.disabled  = !undoRedo.canRedo();
+  if (backBtn) backBtn.disabled = !g_undoRedo.canUndo();
+  if (fwdBtn)  fwdBtn.disabled  = !g_undoRedo.canRedo();
 }
 
 async function doSetRootPath(path) {
@@ -608,7 +647,7 @@ async function doSetRootPath(path) {
 
 async function load() {
   const resp = await (await fetch('/api/movies')).json();
-  const movies = Array.isArray(resp.movies) ? resp.movies : [];
+  g_allMovies = Array.isArray(resp.movies) ? resp.movies : [];
   const rootPath = typeof resp.rootPath === 'string' ? resp.rootPath : '';
   const subdir = !!resp.subdirectories;
 
@@ -623,34 +662,29 @@ async function load() {
 
   // 3. 页面大标题
   const h1 = document.getElementById('wallTitle');
-  if (h1) h1.textContent = `Movie Wall: ${movies.length} items`;
+  if (h1) h1.textContent = `Movie Wall: ${g_allMovies.length} items`;
 
   const subdirBtn = document.getElementById('subdirToggleBtn');
   if (subdirBtn) {
     subdirBtn.setAttribute('aria-pressed', subdir ? 'true' : 'false');
   }
 
-  // 4. 海报墙
-  const wall = document.getElementById('wall');
-  wall.innerHTML = movies.map(m => `
-    <div class="poster" data-id="${m.id}" data-rate="${m.rate}">
-      <img src="${m.thumbUrl}" loading="lazy" alt="">
-      <div class="meta">
-        <div class="duration" title="Video Duration">${msToHMS(m.duration)}</div>
-        <div class="size" title="Video Size">${formatFileSizeGMKB(m.vidSize)}</div>
-        <div class="rating">${ratingHtml(m.rate)}</div>
-      </div>
-      <div class="name" title="${m.name}">${m.name}</div>
-    </div>
-  `).join('');
+  // 4. 过滤后的海报墙
+  applyFilter();   // 替换原来的 wall.innerHTML + h1 更新
 
   return rootPath;
 }
 (async () => {
   const p = await load();
-  if (p) undoRedo.push(p);   // 初始路径作为 undo 栈的基线
+  if (p) g_undoRedo.push(p);   // 初始路径作为 undo 栈的基线
   updateUndoRedoButtons();   // back 和 forward 初始都是 disabled
 })();
+
+// 搜索输入事件防抖
+document.getElementById('searchInput').addEventListener('input', () => {
+  clearTimeout(g_searchDebounceTimer);
+  g_searchDebounceTimer = setTimeout(applyFilter, 150);
+});
 
 // 点击标题/详情页标题 播放
 async function playVideo(id) {
@@ -688,6 +722,10 @@ document.getElementById('wall').addEventListener('click', async (e) => {
       if (data.ok) {
         poster.dataset.rate = String(newRate);
         poster.querySelector('.rating').innerHTML = ratingHtml(newRate);
+
+        // 同步全局数组
+        const m = g_allMovies.find(x => x.id === id);
+        if (m) m.rate = newRate;
       } else {
         console.warn('[rate] failed:', data.error);
       }
@@ -812,6 +850,62 @@ function parentOf(p) {
   return parent;
 }
 
+// ---------- 搜索功能 ----------
+let g_allMovies = [];        // /api/movies 返回的全量数组
+let g_searchDebounceTimer = null;
+function renderWall(movies, keyword) {
+  const wall = document.getElementById('wall');
+  if (movies.length === 0) {
+    wall.innerHTML = `<div class="empty-state">No matches for "${escapeHtml(keyword)}"</div>`;
+    return;
+  }
+  wall.innerHTML = movies.map(m => `
+    <div class="poster" data-id="${m.id}" data-rate="${m.rate}">
+      <img src="${m.thumbUrl}" loading="lazy" alt="">
+      <div class="meta">
+        <div class="duration" title="Video Duration">${msToHMS(m.duration)}</div>
+        <div class="size" title="Video Size">${formatFileSizeGMKB(m.vidSize)}</div>
+        <div class="rating">${ratingHtml(m.rate)}</div>
+      </div>
+      <div class="name" title="${escapeHtml(m.name)}">${highlightMatch(m.name, keyword)}</div>
+    </div>
+  `).join('');
+}
+
+function highlightMatch(name, keyword) {
+  const kw = (keyword || '').trim().toLowerCase();
+  const safe = escapeHtml(name);
+  if (!kw) return safe;
+  const idx = name.toLowerCase().indexOf(kw);
+  if (idx < 0) return safe;
+  return escapeHtml(name.slice(0, idx))
+       + '<mark>' + escapeHtml(name.slice(idx, idx + kw.length)) + '</mark>'
+       + escapeHtml(name.slice(idx + kw.length));
+}
+
+function filterMovies(keyword) {
+  const kw = (keyword || '').trim().toLowerCase();
+  if (!kw) return g_allMovies;
+  return g_allMovies.filter(m => (m.name || '').toLowerCase().includes(kw));
+}
+
+function applyFilter() {
+  const input = document.getElementById('searchInput');
+  const keyword = input ? input.value : '';
+  const filtered = filterMovies(keyword);
+
+  renderWall(filtered, keyword);
+
+  const h1 = document.getElementById('wallTitle');
+  if (h1) {
+    const kw = keyword.trim();
+    h1.textContent = kw
+      ? `Movie Wall: ${filtered.length} / ${g_allMovies.length} matches`
+      : `Movie Wall: ${g_allMovies.length} items`;
+  }
+}
+
+
 // ---------- 统一导航入口 ----------
 async function navigateToPath(newPath) {
   newPath = normalizePath(newPath);
@@ -836,7 +930,7 @@ async function navigateToPath(newPath) {
   const ok = await doSetRootPath(newPath);
   if (ok) {
     const p = await load();
-    undoRedo.push(p);
+    g_undoRedo.push(p);
     updateUndoRedoButtons();
   } else {
     if (pathInput) {
@@ -881,7 +975,7 @@ async function navigateSiblingFolder(isNext) {
 
     if (data.ok) {
       const p = await load();   // 刷新 pathInput、h1、海报墙
-      undoRedo.push(p);
+      g_undoRedo.push(p);
       updateUndoRedoButtons();
     } else {
       // data.ok=false：已到第一个/最后一个目录，什么都不做
@@ -899,6 +993,13 @@ async function navigateSiblingFolder(isNext) {
 document.getElementById('prevFolderBtn').addEventListener('click', () => navigateSiblingFolder(false));
 document.getElementById('nextFolderBtn').addEventListener('click', () => navigateSiblingFolder(true));
 document.addEventListener('keydown', (e) => {
+  // Ctrl+F / Cmd+F 聚焦搜索框
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    const s = document.getElementById('searchInput');
+    if (s) { s.focus(); s.select(); }
+  }
+
   // 只在纯 Ctrl + 括号时触发；Ctrl+Shift / Ctrl+Alt 等组合不拦截
   if (!e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
 
@@ -916,29 +1017,29 @@ document.addEventListener('keydown', (e) => {
 
 
 async function onBackTo() {
-  if (!undoRedo.canUndo()) return;
-  const target = undoRedo.undo();
+  if (!g_undoRedo.canUndo()) return;
+  const target = g_undoRedo.undo();
   updateUndoRedoButtons();
 
   const ok = await doSetRootPath(target);
   if (ok) {
     await load();          // 不 push：栈在 undo() 时已经改了
   } else {
-    undoRedo.redo();       // 请求失败，恢复栈
+    g_undoRedo.redo();       // 请求失败，恢复栈
     updateUndoRedoButtons();
   }
 }
 
 async function onForwardTo() {
-  if (!undoRedo.canRedo()) return;
-  const target = undoRedo.redo();
+  if (!g_undoRedo.canRedo()) return;
+  const target = g_undoRedo.redo();
   updateUndoRedoButtons();
 
   const ok = await doSetRootPath(target);
   if (ok) {
     await load();          // 不 push
   } else {
-    undoRedo.undo();       // 恢复
+    g_undoRedo.undo();       // 恢复
     updateUndoRedoButtons();
   }
 }
@@ -948,7 +1049,7 @@ document.getElementById('forwardToBtn').addEventListener('click', onForwardTo);
 
 
 // ---------- 详情抽屉 ----------
-const detailState = {
+const g_detailState = {
   id: -1,
   imgs: [],
   idx: 0,
@@ -979,12 +1080,12 @@ detailDrawer.innerHTML = `
 document.body.appendChild(detailDrawer);
 
 function renderDetailView() {
-  const total = detailState.imgs.length;
+  const total = g_detailState.imgs.length;
   if (total === 0) return;
-  const idx = detailState.idx;
+  const idx = g_detailState.idx;
 
   detailDrawer.querySelector('.index-text').textContent = `${idx + 1} / ${total}`;
-  detailDrawer.querySelector('.hero img').src = detailState.imgs[idx];
+  detailDrawer.querySelector('.hero img').src = g_detailState.imgs[idx];
 
   detailDrawer.querySelectorAll('.thumbstrip img').forEach((t, i) => {
     t.classList.toggle('active', i === idx);
@@ -1000,8 +1101,8 @@ function renderDetailView() {
 }
 
 function setDetailIndex(newIdx) {
-  if (newIdx < 0 || newIdx >= detailState.imgs.length) return;  // 边界不响应
-  detailState.idx = newIdx;
+  if (newIdx < 0 || newIdx >= g_detailState.imgs.length) return;  // 边界不响应
+  g_detailState.idx = newIdx;
   renderDetailView();
 }
 
@@ -1009,13 +1110,13 @@ function onDetailKey(e) {
   if (e.key === 'Escape') { closeDetail(); return; }
 
   if (e.key === 'ArrowLeft') {
-    if (detailState.idx <= 0) return;               // 首图不响应左键
+    if (g_detailState.idx <= 0) return;               // 首图不响应左键
     e.preventDefault();
-    setDetailIndex(detailState.idx - 1);
+    setDetailIndex(g_detailState.idx - 1);
   } else if (e.key === 'ArrowRight') {
-    if (detailState.idx >= detailState.imgs.length - 1) return;  // 尾图不响应右键
+    if (g_detailState.idx >= g_detailState.imgs.length - 1) return;  // 尾图不响应右键
     e.preventDefault();
-    setDetailIndex(detailState.idx + 1);
+    setDetailIndex(g_detailState.idx + 1);
   }
 }
 
@@ -1025,9 +1126,9 @@ function closeDetail() {
   document.removeEventListener('keydown', onDetailKey);
 
   // 释放大图引用，避免闭包持有
-  detailState.id   = -1;
-  detailState.imgs = [];
-  detailState.idx  = 0;
+  g_detailState.id   = -1;
+  g_detailState.imgs = [];
+  g_detailState.idx  = 0;
 }
 
 async function openDetailDrawer(id) {
@@ -1052,12 +1153,12 @@ async function openDetailDrawer(id) {
       + `<span>${formatFileSizeGMKB(d.vidSize)}</span>`
       + `<span>${d.rate} / 10</span>`;
 
-    detailState.id   = id;
-    detailState.imgs = d.imgs || [];
-    detailState.idx  = 0;
+    g_detailState.id   = id;
+    g_detailState.imgs = d.imgs || [];
+    g_detailState.idx  = 0;
 
     const thumbstrip = detailDrawer.querySelector('.thumbstrip');
-    thumbstrip.innerHTML = detailState.imgs
+    thumbstrip.innerHTML = g_detailState.imgs
       .map((src, i) => `<img src="${src}" data-idx="${i}" alt="">`)
       .join('');
 
@@ -1068,10 +1169,10 @@ async function openDetailDrawer(id) {
     });
 
     // 前后按钮也接上
-    detailDrawer.querySelector('.nav-prev').onclick = () => setDetailIndex(detailState.idx - 1);
-    detailDrawer.querySelector('.nav-next').onclick = () => setDetailIndex(detailState.idx + 1);
+    detailDrawer.querySelector('.nav-prev').onclick = () => setDetailIndex(g_detailState.idx - 1);
+    detailDrawer.querySelector('.nav-next').onclick = () => setDetailIndex(g_detailState.idx + 1);
 
-    if (detailState.imgs.length === 0) {
+    if (g_detailState.imgs.length === 0) {
       detailDrawer.querySelector('.index-text').textContent = '0 / 0';
     } else {
       renderDetailView();
@@ -1083,7 +1184,7 @@ async function openDetailDrawer(id) {
 }
 
 detailDrawer.querySelector('.head .title').addEventListener('click', () => {
-  if (detailState.id >= 0) playVideo(detailState.id);
+  if (g_detailState.id >= 0) playVideo(g_detailState.id);
 });
 detailBackdrop.addEventListener('click', closeDetail);
 detailDrawer.querySelector('.close-btn').addEventListener('click', closeDetail);

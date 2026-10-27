@@ -144,8 +144,7 @@ int CreateThumbnailForAllDirectFoldersUnder(const QString& folderPath, bool bSki
     if (imgs.isEmpty()) {
       continue;
     }
-    StringTool::ImgsSortNameLengthFirst(imgs);
-    const QString imgNameInSubFolder{imgs.front()};
+    const QString imgNameInSubFolder{StringTool::ImgsMinByNumber(imgs)};
     if (!imgNameInSubFolder.startsWith(folderName)) {
        // avoid create useless image
       continue;

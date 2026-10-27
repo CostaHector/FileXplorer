@@ -71,7 +71,7 @@ QStringList ImagesInFolderBrowser::InitImgsList(const QString& dirPath) const {
     return {};
   }
   QStringList imgsLst = dir.entryList(TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDir::SortFlag::Name);
-  StringTool::ImgsSortNameLengthFirst(imgsLst);
+  StringTool::ImgsSortByNumber(imgsLst);
   return imgsLst;
 }
 

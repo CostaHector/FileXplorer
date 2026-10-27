@@ -40,6 +40,7 @@ private:
   QImage getThumbnail(const QString& thumbImgFullPath, const int eleId) const;
   // 内部持有 m_sceneMutex，调用方不得已持有 m_sceneMutex
   QString resolveImage(int id, int imgIdx) const;
+  QString resolveThumbnailImage(int id) const;
   static bool GetQImage(const QString& path, QImage& img, bool enablePlaceholderImage, bool isDetailImage);
   QJsonObject GetQJsonObject(int id, bool bIsDetail) const;
 

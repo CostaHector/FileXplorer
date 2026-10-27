@@ -130,7 +130,7 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
   }
 
   for (QStringList& imgs : m_img2Name) {
-    StringTool::ImgsSortNameLengthFirst(imgs);
+    StringTool::ImgsSortByNumber(imgs);
   }
 
   LOG_D("%d items been grouped into %d groups, which are %d,%d,%d piles of img/vid/json repectively",  //

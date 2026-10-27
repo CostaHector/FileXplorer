@@ -21,6 +21,71 @@ bool FileSizeSorter(const QString& lhs, const QString& rhs) { // not consider fi
   return lhs < rhs; // name ascii second
 }
 
+void ImgsSortByNumber(QStringList& imgs) {
+  QStringList tnImgs;                              // _tn 等非数字后缀，最后追加
+  std::map<int, QList<int>> number2Index;          // 编号 -> 原列表索引
+
+  for (int i = 0; i < imgs.size(); ++i) {
+    const QString& s = imgs[i];
+    const int dotPos = s.lastIndexOf('.');
+    if (dotPos <= 0) {                             // 没有扩展名，或 '.' 在开头
+      tnImgs.append(s);
+      continue;
+    }
+    if (!s[dotPos - 1].isDigit()) {                // '.' 前不是数字，视为 _tn
+      tnImgs.append(s);
+      continue;
+    }
+    const int spacePos = s.lastIndexOf(' ', dotPos);
+    if (spacePos < 0) {                            // 没有空格，无法取编号
+      tnImgs.append(s);
+      continue;
+    }
+    bool bIsNumber{false};
+    const int number = s.midRef(spacePos + 1, dotPos - spacePos - 1).toInt(&bIsNumber);
+    if (!bIsNumber) {
+      tnImgs.append(s);
+      continue;
+    }
+    number2Index[number].append(i);                // 同编号按原顺序保留
+  }
+
+  QStringList sorted;
+  sorted.reserve(imgs.size());
+  for (auto it = number2Index.cbegin(); it != number2Index.cend(); ++it) {
+    for (int idx : it->second) {
+      sorted.append(imgs[idx]);
+    }
+  }
+  sorted += tnImgs;
+  imgs = std::move(sorted);
+}
+
+QString ImgsMinByNumber(const QStringList& imgs) {
+  if (imgs.isEmpty()) return {};
+
+  int bestIndex{0};
+  int bestNum{INT_MAX};
+
+  for (int i = 0; i < imgs.size(); ++i) {
+    const QString& s = imgs[i];
+    int dotPos = s.lastIndexOf('.');
+
+    if (dotPos > 0 && s[dotPos - 1].isDigit()) {
+      int spacePos = s.lastIndexOf(' ', dotPos);
+      if (spacePos >= 0) {
+        bool bIsNumber = false;
+        const int number = s.midRef(spacePos + 1, dotPos - spacePos - 1).toInt(&bIsNumber);
+        if (bIsNumber && number < bestNum) {
+          bestNum   = number;
+          bestIndex = i;
+        }
+      }
+    }
+  }
+  return imgs[bestIndex];
+}
+
 QStringList GetImgsVidsListFromField(const QString& imgsField) {
   return imgsField.split(IMG_VID_SEP_COMP, Qt::SkipEmptyParts);
 }

@@ -419,6 +419,12 @@ QString MovieWallServer::resolveImage(int id, int imgIdx) const {
   return m_sceneElements[id].GetImageAtIndex(mRootPath, imgIdx);
 }
 
+QString MovieWallServer::resolveThumbnailImage(int id) const {
+  QMutexLocker lock(&m_sceneMutex);
+  if (id < 0 || id >= m_sceneElements.size()) return {};
+  return m_sceneElements[id].GetThumbnailImageAbsPath(mRootPath);
+}
+
 bool MovieWallServer::invokeOnMainThread(std::function<bool()> fn) {
   if (QThread::currentThread() == this->thread()) {
     return fn();
@@ -484,7 +490,7 @@ bool MovieWallServer::GetQImage(const QString& path, QImage& img, bool enablePla
 }
 
 QImage MovieWallServer::getThumbnail(const QString& thumbImgFullPath, const int eleId) const {
-  const QString path = resolveImage(eleId, 0);   // 内部加锁 + 边界检查
+  const QString path{resolveThumbnailImage(eleId)};
   if (path.isEmpty()) {
     LOG_W("eleId[%d] out of range or no image", eleId);
     return {};
