@@ -19,7 +19,7 @@ class RateHelper {
   static bool isClickPointInsideRatingBar(const QPoint& clickPnt, const QRect& vRect);
   static int ratingAtPosition(const QPoint& pos, const QRect& visualRect);
 
-  static constexpr int RATING_BAR_X = 24, RATING_BAR_HEIGHT = 24;
+  static constexpr int RATING_BAR_X = 36, RATING_BAR_HEIGHT = 36;
 
  private:
   static bool SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
