@@ -146,6 +146,49 @@ h1 { font-size: 20px; margin: 0 0 12px; }
   border-radius: 6px;
 }
 
+/* 组分隔线 */
+.wall-toolbar .wall-toolbar-sep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 20px;
+  background: #3a3a3a;
+  margin: 0 2px;
+}
+
+/* 排序下拉 */
+.wall-toolbar .wall-sort-select {
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 6px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;          /* 让下拉选项也是深色 */
+}
+.wall-toolbar .wall-sort-select:focus {
+  border-color: #555;
+  color: #eee;
+}
+.wall-toolbar .wall-sort-select option {
+  background: #1a1a1a;
+  color: #ccc;
+}
+
+/* 倒序 toggle 选中态 */
+.wall-toolbar .wall-toggle-btn[aria-pressed="true"] {
+  background: #2f4a2f;
+  color: #8fd18f;
+}
+.wall-toolbar .wall-toggle-btn[aria-pressed="true"]:hover:not(:disabled) {
+  background: #3a5a3a;
+  color: #a8e0a8;
+}
+
 .wall-toolbar .wall-tool-btn {
   flex: 0 0 auto;
   display: inline-flex;
@@ -443,8 +486,28 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 </head>
 
 <body>
-<!-- 导航栏(包含子路径, 上一级, 路径输入框, 上一文件夹, 下一文件夹, 搜索) -->
+<!-- 导航栏(包含排序, 内容倒序|上一个, 下一个, 上一级|包含子路径, 路径输入框|上一文件夹, 下一文件夹|搜索) -->
 <div class="wall-toolbar">
+  <!-- 组 1：排序 + 倒序 -->
+  <select class="wall-sort-select" id="sortBySelect" title="Sort by">
+    <option value="na">NA</option>
+    <option value="name">Name</option>
+    <option value="duration">Duration</option>
+    <option value="size">Size</option>
+    <option value="rate">Rate</option>
+    <option value="rel2Name">Rel2Name</option>
+  </select>
+  <button class="wall-tool-btn wall-toggle-btn" id="reverseToggleBtn"
+          title="Reverse order" aria-pressed="false">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 7L9 7M2 7L5 7Z
+            M19 12H16M5 12L12 12Z
+        M16 17H8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <span class="wall-toolbar-sep"></span>
+
+  <!-- 组 2：路径 undo/redo + 上一级 -->
   <button class="wall-tool-btn" id="backToBtn" title="Back to last path (Mouse BackButton)" disabled>
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="11,4 6,8 11,12"/>
@@ -457,6 +520,10 @@ h1 { font-size: 20px; margin: 0 0 12px; }
       <line x1="13" y1="4" x2="13" y2="12"/>
     </svg>
   </button>
+  <button class="wall-tool-btn" id="levelUpBtn" title="Go to parent folder">..</button>
+  <span class="wall-toolbar-sep"></span>
+
+  <!-- 组 3：包含子路径, 路径输入 -->
   <button class="wall-tool-btn wall-toggle-btn" id="subdirToggleBtn"
           title="Include subdirectories" aria-pressed="false">
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
@@ -467,23 +534,28 @@ h1 { font-size: 20px; margin: 0 0 12px; }
       <path d="M5.5 10 H10.5"/>
     </svg>
   </button>
-  <button class="wall-tool-btn" id="levelUpBtn" title="Go to parent folder">..</button>
   <input class="wall-path-input" id="pathInput" type="text" value="" spellcheck="false" list="pathHistoryList">
   <datalist id="pathHistoryList"></datalist>
+  <span class="wall-toolbar-sep"></span>
+
+  <!-- 组 4：同级文件夹导航 -->
   <button class="wall-tool-btn" id="prevFolderBtn" title="Previous folder (Ctrl+[)">
-  <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
-       stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="4,10 8,6 12,10"/>
-  </svg>
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
+         stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4,10 8,6 12,10"/>
+    </svg>
   </button>
   <button class="wall-tool-btn" id="nextFolderBtn" title="Next folder (Ctrl+])">
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none"
-        stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
+         stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
       <polyline points="4,6 8,10 12,6"/>
     </svg>
   </button>
+  <span class="wall-toolbar-sep"></span>
+
+  <!-- 组 5：搜索 -->
   <input class="wall-search-input" id="searchInput" type="search" placeholder="Search..." spellcheck="false">
 </div>
 
@@ -851,6 +923,55 @@ function parentOf(p) {
   return parent;
 }
 
+// ---------- 排序偏好持久化 ----------
+const SORT_PREF_KEY = 'movieWall.sortPref';
+
+function loadSortPref() {
+  try {
+    const raw = localStorage.getItem(SORT_PREF_KEY);
+    if (!raw) return { sortBy: "na", reverse: false };
+    const obj = JSON.parse(raw);
+    const sortBy = obj.sortBy;
+    return { sortBy, reverse: !!obj.reverse };
+  } catch {
+    return { sortBy: "na", reverse: false };
+  }
+}
+
+function saveSortPref(sortBy, reverse) {
+  try {
+    localStorage.setItem(SORT_PREF_KEY, JSON.stringify({ sortBy, reverse }));
+  } catch { /* 隐私模式/配额满，静默降级 */ }
+}
+
+// ---------- 恢复排序偏好 ----------
+(function restoreSortPref() {
+  const pref = loadSortPref();
+  const sortSelect = document.getElementById('sortBySelect');
+  const reverseBtn = document.getElementById('reverseToggleBtn');
+
+  if (sortSelect) sortSelect.value = String(pref.sortBy);
+  if (reverseBtn) reverseBtn.setAttribute('aria-pressed', pref.reverse ? 'true' : 'false');
+})();
+
+// 排序、倒序 偏好持久化
+document.getElementById('sortBySelect').addEventListener('change', (e) => {
+  const sortBy = e.target.value;
+  const reverse = document.getElementById('reverseToggleBtn').getAttribute('aria-pressed') === 'true';
+  saveSortPref(sortBy, reverse);
+  applyFilter();
+});
+
+document.getElementById('reverseToggleBtn').addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  const next = btn.getAttribute('aria-pressed') !== 'true';
+  btn.setAttribute('aria-pressed', next ? 'true' : 'false');
+
+  const sortBy = document.getElementById('sortBySelect').value;
+  saveSortPref(sortBy, next);
+  applyFilter();
+});
+
 // ---------- 搜索功能 ----------
 let g_allMovies = [];        // /api/movies 返回的全量数组
 let g_searchDebounceTimer = null;
@@ -895,7 +1016,15 @@ function applyFilter() {
   const keyword = input ? input.value : '';
   const filtered = filterMovies(keyword);
 
-  renderWall(filtered, keyword);
+  const sortSelect = document.getElementById('sortBySelect');
+  const sortKey = sortSelect ? sortSelect.value : 'na';
+
+  const reverseBtn = document.getElementById('reverseToggleBtn');
+  const reverse = reverseBtn && reverseBtn.getAttribute('aria-pressed') === 'true';
+
+  const sorted = sortMovies(filtered, sortKey, reverse);
+
+  renderWall(sorted, keyword);
 
   const h1 = document.getElementById('wallTitle');
   if (h1) {
@@ -906,6 +1035,27 @@ function applyFilter() {
   }
 }
 
+// ---------- 排序 ----------
+function sortMovies(movies, key, reverse) {
+  // NA：保持 C++ 返回的原始顺序（按 id 升序）
+  if (!key || key === 'na') {
+    return reverse ? movies.slice().reverse() : movies;
+  }
+
+  const arr = movies.slice();   // 不修改 g_allMovies
+  const cmp = (a, b) => {
+    switch (key) {
+      case 'name':     return (a.name || '').localeCompare(b.name || '');
+      case 'duration': return (a.duration || 0) - (b.duration || 0);
+      case 'size':     return (a.vidSize || 0) - (b.vidSize || 0);
+      case 'rate':     return (a.rate || 0) - (b.rate || 0);
+      case 'rel2Name': return (a.rel2Name || '').localeCompare(b.rel2Name || '');
+      default:         return 0;
+    }
+  };
+  arr.sort(cmp);                // ES2019+ 保证稳定排序
+  return reverse ? arr.reverse() : arr;
+}
 
 // ---------- 统一导航入口 ----------
 async function navigateToPath(newPath) {
@@ -1016,6 +1166,24 @@ document.addEventListener('keydown', (e) => {
   navigateSiblingFolder(isNext);
 });
 
+// ---------- 鼠标侧边键：Back / Forward ----------
+// 用 mousedown 提前拦截浏览器默认导航，避免鼠标按下时页面就跳转
+document.addEventListener('mousedown', (e) => {
+  if (e.button === 3 || e.button === 4) {
+    e.preventDefault();
+  }
+});
+
+// 用 mouseup 触发导航逻辑，和按钮点击行为一致
+document.addEventListener('mouseup', (e) => {
+  if (e.button === 3) {
+    e.preventDefault();
+    onBackTo();
+  } else if (e.button === 4) {
+    e.preventDefault();
+    onForwardTo();
+  }
+});
 
 async function onBackTo() {
   if (!g_undoRedo.canUndo()) return;

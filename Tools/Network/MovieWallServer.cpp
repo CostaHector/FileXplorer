@@ -13,13 +13,12 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDesktopServices>
-#include <QPainter>
 
 constexpr const char* MovieWallServer::DEFAULT_MOVIE_WALL_HOST;
 constexpr int MovieWallServer::DEFAULT_MOVIE_WALL_PORT;
 
-MovieWallServer::MovieWallServer(QObject* parent)
-  : QObject{parent}, m_thumbCache(128) {
+MovieWallServer::MovieWallServer(QObject* parent, bool bIncludeSubdirectory)
+  : QObject{parent}, m_bSubdirectories{bIncludeSubdirectory}, m_thumbCache(128) {
   mFolderIterator.setWrapEnabled(false);
 }
 
@@ -296,6 +295,7 @@ QJsonObject MovieWallServer::GetQJsonObject(int eleId, bool bIsDetail) const {
   o["rate"]     = s.rate;
   o["vidSize"]  = s.vidSize;
   o["duration"] = s.duration;
+  o["rel2Name"] = s.GetRel2Name();
   if (bIsDetail) {
     const QStringList detailImages = s.GetImagesAbsPathList(mRootPath);
     QJsonArray imgs;
@@ -469,6 +469,7 @@ bool MovieWallServer::GetQImage(const QString& path, QImage& img, bool enablePla
       return true;
     }
   }
+
   QImageReader reader(path);
   reader.setAutoTransform(true);
   const QSize orig = reader.size();

@@ -48,6 +48,10 @@ QString SceneInfo::GetAbsolutePath(const QString& rootPath) const {
   return rootPath + rel2scn;
 }
 
+QString SceneInfo::GetRel2Name() const {
+  return rel2scn + name;
+}
+
 QString SceneInfo::GetThumbnailImageAbsPath(const QString& rootPath) const {
   return PathTool::GetAbsFilePathFromRootRelName(rootPath, rel2scn, name + PathTool::THUMBNAIL_IMAGE_SUFFIX);
 }

@@ -22,17 +22,20 @@ public:
   static constexpr const char* DEFAULT_MOVIE_WALL_HOST = "127.0.0.1";
   static constexpr int DEFAULT_MOVIE_WALL_PORT = 8766;
 
-  explicit MovieWallServer(QObject* parent = nullptr);
+  explicit MovieWallServer(QObject* parent = nullptr, bool bIncludeSubdirectory = false);
   ~MovieWallServer() override;
+
+  bool isIncludeSubdirectory() const { return m_bSubdirectories; }
   bool setRootPath(const QString& rootPath);
-  bool onIteratorToAnotherFolderCore(bool isNext);
-  bool onIncludeSubdirectoryChanged(bool bIncludeSubdirectory);
   bool start(quint16 port);
   void stop();
   QString urlAddress() const { return QString::asprintf("http://%s:%d", DEFAULT_MOVIE_WALL_HOST, port()); }
   quint16 port() const { return m_port; }
 
 private:
+  bool onIteratorToAnotherFolderCore(bool isNext);
+  bool onIncludeSubdirectoryChanged(bool bIncludeSubdirectory);
+
   // 在 MovieWallServer 所属线程（主线程）执行 fn，返回其返回值
   bool invokeOnMainThread(std::function<bool()> fn);
 
@@ -56,7 +59,7 @@ private:
   static QByteArray indexHtml();
 
   QString mRootPath;
-  bool m_bSubdirectories{false};
+  bool m_bSubdirectories;
   FolderNxtAndLastIterator mFolderIterator;
   SceneInfoList m_sceneElements;
   mutable QMutex m_sceneMutex; // mSceneElements 中 rate（读+写）
