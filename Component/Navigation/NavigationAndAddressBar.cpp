@@ -3,6 +3,8 @@
 #include "RightClickMenuActions.h"
 #include "MovieWallServer.h"
 #include "PublicMacro.h"
+#include "InputDialogHelper.h"
+#include "NotificatorMacro.h"
 
 #include <QLayout>
 #include <QKeySequence>
@@ -215,15 +217,30 @@ bool NavigationAndAddressBar::onSearchTextReturnPressed() {
 }
 
 bool NavigationAndAddressBar::onToggleMovieWall(bool bLauchServer) {
+  if (!bLauchServer) {
+    // 停止服务
+    if (mMovieWallServer != nullptr) {
+      mMovieWallServer->stop();
+    }
+    return true;
+  }
   if (mMovieWallServer == nullptr) {
-    mMovieWallServer = new MovieWallServer{this};
+    mMovieWallServer = new MovieWallServer{this, true};
   }
-  mMovieWallServer->setRootPath(m_addressLine->pathFromLineEdit());
-  if (bLauchServer) {
-    mMovieWallServer->start(MovieWallServer::DEFAULT_MOVIE_WALL_PORT);
-    QDesktopServices::openUrl(QUrl(mMovieWallServer->urlAddress()));
-  } else {
-    mMovieWallServer->stop();
+  const QString rootPath{m_addressLine->pathFromLineEdit()};
+  const bool bSubdirectories = mMovieWallServer->isIncludeSubdirectory();
+  if (bSubdirectories && PathTool::isPathAtShallowDepth(rootPath)) {
+    const QString title{"This May Take a While - Large Directory Warning"};
+    const QString msg{"The target path is near the drive root, and 'Include subdirectories' is enabled. Building the poster wall may take a while."};
+    const QString& informativeText{rootPath};
+    if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning, QIcon{":img/SAND_GLASS"}, title, msg, informativeText, "")) {
+      // Potential large directory
+      LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
+      return false;
+    }
   }
+  mMovieWallServer->setRootPath(rootPath);
+  mMovieWallServer->start(MovieWallServer::DEFAULT_MOVIE_WALL_PORT);
+  QDesktopServices::openUrl(QUrl(mMovieWallServer->urlAddress()));
   return true;
 }

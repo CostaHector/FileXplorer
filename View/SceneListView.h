@@ -17,6 +17,7 @@ public:
   ~SceneListView();
 
   void setRootPath(const QString& rootPath);
+  bool setSubdirectoriesToggled(bool bSubdirectories);
   int onUpdateJsonFiles();
   int onUpdateScnFiles();
   int onCreateFrontImageThumbnail();

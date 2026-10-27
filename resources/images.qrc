@@ -78,6 +78,7 @@
         <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
         <file alias="AUTO_SAVE">Media/AUTO_SAVE.svg</file>
         <file alias="SILENT_SAVE">Media/SILENT_SAVE.svg</file>
+        <file alias="SAND_GLASS">Media/SAND_GLASS.svg</file>
         <file alias="MOVIE_WALL">Media/MOVIE_WALL.html</file>
 
         <!--TopSideToolBar Icons here-->

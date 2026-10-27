@@ -104,7 +104,7 @@ void SceneListView::subscribe() {
   connect(sceneActInst._UPDATE_JSON, &QAction::triggered, this, &SceneListView::onUpdateJsonFiles);
   connect(sceneActInst._UPDATE_SCN, &QAction::triggered, this, &SceneListView::onUpdateScnFiles);
   connect(sceneActInst._CREATE_THUMBNAIL_FOR_JSON_RELATED_IMGS, &QAction::triggered, this, &SceneListView::onCreateFrontImageThumbnail);
-  connect(sceneActInst._INCLUDEING_SUBDIRECTORIES, &QAction::toggled, _sceneModel, &ScenesListModel::onSubdirectoriesToggled);
+  connect(sceneActInst._INCLUDEING_SUBDIRECTORIES, &QAction::toggled, this, &SceneListView::setSubdirectoriesToggled);
   connect(sceneActInst._CLEAR_SCN_FILE, &QAction::triggered, this, &SceneListView::onClearScnFiles);
   connect(sceneActInst._ARCHIVE_BY_MOVIE_SCORE, &QAction::triggered, this, &SceneListView::onArchiveToByMovieRate);
   connect(sceneActInst._ARCHIVE_AG, &QActionGroup::triggered, this, &SceneListView::onArchiveActionTriggered);
@@ -142,28 +142,38 @@ void SceneListView::toggleSortRequestImplementer(bool bPageByPage) {
 }
 
 void SceneListView::setRootPath(const QString& rootPath) {
-  const bool bNeedSkip{
-#ifdef RUNNING_UNIT_TESTS
-      false
-#else
-      PathTool::isPathAtShallowDepth(rootPath)
-      && !InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Question,
-                                            QIcon{},
-                                            "Large Directory Warning - Performance Impact",
-                                            "This directory appears to be at a high level in the filesystem and may contain a large number of items. "
-                                            "Loading it could cause performance issues.\n\n"
-                                            "Directory: "
-                                                + rootPath + "\n\n Do you want to proceed?",
-                                            "", "")
-#endif
-  };
-  if (bNeedSkip) {
-    // Potential large directory
-    LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
-    return;
-  }
   const bool bSubdirectories = SceneInPageActions::GetInst().GetbSubdirectories();
+#ifndef RUNNING_UNIT_TESTS
+  if (bSubdirectories && PathTool::isPathAtShallowDepth(rootPath)) {
+    const QString title{"This May Take a While - Large Directory Warning"};
+    const QString msg{"The target path is near the drive root, and 'Include subdirectories' is enabled. Building the poster wall may take a while."};
+    const QString& informativeText{rootPath};
+    if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning, QIcon{":img/SAND_GLASS"}, title, msg, informativeText, "")) {
+      // Potential large directory
+      LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
+      return;
+    }
+  }
+#endif
   _sceneModel->setRootPath(rootPath, bSubdirectories, false);
+}
+
+bool SceneListView::setSubdirectoriesToggled(bool bSubdirectories) {
+#ifndef RUNNING_UNIT_TESTS
+  const QString rootPath{_sceneModel->rootPath()};
+  if (bSubdirectories && PathTool::isPathAtShallowDepth(rootPath)) {
+    const QString title{"This May Take a While - Large Directory Warning"};
+    const QString msg{"The target path is near the drive root, and 'Include subdirectories' is enabled. Building the poster wall may take a while."};
+    const QString& informativeText{rootPath};
+    if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning, QIcon{":img/SAND_GLASS"}, title, msg, informativeText, "")) {
+      // Potential large directory
+      LOG_INFO_P("User canceled setting root path", "large directory:[%s]", qPrintable(rootPath));
+      return false;
+    }
+  }
+#endif
+  _sceneModel->onSubdirectoriesToggled(bSubdirectories);
+  return true;
 }
 
 int SceneListView::onUpdateJsonFiles() {

@@ -43,6 +43,7 @@ struct SceneInfo {
   static QString GetSceneFullPathStatic(const QString& folderPath);
   QString GetSceneFullPath(const QString& rootPath) const;
   QString GetAbsolutePath(const QString& rootPath) const;
+  QString GetRel2Name() const;
   QString GetThumbnailImageAbsPath(const QString& rootPath) const;
   QString GetFirstImageAbsPath(const QString& rootPath) const;
   QString GetImageAtIndex(const QString& rootPath, int i) const;

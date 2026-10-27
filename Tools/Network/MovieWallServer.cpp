@@ -13,13 +13,12 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDesktopServices>
-#include <QPainter>
 
 constexpr const char* MovieWallServer::DEFAULT_MOVIE_WALL_HOST;
 constexpr int MovieWallServer::DEFAULT_MOVIE_WALL_PORT;
 
-MovieWallServer::MovieWallServer(QObject* parent)
-  : QObject{parent}, m_thumbCache(128) {
+MovieWallServer::MovieWallServer(QObject* parent, bool bIncludeSubdirectory)
+  : QObject{parent}, m_bSubdirectories{bIncludeSubdirectory}, m_thumbCache(128) {
   mFolderIterator.setWrapEnabled(false);
 }
 
@@ -296,6 +295,7 @@ QJsonObject MovieWallServer::GetQJsonObject(int eleId, bool bIsDetail) const {
   o["rate"]     = s.rate;
   o["vidSize"]  = s.vidSize;
   o["duration"] = s.duration;
+  o["rel2Name"] = s.GetRel2Name();
   if (bIsDetail) {
     const QStringList detailImages = s.GetImagesAbsPathList(mRootPath);
     QJsonArray imgs;
@@ -344,7 +344,7 @@ bool MovieWallServer::PostApiDetailImgCallback(const httplib::Request& req, http
   QByteArray ba;
   QBuffer buf(&ba);
   buf.open(QIODevice::WriteOnly);
-  img.save(&buf, "JPEG", 88);
+  img.save(&buf, "JPEG");
 
   res.set_content(std::string(ba.constData(), static_cast<size_t>(ba.size())), "image/jpeg");
   res.set_header("Cache-Control", "max-age=3600");
@@ -455,9 +455,21 @@ constexpr int PREFEREED_DEFAULT_IMAGE_WIDTH{480}, PREFEREED_DEFAULT_IMAGE_HEIGHT
 
 bool MovieWallServer::GetQImage(const QString& path, QImage& img, bool enablePlaceholderImage, bool isDetailImage) {
   const bool bIsImageNotExist{path.isEmpty() || !QFileInfo::exists(path)};
-  if (bIsImageNotExist && !enablePlaceholderImage) {
-    return false; // 404
+  if (bIsImageNotExist) {
+    if (!enablePlaceholderImage) {
+      return false; // 404
+    } else {
+      // 占位图： 灰底 + 名字
+      static QImage notExistImage{[](){
+        QImage img{PREFEREED_DEFAULT_IMAGE_WIDTH, PREFEREED_DEFAULT_IMAGE_HEIGHT, QImage::Format_RGB32};
+        img.fill(QColor(50, 50, 50));
+        return img;
+      }()};
+      img = notExistImage;
+      return true;
+    }
   }
+
   QImageReader reader(path);
   reader.setAutoTransform(true);
   const QSize orig = reader.size();
@@ -474,18 +486,6 @@ bool MovieWallServer::GetQImage(const QString& path, QImage& img, bool enablePla
     }
   }
   img = reader.read();
-  if (enablePlaceholderImage && img.isNull()) {
-    // 占位图： 灰底 + 名字
-    LOG_D("image path[%s] read failed. use default", qPrintable(path));
-
-    img = QImage(PREFEREED_DEFAULT_IMAGE_WIDTH, PREFEREED_DEFAULT_IMAGE_HEIGHT, QImage::Format_RGB32);
-    img.fill(QColor(50, 50, 50));
-    QPainter p(&img);
-    p.setPen(Qt::gray);
-
-    p.drawText(img.rect(), Qt::AlignCenter | Qt::TextWordWrap, PathTool::fileName(path));
-    p.end();
-  }
   return true;
 }
 
