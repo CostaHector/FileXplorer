@@ -21,6 +21,8 @@ inline void ImgsSortNameLengthFirst(QStringList& imgs) {
 inline void ImgsSortNameFirst(QStringList& imgs) {
   std::sort(imgs.begin(), imgs.end());
 }
+void ImgsSortByNumber(QStringList& imgs);
+QString ImgsMinByNumber(const QStringList& imgs);
 
 int RemoveDuplicateKeepSequence(QStringList& hists);
 int TrimEachElementAndRemoveEmpty(QStringList& keywords);

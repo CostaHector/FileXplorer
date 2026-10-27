@@ -5,9 +5,9 @@
 
 class ScenesMixedTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   ScenesMixedTest() : PlainTestSuite{} {}
- private slots:
+private slots:
   void test_basicFileNames() {
     const QStringList files{
         // 1 vid + 1 json + 5 imgs
@@ -32,14 +32,14 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(sMixed.m_vid2Name["X-Man - The Last Stand"].size(), 1);
     // in ascii table ' ' = 0x20, ' ' = 0x2E
     // but here we want length shorter rather than ascii less
-    const QStringList imgsSorted{
-        "X-Man - The Last Stand.jpg",   //
-        "X-Man - The Last Stand.png",   //
-        "X-Man - The Last Stand 1.png", //
-        "X-Man - The Last Stand 33.png",
+    const QStringList expectImgs{
+        "X-Man - The Last Stand 1.png",   //
         "X-Man - The Last Stand - 2.png", //
+        "X-Man - The Last Stand 33.png",  //
+        "X-Man - The Last Stand.jpg",     // _tn group 按照输入顺序
+        "X-Man - The Last Stand.png",     // _tn group 按照输入顺序
     };
-    QCOMPARE(sMixed.m_img2Name["X-Man - The Last Stand"], imgsSorted);
+    QCOMPARE(sMixed.m_img2Name["X-Man - The Last Stand"], expectImgs);
   }
 
   void test_video_without_part_number() {
@@ -50,29 +50,42 @@ class ScenesMixedTest : public PlainTestSuite {
           << "Tarzan.jpg"
           << "Tarzan 1.jpeg"
           << "Tarzan 2.webp"
-          << "Tarzan 10.png"
-          << "Tarzan - 10.png";
+          << "Tarzan 10.png"           // 按照输入顺序
+          << "Tarzan - 10.png";        // 按照输入顺序
     files << "another Tarzan.mp4"
           << "another Tarzan.wmv"
           << "another Tarzan.json"
           << "another Tarzan.jpg"
           << "another Tarzan 1.jpeg"
           << "another Tarzan 2.webp"
-          << "another Tarzan 10.png"
-          << "another Tarzan - 10.png";
+          << "another Tarzan 10.png"    // 按照输入顺序
+          << "another Tarzan - 10.png"; // 按照输入顺序
+
+    const  QStringList expectTarzanImgs {
+        "Tarzan 1.jpeg",
+        "Tarzan 2.webp",
+        "Tarzan 10.png",
+        "Tarzan - 10.png",
+        "Tarzan.jpg",
+    };
+    const QStringList expectAnotherTarzanImgs {
+        "another Tarzan 1.jpeg",
+        "another Tarzan 2.webp",
+        "another Tarzan 10.png",   // 按照输入顺序
+        "another Tarzan - 10.png", // 按照输入顺序
+        "another Tarzan.jpg",
+    };
 
     ScenesMixed sMixed;
     const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 2); // batch count = 2
     QCOMPARE(grps["Tarzan"].size(), 8);
     QCOMPARE(grps["another Tarzan"].size(), 8);
-    QCOMPARE(sMixed.m_img2Name["Tarzan"].size(), 5);
-    QCOMPARE(sMixed.m_img2Name["Tarzan"][0], "Tarzan.jpg");
+    QCOMPARE(sMixed.m_img2Name["Tarzan"], expectTarzanImgs);
     QCOMPARE(sMixed.m_vid2Name["Tarzan"].size(), 2);
     QVERIFY(sMixed.m_json2Name.contains("Tarzan"));
 
-    QCOMPARE(sMixed.m_img2Name["another Tarzan"].size(), 5);
-    QCOMPARE(sMixed.m_img2Name["another Tarzan"][0], "another Tarzan.jpg");
+    QCOMPARE(sMixed.m_img2Name["another Tarzan"], expectAnotherTarzanImgs);
     QCOMPARE(sMixed.m_vid2Name["another Tarzan"].size(), 2);
     QVERIFY(sMixed.m_json2Name.contains("another Tarzan"));
   }
@@ -101,12 +114,16 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(sMixed.m_vid2Name.keys(), expectGrpNames);
     QCOMPARE(sMixed.m_img2Name.keys(), expectGrpNames);
 
-    const QStringList expectPart1SortedLst{"Superman - The Inked Meat Part 1.jpg",
-                                           "Superman - The Inked Meat Part 1 0.jpg",
-                                           "Superman - The Inked Meat Part 1 33.jpg"};
-    const QStringList expectPart2SortedLst{"Superman - The Inked Meat Part 2.jpg",
-                                           "Superman - The Inked Meat Part 2 - 0.jpg",
-                                           "Superman - The Inked Meat Part 2 - 33.jpg"};
+    const QStringList expectPart1SortedLst{
+        "Superman - The Inked Meat Part 1 0.jpg",
+        "Superman - The Inked Meat Part 1.jpg",
+        "Superman - The Inked Meat Part 1 33.jpg",
+    };
+    const QStringList expectPart2SortedLst{
+        "Superman - The Inked Meat Part 2 - 0.jpg",
+        "Superman - The Inked Meat Part 2.jpg",
+        "Superman - The Inked Meat Part 2 - 33.jpg",
+    };
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 1"], expectPart1SortedLst);
     QCOMPARE(sMixed.m_img2Name["Superman - The Inked Meat Part 2"], expectPart2SortedLst);
   }
@@ -192,14 +209,14 @@ class ScenesMixedTest : public PlainTestSuite {
     QCOMPARE(folder2Items.size(), 4);
     const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items //
         {
-            {"Name", {"Name 1.png", "Name - 1.png"}},
-            {"Name 1", {"Name 1 - 1.png"}},
-            {"Name - 1", {"Name - 1 - 1.png"}},
-            {"Fox - Sporty - Chris Evans, Henry",
-             {"Fox - Sporty - Chris Evans, Henry.png",
-              "Fox - Sporty - Chris Evans, Henry - 1.png",
-              "Fox - Sporty - Chris Evans, Henry - 2.png"}},
-        };
+         {"Name", {"Name 1.png", "Name - 1.png"}},
+         {"Name 1", {"Name 1 - 1.png"}},
+         {"Name - 1", {"Name - 1 - 1.png"}},
+         {"Fox - Sporty - Chris Evans, Henry",
+          {"Fox - Sporty - Chris Evans, Henry.png",
+           "Fox - Sporty - Chris Evans, Henry - 1.png",
+           "Fox - Sporty - Chris Evans, Henry - 2.png"}},
+         };
     QCOMPARE(folder2Items, expectsFolder2Items);
   }
 
