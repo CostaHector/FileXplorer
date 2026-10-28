@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "PublicMacro.h"
 #include "PathTool.h"
+#include "StringTool.h"
 
 #include <QLineEdit>
 #include <algorithm>
@@ -54,6 +55,7 @@ QToolBar* RenameWidget_Replace::InitControlTB() {
   replaceControl->addSeparator();
   replaceControl->addWidget(m_oldStrDefaultModeCB);
   replaceControl->addSeparator();
+  replaceControl->addWidget(m_caseSensitive);
   replaceControl->addWidget(m_regexCB);
   replaceControl->addWidget(m_nameExtIndependent);
   replaceControl->addWidget(m_recursiveCB);
@@ -64,8 +66,15 @@ QToolBar* RenameWidget_Replace::InitControlTB() {
 
 void RenameWidget_Replace::extraSubscribe() {
   connect(m_oldStrCB, &QComboBox::currentTextChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
-  connect(m_regexCB, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);
   connect(m_newStrCB, &QComboBox::currentTextChanged, this, &RenameWidget_Replace::OnlyTriggerRenameCore);
+  connect(m_caseSensitive, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onCaseSensitiveModeChanged);
+  connect(m_regexCB, &QCheckBox::stateChanged, this, &RenameWidget_Replace::onRegex);
+}
+
+void RenameWidget_Replace::onCaseSensitiveModeChanged(int caseSensitiveState) {
+  const bool isCaseSensitive{caseSensitiveState == Qt::Checked};
+  setConfig(RenamerKey::REPLACE_CASE_SENSITIVE, isCaseSensitive);
+  OnlyTriggerRenameCore();
 }
 
 QString GetOldStrDefault(const QStringList& oldStrList, OldStrDefaultMode oldStrDefaultMode) {
@@ -74,10 +83,10 @@ QString GetOldStrDefault(const QStringList& oldStrList, OldStrDefaultMode oldStr
     case OLD_STR_DEFAULT_MODE_LONGEST_COMMON_PREFIX: return PathTool::longestCommonPrefix(oldStrList);
     case OLD_STR_DEFAULT_MODE_SHORTEST_ONE:
       return oldStrList.isEmpty() ? "" : *std::min_element(oldStrList.begin(), oldStrList.end(),
-          [](const QString& a, const QString& b) { return a.length() < b.length(); });
+                                                           [](const QString& a, const QString& b) { return a.length() < b.length(); });
     case OLD_STR_DEFAULT_MODE_LONGEST_ONE:
       return oldStrList.isEmpty() ? "" : *std::max_element(oldStrList.begin(), oldStrList.end(),
-          [](const QString& a, const QString& b) { return a.length() < b.length(); });
+                                                           [](const QString& a, const QString& b) { return a.length() < b.length(); });
     default:
       return "";
   }
@@ -143,6 +152,12 @@ void RenameWidget_Replace::InitExtraMemberWidget() {
     m_oldStrDefaultModeCB->setEditable(false);
   }
 
+  m_caseSensitive = new (std::nothrow) QCheckBox{this};
+  CHECK_NULLPTR_RETURN_VOID(m_caseSensitive)
+  m_caseSensitive->setIcon(QIcon(":img/NAME_STR_CASE"));
+  m_caseSensitive->setToolTip("Distinguish 'A' from 'a' when matching.");
+  m_caseSensitive->setChecked(getConfig(RenamerKey::REPLACE_CASE_SENSITIVE).toBool());
+
   m_regexCB = new (std::nothrow) QCheckBox{tr("Regex"), this};
   CHECK_NULLPTR_RETURN_VOID(m_regexCB)
   m_regexCB->setIcon(QIcon(":img/MATCH_REGEX"));
@@ -161,20 +176,25 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
     using CURRENT_INDEX_CHANGED_MEMBER_FUNC = void (QComboBox::*)(int);
     connect(m_oldStrDefaultModeCB, (CURRENT_INDEX_CHANGED_MEMBER_FUNC)&QComboBox::currentIndexChanged, this, &RenameWidget_Replace::onOldStrDefaultModeChanged);
   }
+
+  const bool isCaseSensitive{m_caseSensitive->checkState() == Qt::CheckState::Checked};
+
   const QString& oldString = m_oldStrCB->currentText();
   const QString& newString = m_newStrCB->currentText();
-  const bool regexEnable = m_regexCB->isChecked();
-  if (regexEnable) {
-    QRegularExpression repRegex{oldString};
-    if (repRegex.isValid()) {
-      regexValidLabel->ToSaved();
-    } else {
+  if (m_regexCB->isChecked()) {
+    QRegularExpression repRegex = StringTool::GetRegularExpression(oldString);
+    if (!repRegex.isValid()) {
       regexValidLabel->ToNotSaved();
       LOG_W("regular expression invalid[%s]", qPrintable(oldString));
       return {};
     }
+    regexValidLabel->ToSaved();
+    if (!isCaseSensitive) {
+      repRegex.setPatternOptions(QRegularExpression::PatternOption::CaseInsensitiveOption);
+    }
+    return RenameHelper::ReplaceRename(replaceeList, repRegex, newString);
   }
-  return RenameHelper::ReplaceRename(replaceeList, oldString, newString, regexEnable);
+  return RenameHelper::ReplaceRename(replaceeList, oldString, newString, isCaseSensitive);
 }
 
 void RenameWidget_Replace::setOldLineEditDisabled(bool bDisabled) {
@@ -193,7 +213,7 @@ void RenameWidget_Replace::InitExtraCommonVariable() {
 }
 
 RenameWidget_Delete::RenameWidget_Delete(QWidget* parent)  //
-    : RenameWidget_Replace(parent) {}
+  : RenameWidget_Replace(parent) {}
 
 void RenameWidget_Delete::initExclusiveSetting() {
   m_newStrCB->setCurrentText("");

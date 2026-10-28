@@ -75,7 +75,7 @@
     <message>
         <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+28"/>
         <source>Name Ext Independent</source>
-        <translation>名/扩展名独立</translation>
+        <translation>名|扩展</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2132,7 +2132,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+45"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+46"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>
@@ -2142,7 +2142,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>新:</translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+113"/>
         <source>Regex</source>
         <translation>正则</translation>
     </message>

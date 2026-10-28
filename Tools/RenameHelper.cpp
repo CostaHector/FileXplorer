@@ -3,7 +3,6 @@
 #include <QRegularExpression>
 
 namespace RenameHelper {
-
 QStringList SpecialDigitReplace2Char(const QStringList& replaceeList) {
   if (replaceeList.isEmpty()) {
     return {};
@@ -19,7 +18,7 @@ QStringList SpecialDigitReplace2Char(const QStringList& replaceeList) {
   return replacedLst;
 }
 
-QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldString, const QString& newString, bool regexEnable) {
+QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldString, const QString& newString, bool bCaseSensitive) {
   if (replaceeList.isEmpty()) {
     return {};
   }
@@ -30,17 +29,21 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QString& oldStr
     return replaceeList;
   }
   QStringList replacedLst{replaceeList};
-  if (!regexEnable) {
-    for (QString& s : replacedLst) {
-      s.replace(oldString, newString);
-    }
-    return replacedLst;
+  const Qt::CaseSensitivity cs{bCaseSensitive ? Qt::CaseSensitivity::CaseSensitive : Qt::CaseSensitivity::CaseInsensitive};
+  for (QString& s : replacedLst) {
+    s.replace(oldString, newString, cs);
   }
-  const QRegularExpression repRegex{oldString};
-  if (!repRegex.isValid()) {
-    LOG_W("regular expression error[%s]", qPrintable(oldString));
+  return replacedLst;
+}
+
+QStringList ReplaceRename(const QStringList& replaceeList, const QRegularExpression& repRegex, const QString& newString) {
+  if (replaceeList.isEmpty()) {
     return {};
   }
+  if (!repRegex.isValid()) {
+    return {};
+  }
+  QStringList replacedLst{replaceeList};
   for (QString& s : replacedLst) {
     s.replace(repRegex, newString);
   }

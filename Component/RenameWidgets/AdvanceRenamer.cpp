@@ -27,8 +27,8 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
   : QDialog{parent} {
   m_nameExtIndependent = new (std::nothrow) QCheckBox{tr("Name Ext Independent"), this};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
-  m_nameExtIndependent->setToolTip("Show file base name and extension respectively.\n"
-                                   "So rename rules will work/or not work on extension");
+  m_nameExtIndependent->setToolTip("Display the base name and extension in separate columns.\n"
+                                   "Rename rules apply to base name column only.");
 
   m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)

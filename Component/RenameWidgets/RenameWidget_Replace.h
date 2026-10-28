@@ -24,10 +24,12 @@ class RenameWidget_Replace : public AdvanceRenamer {
 
  private:
   void onOldStrDefaultModeChanged(int oldStrDefaultMode);
+  void onCaseSensitiveModeChanged(int caseSensitiveState);
   bool UpdateOldStrCbCurrentText();
 
   QComboBox* m_oldStrCB{nullptr};
   QComboBox* m_oldStrDefaultModeCB{nullptr};
+  QCheckBox* m_caseSensitive{nullptr};
   QCheckBox* m_regexCB{nullptr};
   bool m_oldStrInited = false;
 };

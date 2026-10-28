@@ -1,14 +1,12 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
-#include "OnScopeExit.h"
-#include <QTestEventList>
-#include <QSignalSpy>
 
 #include "BeginToExposePrivateMember.h"
 #include "NavigationAndAddressBar.h"
 #include "EndToExposePrivateMember.h"
 #include "TDir.h"
 
+#include <QFileSystemModel>
 #include "IntoNewPathMocker.h"
 
 class NavigationAndAddressBarTest : public PlainTestSuite {
@@ -41,7 +39,6 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       QVERIFY(naviAddr.m_addressLine != nullptr);
       QVERIFY(naviAddr.mFsSearchLE != nullptr);
       QVERIFY(naviAddr.m_fsFilterBtn != nullptr);
-      QVERIFY(naviAddr.mLastNextFolderTb != nullptr);
 
       naviAddr.onBackward();
       naviAddr.onForward();
