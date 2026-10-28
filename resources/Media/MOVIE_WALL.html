@@ -26,11 +26,71 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 }
 
 .poster {
+  position: relative;        /* 让 absolute 的 checkbox 相对卡片定位 */
   background: #2a2a2a;
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* ---------- 多选框 ---------- */
+.poster .poster-select-input {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+  accent-color: #3a7bd5;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.poster:hover .poster-select-input,
+.poster.selected .poster-select-input { opacity: 1; }
+
+.poster.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #3a7bd5;
+  border-radius: 8px;        /* 跟 .poster 的圆角一致 */
+  pointer-events: none;       /* 不拦截点击，checkbox 和 img 仍可交互 */
+  z-index: 1;                 /* 高于 img 的合成层，低于 checkbox 的 z-index: 2 */
+}
+
+/* ---------- 右键评分菜单 ---------- */
+.rate-menu {
+  position: fixed;
+  z-index: 1100;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  padding: 4px 0;
+  min-width: 100px;
+  display: none;
+  user-select: none;
+}
+.rate-menu.open { display: block; }
+.rate-menu .rate-menu-title {
+  padding: 4px 12px 6px;
+  color: #888;
+  font-size: 11px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 4px;
+}
+.rate-menu .rate-menu-item {
+  padding: 5px 14px;
+  color: #ccc;
+  font-size: 13px;
+  cursor: pointer;
+}
+.rate-menu .rate-menu-item:hover {
+  background: #3a7bd5;
+  color: #fff;
 }
 
 /* 海报图片：宽度撑满卡片，高度按原图比例，不裁剪 */
@@ -490,7 +550,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 </head>
 
 <body>
-<!-- 导航栏(包含排序, 内容倒序|上一个, 下一个, 上一级|包含子路径, 路径输入框|上一文件夹, 下一文件夹|搜索) -->
+<!-- 导航栏(包含排序, 内容倒序|上一个, 下一个, 上一级|包含子路径, 路径输入框|上一文件夹, 下一文件夹|搜索|多选) -->
 <div class="wall-toolbar">
   <!-- 组 1：排序 + 倒序 -->
   <select class="wall-sort-select" id="sortBySelect" title="Sort by">
@@ -561,6 +621,11 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 
   <!-- 组 5：搜索 -->
   <input class="wall-search-input" id="searchInput" type="search" placeholder="Search..." spellcheck="false">
+  <span class="wall-toolbar-sep"></span>
+  <!-- 组 6：多选/清空选择/反选 -->
+  <button class="wall-tool-btn" id="selectAllBtn" title="Select all visible">All</button>
+  <button class="wall-tool-btn" id="selectNoneBtn" title="Deselect all">None</button>
+  <button class="wall-tool-btn" id="selectInvertBtn" title="Invert selection (visible only)">Invert</button>
 </div>
 
 <!-- 确认框 -->
@@ -574,6 +639,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
   </div>
 </div>
 
+<div class="rate-menu" id="rateMenu"></div>
 
 <h1 id="wallTitle">Movie Wall</h1>
 <div class="poster-wall" id="wall"></div>
@@ -794,26 +860,7 @@ document.getElementById('wall').addEventListener('click', async (e) => {
     const newRate = Number(star.dataset.value);
     const oldRate = Number(poster.dataset.rate);
     if (newRate === oldRate) return;
-    try {
-      const res = await fetch('/api/rate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, rate: newRate }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        poster.dataset.rate = String(newRate);
-        poster.querySelector('.rating').innerHTML = ratingHtml(newRate);
-
-        // 同步全局数组
-        const m = g_allMovies.find(x => x.id === id);
-        if (m) m.rate = newRate;
-      } else {
-        console.warn('[rate] failed:', data.error);
-      }
-    } catch (err) {
-      console.error('[rate] request failed:', err);
-    }
+    await applyRate(id, newRate);
     return;
   }
 
@@ -831,6 +878,73 @@ document.getElementById('wall').addEventListener('click', async (e) => {
   if (!img) return;
   const poster = img.closest('.poster');
   openDetailDrawer(Number(poster.dataset.id));
+});
+
+// ---------- 右键评分菜单 ----------
+const g_rateMenu = document.getElementById('rateMenu');
+
+function showRateMenu(x, y) {
+  const count = g_selectedIds.size;
+  if (count === 0) return;
+
+  g_rateMenu.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'rate-menu-title';
+  title.textContent = `Rate ${count} selected`;
+  g_rateMenu.appendChild(title);
+
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement('div');
+    item.className = 'rate-menu-item';
+    item.textContent = i;
+    item.addEventListener('click', async () => {
+      g_rateMenu.classList.remove('open');
+      await applyRateToSelected(i);
+    });
+    g_rateMenu.appendChild(item);
+  }
+
+  // 先显示再测量，防止越界
+  g_rateMenu.style.left = '-9999px';
+  g_rateMenu.style.top = '-9999px';
+  g_rateMenu.classList.add('open');
+  const rect = g_rateMenu.getBoundingClientRect();
+  let px = x, py = y;
+  if (px + rect.width  > window.innerWidth)  px = window.innerWidth  - rect.width  - 4;
+  if (py + rect.height > window.innerHeight) py = window.innerHeight - rect.height - 4;
+  g_rateMenu.style.left = px + 'px';
+  g_rateMenu.style.top  = py + 'px';
+}
+
+// 串行应用，避免并发写服务端文件
+async function applyRateToSelected(newRate) {
+  const ids = Array.from(g_selectedIds);
+  let ok = 0;
+  for (const id of ids) {
+    if (await applyRate(id, newRate)) ok++;
+  }
+  console.log(`[rate] applied ${newRate} to ${ok}/${ids.length}`);
+}
+
+// wall 右键
+document.getElementById('wall').addEventListener('contextmenu', (e) => {
+  if (g_selectedIds.size === 0) return;   // 无选中 → 浏览器默认菜单
+  e.preventDefault();
+  showRateMenu(e.clientX, e.clientY);
+});
+
+// 点击其他位置关闭菜单
+document.addEventListener('mousedown', (e) => {
+  if (!g_rateMenu.classList.contains('open')) return;
+  if (g_rateMenu.contains(e.target)) return;
+  g_rateMenu.classList.remove('open');
+});
+
+// Esc 关闭
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && g_rateMenu.classList.contains('open')) {
+    g_rateMenu.classList.remove('open');
+  }
 });
 
 /* 是否包含子路径按钮状态变更 */
@@ -981,6 +1095,67 @@ document.getElementById('reverseToggleBtn').addEventListener('click', (e) => {
   applyFilter();
 });
 
+// ---------- 海报多选 ----------
+const g_selectedIds = new Set();
+
+function syncPosterSelection() {
+  document.querySelectorAll('.poster').forEach(p => {
+    const id = Number(p.dataset.id);
+    const sel = g_selectedIds.has(id);
+    p.classList.toggle('selected', sel);
+    const cb = p.querySelector('.poster-select-input');
+    if (cb) cb.checked = sel;
+  });
+}
+
+function updateWallTitle() {
+  const h1 = document.getElementById('wallTitle');
+  if (!h1) return;
+  const kw = (document.getElementById('searchInput').value || '').trim();
+  const matched = kw ? filterMovies(kw).length : g_allMovies.length;
+  const total = g_allMovies.length;
+  const selCount = g_selectedIds.size;
+  let text = kw
+    ? `Movie Wall: ${matched} / ${total} matches`
+    : `Movie Wall: ${total} items`;
+  if (selCount > 0) text += ` (${selCount} selected)`;
+  h1.textContent = text;
+}
+
+// checkbox 勾选
+document.getElementById('wall').addEventListener('change', (e) => {
+  const cb = e.target.closest('.poster-select-input');
+  if (!cb) return;
+  const id = Number(cb.dataset.id);
+  if (cb.checked) g_selectedIds.add(id);
+  else g_selectedIds.delete(id);
+  syncPosterSelection();
+  updateWallTitle();
+});
+
+// 全选 / 取消
+document.getElementById('selectAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('.poster').forEach(p => {
+    g_selectedIds.add(Number(p.dataset.id));
+  });
+  syncPosterSelection();
+  updateWallTitle();
+});
+document.getElementById('selectNoneBtn').addEventListener('click', () => {
+  g_selectedIds.clear();
+  syncPosterSelection();
+  updateWallTitle();
+});
+document.getElementById('selectInvertBtn').addEventListener('click', () => {
+  document.querySelectorAll('.poster').forEach(p => {
+    const id = Number(p.dataset.id);
+    if (g_selectedIds.has(id)) g_selectedIds.delete(id);
+    else g_selectedIds.add(id);
+  });
+  syncPosterSelection();
+  updateWallTitle();
+});
+
 // ---------- 搜索功能 ----------
 let g_allMovies = [];        // /api/movies 返回的全量数组
 let g_searchDebounceTimer = null;
@@ -992,6 +1167,7 @@ function renderWall(movies, keyword) {
   }
   wall.innerHTML = movies.map(m => `
     <div class="poster" data-id="${m.id}" data-rate="${m.rate}">
+      <input type="checkbox" class="poster-select-input" data-id="${m.id}" title="Select">
       <img src="${m.thumbUrl}" loading="lazy" alt="">
       <div class="meta">
         <div class="duration" title="Video Duration">${msToHMS(m.duration)}</div>
@@ -1001,6 +1177,36 @@ function renderWall(movies, keyword) {
       <div class="name" title="${escapeHtml(m.name)}">${highlightMatch(m.name, keyword)}</div>
     </div>
   `).join('');
+  syncPosterSelection();   // 渲染后恢复选中状态
+}
+
+// 单个 id 改评分，成功返回 true
+async function applyRate(id, newRate) {
+  try {
+    const res = await fetch('/api/rate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, rate: newRate }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      console.warn('[rate] failed:', id, data.error);
+      return false;
+    }
+    // 更新 DOM（如果该 poster 当前可见）
+    const poster = document.querySelector(`.poster[data-id="${id}"]`);
+    if (poster) {
+      poster.dataset.rate = String(newRate);
+      poster.querySelector('.rating').innerHTML = ratingHtml(newRate);
+    }
+    // 同步全局数组
+    const m = g_allMovies.find(x => x.id === id);
+    if (m) m.rate = newRate;
+    return true;
+  } catch (err) {
+    console.error('[rate] request failed:', id, err);
+    return false;
+  }
 }
 
 function highlightMatch(name, keyword) {
@@ -1035,13 +1241,7 @@ function applyFilter() {
 
   renderWall(sorted, keyword);
 
-  const h1 = document.getElementById('wallTitle');
-  if (h1) {
-    const kw = keyword.trim();
-    h1.textContent = kw
-      ? `Movie Wall: ${filtered.length} / ${g_allMovies.length} matches`
-      : `Movie Wall: ${g_allMovies.length} items`;
-  }
+  updateWallTitle();   // 替换原来的 h1 更新，带上选中数
 }
 
 // ---------- 排序 ----------
