@@ -113,10 +113,14 @@ h1 { font-size: 20px; margin: 0 0 12px; }
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.poster .meta .score.none { color: #666; }   /* 0 */
-.poster .meta .score.low  { color: #e05c5c; } /* 1-4 */
-.poster .meta .score.mid  { color: #e0a63c; } /* 5-7 */
-.poster .meta .score.high { color: #4caf50; } /* 8-10 */
+/* 评分数值颜色：严格对应 C++ VideoTierE 的 7 个档位 */
+.poster .meta .score.butt-invalid { color: #333333; }  /* BUTT_INVALID  0    */
+.poster .meta .score.disposable   { color: #555555; }  /* DISPOSABLE    1-2  */
+.poster .meta .score.casuals      { color: #888888; }  /* CASUALS       3-4  */
+.poster .meta .score.standby      { color: #1eaa1e; }  /* STANDBY       5    */
+.poster .meta .score.normals      { color: #0070dd; }  /* NORMALS       6-7  */
+.poster .meta .score.essentials   { color: #a335ee; }  /* ESSENTIALS    8-9  */
+.poster .meta .score.archival     { color: #ff8000; }  /* ARCHIVAL      10   */
 
 /* 名称层：自动换行，不省略 */
 .poster .name {
@@ -584,11 +588,16 @@ function stars(r) {
   return out;
 }
 
+// 与 C++ VideoTierE 的 [rateSpanBegin, rateSpanEnd) 一一对应
 function rateClass(r) {
-  if (r <= 0) return 'none';
-  if (r <= 4) return 'low';
-  if (r <= 7) return 'mid';
-  return 'high';
+  r = Math.round(Number(r) || 0);
+  if (r >= 10) return 'archival';      // 10
+  if (r >= 8)  return 'essentials';    // 8-9
+  if (r >= 6)  return 'normals';       // 6-7
+  if (r >= 5)  return 'standby';       // 5
+  if (r >= 3)  return 'casuals';       // 3-4
+  if (r >= 1)  return 'disposable';    // 1-2
+  return 'butt-invalid';               // 0
 }
 
 function ratingHtml(r) {
