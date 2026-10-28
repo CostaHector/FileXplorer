@@ -331,8 +331,8 @@
         <file alias="LOADING">Notification/LOADING.gif</file>
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
 
-        <file alias="SAVED">pwd/SUCCESS.svg</file>
-        <file alias="NOT_SAVED">pwd/FAILURE.svg</file>
+        <file alias="SAVED">pwd/SAVED.svg</file>
+        <file alias="NOT_SAVED">pwd/NOT_SAVED.svg</file>
     </qresource>
 
     <qresource prefix="/FramelessWindow">

@@ -20,7 +20,6 @@ QString GetBase64PixmapForHtml(const QString& starDotExtensionLowerCase);
 QIcon GetBuiltInIcon(QStyle::StandardPixmap spE);
 
 const QIcon& GetCheckResultIcon(bool bPass);
-const QPixmap& GetLabelStatusPixmap(int labelStatus);
 
 QSize GetImageDimensionPixel(const QString& imgFilePath);
 QSize GetImageDimensionPixel(QBuffer* pBuff, const QString& noDotFormat);

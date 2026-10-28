@@ -49,9 +49,11 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
 
   {
     mIterPrevFolderAct = addAction(QIcon{":img/ITERATE_PREVIOUS_FOLDER"}, tr("Previous folder"));
+    mIterPrevFolderAct->setShortcut(QKeySequence{Qt::ControlModifier | Qt::Key_BracketLeft});
     mIterPrevFolderAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Go to the previous sibling folder."}
                                        .arg(mIterPrevFolderAct->text(), mIterPrevFolderAct->shortcut().toString()));
     mIterNextFolderAct = addAction(QIcon{":img/ITERATE_NEXT_FOLDER"}, tr("Next folder"));
+    mIterNextFolderAct->setShortcut(QKeySequence{Qt::ControlModifier | Qt::Key_BracketRight});
     mIterNextFolderAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Go to the next sibling folder."}
                                        .arg(mIterNextFolderAct->text(), mIterNextFolderAct->shortcut().toString()));
   }

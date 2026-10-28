@@ -43,6 +43,9 @@ QStringList ReplaceRename(const QStringList& replaceeList, const QRegularExpress
   if (!repRegex.isValid()) {
     return {};
   }
+  if (repRegex.pattern().isEmpty()) {
+    return {};
+  }
   QStringList replacedLst{replaceeList};
   for (QString& s : replacedLst) {
     s.replace(repRegex, newString);

@@ -37,7 +37,6 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
 
   regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
-  regexValidLabel->setVisible(false);
 
   m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);

@@ -165,6 +165,10 @@ void RenameWidget_Replace::InitExtraMemberWidget() {
   m_regexCB->setChecked(getConfig(RenamerKey::REGEX_ENABLED).toBool());
 }
 
+void RenameWidget_Replace::initExclusiveSetting() {
+  regexValidLabel->setVisible(true);
+}
+
 QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
   if (!m_oldStrInited) {
     // init lineedit only at first time. when lineedit editted by user. lineedit should not init
@@ -194,6 +198,7 @@ QStringList RenameWidget_Replace::RenameCore(const QStringList& replaceeList) {
     }
     return RenameHelper::ReplaceRename(replaceeList, repRegex, newString);
   }
+  regexValidLabel->ToSaved();
   return RenameHelper::ReplaceRename(replaceeList, oldString, newString, isCaseSensitive);
 }
 
@@ -219,7 +224,7 @@ void RenameWidget_Delete::initExclusiveSetting() {
   m_newStrCB->setCurrentText("");
   m_newStrCB->setEnabled(false);
   m_newStrCB->setToolTip("New str is identically equal to empty str");
-  regexValidLabel->setVisible(true);
+  RenameWidget_Replace::initExclusiveSetting();
 }
 
 void RenameWidget_Delete::InitExtraCommonVariable() {

@@ -13,6 +13,7 @@ class RenameWidget_Replace : public AdvanceRenamer {
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
   void InitExtraMemberWidget() override;
+  void initExclusiveSetting() override;
 
   QStringList RenameCore(const QStringList& replaceeList) override;
   QString GetNewName() const { return m_newStrCB->currentText(); }
