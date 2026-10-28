@@ -158,54 +158,6 @@ class NavigationAndAddressBarTest : public PlainTestSuite {
       QCOMPARE(naviAddr.mFsSearchLE->selectedText(), naviAddr.mFsSearchLE->text());
     }
   }
-
-  void SplitToolButton_2_action_in_one_button_works_ok() {
-    SplitToolButton button;
-    button.setFixedSize(100, 100);
-    const QPoint centerPnt = button.geometry().center();
-    const QPoint topHalfPnt = centerPnt - QPoint(0, 10);
-    const QPoint bottomHalfPnt = centerPnt + QPoint(0, 10);
-
-    {  // 0. pass nullptr to mousePressEvent should not crash down
-      QMouseEvent* mouseEventNullptr = nullptr;
-      button.mousePressEvent(mouseEventNullptr);
-    }
-
-    // 1.0 both mouse click on top Half or keyboard "Ctrl+[" should emit topHalfClicked
-    {
-      QSignalSpy topSpy(&button, &SplitToolButton::topHalfClicked);
-      QMouseEvent topEvent(QEvent::MouseButtonPress, topHalfPnt, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-      button.mousePressEvent(&topEvent);
-      QCOMPARE(topSpy.count(), 1);
-      QVERIFY(topEvent.isAccepted());
-
-      QCOMPARE(button.topShortcut->key(), QKeySequence(Qt::ControlModifier | Qt::Key_BracketLeft));
-      emit button.topShortcut->activated();
-      QCOMPARE(topSpy.count(), 2);
-    }
-
-    // 2.0 both mouse click on bottom Half or keyboard "Ctrl+[" should emit topHalfClicked
-    {
-      QSignalSpy bottomSpy(&button, &SplitToolButton::bottomHalfClicked);
-      QMouseEvent bottomEvent(QEvent::MouseButtonPress, bottomHalfPnt, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-      button.mousePressEvent(&bottomEvent);
-      QCOMPARE(bottomSpy.count(), 1);
-      QVERIFY(bottomEvent.isAccepted());
-
-      QCOMPARE(button.bottomShortcut->key(), QKeySequence(Qt::ControlModifier | Qt::Key_BracketRight));
-      emit button.bottomShortcut->activated();
-      QCOMPARE(bottomSpy.count(), 2);
-    }
-
-    // 3.0 tooltip ok
-    {
-      const QString toolTipString = button.GetToolTipString("previous folder", "next folder");
-      QVERIFY(toolTipString.contains("previous folder"));
-      QVERIFY(toolTipString.contains("next folder"));
-      QVERIFY(toolTipString.contains("Ctrl+["));
-      QVERIFY(toolTipString.contains("Ctrl+]"));
-    }
-  }
 };
 
 #include "NavigationAndAddressBarTest.moc"

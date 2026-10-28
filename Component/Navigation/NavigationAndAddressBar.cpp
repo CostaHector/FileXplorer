@@ -6,45 +6,10 @@
 #include "InputDialogHelper.h"
 #include "NotificatorMacro.h"
 
+#include <QFileSystemModel>
 #include <QLayout>
 #include <QKeySequence>
 #include <QDesktopServices>
-
-SplitToolButton::SplitToolButton(QWidget* parent) : QToolButton{parent} {
-  topShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketLeft}, this};
-  CHECK_NULLPTR_RETURN_VOID(topShortcut)
-  connect(topShortcut, &QShortcut::activated, this, &SplitToolButton::topHalfClicked);
-
-  bottomShortcut = new (std::nothrow) QShortcut{QKeySequence{Qt::ControlModifier | Qt::Key_BracketRight}, this};
-  CHECK_NULLPTR_RETURN_VOID(bottomShortcut)
-  connect(bottomShortcut, &QShortcut::activated, this, &SplitToolButton::bottomHalfClicked);
-}
-
-QString SplitToolButton::GetToolTipString(const QString& topAction, const QString& bottomAction) const {
-  QString shortCutString;
-  shortCutString.reserve(topAction.size() + bottomAction.size() + 30);
-  shortCutString += QString("<b>%1</b><br/>").arg(text());
-  shortCutString += topAction;
-  shortCutString += "(";
-  shortCutString += topShortcut->key().toString();
-  shortCutString += ")";
-  shortCutString += "<br/>";
-  shortCutString += bottomAction;
-  shortCutString += "(";
-  shortCutString += bottomShortcut->key().toString();
-  shortCutString += ")";
-  return shortCutString;
-}
-
-void SplitToolButton::mousePressEvent(QMouseEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  if (event->y() < height() / 2) {
-    emit topHalfClicked();
-  } else {
-    emit bottomHalfClicked();
-  }
-  event->accept();
-}
 
 NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* parent)  //
     : QToolBar{title, parent} {
@@ -69,13 +34,6 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
       "For SceneModel(plain) e.g., target\n"
       "For JsonModel(Regex) e.g., target1.*?target2");
 
-  mLastNextFolderTb = new (std::nothrow) SplitToolButton{this};
-  CHECK_NULLPTR_RETURN_VOID(mLastNextFolderTb)
-  mLastNextFolderTb->setText(tr("Folder Iterater"));
-  mLastNextFolderTb->setIcon(QIcon(":img/NEXT_OR_LAST_FOLDER"));
-  const QString& iteratorToolbuttonTooltip = mLastNextFolderTb->GetToolTipString("Last folder", "Next Folder");
-  mLastNextFolderTb->setToolTip(iteratorToolbuttonTooltip);
-
   addActions(g_addressBarActions().ADDRESS_CONTROLS->actions());
   addSeparator();
 
@@ -89,7 +47,14 @@ NavigationAndAddressBar::NavigationAndAddressBar(const QString& title, QWidget* 
                                  .arg(mOpenMovieWall->text(), mOpenMovieWall->shortcut().toString()));
   addSeparator();
 
-  addWidget(mLastNextFolderTb);
+  {
+    mIterPrevFolderAct = addAction(QIcon{":img/ITERATE_PREVIOUS_FOLDER"}, tr("Previous folder"));
+    mIterPrevFolderAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Go to the previous sibling folder."}
+                                       .arg(mIterPrevFolderAct->text(), mIterPrevFolderAct->shortcut().toString()));
+    mIterNextFolderAct = addAction(QIcon{":img/ITERATE_NEXT_FOLDER"}, tr("Next folder"));
+    mIterNextFolderAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Go to the next sibling folder."}
+                                       .arg(mIterNextFolderAct->text(), mIterNextFolderAct->shortcut().toString()));
+  }
   addSeparator();
 
   addWidget(m_fsFilterBtn);
@@ -123,8 +88,8 @@ void NavigationAndAddressBar::InitEventWhenViewChanged() {
   connect(g_addressBarActions()._FORWARD_TO, &QAction::triggered, this, &NavigationAndAddressBar::onForward);
   connect(g_addressBarActions()._UP_TO, &QAction::triggered, this, &NavigationAndAddressBar::onUpTo);
 
-  connect(mLastNextFolderTb, &SplitToolButton::topHalfClicked, this, &NavigationAndAddressBar::onIteratorToLastFolder);
-  connect(mLastNextFolderTb, &SplitToolButton::bottomHalfClicked, this, &NavigationAndAddressBar::onIteratorToNextFolder);
+  connect(mIterPrevFolderAct, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToLastFolder);
+  connect(mIterNextFolderAct, &QAction::triggered, this, &NavigationAndAddressBar::onIteratorToNextFolder);
 
   connect(mFsSearchLE, &QLineEdit::textChanged, this, &NavigationAndAddressBar::onSearchTextChanged);
   connect(mFsSearchLE, &QLineEdit::returnPressed, this, &NavigationAndAddressBar::onSearchTextReturnPressed);

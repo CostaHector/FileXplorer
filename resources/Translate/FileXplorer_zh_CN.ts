@@ -1626,19 +1626,24 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+65"/>
+        <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+32"/>
         <source>Search</source>
         <translation>搜索</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Folder Iterater</source>
-        <translation>文件夹遍历</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open Movie Wall</source>
         <translation>打开海报墙</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Previous folder</source>
+        <translation>上一个文件夹</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Next folder</source>
+        <translation>下一个文件夹</translation>
     </message>
 </context>
 <context>

@@ -1,7 +1,6 @@
 #ifndef NAVIGATIONANDADDRESSBAR_H
 #define NAVIGATIONANDADDRESSBAR_H
 
-#include <QFileSystemModel>
 #include "AddressELineEdit.h"
 #include "PathUndoRedoer.h"
 #include "PublicVariable.h"
@@ -10,25 +9,9 @@
 
 #include <QLineEdit>
 #include <QToolBar>
-#include <QToolButton>
-#include <QShortcut>
-
-class SplitToolButton : public QToolButton {
-  Q_OBJECT
-public:
-  explicit SplitToolButton(QWidget *parent = nullptr);
-  QString GetToolTipString(const QString& topAction, const QString& bottomAction) const;
-signals:
-  void topHalfClicked();
-  void bottomHalfClicked();
-
-protected:
-  void mousePressEvent(QMouseEvent *event) override;
-private:
-  QShortcut* topShortcut{nullptr}, *bottomShortcut{nullptr};
-};
 
 class MovieWallServer;
+class QFileSystemModel;
 
 class NavigationAndAddressBar : public QToolBar {
   Q_OBJECT
@@ -66,7 +49,7 @@ public:
 
 private:
   bool onIteratorToAnotherFolderCore(bool isNext);
-  SplitToolButton* mLastNextFolderTb{nullptr};
+  QAction* mIterPrevFolderAct{nullptr}, *mIterNextFolderAct{nullptr};
   T_IntoNewPath m_IntoNewPath{nullptr};
   T_on_searchTextChanged m_on_searchTextChanged{nullptr};
   T_on_searchEnterKey m_on_searchEnterKey{nullptr};
