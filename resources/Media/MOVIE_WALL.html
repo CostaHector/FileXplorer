@@ -7,7 +7,7 @@
 
 <style>
 * { box-sizing: border-box; }
-body { margin: 0; padding: 16px; background: #1a1a1a; color: #eee;
+body { margin: 0; padding: 0 4px 4px; background: #1a1a1a; color: #eee;
        font-family: system-ui, sans-serif; }
 h1 { font-size: 20px; margin: 0 0 12px; }
 
@@ -59,6 +59,22 @@ h1 { font-size: 20px; margin: 0 0 12px; }
   border-radius: 8px;        /* 跟 .poster 的圆角一致 */
   pointer-events: none;       /* 不拦截点击，checkbox 和 img 仍可交互 */
   z-index: 1;                 /* 高于 img 的合成层，低于 checkbox 的 z-index: 2 */
+}
+
+/* 选中计数：x / y */
+.wall-toolbar .wall-select-count {
+  flex: 0 0 auto;
+  min-width: 48px;
+  padding: 0 8px;
+  color: #888;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;   /* 数字等宽，切换时不会左右抖 */
+  text-align: center;
+  user-select: none;
+  white-space: nowrap;
+}
+.wall-toolbar .wall-select-count.has-selection {
+  color: #3a7bd5;                        /* 有选中时变蓝，和选中框颜色呼应 */
 }
 
 /* ---------- 右键评分菜单 ---------- */
@@ -200,14 +216,16 @@ h1 { font-size: 20px; margin: 0 0 12px; }
 /* 路径导航栏 */
 /* ---------- 顶部工具栏 ---------- */
 .wall-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 12px;
-  padding: 4px;
+  margin: 0 -16px 12px;     /* 负 margin 抵消 body 左右 padding，背景铺满视口宽度 */
+  padding: 8px 20px;         /* 上下 8px，左右 20px = 16（抵消）+ 4（原 padding） */
   background: #222;
-  border: 1px solid #333;
-  border-radius: 6px;
+  border-bottom: 1px solid #333;
 }
 
 /* 组分隔线 */
@@ -598,7 +616,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
       <path d="M5.5 10 H10.5"/>
     </svg>
   </button>
-  <input class="wall-path-input" id="pathInput" type="text" value="" spellcheck="false" list="pathHistoryList">
+  <input class="wall-path-input" id="pathInput" type="text" value="" spellcheck="false" placeholder="Enter folder path, or leave blank" list="pathHistoryList">
   <datalist id="pathHistoryList"></datalist>
   <span class="wall-toolbar-sep"></span>
 
@@ -626,6 +644,7 @@ h1 { font-size: 20px; margin: 0 0 12px; }
   <button class="wall-tool-btn" id="selectAllBtn" title="Select all visible">All</button>
   <button class="wall-tool-btn" id="selectNoneBtn" title="Deselect all">None</button>
   <button class="wall-tool-btn" id="selectInvertBtn" title="Invert selection (visible only)">Invert</button>
+  <span class="wall-select-count" id="selectCountLabel" title="Selected / total">0 / 0</span>
 </div>
 
 <!-- 确认框 -->
@@ -1015,7 +1034,7 @@ function showConfirm(opts) {
     backdrop.onclick  = () => cleanup(false);
     btnCancel.onclick = () => cleanup(false);
     btnOk.onclick     = () => cleanup(true);
-    document.addEventListener('keydown', onKey);
+    setTimeout(() => document.addEventListener('keydown', onKey), 0);
 
     backdrop.classList.add('open');
     dialog.classList.add('open');
@@ -1114,12 +1133,18 @@ function updateWallTitle() {
   const kw = (document.getElementById('searchInput').value || '').trim();
   const matched = kw ? filterMovies(kw).length : g_allMovies.length;
   const total = g_allMovies.length;
-  const selCount = g_selectedIds.size;
-  let text = kw
+  h1.textContent = kw
     ? `Movie Wall: ${matched} / ${total} matches`
     : `Movie Wall: ${total} items`;
-  if (selCount > 0) text += ` (${selCount} selected)`;
-  h1.textContent = text;
+}
+
+function updateSelectCount() {
+  const label = document.getElementById('selectCountLabel');
+  if (!label) return;
+  const total = g_allMovies.length;
+  const sel = g_selectedIds.size;
+  label.textContent = `${sel} / ${total}`;
+  label.classList.toggle('has-selection', sel > 0);
 }
 
 // checkbox 勾选
@@ -1130,7 +1155,7 @@ document.getElementById('wall').addEventListener('change', (e) => {
   if (cb.checked) g_selectedIds.add(id);
   else g_selectedIds.delete(id);
   syncPosterSelection();
-  updateWallTitle();
+  updateSelectCount();
 });
 
 // 全选 / 取消
@@ -1139,12 +1164,12 @@ document.getElementById('selectAllBtn').addEventListener('click', () => {
     g_selectedIds.add(Number(p.dataset.id));
   });
   syncPosterSelection();
-  updateWallTitle();
+  updateSelectCount();
 });
 document.getElementById('selectNoneBtn').addEventListener('click', () => {
   g_selectedIds.clear();
   syncPosterSelection();
-  updateWallTitle();
+  updateSelectCount();
 });
 document.getElementById('selectInvertBtn').addEventListener('click', () => {
   document.querySelectorAll('.poster').forEach(p => {
@@ -1153,7 +1178,7 @@ document.getElementById('selectInvertBtn').addEventListener('click', () => {
     else g_selectedIds.add(id);
   });
   syncPosterSelection();
-  updateWallTitle();
+  updateSelectCount();
 });
 
 // ---------- 搜索功能 ----------
@@ -1241,7 +1266,8 @@ function applyFilter() {
 
   renderWall(sorted, keyword);
 
-  updateWallTitle();   // 替换原来的 h1 更新，带上选中数
+  updateWallTitle();   // 替换原来的 h1 更新
+  updateSelectCount();
 }
 
 // ---------- 排序 ----------
@@ -1269,7 +1295,6 @@ function sortMovies(movies, key, reverse) {
 // ---------- 统一导航入口 ----------
 async function navigateToPath(newPath) {
   newPath = normalizePath(newPath);
-  if (!newPath) return;
 
   const subdirBtn = document.getElementById('subdirToggleBtn');
   const subdirOn  = subdirBtn && subdirBtn.getAttribute('aria-pressed') === 'true';
