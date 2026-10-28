@@ -36,12 +36,12 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
 
   m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "Previous Image");
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
-  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_BracketLeft));
+  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Left));
   m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
 
   m_nextButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_NEXT"}, "Next Image");
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
-  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_BracketRight));
+  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Right));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
 
   mNaviToolBar->addSeparator();
