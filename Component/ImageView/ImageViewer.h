@@ -21,6 +21,8 @@ public:
 
 signals:
   void onImageScaledIndexChanged(int newScaledIndex);
+  void reqPreviousImage();
+  void reqNextImage();
 
 public slots:
   bool refreshPixmapSize() { return UpdatePixmapAndTitle(); }
@@ -51,6 +53,7 @@ private:
   void ReadSetting();
   bool isScaledToWidth(const QSize& sz) const;
   QSize getDestSize(const QSize& sz) const;
+  bool onDirectionKey(int directionKey, QScrollBar* scrollBar);
 
   QString GetResolutionAndSizeInWinTitle(const QSize& oldSz, const QSize& dstSz) const;
   virtual QString GetPathInfoInWinTitle() const { return ""; }

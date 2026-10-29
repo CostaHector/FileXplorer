@@ -36,12 +36,12 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
 
   m_prevButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_LAST"}, "Previous Image");
   CHECK_NULLPTR_RETURN_VOID(m_prevButton);
-  m_prevButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Left));
+  m_prevButton->setShortcut(QKeySequence(Qt::Key_PageUp));
   m_prevButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to previous image").arg(m_prevButton->text(), m_prevButton->shortcut().toString()));
 
   m_nextButton = mNaviToolBar->addAction(QIcon{":img/PAGINATION_NEXT"}, "Next Image");
   CHECK_NULLPTR_RETURN_VOID(m_nextButton);
-  m_nextButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_Right));
+  m_nextButton->setShortcut(QKeySequence(Qt::Key_PageDown));
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
 
   mNaviToolBar->addSeparator();
@@ -78,6 +78,9 @@ void FileImageViewer::subscribe() {
 
   connect(m_prevButton, &QAction::triggered, this, &FileImageViewer::NavigateImagePrevious);
   connect(m_nextButton, &QAction::triggered, this, &FileImageViewer::NavigateImageNext);
+  connect(this, &ImageViewer::reqPreviousImage, this, &FileImageViewer::NavigateImagePrevious);
+  connect(this, &ImageViewer::reqNextImage, this, &FileImageViewer::NavigateImageNext);
+
   connect(ImageViewerActions::GetInst().NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
 
   connect(m_recycleThisImageButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImage);

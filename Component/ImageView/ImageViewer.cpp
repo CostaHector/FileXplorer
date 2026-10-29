@@ -98,36 +98,54 @@ void ImageViewer::wheelEvent(QWheelEvent* event) {
   QScrollArea::wheelEvent(event);
 }
 
+bool ImageViewer::onDirectionKey(int directionKey, QScrollBar* scrollBar) {
+  if (scrollBar == nullptr || !scrollBar->isVisible()) {
+    // when scrollbar not available
+    if (directionKey == Qt::Key_Left) {
+      emit reqPreviousImage();
+    } else if (directionKey == Qt::Key_Right) {
+      emit reqNextImage();
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  static constexpr int pixel = 30; // each up/down/left/right key pixels count
+  const int delta{directionKey == Qt::Key_Left || directionKey == Qt::Key_Up ? -pixel : pixel};
+  // clamp
+  const int modifiedToValue{qMax(scrollBar->minimum(), qMin(scrollBar->value() + delta, scrollBar->maximum()))};
+  scrollBar->setValue(modifiedToValue);
+  return true;
+}
+
 void ImageViewer::keyPressEvent(QKeyEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
-  if (event->key() == Qt::Key_Escape) {
+  const int key = event->key();
+  if (key == Qt::Key_Escape) {
     event->accept();
     close();
     return;
   }
-  QScrollBar* scrollBar{nullptr};
+
+  bool keyProcessed{false};
   if (event->modifiers() == Qt::NoModifier) {
-    switch (event->key()) {
+    switch (key) {
       case Qt::Key_Left:
       case Qt::Key_Right: {
-        scrollBar = horizontalScrollBar();
+        keyProcessed = onDirectionKey(key, horizontalScrollBar());
         break;
       }
       case Qt::Key_Up:
       case Qt::Key_Down: {
-        scrollBar = verticalScrollBar();
+        keyProcessed = onDirectionKey(key, verticalScrollBar());
         break;
       }
       default:
         break;
     }
   }
-  if (scrollBar != nullptr && !scrollBar->isHidden()) {
-    static constexpr int pixel = 30; // each up/down/left/right key pixels count
-    const int delta{event->key() == Qt::Key_Left || event->key() == Qt::Key_Up ? -pixel : pixel};
-    // clamp
-    const int modifiedToValue{qMax(scrollBar->minimum(), qMin(scrollBar->value() + delta, scrollBar->maximum()))};
-    scrollBar->setValue(modifiedToValue);
+  if (keyProcessed) {
     event->accept();
     return;
   }

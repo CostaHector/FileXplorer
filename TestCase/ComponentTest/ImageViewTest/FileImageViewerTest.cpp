@@ -10,7 +10,6 @@
 #include "ImageTool.h"
 #include "ImageViewerActions.h"
 #include "MouseKeyboardEventHelper.h"
-#include "ImageTestPrecoditionTools.h"
 
 #include "FileTool.h"
 #include <QScrollBar>
