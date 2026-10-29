@@ -93,7 +93,7 @@ int CreateShadowFileUsingNameAsContent(const QString &folderFullPathContainsVide
 }
 
 /* 状态流转图
-
+ *
 创建影子 CreateShadowFileUsingNameAsContent
    │
    ▼
@@ -118,17 +118,15 @@ PENDING_SYNC ──────用户改影子──────▶ 路径 != �
 
 */
 
+// 仅为视频和图片(大小>=260*4+8B 且不已.json结尾的文件)生成影子
 bool IsTreatAsShadowFile(const QString& shadowFileFullPath) {
   // 260 char(s) * 4 bytes each UTF8
   // space+an int number
-  return QFile{shadowFileFullPath}.size() < 260 * 4 + 8;
+  return QFile{shadowFileFullPath}.size() < 260 * 4 + 8 && !shadowFileFullPath.endsWith(".json", Qt::CaseInsensitive);
 }
 
 QString GetVideoForPlayPath(const QString& vidFullPath) {
   if (!IsTreatAsShadowFile(vidFullPath)) {
-    return vidFullPath;
-  }
-  if (vidFullPath.endsWith(".json", Qt::CaseInsensitive)) {
     return vidFullPath;
   }
   // vidFullPath 可能是生成的影子文件, 但是已经对影子文件重命名过
@@ -167,7 +165,6 @@ std::pair<bool, SyncDetails> SyncSourceFileByShadowFile(const QString &shadowPat
     const QString shadowFileFullPath = it.next();
     bool bReadOk{false};
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
-      LOG_W("File is not shadow[%s]", qPrintable(shadowFileFullPath));
       continue;
     }
     const QString oldRel2VidPathAndStatusStr = FileTool::StringTextReader(shadowFileFullPath, &bReadOk);
@@ -264,7 +261,6 @@ SyncDetails onShowStagingStatistics(const QString& shadowPath, QMap<QString, QSt
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
-      LOG_W("File is not shadow[%s]", qPrintable(shadowFileFullPath));
       continue;
     }
     bool bReadOk{false};
@@ -321,7 +317,6 @@ std::pair<bool, int> recycleStagingFileWithGivenStatus(const QString& shadowPath
   while (it.hasNext()) {
     const QString shadowFileFullPath = it.next();
     if (!IsTreatAsShadowFile(shadowFileFullPath)) {
-      LOG_W("File is not shadow[%s]", qPrintable(shadowFileFullPath));
       continue;
     }
     bool bReadOk{false};
