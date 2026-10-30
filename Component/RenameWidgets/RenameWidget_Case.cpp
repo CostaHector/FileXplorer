@@ -36,7 +36,7 @@ QStringList RenameWidget_Case::RenameCore(const QStringList& replaceeList) {
   if (m_lowerCaseFileExtension->isChecked()) {
     m_nExtTE->setPlainText(NameTool::Lower(m_nExtTE->toPlainText()));
   } else {
-    ResetNewExts();
+    setNewDotExts(mExts);
   }
 
   QStringList ans;

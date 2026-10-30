@@ -39,10 +39,10 @@ class AdvanceRenamer : public QDialog {
   virtual bool isCaseChangedOnly() const { return false; }
   virtual void FilterNames(FileOsWalker& /*walker*/) const {}
   void UpdateNameAndExt();
-  void ResetNewExts();
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
   void setNewBaseNames(const QStringList& newBaseNames);
+  void setNewDotExts(const QStringList& dotExts);
   QStringList GetSelectedFilesFullPath() const { return mSelectedFilesFullPath; }
   virtual void InitExtraCommonVariable() {}
   virtual void InitExtraMemberWidget() {}

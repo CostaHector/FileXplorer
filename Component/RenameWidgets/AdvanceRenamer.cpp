@@ -269,6 +269,10 @@ void AdvanceRenamer::setNewBaseNames(const QStringList& newBaseNames) {
   m_nBaseTE->setPlainText(newBaseNames.join(NAME_SEP));
 }
 
+void AdvanceRenamer::setNewDotExts(const QStringList& dotExts) {
+  m_nExtTE->setPlainText(dotExts.join(NAME_SEP));
+}
+
 void AdvanceRenamer::UpdateNameAndExt() {
   const QString suffixs = mExts.join(NAME_SEP);
   m_oBaseTE->setPlainText(mNames.join(NAME_SEP));
@@ -277,10 +281,6 @@ void AdvanceRenamer::UpdateNameAndExt() {
   const QStringList newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
   m_nExtTE->setPlainText(suffixs);
-}
-
-void AdvanceRenamer::ResetNewExts() {
-  m_nExtTE->setPlainText(mExts.join(NAME_SEP));
 }
 
 void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringList& selectedNames) {
@@ -307,7 +307,7 @@ void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringL
 void AdvanceRenamer::OnlyTriggerRenameCore() {
   // will not call OSWalker; only update complete name;
   setWindowTitle(windowTitleFormat.arg(mNames.size()).arg(mWorkPath));
-  const auto& newCompleteNames = RenameCore(mNames);
+  const QStringList newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
 }
 
