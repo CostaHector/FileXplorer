@@ -14,7 +14,8 @@ template<int MIN = INT_MIN, int MAX = INT_MAX>
 bool GeneralIntRangeChecker(const QVariant& v);
 extern template bool GeneralIntRangeChecker<INT_MIN, INT_MAX>(const QVariant&);
 extern template bool GeneralIntRangeChecker<0, 10>(const QVariant&);      // used in rating score
-extern template bool GeneralIntRangeChecker<0, 16>(const QVariant&);      // used in extra small enum
+extern template bool GeneralIntRangeChecker<0, 16>(const QVariant&);      // used in extra small enum. Exclusive
+extern template bool GeneralIntRangeChecker<-1, 16>(const QVariant&);     // used in extra small enum. ExclusiveOptional
 extern template bool GeneralIntRangeChecker<0, 100>(const QVariant&);     // used in small enum, or volume
 extern template bool GeneralIntRangeChecker<0, 255>(const QVariant&);     // used in opacity
 extern template bool GeneralIntRangeChecker<0, 500>(const QVariant&);     // used in large enum

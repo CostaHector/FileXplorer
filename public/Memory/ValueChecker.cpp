@@ -17,6 +17,7 @@ bool GeneralIntRangeChecker(const QVariant& v) {
 template bool GeneralIntRangeChecker<INT_MIN, INT_MAX>(const QVariant&);
 template bool GeneralIntRangeChecker<0, 10>(const QVariant&);
 template bool GeneralIntRangeChecker<0, 16>(const QVariant&);
+template bool GeneralIntRangeChecker<-1, 16>(const QVariant&);
 template bool GeneralIntRangeChecker<0, 100>(const QVariant&);
 template bool GeneralIntRangeChecker<0, 255>(const QVariant&);
 template bool GeneralIntRangeChecker<0, 500>(const QVariant&);

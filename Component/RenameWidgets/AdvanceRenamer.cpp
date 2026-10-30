@@ -200,9 +200,9 @@ void AdvanceRenamer::Subscribe() {
 }
 
 bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
-  const QStringList relNameList = m_relNameTE->toPlainText().split(NAME_SEP);
-  const QStringList oldCompleteNameList = m_oBaseTE->toPlainText().split(NAME_SEP);
-  const QStringList oldSuffixList = m_oExtTE->toPlainText().split(NAME_SEP);
+  const QStringList& relNameList = mRelToNameWithNoRoot;
+  const QStringList& oldCompleteNameList = mNames;
+  const QStringList& oldSuffixList = mExts;
 
   const QStringList newCompleteNameList = m_nBaseTE->toPlainText().split(NAME_SEP);
   const QStringList newSuffixList = m_nExtTE->toPlainText().split(NAME_SEP);
@@ -270,13 +270,17 @@ void AdvanceRenamer::setNewBaseNames(const QStringList& newBaseNames) {
 }
 
 void AdvanceRenamer::UpdateNameAndExt() {
-  const QString& suffixs = mExts.join(NAME_SEP);
+  const QString suffixs = mExts.join(NAME_SEP);
   m_oBaseTE->setPlainText(mNames.join(NAME_SEP));
   m_oExtTE->setPlainText(suffixs);
 
-  const auto& newCompleteNames = RenameCore(mNames);
+  const QStringList newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
   m_nExtTE->setPlainText(suffixs);
+}
+
+void AdvanceRenamer::ResetNewExts() {
+  m_nExtTE->setPlainText(mExts.join(NAME_SEP));
 }
 
 void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringList& selectedNames) {

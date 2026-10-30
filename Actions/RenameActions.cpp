@@ -13,44 +13,6 @@ RenameActions::RenameActions(QObject* parent) : QObject{parent} {
   _PREPEND_PARENT_FOLDER_NAMES = new (std::nothrow) QAction{QIcon{":img/PREPEND_PARENT_FOLDER_NAMES"}, tr("Prepend parent folder names"), this};
   _DIGIT_CHAR_REPLACE_TO_ALPHA = new (std::nothrow) QAction{QIcon{":img/DIGIT_2_ALPHA"}, tr("Digit 2 Alpha"), this};
   RENAME_RIBBONS = Get_Rename_Actions();
-
-  _UPPER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_UPPER_CASE"), tr("Uppercase"), this);
-  _LOWER_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_LOWER_CASE"), tr("Lowercase"), this);
-  _CAPITALIZE_KEEP_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_KEEP_OTHER"), tr("Capitalize first and keep other"), this);
-  _CAPITALIZE_LOWER_OTHER = new (std::nothrow) QAction(QIcon(":img/CAPITALIZE_LOWER_OTHER"), tr("Capitalize first and lower other"), this);
-  _TOGGLE_CASE = new (std::nothrow) QAction(QIcon(":img/RENAME_TOGGLE_CASE"), tr("Toggle Case"), this);
-  _LOWER_CASE_FILE_EXTENSION = new (std::nothrow) QAction(QIcon{":img/RENAME_DOT_FILE_EXTENSION"}, tr("Lowercase Extension"), this);
-  _LOWER_CASE_FILE_EXTENSION->setToolTip("Lowercase File Extension");
-  _LOWER_CASE_FILE_EXTENSION->setCheckable(true);
-  NAME_CASE = Get_CASE_Actions();
-}
-
-QActionGroup* RenameActions::Get_CASE_Actions() {
-  _UPPER_CASE->setToolTip("All uppercase letters");
-  _LOWER_CASE->setToolTip("All lowercase letters");
-  _TOGGLE_CASE->setToolTip("Alternates between upper-and lower-case");
-  _CAPITALIZE_KEEP_OTHER->setToolTip(
-        "Capitalizes first letter of each sentence and ignore other letters.<br/>"
-        "Making it easy to read and understand.<br/>"
-        "e.g.<br/>"
-        "i like NBA\tI Like NBA");
-  _CAPITALIZE_LOWER_OTHER->setToolTip(
-        "Capitalizes first letter of each sentence and lower others.<br/>"
-        "e.g.<br/>"
-        "i like NBA\tI Like Nba");
-
-  QActionGroup* caseAG = new (std::nothrow) QActionGroup(this);
-  caseAG->addAction(_UPPER_CASE);
-  caseAG->addAction(_LOWER_CASE);
-  caseAG->addAction(_CAPITALIZE_KEEP_OTHER);
-  caseAG->addAction(_CAPITALIZE_LOWER_OTHER);
-  caseAG->addAction(_TOGGLE_CASE);
-  caseAG->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
-  foreach(QAction* act, caseAG->actions()) {
-    act->setCheckable(true);
-  }
-  _CAPITALIZE_LOWER_OTHER->setChecked(true);
-  return caseAG;
 }
 
 QActionGroup* RenameActions::Get_Rename_Actions() {
