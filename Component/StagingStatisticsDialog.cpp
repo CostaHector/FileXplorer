@@ -126,6 +126,6 @@ void StagingStatisticsDialog::showEvent(QShowEvent* event) {
 }
 
 void StagingStatisticsDialog::closeEvent(QCloseEvent* event) {
-  Configuration().setValue("Geometry/ADVANCE_RENAMER", saveGeometry());
+  Configuration().setValue("Geometry/STAGING_STATISTICS_DIALOG", saveGeometry());
   QDialog::closeEvent(event);
 }

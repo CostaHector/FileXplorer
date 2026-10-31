@@ -41,34 +41,41 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
   m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
 
-  ReadSettings();
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 }
 
 void AdvanceRenamer::showEvent(QShowEvent* event) {
+  if (!m_geometryRestoredOnce) {
+    ReadSettings();
+  }
   StyleSheet::UpdateTitleBar(this);
   QDialog::showEvent(event);
 }
 
-#include <QApplication>
-#include <QScreen>
-bool NeedSaveCurrentGeometry(const QWidget& w) {
-  const QScreen* pScreen = w.screen();
-  return pScreen != nullptr && pScreen->availableGeometry().contains(w.geometry());
-}
-
 void AdvanceRenamer::closeEvent(QCloseEvent* event) {
-  if (NeedSaveCurrentGeometry(*this)) {
-    Configuration().setValue("Geometry/ADVANCE_RENAMER", saveGeometry());
-  }
+  saveDialogGeometry();
   QDialog::closeEvent(event);
 }
 
+void AdvanceRenamer::reject() {
+  saveDialogGeometry();
+  QDialog::reject();
+}
+
+void AdvanceRenamer::saveDialogGeometry() {
+  const QByteArray newDialogGeometry = saveGeometry();
+  if (newDialogGeometry != m_dialogGeometry) {
+    Configuration().setValue("Geometry/ADVANCE_RENAMER", newDialogGeometry);
+  }
+}
+
 void AdvanceRenamer::ReadSettings() {
-  if (Configuration().contains("Geometry/ADVANCE_RENAMER")) {
-    restoreGeometry(Configuration().value("Geometry/ADVANCE_RENAMER").toByteArray());
-  } else {
+  m_geometryRestoredOnce = true;
+  m_dialogGeometry = Configuration().value("Geometry/ADVANCE_RENAMER").toByteArray();
+  if (m_dialogGeometry.isEmpty()) {
     setGeometry(SizeTool::DEFAULT_GEOMETRY);
+  } else {
+    restoreGeometry(m_dialogGeometry);
   }
 }
 

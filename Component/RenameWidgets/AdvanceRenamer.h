@@ -56,6 +56,7 @@ class AdvanceRenamer : public QDialog {
   static constexpr char NAME_SEP = '\n';
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
+  void reject() override;
 
   QString preAt(int i) const {
     if (i < 0 || i >= mNames.size()) return "";
@@ -101,6 +102,10 @@ class AdvanceRenamer : public QDialog {
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
   bool m_bApplyResult{false};
+
+  void saveDialogGeometry();
+  QByteArray m_dialogGeometry;
+  bool m_geometryRestoredOnce{false};
 };
 
 #endif  // ADVANCERENAMER_H
