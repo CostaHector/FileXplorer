@@ -63,9 +63,10 @@ void AdvanceRenamer::reject() {
 }
 
 void AdvanceRenamer::saveDialogGeometry() {
-  const QByteArray newDialogGeometry = saveGeometry();
+  QByteArray newDialogGeometry = saveGeometry();
   if (newDialogGeometry != m_dialogGeometry) {
     Configuration().setValue("Geometry/ADVANCE_RENAMER", newDialogGeometry);
+    m_dialogGeometry.swap(newDialogGeometry);
   }
 }
 
