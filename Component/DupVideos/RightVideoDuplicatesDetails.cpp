@@ -5,6 +5,9 @@
 #include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
+#include "PathTool.h"
+#include "BatchRenameBy.h"
+#include "RenameWidget_Replace.h"
 #include <QFile>
 
 RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
@@ -17,6 +20,7 @@ RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
 
   m_rightSortProxy->setSourceModel(m_detailsModel);
   setModel(m_rightSortProxy);
+  registerProxyModel(m_rightSortProxy);
 
   subscribe();
 
@@ -58,22 +62,59 @@ bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGrouped
   return m_detailsModel->SetSharedMemberSrc(pGroupedVidsList, pCurDifferType);
 }
 
-bool RightVideoDuplicatesDetails::onRecycleSelection() {
-  const int SELECTED_CNT = selectionModel()->selectedRows().size();
-  if (SELECTED_CNT < 1) {
-    LOG_INFO_NP("Skip", "nothing selected to recycle");
+bool RightVideoDuplicatesDetails::on_Rename(AdvanceRenamer& renameWid) {
+  const QModelIndexList srcIndexes = selectedRowsSource();
+  const int selectedCnt = srcIndexes.size();
+  if (selectedCnt < 1) {
+    LOG_INFO_NP("Rename", "skipped: selection is empty");
     return false;
   }
+  QStringList vidsFullPath;
+  vidsFullPath.reserve(selectedCnt);
+  for (const QModelIndex& srcInd : srcIndexes) {
+    vidsFullPath.push_back(m_detailsModel->filePath(srcInd));
+  }
+  QString prepath;
+  QStringList rels;
+  std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
+  const QStringList relativeToVidsRelated = BatchRenameBy::GetFilesNeedProcess(prepath, rels);
+  renameWid.init();
+  renameWid.setModal(true);
+  renameWid.InitTextEditContent(prepath, relativeToVidsRelated);
+  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
+    LOG_INFO_P("Rename", "User cancel rename %d item(s)", relativeToVidsRelated.size());
+    return false;
+  }
+  return true;
+}
+
+bool RightVideoDuplicatesDetails::on_RecycleSelection() {
+  const QModelIndexList srcIndexes = selectedRowsSource();
+  const int selectedCnt = srcIndexes.size();
+  if (selectedCnt < 1) {
+    LOG_INFO_NP("Recycle", "skipped: selection is empty");
+    return false;
+  }
+  QStringList vidsFullPath;
+  vidsFullPath.reserve(selectedCnt);
+  for (const QModelIndex& srcInd : srcIndexes) {
+    vidsFullPath.push_back(m_detailsModel->filePath(srcInd));
+  }
+
+  QString prepath;
+  QStringList rels;
+  std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
+
+  const QStringList relativeToVidsRelated = BatchRenameBy::GetFilesNeedProcess(prepath, rels);
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE recycleCmds;
-  recycleCmds.reserve(SELECTED_CNT);
-  for (const auto& proInd : selectionModel()->selectedRows()) {
-    const auto& srcInd = m_rightSortProxy->mapToSource(proInd);
-    recycleCmds.append(ACMD::GetInstMOVETOTRASH("", m_detailsModel->filePath(srcInd)));
+  recycleCmds.reserve(relativeToVidsRelated.size());
+  for (const QString& relativeToFile: relativeToVidsRelated) {
+    recycleCmds.append(ACMD::GetInstMOVETOTRASH(prepath, relativeToFile));
   }
-  auto isRenameAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
-  LOG_OE_P(isRenameAllSucceed, "Recycle selection", "%d item(s) bResult:%d", SELECTED_CNT, isRenameAllSucceed);
-  return isRenameAllSucceed;
+  const bool isRecycleAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
+  LOG_OE_P(isRecycleAllSucceed, "Recycle vids and its related", "vid selected=%d, related=%d", selectedCnt, relativeToVidsRelated.size());
+  return isRecycleAllSucceed;
 }
 
 int RightVideoDuplicatesDetails::onLeftVideoGroupsTableSelectionChanged(int newRow) {
@@ -82,5 +123,11 @@ int RightVideoDuplicatesDetails::onLeftVideoGroupsTableSelectionChanged(int newR
 
 void RightVideoDuplicatesDetails::subscribe() {
   connect(this, &QTableView::doubleClicked, this, &RightVideoDuplicatesDetails::on_cellDoubleClicked);
-  connect(g_dupVidFinderAg().RECYCLE_SELECTIONS, &QAction::triggered, this, &RightVideoDuplicatesDetails::onRecycleSelection);
+
+  auto& inst = g_dupVidFinderAg();
+  connect(inst.RENAME_REPLACE, &QAction::triggered, this, [this]() -> void {
+    RenameWidget_Replace pReplacer;
+    on_Rename(pReplacer);
+  });
+  connect(inst.RECYCLE_SELECTIONS, &QAction::triggered, this, &RightVideoDuplicatesDetails::on_RecycleSelection);
 }

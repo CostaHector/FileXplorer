@@ -1,9 +1,6 @@
 #include "DuplicateVideosFinderActions.h"
-#include "PublicVariable.h"
 #include "PublicMacro.h"
 #include <QLineEdit>
-#include <QMenu>
-#include <QLabel>
 
 DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QObject{parent} {
   DIFFER_BY_DURATION = new (std::nothrow) QAction{QIcon{":img/VIDEO_DURATION"}, "Duration Tolerance (ms)", this};
@@ -33,6 +30,12 @@ DuplicateVideosFinderActions::DuplicateVideosFinderActions(QObject* parent) : QO
   CHECK_NULLPTR_RETURN_VOID(RECYCLE_SELECTIONS);
   RECYCLE_SELECTIONS->setShortcut(QKeySequence(Qt::Key_Delete));
   RECYCLE_SELECTIONS->setToolTip(QString("(%1) Move selected items to recycle bin").arg(RECYCLE_SELECTIONS->shortcut().toString()));
+
+  RENAME_REPLACE = new (std::nothrow) QAction{QIcon(":img/NAME_STR_REPLACER_PATH"), "Rename Replace", this};
+  CHECK_NULLPTR_RETURN_VOID(RENAME_REPLACE);
+  RENAME_REPLACE->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier | Qt::Key::Key_R));
+  RENAME_REPLACE->setToolTip(QString("<b>%1 (%2)</b><br/> Replace a substring in file name with another string.")
+                                .arg(RENAME_REPLACE->text(), RENAME_REPLACE->shortcut().toString()));
 
   CLEAR_ANALYSIS_LIST = new (std::nothrow) QAction{"Clear Analyse", this};
   CHECK_NULLPTR_RETURN_VOID(CLEAR_ANALYSIS_LIST);
@@ -76,6 +79,7 @@ QToolBar* DuplicateVideosFinderActions::GetAiMediaToolBar(QLineEdit* tableNameFi
   m_tb->addSeparator();
   m_tb->addAction(OPEN_DATABASE);
   m_tb->addSeparator();
+  m_tb->addAction(RENAME_REPLACE);
   m_tb->addAction(RECYCLE_SELECTIONS);
   m_tb->addSeparator();
   m_tb->addWidget(tableNameFilterLE);

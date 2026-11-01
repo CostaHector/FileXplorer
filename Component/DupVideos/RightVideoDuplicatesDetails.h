@@ -6,6 +6,7 @@
 #include "DuplicateVideosHelper.h"
 #include <QSortFilterProxyModel>
 
+class AdvanceRenamer;
 class RightVideoDuplicatesDetails : public CustomTableView {
  public:
   friend class DuplicateVideosFinder;
@@ -13,11 +14,13 @@ class RightVideoDuplicatesDetails : public CustomTableView {
   bool on_effectiveNameCopiedForEverything(const QModelIndex& ind) const;
   bool on_cellDoubleClicked(const QModelIndex& ind) const;
   bool setSharedMember(GroupedDupVidListArr* pGroupedVidsList, DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType);
-  bool onRecycleSelection();
   int onLeftVideoGroupsTableSelectionChanged(int newRow);
 
  private:
   void subscribe();
+  bool on_Rename(AdvanceRenamer& renameWid);
+  bool on_RecycleSelection();
+
   RightVideoDuplicatesModel* m_detailsModel{nullptr};
   QSortFilterProxyModel* m_rightSortProxy{nullptr};
 };

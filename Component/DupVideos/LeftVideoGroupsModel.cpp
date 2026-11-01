@@ -155,7 +155,7 @@ int LeftVideoGroupsModel::setDeviationSize(qint64 newSize) {
   SwapGroupedVidLstArr(DVCriteriaE::SIZE, newSizeGroupedLst);
   std::swap(m_deviationSz, newSize);
   RowsCountEndChange();
-  LOG_D("Deviation size changed from %d to %d leading groups count changed from %d->%d", oldSize, newSize, beforeRowCnt, afterRowCnt);
+  LOG_D("Deviation size changed from %lld to %lld leading groups count changed from %d->%d", oldSize, newSize, beforeRowCnt, afterRowCnt);
   return afterRowCnt - beforeRowCnt;
 }
 
@@ -163,11 +163,18 @@ bool sortByListSizeEleCountDescending(const DupVidMetaInfoList& lhsLst, const Du
   return lhsLst.size() > rhsLst.size();
 }
 
+template <typename TNumber>
+TNumber getFuzzyValue(const TNumber& number, const TNumber& dev) {
+  return dev == 0 ? number : (number + dev / 2) / dev;
+}
+
+template int     getFuzzyValue<int>(const int&, const int&);
+template qint64  getFuzzyValue<qint64>(const qint64&, const qint64&);
+
 GroupedDupVidList LeftVideoGroupsModel::getDurationsLst(const DupVidMetaInfoList& plainList, int dev) {
-  const auto getFuzzyDur = [dev](int dur) -> int { return dev == 0 ? dur : (dur + dev / 2) / dev; };
   QMap<int, DupVidMetaInfoList> curMap;
   for (auto it = plainList.cbegin(); it != plainList.cend(); ++it) {
-    auto fuzzyDur = getFuzzyDur(it->m_Duration);
+    auto fuzzyDur = getFuzzyValue(it->m_Duration, dev);
     auto durIt = curMap.find(fuzzyDur);
     if (durIt == curMap.end()) {
       curMap.insert(fuzzyDur, {*it});
@@ -188,10 +195,9 @@ GroupedDupVidList LeftVideoGroupsModel::getDurationsLst(const DupVidMetaInfoList
 }
 
 GroupedDupVidList LeftVideoGroupsModel::getSizeLst(const DupVidMetaInfoList& plainList, qint64 dev) {
-  const auto getFuzzySz = [dev](qint64 sz) -> qint64 { return dev == 0 ? sz : (sz + dev / 2) / dev; };
   QMap<qint64, DupVidMetaInfoList> curMap;
   for (auto it = plainList.cbegin(); it != plainList.cend(); ++it) {
-    auto fuzzySz = getFuzzySz(it->m_Size);
+    auto fuzzySz = getFuzzyValue(it->m_Size, dev);
     auto szIt = curMap.find(fuzzySz);
     if (szIt == curMap.end()) {
       curMap.insert(fuzzySz, {*it});

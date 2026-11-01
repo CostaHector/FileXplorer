@@ -1,6 +1,4 @@
 #include "DuplicateVideosFinder.h"
-#include "RightVideoDuplicatesModel.h"
-
 #include "DuplicateVideosFinderActions.h"
 #include "FileOpActs.h"
 
@@ -8,10 +6,6 @@
 #include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
-#include "UndoRedo.h"
-#include "FileTool.h"
-#include "PublicVariable.h"
-#include "NotificatorMacro.h"
 
 #include <QKeyEvent>
 

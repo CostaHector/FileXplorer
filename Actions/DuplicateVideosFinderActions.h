@@ -8,7 +8,7 @@
 
 class DuplicateVideosFinderActions : public QObject {
  public:
-  DuplicateVideosFinderActions(QObject* parent = nullptr);
+  explicit DuplicateVideosFinderActions(QObject* parent = nullptr);
 
   QToolBar* GetAiMediaToolBar(QLineEdit* tableNameFilterLE, QLineEdit* sizeDevLE, QLineEdit* durationDevLE, QWidget* parent);
 
@@ -18,6 +18,7 @@ class DuplicateVideosFinderActions : public QObject {
 
   QAction* OPEN_DATABASE{nullptr};
   QAction* RECYCLE_SELECTIONS{nullptr};
+  QAction* RENAME_REPLACE{nullptr};
 
   QAction* CLEAR_ANALYSIS_LIST{nullptr};
   QAction* ANALYSE_THESE_TABLES{nullptr};

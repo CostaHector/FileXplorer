@@ -49,7 +49,7 @@ class LeftVideoGroupsModel : public QAbstractTableModelPub {
   void changeDifferByTo(DuplicateVideoDetectionCriteria::DVCriteriaE newDiffBy) { m_currentDiffer = newDiffBy; }
   void changeDurTo(int newDur) { m_deviationDur = newDur; }
   void changeSzTo(int newSz) { m_deviationSz = newSz; }
-  int rowCountHelper(const GroupedDupVidList& plainLst) const { return plainLst.size(); }
+  static int rowCountHelper(const GroupedDupVidList& plainLst) { return plainLst.size(); }
 
   DupVidMetaInfoList m_plainDupVidLst;
 

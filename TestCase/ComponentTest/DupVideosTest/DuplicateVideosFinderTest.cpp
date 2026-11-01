@@ -5,7 +5,6 @@
 #include "DuplicateVideosFinder.h"
 #include "EndToExposePrivateMember.h"
 
-#include "DupVidsManager.h"
 #include "VideoTestPrecoditionTools.h"
 #include "DuplicateVideosFinderActions.h"
 #include "ClipboardGuard.h"
