@@ -2,7 +2,7 @@
 #include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QPushButton>

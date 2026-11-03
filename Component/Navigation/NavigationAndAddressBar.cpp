@@ -2,7 +2,7 @@
 #include "AddressBarActions.h"
 #include "RightClickMenuActions.h"
 #include "MovieWallServer.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "InputDialogHelper.h"
 #include "NotificatorMacro.h"
 

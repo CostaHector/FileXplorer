@@ -2,7 +2,7 @@
 #include "ImageTool.h"
 #include "ImageViewerActions.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "SizeTool.h"
 #include "StyleSheet.h"
 #include "DataFormatter.h"
@@ -98,8 +98,12 @@ void ImageViewer::wheelEvent(QWheelEvent* event) {
   QScrollArea::wheelEvent(event);
 }
 
+bool ImageViewer::isScrollBarAvailNow(const QScrollBar* scrollBar) {
+  return scrollBar == nullptr && scrollBar->isVisible();
+}
+
 bool ImageViewer::onDirectionKey(int directionKey, QScrollBar* scrollBar) {
-  if (scrollBar == nullptr || !scrollBar->isVisible()) {
+  if (!isScrollBarAvailNow(scrollBar)) {
     // when scrollbar not available
     if (directionKey == Qt::Key_Left) {
       emit reqPreviousImage();

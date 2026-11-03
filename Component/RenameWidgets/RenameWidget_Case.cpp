@@ -1,6 +1,6 @@
 #include "RenameWidget_Case.h"
 #include "NameTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 #include "RenamerKey.h"
 

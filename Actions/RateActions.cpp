@@ -1,5 +1,5 @@
 #include "RateActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RateHelper.h"
 #include "JsonFieldBoundary.h"
 #include "NotificatorMacro.h"

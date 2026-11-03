@@ -1,5 +1,5 @@
 #include "RatingStarsWidget.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RateActions.h"
 #include <QMenu>
 #include <QToolTip>

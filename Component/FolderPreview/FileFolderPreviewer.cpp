@@ -1,7 +1,7 @@
 #include "FileFolderPreviewer.h"
 #include "CastBrowserHelper.h"
 #include "MovieDbHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include <QIcon>

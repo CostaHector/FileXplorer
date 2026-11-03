@@ -2,7 +2,7 @@
 #define DUPLICATEVIDEOSHELPER_H
 
 #include <QString>
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 #define DUP_VIDEO_META_INFO_KEY_MAPPING \
   DUP_VIDEO_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \
@@ -52,26 +52,34 @@ struct DupVidTableName2RecordCount {
 using DupVidTableName2RecordCountList = QList<DupVidTableName2RecordCount>;
 
 #define REDUNDANT_VIDEO_ENUM_VALUE_MAPPING \
-  DECIDE_BY_ITEM(DURATION, 0)              \
-  DECIDE_BY_ITEM(SIZE, 1)
+  DECIDE_BY_ITEM(SIZE, 0)                  \
+  DECIDE_BY_ITEM(DURATION, 1)              \
+  DECIDE_BY_ITEM(SIZE_AND_DURATION, 2)
 
 namespace DuplicateVideoDetectionCriteria {
 enum class DVCriteriaE {
   // add after BEGIN
-  BEGIN = 0,
+  BEGIN_DEFAULT = 0,
 #define DECIDE_BY_ITEM(enu, val) enu = val,
   REDUNDANT_VIDEO_ENUM_VALUE_MAPPING
 #undef DECIDE_BY_ITEM
   // add before BUTT
-  BOTTOM_SIZE_INVALID,
+  END_BUTT,
 };
-static constexpr DVCriteriaE DEFAULT_VD_CRITERIA_E = DVCriteriaE::SIZE;
+static constexpr DVCriteriaE DEFAULT_VD_CRITERIA_E = DVCriteriaE::BEGIN_DEFAULT;
+
+inline DVCriteriaE GroupByModeInt2Enum(int groupByModeInt) {
+  if (groupByModeInt < (int)DVCriteriaE::BEGIN_DEFAULT || groupByModeInt >= (int)DVCriteriaE::END_BUTT) {
+    return DEFAULT_VD_CRITERIA_E;
+  }
+  return static_cast<DVCriteriaE>(groupByModeInt);
+}
 
 inline const char* c_str(DVCriteriaE dvCriteria) {
-  if (dvCriteria < DVCriteriaE::BEGIN || dvCriteria >= DVCriteriaE::BOTTOM_SIZE_INVALID) {
+  if (dvCriteria < DVCriteriaE::BEGIN_DEFAULT || dvCriteria >= DVCriteriaE::END_BUTT) {
     return "unknown dv criteria";
   }
-  static constexpr const char* DV_CRITERIA_E_2_CHAR_ARRAY[(int)DVCriteriaE::BOTTOM_SIZE_INVALID] {
+  static constexpr const char* DV_CRITERIA_E_2_CHAR_ARRAY[(int)DVCriteriaE::END_BUTT] {
 #define DECIDE_BY_ITEM(enu, val) ENUM_2_STR(enu),
     REDUNDANT_VIDEO_ENUM_VALUE_MAPPING
     #undef DECIDE_BY_ITEM
@@ -83,6 +91,6 @@ inline const char* c_str(DVCriteriaE dvCriteria) {
 constexpr int INVALID_LEFT_SELECTED_ROW = -1;
 
 using GroupedDupVidList = QList<DupVidMetaInfoList>;
-using GroupedDupVidListArr = GroupedDupVidList[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::BOTTOM_SIZE_INVALID];
+using GroupedDupVidListArr = GroupedDupVidList[(int)DuplicateVideoDetectionCriteria::DVCriteriaE::END_BUTT];
 
 #endif  // DUPLICATEVIDEOSHELPER_H

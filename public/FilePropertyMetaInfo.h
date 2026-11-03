@@ -1,7 +1,7 @@
 #ifndef FILEPROPERTYMETAINFO_H
 #define FILEPROPERTYMETAINFO_H
 
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QDateTime>
 
 #define SEARCH_OUT_FILE_INFO_KEY_MAPPING_MAIN                                               \

@@ -1,7 +1,7 @@
 #include "ShadowRenamerActions.h"
 #include "RenamerKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
 #include <QToolBar>

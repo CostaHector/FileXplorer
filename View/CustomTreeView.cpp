@@ -4,7 +4,7 @@
 #include "StyleKey.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ViewItemDelegate.h"
 #include <QSortFilterProxyModel>
 #include <QPainter>

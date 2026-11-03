@@ -1,5 +1,5 @@
 #include "ImgReorderListView.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "InputDialogHelper.h"
 #include "FileTool.h"

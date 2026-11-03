@@ -1,5 +1,5 @@
 #include "ResourceMonitorPanel.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "SystemPath.h"
 #include "ResourceMonitor.h"

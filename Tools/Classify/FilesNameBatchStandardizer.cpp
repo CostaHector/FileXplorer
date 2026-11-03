@@ -1,7 +1,9 @@
 ﻿#include "FilesNameBatchStandardizer.h"
-#include <QSet>
-#include <QDirIterator>
 #include "UndoRedo.h"
+#include "Logger.h"
+
+#include <QDirIterator>
+#include <QSet>
 
 bool FilesNameBatchStandardizer::operator()(const QString& rootPath) {
   QStringList pathList;

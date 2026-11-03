@@ -1,6 +1,6 @@
 #include "FavoritesTreeView.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QContextMenuEvent>
 #include <QInputDialog>
 #include <QMimeData>

@@ -73,7 +73,7 @@ QString GetSearchResultParagraphDisplay(const QString& whereText) {
                                      record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Name).value().toString()};
     QString copiedContent = rmf.joinItself();
     copiedContent += '\t';
-    copiedContent += DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong());
+    copiedContent += DataFormatter::formatFileSizeGMKBPreWrapped(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong());
     copiedContent += '\t';
     copiedContent += DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Duration).value().toInt());
     copiedContent += '\t';
@@ -83,7 +83,7 @@ QString GetSearchResultParagraphDisplay(const QString& whereText) {
     // Copy/erase need/rename need/deduplicate need
     searchResult += "<tr>";
     searchResult += QString{"<td>%1</td>"}.arg(DetailBrowserHelper::GetCopyLineHref(base64UrlPath));
-    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKB(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong()));
+    searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatFileSizeGMKBPreWrapped(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Size).value().toLongLong()));
     searchResult += QString{"<td>%1</td>"}.arg(rmf.fileName);
     searchResult += QString{"<td>%1</td>"}.arg(DataFormatter::formatDurationISOMs(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::Duration).value().toInt()));
     searchResult += QString{"<td>%1</td>"}.arg(record.field((int)FdBasedDb::QUERY_KEY_INFO_FIELD::SampleMD5).value().toString());

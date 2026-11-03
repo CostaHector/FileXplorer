@@ -1,6 +1,6 @@
 #include "ScrollBarPolicyMenu.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 ScrollBarPolicyMenu::ScrollBarPolicyMenu(const QString& menuName, const QString& belongToName, QWidget* parent)
     : QMenu{menuName, parent}, m_memoryName{belongToName + "/ScrollBarPolicy"} {

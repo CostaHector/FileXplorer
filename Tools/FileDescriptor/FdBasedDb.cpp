@@ -5,7 +5,7 @@
 #include "VideoDurationGetter.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "MovieDBModelField.h"
 #include "DataFormatter.h"

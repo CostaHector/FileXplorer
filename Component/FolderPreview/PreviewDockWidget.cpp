@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "ViewActions.h"
 #include "VideoPlayerActions.h"
+#include "PublicCheckMacro.h"
 
 PreviewDockWidget::PreviewDockWidget(const QString& title, QWidget* parent, Qt::WindowFlags flags)
   : QDockWidget{title, parent, flags} {

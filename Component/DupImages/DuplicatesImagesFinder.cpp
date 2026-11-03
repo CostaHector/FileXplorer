@@ -8,7 +8,7 @@
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "UndoRedo.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 constexpr char GEOMETRY_KEY[]{"RedunImgFinderKey/GEOMETRY"};
 

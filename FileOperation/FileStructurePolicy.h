@@ -1,7 +1,7 @@
 #ifndef FILESTRUCTUREPOLICY_H
 #define FILESTRUCTUREPOLICY_H
 
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 #define FILE_STRUCTURE_MODE_FIELD_MAPPING \
   FILE_STRUCTURE_MODE_ITEM(QUERY, 0)      \

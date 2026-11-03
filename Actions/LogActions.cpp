@@ -2,7 +2,7 @@
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "MenuToolButton.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Logger.h"
 #include "SystemPath.h"
 #include <QHash>

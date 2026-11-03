@@ -335,10 +335,10 @@ private slots:
     QCOMPARE(jtm.rowCount(), 1);
 
     const QModelIndex ind = jtm.index(0, JsonModelField::Duration);
-    QCOMPARE(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
+    QCOMPARE(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString(), " 0'   0'   0'   0");
     QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 1);
     QCOMPARE(jtm.UpdateFizeSizeField({ind}, 1), 0); // not change
-    QVERIFY(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString() != "0'0'0'0");
+    QVERIFY(ind.siblingAtColumn(JsonModelField::Size).data(Qt::DisplayRole).toString() != " 0'   0'   0'   0");
 
     MOCKER(VideoDurationGetter::GetLengthQuickStatic)
         .expects(exactly(2))

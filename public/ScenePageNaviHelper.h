@@ -1,7 +1,7 @@
 #ifndef SCENEPAGENAVIHELPER_H
 #define SCENEPAGENAVIHELPER_H
 
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 #define SCENE_PAGE_NAVIGATION_KEY_MAPPING     \
   SCENE_PAGE_NAVIGATION_KEY_ITEM(FRONT, 0)    \

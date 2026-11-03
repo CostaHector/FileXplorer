@@ -1,6 +1,6 @@
 #include "ClickableSlider.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QMouseEvent>
 
 bool ClickableSlider::regMouseEventProcessor(T_REG regFunc) {  // 点击事件, 滑动事件 处理回调

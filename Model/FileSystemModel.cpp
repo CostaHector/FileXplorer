@@ -2,7 +2,7 @@
 #include "PathTool.h"
 #include "CustomStatusBar.h"
 #include "FileSystemModelField.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QMimeData>
 #include <QUrl>
 #include <QApplication>

@@ -1,5 +1,5 @@
 #include "ArchiveFilesActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
 
 ArchiveFilesActions::ArchiveFilesActions(QObject* parent) : QObject{parent} {

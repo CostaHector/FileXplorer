@@ -2,7 +2,7 @@
 #include "CastDBActions.h"
 #include "FdBasedDb.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "SystemPath.h"
 

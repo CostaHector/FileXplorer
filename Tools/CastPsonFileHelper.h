@@ -1,9 +1,9 @@
 #ifndef CASTPSONFILEHELPER_H
 #define CASTPSONFILEHELPER_H
 
-#include <QSqlRecord>
 #include <QString>
 #include <QVariantHash>
+class QSqlRecord;
 
 // enum/memeber/parameter name, enumValue, defaultValueAndType, sqlRecordToType, tblFieldDefinition
 #define PSON_MODEL_FIELD_MAPPING \

@@ -3,10 +3,12 @@
 #include "NameTool.h"
 #include "CastPsonFileHelper.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include "StringTool.h"
 #include "JsonRenameRegex.h"
+#include "Logger.h"
 
+#include <QSqlRecord>
 #include <QSqlQuery>
 #include <QSqlField>
 #include <QSqlError>

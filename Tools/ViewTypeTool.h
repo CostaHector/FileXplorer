@@ -1,6 +1,6 @@
 #ifndef TYPEVIEWSTOOL_H
 #define TYPEVIEWSTOOL_H
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include <QString>
 
 #define VIEW_TYPES_ENUM_VALUE_MAPPING\

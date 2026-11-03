@@ -1,5 +1,4 @@
 #include "VidsDurationDisplayString.h"
-#include "VideoDurationGetter.h"
 #include "Logger.h"
 #include "DataFormatter.h"
 #include <cmath>

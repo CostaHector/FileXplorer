@@ -6,7 +6,6 @@
 #include "EndToExposePrivateMember.h"
 
 #include "VideoTestPrecoditionTools.h"
-#include "DuplicateVideosFinderActions.h"
 #include "ClipboardGuard.h"
 #include "TDir.h"
 #include "Logger.h"
@@ -43,14 +42,14 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
     QVERIFY(QFileInfo{VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH}.isDir());
     QVERIFY(QFileInfo{VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH}.isDir());
 
-    QVERIFY(dvf.m_aiTables != nullptr);
-    dvf.m_aiTables->LoadAiMediaTableNames();  // update
-    QVERIFY(dvf.m_aiTables->m_aiMediaTblModel != nullptr);
-    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 0);
-    QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH));
-    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 1);
-    QVERIFY(dvf.m_aiTables->onScanAPath(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH));
-    QCOMPARE(dvf.m_aiTables->m_aiMediaTblModel->rowCount(), 2);
+    QVERIFY(dvf.m_leftTables != nullptr);
+    dvf.m_leftTables->LoadAiMediaTableNames();  // update
+    QVERIFY(dvf.m_leftTables->m_aiMediaTblModel != nullptr);
+    QCOMPARE(dvf.m_leftTables->m_aiMediaTblModel->rowCount(), 0);
+    QVERIFY(dvf.m_leftTables->onScanAPath(VideoTestPrecoditionTools::VID_DUR_GETTER_SAMPLE_PATH));
+    QCOMPARE(dvf.m_leftTables->m_aiMediaTblModel->rowCount(), 1);
+    QVERIFY(dvf.m_leftTables->onScanAPath(VideoTestPrecoditionTools::TS_FILE_MERGER_SAMPLE_PATH));
+    QCOMPARE(dvf.m_leftTables->m_aiMediaTblModel->rowCount(), 2);
   }
 
   void cleanupTestCase() {  //
@@ -59,16 +58,14 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
 
   void dup_vid_tables_drop_available() {
     // precondition:
-    QVERIFY(dvf.m_aiTables->m_aiMediaTblModel->rowCount() >= 1);
+    QVERIFY(dvf.m_leftTables->m_aiMediaTblModel->rowCount() >= 1);
 
     // cancel all selection to test initial state
-    dvf.m_rightDetailsTbl->clearSelection();
-    QCOMPARE(dvf.m_rightDetailsTbl->selectionModel()->hasSelection(), false);
+    dvf.m_bottomDetailsTbl->clearSelection();
+    QCOMPARE(dvf.m_bottomDetailsTbl->selectionModel()->hasSelection(), false);
 
-    auto& inst = g_dupVidFinderAg();
-
-    dvf.onDifferTypeChanged(inst.DIFFER_BY_SIZE);
-    dvf.onDifferTypeChanged(inst.DIFFER_BY_DURATION);
+    dvf.onDifferTypeChanged((int)DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE);
+    dvf.onDifferTypeChanged((int)DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION);
 
     QVERIFY(dvf.durationDevLE != nullptr);
     dvf.durationDevLE->setText("-999");  // Negative number
@@ -85,12 +82,12 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
     QVERIFY(dvf.tableNameFilterLE != nullptr);
     dvf.tableNameFilterLE->setText("[a-z0-9_].*");
     emit dvf.tableNameFilterLE->returnPressed();
-    const QRegularExpression acutalReg = dvf.m_aiTables->m_sortProxy->filterRegularExpression();
+    const QRegularExpression acutalReg = dvf.m_leftTables->m_sortProxy->filterRegularExpression();
     QCOMPARE(acutalReg.pattern(), "[a-z0-9_].*");
 
     // clear all analyse
     dvf.onAnalyzeDuplicatesInVideosList({});
-    QCOMPARE(dvf.m_leftGrpsTbl->selectionModel()->hasSelection(), false);
+    QCOMPARE(dvf.m_RightGrpsTbl->selectionModel()->hasSelection(), false);
 
     {  // in m_rightDetailsTbl, copy filename for everything tool ok, open file
       // 0. ignored, m_rightDetailsTbl has no records at all
@@ -98,23 +95,23 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
       dvf.keyPressEvent(&copyEvent);
       QCOMPARE(copyEvent.isAccepted(), false);
 
-      QCOMPARE(dvf.m_rightDetailsTbl->hasFocus(), false);
+      QCOMPARE(dvf.m_bottomDetailsTbl->hasFocus(), false);
       QKeyEvent doubleClickedEvent{QEvent::KeyPress, Qt::Key::Key_Enter, Qt::KeyboardModifier::NoModifier, QString(), false, 1};
       dvf.keyPressEvent(&doubleClickedEvent);
       QCOMPARE(doubleClickedEvent.isAccepted(), false);
 
       // 1. let analyze some table
-      dvf.m_aiTables->selectAll();
-      QVERIFY(dvf.m_aiTables->onAnalyzeTheseSelectedTables() > 0);
+      dvf.m_leftTables->selectAll();
+      QVERIFY(dvf.m_leftTables->onAnalyzeTheseSelectedTables() > 0);
 
       // 2. let m_leftGrpsTbl has 1 selection
-      QVERIFY(dvf.m_leftGrpsTbl->m_leftGrpModel->rowCount() >= 1);
-      dvf.m_leftGrpsTbl->selectRow(0);
-      emit dvf.m_leftGrpsTbl->leftSelectionChanged(0);
+      QVERIFY(dvf.m_RightGrpsTbl->m_leftGrpModel->rowCount() >= 1);
+      dvf.m_RightGrpsTbl->selectRow(0);
+      emit dvf.m_RightGrpsTbl->leftSelectionChanged(0);
 
       // 3. let m_rightDetailsTbl has 1 selection
-      QVERIFY(dvf.m_rightDetailsTbl->m_detailsModel->rowCount() >= 1);
-      dvf.m_rightDetailsTbl->selectRow(0);
+      QVERIFY(dvf.m_bottomDetailsTbl->m_detailsModel->rowCount() >= 1);
+      dvf.m_bottomDetailsTbl->selectRow(0);
       {
         ClipboardGuard clipboardGuard;
         const QString beforeText{clipboardGuard.getCurText()};
@@ -128,8 +125,8 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
       {
         dvf.show();
         QTimer::singleShot(0, this, [this]() {
-          dvf.m_rightDetailsTbl->setFocus();
-          QCOMPARE(dvf.m_rightDetailsTbl->hasFocus(), true);
+          dvf.m_bottomDetailsTbl->setFocus();
+          QCOMPARE(dvf.m_bottomDetailsTbl->hasFocus(), true);
           QKeyEvent doubleClickedEvent{QEvent::KeyPress, Qt::Key::Key_Enter, Qt::KeyboardModifier::NoModifier, QString(), false, 1};
           dvf.keyPressEvent(&doubleClickedEvent);
           QCOMPARE(doubleClickedEvent.isAccepted(), true);

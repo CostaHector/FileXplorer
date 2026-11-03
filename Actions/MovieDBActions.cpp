@@ -1,5 +1,5 @@
 #include "MovieDBActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 MovieDBActions& MovieDBActions::GetInst() {
   static MovieDBActions ins;

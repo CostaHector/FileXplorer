@@ -1,6 +1,6 @@
 #include "AddressELineEdit.h"
 #include "ViewHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "ImageTool.h"
 

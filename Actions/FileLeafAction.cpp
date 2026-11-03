@@ -1,6 +1,6 @@
 #include "FileLeafAction.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "MemoryKey.h"
 #include "Configuration.h"
 #include "ImageTool.h"

@@ -1,5 +1,5 @@
 #include "RenameWidget_Digit2Alpha.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RenameHelper.h"
 #include "SpacerWidget.h"
 

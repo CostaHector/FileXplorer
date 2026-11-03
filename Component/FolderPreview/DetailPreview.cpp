@@ -2,7 +2,7 @@
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_PREVIEW_SPLITTER", parent} {
   setOrientation(Qt::Orientation::Vertical);

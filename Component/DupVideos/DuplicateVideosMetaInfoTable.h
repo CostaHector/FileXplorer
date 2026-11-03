@@ -36,6 +36,14 @@ class DuplicateVideosMetaInfoTable : public CustomTableView {
   bool onOpenTableAssociatedPath(const QModelIndex& ind);
   void subscribe();
 
+  QAction* m_ClearAnalysisList{nullptr};
+  QAction* m_AnalyseTheseTables{nullptr};
+  QAction* m_ScanAPath{nullptr};
+  QAction* m_AuditTheseTables{nullptr};
+  QAction* m_DropTheseTables{nullptr};
+  QAction* m_ForceReloadTables{nullptr};
+  QAction* m_OpenDatabase{nullptr};
+
   DupVidMetaInfoList mVideosListNeedAnalyse;
 
   DupVidsManager mDupVidMngr;

@@ -1,7 +1,8 @@
 #ifndef BYTESRANGETOOL_H
 #define BYTESRANGETOOL_H
 
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
+
 #define BYTES_RANGE_ENUM_VALUE_MAPPING \
 BYTES_RANGE_ITEM(FIRST_16_BYTES, 0, 16)           \
 BYTES_RANGE_ITEM(FIRST_1_KB,     1, 1*1024)    \

@@ -1,5 +1,5 @@
 #include "TextElideModeMenu.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 
 TextElideModeMenu::TextElideModeMenu(const QString& menuName, const QString& belongToName, QWidget* parent)

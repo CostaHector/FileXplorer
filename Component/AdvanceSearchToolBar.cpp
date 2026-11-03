@@ -1,5 +1,5 @@
 ﻿#include "AdvanceSearchToolBar.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "SearchKey.h"
 #include "Configuration.h"

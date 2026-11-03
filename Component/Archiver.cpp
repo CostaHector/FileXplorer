@@ -3,7 +3,7 @@
 #include "ImageTool.h"
 #include "StyleSheet.h"
 #include "PathTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 #include <QToolBar>
 

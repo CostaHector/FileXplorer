@@ -8,6 +8,7 @@
 #include "DataFormatter.h"
 #include "VideoDurationGetter.h"
 #include "VidsDurationDisplayString.h"
+#include "PublicCheckMacro.h"
 
 const QString PropertiesWindow::STRING_SPLITTER{60, '-'};
 
@@ -123,7 +124,7 @@ bool PropertiesWindow::operator()(const QList<qint64>& fileSizes, const QList<in
 
   if (g_propertiesWindowAct().SHOW_FILES_SIZE->isChecked()) {
     const qint64 totalSz{std::accumulate(fileSizes.cbegin(), fileSizes.cend(), (qint64)0)};
-    const QString sizeMsg{DataFormatter::formatFileSizeWithBytes(totalSz)};
+    const QString sizeMsg{DataFormatter::formatFileSizeWithBytesPreWrapped(totalSz)};
     m_commonInfomation = QString::asprintf("%d file(s) sizes: %s", fileSizes.size(), qPrintable(sizeMsg));
   } else {
     m_commonInfomation = "not available";

@@ -9,6 +9,8 @@
 #include "BatchRenameBy.h"
 #include "SceneMixed.h"
 #include "JsonUpdater.h"
+#include "Logger.h"
+
 #include <QIcon>
 #include <QBrush>
 #include <QDir>

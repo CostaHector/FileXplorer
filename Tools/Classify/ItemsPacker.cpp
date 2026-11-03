@@ -1,6 +1,7 @@
 ﻿#include "ItemsPacker.h"
 #include "SceneMixed.h"
 #include "UndoRedo.h"
+#include "Logger.h"
 
 #include <QDir>
 #include <QMap>

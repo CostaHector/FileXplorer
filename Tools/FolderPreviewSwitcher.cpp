@@ -1,5 +1,5 @@
 ﻿#include "FolderPreviewSwitcher.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 FolderPreviewSwitcher::FolderPreviewSwitcher(CurrentRowPreviewer* folderPreview,
                                              QObject* parent)  //

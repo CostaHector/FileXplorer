@@ -5,7 +5,7 @@
 #include "PathTool.h"
 #include "FileOsWalker.h"
 #include "UndoRedo.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "RenameNamesUnique.h"

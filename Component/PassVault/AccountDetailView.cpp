@@ -1,6 +1,6 @@
 #include "AccountDetailView.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 
 AccountDetailView::AccountDetailView(const QString &title, QWidget *parent) //

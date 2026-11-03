@@ -1,5 +1,5 @@
 ﻿#include "RenameWidget_LongPath.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileOsWalker.h"
 #include <QLabel>
 

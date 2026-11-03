@@ -1,7 +1,7 @@
 ﻿#include "RenameWidget_Numerize.h"
 #include "RenamerKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "RenameHelper.h"
 #include "ImgReorderDialog.h"

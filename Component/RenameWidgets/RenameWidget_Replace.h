@@ -7,7 +7,6 @@ class RenameWidget_Replace : public AdvanceRenamer {
   Q_OBJECT
  public:
   using AdvanceRenamer::AdvanceRenamer;
-  virtual ~RenameWidget_Replace();
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;

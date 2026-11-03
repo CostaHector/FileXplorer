@@ -11,7 +11,7 @@
 #include "StudiosManager.h"
 #include "EndToExposePrivateMember.h"
 #include "JsonTestPrecoditionTools.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PathTool.h"
 #include "StudioActorManagerTestHelper.h"
 #include <mockcpp/mokc.h>

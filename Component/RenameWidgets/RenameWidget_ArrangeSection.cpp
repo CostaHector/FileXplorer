@@ -1,6 +1,6 @@
 #include "RenameWidget_ArrangeSection.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RenamerKey.h"
 #include "Configuration.h"
 #include "NameSectionArrange.h"

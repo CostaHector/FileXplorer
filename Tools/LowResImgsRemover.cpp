@@ -1,10 +1,12 @@
 #include "LowResImgsRemover.h"
-#include <QDir>
-#include <QFileInfo>
-#include <QHash>
 #include "JsonRenameRegex.h"
 #include "PublicVariable.h"
 #include "UndoRedo.h"
+#include "Logger.h"
+
+#include <QDir>
+#include <QFileInfo>
+#include <QHash>
 
 using namespace FileOperatorType;
 

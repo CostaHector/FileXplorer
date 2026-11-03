@@ -1,5 +1,5 @@
 #include "PopupWidgetManager.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 
 #include "DevicesDrivesTV.h"

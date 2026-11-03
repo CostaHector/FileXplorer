@@ -54,6 +54,7 @@ private:
   bool isScaledToWidth(const QSize& sz) const;
   QSize getDestSize(const QSize& sz) const;
   bool onDirectionKey(int directionKey, QScrollBar* scrollBar);
+  static bool isScrollBarAvailNow(const QScrollBar* scrollBar);
 
   QString GetResolutionAndSizeInWinTitle(const QSize& oldSz, const QSize& dstSz) const;
   virtual QString GetPathInfoInWinTitle() const { return ""; }

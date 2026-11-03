@@ -2,7 +2,7 @@
 #include "PopupWidgetManager.h"
 #include "CompoVisKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "SizeChangeAnimation.h"
 #include "SystemPath.h"
 #include "ImageTool.h"

@@ -1,5 +1,5 @@
 #include "SceneStyleDelegate.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "SceneInfo.h"
 #include "RateHelper.h"
 #include "ColorTools.h"

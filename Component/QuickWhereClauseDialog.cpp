@@ -1,5 +1,5 @@
 ﻿#include "QuickWhereClauseDialog.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "BehaviorKey.h"
 #include "Configuration.h"
 #include "StyleSheet.h"

@@ -1,5 +1,5 @@
 #include "ToolBarWidget.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QLabel>
 
 constexpr Qt::ToolButtonStyle ToolBarWidget::DEF_TOOL_BUTTON_STYLE;

@@ -2,7 +2,7 @@
 #include "RenameHelper.h"
 #include "RenamerKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PathTool.h"
 #include "StringTool.h"
 
@@ -34,10 +34,6 @@ OldStrDefaultMode GetOldStrDefaultModeFromMemory() {
     return OLD_STR_DEFAULT_MODE_BEGIN;
   }
   return static_cast<OldStrDefaultMode>(oldStrDefaultMode);;
-}
-
-RenameWidget_Replace::~RenameWidget_Replace() {
-  Configuration().setValue(RenamerKey::OLD_STR_DEFAULT_MODE_SELECT.name, m_oldStrDefaultModeCB->currentIndex());
 }
 
 QToolBar* RenameWidget_Replace::InitControlTB() {
@@ -99,9 +95,11 @@ bool RenameWidget_Replace::UpdateOldStrCbCurrentText() {
     LOG_E("oldStrDefaultMode[%d] out of range", oldStrDefaultMode);
     return false;
   }
-  OldStrDefaultMode defMode = static_cast<OldStrDefaultMode>(oldStrDefaultMode);
+  const OldStrDefaultMode oldStrMode = static_cast<OldStrDefaultMode>(oldStrDefaultMode);
+  Configuration().setValue(RenamerKey::OLD_STR_DEFAULT_MODE_SELECT.name, oldStrMode);
+
   const QString beforeOldName = m_oldStrCB->currentText();
-  const QString afterOldName = GetOldStrDefault(mNames, defMode);
+  const QString afterOldName = GetOldStrDefault(mNames, oldStrMode);
   if (afterOldName == beforeOldName) {
     return false;
   }

@@ -1,5 +1,5 @@
 #include "HarMgr.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include "SizeTool.h"
 #include "Configuration.h"

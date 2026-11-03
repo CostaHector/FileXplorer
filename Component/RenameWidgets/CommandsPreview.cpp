@@ -1,6 +1,6 @@
 #include "CommandsPreview.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "StyleSheet.h"
 #include "SizeTool.h"

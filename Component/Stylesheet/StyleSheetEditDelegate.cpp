@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include "GeneralDataType.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"

@@ -6,12 +6,11 @@
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideosMetaInfoTable.h"
 #include "EndToExposePrivateMember.h"
-#include "DuplicateVideosFinderActions.h"
 #include "VideoTestPrecoditionTools.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "TDir.h"
 #include <QDesktopServices>
 #include <mockcpp/mokc.h>
@@ -104,23 +103,21 @@ private slots:
     QCOMPARE(beforeData.size(), 2);
 
     // effect same with call onScanAPath twice
-    auto& dupVidActsInst = g_dupVidFinderAg();
 
     dupTv.clearSelection();
     QCOMPARE(dupTv.selectionModel()->hasSelection(), false);
-    emit dupVidActsInst.DROP_THESE_TABLES->triggered();    // nothing select, skip
+    emit dupTv.m_DropTheseTables->triggered();    // nothing select, skip
     QCOMPARE(dupTv.m_aiMediaTblModel->m_data, beforeData); // unchange
 
     dupTv.selectAll();
     QCOMPARE(dupTv.selectionModel()->hasSelection(), true);
-    emit dupVidActsInst.DROP_THESE_TABLES->triggered();     // all select, nothing left
+    emit dupTv.m_DropTheseTables->triggered();     // all select, nothing left
     QVERIFY(dupTv.m_aiMediaTblModel->m_data != beforeData); // changed
     QVERIFY(dupTv.m_aiMediaTblModel->m_data.isEmpty());
   }
 
   // this test only prevent program crash down, the event processor relies on it's model
   void audit_forceReload_open_drop_ok() {
-    auto& dupVidAgInst = g_dupVidFinderAg();
     // %1 videos in %2 tables
     static auto isTitleMessageInExpect = [](const QString& title, const int videosCount, const int tablesCount) -> bool {
       return title.contains(QString("%1 videos in %2 tables").arg(videosCount).arg(tablesCount), Qt::CaseInsensitive); //
@@ -148,7 +145,7 @@ private slots:
     // 1. anaylze emit title changed signal
     QSignalSpy windowTitleChangedSpy(&dupTv, &DuplicateVideosMetaInfoTable::windowTitleChanged);
     QSignalSpy analzedTableFinishedSpy(&dupTv, &DuplicateVideosMetaInfoTable::analyzeTablesFinished);
-    emit dupVidAgInst.ANALYSE_THESE_TABLES->triggered(); // trigger onAnalyzeTheseSelectedTables
+    emit dupTv.m_AnalyseTheseTables->triggered(); // trigger onAnalyzeTheseSelectedTables
     QCOMPARE(dupTv.mVideosListNeedAnalyse.size(), vidNames.size());
     QCOMPARE(analzedTableFinishedSpy.count(), 1);
     QCOMPARE(windowTitleChangedSpy.count(), 1);

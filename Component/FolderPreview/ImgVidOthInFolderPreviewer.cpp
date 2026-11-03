@@ -1,5 +1,5 @@
 #include "ImgVidOthInFolderPreviewer.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "BrowserKey.h"

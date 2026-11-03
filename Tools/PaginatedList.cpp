@@ -1,5 +1,5 @@
 #include "PaginatedList.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Logger.h"
 
 template <typename SceneElementType>

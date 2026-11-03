@@ -12,7 +12,7 @@
 #include "EndToExposePrivateMember.h"
 
 #include "PathTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "JsonTestPrecoditionTools.h"
 #include "FileTool.h"
 #include "MD5Calculator.h"

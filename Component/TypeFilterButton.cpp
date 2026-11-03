@@ -1,5 +1,5 @@
 #include "TypeFilterButton.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "BehaviorKey.h"
 #include "SearchKey.h"
 #include "Configuration.h"

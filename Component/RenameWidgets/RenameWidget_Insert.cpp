@@ -1,6 +1,6 @@
 ﻿#include "RenameWidget_Insert.h"
 #include "RenamerKey.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RenameHelper.h"
 
 RenameWidget_Insert::RenameWidget_Insert(QWidget* parent) //

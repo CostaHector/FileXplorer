@@ -1,8 +1,7 @@
 #include "DuplicateVideosMetaInfoTable.h"
 
-#include "DuplicateVideosFinderActions.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "Configuration.h"
 
@@ -16,14 +15,40 @@
 #include <QUrl>
 
 DuplicateVideosMetaInfoTable::DuplicateVideosMetaInfoTable(QWidget* parent) : CustomTableView{"AiMediaDupTableView", parent} {
-  {
-    auto& agInst = g_dupVidFinderAg();
-    QList<QAction*> exclusiveActs{
-        agInst.ANALYSE_THESE_TABLES, agInst.SCAN_A_PATH,       agInst.FORCE_RELOAD_TABLES,
-        agInst.AUDIT_THESE_TABLES,   agInst.DROP_THESE_TABLES, agInst.CLEAR_ANALYSIS_LIST,
-    };
-    PushFrontExclusiveActions(exclusiveActs);
-  }
+  m_ClearAnalysisList = new (std::nothrow) QAction{"Clear Analyse", this};
+  CHECK_NULLPTR_RETURN_VOID(m_ClearAnalysisList);
+  m_ClearAnalysisList->setToolTip("Clear current analyse list");
+
+  m_AnalyseTheseTables = new (std::nothrow) QAction{QIcon(":img/ANALYSE_AI_MEDIA_TABLES"), "Analyse", this};
+  CHECK_NULLPTR_RETURN_VOID(m_AnalyseTheseTables);
+  m_AnalyseTheseTables->setToolTip("Append records from selected tables to the current analysis list");
+
+  m_ScanAPath = new (std::nothrow) QAction{QIcon(":img/LOAD_A_PATH"), "Scan a path", this};
+  CHECK_NULLPTR_RETURN_VOID(m_ScanAPath);
+  m_ScanAPath->setToolTip("Scan videos from a directory and populate the table with their information");
+
+  m_AuditTheseTables = new (std::nothrow) QAction{QIcon{":img/AUDIT_AI_MEDIA_DUP"}, "Audit", this};
+  CHECK_NULLPTR_RETURN_VOID(m_AuditTheseTables);
+  m_AuditTheseTables->setToolTip("Validate table records and update if corresponding files are missing");
+
+  m_DropTheseTables = new (std::nothrow) QAction{QIcon{":img/DROP_TABLE"}, "Drop Tables", this};
+  CHECK_NULLPTR_RETURN_VOID(m_DropTheseTables);
+  m_DropTheseTables->setToolTip("Delete selected table(s)");
+
+  m_ForceReloadTables = new (std::nothrow) QAction{QIcon{":img/REFRESH_THIS_PATH"}, "Force reload", this};
+  CHECK_NULLPTR_RETURN_VOID(m_ForceReloadTables);
+  m_ForceReloadTables->setToolTip("Delete selected table(s) and reload them from source");
+
+  m_OpenDatabase = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), "&Open Database", this};
+  CHECK_NULLPTR_RETURN_VOID(m_OpenDatabase);
+  m_OpenDatabase->setToolTip(QString("<b>%1 (%2)</b><br/>Open SQLite database files (*.db)<br/>Requires DB Browser for SQLite to be installed and set as the default application")
+                                .arg(m_OpenDatabase->text(), m_OpenDatabase->shortcut().toString()));
+
+  QList<QAction*> exclusiveActs{
+      m_AnalyseTheseTables, m_ScanAPath,       m_ForceReloadTables,
+      m_AuditTheseTables,   m_DropTheseTables, m_ClearAnalysisList,
+  };
+  PushFrontExclusiveActions(exclusiveActs);
 
   m_aiMediaTblModel = new (std::nothrow) DuplicateVideosMetaInfoModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_aiMediaTblModel);
@@ -41,7 +66,7 @@ DuplicateVideosMetaInfoTable::DuplicateVideosMetaInfoTable(QWidget* parent) : Cu
 
 void DuplicateVideosMetaInfoTable::LoadAiMediaTableNames() {
   CHECK_NULLPTR_RETURN_VOID(m_aiMediaTblModel);
-  auto tbl2Cnt = mDupVidMngr.TableName2Cnt();
+  DupVidTableName2RecordCountList tbl2Cnt = mDupVidMngr.TableName2Cnt();
   m_aiMediaTblModel->UpdateDupVideoTableMetaInfoList(tbl2Cnt);
 }
 
@@ -151,22 +176,14 @@ QModelIndexList DuplicateVideosMetaInfoTable::Proxy2Source(const QModelIndexList
   return ans;
 }
 
-void DuplicateVideosMetaInfoTable::subscribe() {
-  auto& dupVidAgInst = g_dupVidFinderAg();
-
-  connect(dupVidAgInst.ANALYSE_THESE_TABLES, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onAnalyzeTheseSelectedTables);
-  connect(dupVidAgInst.CLEAR_ANALYSIS_LIST, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onClearAnalyzeList);
-
-  connect(dupVidAgInst.OPEN_DATABASE, &QAction::triggered, &mDupVidMngr, &DupVidsManager::onShowInFileSystemView);
-
-  connect(dupVidAgInst.SCAN_A_PATH, &QAction::triggered, this, [this]() { onScanAPath(); });
-
-  connect(dupVidAgInst.DROP_THESE_TABLES, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onDropSelectedTables);
-
-  connect(dupVidAgInst.AUDIT_THESE_TABLES, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onAuditSelectedTables);
-
-  connect(dupVidAgInst.FORCE_RELOAD_TABLES, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onForceReloadTables);
-
+void DuplicateVideosMetaInfoTable::subscribe() {  
+  connect(m_AnalyseTheseTables, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onAnalyzeTheseSelectedTables);
+  connect(m_ClearAnalysisList, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onClearAnalyzeList);
+  connect(m_ScanAPath, &QAction::triggered, this, [this]() { onScanAPath(); });
+  connect(m_DropTheseTables, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onDropSelectedTables);
+  connect(m_AuditTheseTables, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onAuditSelectedTables);
+  connect(m_ForceReloadTables, &QAction::triggered, this, &DuplicateVideosMetaInfoTable::onForceReloadTables);
+  connect(m_OpenDatabase, &QAction::triggered, &mDupVidMngr, &DupVidsManager::onShowInFileSystemView);
   connect(this, &QTableView::doubleClicked, this, &DuplicateVideosMetaInfoTable::onOpenTableAssociatedPath);
 }
 
@@ -238,6 +255,6 @@ bool DuplicateVideosMetaInfoTable::onOpenTableAssociatedPath(const QModelIndex& 
     return false;
   }
   const bool openRet = FileTool::OpenLocalFileUsingDesktopService(pth);
-  LOG_OE_P(openRet, "Open Table Associated path", "%s", pth);
+  LOG_OE_NP(openRet, "Open Table Associated path", pth);
   return openRet;
 }

@@ -1,7 +1,7 @@
 #include "StyleSheetMgr.h"
 #include "StyleSheet.h"
 #include "PreferenceActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PreferenceActions.h"
 #include "ToolBarWidget.h"
 #include "CustomTableView.h"

@@ -101,9 +101,9 @@ class VideoTableModelTest : public PlainTestSuite {
     QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::REL_PATH), Qt::DisplayRole).toString(), "/");
     QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::REL_PATH), Qt::DisplayRole).toString(), "/VIDEO_TS/");
 
-    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'1");
-    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'2");
-    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), "0'0'0'5");
+    QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), " 0'   0'   0'   1");
+    QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), " 0'   0'   0'   2");
+    QCOMPARE(videoModel.data(videoModel.index(2, VideoBasicInfo::FILE_SIZE), Qt::DisplayRole).toString(), " 0'   0'   0'   5");
 
     QCOMPARE(videoModel.data(videoModel.index(0, VideoBasicInfo::DURATION_FIELD), Qt::DisplayRole).toString(), "00:00:00");
     QCOMPARE(videoModel.data(videoModel.index(1, VideoBasicInfo::DURATION_FIELD), Qt::DisplayRole).toString(), "00:00:00");

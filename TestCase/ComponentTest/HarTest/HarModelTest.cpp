@@ -70,7 +70,7 @@ private slots:
     QCOMPARE(hm.data(idx, Qt::TextAlignmentRole).toInt(), (int) Qt::AlignLeft);
 
     idx = hm.index(0, 1);
-    QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "0'0'0'11"); // "PDF content" 11字节
+    QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), " 0'   0'   0'  11"); // "PDF content" 11字节
 
     idx = hm.index(0, 2);
     QCOMPARE(hm.data(idx, Qt::DisplayRole).toString(), "application/pdf");

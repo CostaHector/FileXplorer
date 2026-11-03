@@ -1,13 +1,13 @@
-#include "RightVideoDuplicatesModel.h"
+#include "DuplicateVideoDetailsModel.h"
 #include "JsonRenameRegex.h"
 #include "DataFormatter.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
 
 #include <QBrush>
 #include <QFileInfo>
 
-QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) const {
+QVariant DuplicateVideoDetailsModel::data(const QModelIndex& index, int role) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
   if (!isLeftSelectedRowValid()) {
     LOG_D("selectedRow[%d] out of range", getLeftSelectedRow());
@@ -43,7 +43,7 @@ QVariant RightVideoDuplicatesModel::data(const QModelIndex& index, int role) con
   }
 }
 
-int RightVideoDuplicatesModel::rowCountHelper(int leftSelectedRow) const {
+int DuplicateVideoDetailsModel::rowCountHelper(int leftSelectedRow) const {
   CHECK_NULLPTR_RETURN_INT(_pGroupedVidsList, 0);
   CHECK_NULLPTR_RETURN_INT(_pCurrentDiffer, 0);
   const auto& grpLst = (*_pGroupedVidsList)[(int)*_pCurrentDiffer];
@@ -53,11 +53,11 @@ int RightVideoDuplicatesModel::rowCountHelper(int leftSelectedRow) const {
   return grpLst[leftSelectedRow].size();
 }
 
-int RightVideoDuplicatesModel::rowCount(const QModelIndex& /*parent*/) const {
+int DuplicateVideoDetailsModel::rowCount(const QModelIndex& /*parent*/) const {
   return rowCountHelper(getLeftSelectedRow());
 }
 
-auto RightVideoDuplicatesModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
+auto DuplicateVideoDetailsModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
   if (role == Qt::TextAlignmentRole) {
     if (orientation == Qt::Vertical) {
       return Qt::AlignRight;
@@ -72,7 +72,7 @@ auto RightVideoDuplicatesModel::headerData(int section, Qt::Orientation orientat
   return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-bool RightVideoDuplicatesModel::SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
+bool DuplicateVideoDetailsModel::SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
   CHECK_NULLPTR_RETURN_FALSE(_groupedVidsListArr);
   CHECK_NULLPTR_RETURN_FALSE(_currentDiffer);
   _pGroupedVidsList = _groupedVidsListArr;
@@ -80,7 +80,7 @@ bool RightVideoDuplicatesModel::SetSharedMemberSrc(const GroupedDupVidListArr* _
   return true;
 }
 
-int RightVideoDuplicatesModel::onChangeDetailIndex(int newLeftSelectedRow) {
+int DuplicateVideoDetailsModel::onChangeDetailIndex(int newLeftSelectedRow) {
   CHECK_NULLPTR_RETURN_INT(_pGroupedVidsList, -1);
   CHECK_NULLPTR_RETURN_INT(_pCurrentDiffer, -1);
   const int beforeRowN = rowCount();
@@ -100,13 +100,13 @@ int RightVideoDuplicatesModel::onChangeDetailIndex(int newLeftSelectedRow) {
   return afterRowN - beforeRowN;
 }
 
-QString RightVideoDuplicatesModel::fileNameUsedForToolEverything(const QModelIndex& index) const {
+QString DuplicateVideoDetailsModel::fileNameUsedForToolEverything(const QModelIndex& index) const {
   QString fileNamePlain = fileName(index);
   fileNamePlain.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
   return fileNamePlain;
 }
 
-QString RightVideoDuplicatesModel::filePath(const QModelIndex& index) const {
+QString DuplicateVideoDetailsModel::filePath(const QModelIndex& index) const {
   if (!index.isValid()) {
     LOG_W("modelindex is invalid");
     return {};
@@ -122,7 +122,7 @@ QString RightVideoDuplicatesModel::filePath(const QModelIndex& index) const {
   return inf.m_AbsPath;
 }
 
-QString RightVideoDuplicatesModel::fileName(const QModelIndex& index) const {
+QString DuplicateVideoDetailsModel::fileName(const QModelIndex& index) const {
   if (!index.isValid()) {
     LOG_W("modelindex is invalid");
     return {};
@@ -139,7 +139,7 @@ QString RightVideoDuplicatesModel::fileName(const QModelIndex& index) const {
 }
 
 // operation like scanANewPath/AppendToCurrenAnalyzeList/SizeDeviation/DurationDeviation changed will invalidate left selection
-void RightVideoDuplicatesModel::onInvalidateLeftSelection() {
+void DuplicateVideoDetailsModel::onInvalidateLeftSelection() {
   const int beforeRowCnt = rowCount();
   const int afterRowCnt = 0;
   RowsCountBeginChange(beforeRowCnt, afterRowCnt);

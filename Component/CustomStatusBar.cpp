@@ -1,5 +1,5 @@
 #include "CustomStatusBar.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ViewActions.h"
 #include <QStyle>
 

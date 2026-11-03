@@ -9,7 +9,7 @@
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "FileOpActs.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 
 #include <QPixmap>

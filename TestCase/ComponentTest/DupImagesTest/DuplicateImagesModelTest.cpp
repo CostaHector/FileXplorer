@@ -29,7 +29,7 @@ private slots:
     QByteArray validImgContents = GetSvgRawByteArray();
     SVG_FILE_SIZE_IN_BYTES = validImgContents.size();
     QCOMPARE(SVG_FILE_SIZE_IN_BYTES, 129);
-    QCOMPARE(DataFormatter::formatFileSizeGMKB(SVG_FILE_SIZE_IN_BYTES), "0'0'0'129");
+    QCOMPARE(DataFormatter::formatFileSizeGMKB(SVG_FILE_SIZE_IN_BYTES), " 0'   0'   0' 129");
     const QList<FsNodeEntry> gNode{
         FsNodeEntry{"Benchmark/a.jpg", false, validImgContents},          // bench
         FsNodeEntry{"Benchmark/aDuplicate.png", false, validImgContents}, // bench
@@ -112,10 +112,10 @@ private slots:
       QCOMPARE(model.index(2, DIColumnE::Name).data(Qt::DisplayRole).toString(), "aRedun.jpg");
       QCOMPARE(model.index(3, DIColumnE::Name).data(Qt::DisplayRole).toString(), "dEmpty.webp");
 
-      QCOMPARE(model.index(0, DIColumnE::Size).data(Qt::DisplayRole).toString(), "0'0'0'129");
-      QCOMPARE(model.index(1, DIColumnE::Size).data(Qt::DisplayRole).toString(), "0'0'0'129");
-      QCOMPARE(model.index(2, DIColumnE::Size).data(Qt::DisplayRole).toString(), "0'0'0'129");
-      QCOMPARE(model.index(3, DIColumnE::Size).data(Qt::DisplayRole).toString(), "0'0'0'0");
+      QCOMPARE(model.index(0, DIColumnE::Size).data(Qt::DisplayRole).toString(), " 0'   0'   0' 129");
+      QCOMPARE(model.index(1, DIColumnE::Size).data(Qt::DisplayRole).toString(), " 0'   0'   0' 129");
+      QCOMPARE(model.index(2, DIColumnE::Size).data(Qt::DisplayRole).toString(), " 0'   0'   0' 129");
+      QCOMPARE(model.index(3, DIColumnE::Size).data(Qt::DisplayRole).toString(), " 0'   0'   0'   0");
 
       QCOMPARE(model.index(0, DIColumnE::MD5).data(Qt::DisplayRole).toByteArray().isEmpty(), false);
       QCOMPARE(model.index(1, DIColumnE::MD5).data(Qt::DisplayRole).toByteArray().isEmpty(), false);

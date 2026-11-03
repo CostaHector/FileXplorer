@@ -1,6 +1,6 @@
 #include "RenameWidget_ConvertBoldUnicodeCharset2Ascii.h"
 #include "ConvertUnicodeCharsetToAscii.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 RenameWidget_ConvertBoldUnicodeCharset2Ascii::RenameWidget_ConvertBoldUnicodeCharset2Ascii(QWidget* parent)
   : AdvanceRenamer(parent) {}

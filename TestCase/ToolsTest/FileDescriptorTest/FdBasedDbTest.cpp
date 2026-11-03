@@ -4,7 +4,7 @@
 #include "FdBasedDb.h"
 #include "MovieDBModelField.h"
 #include "JsonHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "QuickWhereClauseHelper.h"
 #include "JsonFieldBoundary.h"
 #include "TDir.h"

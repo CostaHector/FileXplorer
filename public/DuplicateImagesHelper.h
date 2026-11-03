@@ -1,8 +1,8 @@
 #ifndef DUPLICATE_IMAGES_HELPER_H
 #define DUPLICATE_IMAGES_HELPER_H
 
+#include "PublicStringMacro.h"
 #include <QString>
-#include "PublicMacro.h"
 
 #define DUP_IMAGE_META_INFO_KEY_MAPPING \
   DUP_IMAGE_META_INFO_KEY_ITEM(Name, 0, QString, DataFormatter::formatDefault) \

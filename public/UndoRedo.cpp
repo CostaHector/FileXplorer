@@ -1,6 +1,8 @@
 ﻿#include "UndoRedo.h"
 #include "SyncModifiyFileSystem.h"
 #include "FileOperation.h"
+#include "Logger.h"
+
 using namespace FileOperatorType;
 
 UndoRedo& UndoRedo::GetInst() {

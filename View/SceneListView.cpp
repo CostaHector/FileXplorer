@@ -2,7 +2,7 @@
 #include "NotificatorMacro.h"
 #include "ScenesListModel.h"
 #include "PlayVideo.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "SceneInPageActions.h"

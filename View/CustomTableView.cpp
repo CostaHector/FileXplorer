@@ -5,7 +5,7 @@
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ViewHelper.h"
 #include "RowHeightRegistry.h"
 

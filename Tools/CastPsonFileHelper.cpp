@@ -1,6 +1,7 @@
 #include "CastPsonFileHelper.h"
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include "JsonHelper.h"
+#include <QSqlRecord>
 #include <QSqlField>
 
 namespace CastPsonFileHelper {

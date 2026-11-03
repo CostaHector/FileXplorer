@@ -3,7 +3,7 @@
 #include "VideoPlayerActions.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientation::Horizontal, parent} {
   mBasicVideoView = new (std::nothrow) BasicVideoView{bBasicMode, this};

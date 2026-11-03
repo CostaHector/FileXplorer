@@ -1,5 +1,5 @@
 #include "RenameWidget_CastElider.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NameTool.h"
 #include "Configuration.h"
 #include "RenamerKey.h"

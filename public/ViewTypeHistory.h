@@ -3,6 +3,7 @@
 
 #include <QStack>
 #include "ViewTypeTool.h"
+#include "Logger.h"
 
 class ViewTypeHistory {
  public:

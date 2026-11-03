@@ -1,7 +1,7 @@
 #include "SyncFileSystemModificationActions.h"
 #include "SyncModifiyFileSystem.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
 

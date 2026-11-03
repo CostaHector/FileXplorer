@@ -1,7 +1,6 @@
-#include "RightVideoDuplicatesDetails.h"
+#include "DuplicateVideoDetailsTable.h"
 #include "FileOperatorPub.h"
-#include "DuplicateVideosFinderActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
@@ -10,9 +9,9 @@
 #include "RenameWidget_Replace.h"
 #include <QFile>
 
-RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
+DuplicateVideoDetailsTable::DuplicateVideoDetailsTable(QWidget* parent) //
   : CustomTableView{"RightVideoDuplicatesDetails", parent} {
-  m_detailsModel = new (std::nothrow) RightVideoDuplicatesModel{this};
+  m_detailsModel = new (std::nothrow) DuplicateVideoDetailsModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_detailsModel);
 
   m_rightSortProxy = new (std::nothrow) QSortFilterProxyModel{this};
@@ -28,7 +27,7 @@ RightVideoDuplicatesDetails::RightVideoDuplicatesDetails(QWidget* parent) //
   setSortingEnabled(true);
 }
 
-bool RightVideoDuplicatesDetails::on_effectiveNameCopiedForEverything(const QModelIndex& ind) const {
+bool DuplicateVideoDetailsTable::on_effectiveNameCopiedForEverything(const QModelIndex& ind) const {
   if (!ind.isValid()) {
     return false;
   }
@@ -40,7 +39,7 @@ bool RightVideoDuplicatesDetails::on_effectiveNameCopiedForEverything(const QMod
   return FileTool::CopyTextToSystemClipboard(name);
 }
 
-bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) const {
+bool DuplicateVideoDetailsTable::on_cellDoubleClicked(const QModelIndex& ind) const {
   if (!ind.isValid()) {
     return false;
   }
@@ -55,14 +54,14 @@ bool RightVideoDuplicatesDetails::on_cellDoubleClicked(const QModelIndex& ind) c
   return FileTool::OpenLocalFileUsingDesktopService(filepath);
 }
 
-bool RightVideoDuplicatesDetails::setSharedMember(GroupedDupVidListArr* pGroupedVidsList,
+bool DuplicateVideoDetailsTable::setSharedMember(GroupedDupVidListArr* pGroupedVidsList,
                                                   DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType) {
   CHECK_NULLPTR_RETURN_FALSE(pGroupedVidsList);
   CHECK_NULLPTR_RETURN_FALSE(pCurDifferType);
   return m_detailsModel->SetSharedMemberSrc(pGroupedVidsList, pCurDifferType);
 }
 
-bool RightVideoDuplicatesDetails::on_Rename(AdvanceRenamer& renameWid) {
+bool DuplicateVideoDetailsTable::on_Rename(AdvanceRenamer& renameWid) {
   const QModelIndexList srcIndexes = selectedRowsSource();
   const int selectedCnt = srcIndexes.size();
   if (selectedCnt < 1) {
@@ -88,7 +87,7 @@ bool RightVideoDuplicatesDetails::on_Rename(AdvanceRenamer& renameWid) {
   return true;
 }
 
-bool RightVideoDuplicatesDetails::on_RecycleSelection() {
+bool DuplicateVideoDetailsTable::on_RecycleSelection() {
   const QModelIndexList srcIndexes = selectedRowsSource();
   const int selectedCnt = srcIndexes.size();
   if (selectedCnt < 1) {
@@ -98,7 +97,10 @@ bool RightVideoDuplicatesDetails::on_RecycleSelection() {
   QStringList vidsFullPath;
   vidsFullPath.reserve(selectedCnt);
   for (const QModelIndex& srcInd : srcIndexes) {
-    vidsFullPath.push_back(m_detailsModel->filePath(srcInd));
+    QString vidFullPath = m_detailsModel->filePath(srcInd);
+    if (QFile::exists(vidFullPath)) {
+      vidsFullPath.push_back(vidFullPath);
+    }
   }
 
   QString prepath;
@@ -117,17 +119,15 @@ bool RightVideoDuplicatesDetails::on_RecycleSelection() {
   return isRecycleAllSucceed;
 }
 
-int RightVideoDuplicatesDetails::onLeftVideoGroupsTableSelectionChanged(int newRow) {
+int DuplicateVideoDetailsTable::onLeftVideoGroupsTableSelectionChanged(int newRow) {
   return m_detailsModel->onChangeDetailIndex(newRow);
 }
 
-void RightVideoDuplicatesDetails::subscribe() {
-  connect(this, &QTableView::doubleClicked, this, &RightVideoDuplicatesDetails::on_cellDoubleClicked);
+void DuplicateVideoDetailsTable::subscribe() {
+  connect(this, &QTableView::doubleClicked, this, &DuplicateVideoDetailsTable::on_cellDoubleClicked);
+}
 
-  auto& inst = g_dupVidFinderAg();
-  connect(inst.RENAME_REPLACE, &QAction::triggered, this, [this]() -> void {
-    RenameWidget_Replace pReplacer;
-    on_Rename(pReplacer);
-  });
-  connect(inst.RECYCLE_SELECTIONS, &QAction::triggered, this, &RightVideoDuplicatesDetails::on_RecycleSelection);
+bool DuplicateVideoDetailsTable::on_RenameReplace() {
+  RenameWidget_Replace pReplacer;
+  return on_Rename(pReplacer);
 }

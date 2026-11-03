@@ -1,6 +1,6 @@
 #include "MultiCursorEditor.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QPainter>
 #include <QTextBlock>
 

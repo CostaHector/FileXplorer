@@ -1,6 +1,8 @@
 #ifndef MOVIEDBMODELFIELD_H
 #define MOVIEDBMODELFIELD_H
 
+#include "PublicStringMacro.h"
+
 namespace MovieDBModelField {
 enum FIELD_E {
   SampleMD5 = 0,//
@@ -31,7 +33,7 @@ enum class ScanFilesTypeE {
 
 inline const char* ScanFilesType2Str(ScanFilesTypeE scanFileType) {
   switch (scanFileType) {
-#define SCAN_FILE_TYPE_ITEM(enu, enuValue) case ScanFilesTypeE::enu: return #enu;
+#define SCAN_FILE_TYPE_ITEM(enu, enuValue) case ScanFilesTypeE::enu: return ENUM_2_STR(enu);
     SCAN_FILE_TYPE_KEY_MAPPING
 #undef SCAN_FILE_TYPE_ITEM
     default:

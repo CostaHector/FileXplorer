@@ -4,7 +4,7 @@
 #include "FileLeafAction.h"
 #include "FileTool.h"
 #include "StyleSheet.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 #include <QIcon>
 #include <QPushButton>

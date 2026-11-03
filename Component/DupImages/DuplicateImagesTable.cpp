@@ -1,10 +1,8 @@
 #include "DuplicateImagesTable.h"
 #include "RedundantImageFinderActions.h"
-#include "RedunImgFinderKey.h"
-#include "PathTool.h"
-#include "Configuration.h"
 #include "FileTool.h"
 #include "UndoRedo.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 
 #include <QHeaderView>

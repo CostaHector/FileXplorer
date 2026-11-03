@@ -28,7 +28,7 @@ private slots:
     QVERIFY(htmlSource.contains(prePathLeft));
     QVERIFY(htmlSource.contains(prePathRight));
     QVERIFY(htmlSource.contains(name));
-    QVERIFY(htmlSource.contains("0'0'1'0"));
+    QVERIFY(htmlSource.contains(" 0'   0'   1'   0"));
     QVERIFY(htmlSource.contains("SampleMD5"));
     QVERIFY(htmlSource.contains(sampleMd5));
     QVERIFY(htmlSource.contains("Detail"));
