@@ -1,7 +1,7 @@
 ﻿#include "RibbonCastDB.h"
 #include "CastDBActions.h"
 #include "ViewActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
 

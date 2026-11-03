@@ -1,7 +1,7 @@
 #include "QuickWhereClauseHelper.h"
 #include "StringTool.h"
 #include "MovieDBModelField.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PathTool.h"
 #include <QSet>
 #include <QSqlQuery>

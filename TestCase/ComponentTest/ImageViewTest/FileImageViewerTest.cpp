@@ -10,7 +10,6 @@
 #include "ImageTool.h"
 #include "ImageViewerActions.h"
 #include "MouseKeyboardEventHelper.h"
-#include "ImageTestPrecoditionTools.h"
 
 #include "FileTool.h"
 #include <QScrollBar>
@@ -22,7 +21,7 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-using namespace MouseKeyboardEventHelper;
+    using namespace MouseKeyboardEventHelper;
 
 class FileImageViewerTest : public PlainTestSuite {
   Q_OBJECT
@@ -178,8 +177,8 @@ private slots:
     viewer._COPY_FILE_NAME->triggered();
   }
 
-  void keyPressEvent_ok() {
-    FileImageViewer viewer{"ThumbnailImageViewer_keyPressEvent_ok"};
+  void keyPressEvent_view_center_ok() {
+    FileImageViewer viewer{"ThumbnailImageViewer_keyPressEvent_view_center_ok"};
     QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, pngName));
 
     QKeyEvent ignoredKey{QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier};
@@ -199,6 +198,8 @@ private slots:
     hScroll->setValue(0);
     vScroll->setValue(0);
 
+    // 可见时方向键控制中心, 不可见时控制上/下一个图片访问
+    MOCKER(FileImageViewer::isScrollBarAvailNow).stubs().will(returnValue(true));
     // right direction ok
     int beforeHorValue{hScroll->value()}, beforeVerValue{vScroll->value()};
     QKeyEvent rightKey{QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier};
@@ -223,6 +224,42 @@ private slots:
     viewer.keyPressEvent(&upKey);
     QCOMPARE(upKey.isAccepted(), true);
     QCOMPARE(vScroll->value(), 0);
+  }
+
+  void keyPressEvent_prev_next_image_ok() {
+    FileImageViewer viewer{"ThumbnailImageViewer_keyPressEvent_prev_next_image_ok"};
+    QVERIFY(viewer.setPixmapByAbsFilePath(parentPath, pngName));
+
+    QSignalSpy reqPreviousImageSpy{&viewer, &ImageViewer::reqPreviousImage};
+    QSignalSpy reqNextImageSpy{&viewer, &ImageViewer::reqNextImage};
+
+    // 可见时方向键控制中心, 不可见时控制上/下一个图片访问
+    MOCKER(FileImageViewer::isScrollBarAvailNow).stubs().will(returnValue(false));
+    // right direction ok
+    QKeyEvent rightKey{QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier};
+    viewer.keyPressEvent(&rightKey);
+    QCOMPARE(rightKey.isAccepted(), true);
+    QCOMPARE(reqNextImageSpy.count(), 1);
+    reqNextImageSpy.clear();
+
+    // down direction ok
+    QKeyEvent downKey{QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier};
+    viewer.keyPressEvent(&downKey);
+    QCOMPARE(reqPreviousImageSpy.count(), 0);
+    QCOMPARE(reqNextImageSpy.count(), 0);
+
+    // left direction ok
+    QKeyEvent leftKey{QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier};
+    viewer.keyPressEvent(&leftKey);
+    QCOMPARE(leftKey.isAccepted(), true);
+    QCOMPARE(reqPreviousImageSpy.count(), 1);
+    reqPreviousImageSpy.clear();
+
+    // up direction ok
+    QKeyEvent upKey{QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier};
+    viewer.keyPressEvent(&upKey);
+    QCOMPARE(reqPreviousImageSpy.count(), 0);
+    QCOMPARE(reqNextImageSpy.count(), 0);
   }
 
   void getDestSize_ok() {

@@ -1,7 +1,7 @@
 #ifndef PWDPUBLICVARIABLE_H
 #define PWDPUBLICVARIABLE_H
 
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #define PWD_TABLE_TYPES_ENUM_VALUE_MAPPING \
   PWD_TABLE_TYPES_ITEM(INDEX, 0)           \
   PWD_TABLE_TYPES_ITEM(TYPE, 1)            \

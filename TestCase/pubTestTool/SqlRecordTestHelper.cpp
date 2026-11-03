@@ -1,6 +1,6 @@
 #include "SqlRecordTestHelper.h"
 #include "CastPsonFileHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "MovieDBModelField.h"
 #include "FdBasedDb.h"
 #include "PathTool.h"

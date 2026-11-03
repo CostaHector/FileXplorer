@@ -1,7 +1,9 @@
 #include "ScenePageControl.h"
 #include "SceneKey.h"
 #include "Configuration.h"
+#include "PublicCheckMacro.h"
 #include "ImageTool.h"
+
 #include <QFormLayout>
 #include <QIntValidator>
 #include <QLabel>

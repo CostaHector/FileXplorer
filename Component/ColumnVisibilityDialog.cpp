@@ -1,5 +1,5 @@
 #include "ColumnVisibilityDialog.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include <QLabel>
 #include <QAction>

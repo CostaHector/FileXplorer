@@ -1,5 +1,5 @@
 #include "MultiParView.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "FileTool.h"
 #include <QMessageBox>

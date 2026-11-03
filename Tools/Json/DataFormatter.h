@@ -1,9 +1,9 @@
 #ifndef DATAFORMATTER_H
 #define DATAFORMATTER_H
 
-#include <QVariant>
 #include <QString>
-#include <QVector>
+class QVariant;
+class QJsonObject;
 
 enum class Gender : int {
   male = 0,
@@ -73,23 +73,27 @@ inline QString formatFileSizeGMKB(const qint64 total) {
   static constexpr qint64 MiB = 1 << 20;
   static constexpr qint64 KiB = 1 << 10;
 
-  const qint64 xGiB = total >> 30;
+  const int xGiB = total >> 30;
   const qint64 remGiB = total & (GiB - 1);
 
-  const qint64 xMiB = remGiB >> 20;
+  const int xMiB = remGiB >> 20;
   const qint64 remMiB = remGiB & (MiB - 1);
 
-  const qint64 xkiB = remMiB >> 10;
-  const qint64 xB = remMiB & (KiB - 1);
-
-  static const QString FILE_SIZE_GMKB_TEMPLATE{"%1'%2'%3'%4"};
-  return FILE_SIZE_GMKB_TEMPLATE.arg(xGiB).arg(xMiB).arg(xkiB).arg(xB);
+  const int xkiB = remMiB >> 10;
+  const int xB = remMiB & (KiB - 1);
+  return QString::asprintf("%2d'%4d'%4d'%4d", xGiB, xMiB, xkiB, xB);
+}
+inline QString formatFileSizeGMKBPreWrapped(const qint64 total) {
+  return "<pre>" + formatFileSizeGMKB(total) + "</pre>";
 }
 inline QString formatFileSizeWithBytes(const qint64 total) {
   const QString FILE_SIZE_DETAIL_TEMPLATE{"%1 (%2 Bytes)"};
   return FILE_SIZE_DETAIL_TEMPLATE.arg(formatFileSizeGMKB(total)).arg(total);
 }
-
+inline QString formatFileSizeWithBytesPreWrapped(const qint64 total) {
+  const QString FILE_SIZE_DETAIL_TEMPLATE{"%1 (%2 Bytes)"};
+  return FILE_SIZE_DETAIL_TEMPLATE.arg(formatFileSizeGMKBPreWrapped(total)).arg(total);
+}
 qint64 formatDateToEfuFileTime(const qint64 ms);
 
 QString formatDateIsoMs(const qint64 ms);

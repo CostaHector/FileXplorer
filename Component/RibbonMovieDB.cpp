@@ -4,7 +4,7 @@
 #include "ViewActions.h"
 #include "ImageTool.h"
 #include "StyleSheet.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
     : QToolBar{title, parent}                                        //

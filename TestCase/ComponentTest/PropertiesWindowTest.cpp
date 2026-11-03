@@ -139,7 +139,9 @@ class PropertiesWindowTest : public PlainTestSuite {
     QVERIFY(propWindow(fileSizes, videoDurations));
     QString html = propWindow.m_propertiesInfoTextEdit->toHtml();
     QVERIFY(html.contains("3 file(s) durations: 00:01:40"));
-    QVERIFY(html.contains("3 file(s) sizes: 0'1'1'1"));
+    QVERIFY(html.contains("3 file(s) sizes:"));
+    QVERIFY(html.contains(" 0'   1'   1'   1")); // " 0'   1'   1'   1"
+    QVERIFY(html.contains("(1049601 Bytes)"));
   }
 
   void md5_display_ok() {

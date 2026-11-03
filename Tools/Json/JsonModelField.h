@@ -1,6 +1,7 @@
 #ifndef JSONMODELFIELD_H
 #define JSONMODELFIELD_H
-#include "PublicMacro.h"
+
+#include "PublicStringMacro.h"
 #include <QString>
 #include <QVariant>
 

@@ -1,7 +1,7 @@
 #include "BasicVideoView.h"
 #include "DataFormatter.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "FileTool.h"
 #include "RateHelper.h"

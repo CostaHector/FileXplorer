@@ -2,54 +2,58 @@
 #define DUPLICATEVIDEOSFINDER_H
 
 #include "DuplicateVideosMetaInfoTable.h"
-#include "LeftVideoGroupsTable.h"
-#include "RightVideoDuplicatesDetails.h"
+#include "DuplicateVideoGroupsTable.h"
+#include "DuplicateVideoDetailsTable.h"
 #include "DuplicateVideosHelper.h"
 #include <QMainWindow>
 #include <QSplitter>
 #include <QToolBar>
 #include <QLineEdit>
 
+class QComboBox;
+
 class DuplicateVideosFinder : public QMainWindow {
   Q_OBJECT
  public:
   explicit DuplicateVideosFinder(QWidget* parent = nullptr);
-
   void onAnalyzeDuplicatesInVideosList(const DupVidMetaInfoList& needAnalyzeVidLst);
-  void onDifferTypeChanged(QAction* newDifferAct);
   void onChangeSizeDeviation();
   void onChangeDurationDeviation();
+
+protected:
+  void showEvent(QShowEvent* event) override;
+  void closeEvent(QCloseEvent* event) override;
+  void keyPressEvent(QKeyEvent* e) override;
+
+ private:
+  void onDifferTypeChanged(const int grpByIndex);
+  void invalidateLeftGrpTblData();
+  void subscribe();
 
   void UpdateWindowsTitleGroupInfo(const QString& dupVidGroupInfoTitle);
   void UpdateWindowsTitleMetaInfo(const QString& dupVidTblMetaInfoTitle);
   void UpdateWindowsTitle();
-  void updateWindowsSize();
+  void ReadSettings();
 
-  void showEvent(QShowEvent* event) override;
-  void closeEvent(QCloseEvent* event) override;
-
-  void keyPressEvent(QKeyEvent* e) override;
-
-  bool operator()(const QString& /**/) { return true; }
-
- private:
-  void invalidateLeftGrpTblData();
-  void subscribe();
-
-  QLineEdit* tableNameFilterLE = nullptr;
-  QLineEdit* durationDevLE = nullptr;
-  QLineEdit* sizeDevLE = nullptr;
   QToolBar* m_tb{nullptr};
-  DuplicateVideosMetaInfoTable* m_aiTables{nullptr};
+  QComboBox* m_GroupByCB{nullptr};
+  QLineEdit* durationDevLE{nullptr};
+  QLineEdit* sizeDevLE{nullptr};
+  QLineEdit* tableNameFilterLE{nullptr};
+  QAction* m_RecycleSelections{nullptr};
+  QAction* m_RenameSelectionsReplace{nullptr};
 
-  LeftVideoGroupsTable* m_leftGrpsTbl{nullptr};
-  RightVideoDuplicatesDetails* m_rightDetailsTbl{nullptr};
+  DuplicateVideosMetaInfoTable* m_leftTables{nullptr};
+  DuplicateVideoGroupsTable* m_RightGrpsTbl{nullptr};
+  DuplicateVideoDetailsTable* m_bottomDetailsTbl{nullptr};
 
-  QSplitter* m_detail_left_right{nullptr};
-  QSplitter* m_tbl_detail_ver{nullptr};
+  QSplitter* m_tables_group_LR_splitter{nullptr};
+  QSplitter* m_tables_detail_UD_splitter{nullptr};
 
   QString mTitleGrpInto;
   QString mTitleMetaInfo;
+
+  bool m_geometryRestoredOnce{false};
 };
 
 #endif  // DUPLICATEVIDEOSFINDER_H

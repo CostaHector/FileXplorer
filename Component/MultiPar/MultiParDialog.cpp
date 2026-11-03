@@ -1,5 +1,5 @@
 #include "MultiParDialog.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "MultiPar2Actions.h"
 #include <QLineEdit>
 #include <QAction>

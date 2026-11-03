@@ -1,6 +1,6 @@
 #include "CopyStringListToClipboard.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QApplication>
 #include <QClipboard>
 

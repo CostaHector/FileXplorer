@@ -8,7 +8,7 @@
 #include "JsonRenameRegex.h"
 #include "SystemPath.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "StringTool.h"
 #include "ImageTool.h"

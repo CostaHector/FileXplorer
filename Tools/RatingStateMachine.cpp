@@ -4,7 +4,7 @@
 #include "SceneInfo.h"
 #include "RateHelper.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 RatingStateMachine::RatingStateMachine() {
   mTransitionTable[(int)RatingState::IDLE][(int)RatingAction::CLICK_SAME_ONE_RATE_BAR_AGAIN] = &RatingStateMachine::PlaceHolderTransit;

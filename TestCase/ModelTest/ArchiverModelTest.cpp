@@ -57,14 +57,14 @@ class ArchiverModelTest : public PlainTestSuite {
     QCOMPARE(model.columnCount(), 3);
 
     QStringList originSizeExpects{
-        "0'0'2'0",  //
-        "0'0'4'0",  //
-        "0'0'8'0",  //
+        " 0'   0'   2'   0",  //
+        " 0'   0'   4'   0",  //
+        " 0'   0'   8'   0",  //
     };
     QStringList compressedSizeExpects{
-        "0'0'1'0",  //
-        "0'0'2'0",  //
-        "0'0'4'0",  //
+        " 0'   0'   1'   0",  //
+        " 0'   0'   2'   0",  //
+        " 0'   0'   4'   0",  //
     };
 
     // 验证数据获取

@@ -1,21 +1,22 @@
-#ifndef LEFTVIDEOGROUPSTABLE_H
-#define LEFTVIDEOGROUPSTABLE_H
+#ifndef DUPLICATEVIDEOGROUPSTABLE_H
+#define DUPLICATEVIDEOGROUPSTABLE_H
 
 #include "CustomTableView.h"
 #include "DuplicateVideosHelper.h"
-#include "LeftVideoGroupsModel.h"
+#include "DuplicateVideoGroupsModel.h"
 #include <QSortFilterProxyModel>
 
-class LeftVideoGroupsTable : public CustomTableView {
+class DuplicateVideoGroupsTable : public CustomTableView {
   Q_OBJECT
  public:
   friend class DuplicateVideosFinder;
-  explicit LeftVideoGroupsTable(QWidget* parent = nullptr);
+  explicit DuplicateVideoGroupsTable(QWidget* parent = nullptr);
   const QString GetCurrentDupVideoGroupInfo() const;
 
+  void initGroupMember(DuplicateVideoDetectionCriteria::DVCriteriaE newDifferType, qint64 newSize, int newDuration);
   void setDifferType(const DuplicateVideoDetectionCriteria::DVCriteriaE& newDifferType);
-  void setDeviationDuration(int newDuration);
   void setDeviationSize(qint64 newSize);
+  void setDeviationDuration(int newDuration);
   int GetCurSrcIndexRow(const QItemSelection& selected) const;
 
  signals:
@@ -27,8 +28,8 @@ class LeftVideoGroupsTable : public CustomTableView {
 
  private:
   void subscribe();
-  LeftVideoGroupsModel* m_leftGrpModel{nullptr};
+  DuplicateVideoGroupsModel* m_leftGrpModel{nullptr};
   QSortFilterProxyModel* m_leftSortProxy{nullptr};
 };
 
-#endif  // LEFTVIDEOGROUPSTABLE_H
+#endif  // DUPLICATEVIDEOGROUPSTABLE_H

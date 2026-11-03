@@ -1,10 +1,10 @@
-#ifndef RIGHTVIDEODUPLICATESMODEL_H
-#define RIGHTVIDEODUPLICATESMODEL_H
+#ifndef DUPLICATEVIDEODETAILSMODEL_H
+#define DUPLICATEVIDEODETAILSMODEL_H
 
 #include "QAbstractTableModelPub.h"
 #include "DuplicateVideosHelper.h"
 
-class RightVideoDuplicatesModel : public QAbstractTableModelPub {
+class DuplicateVideoDetailsModel : public QAbstractTableModelPub {
  public:
   using QAbstractTableModelPub::QAbstractTableModelPub;
 
@@ -37,4 +37,4 @@ class RightVideoDuplicatesModel : public QAbstractTableModelPub {
   const GroupedDupVidListArr* _pGroupedVidsList{nullptr};
 };
 
-#endif  // RIGHTVIDEODUPLICATESMODEL_H
+#endif  // DUPLICATEVIDEODETAILSMODEL_H

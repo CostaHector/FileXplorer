@@ -7,7 +7,7 @@
 #include "JsonModelField.h"
 #include "JsonHelper.h"
 #include "JsonPr.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 using namespace JsonHelper;
 using namespace JsonModelField;

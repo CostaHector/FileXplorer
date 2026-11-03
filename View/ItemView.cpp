@@ -1,5 +1,5 @@
 #include "ItemView.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"

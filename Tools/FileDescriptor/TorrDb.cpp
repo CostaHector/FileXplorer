@@ -1,5 +1,5 @@
 #include "TorrDb.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "TorrentDBModelField.h"
 
 using namespace TorrentDBModelField;

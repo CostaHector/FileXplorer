@@ -1,6 +1,8 @@
 ﻿#include "RedundantFolderRemove.h"
 #include "PublicVariable.h"
 #include "UndoRedo.h"
+#include "Logger.h"
+
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>

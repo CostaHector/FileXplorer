@@ -380,12 +380,6 @@ bool MovieWallServer::PostApiSetRootPath(const httplib::Request& req, httplib::R
   }
 
   const QString path = doc.object().value("path").toString();
-  if (path.isEmpty()) {
-    res.status = 400;
-    res.set_content(R"({"ok":false,"error":"empty path"})", "application/json");
-    return false;
-  }
-
   const bool changed = invokeOnMainThread([this, path]() {
     return setRootPath(path);
   });

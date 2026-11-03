@@ -2,7 +2,7 @@
 #include "MenuToolButton.h"
 #include "StyleSheet.h"
 #include "SceneInfo.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "VideoTierTool.h"
 #include <QToolBar>
 

@@ -1,5 +1,5 @@
 ﻿#include "ActionsSearcher.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ActionsRecorder.h"
 #include <QCompleter>
 #include <QLayout>

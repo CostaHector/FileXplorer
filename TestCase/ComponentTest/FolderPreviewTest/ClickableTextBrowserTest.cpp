@@ -227,13 +227,12 @@ private slots:
       const QString htmlContentWhenSearchReturn2Lines = browser.toPlainText();
       QVERIFY(htmlContentWhenSearchReturn2Lines != initalPlainTextContent);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.count(textWhenNothing), 2);  // result is append to current contens
-
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0' 999"), true); // " 0'   0'   0' 999"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0'   1"), true); // " 0'   0'   0'   1"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
     }
   }
@@ -289,11 +288,11 @@ private slots:
       QCOMPARE(htmlContentWhenSearchReturn2Lines.count(textWhenNothing), 2);  // result is append to current contens
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0' 999"), true); // " 0'   0'   0' 999"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0'   1"), true); // " 0'   0'   0'   1"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
     }
   }
@@ -338,13 +337,12 @@ private slots:
       const QString htmlContentWhenSearchReturn2Lines = browser.toPlainText();
       QVERIFY(htmlContentWhenSearchReturn2Lines != initalPlainTextContent);
       QCOMPARE(htmlContentWhenSearchReturn2Lines.count("Not in database"), 2);  // result is append to current contens
-
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A long description Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'999"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0' 999"), true); // " 0'   0'   0' 999"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/"), true);
 
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("A reference to Hello world.mp4"), true);
-      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("0'0'0'1"), true);
+      QCOMPARE(htmlContentWhenSearchReturn2Lines.contains(" 0'   0'   0'   1"), true); // " 0'   0'   0'   1"
       QCOMPARE(htmlContentWhenSearchReturn2Lines.contains("/home/to/reference/"), true);
     }
   }
@@ -403,7 +401,10 @@ private slots:
     QCOMPARE(browser.mCastImagesVisisble, true);
     QCOMPARE(browser.toPlainText(), "bodyvidTitle▼vidListStrimgTitle▼imgListStr");
 
-    const QString expectCopyContents{"/home/to/file1.mp4\t0'0'0'999\t00:00:00.000\t"};
+    const QString expectCopyContents{"/home/to/file1.mp4\t"
+                                     " 0'   0'   0' 999\t" // " 0'   0'   0' 999"
+                                     "00:00:00.000\t"
+                                     ""};
     const QString base64UrlPath = DetailBrowserHelper::ToBase64Url(expectCopyContents);
     QUrl copySchemaAndPathLink{QString{UrlAnchorTemplate::COPY_LINE_URL}.arg(base64UrlPath)};
     MOCKER(FileTool::CopyTextToSystemClipboard).expects(exactly(1)).with(expectCopyContents, true).will(returnValue(true));

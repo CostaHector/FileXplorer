@@ -1,5 +1,6 @@
 #include "ModelFilterActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
+#include "PublicStringMacro.h"
 #include "BehaviorKey.h"
 #include "SearchKey.h"
 #include "Configuration.h"

@@ -60,8 +60,6 @@ class DuplicateVideosMetaInfoModelTest : public PlainTestSuite {
     QModelIndex index0 = model.index(0, 0);
     QCOMPARE(model.data(index0).toString(), QString("table1"));
     QVERIFY(model.data(index0, Qt::ItemDataRole::UserRole).isNull());
-    // return QIcon and the resource image not in test project
-    QCOMPARE(model.data(index0, Qt::ItemDataRole::DecorationRole).isNull(), false);
 
     QModelIndex index1 = model.index(1, 1);
     QCOMPARE(model.data(index1).toInt(), 20);

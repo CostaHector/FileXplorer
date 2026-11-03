@@ -1,5 +1,5 @@
 ﻿#include "FileSystemListView.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "FileOpActs.h"
 #include "RenameActions.h"
 #include "RightClickMenuActions.h"

@@ -1,5 +1,5 @@
 #include "RightClickMenuActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 RightClickMenuActions::RightClickMenuActions(QObject* parent)  //
   : QObject{parent}                                          //

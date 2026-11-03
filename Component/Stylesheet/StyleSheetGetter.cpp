@@ -1,5 +1,5 @@
 #include "StyleSheetGetter.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 #include <unordered_set>
 

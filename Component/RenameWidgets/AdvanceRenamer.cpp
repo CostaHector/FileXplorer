@@ -5,7 +5,7 @@
 #include "PathTool.h"
 #include "FileOsWalker.h"
 #include "UndoRedo.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include "NotificatorMacro.h"
 #include "RenameNamesUnique.h"
@@ -27,8 +27,8 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
   : QDialog{parent} {
   m_nameExtIndependent = new (std::nothrow) QCheckBox{tr("Name Ext Independent"), this};
   CHECK_NULLPTR_RETURN_VOID(m_nameExtIndependent)
-  m_nameExtIndependent->setToolTip("Show file base name and extension respectively.\n"
-                                   "So rename rules will work/or not work on extension");
+  m_nameExtIndependent->setToolTip("Display the base name and extension in separate columns.\n"
+                                   "Rename rules apply to base name column only.");
 
   m_recursiveCB = new (std::nothrow) QCheckBox{tr("Recursive"), this};
   CHECK_NULLPTR_RETURN_VOID(m_recursiveCB)
@@ -37,39 +37,46 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
 
   regexValidLabel = new (std::nothrow) StateLabel{tr("Regex expression state"), this};
   CHECK_NULLPTR_RETURN_VOID(regexValidLabel)
-  regexValidLabel->setVisible(false);
 
   m_mainLayout = new (std::nothrow) QVBoxLayout{this};
   CHECK_NULLPTR_RETURN_VOID(m_mainLayout);
 
-  ReadSettings();
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 }
 
 void AdvanceRenamer::showEvent(QShowEvent* event) {
+  if (!m_geometryRestoredOnce) {
+    ReadSettings();
+  }
   StyleSheet::UpdateTitleBar(this);
   QDialog::showEvent(event);
 }
 
-#include <QApplication>
-#include <QScreen>
-bool NeedSaveCurrentGeometry(const QWidget& w) {
-  const QScreen* pScreen = w.screen();
-  return pScreen != nullptr && pScreen->availableGeometry().contains(w.geometry());
-}
-
 void AdvanceRenamer::closeEvent(QCloseEvent* event) {
-  if (NeedSaveCurrentGeometry(*this)) {
-    Configuration().setValue("Geometry/ADVANCE_RENAMER", saveGeometry());
-  }
+  saveDialogGeometry();
   QDialog::closeEvent(event);
 }
 
+void AdvanceRenamer::reject() {
+  saveDialogGeometry();
+  QDialog::reject();
+}
+
+void AdvanceRenamer::saveDialogGeometry() {
+  QByteArray newDialogGeometry = saveGeometry();
+  if (newDialogGeometry != m_dialogGeometry) {
+    Configuration().setValue("Geometry/ADVANCE_RENAMER", newDialogGeometry);
+    m_dialogGeometry.swap(newDialogGeometry);
+  }
+}
+
 void AdvanceRenamer::ReadSettings() {
-  if (Configuration().contains("Geometry/ADVANCE_RENAMER")) {
-    restoreGeometry(Configuration().value("Geometry/ADVANCE_RENAMER").toByteArray());
-  } else {
+  m_geometryRestoredOnce = true;
+  m_dialogGeometry = Configuration().value("Geometry/ADVANCE_RENAMER").toByteArray();
+  if (m_dialogGeometry.isEmpty()) {
     setGeometry(SizeTool::DEFAULT_GEOMETRY);
+  } else {
+    restoreGeometry(m_dialogGeometry);
   }
 }
 
@@ -201,9 +208,9 @@ void AdvanceRenamer::Subscribe() {
 }
 
 bool AdvanceRenamer::onApply(const bool isOnlyHelp) {
-  const QStringList relNameList = m_relNameTE->toPlainText().split(NAME_SEP);
-  const QStringList oldCompleteNameList = m_oBaseTE->toPlainText().split(NAME_SEP);
-  const QStringList oldSuffixList = m_oExtTE->toPlainText().split(NAME_SEP);
+  const QStringList& relNameList = mRelToNameWithNoRoot;
+  const QStringList& oldCompleteNameList = mNames;
+  const QStringList& oldSuffixList = mExts;
 
   const QStringList newCompleteNameList = m_nBaseTE->toPlainText().split(NAME_SEP);
   const QStringList newSuffixList = m_nExtTE->toPlainText().split(NAME_SEP);
@@ -270,12 +277,16 @@ void AdvanceRenamer::setNewBaseNames(const QStringList& newBaseNames) {
   m_nBaseTE->setPlainText(newBaseNames.join(NAME_SEP));
 }
 
+void AdvanceRenamer::setNewDotExts(const QStringList& dotExts) {
+  m_nExtTE->setPlainText(dotExts.join(NAME_SEP));
+}
+
 void AdvanceRenamer::UpdateNameAndExt() {
-  const QString& suffixs = mExts.join(NAME_SEP);
+  const QString suffixs = mExts.join(NAME_SEP);
   m_oBaseTE->setPlainText(mNames.join(NAME_SEP));
   m_oExtTE->setPlainText(suffixs);
 
-  const auto& newCompleteNames = RenameCore(mNames);
+  const QStringList newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
   m_nExtTE->setPlainText(suffixs);
 }
@@ -304,7 +315,7 @@ void AdvanceRenamer::InitTextEditContent(const QString& workPath, const QStringL
 void AdvanceRenamer::OnlyTriggerRenameCore() {
   // will not call OSWalker; only update complete name;
   setWindowTitle(windowTitleFormat.arg(mNames.size()).arg(mWorkPath));
-  const auto& newCompleteNames = RenameCore(mNames);
+  const QStringList newCompleteNames = RenameCore(mNames);
   setNewBaseNames(newCompleteNames);
 }
 

@@ -13,7 +13,7 @@
 #include <QUuid>
 #include <QSet>
 #include <QVariant>
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "VidDupTabFields.h"
 
 using namespace VidDupHelper;

@@ -2,7 +2,7 @@
 #include "RateActions.h"
 #include "DualIconCheckableAction.h"
 #include "VideoPlayerActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "PathTool.h"
 #include "SystemPath.h"

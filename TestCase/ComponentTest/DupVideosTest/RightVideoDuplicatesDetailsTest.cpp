@@ -4,10 +4,9 @@
 #include "TDir.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "RightVideoDuplicatesDetails.h"
+#include "DuplicateVideoDetailsTable.h"
 #include "EndToExposePrivateMember.h"
 #include "FileTool.h"
-#include "DuplicateVideosFinderActions.h"
 #include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
@@ -39,7 +38,7 @@ private slots:
   }
 
   void default_construct_ok() {
-    RightVideoDuplicatesDetails rvdd;
+    DuplicateVideoDetailsTable rvdd;
     QVERIFY(rvdd.m_detailsModel != nullptr);
     QVERIFY(rvdd.m_rightSortProxy != nullptr);
     QCOMPARE(rvdd.isSortingEnabled(), true);
@@ -54,7 +53,8 @@ private slots:
     QCOMPARE(rvdd.on_effectiveNameCopiedForEverything(invalidIndex), false);
 
     // nothing selected
-    QCOMPARE(rvdd.onRecycleSelection(), false);
+    QCOMPARE(rvdd.on_RecycleSelection(), false);
+    QCOMPARE(rvdd.on_RenameReplace(), false);
   }
 
   void copy_to_clipboard_and_recycle_selection_ok() {
@@ -71,7 +71,7 @@ private slots:
 
     DuplicateVideoDetectionCriteria::DVCriteriaE differBy = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
 
-    RightVideoDuplicatesDetails rvdd;
+    DuplicateVideoDetailsTable rvdd;
     QCOMPARE(rvdd.setSharedMember(&groupedVidsLists, &differBy), true);
 
     QCOMPARE(rvdd.m_detailsModel->rowCount(), 0);
@@ -116,13 +116,13 @@ private slots:
       QVERIFY(!rvdd.selectionModel()->hasSelection());
       const QStringList beforeNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"})); // ascii(' ') less than ascii('.')
-      emit g_dupVidFinderAg().RECYCLE_SELECTIONS->triggered();
+      QVERIFY(!rvdd.on_RecycleSelection()); // no row selected
       const QStringList nothingSelectedRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QCOMPARE(nothingSelectedRecyleNames, beforeNames);
 
       // 3.1 recycle when all rows selected
       rvdd.selectAll();
-      emit g_dupVidFinderAg().RECYCLE_SELECTIONS->triggered();
+      QVERIFY(rvdd.on_RecycleSelection());
       const QStringList afterSelectedAllRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
       QVERIFY(afterSelectedAllRecyleNames.isEmpty());
     }

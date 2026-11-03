@@ -3,7 +3,7 @@
 
 
 #include "BeginToExposePrivateMember.h"
-#include "RightVideoDuplicatesModel.h"
+#include "DuplicateVideoDetailsModel.h"
 #include "EndToExposePrivateMember.h"
 
 #include <QDir>
@@ -56,7 +56,7 @@ class RightVideoDuplicatesModelTest : public PlainTestSuite {
 public:
 private slots:
   void default_construct_ok() {
-    RightVideoDuplicatesModel model;
+    DuplicateVideoDetailsModel model;
     QCOMPARE(model.rowCount(), 0);
     QCOMPARE(model.columnCount(), DuplicateVideoMetaInfo::DV_TABLE_HEADERS_COUNT);
     QCOMPARE(model.getLeftSelectedRow(), INVALID_LEFT_SELECTED_ROW);
@@ -81,7 +81,7 @@ private slots:
     createTestData(testData);
     DuplicateVideoDetectionCriteria::DVCriteriaE differ = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
 
-    RightVideoDuplicatesModel model;
+    DuplicateVideoDetailsModel model;
     model.SetSharedMemberSrc(&testData, &differ);
     QCOMPARE(model._pGroupedVidsList, &testData);
     QCOMPARE(model._pCurrentDiffer, &differ);
@@ -124,7 +124,7 @@ private slots:
     QCOMPARE(model.data(QModelIndex{}).isNull(), true);
 
     QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Name)).toString(), "sz - v1.mp4");
-    QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Size)).toString(), "0'0'0'1000");       // 1000Bytes
+    QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Size)).toString(), " 0'   0'   0'1000");       // 1000Bytes
     QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Duration)).toString(), "00:00:04.000"); // 4000ms
     QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::ModifiedDate)).toDateTime().isNull(), false);
     QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Hash)).toString(), ""); // calculate md5 instantly, but file not exist
@@ -190,7 +190,7 @@ private slots:
     createTestData(testData);
 
     DuplicateVideoDetectionCriteria::DVCriteriaE differ = DuplicateVideoDetectionCriteria::DVCriteriaE::DURATION;
-    RightVideoDuplicatesModel model;
+    DuplicateVideoDetailsModel model;
     model.SetSharedMemberSrc(&testData, &differ);
     // each detail contains 4,3 elements respectively
 

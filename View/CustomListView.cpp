@@ -4,7 +4,7 @@
 #include "ImageTool.h"
 #include "NotificatorMacro.h"
 #include "ViewHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Bool2QtEnum.h"
 
 #include <QActionGroup>

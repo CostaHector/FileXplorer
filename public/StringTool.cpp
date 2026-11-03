@@ -2,6 +2,7 @@
 #include <QRegularExpression>
 #include <QFile>
 #include <QSet>
+#include <QCache>
 
 namespace StringTool{
 const QRegularExpression IMG_VID_SEP_COMP{"\\||\r\n|\n"};
@@ -146,4 +147,17 @@ QByteArray EscapeCsv(const QString &value) {
   return escaped;
 }
 
+QRegularExpression GetRegularExpression(const QString& targetStr) {
+  static QCache<QString, const QRegularExpression> exprCache(100);
+  const QRegularExpression* pExpr = exprCache[targetStr];
+  if (pExpr != nullptr) {
+    return *pExpr;
+  }
+  pExpr = new (std::nothrow) QRegularExpression(targetStr);
+  if (pExpr == nullptr) {
+    return {};
+  }
+  exprCache.insert(targetStr, pExpr);
+  return *pExpr;
+}
 }

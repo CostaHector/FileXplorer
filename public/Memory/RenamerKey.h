@@ -61,6 +61,7 @@ constexpr KV INSERT_INDEXES_LIST{"RenamerKey/INSERT_INDEXES_LIST", //
                                  GeneralCStrChecker};
 constexpr KV CHOP_POSTFIX_ENABLED{"RenamerKey/CHOP_POSTFIX", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 constexpr KV ARRANGE_SECTION_INDEX{"RenamerKey/ARRANGE_SECTION_INDEX", Var{"1,2"}, GeneralDataType::Type::PLAIN_STR, GeneralCStrChecker};
+constexpr KV REPLACE_CASE_SENSITIVE{"RenamerKey/REPLACE_CASE_SENSITIVE", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 constexpr KV REGEX_ENABLED{"RenamerKey/REGEX_ENABLED", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 
 constexpr KV NUMERIAZER_UNIQUE_EXT_COUNTER{"RenamerKey/NUMERIAZER_UNIQUE_EXT_COUNTER", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
@@ -76,6 +77,9 @@ constexpr KV NUMERIAZER_NO_FORMAT_DEFAULT_INDEX{"RenamerKey/NUMERIAZER_NO_FORMAT
 constexpr KV JSON_BASENAME_DEFAULT_MAX_LENGTH{"RenamerKey/JSON_BASENAME_DEFAULT_MAX_LENGTH", Var{240}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<0, 255>};
 
 constexpr KV OPEN_SOURCE_ON_DOUBLE_CLICK_SW{"RenamerKey/OPEN_SOURCE_ON_DOUBLE_CLICK_SW", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
+
+constexpr KV NAME_CASE_CHECKED_INDEX{"RenamerKey/NAME_CASE_CHECKED_INDEX", Var{-1}, GeneralDataType::Type::RANGE_INT, GeneralIntRangeChecker<-1, 16>};
+constexpr KV NAME_CASE_LOWER_CASE_FILE_EXTENSION{"RenamerKey/NAME_CASE_LOWER_CASE_FILE_EXTENSION", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 } // namespace RenamerKey
 
 #endif // RENAMERKEY_H

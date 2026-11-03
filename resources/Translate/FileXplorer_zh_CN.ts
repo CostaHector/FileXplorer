@@ -75,7 +75,7 @@
     <message>
         <location filename="../../Component/RenameWidgets/AdvanceRenamer.cpp" line="+28"/>
         <source>Name Ext Independent</source>
-        <translation>名/扩展名独立</translation>
+        <translation>名|扩展</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1626,19 +1626,24 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>NavigationAndAddressBar</name>
     <message>
-        <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+65"/>
+        <location filename="../../Component/Navigation/NavigationAndAddressBar.cpp" line="+32"/>
         <source>Search</source>
         <translation>搜索</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Folder Iterater</source>
-        <translation>文件夹遍历</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open Movie Wall</source>
         <translation>打开海报墙</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Previous folder</source>
+        <translation>上一个文件夹</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Next folder</source>
+        <translation>下一个文件夹</translation>
     </message>
 </context>
 <context>
@@ -2127,7 +2132,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+45"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+46"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>
@@ -2137,7 +2142,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>新:</translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+113"/>
         <source>Regex</source>
         <translation>正则</translation>
     </message>

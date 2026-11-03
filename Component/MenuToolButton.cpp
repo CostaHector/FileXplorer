@@ -1,5 +1,5 @@
 #include "MenuToolButton.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "KV.h"
 #include "Configuration.h"
 #include <QMenu>

@@ -1,5 +1,5 @@
 #include "RecursiveFilterProxyTreeModel.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Bool2QtEnum.h"
 
 // setRecursiveFilteringEnabled(true); filterAcceptsRow override its behavior

@@ -1,7 +1,7 @@
 #ifndef SPACERWIDGET_H
 #define SPACERWIDGET_H
 #include <QWidget>
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 namespace SpacerWidget {
 inline QWidget* GetSpacerWidget(QWidget* parent = nullptr, Qt::Orientation ori = Qt::Orientation::Horizontal) {

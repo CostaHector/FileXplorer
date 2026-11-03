@@ -18,81 +18,102 @@ private slots:
     QCOMPARE(ansLst, expectList);
   }
 
-  void test_ReplaceRename_invalid_regex_failed() {
-    QStringList replaceeList;
-    replaceeList << "AAAAAAA"
-                 << "aaaaaaa"
-                 << "0000000";
-    QString oldString{"[A-Za-z0-9{0,9}"};  // invalid
-    QString newString{"X"};
-    bool regexEnable{true};
-    QStringList ansLst = ReplaceRename(replaceeList, oldString, newString, regexEnable);
-    QVERIFY(ansLst.isEmpty());
+  void ReplaceRename_invalid_failed() {
+    {
+      QStringList replaceeList {
+          "AAAAAAA",
+          "aaaaaaa",
+          "0000000",
+      };
+      QRegularExpression invalidRegex{"[A-Za-z0-9{0,9}"};  // invalid
+      QVERIFY(!invalidRegex.isValid());
+      QString newString{"X"};
+      QStringList actualLst = ReplaceRename(replaceeList, invalidRegex, newString);
+      QVERIFY(actualLst.isEmpty());
+
+      QVERIFY(ReplaceRename({}, invalidRegex, "B").isEmpty());
+    }
+
+    {
+      QVERIFY(ReplaceRename({}, "A", "B", true).isEmpty());
+      QVERIFY(ReplaceRename({"AAA", "BBB"}, "", "B", true).isEmpty());
+      QVERIFY(ReplaceRename({}, "A", "B", true).isEmpty());
+    }
   }
 
-  void test_ReplaceRename_valid_regex_ok() {
-    QStringList replaceeList;
-    replaceeList << "AAAAAAA"
-                 << "aaaaaaa"
-                 << "0000000";
-    QStringList expectList;
-    expectList << "X"
-               << "X"
-               << "X";
-    QString oldString{"[A-Za-z0-9]{1,7}"};
+  void ReplaceRename_regex_valid_match_ok() {
+    QStringList replaceeList {
+        "AAAAAAA",
+        "aaaaaaa",
+        "0000000",
+    };
     QString newString{"X"};
-    bool regexEnable{true};
-    QStringList ansLst = ReplaceRename(replaceeList, oldString, newString, regexEnable);
-    QCOMPARE(ansLst, expectList);
+    {
+      QRegularExpression invalidRepRegex{"[A-Za-z0-9{0,9}"};  // invalid
+      QStringList actualLst = ReplaceRename(replaceeList, invalidRepRegex, newString);
+      QVERIFY(actualLst.isEmpty());
+    }
+
+    {
+      QStringList expectList {
+          "X",
+          "X",
+          "X",
+      };
+      QRegularExpression repRegex{"[A-Za-z0-9]{1,7}"};
+      QVERIFY(repRegex.isValid());
+
+      QStringList actualLst = ReplaceRename(replaceeList, repRegex, newString);
+      QCOMPARE(actualLst, expectList);
+    }
+
+    {
+      QRegularExpression repRegex("^(.*?)$");
+      QVERIFY(repRegex.isValid());
+
+      QString beforeName {"FS 001"};
+      QString newString{R"(FusionSphere \1 front)"};
+      QCOMPARE(beforeName.replace(repRegex, newString), "FusionSphere FS 001 front");
+
+      QStringList expectList {
+          "FusionSphere AAAAAAA front",
+          "FusionSphere aaaaaaa front",
+          "FusionSphere 0000000 front",
+      };
+      QStringList actualLst = ReplaceRename(replaceeList, repRegex, newString);
+      QCOMPARE(actualLst, expectList);
+    }
   }
 
-  void test_ReplaceRename_ok() {
-    QStringList replaceeList;
-    replaceeList << "la - hello world"
-                 << "map - nice T-Shirt"
-                 << "LA - not bad";
-    QStringList expectList;
-    expectList << "LosAngle - hello world"
-               << "map - nice T-Shirt"
-               << "LA - not bad";
+  void ReplaceRename_Case_ok() {
+    QStringList replaceeList {
+        "la - hello world",
+        "map - nice T-Shirt",
+        "LA - not bad",
+    };
+    QStringList expectListCaseSensitive {
+        "LosAngle - hello world",
+        "map - nice T-Shirt",
+        "LA - not bad"
+    };
+    QStringList expectListCaseInsensitive {
+        "LosAngle - hello world",
+        "map - nice T-Shirt",
+        "LosAngle - not bad"
+    };
     QString oldString{"la"};
     QString newString{"LosAngle"};
-    bool regexEnable{true};
-    QStringList ansLst = ReplaceRename(replaceeList, oldString, newString, regexEnable);
-    QCOMPARE(ansLst, expectList);
+    QCOMPARE(ReplaceRename(replaceeList, oldString, newString, true), expectListCaseSensitive);    // 大小写敏感
+    QCOMPARE(ReplaceRename(replaceeList, oldString, newString, false), expectListCaseInsensitive); // 大小写不敏感
+
+    QRegularExpression repRegexCaseSensive{oldString};
+    QRegularExpression repRegexCaseInsensive{repRegexCaseSensive};
+    repRegexCaseInsensive.setPatternOptions(QRegularExpression::PatternOption::CaseInsensitiveOption);
+    QCOMPARE(ReplaceRename(replaceeList, repRegexCaseSensive, newString), expectListCaseSensitive);    // 大小写敏感
+    QCOMPARE(ReplaceRename(replaceeList, repRegexCaseInsensive, newString), expectListCaseInsensitive);    // 大小写不敏感
   }
 
-  void test_regular_expression_replace() {
-    QRegularExpression repRegex("^(.*?)$");
-    QVERIFY(repRegex.isValid());
-    QString beforeName {"FS 001"};
-    beforeName.replace(repRegex, "FusionSphere \\1 front");
-    QCOMPARE(beforeName, "FusionSphere FS 001 front");
-  }
-
-  void test_ReplaceRename_regex_ok() {
-    QStringList replaceeList;
-    replaceeList << "FS 01"
-                 << "FS 02"
-                 << "FS 05";
-    QStringList expectList;
-    expectList << "FushionSphere FS 01 Back"
-               << "FushionSphere FS 02 Back"
-               << "FushionSphere FS 05 Back";
-    QString oldString{"^(.*?)$"};
-    QString newString{"FushionSphere \\1 Back"};
-    bool regexEnable{true};
-    QStringList ansLst = ReplaceRename(replaceeList, oldString, newString, regexEnable);
-    QCOMPARE(ansLst, expectList);
-  }
-
-  void test_ReplaceRename_skip_ok() {
-    QVERIFY(ReplaceRename({}, "A", "B", false).isEmpty());
-    QVERIFY(ReplaceRename({"AAA", "BBB"}, "", "B", false).isEmpty());
-    QVERIFY(ReplaceRename({}, "A", "B", false).isEmpty());
-  }
-
-  void test_NumerizeReplace_with_extension_startIndx_0_CommonExtCounter_ok() {
+  void NumerizeReplace_with_extension_startIndx_0_CommonExtCounter_ok() {
     QStringList replaceeList;
     replaceeList << "A"
                  << "A";
@@ -272,19 +293,19 @@ private slots:
 
   void test_PrependParentFolderNameToFileName_ok() {
     QStringList parentFolders{"Henry Cavill/Superman/post",//
-                              "Henry Cavill/Superman/post",//
-                              "Chris Evans/Captain/post",//
-                              "Chris Evans/Captain/post",//
-                             };
+        "Henry Cavill/Superman/post",//
+        "Chris Evans/Captain/post",//
+        "Chris Evans/Captain/post",//
+    };
     QStringList completeNames{"HC 1", "HC 2", "CE", "CE 2"};
     QStringList suffixs{".jpg", ".jpeg", ".jpeg", ".jpeg"};
     QCOMPARE(PrependParentFolderNameToFileName(parentFolders, completeNames, suffixs), //
              (QStringList{
-                "Henry Cavill Superman post HC 1",//
-                "Henry Cavill Superman post HC 2",//
-                "Chris Evans Captain post CE",//
-                "Chris Evans Captain post CE 2",//
-              }));
+             "Henry Cavill Superman post HC 1",//
+             "Henry Cavill Superman post HC 2",//
+             "Chris Evans Captain post CE",//
+             "Chris Evans Captain post CE 2",//
+             }));
   }
 };
 

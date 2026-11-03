@@ -2,7 +2,7 @@
 #define DEVICEDRIVERDBMODELFIELD_H
 
 #include <QStringList>
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 #define DEV_DRV_TABLE_ENUM_VALUE_MAPPING \
   DEV_DRV_TABLE_ENUM_ITEM(ROOT_PATH, 0) \

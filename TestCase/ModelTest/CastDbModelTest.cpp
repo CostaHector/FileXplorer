@@ -7,6 +7,7 @@
 #include "FdBasedDb.h"
 #include "EndToExposePrivateMember.h"
 
+#include "PublicStringMacro.h"
 #include "PathKey.h"
 #include "Configuration.h"
 

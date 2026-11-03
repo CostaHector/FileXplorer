@@ -1,5 +1,6 @@
 #include "QuickWhereClauseDialogMovie.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
+#include "PublicStringMacro.h"
 #include "MovieDBModelField.h"
 #include "PublicVariable.h"
 

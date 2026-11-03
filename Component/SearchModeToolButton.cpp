@@ -1,6 +1,7 @@
 ﻿#include "SearchModeToolButton.h"
 #include "SearchKey.h"
 #include "Configuration.h"
+#include "PublicCheckMacro.h"
 #include <QMenu>
 
 SearchModeToolButton::SearchModeToolButton(QWidget* parent) : QToolButton{parent} {

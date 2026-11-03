@@ -1,7 +1,7 @@
 ﻿#ifndef FILEOPERATORPUB_H
 #define FILEOPERATORPUB_H
 
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include <QStringList>
 namespace FileOperatorType {
 

@@ -1,7 +1,7 @@
 #include "VideoPlayerActions.h"
 #include "Configuration.h"
 #include "VideoPlayerKey.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 constexpr QMediaPlaylist::PlaybackMode VideoPlayerActions::DEFAULT_PLAYBACK_MODE;
 

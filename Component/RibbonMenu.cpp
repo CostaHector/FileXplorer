@@ -28,7 +28,7 @@
 #include "BehaviorKey.h"
 #include "CompoVisKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include <QTimer>
 

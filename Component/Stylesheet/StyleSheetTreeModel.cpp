@@ -1,7 +1,7 @@
 #include "StyleSheetTreeModel.h"
 #include "StyleSheetGetter.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QVariantHash>
 #include <QIcon>
 #include <QColor>

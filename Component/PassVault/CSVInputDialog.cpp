@@ -1,6 +1,6 @@
 #include "CSVInputDialog.h"
 #include "AccountStorage.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "StyleSheet.h"
 

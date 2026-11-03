@@ -1,6 +1,6 @@
 #include "Notificator.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QProgressBar>
 #include <QToolButton>
 #include <QGridLayout>

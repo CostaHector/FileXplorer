@@ -1,5 +1,5 @@
 #include "TagsHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
 #include "SystemPath.h"

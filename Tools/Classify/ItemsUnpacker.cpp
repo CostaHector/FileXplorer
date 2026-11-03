@@ -2,6 +2,8 @@
 #include "PathTool.h"
 #include "ItemsPileCategory.h"
 #include "UndoRedo.h"
+#include "Logger.h"
+
 #include <QRegularExpression>
 #include <QDir>
 

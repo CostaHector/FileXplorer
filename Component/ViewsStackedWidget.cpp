@@ -17,8 +17,7 @@
 #include "JsonParser.h"
 #include "RatingStarsWidget.h"
 #include "TagEditorSideBar.h"
-#include <QRegularExpression>
-#include <QCache>
+#include "StringTool.h"
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
@@ -97,26 +96,6 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   return true;
 }
 
-const QRegularExpression* GetRegularExpression(const QString& targetStr, const int MAX_REGEX_CACHE_COUNT = 100) {
-  static QCache<QString, const QRegularExpression> exprCache(MAX_REGEX_CACHE_COUNT);
-  const QRegularExpression* pExpr = exprCache[targetStr];
-  if (pExpr != nullptr) {
-    return pExpr;
-  }
-  pExpr = new (std::nothrow) QRegularExpression(targetStr);
-  CHECK_NULLPTR_RETURN_NULLPTR(pExpr);
-  if (!pExpr->isValid()) {
-    LOG_D("Invalid regular expression: %s", qPrintable(targetStr));
-    if (pExpr != nullptr) {
-      delete pExpr;
-      pExpr = nullptr;
-    }
-    return nullptr;
-  }
-  exprCache.insert(targetStr, pExpr);
-  return pExpr;
-}
-
 auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool {
   const ViewTypeTool::ViewType vt{GetVt()};
 
@@ -133,9 +112,9 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
     }
     case ViewType::JSON: {
       CHECK_NULLPTR_RETURN_FALSE(m_jsonProxyModel);
-      const QRegularExpression* pRegex = GetRegularExpression(targetStr);
-      CHECK_NULLPTR_RETURN_FALSE(pRegex);
-      m_jsonProxyModel->setFilterRegularExpression(*pRegex);
+      const QRegularExpression reg = StringTool::GetRegularExpression(targetStr);
+      CHECK_FALSE_RETURN_VAL(reg.isValid(), false);
+      m_jsonProxyModel->setFilterRegularExpression(reg);
       return true;
     }
     default: {
@@ -157,9 +136,9 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
     }
     case ViewType::SCENE: {  // avoid lag when text changed frequently
       CHECK_NULLPTR_RETURN_FALSE(m_sceneProxyModel);
-      const QRegularExpression* pRegex = GetRegularExpression(targetStr);
-      CHECK_NULLPTR_RETURN_FALSE(pRegex);
-      m_sceneProxyModel->setFilterRegularExpression(*pRegex);
+      const QRegularExpression reg = StringTool::GetRegularExpression(targetStr);
+      CHECK_FALSE_RETURN_VAL(reg.isValid(), false);
+      m_sceneProxyModel->setFilterRegularExpression(reg);
       break;
     }
     default: {

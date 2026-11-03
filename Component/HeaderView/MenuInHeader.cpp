@@ -1,7 +1,7 @@
 #include "MenuInHeader.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "InputDialogHelper.h"
 #include "SizeTool.h"
 #include <QContextMenuEvent>

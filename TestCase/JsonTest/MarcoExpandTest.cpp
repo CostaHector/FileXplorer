@@ -3,7 +3,7 @@
 #include <QString>
 
 #include "DataFormatter.h"
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 // 定义主宏（放在头文件）
 #define ALL_FIELD_ITEMS                                                                                                      \

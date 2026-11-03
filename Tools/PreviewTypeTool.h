@@ -1,7 +1,7 @@
 #ifndef PREVIEWTYPETOOL_H
 #define PREVIEWTYPETOOL_H
 
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 #define PREVIEW_TYPES_ENUM_VALUE_MAPPING \
   PREVIEW_TYPE_ITEM(CATEGORY, 0) \

@@ -1,5 +1,5 @@
 #include "FullScreenableSplitter.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "Configuration.h"
 #include <QVBoxLayout>
 

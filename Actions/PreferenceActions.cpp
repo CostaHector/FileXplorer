@@ -3,7 +3,7 @@
 #include "StyleKey.h"
 #include "MenuToolButton.h"
 #include "StyleSheet.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "StyleSheetGetter.h"
 #include <QApplication>

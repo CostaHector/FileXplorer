@@ -1,5 +1,5 @@
 ﻿#include "DraggableToolButton.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ViewHelper.h"
 #include <QAction>
 #include <QMimeData>

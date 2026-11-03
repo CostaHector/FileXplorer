@@ -437,12 +437,12 @@ class DataFormatterTest : public PlainTestSuite {
                                 + 1 * 1024 * 1024       //
                                 + 1 * 1024              //
                                 + 1),                   //
-             "1'1'1'1");                                // 1G 1M 1K 1B
+             " 1'   1'   1'   1");                                // 1G 1M 1K 1B
     QCOMPARE(formatFileSizeGMKB(0 * 1024 * 1024 * 1024  //
                                 + 99 * 1024 * 1024      //
                                 + 1023 * 1024           //
                                 + 1),                   //
-             "0'99'1023'1");                            // 99M 1023K 1B
+             " 0'  99'1023'   1");                            // 99M 1023K 1B
   }
 
   void test_sizeToFileSizeDetail_ok() {
@@ -450,7 +450,7 @@ class DataFormatterTest : public PlainTestSuite {
                                      + 1 * 1024 * 1024       //
                                      + 0 * 1024              //
                                      + 1),                   //
-             "0'1'0'1 (1048577 Bytes)");                     // 1M 1B
+             " 0'   1'   0'   1 (1048577 Bytes)");                     // 1M 1B
   }
 
   void test_durationToHumanReadFriendly() {

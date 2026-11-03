@@ -5,7 +5,7 @@
 #include "ScrollBarPolicyMenu.h"
 #include "StyleKey.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "ViewHelper.h"
 #include "RowHeightRegistry.h"
 
@@ -270,11 +270,9 @@ void CustomTableView::registerProxyModel(QSortFilterProxyModel* proxyModelInDeri
 }
 
 QModelIndexList CustomTableView::selectedRowsSource() const {
-  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
-  if (_proxyModel == nullptr) {
-    return proxyIndexes;
-  }
+  CHECK_FALSE_RETURN_VAL(_proxyModel, QModelIndexList{});
 
+  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
   QModelIndexList srcIndexes;
   srcIndexes.reserve(proxyIndexes.size());
   for (const QModelIndex& proxyIndex : proxyIndexes) {

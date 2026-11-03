@@ -1,9 +1,8 @@
 #include "DuplicateVideosMetaInfoModel.h"
 #include "Logger.h"
-#include "PublicMacro.h"
 #include <QIcon>
 
-const QStringList DuplicateVideosMetaInfoModel::DUP_VIDEOS_METAINFO_HOR_HEADER{"Table name", "Count"};
+constexpr const char* DuplicateVideosMetaInfoModel::DUP_VIDEOS_METAINFO_HOR_HEADER[];
 
 auto DuplicateVideosMetaInfoModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
   if (role == Qt::TextAlignmentRole) {
@@ -24,9 +23,9 @@ QVariant DuplicateVideosMetaInfoModel::data(const QModelIndex& index, int role) 
   if (!index.isValid()) {
     return {};
   }
-  const int row = index.row(), col = index.column();
+  const int row = index.row();
   if (role == Qt::ItemDataRole::DisplayRole) {
-    switch (col) {
+    switch (index.column()) {
       case 0:
         return m_data[row].tableName;
       case 1:
@@ -34,9 +33,6 @@ QVariant DuplicateVideosMetaInfoModel::data(const QModelIndex& index, int role) 
       default:
         break;
     }
-  } else if (role == Qt::ItemDataRole::DecorationRole && col == 0) {
-    static const QIcon TABLE_ICON{":img/TABLE"};
-    return TABLE_ICON;
   }
   return {};
 }

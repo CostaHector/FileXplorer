@@ -4,7 +4,7 @@
 #include "SimpleAES.h"
 #include "Configuration.h"
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "StyleSheet.h"
 #include "FileLeafAction.h"
 #include <QFileDialog>

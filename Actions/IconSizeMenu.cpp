@@ -1,6 +1,6 @@
 #include "IconSizeMenu.h"
 #include "ImageTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 IconSizeMenu::IconSizeMenu(const QString& menuName, const QString& belongedToName, QWidget* parent) //
   : QMenu{menuName, parent}

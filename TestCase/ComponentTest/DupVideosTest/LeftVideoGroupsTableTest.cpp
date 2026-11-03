@@ -2,7 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "LeftVideoGroupsTable.h"
+#include "DuplicateVideoGroupsTable.h"
 #include "EndToExposePrivateMember.h"
 
 #include "VideoPlayerKey.h"
@@ -18,7 +18,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
   void selection_toggle_non_and_valid_ok() {
     setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2kB
 
-    LeftVideoGroupsTable lvgt;
+    DuplicateVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
     QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
@@ -35,7 +35,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
     QCOMPARE(lvgt.onDuplicateVideosListChanged(duplicaVideosListNeedAnalyze), 2);
     QCOMPARE(lvgt.m_leftGrpModel->rowCount(), 2);
 
-    QSignalSpy spy(&lvgt, &LeftVideoGroupsTable::leftSelectionChanged);
+    QSignalSpy spy(&lvgt, &DuplicateVideoGroupsTable::leftSelectionChanged);
 
     QItemSelectionModel* selectionModel = lvgt.selectionModel();
     QVERIFY(selectionModel != nullptr);
@@ -71,7 +71,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
              && title.contains(differBy, Qt::CaseInsensitive);                             //
     };
 
-    LeftVideoGroupsTable lvgt;
+    DuplicateVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
     QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
@@ -88,7 +88,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
         {"v5.mp4", 10240, 2000, 0, "/v3.mp4", "hash3"},  //
     };
 
-    QSignalSpy winTitleSpy(&lvgt, &LeftVideoGroupsTable::windowTitleChanged);
+    QSignalSpy winTitleSpy(&lvgt, &DuplicateVideoGroupsTable::windowTitleChanged);
 
     // 1. onDuplicateVideosListChanged changes windowTitle
     // [2048,2048,2048] round 2048=1, [10240,10240] round 2048=5
@@ -135,7 +135,7 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
   void sort_by_column_enabled_ok() {
     setConfig(VideoPlayerKey::DUPLICATE_FINDER_DEVIATION_FILESIZE, 2048);  // 2kB
 
-    LeftVideoGroupsTable lvgt;
+    DuplicateVideoGroupsTable lvgt;
     QVERIFY(lvgt.m_leftGrpModel != nullptr);
     QVERIFY(lvgt.m_leftSortProxy != nullptr);
     QCOMPARE(lvgt.m_leftGrpModel->m_currentDiffer, DuplicateVideoDetectionCriteria::DEFAULT_VD_CRITERIA_E);
@@ -176,11 +176,11 @@ class LeftVideoGroupsTableTest : public PlainTestSuite {
 
     // 2. sort by second column: size
     lvgt.sortByColumn(1, Qt::AscendingOrder);
-    QCOMPARE(lvgt.model()->index(0, 1).data().toInt(), 2048);
-    QCOMPARE(lvgt.model()->index(1, 1).data().toInt(), 10240);
+    QCOMPARE(lvgt.model()->index(0, 1).data().toString(), " 0'   0'   2'   0");  // 2048
+    QCOMPARE(lvgt.model()->index(1, 1).data().toString(), " 0'   0'  10'   0"); // 10240
     lvgt.sortByColumn(1, Qt::DescendingOrder); // mouse click not work
-    QCOMPARE(lvgt.model()->index(0, 1).data().toInt(), 10240);
-    QCOMPARE(lvgt.model()->index(1, 1).data().toInt(), 2048);
+    QCOMPARE(lvgt.model()->index(0, 1).data().toString(), " 0'   0'  10'   0");
+    QCOMPARE(lvgt.model()->index(1, 1).data().toString(), " 0'   0'   2'   0");
   }
 };
 

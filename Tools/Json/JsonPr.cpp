@@ -1,6 +1,6 @@
 #include "JsonPr.h"
 #include "PathTool.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "CastManager.h"
 #include "StudiosManager.h"
 #include "NameTool.h"

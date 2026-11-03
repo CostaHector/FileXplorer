@@ -1,5 +1,5 @@
 ﻿#include "RenameWidget_SwapFileNames.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 RenameWidget_SwapFileNames::RenameWidget_SwapFileNames(QWidget* parent)  //
     : AdvanceRenamer(parent) {

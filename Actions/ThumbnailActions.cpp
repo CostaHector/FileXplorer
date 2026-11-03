@@ -1,5 +1,5 @@
 #include "ThumbnailActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "MenuToolButton.h"
 #include "ImageTool.h"

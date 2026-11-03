@@ -8,7 +8,7 @@
 #include "NotificatorMacro.h"
 #include "StudiosManager.h"
 #include "MovieDBModelField.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "PublicVariable.h"
 #include "ViewActions.h"
 #include "SystemPath.h"

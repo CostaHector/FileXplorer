@@ -1,5 +1,5 @@
 ﻿#include "BrowserActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 #include <QMenu>
 #include <QToolBar>

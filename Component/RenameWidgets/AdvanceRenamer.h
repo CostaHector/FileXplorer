@@ -42,6 +42,7 @@ class AdvanceRenamer : public QDialog {
   void InitTextEditContent(const QString& workPath, const QStringList& selectedNames);
   void OnlyTriggerRenameCore();
   void setNewBaseNames(const QStringList& newBaseNames);
+  void setNewDotExts(const QStringList& dotExts);
   QStringList GetSelectedFilesFullPath() const { return mSelectedFilesFullPath; }
   virtual void InitExtraCommonVariable() {}
   virtual void InitExtraMemberWidget() {}
@@ -55,6 +56,7 @@ class AdvanceRenamer : public QDialog {
   static constexpr char NAME_SEP = '\n';
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
+  void reject() override;
 
   QString preAt(int i) const {
     if (i < 0 || i >= mNames.size()) return "";
@@ -100,6 +102,10 @@ class AdvanceRenamer : public QDialog {
   QHBoxLayout* m_nameEditLayout{nullptr};
   QVBoxLayout* m_mainLayout{nullptr};
   bool m_bApplyResult{false};
+
+  void saveDialogGeometry();
+  QByteArray m_dialogGeometry;
+  bool m_geometryRestoredOnce{false};
 };
 
 #endif  // ADVANCERENAMER_H

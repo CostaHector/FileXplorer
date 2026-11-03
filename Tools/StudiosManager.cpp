@@ -3,7 +3,7 @@
 #include "PathTool.h"
 #include "SystemPath.h"
 #include "JsonRenameRegex.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "JsonModelField.h"
 #include "JsonHelper.h"
 #include <QVariantHash>

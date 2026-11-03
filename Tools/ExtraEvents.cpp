@@ -20,7 +20,7 @@
 #include "Configuration.h"
 
 #include "NotificatorMacro.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 #include <QMessageBox>
 

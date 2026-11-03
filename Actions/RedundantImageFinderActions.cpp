@@ -1,5 +1,5 @@
 ﻿#include "RedundantImageFinderActions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "RedunImgFinderKey.h"
 #include "Configuration.h"
 #include "MenuToolButton.h"

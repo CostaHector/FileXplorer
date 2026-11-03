@@ -7,12 +7,12 @@ class RenameWidget_Replace : public AdvanceRenamer {
   Q_OBJECT
  public:
   using AdvanceRenamer::AdvanceRenamer;
-  virtual ~RenameWidget_Replace();
 
   void InitExtraCommonVariable() override;
   QToolBar* InitControlTB() override;
   void extraSubscribe() override;
   void InitExtraMemberWidget() override;
+  void initExclusiveSetting() override;
 
   QStringList RenameCore(const QStringList& replaceeList) override;
   QString GetNewName() const { return m_newStrCB->currentText(); }
@@ -24,10 +24,12 @@ class RenameWidget_Replace : public AdvanceRenamer {
 
  private:
   void onOldStrDefaultModeChanged(int oldStrDefaultMode);
+  void onCaseSensitiveModeChanged(int caseSensitiveState);
   bool UpdateOldStrCbCurrentText();
 
   QComboBox* m_oldStrCB{nullptr};
   QComboBox* m_oldStrDefaultModeCB{nullptr};
+  QCheckBox* m_caseSensitive{nullptr};
   QCheckBox* m_regexCB{nullptr};
   bool m_oldStrInited = false;
 };

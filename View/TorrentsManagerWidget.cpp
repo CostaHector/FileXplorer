@@ -5,6 +5,7 @@
 #include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
+#include "PublicCheckMacro.h"
 
 #include "TorrDBAction.h"
 #include "TorrentDBModelField.h"

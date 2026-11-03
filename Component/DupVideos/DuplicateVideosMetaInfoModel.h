@@ -9,7 +9,7 @@ class DuplicateVideosMetaInfoModel : public QAbstractTableModelPub {
   using QAbstractTableModelPub::QAbstractTableModelPub;
   auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override;
   auto rowCount(const QModelIndex& /*parent*/ = {}) const -> int override { return m_data.size(); }
-  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return DUP_VIDEOS_METAINFO_HOR_HEADER.size(); }
+  auto columnCount(const QModelIndex& /*parent*/ = {}) const -> int override { return sizeof(DUP_VIDEOS_METAINFO_HOR_HEADER) / sizeof(DUP_VIDEOS_METAINFO_HOR_HEADER[0]); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QString fileName(const QModelIndex& index) const;
   QStringList fileNames(const QModelIndexList& indx) const;
@@ -17,7 +17,7 @@ class DuplicateVideosMetaInfoModel : public QAbstractTableModelPub {
 
  private:
   DupVidTableName2RecordCountList m_data;
-  static const QStringList DUP_VIDEOS_METAINFO_HOR_HEADER;
+  static constexpr const char* DUP_VIDEOS_METAINFO_HOR_HEADER[]{"Table name", "Count"};
 };
 
 #endif  // DUPLICATEVIDEOSMETAINFOMODEL_H

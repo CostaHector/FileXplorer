@@ -9,7 +9,6 @@ class RenameActions : public QObject {
  public:
   explicit RenameActions(QObject* parent = nullptr);
 
-  QActionGroup* Get_CASE_Actions();
   QActionGroup* Get_Rename_Actions();
 
   QList<QAction*> GetGeneralRenameActions() {
@@ -27,14 +26,6 @@ class RenameActions : public QObject {
   QAction* _PREPEND_PARENT_FOLDER_NAMES {nullptr};
   QAction* _DIGIT_CHAR_REPLACE_TO_ALPHA{nullptr};
   QActionGroup* RENAME_RIBBONS {nullptr};
-
-  QAction* _UPPER_CASE {nullptr};
-  QAction* _LOWER_CASE {nullptr};
-  QAction* _CAPITALIZE_KEEP_OTHER {nullptr};
-  QAction* _CAPITALIZE_LOWER_OTHER {nullptr};
-  QAction* _TOGGLE_CASE {nullptr};
-  QAction* _LOWER_CASE_FILE_EXTENSION {nullptr};
-  QActionGroup* NAME_CASE {nullptr};
 };
 
 RenameActions& g_renameAg();

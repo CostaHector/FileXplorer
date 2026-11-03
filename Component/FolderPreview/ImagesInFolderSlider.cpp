@@ -1,7 +1,7 @@
 #include "ImagesInFolderSlider.h"
 #include "PublicVariable.h"
 #include "ArchiveFiles.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QPixmap>
 #include <QDir>
 #include <QFileInfo>

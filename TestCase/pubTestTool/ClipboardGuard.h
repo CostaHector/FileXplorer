@@ -1,7 +1,7 @@
 #ifndef CLIPBOARDGUARD_H
 #define CLIPBOARDGUARD_H
 #include <memory>
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>

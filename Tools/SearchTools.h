@@ -2,7 +2,7 @@
 #define SEARCHTOOLS_H
 
 #include <QString>
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 
 #define SEARCH_MODE_ENUM_VALUE_MAPPING \
   SEARCH_MODE_TYPE_ITEM(NORMAL, 0)     \

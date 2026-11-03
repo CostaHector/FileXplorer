@@ -3,6 +3,7 @@
 #include "VideoDurationGetter.h"
 #include "MD5Calculator.h"
 #include "PathTool.h"
+#include "Logger.h"
 
 #include <QTextStream>
 #include <QFile>

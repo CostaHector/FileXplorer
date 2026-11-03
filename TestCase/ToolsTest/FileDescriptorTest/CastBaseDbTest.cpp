@@ -6,7 +6,7 @@
 #include "CastBaseDb.h"
 #include "TDir.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include "StringTool.h"
 #include "CastPsonFileHelper.h"
 #include "SqlRecordTestHelper.h"

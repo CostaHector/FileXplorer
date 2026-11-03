@@ -1,7 +1,8 @@
 #include "QuickWhereClauseDialogCast.h"
 #include "Notificator.h"
 #include "CastPsonFileHelper.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
+#include "PublicStringMacro.h"
 #include "PublicVariable.h"
 #include "CastAkasManager.h"
 

@@ -1,5 +1,5 @@
 #include "MultiPar2Actions.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"

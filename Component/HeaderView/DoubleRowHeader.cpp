@@ -1,6 +1,6 @@
 #include "DoubleRowHeader.h"
 #include "Configuration.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 DoubleRowHeader::DoubleRowHeader(const QString &parentTableName, QWidget *parent)
   : HorMenuInHeader{parentTableName, parent}

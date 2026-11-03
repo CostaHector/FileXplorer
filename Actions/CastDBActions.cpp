@@ -1,6 +1,6 @@
 #include "CastDBActions.h"
 #include "PublicVariable.h"
-#include "PublicMacro.h"
+#include "PublicCheckMacro.h"
 
 #include <QMenu>
 #include <QActionGroup>

@@ -4,7 +4,6 @@
 #include "BeginToExposePrivateMember.h"
 #include "RenameWidget_Case.h"
 #include "EndToExposePrivateMember.h"
-#include "RenameActions.h"
 #include "TDir.h"
 
 class RenameWidget_CaseTest : public PlainTestSuite {
@@ -33,7 +32,7 @@ class RenameWidget_CaseTest : public PlainTestSuite {
     pCase.setModal(true);
     pCase.m_nameExtIndependent->setChecked(true);
     pCase.m_recursiveCB->setChecked(true);
-    g_renameAg()._UPPER_CASE->setChecked(true);
+    pCase.m_upperCase->setChecked(true);
 
     pCase.InitTextEditContent(casePath, selectFileNames);
     QCOMPARE(pCase.mSelectedNames, (QStringList{"super", "Henry Cavill.jpg"}));
@@ -56,8 +55,8 @@ class RenameWidget_CaseTest : public PlainTestSuite {
     }
 
     {  // lower case
-      g_renameAg()._LOWER_CASE->setChecked(true);
-      emit g_renameAg().NAME_CASE->triggered(g_renameAg()._LOWER_CASE);
+      pCase.m_lowerCase->setChecked(true);
+      emit pCase.m_nameCaseAg->triggered(pCase.m_lowerCase);
 
       const QString& sNewName = pCase.m_nBaseTE->toPlainText();
       const QString& sNewExt = pCase.m_nExtTE->toPlainText();

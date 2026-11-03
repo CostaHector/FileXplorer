@@ -1,7 +1,7 @@
 #ifndef DBMANAGERHELPER_H
 #define DBMANAGERHELPER_H
 
-#include "PublicMacro.h"
+#include "PublicStringMacro.h"
 #include <QString>
 
 #define SQL_TABLE_DROP_OR_DELETE_MAPPING \
