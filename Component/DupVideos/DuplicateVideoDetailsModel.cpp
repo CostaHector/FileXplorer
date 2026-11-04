@@ -3,9 +3,12 @@
 #include "DataFormatter.h"
 #include "PublicCheckMacro.h"
 #include "ImageTool.h"
+#include "PathTool.h"
 
+#include <QUrl>
 #include <QBrush>
 #include <QFileInfo>
+#include <QMimeData>
 
 QVariant DuplicateVideoDetailsModel::data(const QModelIndex& index, int role) const {
   CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
@@ -57,7 +60,7 @@ int DuplicateVideoDetailsModel::rowCount(const QModelIndex& /*parent*/) const {
   return rowCountHelper(getLeftSelectedRow());
 }
 
-auto DuplicateVideoDetailsModel::headerData(int section, Qt::Orientation orientation, int role) const -> QVariant {
+QVariant DuplicateVideoDetailsModel::headerData(int section, Qt::Orientation orientation, int role) const {
   if (role == Qt::TextAlignmentRole) {
     if (orientation == Qt::Vertical) {
       return Qt::AlignRight;
@@ -70,6 +73,44 @@ auto DuplicateVideoDetailsModel::headerData(int section, Qt::Orientation orienta
     return section + 1;
   }
   return QAbstractTableModel::headerData(section, orientation, role);
+}
+
+Qt::ItemFlags DuplicateVideoDetailsModel::flags(const QModelIndex &index) const {
+  return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+}
+
+QMimeData* DuplicateVideoDetailsModel::mimeData(const QModelIndexList &indexes) const {
+  if (indexes.isEmpty()) {
+    return nullptr;
+  }
+
+  // 过滤首列
+  QModelIndexList pathIndexes;
+  for (const QModelIndex& index : indexes) {
+    if (index.column() != 0) {
+      continue;
+    }
+    pathIndexes.push_back(index);
+  }
+  if (pathIndexes.isEmpty()) {
+    return nullptr;
+  }
+  const QStringList vids = filesFullPath(pathIndexes);
+
+  QList<QUrl> urls;
+  for (const QString& vid: vids) {
+    if (vid.isEmpty()) {
+      continue;
+    }
+    urls.append(QUrl::fromLocalFile(vid));
+  }
+  if (urls.isEmpty()) {
+    return nullptr;
+  }
+
+  QMimeData* mimeData = new QMimeData;
+  mimeData->setUrls(urls);
+  return mimeData;
 }
 
 bool DuplicateVideoDetailsModel::SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer) {
@@ -101,9 +142,10 @@ int DuplicateVideoDetailsModel::onChangeDetailIndex(int newLeftSelectedRow) {
 }
 
 QString DuplicateVideoDetailsModel::fileNameUsedForToolEverything(const QModelIndex& index) const {
-  QString fileNamePlain = fileName(index);
-  fileNamePlain.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
-  return fileNamePlain;
+  QString fileNameWithExt = fileName(index); // may contains FolderName
+  QString fileName = PathTool::GetBaseName(fileNameWithExt);
+  fileName.replace(JSON_RENAME_REGEX::INVALID_TABLE_NAME_LETTER, " ");
+  return fileName;
 }
 
 QString DuplicateVideoDetailsModel::filePath(const QModelIndex& index) const {
@@ -136,6 +178,23 @@ QString DuplicateVideoDetailsModel::fileName(const QModelIndex& index) const {
 
   const DuplicateVideoMetaInfo::DVInfo& inf = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()][index.row()];
   return inf.m_Name;
+}
+
+QStringList DuplicateVideoDetailsModel::filesFullPath(const QModelIndexList& indexes) const {
+  if (indexes.isEmpty()) {
+    return {};
+  }
+  if (!isLeftSelectedRowValid()) {
+    return {};
+  }
+  CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pGroupedVidsList);
+  CHECK_NULLPTR_RETURN_DEFAULT_CONSTRUCT(_pCurrentDiffer);
+  const DupVidMetaInfoList& dvInfoLst = (*_pGroupedVidsList)[(int)*_pCurrentDiffer][getLeftSelectedRow()];
+  QStringList files;
+  for (const QModelIndex& ind: indexes) {
+    files.push_back(dvInfoLst[ind.row()].m_AbsPath);
+  }
+  return files;
 }
 
 // operation like scanANewPath/AppendToCurrenAnalyzeList/SizeDeviation/DurationDeviation changed will invalidate left selection

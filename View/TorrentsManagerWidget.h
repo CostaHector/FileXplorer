@@ -37,8 +37,6 @@ class TorrentsManagerWidget : public QMainWindow {
   bool onSubmit();
 
   void showEvent(QShowEvent *event) override;
-  void closeEvent(QCloseEvent* event) override;
-  void updateWindowsSize();
 
 private:
   TorrDb mDb;

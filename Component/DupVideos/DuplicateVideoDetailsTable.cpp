@@ -7,10 +7,13 @@
 #include "PathTool.h"
 #include "BatchRenameBy.h"
 #include "RenameWidget_Replace.h"
+#include "FileOpActs.h"
 #include <QFile>
 
 DuplicateVideoDetailsTable::DuplicateVideoDetailsTable(QWidget* parent) //
   : CustomTableView{"RightVideoDuplicatesDetails", parent} {
+  setDragDropMode(QAbstractItemView::DragDropMode::DragOnly);
+
   m_detailsModel = new (std::nothrow) DuplicateVideoDetailsModel{this};
   CHECK_NULLPTR_RETURN_VOID(m_detailsModel);
 
@@ -27,11 +30,16 @@ DuplicateVideoDetailsTable::DuplicateVideoDetailsTable(QWidget* parent) //
   setSortingEnabled(true);
 }
 
-bool DuplicateVideoDetailsTable::on_effectiveNameCopiedForEverything(const QModelIndex& ind) const {
-  if (!ind.isValid()) {
+QStringList DuplicateVideoDetailsTable::selectedFilesFullPath() const {
+  const QModelIndexList srcIndexes = selectedRowsSource();
+  return m_detailsModel->filesFullPath(srcIndexes);
+}
+
+bool DuplicateVideoDetailsTable::on_effectiveNameCopiedForEverything(const QModelIndex& proInd) const {
+  if (!proInd.isValid()) {
     return false;
   }
-  const auto& srcIndex = m_rightSortProxy->mapToSource(ind);
+  const auto& srcIndex = m_rightSortProxy->mapToSource(proInd);
   if (!srcIndex.isValid()) {
     return false;
   }
@@ -39,11 +47,11 @@ bool DuplicateVideoDetailsTable::on_effectiveNameCopiedForEverything(const QMode
   return FileTool::CopyTextToSystemClipboard(name);
 }
 
-bool DuplicateVideoDetailsTable::on_cellDoubleClicked(const QModelIndex& ind) const {
-  if (!ind.isValid()) {
+bool DuplicateVideoDetailsTable::on_cellDoubleClicked(const QModelIndex& proInd) const {
+  if (!proInd.isValid()) {
     return false;
   }
-  const auto& srcIndex = m_rightSortProxy->mapToSource(ind);
+  const auto& srcIndex = m_rightSortProxy->mapToSource(proInd);
   if (!srcIndex.isValid()) {
     return false;
   }
@@ -108,12 +116,17 @@ bool DuplicateVideoDetailsTable::on_RecycleSelection() {
   std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
 
   const QStringList relativeToVidsRelated = BatchRenameBy::GetFilesNeedProcess(prepath, rels);
+  if (relativeToVidsRelated.isEmpty()) {
+    LOG_INFO_P("Nothing need to recycle", "prepath[%s], rels count[%d]", qPrintable(prepath), rels.size());
+    return true;
+  }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE recycleCmds;
   recycleCmds.reserve(relativeToVidsRelated.size());
   for (const QString& relativeToFile: relativeToVidsRelated) {
     recycleCmds.append(ACMD::GetInstMOVETOTRASH(prepath, relativeToFile));
   }
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
   const bool isRecycleAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
   LOG_OE_P(isRecycleAllSucceed, "Recycle vids and its related", "vid selected=%d, related=%d", selectedCnt, relativeToVidsRelated.size());
   return isRecycleAllSucceed;

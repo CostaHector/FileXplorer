@@ -10,7 +10,6 @@
 #include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include "RateHelper.h"
-#include "FileTool.h"
 #include "PathTool.h"
 #include "VideoTestPrecoditionTools.h"
 #include "InputDialogHelper.h"

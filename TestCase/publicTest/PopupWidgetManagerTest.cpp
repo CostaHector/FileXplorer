@@ -5,6 +5,7 @@
 #include "PopupWidgetManager.h"
 #include "EndToExposePrivateMember.h"
 
+#include "StyleSheet.h"
 #include "Configuration.h"
 #include "DevicesDrivesTV.h"
 #include "DuplicatesImagesFinder.h"
@@ -16,6 +17,12 @@
 #include "PasswordBook.h"
 #endif
 #include "ResourceMonitorPanel.h"
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class PopupWidgetManagerTest : public PlainTestSuite {
   Q_OBJECT
@@ -81,13 +88,26 @@ class PopupWidgetManagerTest : public PlainTestSuite {
   }
 
  private slots:
-  void initTestCase() { Configuration().clear(); }
+  void initTestCase() {
+    GlobalMockObject::reset();
+    Configuration().clear();
+  }
 
-  void cleanupTestCase() { Configuration().clear(); }
+  void cleanupTestCase() {
+    GlobalMockObject::verify();
+    Configuration().clear();
+  }
 
   void checkable_popup_widget_geometry_state_ok() {
     PopupWidgetManagerTestTemplate<DevicesDrivesTV>("DevicesDrivesTV", true);
-    PopupWidgetManagerTestTemplate<DuplicateVideosFinder>("DuplicateVideosFinder", true);
+    {
+      // showEvent should called at least once
+      MOCKER(StyleSheet::UpdateTitleBar).expects(atLeast(1));
+      PopupWidgetManagerTestTemplate<DuplicateVideosFinder>("DuplicateVideosFinder", true);
+      // closeEvent should called at least once
+      QCOMPARE(Configuration().contains("DuplicateVideosFinder/State"), true);
+      QCOMPARE(Configuration().contains("DuplicateVideosFinder/LRSplitterState"), true);
+    }
     PopupWidgetManagerTestTemplate<DuplicatesImagesFinder>("RedundantImageFinder", true);
     PopupWidgetManagerTestTemplate<TorrentsManagerWidget>("TorrentsManagerWidget", true);
     PopupWidgetManagerTestTemplate<ConfigsMgr>("ConfigsTable", true);

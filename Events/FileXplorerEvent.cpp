@@ -545,6 +545,7 @@ void FileXplorerEvent::subscribe() {
 
     m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
+
     m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
     connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
@@ -864,6 +865,9 @@ bool FileXplorerEvent::on_RedunImageFinder(bool bChecked) {
   }
   const QString pth = _contentPane->getRootPath();
   DuplicatesImagesFinder* pRedunImgTemp = m_redundantImageFinder->widget();
+  if (pRedunImgTemp == nullptr) {
+    return false;
+  }
   bool finderRet = pRedunImgTemp->operator()(pth);
   return finderRet;
 }

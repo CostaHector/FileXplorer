@@ -81,20 +81,22 @@ template<typename WidgetType>
 bool PopupWidgetManager<WidgetType>::eventFilter(QObject* watched, QEvent* event) {
   if (watched == m_widget && event->type() == QEvent::Close) {
     if (m_action->isCheckable()) {
+      QSignalBlocker blocker(m_action);   // 只改勾选状态，不触发二次 hide
       m_action->setChecked(false);
     }
     if (m_onCloseCallback != nullptr) {
       m_onCloseCallback();
     }
     event->accept();
-    return true;
+    return false; // 让事件继续传给 widget 自己的 closeEvent
   }
   if (watched == m_widget && event->type() == QEvent::Show) {
     if (m_action->isCheckable()) {
+      QSignalBlocker blocker(m_action);   // 只改勾选状态，不触发二次 show
       m_action->setChecked(true);
     }
     event->accept();
-    return true;
+    return false;  // 让事件继续传给 widget 自己的 showEvent
   }
   return QObject::eventFilter(watched, event);
 }
