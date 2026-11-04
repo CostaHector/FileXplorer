@@ -1,13 +1,10 @@
 #include "DuplicatesImagesFinder.h"
 #include "SpacerWidget.h"
-#include "MenuToolButton.h"
 
 #include "FileOpActs.h"
 #include "RedundantImageFinderActions.h"
-#include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
-#include "UndoRedo.h"
 #include "PublicCheckMacro.h"
 
 constexpr char GEOMETRY_KEY[]{"RedunImgFinderKey/GEOMETRY"};
@@ -31,20 +28,11 @@ DuplicatesImagesFinder::DuplicatesImagesFinder(QWidget* parent) //
 
   subscribe();
 
-  ReadSetting();
   setWindowIcon(QIcon{":img/DUPLICATE_IMAGES_FINDER"});
 }
 
 bool DuplicatesImagesFinder::operator()(const QString& folderPath) {
   return m_table->operator()(folderPath);
-}
-
-void DuplicatesImagesFinder::ReadSetting() {
-  if (Configuration().contains(GEOMETRY_KEY)) {
-    restoreGeometry(Configuration().value(GEOMETRY_KEY).toByteArray());
-  } else {
-    setGeometry(SizeTool::DEFAULT_GEOMETRY);
-  }
 }
 
 void DuplicatesImagesFinder::showEvent(QShowEvent* event) {

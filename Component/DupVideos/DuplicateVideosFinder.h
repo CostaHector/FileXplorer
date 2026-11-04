@@ -5,17 +5,19 @@
 #include "DuplicateVideoGroupsTable.h"
 #include "DuplicateVideoDetailsTable.h"
 #include "DuplicateVideosHelper.h"
-#include <QMainWindow>
+
 #include <QSplitter>
 #include <QToolBar>
 #include <QLineEdit>
 
 class QComboBox;
+class VideoPlayerSplitter;
 
-class DuplicateVideosFinder : public QMainWindow {
+class DuplicateVideosFinder : public QSplitter {
   Q_OBJECT
  public:
   explicit DuplicateVideosFinder(QWidget* parent = nullptr);
+  ~DuplicateVideosFinder();
   void onAnalyzeDuplicatesInVideosList(const DupVidMetaInfoList& needAnalyzeVidLst);
   void onChangeSizeDeviation();
   void onChangeDurationDeviation();
@@ -30,6 +32,8 @@ protected:
   void invalidateLeftGrpTblData();
   void subscribe();
 
+  void saveSplitterStateOnClose();
+
   void UpdateWindowsTitleGroupInfo(const QString& dupVidGroupInfoTitle);
   void UpdateWindowsTitleMetaInfo(const QString& dupVidTblMetaInfoTitle);
   void UpdateWindowsTitle();
@@ -42,13 +46,15 @@ protected:
   QLineEdit* tableNameFilterLE{nullptr};
   QAction* m_RecycleSelections{nullptr};
   QAction* m_RenameSelectionsReplace{nullptr};
+  QAction* m_showVideoPlayer{nullptr};
 
   DuplicateVideosMetaInfoTable* m_leftTables{nullptr};
   DuplicateVideoGroupsTable* m_RightGrpsTbl{nullptr};
   DuplicateVideoDetailsTable* m_bottomDetailsTbl{nullptr};
 
   QSplitter* m_tables_group_LR_splitter{nullptr};
-  QSplitter* m_tables_detail_UD_splitter{nullptr};
+
+  VideoPlayerSplitter* m_videoPlayers{nullptr};
 
   QString mTitleGrpInto;
   QString mTitleMetaInfo;

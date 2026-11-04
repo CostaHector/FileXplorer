@@ -37,7 +37,7 @@ public:
   void onSamplePeriodChanged(int newPeriodInMilliSecond);
   bool onExportUsageToLocalFile();
 protected:
-  QSize sizeHint() const {
+  QSize sizeHint() const override {
     return {1024, 768};
   }
   void showEvent(QShowEvent* event) override;

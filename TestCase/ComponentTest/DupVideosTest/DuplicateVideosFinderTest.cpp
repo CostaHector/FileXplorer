@@ -9,6 +9,7 @@
 #include "ClipboardGuard.h"
 #include "TDir.h"
 #include "Logger.h"
+#include "Configuration.h"
 
 #include <QDesktopServices>
 #include <mockcpp/mokc.h>
@@ -31,6 +32,8 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
   DuplicateVideosFinder dvf;
  private slots:
   void initTestCase() {
+    Configuration().clear();
+
     GlobalMockObject::reset();
     MOCKER(QDesktopServices::openUrl).stubs().will(returnValue(true));
 
@@ -53,6 +56,7 @@ class DuplicateVideosFinderTest : public PlainTestSuite {
   }
 
   void cleanupTestCase() {  //
+    Configuration().clear();
     GlobalMockObject::verify();
   }
 

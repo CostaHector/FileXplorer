@@ -30,14 +30,18 @@ public:
   int rateAllVideoSameLevelAsCurrentVideo(bool bForce) const;
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
+  void setAlwaysShowStatusLabel();
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
   void reqFullscreenModeChange(bool bFullScreen);
   void reqPlayNextOneMedia();
   void userMousePressOrKeyPressHappened();
+  void currentMediaChanged(const QString& mediaPath);
 
 protected:
+  void showEvent(QShowEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
   bool eventFilter(QObject* watched, QEvent* event) override;
   QMediaPlayer* GetPlayer() { return mPlayer; }
   const QMediaPlayer* GetPlayer() const { return mPlayer; }

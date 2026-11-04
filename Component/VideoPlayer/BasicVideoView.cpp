@@ -82,11 +82,11 @@ BasicVideoView::~BasicVideoView() {
 
 void BasicVideoView::subscribe() {
   connect(VolumeWidget::GInstance(), &VolumeWidget::mutedStateToggled, this, [this](bool bMute){
-    mOperationStatusLbl->setAutoHideText(bMute ? "Mute" : "Unmute");
+    mOperationStatusLbl->setStatusMessage(bMute ? "Mute" : "Unmute");
     mPlayer->setMuted(bMute);
   });
   connect(VolumeWidget::GInstance(), &VolumeWidget::sliderVolumeChanged, this, [this](int volumeVal){
-    mOperationStatusLbl->setAutoHideText(QString::asprintf("Volume: %d", volumeVal));
+    mOperationStatusLbl->setStatusMessage(QString::asprintf("Volume: %d", volumeVal));
     mPlayer->setVolume(volumeVal);
   });
 
@@ -129,10 +129,12 @@ void BasicVideoView::subscribe() {
   connect(rateActions, &RateActions::AdjustRateMovieRecursivelyReq, this, &BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo);
 
   connect(&FileOpActs::GetInst(), &FileOpActs::unlockOccupiedFiles, this, &BasicVideoView::onStopPlaying);
+
+  connect(this, &BasicVideoView::currentMediaChanged, mOperationStatusLbl, &AutoHideLabel::showPlayingMediaName);
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
-  mOperationStatusLbl->setAutoHideText(QString::asprintf("Fullscreen mode changed to: %d", bFullScreen));
+  mOperationStatusLbl->setStatusMessage(QString::asprintf("Fullscreen mode changed to: %d", bFullScreen));
   emit reqFullscreenModeChange(bFullScreen);
 }
 
@@ -165,6 +167,7 @@ bool BasicVideoView::PlayAVideo(const QString& filePath, bool forcePlayInstantly
       break;
     }
   }
+  emit currentMediaChanged(mCurrentPlayingMediaPath);
   return true;
 }
 
@@ -243,13 +246,17 @@ int BasicVideoView::adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const {
   return RateHelper::AdjustFileRateRecursively(sameLevelPath, delta); // no need widget
 }
 
+void BasicVideoView::setAlwaysShowStatusLabel() {
+  mOperationStatusLbl->setDebugMode(true);
+}
+
 bool BasicVideoView::deviatePositionPrevious() {
-  mOperationStatusLbl->setAutoHideText("-10s");
+  mOperationStatusLbl->setStatusMessage("-10s");
   return DeviatePositionCore(mPlayer, -10);
 }
 
 bool BasicVideoView::deviatePositionNext() {
-  mOperationStatusLbl->setAutoHideText("+10s");
+  mOperationStatusLbl->setStatusMessage("+10s");
   return DeviatePositionCore(mPlayer, 10);
 }
 
@@ -339,7 +346,7 @@ void BasicVideoView::onPauseActionToggled(bool pauseChecked) {
     if (mPlayer->media().isNull()) {
       const QString pth = GetCurrentPlayingMediaPath();
       if (!QFileInfo(pth).isFile()) {
-        mOperationStatusLbl->setAutoHideText("Media inexist");
+        mOperationStatusLbl->setStatusMessage("Media inexist");
         return;
       }
       setMediaWithStatus(pth);
@@ -352,12 +359,12 @@ void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
   switch (state) {
     case QMediaPlayer::StoppedState: {
       mProgressSliderUpdateTimer.stop();
-      mOperationStatusLbl->setAutoHideText("Stopped");
+      mOperationStatusLbl->setStatusMessage("Stopped");
       break;
     }
     case QMediaPlayer::PlayingState: {
       mProgressSliderUpdateTimer.start();
-      mOperationStatusLbl->setAutoHideText("Playing");
+      mOperationStatusLbl->setStatusMessage("Playing");
       static bool bSystemUnmutedInited{false};
       if (!mPlayer->isMuted() && !bSystemUnmutedInited) {
         bSystemUnmutedInited = setSystemAppMute(false);
@@ -366,11 +373,11 @@ void BasicVideoView::onStateChanged(QMediaPlayer::State state) {
     }
     case QMediaPlayer::PausedState: {
       mProgressSliderUpdateTimer.stop();
-      mOperationStatusLbl->setAutoHideText("Paused");
+      mOperationStatusLbl->setStatusMessage("Paused");
       break;
     }
     default: {
-      mOperationStatusLbl->setAutoHideText("Unknown");
+      mOperationStatusLbl->setStatusMessage("Unknown");
       break;
     }
   }
@@ -383,6 +390,16 @@ void BasicVideoView::onMediaStatusChanged(QMediaPlayer::MediaStatus status) {
       emit reqPlayNextOneMedia();
     }
   }
+}
+
+void BasicVideoView::showEvent(QShowEvent* event) {
+  mOperationStatusLbl->setFixedWidth(width());
+  QWidget::showEvent(event);
+}
+
+void BasicVideoView::resizeEvent(QResizeEvent* event) {
+  mOperationStatusLbl->setFixedWidth(width());
+  QWidget::resizeEvent(event);
 }
 
 bool BasicVideoView::eventFilter(QObject* watched, QEvent* event) {

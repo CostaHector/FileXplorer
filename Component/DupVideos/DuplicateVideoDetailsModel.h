@@ -12,11 +12,14 @@ class DuplicateVideoDetailsModel : public QAbstractTableModelPub {
   int rowCount(const QModelIndex& parent = {}) const override;
   int columnCount(const QModelIndex& /*parent*/ = {}) const override { return DuplicateVideoMetaInfo::DV_TABLE_HEADERS_COUNT; }
 
-  auto headerData(int section, Qt::Orientation orientation, int role) const -> QVariant override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
+  QMimeData* mimeData(const QModelIndexList &indexes) const override;
 
   QString fileNameUsedForToolEverything(const QModelIndex& index) const;
   QString filePath(const QModelIndex& index) const;
   QString fileName(const QModelIndex& index) const;
+  QStringList filesFullPath(const QModelIndexList& indexes) const;
 
   bool SetSharedMemberSrc(const GroupedDupVidListArr* _groupedVidsListArr, const DuplicateVideoDetectionCriteria::DVCriteriaE* _currentDiffer);
 

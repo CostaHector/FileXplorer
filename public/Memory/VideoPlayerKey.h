@@ -15,6 +15,7 @@ constexpr KV AUTO_HIDE_TOOLBAR{"VideoPlayerKey/AUTO_HIDE_TOOLBAR", Var{false}, G
 constexpr KV DUPLICATE_FINDER_DEVIATION_DURATION{"VideoPlayerKey/DUPLICATE_FINDER_DEVIATION_DURATION", Var{2 * 1000}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, INT_MAX>};   // 2s ~ 20s
 constexpr KV DUPLICATE_FINDER_DEVIATION_FILESIZE{"VideoPlayerKey/DUPLICATE_FINDER_DEVIATION_FILESIZE", Var{2 * 1024}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, INT_MAX>}; // 2kB ~ 30MB
 constexpr KV DUPLICATE_GROUP_BY_MODE{"VideoPlayerKey/DUPLICATE_GROUP_BY_MODE", Var{0}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 16>};
+constexpr KV DUPLICATE_VIDEO_PLAYERS_ENABLED{"VideoPlayerKey/DUPLICATE_VIDEO_PLAYERS_ENABLED", Var{false}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 
 constexpr KV RATE_MOVIE_DEFAULT_VALUE{"VideoPlayerKey/RATE_MOVIE_DEFAULT_VALUE", Var{5}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 10>};
 } // namespace VideoPlayerKey

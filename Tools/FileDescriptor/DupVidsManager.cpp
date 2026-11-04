@@ -10,10 +10,8 @@
 #include <QSqlRecord>
 #include <QDateTime>
 #include <QSqlQuery>
-#include <QUuid>
 #include <QSet>
 #include <QVariant>
-#include "PublicCheckMacro.h"
 #include "VidDupTabFields.h"
 
 using namespace VidDupHelper;
@@ -21,15 +19,15 @@ using namespace VidDupHelper;
 const QString DupVidsManager::CREATE_DUP_VID_TABLE_TEMPLATE  //
 {"CREATE TABLE IF NOT EXISTS `%1`"                       //
   + QString(R"((
-      `%1` NCHAR(512) NOT NULL,
+      `%1` NCHAR(260) NOT NULL,
       `%2` INTEGER NOT NULL,
       `%3` INTEGER DEFAULT 0,
       `%4` INTEGER DEFAULT NULL,
-      `%5` NCHAR(512),
+      `%5` NCHAR(260),
       `%6` NCHAR(32) DEFAULT NULL,
       `%7` NCHAR(32) DEFAULT NULL,
       `%8` NCHAR(32) DEFAULT NULL,
-      PRIMARY KEY (`%5`, `%2`)
+      PRIMARY KEY (`%5`)
 );)")
       .arg(ENUM_2_STR(EFFECTIVE_NAME))
       .arg(ENUM_2_STR(SIZE))
@@ -104,7 +102,7 @@ bool DupVidsManager::ScanALocation(const QString& path) {
   while (it.hasNext()) {
     const QString file_path = it.next();
     const QFileInfo file_info{file_path};
-    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME, PathTool::GetEffectiveName(file_path));
+    query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_EFFECTIVE_NAME, PathTool::fileName(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_SIZE, file_info.size());
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DURATION, bSkipDuration ? 0 : VideoDurationGetter::GetDurationFromJsonFirst(file_path));
     query.bindValue(INSERT_DUP_VID_TEMPLATE_FIELD_DATE, file_info.birthTime().toMSecsSinceEpoch());

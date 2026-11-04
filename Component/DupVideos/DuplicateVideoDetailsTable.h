@@ -11,10 +11,14 @@ class DuplicateVideoDetailsTable : public CustomTableView {
  public:
   friend class DuplicateVideosFinder;
   explicit DuplicateVideoDetailsTable(QWidget* parent = nullptr);
+
+  QStringList selectedFilesFullPath() const;
   bool on_effectiveNameCopiedForEverything(const QModelIndex& ind) const;
   bool on_cellDoubleClicked(const QModelIndex& ind) const;
+
   bool setSharedMember(GroupedDupVidListArr* pGroupedVidsList, DuplicateVideoDetectionCriteria::DVCriteriaE* pCurDifferType);
   int onLeftVideoGroupsTableSelectionChanged(int newRow);
+
 
 public slots:
   bool on_RenameReplace();

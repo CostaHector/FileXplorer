@@ -18,7 +18,6 @@ protected:
 
 private:
   void subscribe();
-  void ReadSetting();
 
   QToolBar* m_toolBar{nullptr};
   DuplicateImagesTable* m_table{nullptr};

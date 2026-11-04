@@ -50,7 +50,6 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   m_torrentsListView->InitTableView();
 
   subscribe();
-  updateWindowsSize();
   setWindowTitle("Torrents Manager Widget");
   setWindowIcon(QIcon(":img/TORRENTS_VIEW"));
 }
@@ -255,18 +254,4 @@ void TorrentsManagerWidget::showEvent(QShowEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   QMainWindow::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
-}
-
-void TorrentsManagerWidget::closeEvent(QCloseEvent* event) {
-  g_torrActions().SHOW_TORRENTS_MANAGER->setChecked(false);
-  Configuration().setValue("Geometry/TorrentsManagerWidget", saveGeometry());
-  QMainWindow::closeEvent(event);
-}
-
-void TorrentsManagerWidget::updateWindowsSize() {
-  if (Configuration().contains("Geometry/TorrentsManagerWidget")) {
-    restoreGeometry(Configuration().value("Geometry/TorrentsManagerWidget").toByteArray());
-  } else {
-    setGeometry(SizeTool::DEFAULT_GEOMETRY);
-  }
 }
