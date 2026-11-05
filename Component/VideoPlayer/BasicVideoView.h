@@ -32,6 +32,7 @@ public:
 
   /* 重命名 */
   bool on_RenameReplace();
+  void DisableRenameShortcut();
 
   /* 访问 前一个/后一个 视频 */
   void EnableVideoIterate();

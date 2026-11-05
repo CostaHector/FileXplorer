@@ -298,11 +298,11 @@ QActionGroup* FileOpActs::GetNEWActions() {
 }
 
 QActionGroup* FileOpActs::FolderMergeActions() {
-  MERGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_M));
+  MERGE->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_M));
   MERGE->setShortcutVisibleInContextMenu(true);
   MERGE->setToolTip(QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE->text(), MERGE->shortcut().toString()));
 
-  MERGE_REVERSE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_M));
+  MERGE_REVERSE->setShortcut(QKeySequence(Qt::AltModifier | Qt::ShiftModifier | Qt::Key_M));
   MERGE_REVERSE->setShortcutVisibleInContextMenu(true);
   MERGE_REVERSE->setToolTip(
       QString("<b>%1 (%2)</b><br/> Given folderA and folderB, B+=A").arg(MERGE_REVERSE->text(), MERGE_REVERSE->shortcut().toString()));
