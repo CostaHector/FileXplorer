@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 
 #include "RenamerKey.h"
 #include "Configuration.h"
@@ -18,9 +18,9 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-    using namespace BatchRenameBy;
+    using namespace FileBatchOps;
 
-class BatchRenameByTest : public PlainTestSuite {
+class FileBatchOpsTest : public PlainTestSuite {
   Q_OBJECT
 public:
   TDir mTDir;
@@ -59,7 +59,7 @@ private slots:
     GlobalMockObject::verify();
   }
 
-  void GetFilesNeedProcess_ok() {
+  void ExpandRelatedFiles_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
     QStringList patterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
     QMap<QString, QString> file2Pattern;
@@ -73,7 +73,7 @@ private slots:
          {"Jensen Ackles.pson", "Jensen Ackles.mp4"},
          {"Michael Fassbender.json", "Michael Fassbender.json"},
          };
-    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Pattern)};
+    const QStringList filesNeedRename{ExpandRelatedFiles(workPath, patterns, &file2Pattern)};
     const QStringList beforeSelectedNames{
         "Chris Evans 2.png",        //
         "Chris Evans.jpg",          //
@@ -108,105 +108,51 @@ private slots:
         "pattern/Jensen Ackles.mp4",        //
         "pattern/Jensen Ackles.pson",       //
     };
-    const QStringList filesNeedRename{GetFilesNeedProcess(workPath, patterns, &file2Pattern)};
+    const QStringList filesNeedRename{ExpandRelatedFiles(workPath, patterns, &file2Pattern)};
     QCOMPARE(beforeSelectedNames, filesNeedRename);
     QCOMPARE(expectFile2Pattern, file2Pattern);
   }
 
-  void ReplaceQueryAndConfirm_ok() {
+  void RenameSelectedReplace_ok() {
     using namespace AdvanceRenamerTestTool;
-    set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted, QDialog::DialogCode::Accepted});
-    MOCKER(AdvanceRenamer::execCore).expects(exactly(3)).will(invoke(execCoreMock));
+    set({QDialog::DialogCode::Rejected});
+    MOCKER(AdvanceRenamer::execCore).expects(exactly(1)).will(invoke(execCoreMock));
 
     QString workPath = mTDir.itemPath("replace/pattern");
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
-
-    // 字符串替换"a"->"X"->"a", 恢复成功
-    QString defOldName{"a"};
-    QString defNewName{"X"};
-    bool disableOldNameEdit{false};
+    const QStringList beforeSelectedNames{ExpandRelatedFiles(workPath, beforePatterns)};
 
     // 默认入参not crash
-    QCOMPARE(ReplaceQueryAndConfirm({}, {}, {}, {}, false), RnmResult::SKIP);
+    QCOMPARE(RenameSelectedReplace({}, {}), OpStatus::SKIP);
 
-    QCOMPARE(ReplaceQueryAndConfirm(workPath, beforeSelectedNames, defOldName, defNewName, disableOldNameEdit), RnmResult::SKIP);
+    // user skip replace unchange
+    QCOMPARE(RenameSelectedReplace(workPath, beforeSelectedNames), OpStatus::SKIP);
     const QSet<QString> snapshot2 = mTDir.SnapshotAtPath(workPath);
-    QCOMPARE(snapshot2, snapshot1);  // user skip replace unchange
-
-    QCOMPARE(ReplaceQueryAndConfirm(workPath, beforeSelectedNames, defOldName, defNewName, disableOldNameEdit), RnmResult::ALL_SUCCEED);
-    const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
-    QVERIFY(snapshot3 != snapshot1);
-    const QSet<QString> expectAfterRename{
-        "Chris EvXns 2.png",        //
-        "Chris EvXns.jpg",          //
-        "Chris EvXns.json",         //
-        "Chris EvXns_tn.jpg",         //
-        "Chris Hemsworth_a.pson",   //
-        "Jensen Ackles.mp4",        //
-        "Jensen Ackles.pson",       //
-        "MichXel FXssbender.json",  //
-    };
-    QCOMPARE(snapshot3, expectAfterRename);
-
-    // 恢复
-    QStringList afterPatterns{"Chris EvXns.json", "Jensen Ackles.mp4", "MichXel FXssbender.json"};
-    const QStringList afterSelectedNames{GetFilesNeedProcess(workPath, afterPatterns)};
-
-    QCOMPARE(ReplaceQueryAndConfirm(workPath, afterSelectedNames, defNewName, defOldName, disableOldNameEdit), RnmResult::ALL_SUCCEED);
-
-    const QSet<QString> snapshot4 = mTDir.SnapshotAtPath(workPath);
-    QCOMPARE(snapshot4, snapshot1);
+    QCOMPARE(snapshot2, snapshot1);
   }
 
-  void InsertQueryAndConfirm_ok() {
+  void RenameSelectedInsert_ok() {
     using namespace AdvanceRenamerTestTool;
-    set({QDialog::DialogCode::Rejected, QDialog::DialogCode::Accepted, QDialog::DialogCode::Accepted});
-    MOCKER(AdvanceRenamer::execCore).expects(exactly(3)).will(invoke(execCoreMock));
+    set({QDialog::DialogCode::Rejected});
+    MOCKER(AdvanceRenamer::execCore).expects(exactly(1)).will(invoke(execCoreMock));
 
     QString workPath = mTDir.itemPath("replace/pattern");
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json", "Jensen Ackles.mp4", "Michael Fassbender.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
-
-    QString strInsert{"best of "};
-    int insertAtIndex{0};
+    const QStringList beforeSelectedNames{ExpandRelatedFiles(workPath, beforePatterns)};
 
     // 默认入参not crash
-    QCOMPARE(InsertQueryAndConfirm({}, {}, {}, 0), RnmResult::SKIP);
+    QCOMPARE(RenameSelectedInsert({}, {}), OpStatus::SKIP);
 
-    QCOMPARE(InsertQueryAndConfirm(workPath, beforeSelectedNames, strInsert, insertAtIndex), RnmResult::SKIP);
+    QCOMPARE(RenameSelectedInsert(workPath, beforeSelectedNames), OpStatus::SKIP);
     const QSet<QString> snapshot2 = mTDir.SnapshotAtPath(workPath);
     QCOMPARE(snapshot2, snapshot1);  // user skip insert unchange
-
-    // 1st. 字符串插入"best of ", 0, ok
-    QCOMPARE(InsertQueryAndConfirm(workPath, beforeSelectedNames, strInsert, insertAtIndex), RnmResult::ALL_SUCCEED);
-    const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
-    QVERIFY(snapshot3 != snapshot1);
-    const QSet<QString> expectAfterRename{
-        "Chris Hemsworth_a.pson",           //
-        "best of Chris Evans 2.png",        //
-        "best of Chris Evans.jpg",          //
-        "best of Chris Evans.json",         //
-        "best of Chris Evans_tn.jpg",       //
-        "best of Jensen Ackles.mp4",        //
-        "best of Jensen Ackles.pson",       //
-        "best of Michael Fassbender.json",  //
-    };
-    QCOMPARE(snapshot3, expectAfterRename);
-
-    // recover: replace "best of " by ""
-    QStringList afterPatterns{"best of Chris Evans.json", "best of Jensen Ackles.mp4", "best of Michael Fassbender.json"};
-    const QStringList afterSelectedNames{GetFilesNeedProcess(workPath, afterPatterns)};
-    QCOMPARE(ReplaceQueryAndConfirm(workPath, afterSelectedNames, "best of ", "", true), RnmResult::ALL_SUCCEED);
-    const QSet<QString> snapshot4 = mTDir.SnapshotAtPath(workPath);
-    QCOMPARE(snapshot4, snapshot1);
   }
 
-  void NumerizerQueryAndConfirm_ok() {
+  void RenameSelectedNumerizer_ok() {
     setConfig(RenamerKey::NAME_EXT_INDEPENDENT, true);
     setConfig(RenamerKey::NUMERIAZER_UNIQUE_EXT_COUNTER, false);
     setConfig(RenamerKey::NUMERIAZER_NO_FORMAT, " %1");
@@ -220,17 +166,17 @@ private slots:
     const QSet<QString> snapshot1 = mTDir.SnapshotAtPath(workPath);
 
     QStringList beforePatterns{"Chris Evans.json"};
-    const QStringList beforeSelectedNames{GetFilesNeedProcess(workPath, beforePatterns)};
+    const QStringList beforeSelectedNames{ExpandRelatedFiles(workPath, beforePatterns)};
 
     // 默认入参not crash
-    QCOMPARE(NumerizerQueryAndConfirm({}, {}), RnmResult::SKIP);
+    QCOMPARE(RenameSelectedNumerizer({}, {}), OpStatus::SKIP);
 
-    QCOMPARE(NumerizerQueryAndConfirm(workPath, beforeSelectedNames), RnmResult::SKIP);
+    QCOMPARE(RenameSelectedNumerizer(workPath, beforeSelectedNames), OpStatus::SKIP);
     const QSet<QString> snapshot2 = mTDir.SnapshotAtPath(workPath);
     QCOMPARE(snapshot2, snapshot1);  // user skip insert unchange
 
     // 编号, 后缀统一计数, 后缀和基础名分开, 从0开始计数, 格式为" %1", 预期只改两个文件名
-    QCOMPARE(NumerizerQueryAndConfirm(workPath, beforeSelectedNames), RnmResult::ALL_SUCCEED);
+    QCOMPARE(RenameSelectedNumerizer(workPath, beforeSelectedNames), OpStatus::ALL_SUCCEED);
     const QSet<QString> snapshot3 = mTDir.SnapshotAtPath(workPath);
     QVERIFY(snapshot3 != snapshot1);
     const QSet<QString> expectAfterRename{
@@ -251,65 +197,66 @@ private slots:
     QCOMPARE(snapshot4, snapshot1);
   }
 
-  void ReplaceBySpecifiedJson_ok() {
+  void RenameWithPatternReplace_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
-    MOCKER(ReplaceQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
+
+    MOCKER(RenameSelected).expects(exactly(2)).will(returnValue(OpStatus::ALL_SUCCEED));
     // default not crash down
-    QCOMPARE(ReplaceBySpecifiedJson({}, {}), 0);
+    QCOMPARE(RenameWithPatternReplace({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    const QStringList filesNeedRename_cnt3{ExpandRelatedFiles(workPath, json2Names)};
     QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1); // 4Chris Evans+1Michael Fassbender
-    QCOMPARE(ReplaceBySpecifiedJson(workPath, json2Names), 4 + 1);
+    QCOMPARE(RenameWithPatternReplace(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    const QStringList filesNeedRename_cnt2{ExpandRelatedFiles(workPath, json1Names)};
     QCOMPARE(filesNeedRename_cnt2.size(), 4);
-    QCOMPARE(ReplaceBySpecifiedJson(workPath, json1Names), 4);
+    QCOMPARE(RenameWithPatternReplace(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 
-  void InsertBySpecifiedJson_ok() {
+  void RenameWithPatternInsert_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
-    MOCKER(InsertQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
+    MOCKER(RenameSelected).expects(exactly(2)).will(returnValue(OpStatus::ALL_SUCCEED));
 
     // default not crash down
-    QCOMPARE(InsertBySpecifiedJson({}, {}), 0);
+    QCOMPARE(RenameWithPatternInsert({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    const QStringList filesNeedRename_cnt3{ExpandRelatedFiles(workPath, json2Names)};
     QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1);
-    QCOMPARE(InsertBySpecifiedJson(workPath, json2Names), 4 + 1);
+    QCOMPARE(RenameWithPatternInsert(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    const QStringList filesNeedRename_cnt2{ExpandRelatedFiles(workPath, json1Names)};
     QCOMPARE(filesNeedRename_cnt2.size(), 4);
-    QCOMPARE(InsertBySpecifiedJson(workPath, json1Names), 4);
+    QCOMPARE(RenameWithPatternInsert(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 
   void NumerizerBySpecifiedJson_ok() {
     QString workPath = mTDir.itemPath("replace/pattern");
-    MOCKER(NumerizerQueryAndConfirm).expects(exactly(2)).will(returnValue(RnmResult::ALL_SUCCEED));
+    MOCKER(RenameSelected).expects(exactly(2)).will(returnValue(OpStatus::ALL_SUCCEED));
 
     // default not crash down
-    QCOMPARE(NumerizerBySpecifiedJson({}, {}), 0);
+    QCOMPARE(RenameWithPatternNumerizer({}, {}), 0);
 
     const QStringList& json2Names{"Chris Evans.json", "Michael Fassbender.json"};
-    const QStringList filesNeedRename_cnt3{GetFilesNeedProcess(workPath, json2Names)};
+    const QStringList filesNeedRename_cnt3{ExpandRelatedFiles(workPath, json2Names)};
     QCOMPARE(filesNeedRename_cnt3.size(), 4 + 1);
-    QCOMPARE(NumerizerBySpecifiedJson(workPath, json2Names), 4 + 1);
+    QCOMPARE(RenameWithPatternNumerizer(workPath, json2Names), 4 + 1);
     // 3 file renamed by this 2 pattern
 
     const QStringList& json1Names{"Chris Evans.json"};
-    const QStringList filesNeedRename_cnt2{GetFilesNeedProcess(workPath, json1Names)};
+    const QStringList filesNeedRename_cnt2{ExpandRelatedFiles(workPath, json1Names)};
     QCOMPARE(filesNeedRename_cnt2.size(), 4);
-    QCOMPARE(NumerizerBySpecifiedJson(workPath, json1Names), 4);
+    QCOMPARE(RenameWithPatternNumerizer(workPath, json1Names), 4);
     // 2 file renamed by this 1 pattern
   }
 };
 
-#include "BatchRenameByTest.moc"
-REGISTER_TEST(BatchRenameByTest, false)
+#include "FileBatchOpsTest.moc"
+REGISTER_TEST(FileBatchOpsTest, false)

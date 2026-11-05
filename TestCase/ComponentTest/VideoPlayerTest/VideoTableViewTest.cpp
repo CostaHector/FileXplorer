@@ -5,7 +5,7 @@
 #include "BeginToExposePrivateMember.h"
 #include "VideoTableView.h"
 #include "EndToExposePrivateMember.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "RecycleCfmDlg.h"
 
 #include <QSignalSpy>
@@ -217,7 +217,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.onRenameJsonAndRelatedReplace(), 0);  // no row selected
 
     videoTv.selectAll();
-    MOCKER(BatchRenameBy::ReplaceBySpecifiedJson)
+    MOCKER(FileBatchOps::RenameWithPatternReplace)
         .expects(exactly(2))    //
         .will(returnValue(0))   // 1st: user cancel, 0 files renamed, 0 row deleted
         .then(returnValue(3));  // 2nd: 3 files renamed, 1 row deleted
@@ -240,7 +240,7 @@ class VideoTableViewTest : public PlainTestSuite {
     QCOMPARE(videoTv.onRenameJsonAndRelatedInsert(), 0);  // no row selected
 
     videoTv.selectAll();
-    MOCKER(BatchRenameBy::InsertBySpecifiedJson)
+    MOCKER(FileBatchOps::RenameWithPatternInsert)
         .expects(exactly(2))    //
         .will(returnValue(0))   // 1st: user cancel, 0 files renamed, 0 row deleted
         .then(returnValue(3));  // 2nd: 3 files renamed, 1 row deleted

@@ -6,7 +6,7 @@
 #include "CastManager.h"
 #include "PathTool.h"
 #include "GeneralDataType.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "SceneMixed.h"
 #include "JsonUpdater.h"
 #include "Logger.h"
@@ -232,7 +232,7 @@ QStringList JsonTableModel::RelativePath2JsonFile(const QModelIndexList& indexes
 
 QStringList JsonTableModel::RelativePath2RelatedFiles(const QModelIndexList& indexes, QMap<QString, QString>* pFile2Json) const {
   const QStringList& relativePathsOfJson{RelativePath2JsonFile(indexes)};
-  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson, pFile2Json);
+  return FileBatchOps::ExpandRelatedFiles(rootPath(), relativePathsOfJson, pFile2Json);
 }
 
 QMap<QString, QStringList> JsonTableModel::RelativePath2JsonFile2CastList(const QModelIndexList& indexes) const {

@@ -22,7 +22,7 @@ QActionGroup* RenameActions::Get_Rename_Actions() {
   _SECTIONS_ARRANGE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F2));
   _SECTIONS_ARRANGE->setToolTip(QString("<b>%1 (%2)</b><br/> Swap sections in name. e.g., A-B-C -> A-C-B.").arg(_SECTIONS_ARRANGE->text()).arg(_SECTIONS_ARRANGE->shortcut().toString()));
 
-  _REVERSE_NAMES_LIST->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_R));
+  _REVERSE_NAMES_LIST->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_R));
   _REVERSE_NAMES_LIST->setToolTip(QString("<b>%1 (%2)</b><br/> Swap 2 filenames.<br/>"
                                           "e.g.,<br/>"
                                           "file1, file2 -> file2, file1")

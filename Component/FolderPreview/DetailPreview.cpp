@@ -9,6 +9,7 @@ DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_P
 
   mDetailTextBrowser = new (std::nothrow) ClickableTextBrowser{this};
   mBasicVideoView = new (std::nothrow) BasicVideoView{true, this};
+  mBasicVideoView->EnableVideoIterate();
 
   mBasicVideoView->setVisible(false);
   addWidget(mDetailTextBrowser);

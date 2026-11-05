@@ -16,6 +16,7 @@ class FolderNxtAndLastIterator {
                                     bool bIncludingSubDir = false);
   static FolderNxtAndLastIterator GetInstsNaviFolders();
   static FolderNxtAndLastIterator GetInstsNaviImages(bool bIncludingSubDir);
+  static FolderNxtAndLastIterator* NewInstsNaviVideos(bool bIncludingSubDir);
 
   bool operator()(const QString& parentPath, bool bForce = false);
 

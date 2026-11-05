@@ -8,6 +8,7 @@
 #include "VideoPlayerKey.h"
 #include "Configuration.h"
 #include <QSignalSpy>
+#include <QLabel>
 
 class VolumeWidgetTest : public PlainTestSuite {
   Q_OBJECT

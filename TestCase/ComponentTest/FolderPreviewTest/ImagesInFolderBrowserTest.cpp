@@ -12,7 +12,7 @@
 #include "Configuration.h"
 #include "ArchiveFiles.h"
 #include "DraggableToolButton.h"
-#include "StyleSheet.h"
+#include "ImageTool.h"
 #include "ImageTestPrecoditionTools.h"
 #include <QScrollBar>
 

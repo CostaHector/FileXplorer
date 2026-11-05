@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QBoxLayout>
-#include <QLabel>
 #include <QToolButton>
 #include <QAction>
 #include "ClickableSlider.h"
@@ -16,7 +15,7 @@ short nextLevelInLinearScale(short target);
 constexpr short ENLARGE_TIMES = 100;
 }  // namespace VolumeIterate
 
-
+class QLabel;
 class VolumeWidget : public QWidget {
   Q_OBJECT
 public:

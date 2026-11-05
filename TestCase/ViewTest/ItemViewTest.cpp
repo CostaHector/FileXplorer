@@ -9,7 +9,7 @@
 #include "TDir.h"
 #include "FileTool.h"
 #include "FileToolMock.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 
 #include <mockcpp/mokc.h>
 #include <mockcpp/GlobalMockObject.h>
@@ -102,7 +102,7 @@ class ItemViewTest : public PlainTestSuite {
   }
 
   void onRenameSelectedItems_ok() {
-    MOCKER(BatchRenameBy::NumerizerQueryAndConfirm).stubs().will(returnValue(BatchRenameBy::RnmResult::ALL_SUCCEED));
+    MOCKER(FileBatchOps::RenameSelectedNumerizer).stubs().will(returnValue(FileBatchOps::OpStatus::ALL_SUCCEED));
 
     ImgsModel mImgModel{"ImgsModel"};
     mImgModel.UpdateData({

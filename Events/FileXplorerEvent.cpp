@@ -28,6 +28,7 @@
 #include "RenameWidget_SwapFileNames.h"
 #include "RenameWidget_PrependParentFolderName.h"
 #include "RenameWidget_Digit2Alpha.h"
+#include "FileBatchOps.h"
 #include "DuplicateVideosFinder.h"
 #include "HarMgr.h"
 
@@ -63,6 +64,7 @@
 #include "RecycleCfmDlg.h"
 #include "RowHeightRegistry.h"
 
+#include "ImageTool.h"
 #include "ShadowRenamer.h"
 #include "ShadowRenamerActions.h"
 #include "StagingStatisticsDialog.h"
@@ -648,24 +650,39 @@ void FileXplorerEvent::subscribe() {
   }
 }
 
-struct AutoSwitchPath {
-  AutoSwitchPath(ViewTypeTool::ViewType vt, FileSystemModel* fsm, int filesCnt, QString recoverPath, bool bForceRefresh = false)//
-    : mIsNeedSwitchAway{ViewTypeTool::isFSView(vt) && (filesCnt > 100 || bForceRefresh)},
-    mFsm{fsm},
-    mRootPath{recoverPath}  {
-    if (mFsm != nullptr && mIsNeedSwitchAway) {
-      mFsm->setRootPath("");
+class ScopedFileSysModelRefresh {
+public:
+  ScopedFileSysModelRefresh(QFileSystemModel* fsm, const QString& rootPath, bool need) : mFsm(need ? fsm : nullptr), mRootPath(rootPath) {
+    if (mFsm != nullptr) {
+      mBlocker = new QSignalBlocker(mFsm);
     }
   }
-  ~AutoSwitchPath() {
-    if (mFsm != nullptr && mIsNeedSwitchAway) {
-      mFsm->setRootPath(mRootPath);
-    }
+
+  // 取消重命名时调用： 只解除阻塞，不切路径刷新
+  void disable() {
+    mDisabled = true;
   }
+
+  ~ScopedFileSysModelRefresh() {
+    if (mBlocker != nullptr) {
+      delete mBlocker;
+      mBlocker = nullptr;
+    }
+
+    if (mFsm == nullptr || mDisabled) {
+      return;
+    }
+
+    // 解阻后主动刷新一次最终结果
+    mFsm->setRootPath("");
+    mFsm->setRootPath(mRootPath);
+  }
+
 private:
-  bool mIsNeedSwitchAway{false};
-  FileSystemModel* mFsm{nullptr};
+  QFileSystemModel* mFsm{nullptr};
   QString mRootPath;
+  QSignalBlocker* mBlocker{nullptr};
+  bool mDisabled{false};
 };
 
 void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
@@ -685,12 +702,15 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
   }
-  AutoSwitchPath asp{vt, _fileSysModel, preNames.size(), currentPath, renameWid.isCaseChangedOnly()};
-  renameWid.init();
-  renameWid.setModal(true);
-  renameWid.InitTextEditContent(currentPath, preNames);
-  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
+  FileBatchOps::prepareRenameDialog(renameWid, currentPath, preNames);
+
+  const bool needRefreshGuard {ViewTypeTool::isFSView(vt) && (preNames.size() > 100 || renameWid.isCaseChangedOnly())};
+  ScopedFileSysModelRefresh guard{_fileSysModel, currentPath, needRefreshGuard};
+
+  const FileBatchOps::OpStatus r = FileBatchOps::execRenameDialog(renameWid);
+  if (r == FileBatchOps::OpStatus::SKIP) {
     LOG_INFO_P("[Cancel] rename", "User cancel rename %d item(s)", preNames.size());
+    guard.disable();
   }
 }
 
@@ -764,7 +784,8 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
 bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
   const auto vt = _contentPane->GetVt();
   const QString currentPath = _contentPane->getRootPath();
-  AutoSwitchPath asp{vt, _fileSysModel, 0, currentPath, true};
+  _fileSysModel->setRootPath("");
+  _fileSysModel->setRootPath(currentPath);
   return true;
 }
 

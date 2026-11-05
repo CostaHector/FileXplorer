@@ -3,7 +3,7 @@
 #include "FileTool.h"
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include <QFile>
 
 ItemView::ItemView(const QString& itemViewName, QWidget* parent)  //
@@ -104,7 +104,7 @@ int ItemView::onRenameSelectedItems() {
 
   const QString& localPath{mModels->rootPath()};
   const QStringList& fileNamesSelected{mModels->rel2fileNames(srcIndexes)};
-  const BatchRenameBy::RnmResult rnmResult{BatchRenameBy::NumerizerQueryAndConfirm(localPath, fileNamesSelected)};
+  const FileBatchOps::OpStatus rnmResult{FileBatchOps::RenameSelectedNumerizer(localPath, fileNamesSelected)};
   const int removeRowCnt{mModels->AfterRowsRemoved(srcIndexes)};
   return fileNamesSelected.size();
 }

@@ -1,16 +1,8 @@
 #ifndef VIDEOVIEW_H
 #define VIDEOVIEW_H
 
-#include <QWidget>
-#include <QVideoProbe>
-#include <QToolBar>
 #include <QSplitter>
 #include <QVBoxLayout>
-#include <QToolButton>
-#include <QMediaPlaylist>
-#include "ClickableSlider.h"
-#include "EnumIntAction.h"
-#include "MenuToolButton.h"
 #include "BasicVideoView.h"
 #include "VideoTableView.h"
 
