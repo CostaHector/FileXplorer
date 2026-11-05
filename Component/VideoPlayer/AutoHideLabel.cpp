@@ -6,6 +6,7 @@ constexpr int AutoHideLabel::TIME_PERIOD;
 
 AutoHideLabel::AutoHideLabel(const QString &text, QWidget *parent, Qt::WindowFlags f)
   : QLabel{text, parent, f} {
+  setTextInteractionFlags(Qt::TextSelectableByMouse);
   mAutoHideTimer.setInterval(TIME_PERIOD);
   mAutoHideTimer.setSingleShot(true);
   connect(&mAutoHideTimer, &QTimer::timeout, this, &QLabel::hide);
