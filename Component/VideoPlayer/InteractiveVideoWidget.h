@@ -2,13 +2,12 @@
 #define INTERACTIVEVIDEOWIDGET_H
 
 #include <QVideoWidget>
-#include <QMediaPlaylist>
-#include <QMenu>
 #include <QTimer>
 #include "RateActions.h"
 
 typedef std::function<bool(bool)> TFuncFullScreenToggleCallback;
 
+class QMenu;
 class InteractiveVideoWidget : public QVideoWidget {
   Q_OBJECT
 public:
@@ -50,6 +49,7 @@ private:
   bool onSelectAFolder();
   void tryStartAutoHideTimer();
 
+  QAction* mRenameCurrentMediaAct{nullptr};                            // 重命名当前媒体及相关文件
   QAction* mGrabFrame{nullptr};                                        // 抓取当前帧
   QAction* mPauseAct{nullptr};                                         // 通用暂停/继续动作
   QAction* mStopAct{nullptr};                                          // 停止播放

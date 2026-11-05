@@ -12,6 +12,10 @@ FolderNxtAndLastIterator FolderNxtAndLastIterator::GetInstsNaviImages(bool bIncl
   return FolderNxtAndLastIterator{TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, bIncludingSubDir};
 }
 
+FolderNxtAndLastIterator* FolderNxtAndLastIterator::NewInstsNaviVideos(bool bIncludingSubDir) {
+  return new FolderNxtAndLastIterator{TYPE_FILTER::AI_DUP_VIDEO_TYPE_SET, QDir::Filter::Files, bIncludingSubDir};
+}
+
 FolderNxtAndLastIterator::FolderNxtAndLastIterator(const QStringList& nameFilters, QDir::Filters dirFilters, bool bIncludingSubDir)
   : mNameFilters{nameFilters}
   , mDirFilters{dirFilters}

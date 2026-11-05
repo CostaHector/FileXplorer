@@ -8,7 +8,7 @@
 #include "SceneInPageActions.h"
 #include "SceneInfoManager.h"
 #include "ScenePageControl.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "RecycleCfmDlg.h"
@@ -370,7 +370,7 @@ int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringLi
     if (!QFileInfo{tierFolderAbsPath}.isDir()) {
       archiveCmds.append(FileOperatorType::ACMD::GetInstMKDIR(tierFolderLocatedIn, tierFolderName));
     }
-    const QStringList& filesNeedArchive = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+    const QStringList& filesNeedArchive = FileBatchOps::ExpandRelatedFiles(jsonLocatedInPath, jsonFileNames);
     allFilesNeedArchive += filesNeedArchive;
     for (const auto& nm : filesNeedArchive) {
       archiveCmds.append(FileOperatorType::ACMD::GetInstMV(jsonLocatedInPath, nm, tierFolderAbsPath));

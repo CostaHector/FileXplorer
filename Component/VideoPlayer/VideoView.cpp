@@ -2,7 +2,6 @@
 #include "Logger.h"
 #include "VideoPlayerActions.h"
 #include "Configuration.h"
-#include "NotificatorMacro.h"
 #include "PublicCheckMacro.h"
 
 VideoView::VideoView(bool bBasicMode, QWidget* parent) : QSplitter{Qt::Orientation::Horizontal, parent} {
@@ -53,6 +52,10 @@ void VideoView::onReqModeChange(bool bBasicMode) {
 
 void VideoView::subscribe() {
   const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget();
+  if (mBasicVideoView->isEnableVideoIterate()) {
+    LOG_W("Video iterate navigation slot callback handed over: BasicVideoView -> VideoTableView");
+    mBasicVideoView->DisableVideoIterate();
+  }
   connect(inst->mPlayPrevAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
   connect(inst->mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
   connect(inst->mShowVideoList, &QAction::toggled, this, &VideoView::onChangeListVisibility);

@@ -5,7 +5,7 @@
 #include "NotificatorMacro.h"
 #include "UndoRedo.h"
 #include "PathTool.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "RenameWidget_Replace.h"
 #include "FileOpActs.h"
 #include <QFile>
@@ -84,12 +84,14 @@ bool DuplicateVideoDetailsTable::on_Rename(AdvanceRenamer& renameWid) {
   QString prepath;
   QStringList rels;
   std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
-  const QStringList relativeToVidsRelated = BatchRenameBy::GetFilesNeedProcess(prepath, rels);
-  renameWid.init();
-  renameWid.setModal(true);
-  renameWid.InitTextEditContent(prepath, relativeToVidsRelated);
-  if (renameWid.exec() != QDialog::Accepted) { // don't mixed with renameWid.show(); (even it can operate on former widget)
-    LOG_INFO_P("Rename", "User cancel rename %d item(s)", relativeToVidsRelated.size());
+  if (prepath.isEmpty()) {
+    LOG_WARN_NP("Rename", "prepath is empty");
+    return false;
+  }
+
+  const FileBatchOps::OpOutcome outcome = FileBatchOps::RenameSelectedWithRelated(renameWid, prepath, rels);
+  if (outcome.result == FileBatchOps::OpStatus::SKIP) {
+    LOG_INFO_P("Rename", "User cancel rename %d item(s)", outcome.count);
     return false;
   }
   return true;
@@ -115,7 +117,7 @@ bool DuplicateVideoDetailsTable::on_RecycleSelection() {
   QStringList rels;
   std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
 
-  const QStringList relativeToVidsRelated = BatchRenameBy::GetFilesNeedProcess(prepath, rels);
+  const QStringList relativeToVidsRelated = FileBatchOps::ExpandRelatedFiles(prepath, rels);
   if (relativeToVidsRelated.isEmpty()) {
     LOG_INFO_P("Nothing need to recycle", "prepath[%s], rels count[%d]", qPrintable(prepath), rels.size());
     return true;

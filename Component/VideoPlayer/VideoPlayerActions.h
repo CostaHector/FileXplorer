@@ -7,7 +7,6 @@
 #include "EnumIntAction.h"
 #include "VideoPlayTool.h"
 #include "MenuToolButton.h"
-#include "VolumeWidget.h"
 
 extern template struct EnumIntAction<QMediaPlaylist::PlaybackMode>;
 extern template struct EnumIntAction<VideoPlayTool::PlaybackTriggerMode>;

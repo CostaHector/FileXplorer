@@ -5,7 +5,7 @@
 #include "RelatedHelper.h"
 #include "RecycleCfmDlg.h"
 #include "ImageViewerActions.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "FileOpActs.h"
@@ -117,8 +117,6 @@ std::unique_ptr<QMovie> FileImageViewer::GetMovieCore(QSize& movieSize) const {
 }
 
 bool FileImageViewer::NavigateImageCore(FolderNxtAndLastIterator::NaviDirection direction) {
-  mImgIt(mParentPath);
-
   QString newImageName;
   switch (direction) {
     case FolderNxtAndLastIterator::NaviDirection::PREV:
@@ -170,7 +168,7 @@ bool FileImageViewer::RecycleCurrentImageAndItsRelated() {
 
   QString jsonLocatedInPath = PathTool::absolutePath(jsonPath);
   QStringList jsonFileNames{PathTool::relativePath(jsonPath, jsonLocatedInPath.size())};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+  const QStringList& filesNeedRecycle = FileBatchOps::ExpandRelatedFiles(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
 
   if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {

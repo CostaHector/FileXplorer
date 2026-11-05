@@ -4,7 +4,9 @@
 #include "DualIconCheckableAction.h"
 #include "VideoPlayerActions.h"
 #include "Logger.h"
+
 #include <cmath>
+#include <QLabel>
 
 namespace VolumeIterate {
 constexpr const short VOLUME_IN_LOG_SCALE_ARR[]  //

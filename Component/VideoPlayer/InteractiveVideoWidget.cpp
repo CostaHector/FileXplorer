@@ -10,15 +10,22 @@
 #include "PathKey.h"
 #include "Configuration.h"
 #include "ToolBarWidget.h"
+
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 #include <QFileDialog>
+#include <QMenu>
 
 InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent) : QVideoWidget{parent} {
   mGrabFrame = new QAction{QIcon{":/VideoPlayer/GRAB_FRAME"}, tr("Grab a Frame"), this};
   mGrabFrame->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_E));
   mGrabFrame->setToolTip(QString{"<b>%1 (%2)</b><br/>Grab the frame at current position"}//
                                .arg(mGrabFrame->text(), mGrabFrame->shortcut().toString()));
+
+  mRenameCurrentMediaAct = new QAction{QIcon(":img/NAME_STR_REPLACER_PATH"), tr("Rename(Replace)"), this};
+  mRenameCurrentMediaAct->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key::Key_F2));
+  mRenameCurrentMediaAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Rename current media playing and its related files."}//
+                             .arg(mRenameCurrentMediaAct->text(), mRenameCurrentMediaAct->shortcut().toString()));
 
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, true);
 
@@ -70,6 +77,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addAction(mHideToolBarAct);
   mContextMenu->addAction(mShowVideoList);
   mContextMenu->addAction(mGrabFrame);
+  mContextMenu->addAction(mRenameCurrentMediaAct);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mPauseAct);
   mContextMenu->addAction(mStopAct);
@@ -218,7 +226,13 @@ void InteractiveVideoWidget::mousePressEvent(QMouseEvent* event) {
 void InteractiveVideoWidget::keyPressEvent(QKeyEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   const Qt::KeyboardModifiers modifier = event->modifiers();
-  switch (event->key()) {
+  const int ky = event->key();
+  if (modifier == Qt::KeyboardModifier::AltModifier && ky == Qt::Key::Key_Return) {
+    mHideToolBarAct->toggle();
+    event->setAccepted(true);
+    return;
+  }
+  switch (ky) {
     case Qt::Key::Key_Left: {
       mSeekBackwardAct->trigger();
       break;
@@ -250,12 +264,6 @@ void InteractiveVideoWidget::keyPressEvent(QKeyEvent* event) {
     case Qt::Key::Key_Escape: {
       if (isVideoFullScreen()) {
         mFullScreenAct->setChecked(false);
-      }
-      break;
-    }
-    case Qt::Key::Key_Return: {
-      if (modifier == Qt::KeyboardModifier::AltModifier) {
-        mHideToolBarAct->toggle();
       }
       break;
     }

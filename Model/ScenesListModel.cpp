@@ -5,7 +5,7 @@
 #include "RateHelper.h"
 #include "ImageTool.h"
 #include "PathTool.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 
 #include <QObject>
 #include <QPixmap>
@@ -207,7 +207,7 @@ QStringList ScenesListModel::RelativePath2JsonFile(const QModelIndexList& indexe
 
 QStringList ScenesListModel::RelativePath2RelatedFiles(const QModelIndexList& indexes) const {
   const QStringList& relativePathsOfJson{RelativePath2JsonFile(indexes)};
-  return BatchRenameBy::GetFilesNeedProcess(rootPath(), relativePathsOfJson);
+  return FileBatchOps::ExpandRelatedFiles(rootPath(), relativePathsOfJson);
 }
 
 bool ScenesListModel::setRootPath(const QString& rootPath, bool bSubdirectories, bool bForce) {

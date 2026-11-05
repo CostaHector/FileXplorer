@@ -1,7 +1,7 @@
 #include "VideoTableView.h"
 #include "NotificatorMacro.h"
 #include "RateActions.h"
-#include "BatchRenameBy.h"
+#include "FileBatchOps.h"
 #include "FileOperatorPub.h"
 #include "UndoRedo.h"
 #include "RecycleCfmDlg.h"
@@ -223,7 +223,7 @@ int VideoTableView::onRenameJsonAndRelatedReplace() {
 
   const QString& videoLocatedInPath{mVideoModel->rootPath()};
   const QStringList& videoFileNames{mVideoModel->rel2fileNames(srcIndexes)};
-  const int relatedFilesCnt{BatchRenameBy::ReplaceBySpecifiedJson(videoLocatedInPath, videoFileNames)};
+  const int relatedFilesCnt{FileBatchOps::RenameWithPatternReplace(videoLocatedInPath, videoFileNames)};
   if (relatedFilesCnt <= 0) {
     return 0;
   }
@@ -241,7 +241,7 @@ int VideoTableView::onRenameJsonAndRelatedInsert() {
 
   const QString& videoLocatedInPath{mVideoModel->rootPath()};
   const QStringList& videoFileNames{mVideoModel->rel2fileNames(srcIndexes)};
-  const int relatedFilesCnt{BatchRenameBy::InsertBySpecifiedJson(videoLocatedInPath, videoFileNames)};
+  const int relatedFilesCnt{FileBatchOps::RenameWithPatternInsert(videoLocatedInPath, videoFileNames)};
   if (relatedFilesCnt <= 0) {
     return 0;
   }
@@ -267,7 +267,7 @@ int VideoTableView::onRecycleVideoAndRelated() {
   const QString& jsonLocatedInPath{mVideoModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{mVideoModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = BatchRenameBy::GetFilesNeedProcess(jsonLocatedInPath, jsonFileNames);
+  const QStringList& filesNeedRecycle = FileBatchOps::ExpandRelatedFiles(jsonLocatedInPath, jsonFileNames);
   const int relatedFilesCnt{filesNeedRecycle.size()};
 
   if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {

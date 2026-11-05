@@ -130,10 +130,10 @@ private slots:
     QCOMPARE(model.data(model.index(0, DuplicateVideoMetaInfo::Hash)).toString(), ""); // calculate md5 instantly, but file not exist
 
     // fileNameUsedForToolEverything: only [0-9a-zA-Z_ ] characters in ans
-    QCOMPARE(model.fileNameUsedForToolEverything(model.index(0, DuplicateVideoMetaInfo::Name)), "sz   v1 mp4");
-    QCOMPARE(model.fileNameUsedForToolEverything(model.index(1, DuplicateVideoMetaInfo::Name)), "sz_v2 mp4");
-    QCOMPARE(model.fileNameUsedForToolEverything(model.index(2, DuplicateVideoMetaInfo::Name)), "sz_v3 mp4");
-    QCOMPARE(model.fileNameUsedForToolEverything(model.index(3, DuplicateVideoMetaInfo::Name)), "sz_v4 mp4");
+    QCOMPARE(model.fileNameUsedForToolEverything(model.index(0, DuplicateVideoMetaInfo::Name)), "sz   v1");
+    QCOMPARE(model.fileNameUsedForToolEverything(model.index(1, DuplicateVideoMetaInfo::Name)), "sz_v2");
+    QCOMPARE(model.fileNameUsedForToolEverything(model.index(2, DuplicateVideoMetaInfo::Name)), "sz_v3");
+    QCOMPARE(model.fileNameUsedForToolEverything(model.index(3, DuplicateVideoMetaInfo::Name)), "sz_v4");
 
     {
       const QString notExistAbsFullPath = model.data(model.index(0, DuplicateVideoMetaInfo::AbsPath)).toString();

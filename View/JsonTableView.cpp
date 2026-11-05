@@ -9,6 +9,7 @@
 #include "TagsHelper.h"
 #include "PathTool.h"
 #include "RenameWidget_CastElider.h"
+#include "FileBatchOps.h"
 
 #include <QDir>
 #include <QHeaderView>
@@ -536,14 +537,15 @@ int JsonTableView::onSyncRelatedFileNameWithNameCast() {
   const QStringList relNames = _JsonModel->RelativePath2RelatedFiles(srcIndexes, &relatedFile2Json);
   const QString currentPath = _JsonModel->rootPath();
   QMap<QString, QStringList> relativeJson2Cast = _JsonModel->RelativePath2JsonFile2CastList(srcIndexes);
-  RenameWidget_CastElider pCastElider{this};
-  pCastElider.init();
-  pCastElider.setModal(true);
-  pCastElider.initCoreName2CastListMap(relativeJson2Cast);
-  pCastElider.initRelatedFile2Json(relatedFile2Json);
-  pCastElider.InitTextEditContent(currentPath, relNames);
-  // AfterJsonFilesNameRenamed
-  if (RenameWidget_CastElider::execCore(&pCastElider) != QDialog::Accepted) {
+
+  FileBatchOps::BeforeInitTextContentFn fn = [&relatedFile2Json, &relativeJson2Cast](AdvanceRenamer& base) {
+    auto& w = static_cast<RenameWidget_CastElider&>(base);
+    w.initCoreName2CastListMap(relativeJson2Cast);
+    w.initRelatedFile2Json(relatedFile2Json);
+  };
+  RenameWidget_CastElider pCastElider;
+  FileBatchOps::prepareRenameDialog(pCastElider, currentPath, relNames, fn);
+  if (FileBatchOps::execRenameDialog(pCastElider) == FileBatchOps::OpStatus::SKIP) {
     LOG_INFO_P("[Cancel] Sync related files", "User cancel rename %d item(s)", relNames.size());
     return 0;
   }

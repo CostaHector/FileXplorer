@@ -2,17 +2,15 @@
 #define BASICVIDEOVIEW_H
 
 #include <QWidget>
-#include <QVideoWidget>
 #include <QMediaPlayer>
-#include <QSlider>
 #include <QVBoxLayout>
-#include <QToolButton>
 #include <QTimer>
 #include "AutoHideLabel.h"
 #include "ClickableSlider.h"
 #include "ToolBarWidget.h"
 #include "InteractiveVideoWidget.h"
 
+class FolderNxtAndLastIterator;
 class BasicVideoView : public QWidget {
   Q_OBJECT
 public:
@@ -31,6 +29,15 @@ public:
   bool adjustRateCurrentVideo(int delta) const;
   int adjustRateAllVideoSameLevelAsCurrentVideo(int delta) const;
   void setAlwaysShowStatusLabel();
+
+  /* 重命名 */
+  bool on_RenameReplace();
+
+  /* 访问 前一个/后一个 视频 */
+  void EnableVideoIterate();
+  bool isEnableVideoIterate() { return mVideoIterator != nullptr; }
+  void DisableVideoIterate();
+  void clearVideoIterate();
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -82,6 +89,10 @@ private:
 
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
+  FolderNxtAndLastIterator* mVideoIterator{nullptr};
+  bool onNavigatePreviousVideo() { return navigateVideo(false); }
+  bool onNavigateNextVideo()     { return navigateVideo(true);  }
+  bool navigateVideo(bool bForward);
 
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };
