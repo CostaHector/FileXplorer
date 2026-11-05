@@ -69,16 +69,27 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
     const QStringList& files{relIt.value()};
     auto firstFileIt = std::__lower_bound(files.cbegin(), files.cend(), jsonBaseName, prefixLessThan);
     for (auto it = firstFileIt; it != files.end(); ++it) {
+      // file.mp4
+      // file.jpg
+      // file_tn.jpg
+      // file 0.jpg
+      // file - 0.jpg
+      // file.mp4_20260818_155313.075.jpg
+      // file_011050.075.jpg
       const QString& fileName = *it;
       if (!fileName.startsWith(jsonBaseName)) {
         continue;
       }
       std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
-      // fileBaseName == (jsonBaseName + extraContent) + fileExt. extraContent can be:
-      // 1. "": (fileBaseName == jsonBaseName)
+      // fileBaseName == (jsonBaseName + extraContent) + fileExt.
+      // extraContent can be:
+      // 1. "":           (fileBaseName == jsonBaseName)
       // 2. "_tn"
-      // 3. " - number": len(fileBaseName) > len(jsonBaseName)
-      // 4. " number": len(fileBaseName) > len(jsonBaseName)
+      // 3.1 " - number": len(fileBaseName) > len(jsonBaseName)
+      // 3.2 " number"  : len(fileBaseName) > len(jsonBaseName)
+      // fileName can be endswith:
+      // 4.1 "_20260818_155313.075.jpg"
+      // 4.2 "_011050.075.jpg"
       const QString extraContent = fileBaseName.mid(jsonBaseName.size());
       if (extraContent.isEmpty()) {
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
@@ -91,6 +102,15 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
         continue;
       }
       if (ItemsPileCategory::IMG_PILE_NAME_PATTERN.match(extraContent).hasMatch()) {
+        filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
+        if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
+        continue;
+      }
+      if (ItemsPileCategory::GetImageNoTimeStampPatternLength(fileName) >= 0) {
+        // 注意 mp4, mkv 会被同时扩展到
+        // "file.mp4_20260818_155313.075.jpg" -> "file.mp4"
+        // "file.mkv_20260818_155313.075.jpg" -> "file.mkv"
+        // "file_011050.075.jpg"              -> "file"
         filesNeedRename.push_back(isRel ? relPath + '/' + fileName : fileName);
         if (pFile2Pattern) (*pFile2Pattern)[filesNeedRename.back()] = rel2Json;
         continue;

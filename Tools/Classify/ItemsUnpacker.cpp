@@ -37,10 +37,14 @@ bool ItemsUnpacker::CanExtractOut(const QStringList& items) {
     auto typeEnum = dotExt2TypeHash.value(ext.toLower(), SCENE_COMPONENT_TYPE::OTHER);
     switch (typeEnum) {
       case IMG: {
-        if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
-          noNumberName = result.captured(1);
-        } else if (baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
+        int noTimestampLen = -1;
+        if (baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
           noNumberName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
+        } else if ((result = IMG_PILE_NAME_PATTERN.match(baseName)).hasMatch()) {
+          noNumberName = result.captured(1);
+        } else if ((noTimestampLen = ItemsPileCategory::GetImageNoTimeStampPatternLength(medName)) >= 0) {
+          noNumberName = medName.left(noTimestampLen);
+          noNumberName = PathTool::GetBaseName(noNumberName);
         }
         break;
       }

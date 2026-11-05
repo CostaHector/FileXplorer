@@ -93,18 +93,31 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
     }
   }
 
+  int noTimestampLen = -1;
   // classify images into m_img2Name
   QRegularExpressionMatch matchResult;
   for (const stImg& img : imageNames) {
+    // 1. "":           (fileBaseName == jsonBaseName)
+    // 2. "_tn"
+    // 3.1 " - number": len(fileBaseName) > len(jsonBaseName)
+    // 3.2 " number"  : len(fileBaseName) > len(jsonBaseName)
+    // fileName can be endswith:
+    // 4.1 "_20260818_155313.075.jpg"
+    // 4.2 "_011050.075.jpg"
     QString imgGrpName{img.baseName};
     if (batches.contains(img.baseName)) {
       // Poster of a movie "Golden Island part 1.mp4" named "Golden Island part 1.jpg" should be in group "Golden Island part 1"
-    } else if ((matchResult = IMG_PILE_NAME_PATTERN.match(img.baseName)).hasMatch()) {  // ^(.*?)( | - )(\\d{1,3})?$
-      // Screenshot of a movie "Golden Island part 1.mp4" named "Golden Island part 1 0.jpg",  "Golden Island part 1 1.jpg" should be in group "Golden
-      // Island part 1"
-      imgGrpName = matchResult.captured(1);
     } else if (img.baseName.endsWith(PathTool::THUMBNAIL_FILE_ABBR)) {
       imgGrpName.chop(sizeof(PathTool::THUMBNAIL_FILE_ABBR) - 1);
+    } else if ((matchResult = IMG_PILE_NAME_PATTERN.match(img.baseName)).hasMatch()) {  // ^(.*?)( | - )(\\d{1,3})?$
+      // Screenshot of a movie "Golden Island part 1.mp4" named
+      // "Golden Island part 1 0.jpg",  "Golden Island part 1 1.jpg" should be in group "Golden Island part 1"
+      imgGrpName = matchResult.captured(1);
+    } else if ((noTimestampLen = ItemsPileCategory::GetImageNoTimeStampPatternLength(img.fullName)) >= 0){
+      // "file.mp4_20260818_155313.075.jpg" -> "file.mp4" -> "file"
+      // "file_011050.075.jpg"              -> "file"     -> "file"
+      imgGrpName = img.fullName.left(noTimestampLen);
+      imgGrpName = PathTool::GetBaseName(imgGrpName);
     }
     // Image is neither a post nor a screenshot of a movie should be in a seperate group
     m_img2Name[imgGrpName].append(img.fullName);

@@ -198,11 +198,19 @@ bool FileXplorerEvent::on_CreateVideoStoryBoard(int dimensionX, int dimensionY, 
   return true;
 }
 
-bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
+bool FileXplorerEvent::on_AutoRenameVideoSourceFrames(bool skipIfExist) {
   const QString rootPath = _contentPane->getRootPath();
   VideoStoryboard tp{skipIfExist};
-  bool renameResult = tp.RenameVideoStoryBoardCreatedByPotPlayer(rootPath);
-  LOG_OE_NP(renameResult, "Rename thumbnail under path", rootPath);
+  bool renameResult = tp.AutoRenameVideoSourceFrame(rootPath);
+  LOG_OE_NP(renameResult, "Auto rename video source frames under path", rootPath);
+  return true;
+}
+
+bool FileXplorerEvent::on_AutoRenameVideoStoryboards(bool skipIfExist) {
+  const QString rootPath = _contentPane->getRootPath();
+  VideoStoryboard tp{skipIfExist};
+  bool renameResult = tp.AutoRenameVideoStoryboards(rootPath);
+  LOG_OE_NP(renameResult, "Auto rename video storyboard under path", rootPath);
   return true;
 }
 
@@ -472,9 +480,13 @@ void FileXplorerEvent::subscribeThumbnailActions() {
   connect(&ins, &ThumbnailActions::extractImages, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
   connect(&ins, &ThumbnailActions::grabFrames, this, &FileXplorerEvent::on_GrabFramesFromVideos);
 
-  connect(ins._RENAME_STORYBOARD_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
+  connect(ins._AUTO_RENAME_VIDEO_SOURCE_FRAMES, &QAction::triggered, this, [this, &ins]() {
     const bool bSkipExist = ins.isSkipIfAlreadyExist();
-    on_RenameThumbnailImages(bSkipExist);
+    on_AutoRenameVideoSourceFrames(bSkipExist);
+  });
+  connect(ins._AUTO_RENAME_VIDEO_STORYBOARDS, &QAction::triggered, this, [this, &ins]() {
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
+    on_AutoRenameVideoStoryboards(bSkipExist);
   });
 
   connect(ins._CREATE_THUMBNAIL_FOR_FOLDER, &QAction::triggered, this, [this, &ins]() {
@@ -783,6 +795,9 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
 
 bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
   const auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    return true;
+  }
   const QString currentPath = _contentPane->getRootPath();
   _fileSysModel->setRootPath("");
   _fileSysModel->setRootPath(currentPath);

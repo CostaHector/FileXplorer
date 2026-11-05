@@ -14,8 +14,8 @@ class VideoStoryboard {
 
   static bool IsImageAnThumbnail(const QString& imgAbsPath);
   static bool IsImageNameLooksLikeThumbnail(const QString& imgBaseName);
-  bool RenameVideoSourceFrameSavedByPotPlayer(const QString& path) const;
-  bool RenameVideoStoryBoardCreatedByPotPlayer(const QString& path) const;
+  bool AutoRenameVideoSourceFrame(const QString& path) const;
+  bool AutoRenameVideoStoryboards(const QString& path) const;
   int Create(const QStringList& files, int dimensionX, int dimensionY, int widthPx, const bool isJpg = true) const;
 
   explicit VideoStoryboard(bool skipIfImgAlreadyExist);
