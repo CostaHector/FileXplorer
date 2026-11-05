@@ -8,6 +8,7 @@
 #include "UndoRedo.h"
 #include "ItemsPileCategory.h"
 #include "NotificatorMacro.h"
+#include "RecycleCfmDlg.h"
 #include <QDir>
 
 namespace FileBatchOps {
@@ -142,7 +143,7 @@ int RenameWithPatterns(AdvanceRenamer& renamer, const QString& path, const QStri
     return 0;
   }
   LOG_OE_P(outcome.result == OpStatus::ALL_SUCCEED, "Rename by Pattern", "[%s] %d item(s) specified by %d pattern get renamed", logTag, outcome.count, jsonOrVidNames.size());
-  return outcome.count;
+  return outcome.result == OpStatus::PARTIAL_FAILED ? -1 : outcome.count;
 }
 
 int RenameWithPatternInsert(const QString& path, const QStringList& jsonOrVidNames) {
@@ -197,6 +198,10 @@ OpStatus MoveToTrashSelectedWithRelated(QString workPath, const QStringList &sel
   const QStringList filesNeedProcess = ExpandRelatedFiles(workPath, selectedJsonOrVideoNames);
   if (filesNeedProcess.isEmpty()) {
     LOG_INFO_NP("[Skip]", "Nothing to process after ExpandRelatedFiles");
+    return OpStatus::SKIP;
+  }
+  if (!RecycleCfmDlg::recycleQuestion(workPath, filesNeedProcess, false)) {
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d expand to %d item(s) no change", selectedJsonOrVideoNames.size(), filesNeedProcess.size());
     return OpStatus::SKIP;
   }
   return MoveToTrashSelected(workPath, filesNeedProcess);

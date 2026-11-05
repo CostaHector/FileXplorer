@@ -45,6 +45,12 @@ FileImageViewer::FileImageViewer(const QString& memoryKeyName, QWidget* parent) 
   m_nextButton->setToolTip(QString("<b>%1 (%2)</b><br/>Go to next image").arg(m_nextButton->text(), m_nextButton->shortcut().toString()));
 
   mNaviToolBar->addSeparator();
+  mRenameImageRelatedFilesAct = mNaviToolBar->addAction(QIcon{":img/NAME_STR_REPLACER_PATH"}, "Rename(Replace)");
+  CHECK_NULLPTR_RETURN_VOID(mRenameImageRelatedFilesAct);
+  mRenameImageRelatedFilesAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_M));
+  mRenameImageRelatedFilesAct->setToolTip(QString("<b>%1 (%2)</b><br/>Rename current image and its related files.").arg(mRenameImageRelatedFilesAct->text(), mRenameImageRelatedFilesAct->shortcut().toString()));
+
+  mNaviToolBar->addSeparator();
   m_recycleThisImageButton = mNaviToolBar->addAction(QIcon{":img/MOVE_TO_TRASH_BIN"}, "Recycle");
   CHECK_NULLPTR_RETURN_VOID(m_recycleThisImageButton);
   m_recycleThisImageButton->setShortcut(QKeySequence(Qt::KeyboardModifier::ControlModifier | Qt::Key_D));
@@ -83,6 +89,7 @@ void FileImageViewer::subscribe() {
 
   connect(ImageViewerActions::GetInst().NAVIGATE_INTO_SUBFOLDERS_WHEN_ITERATE_ACT, &QAction::toggled, this, &FileImageViewer::NavigateIntoSubdirectoryChanged);
 
+  connect(mRenameImageRelatedFilesAct, &QAction::triggered, this, &FileImageViewer::on_RenameReplace);
   connect(m_recycleThisImageButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImage);
   connect(m_recyleThisImageAndRelatedButton, &QAction::triggered, this, &FileImageViewer::RecycleCurrentImageAndItsRelated);
 }
@@ -159,33 +166,37 @@ bool FileImageViewer::RecycleCurrentImage() {
 
 bool FileImageViewer::RecycleCurrentImageAndItsRelated() {
   const QString currentImageAbsPath = GetImageAbsPath();
-
   QString jsonPath;
   if (!RelatedHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
-    // no json find no need recycle, only recycle itself
+    // no json find. no other need recycle, only recycle itself
     return RecycleCurrentImage();
   }
 
-  QString jsonLocatedInPath = PathTool::absolutePath(jsonPath);
-  QStringList jsonFileNames{PathTool::relativePath(jsonPath, jsonLocatedInPath.size())};
-  const QStringList& filesNeedRecycle = FileBatchOps::ExpandRelatedFiles(jsonLocatedInPath, jsonFileNames);
-  const int relatedFilesCnt{filesNeedRecycle.size()};
+  QString jsonLocatedInPath;
+  QString jsonFileName = PathTool::GetPrepathAndFileName(jsonPath, jsonLocatedInPath);
 
-  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
-    return true;
-  }
-
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(relatedFilesCnt);
-  for (const auto& nm : filesNeedRecycle) {
-    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
-  }
-  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
-  if (!bAllSucceed) {
+  const FileBatchOps::OpStatus rnmResult = FileBatchOps::MoveToTrashSelectedWithRelated(jsonLocatedInPath, {jsonFileName});
+  if (rnmResult == FileBatchOps::OpStatus::PARTIAL_FAILED) {
     return false;
   }
-  return NavigateImageNext();
+  if (rnmResult == FileBatchOps::OpStatus::SKIP) {
+    return true;
+  }
+  NavigateImageNext();
+  return true;
+}
+
+bool FileImageViewer::on_RenameReplace() {
+  const QString currentImageAbsPath = GetImageAbsPath();
+  QString jsonPath;
+  if (!RelatedHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
+    // no json find. no other need recycle, only rename itself
+    return FileBatchOps::RenameSelectedReplace(mParentPath, {mRel2Image}) != FileBatchOps::OpStatus::PARTIAL_FAILED;
+  }
+  QString jsonLocatedInPath;
+  QString jsonFileName = PathTool::GetPrepathAndFileName(jsonPath, jsonLocatedInPath);
+  int renameCnt = FileBatchOps::RenameWithPatternReplace(jsonLocatedInPath, {jsonFileName});
+  return renameCnt >= 0;
 }
 
 void FileImageViewer::onCustomContextMenuRequested(const QPoint& pos) {
