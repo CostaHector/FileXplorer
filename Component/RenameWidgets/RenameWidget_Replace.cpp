@@ -39,9 +39,9 @@ OldStrDefaultMode GetOldStrDefaultModeFromMemory() {
 QToolBar* RenameWidget_Replace::InitControlTB() {
   QToolBar* replaceControl = new (std::nothrow) QToolBar{"replace tb", this};
   CHECK_NULLPTR_RETURN_NULLPTR(replaceControl);
-  auto* pOldLabel = new (std::nothrow) QLabel{tr("Old:"), replaceControl};
+  QLabel* pOldLabel = new (std::nothrow) QLabel{tr("Old:"), replaceControl};
   CHECK_NULLPTR_RETURN_NULLPTR(pOldLabel);
-  auto* pNewLabel = new (std::nothrow) QLabel{tr("New:"), replaceControl};
+  QLabel* pNewLabel = new (std::nothrow) QLabel{tr("New:"), replaceControl};
   CHECK_NULLPTR_RETURN_NULLPTR(pNewLabel);
 
   replaceControl->addWidget(pOldLabel);
