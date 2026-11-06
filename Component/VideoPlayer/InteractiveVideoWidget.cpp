@@ -23,7 +23,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
                                .arg(mGrabFrame->text(), mGrabFrame->shortcut().toString()));
 
   mRenameCurrentMediaAct = new QAction{QIcon(":img/NAME_STR_REPLACER_PATH"), tr("Rename(Replace)"), this};
-  mRenameCurrentMediaAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_F2));
+  mRenameCurrentMediaAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_M));
   mRenameCurrentMediaAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Rename current media playing and its related files."}//
                              .arg(mRenameCurrentMediaAct->text(), mRenameCurrentMediaAct->shortcut().toString()));
 

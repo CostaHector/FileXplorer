@@ -26,6 +26,8 @@ class DuplicateVideoDetailsModel : public QAbstractTableModelPub {
   int onChangeDetailIndex(int newLeftSelectedRow);
   void onInvalidateLeftSelection();
 
+  int AfterVideoFilesRecycled(const QModelIndexList& indexes);
+
  private:
   int rowCountHelper(int leftSelectedRow) const;
   int getLeftSelectedRow() const { return m_leftSelectedRow; }

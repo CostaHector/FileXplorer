@@ -157,23 +157,27 @@ bool FileXplorerEvent::on_CreateDvdInfoRecursively() {
   if (!__CanNewItem()) {
     return false;
   }
-
   const QString createIn{_fileSysModel->rootPath()};
+  const int ret = InputDialogHelper::YesNoCancelBox(
+      QMessageBox::Icon::NoIcon, QIcon(":img/NEW_DVD_INFO"),
+      "Create DVD Metadata", "Do you want to overwrite existing .dvd files under?",
+      createIn, "", "Override", "No Override");
 
-  QMessageBox msgBox;
-  msgBox.setWindowTitle("Create DVD Metadata");
-  msgBox.setWindowIcon(QIcon(":img/NEW_DVD_INFO"));
-  msgBox.setText(QString{"Do you want to overwrite existing .dvd files\nunder path\n%1?"}.arg(createIn));
-  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-  msgBox.setDefaultButton(QMessageBox::No);
-
-  const int ret = msgBox.exec();
-  if (ret != QMessageBox::Yes && ret != QMessageBox::No) {
-    LOG_INFO_NP("Skip", "User canceled creation of DVD info recursively");
-    return true;
+  bool bOverrideWhenExist{false};
+  switch (ret) {
+    case QMessageBox::Yes:
+      bOverrideWhenExist = true;
+      break;
+    case QMessageBox::No:
+      bOverrideWhenExist = false;
+      break;
+    case QMessageBox::Cancel:
+      LOG_INFO_NP("Skip", "User canceled creation of DVD info");
+      return true;
+    default:
+      return false;
   }
 
-  const bool bOverrideWhenExist{ret == QMessageBox::Yes};
   int succeedCnt = CreateFileFolderHelper::GenerateDvdFileRecursively(createIn, bOverrideWhenExist);
   LOG_OE_P(succeedCnt >= 0, "Create dvd meta", "%d .dvd file under path:%s created ok", succeedCnt, qPrintable(createIn));
   return succeedCnt >= 0;
@@ -198,11 +202,19 @@ bool FileXplorerEvent::on_CreateVideoStoryBoard(int dimensionX, int dimensionY, 
   return true;
 }
 
-bool FileXplorerEvent::on_RenameThumbnailImages(bool skipIfExist) {
+bool FileXplorerEvent::on_AutoRenameVideoSourceFrames(bool skipIfExist) {
   const QString rootPath = _contentPane->getRootPath();
   VideoStoryboard tp{skipIfExist};
-  bool renameResult = tp.RenameVideoStoryBoardCreatedByPotPlayer(rootPath);
-  LOG_OE_NP(renameResult, "Rename thumbnail under path", rootPath);
+  bool renameResult = tp.AutoRenameVideoSourceFrame(rootPath);
+  LOG_OE_NP(renameResult, "Auto rename video source frames under path", rootPath);
+  return true;
+}
+
+bool FileXplorerEvent::on_AutoRenameVideoStoryboards(bool skipIfExist) {
+  const QString rootPath = _contentPane->getRootPath();
+  VideoStoryboard tp{skipIfExist};
+  bool renameResult = tp.AutoRenameVideoStoryboards(rootPath);
+  LOG_OE_NP(renameResult, "Auto rename video storyboard under path", rootPath);
   return true;
 }
 
@@ -472,9 +484,13 @@ void FileXplorerEvent::subscribeThumbnailActions() {
   connect(&ins, &ThumbnailActions::extractImages, this, &FileXplorerEvent::on_ExtractImagesFromThumbnail);
   connect(&ins, &ThumbnailActions::grabFrames, this, &FileXplorerEvent::on_GrabFramesFromVideos);
 
-  connect(ins._RENAME_STORYBOARD_FROM_POT_PLAYER, &QAction::triggered, this, [this, &ins]() {
+  connect(ins._AUTO_RENAME_VIDEO_SOURCE_FRAMES, &QAction::triggered, this, [this, &ins]() {
     const bool bSkipExist = ins.isSkipIfAlreadyExist();
-    on_RenameThumbnailImages(bSkipExist);
+    on_AutoRenameVideoSourceFrames(bSkipExist);
+  });
+  connect(ins._AUTO_RENAME_VIDEO_STORYBOARDS, &QAction::triggered, this, [this, &ins]() {
+    const bool bSkipExist = ins.isSkipIfAlreadyExist();
+    on_AutoRenameVideoStoryboards(bSkipExist);
   });
 
   connect(ins._CREATE_THUMBNAIL_FOR_FOLDER, &QAction::triggered, this, [this, &ins]() {
@@ -783,6 +799,9 @@ bool FileXplorerEvent::on_OpenInTerminal() const {
 
 bool FileXplorerEvent::on_forceRefreshFileSystemModel() {
   const auto vt = _contentPane->GetVt();
+  if (!ViewTypeTool::isFSView(vt)) {
+    return true;
+  }
   const QString currentPath = _contentPane->getRootPath();
   _fileSysModel->setRootPath("");
   _fileSysModel->setRootPath(currentPath);
@@ -908,31 +927,25 @@ bool FileXplorerEvent::on_moveToTrashBin() {
   std::function<int()> afterOperationUpdateModelCallback;
   QStringList prepaths, names;
   std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(&afterOperationUpdateModelCallback);
-  if (names.isEmpty()) {
-    LOG_INFO_NP("[Skip]", "Nothing selected");
-    return true;
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelectedWithVaryRootPaths(prepaths, names);
+  switch (recycleStatus) {
+    case FileBatchOps::OpStatus::PARTIAL_FAILED: {
+      LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+      return false;
+    }
+    case FileBatchOps::OpStatus::SKIP: {
+      return true;
+    }
+    case FileBatchOps::OpStatus::ALL_SUCCEED: {
+      if (afterOperationUpdateModelCallback) {
+        afterOperationUpdateModelCallback();
+      }
+      LOG_OK_P("[MoveToTrash] All succeed", "Files Count %d", names.size());
+      return true;
+    }
+    default:
+      return false;
   }
-  if (prepaths.size() != names.size()) {
-    LOG_INFO_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", prepaths.size(), names.size());
-    return true;
-  }
-
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(prepaths.size());
-  for (int i = 0; i < prepaths.size(); ++i) {
-    removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(removeCmds)) {
-    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
-    return false;
-  }
-  if (afterOperationUpdateModelCallback) {
-    afterOperationUpdateModelCallback();
-  }
-  LOG_OK_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
-  return true;
 }
 
 bool FileXplorerEvent::on_deletePermanently() {

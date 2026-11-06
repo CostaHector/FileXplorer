@@ -44,6 +44,10 @@ AdvanceRenamer::AdvanceRenamer(QWidget* parent) //
   setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 }
 
+AdvanceRenamer::~AdvanceRenamer() {
+  saveDialogGeometry();
+}
+
 void AdvanceRenamer::showEvent(QShowEvent* event) {
   if (!m_geometryRestoredOnce) {
     ReadSettings();
@@ -52,21 +56,10 @@ void AdvanceRenamer::showEvent(QShowEvent* event) {
   QDialog::showEvent(event);
 }
 
-void AdvanceRenamer::closeEvent(QCloseEvent* event) {
-  saveDialogGeometry();
-  QDialog::closeEvent(event);
-}
-
-void AdvanceRenamer::reject() {
-  saveDialogGeometry();
-  QDialog::reject();
-}
-
 void AdvanceRenamer::saveDialogGeometry() {
   QByteArray newDialogGeometry = saveGeometry();
   if (newDialogGeometry != m_dialogGeometry) {
     Configuration().setValue("Geometry/ADVANCE_RENAMER", newDialogGeometry);
-    m_dialogGeometry.swap(newDialogGeometry);
   }
 }
 

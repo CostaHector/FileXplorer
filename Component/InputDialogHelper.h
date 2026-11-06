@@ -8,7 +8,13 @@ namespace InputDialogHelper {
 std::pair<bool, QFont> GetFontWithInitial(const QFont &initialFont, QWidget *parent = nullptr, const QString &title = "");
 std::pair<bool, int> GetIntWithInitial(QWidget *parent, const QString &title, const QString &label, int value, int minValue, int maxValue, int step);
 
-bool YesOrCancelBox(QMessageBox::Icon iconType, const QIcon& winIcon, const QString& title, const QString& text, const QString& informativeText, const QString& detailedText);
+bool YesOrCancelBox(QMessageBox::Icon iconType, const QIcon& winIcon,
+                    const QString& title, const QString& text,
+                    const QString& informativeText, const QString& detailedText);
+int YesNoCancelBox(QMessageBox::Icon iconType, const QIcon& winIcon,
+                   const QString& title, const QString& text,
+                   const QString& informativeText, const QString& detailedText,
+                   const QString& yesText = {}, const QString& noText = {});
 } // namespace InputDialogHelper
 
 #endif // INPUTDIALOGHELPER_H

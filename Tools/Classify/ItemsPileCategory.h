@@ -10,6 +10,8 @@ using T_DOT_EXT_2_TYPE = QHash<QString, SCENE_COMPONENT_TYPE>;
 const T_DOT_EXT_2_TYPE& GetTypeFromDotExtension();
 
 const QRegularExpression IMG_PILE_NAME_PATTERN{"^(.*?)( | - )(\\d{1,3})( \\d{1,4}x\\d{1,4})?$"};
+
+int GetImageNoTimeStampPatternLength(const QString& srcFrameImgName);
 }  // namespace ItemsPileCategory
 
 #endif  // ITEMSPILECATEGORY_H

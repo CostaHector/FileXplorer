@@ -24,11 +24,13 @@ void VideoPlayerSplitter::onShowViewPlayer(bool bShow) {
     if (m_left == nullptr) {
       m_left = new BasicVideoView{true, this};
       m_left->setAlwaysShowStatusLabel();
+      m_left->DisableRenameShortcut();
       m_left->setAcceptDrops(false);
     }
     if (m_right == nullptr) {
       m_right = new BasicVideoView{true, this};
       m_right->setAlwaysShowStatusLabel();
+      m_right->DisableRenameShortcut();
       m_right->setAcceptDrops(false);
     }
     addWidget(m_left);

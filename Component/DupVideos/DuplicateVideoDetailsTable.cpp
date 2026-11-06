@@ -104,34 +104,36 @@ bool DuplicateVideoDetailsTable::on_RecycleSelection() {
     LOG_INFO_NP("Recycle", "skipped: selection is empty");
     return false;
   }
-  QStringList vidsFullPath;
-  vidsFullPath.reserve(selectedCnt);
-  for (const QModelIndex& srcInd : srcIndexes) {
-    QString vidFullPath = m_detailsModel->filePath(srcInd);
-    if (QFile::exists(vidFullPath)) {
-      vidsFullPath.push_back(vidFullPath);
-    }
-  }
+  const QStringList vidsFullPath{m_detailsModel->filesFullPath(srcIndexes)};
 
   QString prepath;
   QStringList rels;
   std::tie(prepath, rels) = PathTool::GetLAndRels(vidsFullPath);
 
-  const QStringList relativeToVidsRelated = FileBatchOps::ExpandRelatedFiles(prepath, rels);
-  if (relativeToVidsRelated.isEmpty()) {
-    LOG_INFO_P("Nothing need to recycle", "prepath[%s], rels count[%d]", qPrintable(prepath), rels.size());
-    return true;
+  FileBatchOps::OpOutcome recycleOutcome = FileBatchOps::MoveToTrashSelectedWithRelated(prepath, rels);
+  bool bRecycleSucceed{false};
+  int affectedFilesCnt{-1};
+  switch (recycleOutcome.result) {
+    case FileBatchOps::OpStatus::PARTIAL_FAILED:{
+      affectedFilesCnt = -1;
+      bRecycleSucceed = false;
+      break;
+    }
+    case FileBatchOps::OpStatus::SKIP: { // Nothing need to recycle or user cancel
+      affectedFilesCnt = 0;
+      return true;
+    }
+    case FileBatchOps::OpStatus::ALL_SUCCEED: {
+      affectedFilesCnt = recycleOutcome.count;
+      bRecycleSucceed = true;
+      break;
+    }
+    default:
+      break;
   }
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE recycleCmds;
-  recycleCmds.reserve(relativeToVidsRelated.size());
-  for (const QString& relativeToFile: relativeToVidsRelated) {
-    recycleCmds.append(ACMD::GetInstMOVETOTRASH(prepath, relativeToFile));
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  const bool isRecycleAllSucceed = UndoRedo::GetInst().Do(recycleCmds);
-  LOG_OE_P(isRecycleAllSucceed, "Recycle vids and its related", "vid selected=%d, related=%d", selectedCnt, relativeToVidsRelated.size());
-  return isRecycleAllSucceed;
+  const int recycleRowCnt = m_detailsModel->AfterVideoFilesRecycled(srcIndexes);
+  LOG_OE_P(bRecycleSucceed, "Recycle", "recycle %d expanded json/img/video items, rows[%d]", affectedFilesCnt, recycleRowCnt);
+  return bRecycleSucceed;
 }
 
 int DuplicateVideoDetailsTable::onLeftVideoGroupsTableSelectionChanged(int newRow) {

@@ -20,6 +20,7 @@ class AdvanceRenamer : public QDialog {
  public:
   static int execCore(AdvanceRenamer* self);
   explicit AdvanceRenamer(QWidget* parent = nullptr);
+  ~AdvanceRenamer();
 
   void ReadSettings();
 
@@ -55,8 +56,6 @@ class AdvanceRenamer : public QDialog {
  protected:
   static constexpr char NAME_SEP = '\n';
   void showEvent(QShowEvent* event) override;
-  void closeEvent(QCloseEvent* event) override;
-  void reject() override;
 
   QString preAt(int i) const {
     if (i < 0 || i >= mNames.size()) return "";

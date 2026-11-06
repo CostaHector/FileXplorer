@@ -476,6 +476,10 @@ bool BasicVideoView::navigateVideo(bool bForward) {
   return PlayAVideo(PathTool::Path2Join(prepath, targetVidName), true);
 }
 
+void BasicVideoView::DisableRenameShortcut() {
+  mVideoWidget->mRenameCurrentMediaAct->setShortcut(QKeySequence());
+}
+
 bool BasicVideoView::on_RenameReplace() {
   if (mCurrentPlayingMediaPath.isEmpty()) {
     return false;

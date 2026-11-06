@@ -88,7 +88,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+103"/>
+        <location line="+110"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -473,7 +473,7 @@
 <context>
     <name>DuplicateImagesTable</name>
     <message>
-        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+27"/>
+        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+25"/>
         <source>Select Same Hash Rows(Ignore first one)</source>
         <translation>选中相同哈希行(保留首个)</translation>
     </message>
@@ -562,7 +562,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+195"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+207"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -987,7 +987,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+25"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+32"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -1037,9 +1037,14 @@
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="-23"/>
+        <location line="-28"/>
         <source>Grab a Frame</source>
         <translation>抓取一帧</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Rename(Replace)</source>
+        <translation>重命名</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -1641,7 +1646,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>上一个文件夹</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Next folder</source>
         <translation>下一个文件夹</translation>
     </message>
@@ -1725,7 +1730,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>PreviewDockWidget</name>
     <message>
-        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+10"/>
+        <location filename="../../Component/FolderPreview/PreviewDockWidget.cpp" line="+11"/>
         <source>Category Preview</source>
         <translation>分类预览</translation>
     </message>
@@ -1992,36 +1997,6 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <source>Digit 2 Alpha</source>
         <translation>数值字符替换</translation>
     </message>
-    <message>
-        <location line="+3"/>
-        <source>Uppercase</source>
-        <translation>纯大写</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lowercase</source>
-        <translation>纯小写</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Capitalize first and keep other</source>
-        <translation>首字母大写其它不变</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Capitalize first and lower other</source>
-        <translation>首字母大写其它小写</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Toggle Case</source>
-        <translation>大小写互换</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lowercase Extension</source>
-        <translation>扩展名小写</translation>
-    </message>
 </context>
 <context>
     <name>RenameWidget_ArrangeSection</name>
@@ -2044,6 +2019,39 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+31"/>
         <source>Record section wasted</source>
         <translation>记录丢弃的段</translation>
+    </message>
+</context>
+<context>
+    <name>RenameWidget_Case</name>
+    <message>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Case.cpp" line="+76"/>
+        <source>Uppercase</source>
+        <translation>纯大写</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Lowercase</source>
+        <translation>纯小写</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Capitalize first and keep other</source>
+        <translation>首字母大写其它不变</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Capitalize first and lower other</source>
+        <translation>首字母大写其它小写</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Toggle Case</source>
+        <translation>大小写互换</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Lowercase Extension</source>
+        <translation>扩展名小写</translation>
     </message>
 </context>
 <context>
@@ -2132,7 +2140,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>RenameWidget_Replace</name>
     <message>
-        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+46"/>
+        <location filename="../../Component/RenameWidgets/RenameWidget_Replace.cpp" line="+42"/>
         <source>Old:</source>
         <translation>旧:</translation>
     </message>
@@ -2142,7 +2150,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>新:</translation>
     </message>
     <message>
-        <location line="+113"/>
+        <location line="+115"/>
         <source>Regex</source>
         <translation>正则</translation>
     </message>
@@ -2328,7 +2336,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../../Component/ScenePageControl.cpp" line="+28"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+30"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>
@@ -2521,12 +2529,17 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>创建4x4缩略图</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Update storyboard name</source>
-        <translation>更新故事板文件名</translation>
+        <location line="+7"/>
+        <source>Auto Rename Video Source Frames</source>
+        <translation>自动重命名帧</translation>
     </message>
     <message>
         <location line="+5"/>
+        <source>Auto Rename Video Storyboards</source>
+        <translation>自动重命名故事板</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Extract [0, 1) imgs</source>
         <translation>提取首张图片</translation>
     </message>

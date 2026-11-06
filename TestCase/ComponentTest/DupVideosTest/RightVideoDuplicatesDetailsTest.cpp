@@ -6,7 +6,10 @@
 #include "BeginToExposePrivateMember.h"
 #include "DuplicateVideoDetailsTable.h"
 #include "EndToExposePrivateMember.h"
+#include "RecycleCfmDlg.h"
 #include "FileTool.h"
+#include "UndoRedo.h"
+
 #include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
@@ -15,7 +18,7 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
+    class RightVideoDuplicatesDetailsTest : public PlainTestSuite {
   Q_OBJECT
 public:
   TDir tDir;
@@ -57,17 +60,15 @@ private slots:
     QCOMPARE(rvdd.on_RenameReplace(), false);
   }
 
-  void copy_to_clipboard_and_recycle_selection_ok() {
-    GroupedDupVidList szGrp{
-        DupVidMetaInfoList{
+  void copy_to_clipboard_ok() {
+    GroupedDupVidList szGrp{DupVidMetaInfoList {
         // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
         {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
         {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
-        {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
-        },
-    };
-    GroupedDupVidList durGrp = szGrp; // for simplicity. two of them are equal
-    GroupedDupVidListArr groupedVidsLists{szGrp, durGrp};
+        {"inexist video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("inexist video 1.mp4"), "h3"}, // a remain
+        },};
+    GroupedDupVidList durGrp = szGrp, sizeAndDurGrp = szGrp; // for simplicity. akk of them are equal
+    GroupedDupVidListArr groupedVidsLists{szGrp, durGrp, szGrp};
 
     DuplicateVideoDetectionCriteria::DVCriteriaE differBy = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
 
@@ -76,9 +77,9 @@ private slots:
 
     QCOMPARE(rvdd.m_detailsModel->rowCount(), 0);
     QCOMPARE(rvdd.onLeftVideoGroupsTableSelectionChanged(0), 3 - 0);
+    QCOMPARE(rvdd.m_detailsModel->rowCount(), 3);
     QCOMPARE(szGrp.size(), 1);    // groups count=1
     QCOMPARE(szGrp[0].size(), 3); // item(s) int group[0]=3
-    QCOMPARE(rvdd.m_detailsModel->rowCount(), 3);
 
     QModelIndex sourceIndex0 = rvdd.m_detailsModel->index(0, 0);
     QModelIndex proxyIndex0 = rvdd.m_rightSortProxy->mapFromSource(sourceIndex0);
@@ -110,22 +111,47 @@ private slots:
       QCOMPARE(rvdd.on_cellDoubleClicked(proxyIndex0), true);
       QCOMPARE(rvdd.on_cellDoubleClicked(fileNotExistProxyIndex2), false);
     }
+  }
 
-    {
-      // 3.0 recycle when nothing selected
-      QVERIFY(!rvdd.selectionModel()->hasSelection());
-      const QStringList beforeNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-      QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"})); // ascii(' ') less than ascii('.')
-      QVERIFY(!rvdd.on_RecycleSelection()); // no row selected
-      const QStringList nothingSelectedRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-      QCOMPARE(nothingSelectedRecyleNames, beforeNames);
+  void recycle_selection_ok() {
+    GroupedDupVidList szGrp{DupVidMetaInfoList {
+        // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
+        {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
+        {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
+        {"inexist video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("inexist video 1.mp4"), "h3"}, // a remain
+        },};
+    GroupedDupVidList durGrp = szGrp, sizeAndDurGrp = szGrp; // for simplicity. two of them are equal
+    GroupedDupVidListArr groupedVidsLists{szGrp, durGrp, sizeAndDurGrp};
 
-      // 3.1 recycle when all rows selected
-      rvdd.selectAll();
-      QVERIFY(rvdd.on_RecycleSelection());
-      const QStringList afterSelectedAllRecyleNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
-      QVERIFY(afterSelectedAllRecyleNames.isEmpty());
-    }
+    DuplicateVideoDetectionCriteria::DVCriteriaE differBy = DuplicateVideoDetectionCriteria::DVCriteriaE::SIZE;
+
+    DuplicateVideoDetailsTable rvdd;
+    QCOMPARE(rvdd.setSharedMember(&groupedVidsLists, &differBy), true);
+
+    QCOMPARE(rvdd.m_detailsModel->rowCount(), 0);
+    QCOMPARE(rvdd.onLeftVideoGroupsTableSelectionChanged(0), 3 - 0);
+    QCOMPARE(rvdd.m_detailsModel->rowCount(), 3);
+
+    const QStringList beforeNames = tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name);
+
+    // 3.0 recycle when nothing selected
+    QVERIFY(!rvdd.selectionModel()->hasSelection());
+    QCOMPARE(beforeNames, (QStringList{"video 1 ai.mp4", "video 1.mp4"})); // ascii(' ') less than ascii('.')
+    QVERIFY(!rvdd.on_RecycleSelection()); // no row selected
+    QCOMPARE(tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name), beforeNames);
+
+    // 3.1 recycle when all rows selected. first time user cancel. second time accept
+    rvdd.selectAll();
+    MOCKER(RecycleCfmDlg::recycleQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
+    QVERIFY(rvdd.on_RecycleSelection()); // user cancel
+    QCOMPARE(tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name), beforeNames);
+
+    QVERIFY(rvdd.on_RecycleSelection());
+    QVERIFY(tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name).isEmpty());
+
+    // 避免残留在回收站
+    QVERIFY(UndoRedo::on_Undo());
+    QCOMPARE(tDir.entryList(QDir::Filter::Files, QDir::SortFlag::Name), beforeNames);
   }
 };
 

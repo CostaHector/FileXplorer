@@ -306,7 +306,7 @@ std::pair<QString, QStringList> GetLAndRels(const QStringList& lAbsPathList) {
     QString fileName = PathTool::GetPrepathAndFileName(lAbsPathList.front(), prePath);
     return {prePath, QStringList{fileName}};
   }
-  const QString& prefixPath = longestCommonPrefix(lAbsPathList);
+  const QString prefixPath = longestCommonPrefix(lAbsPathList);
   // "/home/rel2entry" => rel2EntryN = 5+1
   const int prefixLen = prefixPath.size();
   QStringList lRels = GetRels(prefixLen, lAbsPathList);
@@ -325,7 +325,7 @@ QString longestCommonPrefix(const QStringList& strs) {
   int count = strs.size();
   for (int i = 1; i < count; ++i) {
     prefix = StrCommonPrefix(prefix, strs[i]);
-    if (!prefix.size()) {
+    if (prefix.isEmpty()) {
       break;
     }
   }

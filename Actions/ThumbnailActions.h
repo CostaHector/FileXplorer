@@ -18,7 +18,8 @@ public:
 
   QAction* _SKIP_IF_ALREADY_EXIST{nullptr};
   QAction* _CREATE_THUMBNAIL_FOR_FOLDER{nullptr};
-  QAction* _RENAME_STORYBOARD_FROM_POT_PLAYER{nullptr};
+  QAction* _AUTO_RENAME_VIDEO_SOURCE_FRAMES{nullptr};
+  QAction* _AUTO_RENAME_VIDEO_STORYBOARDS{nullptr};
 
 signals:
   void crtVideoStoryBoard(int rowCnt, int colCnt, int widthPixel, bool bSkipIfExist);

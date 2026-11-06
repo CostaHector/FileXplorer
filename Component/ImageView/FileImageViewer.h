@@ -28,6 +28,7 @@ public slots:
 
 private:
   void subscribe();
+  bool on_RenameReplace();
 
   QPixmap GetPixmapCore() const override;
   std::unique_ptr<QMovie> GetMovieCore(QSize& movieSize) const override;
@@ -41,6 +42,7 @@ private:
   FolderNxtAndLastIterator mImgIt;
 
   QAction *m_prevButton{nullptr}, *m_nextButton{nullptr};
+  QAction* mRenameImageRelatedFilesAct{nullptr};
   QAction* m_recycleThisImageButton{nullptr}, *m_recyleThisImageAndRelatedButton{nullptr};
 
   QAction *_OPEN_IN_SYSTEM_APPLICATION{nullptr}, *_REVEAL_IN_FILE_EXPLORER{nullptr}, *_COPY_FILE_NAME{nullptr};

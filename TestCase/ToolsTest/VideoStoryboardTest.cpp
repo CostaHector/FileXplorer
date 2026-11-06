@@ -203,7 +203,7 @@ private slots:
 
     // not skip
     VideoStoryboard it{false};
-    QVERIFY(it.RenameVideoStoryBoardCreatedByPotPlayer(tDir.path()));
+    QVERIFY(it.AutoRenameVideoStoryboards(tDir.path()));
 
     const QSet<QString> expectSnapShots{
         "a need.mp4",

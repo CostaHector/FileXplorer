@@ -5,6 +5,7 @@
 #include "VideoDurationGetter.h"
 #include "UndoRedo.h"
 #include "ImageTool.h"
+#include "ItemsPileCategory.h"
 
 #include <QDirIterator>
 #include <QRegularExpression>
@@ -104,27 +105,17 @@ bool VideoStoryboard::IsImageNameLooksLikeThumbnail(const QString& imgBaseName) 
   return false;
 }
 
-bool VideoStoryboard::RenameVideoSourceFrameSavedByPotPlayer(const QString& path) const {
-  // xxxx.mp4_20260818_155313.075.jpg
-  static constexpr int POT_PLAYER_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof("_20260818_155313.075.jpg") - 1};
-  const static QRegularExpression POT_PLAYER_SOURCE_FRAME_NAME_PATTERN(R"(_\d{8}_\d{6}\.\d{3}\.jpg$)");
-
-  static constexpr int BUILT_IN_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT{sizeof("_010203.567.jpg") - 1};
-  const static QRegularExpression BUILT_IN_SOURCE_FRAME_NAME_PATTERN(R"(_\d{6}\.\d{3}\.jpg$)");
-
+bool VideoStoryboard::AutoRenameVideoSourceFrame(const QString& path) const {
   QHash<QString, QStringList> sourceFrames;
   QDirIterator it{path, {"*.jpg"}, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
   while (it.hasNext()) {
     it.next();
     QString srcFrameImgName = it.fileName();
-    QString srcFrameVidName;
-    if (POT_PLAYER_SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
-      srcFrameVidName = srcFrameImgName.chopped(POT_PLAYER_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
-    } else if (BUILT_IN_SOURCE_FRAME_NAME_PATTERN.match(srcFrameImgName).hasMatch()) {
-      srcFrameVidName = srcFrameImgName.chopped(BUILT_IN_SOURCE_FRAME_FORMAT_EXAMPLE_VALID_CHAR_CNT);
-    } else {
+    int vidNameLength = ItemsPileCategory::GetImageNoTimeStampPatternLength(srcFrameImgName);
+    if (vidNameLength < 0) {
       continue;
     }
+    const QString srcFrameVidName = srcFrameImgName.left(vidNameLength);
     QString vidNameWithoutExtension = PathTool::GetBaseName(srcFrameVidName);
     sourceFrames[vidNameWithoutExtension].push_back(it.filePath());
   }
@@ -158,44 +149,43 @@ bool VideoStoryboard::RenameVideoSourceFrameSavedByPotPlayer(const QString& path
 }
 
 
-bool VideoStoryboard::RenameVideoStoryBoardCreatedByPotPlayer(const QString& path) const {
-  if (!RenameVideoSourceFrameSavedByPotPlayer(path)) {
-    return false;
-  }
-
+bool VideoStoryboard::AutoRenameVideoStoryboards(const QString& path) const {
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE cmds;
 
   QDirIterator it{path, TYPE_FILTER::IMAGE_TYPE_SET, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories};
-  const static QSet<QString> VID_TYPE_HASH{TYPE_FILTER::VIDEO_TYPE_SET.cbegin(), TYPE_FILTER::VIDEO_TYPE_SET.cend()};
 
   QString directFolderPath;
   QString oldImgPath, oldImgName;
   QString correspondFile, imgDotExt;
   QString vidBaseName, vidDotext;
   while (it.hasNext()) {
-    oldImgPath = it.next();
-    std::tie(correspondFile, imgDotExt) = PathTool::GetBaseNameExt(oldImgPath);
-    std::tie(vidBaseName, vidDotext) = PathTool::GetBaseNameExt(correspondFile);
-    vidDotext = vidDotext.toLower();
-    directFolderPath = oldImgPath.chopped(1 + correspondFile.size() + imgDotExt.size());
-    oldImgName = oldImgPath.mid(directFolderPath.size() + 1);
-    if (!VID_TYPE_HASH.contains("*" + vidDotext)) {
+    oldImgPath = it.next();                                                              // "path/to/Michael Fassbender.mp4.jpg
+    std::tie(correspondFile, imgDotExt) = PathTool::GetBaseNameExt(oldImgPath);          // ("Michael Fassbender.mp4", ".jpg")
+    std::tie(vidBaseName, vidDotext) = PathTool::GetBaseNameExt(correspondFile);         // ("Michael Fassbender", ".mp4")
+    vidDotext = vidDotext.toLower();                                                     // ".mp4"
+    directFolderPath = oldImgPath.chopped(1 + correspondFile.size() + imgDotExt.size()); // "path/to"
+    oldImgName = oldImgPath.mid(directFolderPath.size() + 1);                            // "Michael Fassbender.mp4.jpg"
+    if (!TYPE_FILTER::isDotExtVideo(vidDotext)) {
       continue;
     }
-
-    const int imgWidth = ImageTool::GetImageDimensionPixel(oldImgPath).width();
-    if (imgWidth % 360 != 0 && imgWidth % 480 != 0) { // width invalid
-      continue;
-    }
-    const int gridCnt{ imgWidth % 720 == 0 ? imgWidth / 720 : (imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360) };
 
     QDir dir{directFolderPath};
-    if (!dir.exists(correspondFile)) {
+    if (!dir.exists(correspondFile)) {                                                   // no corresponding file "Michael Fassbender.mp4"
       continue;
     }
+
+    const QSize imgPixelSize = ImageTool::GetImageDimensionPixel(oldImgPath);
+    const int imgWidth = imgPixelSize.width(), imgHeight = imgPixelSize.height();
+    if (!(imgWidth % 360 == 0 || imgWidth % 480 == 0) || !(imgHeight % 360 == 0 || imgHeight % 480 == 0)) {
+      // Only Allowed: (width=360k or 480k) && (height=360k or 480k)
+      continue;
+    }
+    const int gridRowCnt{ imgWidth % 720 == 0 ? imgWidth / 720 : (imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360) };
+    const int gridColCnt{ imgHeight % 720 == 0 ? imgHeight / 720 : (imgHeight % 480 == 0 ? imgHeight / 480 : imgHeight / 360) };
+
     // newImageName = vidBaseName + " 33" + imgDotExt
-    vidBaseName += QString::asprintf(" %d%d", gridCnt, gridCnt);
+    vidBaseName += QString::asprintf(" %d%d", gridRowCnt, gridColCnt);
     vidBaseName += imgDotExt;
     if (dir.exists(vidBaseName)) {
       if (mSkipImageIfAlreadyExist) {
