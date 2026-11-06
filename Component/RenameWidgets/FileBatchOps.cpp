@@ -41,11 +41,9 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
   constexpr bool IGNORE_CASE{true};
   constexpr Qt::CaseSensitivity CASE_SENSITIVITY{IGNORE_CASE ? Qt::CaseInsensitive : Qt::CaseSensitive};
   constexpr QDir::SortFlags SORT_FLAG{IGNORE_CASE ? (QDir::SortFlag::Name | QDir::SortFlag::IgnoreCase) : QDir::SortFlag::Name};
-
-  const auto prefixLessThan = [](const QStringList::ConstIterator& nameIt, const QString& prefix)->bool {
-    const QString& fileName = (*nameIt);
+  const auto prefixLessThan = [](const QString& fileName, const QString& prefix) -> bool {
     const int cmpLength{qMin(prefix.size(), fileName.size())};
-    if (const int cmp = QString::compare(fileName.left(cmpLength), prefix.left(cmpLength), CASE_SENSITIVITY)) { // !=0
+    if (const int cmp = QString::compare(fileName.left(cmpLength), prefix.left(cmpLength), CASE_SENSITIVITY)) {
       // [大小写不敏感控制 1], 通过模式"Michael Fassbender.mp4"可以额外找出path路径下的"michael fassbender.json"
       return cmp < 0;
     }
@@ -73,7 +71,7 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
     }
 
     const QStringList& files{relIt.value()};
-    auto firstFileIt = std::__lower_bound(files.cbegin(), files.cend(), jsonBaseName, prefixLessThan);
+    auto firstFileIt = std::lower_bound(files.cbegin(), files.cend(), jsonBaseName, prefixLessThan);
     for (auto it = firstFileIt; it != files.end(); ++it) {
       // file.mp4
       // file.jpg
