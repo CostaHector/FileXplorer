@@ -267,23 +267,29 @@ int VideoTableView::onRecycleVideoAndRelated() {
   const QString& jsonLocatedInPath{mVideoModel->rootPath()};
   const QModelIndexList& indexes{selectedRowsSource()};
   const QStringList& jsonFileNames{mVideoModel->rel2fileNames(indexes)};
-  const QStringList& filesNeedRecycle = FileBatchOps::ExpandRelatedFiles(jsonLocatedInPath, jsonFileNames);
-  const int relatedFilesCnt{filesNeedRecycle.size()};
 
-  if (!RecycleCfmDlg::recycleQuestion(jsonLocatedInPath, filesNeedRecycle, false)) {
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relatedFilesCnt);
-    return 0;
+  const FileBatchOps::OpOutcome recycleOutcome = FileBatchOps::MoveToTrashSelectedWithRelated(jsonLocatedInPath, jsonFileNames);
+  bool bRecycleSucceed{false};
+  int affectedFilesCnt{-1};
+  switch (recycleOutcome.result) {
+    case FileBatchOps::OpStatus::PARTIAL_FAILED: {
+      affectedFilesCnt = -1;
+      bRecycleSucceed = false;
+    }
+    case FileBatchOps::OpStatus::SKIP: {
+      affectedFilesCnt = 0;
+      return 0;
+    }
+    case FileBatchOps::OpStatus::ALL_SUCCEED: {
+      affectedFilesCnt = recycleOutcome.count;
+      bRecycleSucceed = true;
+    }
+    default:
+      break;
   }
-
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(relatedFilesCnt);
-  for (const auto& nm : filesNeedRecycle) {
-    removeCmds.append(FileOperatorType::ACMD::GetInstMOVETOTRASH(jsonLocatedInPath, nm));
-  }
-  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
   const int removeRowCnt = mVideoModel->AfterVideoFilesNameRenamed(indexes);
-  LOG_OE_P(bAllSucceed, "Recycle", "recycle %d json/img/video items, rows[%d]", relatedFilesCnt, removeRowCnt);
-  return relatedFilesCnt;
+  LOG_OE_P(bRecycleSucceed, "Recycle", "recycle %d expanded json/img/video items, rows[%d]", affectedFilesCnt, removeRowCnt);
+  return affectedFilesCnt;
 }
 
 void VideoTableView::initExclusivePreferenceSetting() {

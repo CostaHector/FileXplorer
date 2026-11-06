@@ -155,35 +155,41 @@ void FileImageViewer::NavigateIntoSubdirectoryChanged(bool bInclude) {
   mImgIt(mParentPath, true); // force refresh images in folder structure
 }
 
-bool FileImageViewer::RecycleCurrentImage() {
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE removeCmds{FileOperatorType::ACMD::GetInstMOVETOTRASH(mParentPath, mRel2Image)};
-  bool bAllSucceed = UndoRedo::GetInst().Do(removeCmds);
-  if (!bAllSucceed) {
-    return false;
+bool AfterRecycle(FileBatchOps::OpStatus recycleStatus, std::function<void()> pNaviFunc) {
+  switch (recycleStatus) {
+    case FileBatchOps::OpStatus::PARTIAL_FAILED: return false;
+    case FileBatchOps::OpStatus::SKIP: return true;
+    case FileBatchOps::OpStatus::ALL_SUCCEED: {
+      if (pNaviFunc) {
+        pNaviFunc();
+      }
+      return true;
+    }
+    default:
+      return false;
   }
-  return NavigateImageNext();
+}
+
+bool FileImageViewer::RecycleCurrentImage() {
+  const QString currentImageAbsPath = GetImageAbsPath();
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelected("", {currentImageAbsPath});
+  return AfterRecycle(recycleStatus, [this](){ NavigateImageNext(); });
 }
 
 bool FileImageViewer::RecycleCurrentImageAndItsRelated() {
+  FileBatchOps::OpStatus recycleStatus{FileBatchOps::OpStatus::SKIP};
   const QString currentImageAbsPath = GetImageAbsPath();
   QString jsonPath;
   if (!RelatedHelper::getJsonPathFromFile(currentImageAbsPath, jsonPath)) {
     // no json find. no other need recycle, only recycle itself
-    return RecycleCurrentImage();
+    recycleStatus = FileBatchOps::MoveToTrashSelected("", {currentImageAbsPath});
+  } else {
+    QString jsonLocatedInPath;
+    QString jsonFileName = PathTool::GetPrepathAndFileName(jsonPath, jsonLocatedInPath);
+    const FileBatchOps::OpOutcome recycleOutcome = FileBatchOps::MoveToTrashSelectedWithRelated(jsonLocatedInPath, {jsonFileName});
+    recycleStatus = recycleOutcome.result;
   }
-
-  QString jsonLocatedInPath;
-  QString jsonFileName = PathTool::GetPrepathAndFileName(jsonPath, jsonLocatedInPath);
-
-  const FileBatchOps::OpStatus rnmResult = FileBatchOps::MoveToTrashSelectedWithRelated(jsonLocatedInPath, {jsonFileName});
-  if (rnmResult == FileBatchOps::OpStatus::PARTIAL_FAILED) {
-    return false;
-  }
-  if (rnmResult == FileBatchOps::OpStatus::SKIP) {
-    return true;
-  }
-  NavigateImageNext();
-  return true;
+  return AfterRecycle(recycleStatus, [this](){ NavigateImageNext(); });
 }
 
 bool FileImageViewer::on_RenameReplace() {

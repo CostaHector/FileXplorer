@@ -206,3 +206,42 @@ void DuplicateVideoDetailsModel::onInvalidateLeftSelection() {
   RowsCountEndChange();
 }
 
+int DuplicateVideoDetailsModel::AfterVideoFilesRecycled(const QModelIndexList& indexes) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  const int rowCnt = rowCount();
+  const int colCnt = columnCount();
+  if (rowCnt <= 0 || colCnt <= 0) {
+    return 0;
+  }
+
+  // 从 selectByRow 的 indexes 中找出最上端、最下端的行
+  int minRow = std::numeric_limits<int>::max();
+  int maxRow = -1;
+  for (const QModelIndex& idx : indexes) {
+    if (!idx.isValid()) {
+      continue;
+    }
+    const int r = idx.row();
+    if (r < minRow) minRow = r;
+    if (r > maxRow) maxRow = r;
+  }
+  if (maxRow < minRow) {
+    LOG_D("AfterVideoFilesRecycled: no valid index");
+    return 0;
+  }
+
+  // 左上用第 0 列、右下用最后一列，确保覆盖所有列的 ForegroundRole
+  const QModelIndex topLeft = index(minRow, 0);
+  const QModelIndex bottomRight = index(maxRow, colCnt - 1);
+  if (!topLeft.isValid() || !bottomRight.isValid()) {
+    LOG_D("AfterVideoFilesRecycled: invalid topLeft/bottomRight");
+    return 0;
+  }
+
+  // 不删除行，只刷新 ForegroundRole：
+  // data() 中 QFile::exists(inf.m_AbsPath) 对已回收文件返回 false → gray
+  emit dataChanged(topLeft, bottomRight, {Qt::ForegroundRole});
+  return indexes.size();
+}

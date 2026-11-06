@@ -923,31 +923,25 @@ bool FileXplorerEvent::on_moveToTrashBin() {
   std::function<int()> afterOperationUpdateModelCallback;
   QStringList prepaths, names;
   std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(&afterOperationUpdateModelCallback);
-  if (names.isEmpty()) {
-    LOG_INFO_NP("[Skip]", "Nothing selected");
-    return true;
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelectedVaryRootPath(prepaths, names);
+  switch (recycleStatus) {
+    case FileBatchOps::OpStatus::PARTIAL_FAILED: {
+      LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+      return false;
+    }
+    case FileBatchOps::OpStatus::SKIP: {
+      return true;
+    }
+    case FileBatchOps::OpStatus::ALL_SUCCEED: {
+      if (afterOperationUpdateModelCallback) {
+        afterOperationUpdateModelCallback();
+      }
+      LOG_OK_P("[MoveToTrash] All succeed", "Files Count %d", names.size());
+      return true;
+    }
+    default:
+      return false;
   }
-  if (prepaths.size() != names.size()) {
-    LOG_INFO_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", prepaths.size(), names.size());
-    return true;
-  }
-
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(prepaths.size());
-  for (int i = 0; i < prepaths.size(); ++i) {
-    removeCmds.append(ACMD::GetInstMOVETOTRASH(prepaths[i], names[i]));
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(removeCmds)) {
-    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
-    return false;
-  }
-  if (afterOperationUpdateModelCallback) {
-    afterOperationUpdateModelCallback();
-  }
-  LOG_OK_P("[MoveToTrash] All succeed", "Commands count %d", removeCmds.size());
-  return true;
 }
 
 bool FileXplorerEvent::on_deletePermanently() {

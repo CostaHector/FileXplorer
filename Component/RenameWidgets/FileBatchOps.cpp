@@ -196,16 +196,22 @@ OpStatus RenameSelectedNumerizer(const QString& workPath, const QStringList& sel
 }
 
 // ---- 回收相关核心入口
-OpStatus MoveToTrashSelected(QString workPath, const QStringList &names) {
-  if (names.isEmpty()) {
+OpStatus MoveToTrashSelected(const QString& workPath, const QStringList &relNames) {
+  // 这里的 names可以含前置相对路径的文件名(间接)
+  if (relNames.isEmpty()) {
     LOG_INFO_NP("[Skip]", "Nothing selected");
+    return OpStatus::SKIP;
+  }
+  if (relNames.size() > 1 && !RecycleCfmDlg::recycleQuestion(workPath, relNames, false)) {
+    // show dialog only more than one file
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relNames.size());
     return OpStatus::SKIP;
   }
   using namespace FileOperatorType;
   BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(names.size());
-  for (int i = 0; i < names.size(); ++i) {
-    removeCmds.append(ACMD::GetInstMOVETOTRASH(workPath, names[i]));
+  removeCmds.reserve(relNames.size());
+  for (int i = 0; i < relNames.size(); ++i) {
+    removeCmds.append(ACMD::GetInstMOVETOTRASH(workPath, relNames[i]));
   }
   emit FileOpActs::GetInst().unlockOccupiedFiles();
   if (!UndoRedo::GetInst().Do(removeCmds)) {
@@ -214,17 +220,45 @@ OpStatus MoveToTrashSelected(QString workPath, const QStringList &names) {
   }
   return OpStatus::ALL_SUCCEED;
 }
-OpStatus MoveToTrashSelectedWithRelated(QString workPath, const QStringList &selectedJsonOrVideoNames) {
+
+OpStatus MoveToTrashSelectedVaryRootPath(const QStringList& workPaths, const QStringList &names) {
+  // 用于 SearchView, MovieDBView, 这里的names是不含前置相对路径的文件名(直接)
+  if (workPaths.size() != names.size()) { // 输入非法
+    LOG_WARN_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", workPaths.size(), names.size());
+    return OpStatus::SKIP;
+  }
+  const QStringList& relNames = names;
+  if (relNames.isEmpty()) {
+    LOG_INFO_NP("[Skip]", "Nothing selected");
+    return OpStatus::SKIP;
+  }
+  if (relNames.size() > 1 && !RecycleCfmDlg::recycleQuestion("Vary...", relNames, false)) {
+    // show dialog only more than one file
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relNames.size());
+    return OpStatus::SKIP;
+  }
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relNames.size());
+  for (int i = 0; i < relNames.size(); ++i) {
+    removeCmds.append(ACMD::GetInstMOVETOTRASH(workPaths[i], relNames[i]));
+  }
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
+  if (!UndoRedo::GetInst().Do(removeCmds)) {
+    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+    return OpStatus::PARTIAL_FAILED;
+  }
+  return OpStatus::ALL_SUCCEED;
+}
+
+
+OpOutcome MoveToTrashSelectedWithRelated(const QString& workPath, const QStringList &selectedJsonOrVideoNames) {
   const QStringList filesNeedProcess = ExpandRelatedFiles(workPath, selectedJsonOrVideoNames);
   if (filesNeedProcess.isEmpty()) {
-    LOG_INFO_NP("[Skip]", "Nothing to process after ExpandRelatedFiles");
-    return OpStatus::SKIP;
+    LOG_INFO_P("[Skip]", "Nothing to moveToTrash after ExpandRelatedFiles(%d)", selectedJsonOrVideoNames.size());
+    return {OpStatus::SKIP, 0};
   }
-  if (!RecycleCfmDlg::recycleQuestion(workPath, filesNeedProcess, false)) {
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d expand to %d item(s) no change", selectedJsonOrVideoNames.size(), filesNeedProcess.size());
-    return OpStatus::SKIP;
-  }
-  return MoveToTrashSelected(workPath, filesNeedProcess);
+  return {MoveToTrashSelected(workPath, filesNeedProcess), filesNeedProcess.size()};
 }
 
 } // namespace BatchRenameBy

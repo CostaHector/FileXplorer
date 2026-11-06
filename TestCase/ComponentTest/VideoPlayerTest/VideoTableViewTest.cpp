@@ -256,8 +256,8 @@ class VideoTableViewTest : public PlainTestSuite {
     videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
     QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
 
-    QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
-    videoTv.setMediaFiles("", inexistFiles, false);
+    QStringList inexistFiles{"Kaka 0.mp4", "Kaka 1.mp4", "Kaka 2.mp4"};
+    videoTv.setMediaFiles("/", inexistFiles, false);
     QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
 
     videoTv.clearSelection();
@@ -268,21 +268,27 @@ class VideoTableViewTest : public PlainTestSuite {
   }
 
   void onRecycleVideoAndRelated_ok() {
+    QStringList inexistFiles{"Kaka 0.mp4", "Kaka 1.mp4", "Kaka 2.mp4"};
+    QStringList expandedFiles{"Kaka 0.mp4", "Kaka 1.mp4", "Kaka 2.mp4",
+                              "Kaka 0 0.jpg", "Kaka 1 0.jpg", "Kaka 2 0.jpg"};
+    // 打桩让文件扩展成功
+    MOCKER(FileBatchOps::ExpandRelatedFiles).expects(exactly(2)).will(returnValue(expandedFiles)).then(returnValue(expandedFiles));
     MOCKER(RecycleCfmDlg::recycleQuestion).expects(exactly(2)).will(returnValue(false)).then(returnValue(true));
+
     VideoTableView videoTv;
     videoTv.mProxyModel->sort(VideoBasicInfo::FILE_NAME, Qt::AscendingOrder);
     QCOMPARE(videoTv.onRateSelectedMovies(10), 0);
 
-    QStringList inexistFiles{"/Kaka 0.mp4", "/Kaka 1.mp4", "/Kaka 2.mp4"};
-    videoTv.setMediaFiles("", inexistFiles, false);
+    videoTv.setMediaFiles("InexistVideoPath/to", inexistFiles, false);
     QCOMPARE(videoTv.mProxyModel->rowCount(), 3);
 
     videoTv.clearSelection();
-    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // no selection
+    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // no selection at all
 
     videoTv.selectAll();
     QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // 1st. user click cancel
-    QCOMPARE(videoTv.onRecycleVideoAndRelated(), 0);  // 2nd. user click yes. 3 files related to video(include json self), but not exist
+    QCOMPARE(videoTv.onRecycleVideoAndRelated(), expandedFiles.size()); // 2nd. recycle. already
+    QCOMPARE(videoTv.mProxyModel->rowCount(), 0);
   }
 };
 
