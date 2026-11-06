@@ -104,14 +104,7 @@ bool DuplicateVideoDetailsTable::on_RecycleSelection() {
     LOG_INFO_NP("Recycle", "skipped: selection is empty");
     return false;
   }
-  QStringList vidsFullPath;
-  vidsFullPath.reserve(selectedCnt);
-  for (const QModelIndex& srcInd : srcIndexes) {
-    QString vidFullPath = m_detailsModel->filePath(srcInd);
-    if (QFile::exists(vidFullPath)) {
-      vidsFullPath.push_back(vidFullPath);
-    }
-  }
+  const QStringList vidsFullPath{m_detailsModel->filesFullPath(srcIndexes)};
 
   QString prepath;
   QStringList rels;

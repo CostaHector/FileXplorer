@@ -157,23 +157,27 @@ bool FileXplorerEvent::on_CreateDvdInfoRecursively() {
   if (!__CanNewItem()) {
     return false;
   }
-
   const QString createIn{_fileSysModel->rootPath()};
+  const int ret = InputDialogHelper::YesNoCancelBox(
+      QMessageBox::Icon::NoIcon, QIcon(":img/NEW_DVD_INFO"),
+      "Create DVD Metadata", "Do you want to overwrite existing .dvd files under?",
+      createIn, "", "Override", "No Override");
 
-  QMessageBox msgBox;
-  msgBox.setWindowTitle("Create DVD Metadata");
-  msgBox.setWindowIcon(QIcon(":img/NEW_DVD_INFO"));
-  msgBox.setText(QString{"Do you want to overwrite existing .dvd files\nunder path\n%1?"}.arg(createIn));
-  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-  msgBox.setDefaultButton(QMessageBox::No);
-
-  const int ret = msgBox.exec();
-  if (ret != QMessageBox::Yes && ret != QMessageBox::No) {
-    LOG_INFO_NP("Skip", "User canceled creation of DVD info recursively");
-    return true;
+  bool bOverrideWhenExist{false};
+  switch (ret) {
+    case QMessageBox::Yes:
+      bOverrideWhenExist = true;
+      break;
+    case QMessageBox::No:
+      bOverrideWhenExist = false;
+      break;
+    case QMessageBox::Cancel:
+      LOG_INFO_NP("Skip", "User canceled creation of DVD info");
+      return true;
+    default:
+      return false;
   }
 
-  const bool bOverrideWhenExist{ret == QMessageBox::Yes};
   int succeedCnt = CreateFileFolderHelper::GenerateDvdFileRecursively(createIn, bOverrideWhenExist);
   LOG_OE_P(succeedCnt >= 0, "Create dvd meta", "%d .dvd file under path:%s created ok", succeedCnt, qPrintable(createIn));
   return succeedCnt >= 0;
@@ -923,7 +927,7 @@ bool FileXplorerEvent::on_moveToTrashBin() {
   std::function<int()> afterOperationUpdateModelCallback;
   QStringList prepaths, names;
   std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(&afterOperationUpdateModelCallback);
-  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelectedVaryRootPath(prepaths, names);
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelectedWithVaryRootPaths(prepaths, names);
   switch (recycleStatus) {
     case FileBatchOps::OpStatus::PARTIAL_FAILED: {
       LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");

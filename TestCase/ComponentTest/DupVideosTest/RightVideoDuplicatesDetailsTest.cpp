@@ -65,7 +65,7 @@ private slots:
         // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
         {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
         {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
-        {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
+        {"inexist video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("inexist video 1.mp4"), "h3"}, // a remain
         },};
     GroupedDupVidList durGrp = szGrp, sizeAndDurGrp = szGrp; // for simplicity. akk of them are equal
     GroupedDupVidListArr groupedVidsLists{szGrp, durGrp, szGrp};
@@ -118,7 +118,7 @@ private slots:
         // QString name; qint64 sz; int dur; qint64 modifiedDate; QString abspath; QString hash;
         {"video 1 ai.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1 ai.mp4"), "h1"},    //
         {"video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("video 1.mp4"), "h2"},          //
-        {"inexist video 1.mp4", 10, 4000, 0, "inexist path already deleted before", "h3"}, // a remain
+        {"inexist video 1.mp4", 10, 4000, 0, mDir.absoluteFilePath("inexist video 1.mp4"), "h3"}, // a remain
         },};
     GroupedDupVidList durGrp = szGrp, sizeAndDurGrp = szGrp; // for simplicity. two of them are equal
     GroupedDupVidListArr groupedVidsLists{szGrp, durGrp, sizeAndDurGrp};

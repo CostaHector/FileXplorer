@@ -38,16 +38,22 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
 
   QHash<QString, QStringList> dirToJsonNames;
 
+  constexpr bool IGNORE_CASE{true};
+  constexpr Qt::CaseSensitivity CASE_SENSITIVITY{IGNORE_CASE ? Qt::CaseInsensitive : Qt::CaseSensitive};
+  constexpr QDir::SortFlags SORT_FLAG{IGNORE_CASE ? (QDir::SortFlag::Name | QDir::SortFlag::IgnoreCase) : QDir::SortFlag::Name};
+
   const auto prefixLessThan = [](const QStringList::ConstIterator& nameIt, const QString& prefix)->bool {
     const QString& fileName = (*nameIt);
     const int cmpLength{qMin(prefix.size(), fileName.size())};
-    if (const int cmp = QString::compare(fileName.left(cmpLength), prefix.left(cmpLength))) { // !=0
+    if (const int cmp = QString::compare(fileName.left(cmpLength), prefix.left(cmpLength), CASE_SENSITIVITY)) { // !=0
+      // [大小写不敏感控制 1], 通过模式"Michael Fassbender.mp4"可以额外找出path路径下的"michael fassbender.json"
       return cmp < 0;
     }
     return fileName.size() < prefix.size();
   };
 
-  QDir sameLevelDir{path, "", QDir::SortFlag::Name, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
+  // [大小写不敏感控制 2] 获取路径下的文件/文件夹时, 保证有序且大小写不敏感
+  QDir sameLevelDir{path, "", SORT_FLAG, QDir::Filter::Files | QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot};
   for (const QString& rel2Json : relPatternNames) {
     jsonFileName = PathTool::GetPrepathAndFileName(rel2Json, relPath);
     const bool isRel{!relPath.isEmpty()};
@@ -77,7 +83,8 @@ QStringList ExpandRelatedFiles(const QString& path, const QStringList& relPatter
       // file.mp4_20260818_155313.075.jpg
       // file_011050.075.jpg
       const QString& fileName = *it;
-      if (!fileName.startsWith(jsonBaseName)) {
+      // [大小写不敏感控制 3] 前缀只要大小写不敏感一致就行
+      if (!fileName.startsWith(jsonBaseName, CASE_SENSITIVITY)) {
         continue;
       }
       std::tie(fileBaseName, fileExt) = PathTool::GetBaseNameExt(fileName);
@@ -196,66 +203,65 @@ OpStatus RenameSelectedNumerizer(const QString& workPath, const QStringList& sel
 }
 
 // ---- 回收相关核心入口
+namespace {
+OpStatus MoveToTrashSelectedCore(const QStringList& workPaths, const QStringList &relNames) {
+  if (relNames.isEmpty()) {
+    LOG_INFO_NP("[Skip]", "Nothing selected");
+    return OpStatus::SKIP;
+  }
+  // 允许两种输入:
+  // 1. workPaths和relNames 元素一一匹配
+  // 2. workPaths只有一个元素, 匹配到relNames的各个元素
+  const bool isCommonWorkPath{workPaths.size() == 1};
+  const bool isInputAllowed{workPaths.size() == relNames.size() || isCommonWorkPath};
+  if (!isInputAllowed) {
+    LOG_WARN_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", workPaths.size(), relNames.size());
+    return OpStatus::SKIP;
+  }
+  const QString commonWorkPathMsg{isCommonWorkPath ? workPaths.front() : "Working path varies..."};
+
+  if (relNames.size() > 1 && !RecycleCfmDlg::recycleQuestion(commonWorkPathMsg, relNames, false)) {
+    // show dialog only more than one file
+    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relNames.size());
+    return OpStatus::SKIP;
+  }
+  using namespace FileOperatorType;
+  BATCH_COMMAND_LIST_TYPE removeCmds;
+  removeCmds.reserve(relNames.size());
+  if (isCommonWorkPath) {
+    const QString& commonWorkPath = workPaths.front();
+    for (const QString& name : relNames) {
+      removeCmds.append(ACMD::GetInstMOVETOTRASH(commonWorkPath, name));
+    }
+  } else {
+    for (int i = 0; i < relNames.size(); ++i) {
+      removeCmds.append(ACMD::GetInstMOVETOTRASH(workPaths[i], relNames[i]));
+    }
+  }
+
+  emit FileOpActs::GetInst().unlockOccupiedFiles();
+  if (!UndoRedo::GetInst().Do(removeCmds)) {
+    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
+    return OpStatus::PARTIAL_FAILED;
+  }
+  return OpStatus::ALL_SUCCEED;
+}
+}
+
 OpStatus MoveToTrashSelected(const QString& workPath, const QStringList &relNames) {
-  // 这里的 names可以含前置相对路径的文件名(间接)
-  if (relNames.isEmpty()) {
-    LOG_INFO_NP("[Skip]", "Nothing selected");
-    return OpStatus::SKIP;
-  }
-  if (relNames.size() > 1 && !RecycleCfmDlg::recycleQuestion(workPath, relNames, false)) {
-    // show dialog only more than one file
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relNames.size());
-    return OpStatus::SKIP;
-  }
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(relNames.size());
-  for (int i = 0; i < relNames.size(); ++i) {
-    removeCmds.append(ACMD::GetInstMOVETOTRASH(workPath, relNames[i]));
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(removeCmds)) {
-    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
-    return OpStatus::PARTIAL_FAILED;
-  }
-  return OpStatus::ALL_SUCCEED;
+  // 用于FileSystemView, SceneView, JsonView, 这里的 names可以含前置相对路径的文件名(间接)
+  return MoveToTrashSelectedCore({workPath}, relNames);
 }
 
-OpStatus MoveToTrashSelectedVaryRootPath(const QStringList& workPaths, const QStringList &names) {
+OpStatus MoveToTrashSelectedWithVaryRootPaths(const QStringList& workPaths, const QStringList &names) {
   // 用于 SearchView, MovieDBView, 这里的names是不含前置相对路径的文件名(直接)
-  if (workPaths.size() != names.size()) { // 输入非法
-    LOG_WARN_P("[Skip]", "Prepaths[%d] and Names[%d] length Inequal", workPaths.size(), names.size());
-    return OpStatus::SKIP;
-  }
-  const QStringList& relNames = names;
-  if (relNames.isEmpty()) {
-    LOG_INFO_NP("[Skip]", "Nothing selected");
-    return OpStatus::SKIP;
-  }
-  if (relNames.size() > 1 && !RecycleCfmDlg::recycleQuestion("Vary...", relNames, false)) {
-    // show dialog only more than one file
-    LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", relNames.size());
-    return OpStatus::SKIP;
-  }
-  using namespace FileOperatorType;
-  BATCH_COMMAND_LIST_TYPE removeCmds;
-  removeCmds.reserve(relNames.size());
-  for (int i = 0; i < relNames.size(); ++i) {
-    removeCmds.append(ACMD::GetInstMOVETOTRASH(workPaths[i], relNames[i]));
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(removeCmds)) {
-    LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
-    return OpStatus::PARTIAL_FAILED;
-  }
-  return OpStatus::ALL_SUCCEED;
+  return MoveToTrashSelectedCore(workPaths, names);
 }
-
 
 OpOutcome MoveToTrashSelectedWithRelated(const QString& workPath, const QStringList &selectedJsonOrVideoNames) {
   const QStringList filesNeedProcess = ExpandRelatedFiles(workPath, selectedJsonOrVideoNames);
   if (filesNeedProcess.isEmpty()) {
-    LOG_INFO_P("[Skip]", "Nothing to moveToTrash after ExpandRelatedFiles(%d)", selectedJsonOrVideoNames.size());
+    LOG_INFO_P("[Skip]", "Nothing to moveToTrash after ExpandRelatedFiles(%d) in %s", selectedJsonOrVideoNames.size(), qPrintable(workPath));
     return {OpStatus::SKIP, 0};
   }
   return {MoveToTrashSelected(workPath, filesNeedProcess), filesNeedProcess.size()};

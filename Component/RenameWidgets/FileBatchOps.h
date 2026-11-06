@@ -51,7 +51,7 @@ OpStatus RenameSelectedNumerizer(const QString& workPath, const QStringList& sel
 
 // ---- 回收相关核心入口
 OpStatus MoveToTrashSelected(const QString& workPath, const QStringList& names);
-OpStatus MoveToTrashSelectedVaryRootPath(const QStringList& workPaths, const QStringList &relNames);
+OpStatus MoveToTrashSelectedWithVaryRootPaths(const QStringList& workPaths, const QStringList &relNames);
 OpOutcome MoveToTrashSelectedWithRelated(const QString& workPath, const QStringList& selectedJsonOrVideoNames);
 }  // namespace BatchRenameBy
 
