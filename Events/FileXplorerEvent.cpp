@@ -925,73 +925,37 @@ bool FileXplorerEvent::on_moveToTrashBin() {
   }
 
   std::function<int()> afterOperationUpdateModelCallback;
-  QStringList prepaths, names;
-  std::tie(prepaths, names) = _contentPane->getFilePrepathsAndName(&afterOperationUpdateModelCallback);
-  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelectedWithVaryRootPaths(prepaths, names);
-  switch (recycleStatus) {
-    case FileBatchOps::OpStatus::PARTIAL_FAILED: {
-      LOG_ERR_NP("[MoveToTrash] Partially failed", "Some item(s) move to trashbin failed");
-      return false;
-    }
-    case FileBatchOps::OpStatus::SKIP: {
-      return true;
-    }
-    case FileBatchOps::OpStatus::ALL_SUCCEED: {
-      if (afterOperationUpdateModelCallback) {
-        afterOperationUpdateModelCallback();
-      }
-      LOG_OK_P("[MoveToTrash] All succeed", "Files Count %d", names.size());
-      return true;
-    }
-    default:
-      return false;
+  QString workpath;
+  QStringList rel2names;
+  std::tie(workpath, rel2names) = _contentPane->getWorkPathAndRel2Name(&afterOperationUpdateModelCallback);
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelected(workpath, rel2names);
+  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED && afterOperationUpdateModelCallback) {
+    afterOperationUpdateModelCallback();
   }
+  return recycleStatus != FileBatchOps::OpStatus::PARTIAL_FAILED;
 }
 
 bool FileXplorerEvent::on_deletePermanently() {
-  auto vt = _contentPane->GetVt();
-  if (!ViewTypeTool::isFSView(vt)) {
-    LOG_WARN_NP("[Abort] Current view not support Delete Permanently", _contentPane->GetCurViewName());
+  ViewTypeTool::ViewType vt = _contentPane->GetVt();
+  if (!ViewTypeTool::IsRenameMoveRecycleAvail(vt)) {
+    LOG_WARN_NP("[Abort] Current view not support DeletePermanently", _contentPane->GetCurViewName());
     return false;
   }
   const QString pth = _contentPane->getRootPath();
   if (PathTool::isLinuxRootOrWinEmpty(pth)) {
-    LOG_INFO_P("[Abort] Delete Permanently", "rootPath:%s", qPrintable(pth));
+    LOG_WARN_NP("[Abort] Path not recyclable", pth);
     return false;
   }
 
-  auto* view = _contentPane->GetCurView();
-  using namespace FileOperatorType;
-
-  const auto& indexes = view->selectionModel()->selectedRows();
-  QStringList deleteNames;
-  deleteNames.reserve(indexes.size());
-  BATCH_COMMAND_LIST_TYPE cmds;
-  cmds.reserve(indexes.size());
-  for (const QModelIndex& ind : indexes) {
-    const QFileInfo& fi = _fileSysModel->fileInfo(ind);
-    if (fi.isDir()) {
-      cmds.push_back(ACMD::GetInstRMFOLDERFORCE(pth, fi.fileName()));
-    } else if (fi.isFile()) {
-      cmds.push_back(ACMD::GetInstRMFILE(pth, fi.fileName()));
-    } else {
-      LOG_I("Here may some types not removed [%s]", qPrintable(fi.filePath()));
-      continue;
-    }
-    deleteNames.push_back(fi.fileName());
+  std::function<int()> afterOperationUpdateModelCallback;
+  QString workpath;
+  QStringList rel2names;
+  std::tie(workpath, rel2names) = _contentPane->getWorkPathAndRel2Name(&afterOperationUpdateModelCallback);
+  FileBatchOps::OpStatus recycleStatus = FileBatchOps::DeletePermanentlySelected(workpath, rel2names);
+  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED && afterOperationUpdateModelCallback) {
+    afterOperationUpdateModelCallback();
   }
-
-  if (!RecycleCfmDlg::recycleQuestion(pth, deleteNames, true)) {
-    LOG_INFO_P("[Cancel] User cancel delete", "%d item(s) no change", cmds.size());
-    return true;
-  }
-  emit FileOpActs::GetInst().unlockOccupiedFiles();
-  if (!UndoRedo::GetInst().Do(cmds)) {
-    LOG_ERR_P("[Failed] Partial item(s) deleted failed", "%d cmds", cmds.size());
-    return false;
-  }
-  LOG_OK_P("[Ok] All item(s) deleted succeed", "%d cmds", cmds.size());
-  return true;
+  return recycleStatus != FileBatchOps::OpStatus::PARTIAL_FAILED;
 }
 
 void FileXplorerEvent::on_SelectAll() {
@@ -1360,35 +1324,13 @@ bool FileXplorerEvent::on_RemoveRedundantItem(RedundantRmv& remover) {
     LOG_WARN_NP("[Abort] Current View type not support RemoveRedundantItem", ViewTypeTool::c_str(vt));
     return false;
   }
-
   const QString& currentPath = _fileSysModel->rootPath();
   if (PathTool::isRootOrEmpty(currentPath)) {
     LOG_ERR_NP("Path is root or empty", currentPath);
     return false;
   }
-
-  int cmdCnt = remover(currentPath);
-  if (cmdCnt == 0) {
-    LOG_OK_NP("Skip", "Nothing to remove");
-    return true;
-  }
-  const QString removeCmdDetail{remover};
-
-  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Icon::Warning,
-                                         QIcon{},
-                                         QString{"Confirm %1 command(s)?"}.arg(cmdCnt),
-                                         QString{"Remove Redundant folder\nFolder:\n%1"}.arg(currentPath),
-                                         "", removeCmdDetail)) {
-    LOG_INFO_NP("[Skip] User cancelled", "redundant item will not remove");
-    return true;
-  }
-  bool rmvResult = remover.Exec();
-  if (!rmvResult) {
-    LOG_ERR_NP("[Failed] Partial Remove Redundant folder failed", currentPath);
-    return false;
-  }
-  LOG_OK_NP("[Ok] All Remove Redundant folder succeed", currentPath);
-  return true;
+  const int cmdCnt = remover.Find(currentPath);
+  return remover.Exec();
 }
 
 bool FileXplorerEvent::on_MoveCopyEventSkeleton(const Qt::DropAction& dropAct, QString dest) {

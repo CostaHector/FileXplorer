@@ -70,8 +70,7 @@ public:
   void removeDisable(const QModelIndex& ind);
   void clearDisables();
 
-  int RecycleSomething(const QSet<QModelIndex>& recycleIndexes);
-  void ClearRecycle();
+  int RecycleSomething(const QModelIndexList& recycleIndexes);
 
   QString absolutePath(const QModelIndex& curIndex) const {  //
     const int row = curIndex.row();
@@ -132,7 +131,6 @@ private:
   SelectionsRangeHelper mCutIndexes, mCopyIndexes;
   QSet<QModelIndex> m_disableList;  // QFileSystemModel: only setNameFilter will effect this
   // SearchModel: both setNameFilter and contents will effect this
-  QSet<QModelIndex> m_recycleSet;
 };
 
 #endif  // ADVANCESEARCHMODEL_H

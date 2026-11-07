@@ -10,7 +10,6 @@ class JsonTableView : public CustomTableView {
  public:
   explicit JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* jsonProxyModel, QWidget* parent = nullptr);
   QModelIndex CurrentIndexSource() const;
-  QModelIndexList selectedRowsSource(JsonModelField::FIELD_E column = JsonModelField::Name) const;
 
   int ReadADirectory(const QString& path);
   void subscribe();

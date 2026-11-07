@@ -177,7 +177,7 @@ private slots:
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName1);
 
     // 1.4 table name occupied
-    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
+    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, QString("%1 (occupied)").arg(tableName1));
     QVERIFY(!movieView.onCreateATable());
     QVERIFY(fdDb.IsTableExist(tableName1));
 

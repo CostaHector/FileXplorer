@@ -16,7 +16,6 @@ HarTableView::HarTableView(QWidget* parent)
 
   mSortFilterProxy->setSourceModel(mHarModel);
   setModel(mSortFilterProxy);
-  registerProxyModel(mSortFilterProxy);
 
   InitTableView();
 

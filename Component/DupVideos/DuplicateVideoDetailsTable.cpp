@@ -22,7 +22,6 @@ DuplicateVideoDetailsTable::DuplicateVideoDetailsTable(QWidget* parent) //
 
   m_rightSortProxy->setSourceModel(m_detailsModel);
   setModel(m_rightSortProxy);
-  registerProxyModel(m_rightSortProxy);
 
   subscribe();
 

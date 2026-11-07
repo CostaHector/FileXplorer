@@ -1,25 +1,21 @@
-﻿#ifndef REDUNDANTFOLDERREMOVE_H
-#define REDUNDANTFOLDERREMOVE_H
+﻿#ifndef REDUNDANTRMV_H
+#define REDUNDANTRMV_H
+
 #include "FileOperatorPub.h"
+#include <QStringList>
+
 class RedundantRmv {
- public:
+public:
   RedundantRmv() = default;
-  ~RedundantRmv() = default;
-
-  FileOperatorType::BATCH_COMMAND_LIST_TYPE m_cmds;
-
-  virtual auto CleanEmptyFolderCore(const QString& folderPath) -> int = 0;
-  int operator()(const QString& path);
+  virtual ~RedundantRmv() = default;
+  int Find(const QString& path);
   bool Exec();
-
-  operator QString() const {
-    QString s;
-    for (const auto& cmd : m_cmds) {
-      s += cmd.toStr();
-      s += '\n';
-    }
-    return s;
-  }
+protected:
+  QString m_workPath;
+  QStringList m_relNames;
+  FileOperatorType::BATCH_COMMAND_LIST_TYPE m_mixedCmds; // 前置工作
+private:
+  virtual int CleanEmptyFolderCore(const QString& folderPath) = 0;
 };
 
 /* Here we call a folder with no item or only one item redundant folder
@@ -33,13 +29,13 @@ A/{AB} => upgrade AB level, then recycle parent A
 A/{A.mp4} => upgrade A.mp4 level, then recycle folder A
 */
 
+
 class ZeroOrOneItemFolderProc : public RedundantRmv {
- public:
-  constexpr static int TOLERANCE_LETTER_CNT = 6;
-  ZeroOrOneItemFolderProc() : RedundantRmv() {
-    // defence : including subfolder may cause huge problem to the whole file system;
-  }
-  auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
+public:
+  using RedundantRmv::RedundantRmv;
+  // defence : including subfolder may cause huge problem to the whole file system;
+private:
+  int CleanEmptyFolderCore(const QString& folderPath) override;
 };
 
 // EmptyFolderRmv:
@@ -47,19 +43,18 @@ class ZeroOrOneItemFolderProc : public RedundantRmv {
 // A/{A.mp4} => do nothing
 // A/B/{}, A/C/{}=> recycle B and C
 class EmptyFolderRmv : public RedundantRmv {
- public:
-  EmptyFolderRmv() : RedundantRmv() {}
-  auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
- private:
+public:
+  using RedundantRmv::RedundantRmv;
+private:
+  int CleanEmptyFolderCore(const QString& folderPath) override;
   QStringList FindOutEmptyFolderOrAllSubFolderEmpty(const QString& folderPath) const;
 };
 
 class FolderNameContainKeyRmv : public RedundantRmv {
- public:
+public:
   explicit FolderNameContainKeyRmv(const QString& keyword) : RedundantRmv(), m_keyword{keyword} {}
-  auto CleanEmptyFolderCore(const QString& folderPath) -> int override;
-
- private:
+private:
+  int CleanEmptyFolderCore(const QString& folderPath) override;
   const QString m_keyword;
 };
-#endif  // REDUNDANTFOLDERREMOVE_H
+#endif  // REDUNDANTRMV_H

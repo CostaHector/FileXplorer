@@ -6,6 +6,8 @@
 #include "Logger.h"
 #include "PublicCheckMacro.h"
 #include "ViewItemDelegate.h"
+#include "ViewSelectionHelper.h"
+
 #include <QSortFilterProxyModel>
 #include <QPainter>
 #include <QContextMenuEvent>
@@ -151,23 +153,8 @@ void CustomTreeView::paintEvent(QPaintEvent* event) {
   QTreeView::paintEvent(event);
 }
 
-void CustomTreeView::registerProxyModel(QSortFilterProxyModel* proxyModelInDerived) {
-  CHECK_NULLPTR_RETURN_VOID(proxyModelInDerived);
-  _proxyModel = proxyModelInDerived;
-}
-
 QModelIndexList CustomTreeView::selectedRowsSource() const {
-  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
-  if (_proxyModel == nullptr) {
-    return proxyIndexes;
-  }
-
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proxyIndexes.size());
-  for (const QModelIndex& proxyIndex : proxyIndexes) {
-    srcIndexes.push_back(_proxyModel->mapToSource(proxyIndex));
-  }
-  return srcIndexes;
+  return ViewSelectionHelper::selectedRowsSourceCore(*this);
 }
 
 void CustomTreeView::AddItselfAction2Menu() {

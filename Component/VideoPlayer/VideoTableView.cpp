@@ -176,16 +176,6 @@ void VideoTableView::ReqPlay(const QModelIndex& proIndex, bool bPlayInstantly) {
   emit reqPlayMedia(mediaFullPath, bPlayInstantly);
 }
 
-QModelIndexList VideoTableView::selectedRowsSource() const {
-  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proxyIndexes.size());
-  for (const QModelIndex& proxyIndex : proxyIndexes) {
-    srcIndexes.push_back(mProxyModel->mapToSource(proxyIndex));
-  }
-  return srcIndexes;
-}
-
 int VideoTableView::onRateSelectedMovies(int newRate) {
   const QModelIndexList& srcIndexes{selectedRowsSource()};
   if (srcIndexes.isEmpty()) {

@@ -4,7 +4,6 @@
 #include "BeginToExposePrivateMember.h"
 #include "DupVidsManager.h"
 #include "EndToExposePrivateMember.h"
-#include "FileSystemTestSuite.h"
 
 #include "PlainTestSuite.h"
 #include "TDir.h"

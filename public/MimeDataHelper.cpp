@@ -30,20 +30,15 @@ MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const
   return {filePaths, urls, indexes};
 }
 
-MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const SearchProxyModel& searchProxyModel, const QModelIndexList& proIndexes) {
+MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const QModelIndexList& srcIndexes) {
   QStringList filePaths;
-  filePaths.reserve(proIndexes.size());
+  filePaths.reserve(srcIndexes.size());
 
   QList<QUrl> urls;
-  urls.reserve(proIndexes.size());
+  urls.reserve(srcIndexes.size());
 
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proIndexes.size());
-
-  for (const auto& proInd : proIndexes) {
-    const auto& srcind = searchProxyModel.mapToSource(proInd);
-    const QString absFilePath = searchSrcModel.filePath(srcind);
-    srcIndexes.append(srcind);
+  for (const auto& srcInd : srcIndexes) {
+    const QString absFilePath = searchSrcModel.filePath(srcInd);
     filePaths.append(absFilePath);
     urls.append(QUrl::fromLocalFile(absFilePath));
   }

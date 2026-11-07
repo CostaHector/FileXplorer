@@ -83,7 +83,7 @@ class ViewsStackedWidget : public QStackedWidget {
   QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QStringList getFilePaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QStringList getFilePrepaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  std::pair<QStringList, QStringList> getFilePrepathsAndName(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  std::pair<QString, QStringList> getWorkPathAndRel2Name(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QStringList getFullRecords(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   int getSelectedRowsCount(SelectionUsage usage=SelectionUsage::DEFAULT) const;
@@ -115,7 +115,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   ScenesListModel* m_scenesModel{nullptr};
   SceneSortProxyModel* m_sceneProxyModel{nullptr};
-  SceneListView* m_sceneTableView{nullptr};
+  SceneListView* m_sceneListView{nullptr};
 
   CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus
   CastBaseDb* mCastDb{nullptr};

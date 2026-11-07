@@ -25,7 +25,6 @@ public:
   void subscribe();
   bool onOpenCorrespondingFolder();
   bool onClickEvent(const QModelIndex& idx);
-  QModelIndexList selectedRowsSource() const;
 
 signals:
   void currentSceneChanged(const QString& name, const QString& jsonAbsFilePath, const QStringList& imgPthLst, const QStringList& vidsLst);

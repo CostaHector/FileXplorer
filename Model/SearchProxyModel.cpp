@@ -46,9 +46,6 @@ void SearchProxyModel::PrintRegexDebugMessage() const {
 
 void SearchProxyModel::startFilterWhenTextChanged(const QString& nameText, const QString& contentText) {
   // triggered by enter key
-  if (_searchSourceModel != nullptr) {
-    _searchSourceModel->clearDisables();
-  }
   m_nameRawString = nameText;
   m_contentRawText.clear();
   using namespace SearchTools;

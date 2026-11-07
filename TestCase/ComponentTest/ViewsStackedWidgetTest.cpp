@@ -534,7 +534,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     const QStringList filePrepaths{lvl1Path, lvl1Path, lvl1Path, lvl1Path};
     const QStringList fileNames{jpgName, jsonName, mp4Name, psonName};
     const QStringList filePaths{jpgFileAbsPath, jsonFileAbsPath, mp4FileAbsPath, psonFileAbsPath};
-    const std::pair<QStringList, QStringList> expectPreAndName{filePrepaths, fileNames};
+    const std::pair<QString, QStringList> expectPreAndName{lvl1Path, fileNames};
     const QList<QUrl> expectUrls{QUrl::fromLocalFile(jpgFileAbsPath), QUrl::fromLocalFile(jsonFileAbsPath), QUrl::fromLocalFile(mp4FileAbsPath),
                                  QUrl::fromLocalFile(psonFileAbsPath)};
 
@@ -579,7 +579,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
         QCOMPARE(pathsAndUrls.texts, filePaths);
         QCOMPARE(pathsAndUrls.urls, expectUrls);
         QCOMPARE(pathsAndUrls.srcIndexes, selectedRowsIndexes);
-        QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndName);
+        QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndName);
 
         m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -617,7 +617,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
         QCOMPARE(pathsAndUrls.texts, filePaths);
         QCOMPARE(pathsAndUrls.urls, expectUrls);
         QCOMPARE(pathsAndUrls.srcIndexes, selectedRowsIndexes);
-        QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndName);
+        QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndName);
 
         m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -656,7 +656,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
         QCOMPARE(pathsAndUrls.texts, filePaths);
         QCOMPARE(pathsAndUrls.urls, expectUrls);
         QCOMPARE(pathsAndUrls.srcIndexes, selectedRowsIndexes);
-        QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndName);
+        QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndName);
 
         m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -684,7 +684,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(psonInd.data(Qt::DisplayRole).toString(), "Kaka.pson");
       const QModelIndexList selectedRowsIndexes{jpgInd, jsonInd, mp4Ind, psonInd};
       const QStringList filePrepathsSearch{lvl1Path + '/', lvl1Path + '/', lvl1Path + '/', lvl1Path + '/'};
-      const std::pair<QStringList, QStringList> expectPreAndNameSearch{filePrepathsSearch, fileNames};
+      const std::pair<QString, QStringList> expectPreAndNameSearch{lvl1Path, fileNames};
 
       QVERIFY(!m_fsPanel.hasSelection());
 
@@ -709,7 +709,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(pathsAndUrls.texts, filePaths);
       QCOMPARE(pathsAndUrls.urls, expectUrls);
       QCOMPARE(compareModelIndexList(pathsAndUrls.srcIndexes, selectedRowsIndexes), true);
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndNameSearch);
+      QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndNameSearch);
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -733,7 +733,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QStringList filePrepathsJson{lvl1Path, lvl1Path, lvl1Path, lvl1Path};
       const QStringList fileNamesRelatedToJson{jpgName, jsonName, mp4Name, psonName};
       const QStringList filePathsJson{jsonFileAbsPath};
-      const std::pair<QStringList, QStringList> expectPreAndNameJson{filePrepathsJson, fileNamesRelatedToJson};
+      const std::pair<QString, QStringList> expectPreAndNameJson{lvl1Path, fileNamesRelatedToJson};
 
       QVERIFY(!m_fsPanel.hasSelection());
 
@@ -754,7 +754,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
 
       const MimeDataHelper::MimeDataMember& pathsAndUrls = m_fsPanel.getFilePathsAndUrls();
       QCOMPARE(pathsAndUrls.isEmpty(), true);
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndNameJson);
+      QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndNameJson);
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -814,7 +814,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
 
       const MimeDataHelper::MimeDataMember& pathsAndUrls = m_fsPanel.getFilePathsAndUrls();
       QCOMPARE(pathsAndUrls.isEmpty(), true);
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), (std::pair<QStringList, QStringList>{}));
+      QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), (std::pair<QString, QStringList>{}));
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -828,7 +828,8 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
     {  // Preparation:
       const QString dbName{mTDir.itemPath("SelectionOnMovieViewTest.db")};
       const QString connName{"SelectionOnMovieViewTestConn"};
-      const QString tableName{"ABCDEF12_3456_7890_ABCDEF1234567890"};  // can be converted to guid
+      const QString tableName{"C__DISKS_RANDOM"};  // can be converted to guid
+      const QString workPath{"C:/DISKS/RANDOM"};
       MOCKER(SystemPath::VIDS_DATABASE).expects(exactly(1)).will(returnValue(dbName));
       MOCKER(SystemPath::MovieDBConnection).expects(exactly(1)).will(returnValue(connName));
       {
@@ -840,6 +841,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
         QCOMPARE(movieDb.ReadADirectory(tableName, lvl1Path), 1);
       }
       m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::MOVIE);
+      QCOMPARE(m_fsPanel.m_movieDbModel->rootPath(), workPath);
       QCOMPARE(m_fsPanel.m_movieDbModel->rowCount(), 1);
 
       m_fsPanel.m_movieView->sortByColumn(0, Qt::SortOrder::AscendingOrder);
@@ -849,9 +851,11 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       const QStringList fileNamesMovie{mp4Name};
       const QModelIndexList selectedRowsMovie{movieInd};
       const QStringList filePathsMovie{mp4FileAbsPath};
+      const QStringList rel2namesMovie{mp4FileAbsPath.mid(workPath.size() + 1)};
       const QStringList filePrepathsMovie{lvl1Path + '/'};
       const QList<QUrl> expectUrls{QUrl::fromLocalFile(mp4FileAbsPath)};
-      const std::pair<QStringList, QStringList> expectPreAndNameMovie{filePrepathsMovie, fileNamesMovie};
+
+      const std::pair<QString, QStringList> expectPreAndNameMovie{workPath, rel2namesMovie};
 
       QCOMPARE(m_fsPanel.getRootPath(), "");  // no rootpath in MOVIE
       QVERIFY(!m_fsPanel.hasSelection());
@@ -875,7 +879,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(pathsAndUrls.texts, filePathsMovie);
       QCOMPARE(pathsAndUrls.urls, expectUrls);
       QCOMPARE(pathsAndUrls.srcIndexes, selectedRowsMovie);
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), expectPreAndNameMovie);
+      QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), expectPreAndNameMovie);
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 
@@ -886,6 +890,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
       QCOMPARE(m_fsPanel.getFileInfo(movieInd), mp4FileInfo);
     }
 
+    // Scene View
     {
       using namespace SceneInfoManager;
       ScnMgr scnMgr1;
@@ -927,7 +932,7 @@ class ViewsStackedWidgetTest : public PlainTestSuite {
 
       const MimeDataHelper::MimeDataMember& pathsAndUrls = m_fsPanel.getFilePathsAndUrls();
       QVERIFY(pathsAndUrls.isEmpty());
-      QCOMPARE(m_fsPanel.getFilePrepathsAndName(), (std::pair<QStringList, QStringList>{filePrepaths, fileNames}));
+      QCOMPARE(m_fsPanel.getWorkPathAndRel2Name(), (std::pair<QString, QStringList>{lvl1Path, fileNames}));
 
       m_fsPanel.getFilePathsAndUrls(Qt::DropAction::CopyAction);
 

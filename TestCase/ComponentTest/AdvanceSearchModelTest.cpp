@@ -8,6 +8,8 @@
 #include "SearchProxyModel.h"
 #include "EndToExposePrivateMember.h"
 
+#include "OnScopeExit.h"
+
 class AdvanceSearchModelTest : public PlainTestSuite {
   Q_OBJECT
  public:
@@ -282,7 +284,6 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     QCOMPARE(sourceModel.data(firstInd.siblingAtColumn(PropColumnE::Name), Qt::ItemDataRole::TextAlignmentRole).toInt(), int(Qt::AlignLeft | Qt::AlignVCenter));
 
     QVERIFY(sourceModel.m_disableList.isEmpty());
-    QVERIFY(sourceModel.m_recycleSet.isEmpty());
     QVERIFY(sourceModel.data(firstInd, Qt::ItemDataRole::ForegroundRole).isNull());  // should be null
 
     {  // iteratorFlag=Subdirectories, files only
@@ -320,21 +321,23 @@ class AdvanceSearchModelTest : public PlainTestSuite {
     searchProxyModel.initSearchMode(SearchTools::SearchModeE::FILE_CONTENTS);
 
     const QModelIndex firstIndex = sourceModel.index(0, FilePropertyHelper::Name);
-
+    const QString firstFileFullPath = sourceModel.filePath(firstIndex);
     {  // 1. recycle => red
       QVERIFY(sourceModel.m_disableList.isEmpty());
-      QVERIFY(sourceModel.m_recycleSet.isEmpty());
-      sourceModel.RecycleSomething({firstIndex});
-      QCOMPARE(sourceModel.m_recycleSet.isEmpty(), false);
 
+      QString pathInTrash;
+      QVERIFY(QFile::exists(firstFileFullPath));
+      QVERIFY(QFile::moveToTrash(firstFileFullPath, &pathInTrash));
+      OnScopeExit {
+        QFile::rename(pathInTrash, firstFileFullPath);
+      };
+      sourceModel.RecycleSomething({firstIndex});
       QVariant recycleColorVar = sourceModel.data(firstIndex, Qt::ItemDataRole::ForegroundRole);
       QVERIFY(recycleColorVar.isValid());
       QVERIFY(recycleColorVar.canConvert<QColor>());
       QCOMPARE(recycleColorVar.value<QColor>(), QColor(Qt::GlobalColor::red));
-
-      sourceModel.ClearRecycle();
-      QCOMPARE(sourceModel.m_recycleSet.isEmpty(), true);
     }
+    QVERIFY(QFile::exists(sourceModel.filePath(firstIndex))); // 回收站回来了
 
     {  // 2. disable => gray
       searchProxyModel.setSearchMode(SearchTools::SearchModeE::NORMAL);

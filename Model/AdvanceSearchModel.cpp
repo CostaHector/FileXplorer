@@ -2,13 +2,11 @@
 #include "NotificatorMacro.h"
 #include "PathTool.h"
 #include "ImageTool.h"
-#include "PublicVariable.h"
 #include "DataFormatter.h"
 #include "InputDialogHelper.h"
 
 void AdvanceSearchModel::updateSearchResultList() {
   using namespace FilePropertyHelper;
-  ClearRecycle();
   FilePropertyInfoList allItemsUnderThisPath;
   QDirIterator it{m_rootPath, m_filters, m_iteratorFlags};
   QString rel2searchItem;
@@ -124,7 +122,7 @@ QVariant AdvanceSearchModel::data(const QModelIndex& index, int role) const {
     if (m_disableList.contains(index)) {
       static const QColor DISABLE_COLOR{Qt::GlobalColor::lightGray};
       return DISABLE_COLOR;
-    } else if (m_recycleSet.contains(index)) {
+    } else if (!QFile::exists(filePath(index))) {
       static const QColor RECYCLE_COLOR{Qt::GlobalColor::red};
       return RECYCLE_COLOR;
     }
@@ -174,16 +172,14 @@ void AdvanceSearchModel::clearDisables() {
     emit dataChanged(ind, ind, {Qt::ForegroundRole});
   }
 }
-
-int AdvanceSearchModel::RecycleSomething(const QSet<QModelIndex>& recycleIndexes) {
-  m_recycleSet += recycleIndexes;
-  return recycleIndexes.size();
-}
-
-void AdvanceSearchModel::ClearRecycle() {
-  decltype(m_recycleSet) tmp;
-  tmp.swap(m_recycleSet);
-  foreach (const QModelIndex& ind, tmp) {
-    emit dataChanged(ind, ind, {Qt::ItemDataRole::BackgroundRole});
+int AdvanceSearchModel::RecycleSomething(const QModelIndexList& recycleIndexes) {
+  const int backCol = columnCount() - 1;
+  if (backCol < 0) {
+    return 0;
   }
+  QList<int> uniqueAscRows = ModelTools::GetSortedUniqueRowsFromIndexes(recycleIndexes);
+  for (const auto& pr: ModelTools::MergeList2SectionsRange(uniqueAscRows)) {
+    emit dataChanged(index(pr.first, backCol), index(pr.first, backCol), {Qt::ForegroundRole});
+  }
+  return uniqueAscRows.size();
 }

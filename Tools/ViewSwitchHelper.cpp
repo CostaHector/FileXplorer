@@ -163,15 +163,15 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
       break;
     }
     case ViewType::SCENE: {
-      if (_view->m_sceneTableView == nullptr) {
+      if (_view->m_sceneListView == nullptr) {
         _view->m_scenesModel = new ScenesListModel{"SCENES_TABLE"};
         _view->m_sceneProxyModel = new SceneSortProxyModel;
-        _view->m_sceneTableView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _view);
-        _view->m_sceneTableView->InitListView();
-        _view->AddView(viewType, _view->m_sceneTableView);
+        _view->m_sceneListView = new SceneListView(_view->m_scenesModel, _view->m_sceneProxyModel, _view);
+        _view->m_sceneListView->InitListView();
+        _view->AddView(viewType, _view->m_sceneListView);
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
-      _view->m_sceneTableView->setRootPath(newPath);
+      _view->m_sceneListView->setRootPath(newPath);
       viewIndex = _view->m_name2ViewIndex[viewType];
       break;
     }

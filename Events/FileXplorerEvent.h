@@ -1,6 +1,6 @@
 #ifndef FILEXPLOREREVENT_H
 #define FILEXPLOREREVENT_H
-#include "RedundantFolderRemove.h"
+#include "RedundantRmv.h"
 #include "FileSystemModel.h"
 #include "PopupWidgetManager.h"
 #include "ComplexOperation.h"

@@ -16,7 +16,6 @@ MultiParView::MultiParView(ParVerifyInfomationList &&resultList, const QString &
   mSortFilterProxy->setSourceModel(mMultiParModel);
 
   setModel(mSortFilterProxy);
-  registerProxyModel(mSortFilterProxy);
   InitTableView();
 
   {
