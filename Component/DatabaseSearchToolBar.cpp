@@ -118,7 +118,8 @@ void MovieDBSearchToolBar::extraSignalSubscribe() {
 }
 
 QString MovieDBSearchToolBar::GetMovieTableMountPath() const {
-  return MountPathTableNameMapper::toMountPath(GetCurrentTableName());
+  bool isPathParseOk{false};
+  return MountPathTableNameMapper::toMountPath(GetCurrentTableName(), isPathParseOk);
 }
 
 QString MovieDBSearchToolBar::AskUserDropWhichTable() {

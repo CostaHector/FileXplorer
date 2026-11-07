@@ -20,7 +20,6 @@ DuplicateImagesTable::DuplicateImagesTable(QWidget* parent)
   m_imgProxy->setSourceModel(m_imgModel);
 
   setModel(m_imgProxy);
-  registerProxyModel(m_imgProxy);
 
   mSelectSameHashRows = new QAction{tr("Select Same Hash Rows(Ignore first one)"), this};
 

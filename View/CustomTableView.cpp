@@ -8,6 +8,7 @@
 #include "PublicCheckMacro.h"
 #include "ViewHelper.h"
 #include "RowHeightRegistry.h"
+#include "ViewSelectionHelper.h"
 
 #include <QPainter>
 #include <QContextMenuEvent>
@@ -264,21 +265,8 @@ void CustomTableView::paintEvent(QPaintEvent* event) {
   QTableView::paintEvent(event);
 }
 
-void CustomTableView::registerProxyModel(QSortFilterProxyModel* proxyModelInDerived) {
-  CHECK_NULLPTR_RETURN_VOID(proxyModelInDerived);
-  _proxyModel = proxyModelInDerived;
-}
-
 QModelIndexList CustomTableView::selectedRowsSource() const {
-  CHECK_FALSE_RETURN_VAL(_proxyModel, QModelIndexList{});
-
-  QModelIndexList proxyIndexes{selectionModel()->selectedRows()};
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proxyIndexes.size());
-  for (const QModelIndex& proxyIndex : proxyIndexes) {
-    srcIndexes.push_back(_proxyModel->mapToSource(proxyIndex));
-  }
-  return srcIndexes;
+  return ViewSelectionHelper::selectedRowsSourceCore(*this);
 }
 
 QList<int> CustomTableView::selectedRowsSourceInt() const {

@@ -257,16 +257,6 @@ void SceneListView::initExclusivePreferenceSetting() {
   CustomListView::m_defaultWrapping = true;
 }
 
-QModelIndexList SceneListView::selectedRowsSource() const {
-  const QModelIndexList& proIndexes = selectedIndexes();
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proIndexes.size());
-  for (const auto& proIndex : proIndexes) {
-    srcIndexes.append(_sceneSortProxyModel->mapToSource(proIndex));
-  }
-  return srcIndexes;
-}
-
 void SceneListView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (event->button() == Qt::MouseButton::LeftButton) {
@@ -357,7 +347,6 @@ int SceneListView::ArchiveToCore(const QModelIndexList& indexes, const QStringLi
   FileOperatorType::BATCH_COMMAND_LIST_TYPE archiveCmds;
 
   const QString& jsonLocatedInPath{_sceneModel->rootPath()};
-  const int N = jsonLocatedInPath.size();
   QString tierFolderLocatedIn;
   QString parentFolderName = PathTool::GetPrepathAndFileName(jsonLocatedInPath, tierFolderLocatedIn);
   for (int videoTier = (int)VideoTierE::BEGIN; videoTier < (int)VideoTierE::BUTT_INVALID; ++videoTier) {

@@ -55,16 +55,6 @@ QModelIndex JsonTableView::CurrentIndexSource() const {
   return _JsonProxyModel->mapToSource(proIndex);
 }
 
-QModelIndexList JsonTableView::selectedRowsSource(JsonModelField::FIELD_E column) const {
-  const QModelIndexList& proIndexes = CustomTableView::selectionModel()->selectedRows(column);
-  QModelIndexList srcIndexes;
-  srcIndexes.reserve(proIndexes.size());
-  for (const auto& proIndex : proIndexes) {
-    srcIndexes.append(_JsonProxyModel->mapToSource(proIndex));
-  }
-  return srcIndexes;
-}
-
 int JsonTableView::ReadADirectory(const QString& path) {
   return _JsonModel->setRootPath(path);
 }
@@ -82,7 +72,7 @@ int JsonTableView::onFixSelectionRecordContents(bool bFixed) {
     LOG_INFO_NP("[skip] nothing selected", "skip fix json record");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::ContentFixed);
+  const QModelIndexList& indexes = selectedRowsSource();
   return _JsonModel->SetRecordContentsFixed(indexes, bFixed);
 }
 
@@ -91,7 +81,7 @@ int JsonTableView::onSaveCurrentChanges() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->SaveCurrentChanges(indexes);
   if (cnt < 0) {
     LOG_ERR_P("Save failed", "errorCode:%d", cnt);
@@ -106,7 +96,7 @@ int JsonTableView::onSyncNameField() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->SyncFieldNameByJsonBaseName(indexes);
   LOG_OK_P("Name field has been sync by json basename", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -117,7 +107,7 @@ int JsonTableView::onExportCastStudioToDictonary() {
     LOG_INFO_NP("[skip] nothing selected", "skip sync name field");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const QModelIndexList& indexes = selectedRowsSource();
   int castCnt{0}, studioCnt{0};
   std::tie(castCnt, studioCnt) = _JsonModel->ExportCastStudioToLocalDictionaryFile(indexes);
   if (castCnt < 0 || studioCnt < 0) {
@@ -162,7 +152,7 @@ int JsonTableView::onSetStudio() {
     m_studioCandidates.insert(insertPos, studio);
   }
 
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->SetStudio(indexes, studio);
 
   LOG_OK_P("studio has been changed", "%d/%d row(s) to %s", cnt, indexes.size(), qPrintable(studio));
@@ -174,7 +164,7 @@ int JsonTableView::onInitCastAndStudio() {
     LOG_INFO_NP("nothing selected", "skip init cast/studio studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->InitCastAndStudio(indexes);
 
   LOG_OK_P("cast/studio has been inited", "%d/%d row(s)", cnt, indexes.size());
@@ -194,7 +184,7 @@ int JsonTableView::onHintCastAndStudio() {
     return -1;
   }
 
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
+  const QModelIndexList& indexes = selectedRowsSource();
   if (indexes.size() > 1 && !userSelection.isEmpty()) {
     LOG_WARN_NP("Dangerous! User select more than 1 line and text selected", "skip");
     return -1;
@@ -211,7 +201,7 @@ int JsonTableView::onFormatCast() {
     LOG_INFO_NP("[Skip]nothing selected", "skip cast format");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Cast);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->FormatCast(indexes);
 
   LOG_OK_P("Cast has been format", "%d/%d row(s)", cnt, indexes.size());
@@ -223,7 +213,7 @@ int JsonTableView::onUpdateFileSize() {
     LOG_INFO_NP("[Skip]nothing selected", "skip file size update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Size);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->UpdateFizeSizeField(indexes);
   LOG_OK_P("File size field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -234,7 +224,7 @@ int JsonTableView::onUpdateDuration() {
     LOG_INFO_NP("[Skip]nothing selected", "skip duration update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Duration);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->UpdateDurationField(indexes);
   LOG_OK_P("Duration field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -245,7 +235,7 @@ int JsonTableView::onUpdateFileMD5() {
     LOG_INFO_NP("[Skip]nothing selected", "skip file md5 update");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::MD5);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->UpdateMD5Field(indexes);
   LOG_OK_P("File md5 field has been update", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -277,7 +267,7 @@ int JsonTableView::onClearStudio() {
     LOG_INFO_NP("[Skip]nothing selected", "skip clear studio");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Studio);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->SetStudio(indexes, "");
   LOG_OK_P("studio has been cleared", "%d/%d row(s)", cnt, indexes.size());
   return cnt;
@@ -335,7 +325,7 @@ int JsonTableView::onSetCastOrTags(const JsonModelField::FIELD_OP_TYPE type, con
   }
 
   int cnt{0};
-  const QModelIndexList& indexes = selectedRowsSource(fieldColumn);
+  const QModelIndexList& indexes = selectedRowsSource();
   switch (mode) {
     case JsonModelField::FIELD_OP_MODE::SET:
     case JsonModelField::FIELD_OP_MODE::CLEAR:
@@ -360,7 +350,7 @@ int JsonTableView::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) {
     LOG_INFO_NP("Skip Add Tags", "no item selected");
     return 0;
   }
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Tags);
+  const QModelIndexList& indexes = selectedRowsSource();
   int cnt{0};
   if (bCheckOrUncheck) {
     cnt = _JsonModel->AddCastOrTags(indexes, JsonModelField::Tags, tags);
@@ -520,7 +510,7 @@ int JsonTableView::onComposeNameWithCast() {
     return 0;
   }
 
-  const QModelIndexList& indexes = selectedRowsSource(JsonModelField::Name);
+  const QModelIndexList& indexes = selectedRowsSource();
   const int cnt = _JsonModel->ComposeNameWithCast(indexes);
 
   LOG_OK_P("Compose name with cast", "%d/%d row(s)", cnt, indexes.size());
@@ -532,7 +522,7 @@ int JsonTableView::onSyncRelatedFileNameWithNameCast() {
     LOG_INFO_NP("Nothing selected", "Skip Sync related files");
     return 0;
   }
-  const QModelIndexList& srcIndexes = selectedRowsSource(JsonModelField::Name);
+  const QModelIndexList& srcIndexes = selectedRowsSource();
   QMap<QString, QString> relatedFile2Json;
   const QStringList relNames = _JsonModel->RelativePath2RelatedFiles(srcIndexes, &relatedFile2Json);
   const QString currentPath = _JsonModel->rootPath();

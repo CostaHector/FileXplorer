@@ -1,10 +1,7 @@
 #include "QAbstractListModelPub.h"
 #include "Logger.h"
-#include "StringTool.h"
-#include "PublicVariable.h"
 #include "ImageTool.h"
 #include "Configuration.h"
-#include <QFile>
 
 QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObject* parent)  //
     : QAbstractListModel{parent}, mMemoryName{listViewName} {

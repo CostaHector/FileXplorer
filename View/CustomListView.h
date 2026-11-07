@@ -18,6 +18,7 @@ class CustomListView : public QListView {
   void PushBackExclusiveActions(const QList<QAction*>& acts);
 
   void InitListView();
+  QModelIndexList selectedRowsSource() const;
 
 signals:
   void onUseThumbnailAsDecorationRoleChanged(bool bEnableUse);

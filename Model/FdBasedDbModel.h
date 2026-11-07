@@ -41,6 +41,7 @@ public:
   }
 
   QString fullInfo(const QModelIndex& curIndex) const;
+  QString pathRelative2RootPath(const QModelIndex& curIndex) const;
 
   void SetStudio(const QModelIndexList& tagColIndexes, const QString& studio);
   void SetCastOrTags(const QModelIndexList& tagColIndexes, const QString& sentence);

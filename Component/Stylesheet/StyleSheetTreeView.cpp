@@ -12,7 +12,6 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   mStyleFilterProxyModel = new TreeFilterProxyModel<StyleTreeNode>{this};
   mStyleFilterProxyModel->setSourceModel(mStyleModel);
   setModel(mStyleFilterProxyModel);
-  registerProxyModel(mStyleFilterProxyModel);
 
   mStyleSheetEditDelegate = new StyleSheetEditDelegate{StyleItemData::Role::DATA_TYPE_ROLE, StyleItemData::EDITABLE_COLUMN, this};
   setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);

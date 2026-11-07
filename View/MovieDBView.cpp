@@ -24,10 +24,10 @@ MovieDBView::MovieDBView(FdBasedDb& movieDb_,
                          FdBasedDbModel* model_,              //
                          MovieDBSearchToolBar* dbSearchBar_,  //
                          QWidget* parent)      //
-    : CustomTableView{"MOVIE_TABLE", parent},  //
-      _fdBasedDb{movieDb_},                    //
-      _dbModel{model_},
-      _movieDbSearchBar{dbSearchBar_} {
+  : CustomTableView{"MOVIE_TABLE", parent},  //
+  _fdBasedDb{movieDb_},                    //
+  _dbModel{model_},
+  _movieDbSearchBar{dbSearchBar_} {
   CHECK_NULLPTR_RETURN_VOID(model_);
   CHECK_NULLPTR_RETURN_VOID(dbSearchBar_);
 
@@ -127,7 +127,8 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
 
 QString MovieDBView::GetAPathFromUserSelect(const QString& curTblName, const QString& usageMsg) {
   const bool bAllowOutsidePath{MovieDBActions::GetInst().isAllowPathOutsideTableMount()};
-  const QString& tablePeerPath = MountPathTableNameMapper::toMountPath(curTblName);
+  bool isPathParseOk{false};
+  const QString& tablePeerPath = MountPathTableNameMapper::toMountPath(curTblName, isPathParseOk);
   QString lastPath = Configuration().value(PathKey::DB_INSERT_VIDS_FROM.name, PathKey::DB_INSERT_VIDS_FROM.toVariant()).toString();
   if (!QFileInfo(lastPath).isDir()) {  // fallback
     lastPath = MountPathTableNameMapper::isMountPointOnline(tablePeerPath) ? tablePeerPath : "";
@@ -241,31 +242,62 @@ bool MovieDBView::onInitDataBase() {
   return true;
 }
 
+bool ChooseAMovieTableName(const QStringList& occupiedNames, QString& tableNameSpecified) {
+  const QString kBROWSE_FOLDER = "Browse for a folder...";
+  const QStringList candidates = MountPathTableNameMapper::CandidateTableNamesList();
+
+  // 显示项与 candidates 一一对应
+  QStringList displayItems;
+  displayItems.reserve(candidates.size() + 1);
+  displayItems << kBROWSE_FOLDER;
+  for (const QString& name : candidates) {
+    displayItems << (occupiedNames.contains(name) ? QString("%1 (occupied)").arg(name) : name);
+  }
+
+  bool isInputOk = false;
+  const QString selected = QInputDialog::getItem(//
+      nullptr,//
+      "Create a New Table", QString{R"(Select a table name, or choose "%1" to browse a folder:)"}.arg(kBROWSE_FOLDER),//
+      displayItems, /*current=*/0, /*editable=*/false, &isInputOk);
+  if (!isInputOk) {
+    LOG_INFO_NP("[Skip]", "User cancelled table creation");
+    return false;
+  }
+
+  if (selected == kBROWSE_FOLDER) {
+    const QString pathSelected = QFileDialog::getExistingDirectory(nullptr, "Choose a Folder as Table Name", SystemPath::HomePath());
+    tableNameSpecified = MountPathTableNameMapper::toTableName(pathSelected);
+  } else {
+    // displayItems 与 candidates 索引一致，用 indexOf 还原原始表名
+    const int idx = displayItems.indexOf(selected);
+    if (idx < 0 || idx >= candidates.size()) {
+      LOG_WARN_P("[Abort]", "Unexpected selection: %s", qPrintable(selected));
+      return false;
+    }
+    tableNameSpecified = selected;
+  }
+
+  if (tableNameSpecified.isEmpty()) {
+    LOG_WARN_NP("[Abort]", "Table name is empty");
+    return false;
+  }
+  if (occupiedNames.contains(tableNameSpecified)) {
+    LOG_WARN_P("[Abort]", "Table name already in use: %s", qPrintable(tableNameSpecified));
+    return false;
+  }
+  return true;
+}
+
 bool MovieDBView::onCreateATable() {
   QSqlDatabase con = _fdBasedDb.GetDb();
   if (!_fdBasedDb.CheckValidAndOpen(con)) {
     LOG_W("Open failed:%s", qPrintable(con.lastError().text()));
     return false;
   }
-
-  const QStringList& candidates = MountPathTableNameMapper::CandidateTableNamesList();
-  const QString tableNameInputTitle = "Input an unique table name";
-  const QString tableNameInputHintMsg{QString("Here is the %1 mount points that you can use as table name:\n%2")  //
-                                          .arg(candidates.size())
-                                          .arg(candidates.join('\n'))};
-  bool isInputOk{false};
-  QString tableNameSpecified = QInputDialog::getItem(this, tableNameInputTitle, tableNameInputHintMsg, candidates, 0, true, &isInputOk);
-  if (!isInputOk) {
-    LOG_OK_NP("[skip] User cancel create table", "return");
-    return false;
-  }
-  if (tableNameSpecified.isEmpty()) {
-    LOG_WARN_NP("[Abort] Table name empty", tableNameSpecified);
-    return false;
-  }
   const QStringList& occupiedTables = con.tables();
-  if (occupiedTables.contains(tableNameSpecified)) {
-    LOG_WARN_NP("[Abort] already been occupied", tableNameSpecified);
+
+  QString tableNameSpecified;
+  if (!ChooseAMovieTableName(occupiedTables, tableNameSpecified)) {
     return false;
   }
 

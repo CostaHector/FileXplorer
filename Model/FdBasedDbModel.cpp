@@ -5,6 +5,7 @@
 #include "MountHelper.h"
 #include "Logger.h"
 #include "MovieDBModelField.h"
+
 #include <QSqlQuery>
 #include <QSqlRecord>
 
@@ -15,7 +16,8 @@ FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
 
 void FdBasedDbModel::setTable(const QString& tableName) {
   QSqlTableModel::setTable(tableName);
-  m_rootPath = MountPathTableNameMapper::toMountPath(tableName);
+  bool isPathParseOk{false};
+  m_rootPath = MountPathTableNameMapper::toMountPath(tableName, isPathParseOk);
   LOG_D("tableName:%s, m_rootPath:%s", qPrintable(tableName), qPrintable(m_rootPath));
 }
 
@@ -71,6 +73,11 @@ QString FdBasedDbModel::fullInfo(const QModelIndex& curIndex) const {
   fullInfoStr += '\t';
   fullInfoStr += r.value(MovieDBModelField::PrePathRight).toString();
   return fullInfoStr;
+}
+
+// 表名为"MOVIE"时, m_rootPath="", Relative2RootPath取绝对路径
+QString FdBasedDbModel::pathRelative2RootPath(const QModelIndex& curIndex) const {
+  return filePath(curIndex).mid(m_rootPath.isEmpty() ? 0 : m_rootPath.size() + 1);
 }
 
 void FdBasedDbModel::SetStudio(const QModelIndexList& tagColIndexes, const QString& studio) {

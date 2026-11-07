@@ -13,7 +13,6 @@ FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
   mFavProxyModel = new RecursiveFilterProxyTreeModel{this};
   mFavProxyModel->setSourceModel(mFavModel);
   setModel(mFavProxyModel);
-  registerProxyModel(mFavProxyModel);
 
   setDragDropMode(QAbstractItemView::DragDrop);
 

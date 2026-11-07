@@ -5,6 +5,8 @@
 #include "AddressBarActions.h"
 #include "ViewActions.h"
 #include "FileOpActs.h"
+#include "QAbstractProxyModel.h"
+
 #include <QApplication>
 #include <QDrag>
 #include <QPainter>

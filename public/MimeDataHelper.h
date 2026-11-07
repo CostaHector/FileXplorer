@@ -25,7 +25,7 @@ struct MimeDataMember {
 template <typename TSrcModel>
 MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& indexes);
 
-MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const SearchProxyModel& searchProxyModel, const QModelIndexList& proIndexes);
+MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const QModelIndexList& proIndexes);
 
 
 template <typename TSrcModel>

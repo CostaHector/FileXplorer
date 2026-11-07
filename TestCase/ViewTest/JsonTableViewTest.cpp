@@ -77,7 +77,7 @@ class JsonTableViewTest : public PlainTestSuite {
     QVERIFY(jsonView._JsonProxyModel != nullptr);
 
     QVERIFY(!jsonView.CurrentIndexSource().isValid());
-    QVERIFY(jsonView.selectedRowsSource(JsonModelField::Name).isEmpty());
+    QVERIFY(jsonView.selectedRowsSource().isEmpty());
 
     emit inst._CAPITALIZE_FIRST_LETTER_IN_SELECTION->triggered();
     emit inst._LOWER_ALL_LETTERS_IN_SELECTION->triggered();

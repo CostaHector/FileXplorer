@@ -19,6 +19,7 @@ class CustomTreeView : public QTreeView {
 
   void PushFrontExclusiveActions(const QList<QAction*>& acts);
   void InitTreeView();
+  QModelIndexList selectedRowsSource() const;
 
   int rowHeight() const;
   bool setRowHeight(int newRowHeight);
@@ -32,9 +33,6 @@ class CustomTreeView : public QTreeView {
   EditTriggers m_defaultEditTriggers{EditTrigger::EditKeyPressed};
   bool m_defaultExpandAll{false}, m_defaultShowBackgroundImage{false};
   void paintEvent(QPaintEvent *event) override;
-
-  void registerProxyModel(QSortFilterProxyModel* proxyModelInDerived);
-  QModelIndexList selectedRowsSource() const;
 
  private:
   void AddItselfAction2Menu();
@@ -60,8 +58,6 @@ class CustomTreeView : public QTreeView {
   DoubleRowHeader* m_horHeader{nullptr};
   AddableMenu* m_menu{nullptr};
   ViewItemDelegate* m_itemDelegate{nullptr};
-
-  QSortFilterProxyModel* _proxyModel{nullptr};
 
   inline bool isNameExists(const QString& name) const { return mTreeInstSet.contains(name); }
   static QSet<QString> mTreeInstSet;

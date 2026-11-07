@@ -69,12 +69,12 @@ class ViewSwitchHelperTest : public PlainTestSuite {
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::MOVIE);
     QCOMPARE(m_fsPanel.GetCurViewName(), "MOVIE");
 
-    QVERIFY(m_fsPanel.m_sceneTableView == nullptr);
+    QVERIFY(m_fsPanel.m_sceneListView == nullptr);
     QVERIFY(m_fsPanel.m_scenesModel == nullptr);
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::SCENE);
     QVERIFY(m_fsPanel.m_scenesModel != nullptr);
-    QVERIFY(m_fsPanel.m_sceneTableView != nullptr);
-    QCOMPARE(m_fsPanel.currentWidget(), m_fsPanel.m_sceneTableView);
+    QVERIFY(m_fsPanel.m_sceneListView != nullptr);
+    QCOMPARE(m_fsPanel.currentWidget(), m_fsPanel.m_sceneListView);
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::SCENE);
     QCOMPARE(m_fsPanel.GetCurViewName(), "SCENE");
 

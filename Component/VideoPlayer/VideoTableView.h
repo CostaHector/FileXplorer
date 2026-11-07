@@ -28,8 +28,6 @@ signals:
 private:
   void initExclusivePreferenceSetting() override;
 
-  QModelIndexList selectedRowsSource() const;
-
   QModelIndex previousIndex() const;
   QModelIndex nextIndex() const;
   QModelIndex iteratorCore(int step) const;

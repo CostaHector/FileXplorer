@@ -6,6 +6,7 @@
 #include "ViewHelper.h"
 #include "PublicCheckMacro.h"
 #include "Bool2QtEnum.h"
+#include "ViewSelectionHelper.h"
 
 #include <QActionGroup>
 #include <QContextMenuEvent>
@@ -199,4 +200,8 @@ void CustomListView::mousePressEvent(QMouseEvent* event) {
     return;
   }
   QListView::mousePressEvent(event);
+}
+
+QModelIndexList CustomListView::selectedRowsSource() const {
+  return ViewSelectionHelper::selectedRowsSourceCore(*this);
 }
