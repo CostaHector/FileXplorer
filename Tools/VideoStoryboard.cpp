@@ -177,15 +177,16 @@ bool VideoStoryboard::AutoRenameVideoStoryboards(const QString& path) const {
 
     const QSize imgPixelSize = ImageTool::GetImageDimensionPixel(oldImgPath);
     const int imgWidth = imgPixelSize.width(), imgHeight = imgPixelSize.height();
-    if (!(imgWidth % 360 == 0 || imgWidth % 480 == 0) || !(imgHeight % 360 == 0 || imgHeight % 480 == 0)) {
-      // Only Allowed: (width=360k or 480k) && (height=360k or 480k)
+    if (!(imgWidth % 360 == 0 || imgWidth % 480 == 0)) {
+      // Only Allowed: (width=360k or 480k)
       continue;
     }
     const int gridRowCnt{ imgWidth % 720 == 0 ? imgWidth / 720 : (imgWidth % 480 == 0 ? imgWidth / 480 : imgWidth / 360) };
-    const int gridColCnt{ imgHeight % 720 == 0 ? imgHeight / 720 : (imgHeight % 480 == 0 ? imgHeight / 480 : imgHeight / 360) };
-
+    if (!(imgHeight % gridRowCnt == 0)) {
+      continue;
+    }
     // newImageName = vidBaseName + " 33" + imgDotExt
-    vidBaseName += QString::asprintf(" %d%d", gridRowCnt, gridColCnt);
+    vidBaseName += QString::asprintf(" %d%d", gridRowCnt, gridRowCnt);
     vidBaseName += imgDotExt;
     if (dir.exists(vidBaseName)) {
       if (mSkipImageIfAlreadyExist) {
