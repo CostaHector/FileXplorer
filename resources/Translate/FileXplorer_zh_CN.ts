@@ -88,7 +88,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+110"/>
+        <location line="+103"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -260,7 +260,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../../View/CustomListView.cpp" line="+30"/>
+        <location filename="../../View/CustomListView.cpp" line="+31"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -303,7 +303,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../../View/CustomTableView.cpp" line="+40"/>
+        <location filename="../../View/CustomTableView.cpp" line="+41"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -361,7 +361,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+40"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+42"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -473,7 +473,7 @@
 <context>
     <name>DuplicateImagesTable</name>
     <message>
-        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+25"/>
+        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+24"/>
         <source>Select Same Hash Rows(Ignore first one)</source>
         <translation>选中相同哈希行(保留首个)</translation>
     </message>
@@ -494,7 +494,7 @@
 <context>
     <name>FavoritesTreeView</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+30"/>
+        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+29"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -562,7 +562,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+207"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+213"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -698,7 +698,7 @@
         <translation>永久删除</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+23"/>
         <source>Merged to Front</source>
         <translation>合并到前一个</translation>
     </message>
@@ -743,7 +743,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-53"/>
         <source>Unlock Occupied Files</source>
         <translation>解除占用文件</translation>
     </message>
@@ -763,12 +763,17 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-318"/>
+        <location line="-309"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-9"/>
+        <source>Show recycle confirmation</source>
+        <translation>回收前确认</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Redo</source>
         <translation>撤销</translation>
     </message>
@@ -925,7 +930,7 @@
 <context>
     <name>HarTableView</name>
     <message>
-        <location filename="../../Component/Har/HarTableView.cpp" line="+23"/>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+22"/>
         <source>Export Selections to</source>
         <translation>导出选中</translation>
     </message>
@@ -1591,7 +1596,7 @@
 <context>
     <name>MultiParView</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+23"/>
+        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+22"/>
         <source>Repair Broken File</source>
         <translation>修复损坏文件</translation>
     </message>
@@ -1834,7 +1839,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../../Model/QAbstractListModelPub.cpp" line="+16"/>
+        <location filename="../../Model/QAbstractListModelPub.cpp" line="+13"/>
         <source>Smooth Transformation</source>
         <translation>平滑图片</translation>
     </message>
@@ -2410,7 +2415,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+29"/>
+        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+28"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
@@ -2534,7 +2539,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>自动重命名帧</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Auto Rename Video Storyboards</source>
         <translation>自动重命名故事板</translation>
     </message>

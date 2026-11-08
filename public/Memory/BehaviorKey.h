@@ -26,6 +26,7 @@ constexpr KV DIR_FILTER_ON_SWITCH_ENABLE{"BehaviorKey/DIR_FILTER_ON_SWITCH_ENABL
 
 constexpr KV ALL_LOG_LEVEL_AUTO_FFLUSH{"BehaviorKey/ALL_LOG_LEVEL_AUTO_FFLUSH", Var{(int) QtMsgType::QtWarningMsg}, GeneralDataType::Type::PLAIN_INT, GeneralIntRangeChecker<0, 16>};
 constexpr KV RETURN_ERRORCODE_UPON_ANY_FAILURE{"BehaviorKey/RETURN_ERRORCODE_UPON_ANY_FAILURE", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
+constexpr KV CONFIRM_BEFORE_MOVE_TO_TRASH{"BehaviorKey/CONFIRM_BEFORE_MOVE_TO_TRASH", Var{true}, GeneralDataType::Type::PLAIN_BOOL, GeneralBoolChecker};
 } // namespace BehaviorKey
 
 #endif // BEHAVIORKEY_H

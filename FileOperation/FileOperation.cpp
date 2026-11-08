@@ -1,5 +1,6 @@
 ﻿#include "FileOperation.h"
 #include "PathTool.h"
+#include "GlobalSwitches.h"
 #include "Logger.h"
 
 #include <QStringList>
@@ -21,7 +22,7 @@ RETURN_TYPE executer(const BATCH_COMMAND_LIST_TYPE& aBatch) {
 #undef FILE_OPERATOR_KEY_ITEM
   };
 
-  const bool b_fastFail{IsReturnErrorCodeUponAnyFailureSw()};
+  const bool b_fastFail{GlobalSwitches::IsReturnErrorCodeUponAnyFailureSw()};
   int failedCnt{0};
   QString failedCmds;
   BATCH_COMMAND_LIST_TYPE allRecoverList;

@@ -1,5 +1,5 @@
 #include "FileOpActs.h"
-#include "FileOperatorPub.h"
+#include "GlobalSwitches.h"
 #include "StyleSheet.h"
 #include "ImageTool.h"
 #include "BehaviorKey.h"
@@ -57,6 +57,15 @@ FileOpActs::FileOpActs(QObject* parent)
   DELETE_PERMANENTLY->setToolTip(QString("<b>%1 (%2)</b><br/> Delete the selected item(s) permanently")
                                      .arg(DELETE_PERMANENTLY->text(), DELETE_PERMANENTLY->shortcut().toString()));
 
+  CONFIRM_BEFORE_MOVE_TO_TRASH = new (std::nothrow) QAction(tr("Show recycle confirmation"), this);
+  CONFIRM_BEFORE_MOVE_TO_TRASH->setShortcutVisibleInContextMenu(true);
+  CONFIRM_BEFORE_MOVE_TO_TRASH->setToolTip("Show a confirmation dialog when recycling more than one file. Enabled by default.");
+  GlobalSwitches::InitConfirmBeforeMoveToTrashSw();
+  const bool bShowConfirmDialogBeforeRecycleOr = GlobalSwitches::IsConfirmBeforeMoveToTrash();
+  CONFIRM_BEFORE_MOVE_TO_TRASH->setCheckable(true);
+  CONFIRM_BEFORE_MOVE_TO_TRASH->setChecked(bShowConfirmDialogBeforeRecycleOr);
+  connect(CONFIRM_BEFORE_MOVE_TO_TRASH, &QAction::toggled, &GlobalSwitches::SetConfirmBeforeBeforeMoveToTrashSw);
+
   UNDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/UNDO"), tr("Undo"), this);
   REDO_OPERATION = new (std::nothrow) QAction(QIcon(":img/REDO"), tr("Redo"), this);
   UNDO_REDO_RIBBONS = Get_UNDO_REDO_OPERATIONS_Actions();
@@ -99,15 +108,6 @@ FileOpActs::FileOpActs(QObject* parent)
 
 void FileOpActs::subscribe() {
   connect(_UNLOCK_OCCUPIED_FILES, &QAction::triggered, this, &FileOpActs::unlockOccupiedFiles);
-}
-
-QActionGroup* FileOpActs::GetDeleteActions() {
-
-
-  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
-  actionGroup->addAction(MOVE_TO_TRASHBIN);
-  actionGroup->addAction(DELETE_PERMANENTLY);
-  return actionGroup;
 }
 
 QActionGroup* FileOpActs::GetMOVE_COPY_TOActions() {
@@ -359,10 +359,10 @@ void FileOpActs::FolderFileCategoryProcess() {
       "Let it easy to operate on empty or duplicate(already exist) images");
   _DUPLICATE_IMAGES_FINDER->setCheckable(true);
 
-  FileOperatorType::InitReturnErrorCodeUponAnyFailureSw();
-  const bool bFastFail = FileOperatorType::IsReturnErrorCodeUponAnyFailureSw();
+  GlobalSwitches::InitReturnErrorCodeUponAnyFailureSw();
+  const bool bFastFail = GlobalSwitches::IsReturnErrorCodeUponAnyFailureSw();
   _RETURN_ERROR_CODE_UPON_ANY_FAILURE->setChecked(bFastFail);
-  connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::toggled, &FileOperatorType::SetReturnErrorCodeUponAnyFailureSw);
+  connect(_RETURN_ERROR_CODE_UPON_ANY_FAILURE, &QAction::toggled, &GlobalSwitches::SetReturnErrorCodeUponAnyFailureSw);
 }
 
 void FileOpActs::InitFileStructureActions() {
@@ -399,8 +399,17 @@ QToolBar* FileOpActs::GetFolderOperationModeTb(QWidget* parent) {
   return folderOperationModeTB;
 }
 
+QActionGroup* FileOpActs::GetDeleteActions() {
+  QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
+  QList<QAction*> actsList = GetDeleteItemsActions();
+  for (auto* pAct: actsList) {
+    actionGroup->addAction(pAct);
+  }
+  return actionGroup;
+}
+
 QList<QAction*> FileOpActs::GetDeleteItemsActions() const {
-  return {MOVE_TO_TRASHBIN, DELETE_PERMANENTLY};
+  return {MOVE_TO_TRASHBIN, DELETE_PERMANENTLY, CONFIRM_BEFORE_MOVE_TO_TRASH};
 }
 
 QWidget* FileOpActs::GetDeleteItemsToolButton(QWidget* notNullParent) const {
