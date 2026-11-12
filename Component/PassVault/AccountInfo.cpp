@@ -1,5 +1,4 @@
 #include "AccountInfo.h"
-#include <QStringList>
 #include <QRegularExpression>
 
 QString AccountInfo::toCsvLine() const {
@@ -19,3 +18,9 @@ bool AccountInfo::FromCsvLine(const QString& csvLine, AccountInfo& acc) {
   acc = AccountInfo{parts[0], parts[1], parts[2], parts[3], othersStr};
   return true;
 }
+
+constexpr int AccountInfo::COLUMN_COUNT;
+constexpr const char* AccountInfo::HOR_HEADER_TITLES[];
+constexpr int AccountInfo::SORT_COLUMN;
+constexpr AccountInfo::Role AccountInfo::DEF_SORT_ROLE;
+constexpr int AccountInfo::DATA_TYPE_ROLE;

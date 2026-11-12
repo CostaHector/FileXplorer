@@ -12,7 +12,6 @@
 #include "TDir.h"
 #include <openssl/err.h>
 #include <openssl/evp.h>
-#include "PwdTableEditActions.h"
 #include <QDesktopServices>
 
 #include <mockcpp/mokc.h>
@@ -68,14 +67,14 @@ class PasswordBookTest : public PlainTestSuite {
 
     PasswordBook pwdMgr;
     {
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // no file no row
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 0);  // no file no row
       // title correct
       QVERIFY(pwdMgr.windowTitle().contains(mEncCsvFilePath));
       pwdMgr.onSave();  // nothing changed, skip save, still no file norow
       // statusBar message correct
       QVERIFY(pwdMgr.mStatusBar->currentMessage().contains("SKIP", Qt::CaseInsensitive));
       QVERIFY(!tDir.exists("accounts_test.csv"));
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 0);
 
       emit ins.OPEN_DIRECTORY->triggered();  // should not crash down
     }
@@ -99,21 +98,21 @@ class PasswordBookTest : public PlainTestSuite {
       pwdMgr.mCsvInputDialog->textEdit->setPlainText("");
       emit pwdMgr.mCsvInputDialog->buttonBox->helpRequested();
       emit pwdMgr.mCsvInputDialog->pOkBtn->clicked();
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // still no row
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 0);  // still no row
 
       // 2 valid row contents, cancel still no row
       pwdMgr.mCsvInputDialog->textEdit->setPlainText(partial2LineValidCSV);
       emit pwdMgr.mCsvInputDialog->buttonBox->helpRequested();
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
       emit pwdMgr.mCsvInputDialog->buttonBox->rejected();
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 0);  // still no row
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 0);  // still no row
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
 
       // 2 valid row contents, accept get 2 row
       pwdMgr.onGetRecordsFromInput();
       QCOMPARE(pwdMgr.mCsvInputDialog->tempAccounts.size(), 2);
       emit pwdMgr.mCsvInputDialog->pOkBtn->clicked();
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 row exist
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);  // 2 row exist
       QVERIFY(pwdMgr.mCsvInputDialog->close());
     }
 
@@ -122,7 +121,7 @@ class PasswordBookTest : public PlainTestSuite {
       pwdMgr.onSave();
       QVERIFY(pwdMgr.mStatusBar->currentMessage().contains("OK", Qt::CaseInsensitive));
       QVERIFY(tDir.exists("accounts_test.csv"));
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 row exist
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);  // 2 row exist
     }
 
     {  // now file exist
@@ -143,37 +142,21 @@ class PasswordBookTest : public PlainTestSuite {
       QVERIFY(pwdMgr.mPlainCSVContentWid->close());
     }
 
-    {  // signal currentRowChanged connect correct
-      QVERIFY(pwdMgr.mAccountDetailView->pAccount == nullptr);
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 row exist
-      pwdMgr.mAccountListView->selectionModel()->clear();
-
-      pwdMgr.mAccountListView->selectRow(0);
-      const auto* const p1 = pwdMgr.mAccountDetailView->pAccount;
-      QVERIFY(p1 != nullptr);
-
-      pwdMgr.mAccountListView->selectRow(1);
-      const auto* const p2 = pwdMgr.mAccountDetailView->pAccount;
-      QVERIFY(p2 != nullptr);
-
-      QVERIFY(p1 != p2);
-    }
-
     { // filter ok
-      QVERIFY(pwdMgr.mAccountListView->mPwdModel != nullptr);
-      QVERIFY(pwdMgr.mAccountListView->mSortProxyModel != nullptr);
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);
-      QCOMPARE(pwdMgr.mAccountListView->mSortProxyModel->rowCount(), 2);
+      QVERIFY(pwdMgr.mAccountTableView->mPwdModel != nullptr);
+      QVERIFY(pwdMgr.mAccountTableView->mSortProxyModel != nullptr);
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);
+      QCOMPARE(pwdMgr.mAccountTableView->mSortProxyModel->rowCount(), 2);
 
       pwdMgr.mSearchText->setText("Henry Cavill");
       emit pwdMgr.mSearchText->returnPressed();
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);
-      QCOMPARE(pwdMgr.mAccountListView->mSortProxyModel->rowCount(), 1);
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);
+      QCOMPARE(pwdMgr.mAccountTableView->mSortProxyModel->rowCount(), 1);
 
       pwdMgr.mSearchText->setText("");
       emit pwdMgr.mSearchText->returnPressed();
-      QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);
-      QCOMPARE(pwdMgr.mAccountListView->mSortProxyModel->rowCount(), 2);
+      QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);
+      QCOMPARE(pwdMgr.mAccountTableView->mSortProxyModel->rowCount(), 2);
     }
 
     pwdMgr.closeEvent(nullptr);
@@ -187,10 +170,10 @@ class PasswordBookTest : public PlainTestSuite {
     QVERIFY(tDir.exists("accounts_test.csv"));
 
     PasswordBook pwdMgr;
-    QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);  // 2 rows once opened
+    QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);  // 2 rows once opened
     pwdMgr.onSave();                                              // no need save at all
     QVERIFY(pwdMgr.mStatusBar->currentMessage().contains("SKIP", Qt::CaseInsensitive));
-    QCOMPARE(pwdMgr.mAccountListView->mPwdModel->rowCount(), 2);
+    QCOMPARE(pwdMgr.mAccountTableView->mPwdModel->rowCount(), 2);
   }
 };
 

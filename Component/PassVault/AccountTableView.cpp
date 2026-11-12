@@ -1,167 +1,31 @@
 #include "AccountTableView.h"
-#include "PwdPublicVariable.h"
-#include "PwdTableEditActions.h"
-#include "NotificatorMacro.h"
+#include "StyleSheetEditDelegate.h"
+#include "AccountInfo.h"
 #include <QHeaderView>
-#include <QDateTime>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QPushButton>
 
-AccountTableView::AccountTableView(QWidget* parent)
-    : CustomTableView{"PASSWORD_TABLEVIEW", parent}  //
+AccountTableView::AccountTableView(AccountTableModel* pwdModel, AccountSortFilterProxyModel* sortProxyModel, QWidget* parent)
+  : CustomTableView{"PASSWORD_TABLEVIEW", parent}, _pwdModel{pwdModel}, _sortProxyModel{sortProxyModel}  //
 {
-  mPwdModel = new (std::nothrow) PwdTableModel{this};
-  CHECK_NULLPTR_RETURN_VOID(mPwdModel);
+  setModel(_sortProxyModel);
 
-  mSortProxyModel = new (std::nothrow) AccountSortFilterProxyModel{this};
-  CHECK_NULLPTR_RETURN_VOID(mSortProxyModel);
+  StyleSheetEditDelegate* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{AccountInfo::DATA_TYPE_ROLE, {AccountInfo::Role::OTHERS_STR_ROLE - AccountInfo::Role::DEF_BEGIN_ROLE}, this};
+  setItemDelegate(detailColumnDelegator);
 
-  mSortProxyModel->setSourceModel(mPwdModel);
-  mSortProxyModel->BindAccountsList(mPwdModel->mAccountsList);
-
-  setModel(mSortProxyModel);
   InitTableView();
-  Subscribe();
+
+  QAction* insertAnRowAct = new QAction{QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert a row"), this};
+  insertAnRowAct->setToolTip("Insert a row before current line");
+  InsertActionAtVerHeaderMenu(insertAnRowAct, 0);
+
+  connect(insertAnRowAct, &QAction::triggered, this, &AccountTableView::EmitInsertLinesReq);
 }
 
-int AccountTableView::GetRowsCountFromUserInput(const QString& method) {
-  bool isOk{false};
-  int userInputCount{0};
-#ifdef RUNNING_UNIT_TESTS
-  std::tie(isOk, userInputCount) = AccountTableViewMock::getIntFromUserInputMock();
-#else
-  userInputCount = QInputDialog::getInt(this, method + " Rows Count", "number", 1, 0, 255, 1, &isOk);
-#endif
-  if (!isOk) {
-    LOG_W("User input invalid row count[%d]", userInputCount);
-    return 0;
-  }
-  return userInputCount;
-}
-
-void AccountTableView::Subscribe() {
-  auto& ins = GetTableEditActionsInst();
-  connect(ins.INSERT_A_ROW, &QAction::triggered, this, [this]() {
-    int cnt = 1;
-    InsertNRows(cnt);
-  });
-  connect(ins.INSERT_ROWS, &QAction::triggered, this, [this]() {
-    int cnt = GetRowsCountFromUserInput("INSERT");
-    if (cnt > 0) {
-      InsertNRows(cnt);
-    }
-  });
-  connect(ins.APPEND_ROWS, &QAction::triggered, this, [this]() {
-    int cnt = GetRowsCountFromUserInput("APPEND");
-    if (cnt > 0) {
-      AppendNRows(cnt);
-    }
-  });
-  connect(ins.DELETE_ROWS, &QAction::triggered, this, &AccountTableView::RemoveSelectedRows);
-}
-
-int AccountTableView::RemoveSelectedRows() {
-  if (!selectionModel()->hasSelection()) {
-    LOG_INFO_NP("Nothing were selected", "skip remove");
-    return 0;
-  }
-  const int nSelectedRowsCnt = selectionModel()->selectedRows().size();
-  QString msg{QString{"Are you sure to remove the %1 row(s) selected?<br/><b>NOT RECOVERABLE</b>"}.arg(nSelectedRowsCnt)};
-  QMessageBox deleteConfirm;
-  deleteConfirm.setWindowTitle("Delete Confirm?");
-  deleteConfirm.setWindowIcon(QIcon(":/edit/DELETE_ROWS"));
-  deleteConfirm.setIcon(QMessageBox::Icon::Warning);
-  deleteConfirm.setText(msg);
-  deleteConfirm.addButton(QMessageBox::StandardButton::Ok);
-  deleteConfirm.addButton(QMessageBox::StandardButton::Cancel);
-
-  int deleteCfmBtn = QMessageBox::StandardButton::Cancel;
-#ifdef RUNNING_UNIT_TESTS
-  deleteCfmBtn = AccountTableViewMock::cfmRemoveSelectedRowMock() ? QMessageBox::StandardButton::Ok : QMessageBox::StandardButton::Cancel;
-#else
-  deleteCfmBtn = deleteConfirm.exec();
-#endif
-  if (deleteCfmBtn != QMessageBox::StandardButton::Ok) {
-    LOG_INFO_NP("User cancel delete", "Skip remove records");
-    return 0;
-  }
-  std::set<int> selectedRows;
-  for (const auto& rowIndex : selectionModel()->selectedRows()) {
-    const auto& srcIndex = mSortProxyModel->mapToSource(rowIndex);
-    selectedRows.insert(srcIndex.row());
-  }
-  const int rowsDeleted = mPwdModel->RemoveIndexes(selectedRows);
-  if (rowsDeleted < 0) {
-    LOG_ERR_P("Row(s) deleted failed", "selected:%d , code:%d", nSelectedRowsCnt, rowsDeleted);
-    return rowsDeleted;
-  }
-  LOG_OK_P("Row(s) deleted ok", "All %d row(s) deleted successfully", nSelectedRowsCnt);
-  return rowsDeleted;
-}
-
-void AccountTableView::InsertNRows(int rowCnt) {
+bool AccountTableView::EmitInsertLinesReq() {
   const QModelIndex verHeaderIndex = verticalHeader()->currentIndex();
   if (!verHeaderIndex.isValid()) {
-    LOG_WARN_NP("No row selected", "Select a row at first");
-    return;
-  }
-  const int insertIndexBefore = verHeaderIndex.row();
-  LOG_INFO_P("Insert at", "Index %d with %d row(s)", insertIndexBefore, rowCnt);
-  mPwdModel->InsertNRows(insertIndexBefore, rowCnt);
-}
-
-void AccountTableView::AppendNRows(int rowCnt) {
-  int lastRowIndex = verticalHeader()->count();
-  LOG_INFO_P("Append", "Index %d with %d row(s)", lastRowIndex, rowCnt);
-  mPwdModel->InsertNRows(lastRowIndex, rowCnt);
-}
-
-QModelIndex AccountTableView::GetSourceIndex(const QModelIndex& proxyIndex) const {
-  if (!proxyIndex.isValid()) {
-    return {};
-  }
-  return mSortProxyModel->mapToSource(proxyIndex);
-}
-
-AccountInfo* AccountTableView::GetAccountInfoByCurrentIndex(const QModelIndex& proxyIndex) {
-  QModelIndex srcCurrentIndex = GetSourceIndex(proxyIndex);
-  if (!srcCurrentIndex.isValid()) {
-    return nullptr;
-  }
-  return mPwdModel->rowDataAt(srcCurrentIndex.row());
-}
-
-bool AccountTableView::ExportPlainCSV() {
-  QMessageBox confirmDialog(this);
-  confirmDialog.setWindowTitle("Export Plaintext List?");
-  confirmDialog.setWindowIcon(QIcon(":/edit/EXPORT"));
-  confirmDialog.setText("WARNING: This may cause <b>information leakage</b>. Please keep the exported file secure.");
-  confirmDialog.setIcon(QMessageBox::Warning);
-
-  QPushButton* exportButton = confirmDialog.addButton("Continue Export", QMessageBox::AcceptRole);
-  confirmDialog.addButton(QMessageBox::StandardButton::Cancel);
-  exportButton->setIcon(QIcon(":/edit/EXPORT"));
-  confirmDialog.setDefaultButton(QMessageBox::StandardButton::Cancel);
-
-  QAbstractButton* pBtn{nullptr};
-#ifdef RUNNING_UNIT_TESTS
-  pBtn = AccountTableViewMock::cfmExportPlainCSVMock() ? exportButton : nullptr;
-#else
-  confirmDialog.exec();
-  pBtn = confirmDialog.clickedButton();
-#endif
-  if (pBtn != exportButton) {
-    LOG_INFO_NP("User cancelled plaintext export", "return");
     return false;
   }
-  const QString timeStr = QDateTime::currentDateTime().toString();
-  bool exportResult = mPwdModel->ExportToPlainCSV();
-  LOG_OE_P(exportResult, "Export plain CSV", "Store the file securely\n%s", qPrintable(timeStr));
+  const int insertIndexBefore = verHeaderIndex.row();
+  emit insertLinesReq(insertIndexBefore, 1);
   return true;
-}
-
-void AccountTableView::SetFilter(const QString& keywords) {
-  CHECK_NULLPTR_RETURN_VOID(mSortProxyModel);
-  mSortProxyModel->setFilterFixedString(keywords);
 }

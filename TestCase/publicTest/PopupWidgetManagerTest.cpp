@@ -30,23 +30,21 @@ class PopupWidgetManagerTest : public PlainTestSuite {
   template <typename WIDGET_TYPE>
   void PopupWidgetManagerTestTemplate(const QString& configsBaseName, bool isCheckable = true) {
     {
-      auto* pDynCreate = new (std::nothrow) PopupWidgetManager<WIDGET_TYPE>(nullptr, nullptr, "");
+      auto* pDynCreate = new (std::nothrow) PopupWidgetManager<WIDGET_TYPE>(nullptr, nullptr);
       if (pDynCreate != nullptr) {
         delete pDynCreate;
         pDynCreate = nullptr;
       }
     }
 
-    const QString widgetGeometryKey = "Geometry/" + configsBaseName;
-    QVERIFY(!Configuration().contains(widgetGeometryKey));
     {
       {  // invalid input. shoud not crash down
         QWidget parentWidget;
         QAction randomAct{configsBaseName, &parentWidget};
         randomAct.setCheckable(isCheckable);
-        PopupWidgetManager<WIDGET_TYPE> actionNullptrPopupMgr{nullptr, &parentWidget, "actionNullptrPopupMgr"};
-        PopupWidgetManager<WIDGET_TYPE> parentNullptrPopupMgr{&randomAct, nullptr, "parentNullptrPopupMgr"};
-        PopupWidgetManager<WIDGET_TYPE> emptyCfgKeyPopupMgr{&randomAct, &parentWidget, ""};
+        PopupWidgetManager<WIDGET_TYPE> actionNullptrPopupMgr{nullptr, &parentWidget};
+        PopupWidgetManager<WIDGET_TYPE> parentNullptrPopupMgr{&randomAct, nullptr};
+        PopupWidgetManager<WIDGET_TYPE> emptyCfgKeyPopupMgr{&randomAct, &parentWidget};
         emit randomAct.triggered(true);
         QVERIFY(!actionNullptrPopupMgr.isVisible());
         QVERIFY(!parentNullptrPopupMgr.isVisible());
@@ -60,7 +58,7 @@ class PopupWidgetManagerTest : public PlainTestSuite {
       QAction widAct{configsBaseName, &parentWidget};
       widAct.setCheckable(isCheckable);
 
-      PopupWidgetManager<WIDGET_TYPE> wid{&widAct, &parentWidget, widgetGeometryKey};
+      PopupWidgetManager<WIDGET_TYPE> wid{&widAct, &parentWidget};
       wid.setOnCloseCallback(fCloseCallback);
       wid.setWidgetCreator(nullptr);  // we usually don't need this. Default constructor is enough now
       QVERIFY(wid.widget() == nullptr);
@@ -84,7 +82,6 @@ class PopupWidgetManagerTest : public PlainTestSuite {
       QCOMPARE(widAct.isChecked(), false);
       QCOMPARE(wid.isVisible(), false);
     }
-    QVERIFY(Configuration().contains(widgetGeometryKey));
   }
 
  private slots:

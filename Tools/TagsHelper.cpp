@@ -42,7 +42,7 @@ TagDefine TagDefine::ParseALine(const QString& lineContent) {
 
 QList<TagDefine> TagDefine::ParseAFile(const QString& tagDefinitionCsvFilePath) {
   bool bReadResult{false};
-  QString tagsCsvContent = FileTool::StringTextReader(tagDefinitionCsvFilePath, &bReadResult, true);
+  QString tagsCsvContent = FileTool::StringTextReader(tagDefinitionCsvFilePath, &bReadResult);
   if (!bReadResult) {
     tagsCsvContent =
         R"(textFullName,textAbbr,toolTip,accessCount

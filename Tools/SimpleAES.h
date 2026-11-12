@@ -6,9 +6,9 @@
 
 class SimpleAES {
 public:
+  SimpleAES() = default;
   explicit SimpleAES(const QString& key);
-  static SimpleAES &GetInst();
-  static void InitInst(const QString& key);
+  void setKey(const QString &userInputKey);
 
   operator bool() const { return isInited(); }
   bool isInited() const { return m_bInited; }
@@ -20,8 +20,6 @@ public:
   bool decrypt_GCM_ByteArray(const QByteArray &input, QByteArray &decryptedResult) const;
 
 private:
-  SimpleAES() = default;
-  void setKey(const QString &userInputKey);
   void setInited() { m_bInited = true; }
   bool m_bInited{false};
   bool m_bUseRandomIV{true}; // all 0 is used for debug only

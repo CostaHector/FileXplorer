@@ -238,6 +238,13 @@ bool CustomTableView::setRowHeight(int newRowHeight) {
   return m_verHeader->checkAndSetDefaultSectionSize(newRowHeight);
 }
 
+void CustomTableView::InsertActionAtHorHeaderMenu(QAction* pAct, int pos) {
+  m_horHeader->InsertActionToMenu(pAct, pos);
+}
+void CustomTableView::InsertActionAtVerHeaderMenu(QAction* pAct, int pos) {
+  m_verHeader->InsertActionToMenu(pAct, pos);
+}
+
 void CustomTableView::mousePressEvent(QMouseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event);
   if (ViewHelper::onMouseSidekeyBackwardForward(event->modifiers(), event->button())) {

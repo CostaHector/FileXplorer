@@ -331,6 +331,8 @@
         <file alias="LOADING">Notification/LOADING.gif</file>
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
 
+        <file alias="RESTORE">pwd/RESTORE.svg</file>
+        <file alias="MODIFIED">pwd/MODIFIED.svg</file>
         <file alias="SAVED">pwd/SAVED.svg</file>
         <file alias="NOT_SAVED">pwd/NOT_SAVED.svg</file>
     </qresource>
@@ -437,6 +439,7 @@
     <qresource prefix="/">
         <file alias="PASSWORD_MANAGER">pwd/password_manager.ico</file>
         <file alias="PASSWORD_TABLE">pwd/PASSWORD_TABLE.png</file>
+        <file alias="PASWORD_BOOK_INDEX">pwd/PASWORD_BOOK_INDEX.html</file>
         <file alias="AES_KEY">pwd/aes_key.png</file>
         <file alias="WARNING">pwd/warning.png</file>
         <file alias="LOGIN">pwd/LOGIN.svg</file>

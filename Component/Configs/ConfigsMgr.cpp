@@ -39,8 +39,8 @@ ConfigsMgr::ConfigsMgr(QWidget* parent)
   lo->addWidget(m_cfgsTable);
   lo->addWidget(m_dlgBtnBox);
 
-  setWindowTitle(g_fileLeafActions()._SETTINGS->text());
-  setWindowIcon(g_fileLeafActions()._SETTINGS->icon());
+  setWindowTitle(FileLeafActions::GetInst()._SETTINGS->text());
+  setWindowIcon(FileLeafActions::GetInst()._SETTINGS->icon());
   RefreshFailedCountLabel();
 
   subscribe();
@@ -64,12 +64,6 @@ void ConfigsMgr::subscribe() {
 
   connect(m_recheckAction, &QAction::triggered, this, &ConfigsMgr::RefreshFailedCountLabel);
   connect(m_cfgsTable, &ConfigsTableView::modelCfgFailedCountChanged, this, &ConfigsMgr::UpdateFailedCountLabel);
-}
-
-void ConfigsMgr::hideEvent(QHideEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event);
-  g_fileLeafActions()._SETTINGS->setChecked(false);
-  QDialog::hideEvent(event);
 }
 
 void ConfigsMgr::UpdateFailedCountLabel(int newFailedCount) {

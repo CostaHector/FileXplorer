@@ -110,11 +110,6 @@ void ResourceMonitorPanel::showEvent(QShowEvent* event) {
   StyleSheet::UpdateTitleBar(this);
 }
 
-void ResourceMonitorPanel::hideEvent(QHideEvent* event) {
-  g_fileLeafActions()._CPU_MEMORY_USAGE_MONITOR->setChecked(false);
-  QWidget::hideEvent(event);
-}
-
 void ResourceMonitorPanel::Subscribe() {
   connect(&mTimer, &QTimer::timeout, this, &ResourceMonitorPanel::onTimeout);
   connect(mInterval, &QSlider::valueChanged, this, &ResourceMonitorPanel::onSamplePeriodChanged);

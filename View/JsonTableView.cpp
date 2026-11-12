@@ -34,13 +34,9 @@ JsonTableView::JsonTableView(JsonTableModel* jsonModel, QSortFilterProxyModel* j
 
   setModel(_JsonProxyModel);
 
-  auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JsonModelField::Detail, this};
+  auto* detailColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, {JsonModelField::Cast, JsonModelField::Detail}, this};
   CHECK_NULLPTR_RETURN_VOID(detailColumnDelegator);
-  setItemDelegateForColumn(JsonModelField::Detail, detailColumnDelegator);
-
-  auto* castColumnDelegator = new (std::nothrow) StyleSheetEditDelegate{JsonTableModel::DATA_TYPE_ROLE, JsonModelField::Cast, this};
-  CHECK_NULLPTR_RETURN_VOID(castColumnDelegator);
-  setItemDelegateForColumn(JsonModelField::Cast, castColumnDelegator);
+  setItemDelegate(detailColumnDelegator);
 
   InitTableView();
 

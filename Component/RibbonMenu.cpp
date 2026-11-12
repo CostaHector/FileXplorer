@@ -115,7 +115,7 @@ QToolBar* RibbonMenu::LeafFile() const {
   QToolButton* logToolButton = g_LogActions().GetLogToolButton(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(logToolButton);
 
-  auto& fileLeafInst = g_fileLeafActions();
+  auto& fileLeafInst = FileLeafActions::GetInst();
   auto* systemContextMenuTb = fileLeafInst.GetSystemContextMenu(leafFileWid);
   CHECK_NULLPTR_RETURN_NULLPTR(systemContextMenuTb);
 
@@ -140,6 +140,7 @@ QToolBar* RibbonMenu::LeafFile() const {
 
   // Advance
   leafFileWid->addAction(fileLeafInst._PWD_BOOK);
+  leafFileWid->addAction(fileLeafInst._PWD_BOOK_SERVER);
   leafFileWid->addAction(fileLeafInst._CPU_MEMORY_USAGE_MONITOR);
   leafFileWid->addWidget(logToolButton);
   leafFileWid->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);

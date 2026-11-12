@@ -2,7 +2,7 @@
 #include "PlainTestSuite.h"
 
 #include "BeginToExposePrivateMember.h"
-#include "PwdTableModel.h"
+#include "AccountTableModel.h"
 #include "EndToExposePrivateMember.h"
 #include "SimpleAES.h"
 #include "TDir.h"

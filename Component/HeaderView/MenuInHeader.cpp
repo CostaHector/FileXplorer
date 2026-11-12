@@ -106,6 +106,21 @@ MenuInHeader::~MenuInHeader() {
   Configuration().setValue(m_headerStateKey, saveState());
 }
 
+void MenuInHeader::InsertActionToMenu(QAction* act, int pos) {
+  const QList<QAction*> existing = m_menu->actions();
+
+  // pos 允许超出范围：负值当 0，超过末尾当“追加”
+  pos = qBound(0, pos, existing.size());
+  // pos == size 时 before 为 nullptr，insertAction/insertSeparator 会追加到末尾
+  QAction* before = (pos < existing.size()) ? existing.at(pos) : nullptr;
+
+  if (act == nullptr) {
+    m_menu->insertSeparator(before);
+  } else {
+    m_menu->insertAction(before, act);
+  }
+}
+
 void MenuInHeader::AddActionToMenu(QAction* act) {
   if (act == nullptr) {
     m_menu->addSeparator();

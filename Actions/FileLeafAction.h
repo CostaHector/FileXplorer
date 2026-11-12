@@ -7,10 +7,10 @@
 class FileLeafActions : public QObject {
   Q_OBJECT
  public:
-  explicit FileLeafActions(QObject* parent = nullptr);
+  static FileLeafActions& GetInst();
 
   QAction* _SETTINGS{nullptr};
-  QAction* _PWD_BOOK{nullptr};
+  QAction* _PWD_BOOK{nullptr}, *_PWD_BOOK_SERVER{nullptr};
   QAction* _ABOUT_FILE_EXPLORER{nullptr};
   QAction* _LANUAGE{nullptr};
   QAction* _CPU_MEMORY_USAGE_MONITOR{nullptr};
@@ -20,8 +20,9 @@ class FileLeafActions : public QObject {
   QToolButton* GetSystemContextMenu(QWidget* parent);
 
   QActionGroup* _LEAF_FILE{nullptr};
-};
 
-FileLeafActions& g_fileLeafActions();
+private:
+  explicit FileLeafActions(QObject* parent = nullptr);
+};
 
 #endif  // FILELEAFACTION_H

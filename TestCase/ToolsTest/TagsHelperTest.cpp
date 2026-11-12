@@ -89,13 +89,13 @@ private slots:
     {
       bool bReadInexistCSVFailed = false;
       MOCKER(FileTool::StringTextReader).expects(exactly(1))//
-          .with(eq(QString{"inexist csv file path"}), outBoundP(&bReadInexistCSVFailed, sizeof(bReadInexistCSVFailed)), eq(true))
+          .with(eq(QString{"inexist csv file path"}), outBoundP(&bReadInexistCSVFailed, sizeof(bReadInexistCSVFailed)))
           .will(returnValue(QString{""})) // call1
           .id("ReadInexistCSVFailed"); // don't use ignoreReturnValue();
 
       bool bReadExistCSVOk = true;
       MOCKER(FileTool::StringTextReader).expects(exactly(2))//
-          .with(eq(QString{"exist csv file path"}), outBoundP(&bReadExistCSVOk, sizeof(bReadExistCSVOk)), eq(true))
+          .with(eq(QString{"exist csv file path"}), outBoundP(&bReadExistCSVOk, sizeof(bReadExistCSVOk)))
           .after("ReadInexistCSVFailed")
           .will(returnValue(QString{""})) // call2 return empty contents
           .then(returnValue(QString{

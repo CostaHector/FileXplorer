@@ -41,7 +41,7 @@ protected:
     return {1024, 768};
   }
   void showEvent(QShowEvent* event) override;
-  void hideEvent(QHideEvent* event) override;
+
 private:
   void Subscribe();
   static QString GetSampleIntervalString(const int newPeriodInMilliSecond) {

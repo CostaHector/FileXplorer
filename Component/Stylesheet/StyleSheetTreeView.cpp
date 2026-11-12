@@ -13,8 +13,8 @@ StyleSheetTreeView::StyleSheetTreeView(QWidget* parent) //
   mStyleFilterProxyModel->setSourceModel(mStyleModel);
   setModel(mStyleFilterProxyModel);
 
-  mStyleSheetEditDelegate = new StyleSheetEditDelegate{StyleItemData::Role::DATA_TYPE_ROLE, StyleItemData::EDITABLE_COLUMN, this};
-  setItemDelegateForColumn(StyleItemData::EDITABLE_COLUMN, mStyleSheetEditDelegate);
+  mStyleSheetEditDelegate = new StyleSheetEditDelegate{StyleItemData::Role::DATA_TYPE_ROLE, {StyleItemData::EDITABLE_COLUMN}, this};
+  setItemDelegate(mStyleSheetEditDelegate);
 
   setDragDropMode(QAbstractItemView::NoDragDrop);
   setSortingEnabled(true);

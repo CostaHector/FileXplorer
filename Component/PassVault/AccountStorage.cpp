@@ -1,145 +1,63 @@
 #include "AccountStorage.h"
-#include "SimpleAES.h"
-#include "SystemPath.h"
-#include "FileTool.h"
 #include "Logger.h"
-#include <QFile>
-#include <QRegularExpression>
-#include <QTextStream>
-#include <QDir>
+#include "SystemPath.h"
 
-const QString& AccountStorage::GetFullEncCsvFilePath() {
-  static constexpr char ENC_CSV_FILE[]{"accounts.csv"};
-  static const QString absEncFilePath = QDir::toNativeSeparators(SystemPath::RoamingPath() + "/" + ENC_CSV_FILE);
-#ifdef RUNNING_UNIT_TESTS
-  return AccountStorageMock::GetFullEncCsvFilePathMock();
-#endif
-  return absEncFilePath;
+AccountStorage::AccountStorage(const QString& encFileFullPath, const QString& aesKey)
+  : AccountStorage{AccountFileHelper::ValidateAndLoad(encFileFullPath, aesKey), encFileFullPath, aesKey} {
 }
 
-const QString& AccountStorage::GetFullPlainCsvFilePath() {
-  static constexpr char EXPORTED_PLAIN_CSV_FILE[]{"exportedPlainAccounts.csv"};
-  static const QString absPlainFilePath = QDir::toNativeSeparators(SystemPath::RoamingPath() + "/" + EXPORTED_PLAIN_CSV_FILE);
-#ifdef RUNNING_UNIT_TESTS
-  return AccountStorageMock::GetFullPlainCsvFilePathMock();
-#endif
-  return absPlainFilePath;
+AccountStorage::AccountStorage(AccountFileHelper::LoadResult&& result, const QString& encFileFullPath, const QString& aesKey)
+  : mIsValid{result.valid}, mAccounts{std::move(result.accounts)}, mEncCsvFileFullPath{encFileFullPath}, mAesKey{aesKey}, mSaveToDirectory{SystemPath::RoamingPath()} {
 }
 
-const bool AccountStorage::IsAccountCSVFileInexistOrEmpty() {
-  QFile csvFile{GetFullEncCsvFilePath()};
-  return !csvFile.exists() || csvFile.size() == 0;
+void AccountStorage::SetEncFileFullPath(const QString& encFileFullPath) {
+  AccountStorage temp{encFileFullPath, mAesKey};
+  swap(temp);
 }
 
-QString AccountStorage::GetExportCSVRecordsStatic(const QVector<AccountInfo>& lst) {
-  QString fullPlainCSVContents;
-  fullPlainCSVContents.reserve(2048);
-  for (const AccountInfo& acc : lst) {
-    fullPlainCSVContents += acc.toCsvLine();
-    fullPlainCSVContents += '\n';
-  }
-  return fullPlainCSVContents;
+void AccountStorage::SetAesKey(const QString& aesKey) {
+  AccountStorage temp{mEncCsvFileFullPath, aesKey};
+  swap(temp);
 }
 
-QString AccountStorage::GetExportCSVRecords() const {
-  return GetExportCSVRecordsStatic(mAccounts);
+bool AccountStorage::CommitChangesToEncryptedCsvFile() {
+  const QString pth{AccountFileHelper::GetSaveToFullPath(true, mSaveToDirectory)};
+  return AccountFileHelper::CommitChangesToEncryptedCsvFile(mAccounts, pth, mAesKey);
 }
 
-// one can save to file to plain text or encrypted by their willing
-bool AccountStorage::SaveAccounts(bool bEncrypt) const {
-  QString fullPlainCSVContents = GetExportCSVRecords();
-  QString contentNeedDumped;
-  QString writeIntoPath;
+bool AccountStorage::ExportToPlainCsvFile() const {
+  const QString pth{AccountFileHelper::GetSaveToFullPath(false, mSaveToDirectory)};
+  return AccountFileHelper::ExportAccountsToPlainCsvFile(mAccounts, pth);
+}
 
-  if (bEncrypt) {
-    writeIntoPath = GetFullEncCsvFilePath();
-    bool encryptedResult = SimpleAES::GetInst().encrypt_GCM(fullPlainCSVContents, contentNeedDumped);
-    if (!encryptedResult) {
-      qCritical("Encrypt file[%s] failed! Skip write into file!", qPrintable(writeIntoPath));
-      return false;
-    }
-  } else {
-    writeIntoPath = GetFullPlainCsvFilePath();
-    contentNeedDumped.swap(fullPlainCSVContents);
-  }
+AccountInfo& AccountStorage::operator[](int i) {
+  return mAccounts[i];
+}
 
-  bool saveRes = FileTool::StringTextWriter(writeIntoPath, contentNeedDumped, QIODevice::WriteOnly | QIODevice::Text);
-  if (!saveRes) {
-    qCritical("Open file[%s] to write failed", qPrintable(writeIntoPath));
+const AccountInfo& AccountStorage::operator[](int i) const {
+  return mAccounts[i];
+}
+
+bool AccountStorage::clearRowRangeModified(int beginRow, int endRow) {
+  if (!(0 <= beginRow && beginRow < endRow && endRow <= size())) {
+    LOG_W("range[%d, %d) invalid", beginRow, endRow);
     return false;
   }
-
-  AfterSave();
-  LOG_D("%d byte(s) of %d record(s) dumped into %s succced", fullPlainCSVContents.size(), size(), qPrintable(writeIntoPath));
+  std::for_each(mAccounts.begin() + beginRow, mAccounts.begin() + endRow, [](AccountInfo& ele) { ele.SetModified(false); });
   return true;
 }
 
-bool AccountStorage::ParseEncryptCsvFile(const QString& encryptCsvFilePath, QString& plainCsvFileContent){
-  bool bReadOk{false};
-  QString encryptedContents = FileTool::StringTextReader(encryptCsvFilePath, &bReadOk);
-  if (!bReadOk) {
-    LOG_W("Open file to read failed", qPrintable(encryptCsvFilePath));
+bool AccountStorage::markRowRangeDeleted(int beginRow, int endRow, bool bDeleted) {
+  if (!(0 <= beginRow && beginRow < endRow && endRow <= size())) {
+    LOG_W("range[%d, %d) invalid", beginRow, endRow);
     return false;
   }
-  bool decryptResult = SimpleAES::GetInst().decrypt_GCM(encryptedContents, plainCsvFileContent);
-  if (!decryptResult) {
-    LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encryptCsvFilePath));
-    return false;
-  }
+  std::for_each(mAccounts.begin() + beginRow, mAccounts.begin() + endRow, [bDeleted](AccountInfo& ele) { ele.SetDeleted(bDeleted); });
   return true;
 }
 
-// when start on, data is from plain or encrypted is determined
-bool AccountStorage::LoadAccounts() {
-  if (IsAccountCSVFileInexistOrEmpty()) {
-    return true; // first time used
-  }
-  const QString encCsvFilePath = GetFullEncCsvFilePath();
-  QString plainCsvFileContent;
-  if (!ParseEncryptCsvFile(encCsvFilePath, plainCsvFileContent)) {
-    return false;
-  }
-  int nonEmptyLine{0};
-  decltype(mAccounts) tempAccounts = GetAccountsFromPlainString(plainCsvFileContent, &nonEmptyLine);
-  mAccounts.swap(tempAccounts);
-  // SetListModified(); here mAccounts is same as file contents, we consider it has no modification
-  LOG_D("%d account record(s) was loaded from %d non empty lines", mAccounts.size(), nonEmptyLine);
-  return true;
-}
-
-QVector<AccountInfo> AccountStorage::GetAccountsFromPlainString(const QString& contents, int* pNonEmptyLine) {
-  decltype(mAccounts) tempAccounts;
-  AccountInfo acc;
-  int nonEmptyLine{0};
-  for (const QString& line : contents.split('\n', Qt::SkipEmptyParts)) {
-    if (line.isEmpty()) {
-      continue;
-    }
-    ++nonEmptyLine;
-    if (!AccountInfo::FromCsvLine(line, acc)) {
-      continue;
-    }
-    tempAccounts.push_back(acc);
-  }
-  if (pNonEmptyLine != nullptr) {
-    *pNonEmptyLine = nonEmptyLine;
-  }
-  return tempAccounts;
-}
-
-int AccountStorage::RemoveIndexes(const std::set<int>& rows) {
-  // rows is ascending
-  int beforeRowCnt = size();
-  for (auto rit = rows.crbegin(); rit != rows.crend(); ++rit) {
-    if (*rit < 0 || *rit >= beforeRowCnt) {
-      continue;
-    }
-    mAccounts.removeAt(*rit);
-  }
-  LOG_D("row size changed from %d->%d(given %lu row indexes)", beforeRowCnt, size(), rows.size());
-  const int rmvedRowCnt{beforeRowCnt - size()};
-  SetListModified(rmvedRowCnt);
-  return rmvedRowCnt;
+bool AccountStorage::IsDataDirty() const {
+  return std::any_of(mAccounts.cbegin(), mAccounts.cend(), [](const AccountInfo& ele) { return ele.IsModified(); });
 }
 
 bool AccountStorage::InsertNRows(int indexBefore, int cnt) {
@@ -152,27 +70,16 @@ bool AccountStorage::InsertNRows(int indexBefore, int cnt) {
   } else if (indexBefore > size()) {
     indexBefore = size();
   }
-  mAccounts.insert(indexBefore, cnt, AccountInfo{});
-  SetListModified(cnt);
+
+  const int oldSize = mAccounts.size();
+  mAccounts.reserve(oldSize + cnt);
+  for (int i = 0; i < cnt; ++i) {
+    mAccounts.push_back(AccountInfo{});
+  }
+  std::rotate(mAccounts.begin() + indexBefore, mAccounts.begin() + oldSize, mAccounts.end());
   return true;
 }
 
 bool AccountStorage::AppendNRows(int cnt) {
   return InsertNRows(size(), cnt);
-}
-
-AccountInfo& AccountStorage::operator[](int i) {
-  if (i < 0 || i >= size()) {
-    static AccountInfo INVALID_ACC_FILE_ITEM;
-    return INVALID_ACC_FILE_ITEM;
-  }
-  return mAccounts[i];
-}
-
-const AccountInfo& AccountStorage::operator[](int i) const {
-  if (i < 0 || i >= size()) {
-    static AccountInfo INVALID_ACC_FILE_ITEM;
-    return INVALID_ACC_FILE_ITEM;
-  }
-  return mAccounts[i];
 }

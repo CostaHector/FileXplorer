@@ -1,52 +1,23 @@
 #ifndef ACCOUNTTABLEVIEW_H
 #define ACCOUNTTABLEVIEW_H
 
-#include <QSortFilterProxyModel>
 #include "CustomTableView.h"
-#include "PwdTableModel.h"
-
-#ifdef RUNNING_UNIT_TESTS
-namespace AccountTableViewMock{
-inline std::pair<bool, int>& getIntFromUserInputMock() {
-  static std::pair<bool, int> accept2IntNumberPair{false, 0};
-  return accept2IntNumberPair;
-}
-inline bool& cfmRemoveSelectedRowMock() {
-  static bool cfmRemove = false;
-  return cfmRemove;
-}
-inline bool& cfmExportPlainCSVMock() {
-  static bool cfmExport = false;
-  return cfmExport;
-}
-inline void clear() {
-  getIntFromUserInputMock() = std::pair<bool, int>(false, 0);
-  cfmRemoveSelectedRowMock() = false;
-  cfmExportPlainCSVMock() = false;
-}
-}
-#endif
+#include "AccountTableModel.h"
+#include "AccountSortFilterProxyModel.h"
 
 class AccountTableView : public CustomTableView {
+  Q_OBJECT
 public:
-  friend class PasswordBook;
-  explicit AccountTableView(QWidget* parent = nullptr);
-  void Subscribe();
-  int GetRowsCountFromUserInput(const QString& method);
-  int RemoveSelectedRows();
-  void InsertNRows(int rowCnt = 1);
-  void AppendNRows(int rowCnt);
-  QModelIndex GetSourceIndex(const QModelIndex& proxyIndex) const;
-  AccountInfo* GetAccountInfoByCurrentIndex(const QModelIndex& proxyIndex);
-  bool IsLoadSucceed() const {
-    return mPwdModel->GetLoadResult();
-  }
-  void SetFilter(const QString& keywords);
+  explicit AccountTableView(AccountTableModel* pwdModel, AccountSortFilterProxyModel* sortProxyModel, QWidget* parent = nullptr);
+
+signals:
+  void insertLinesReq(int pos, int cnt);
 
 private:
-  bool ExportPlainCSV();
-  PwdTableModel* mPwdModel{nullptr};
-  AccountSortFilterProxyModel* mSortProxyModel{nullptr};
+  bool EmitInsertLinesReq();
+
+  AccountTableModel* _pwdModel{nullptr};
+  AccountSortFilterProxyModel* _sortProxyModel{nullptr};
 };
 
 #endif // ACCOUNTTABLEVIEW_H
