@@ -5,6 +5,7 @@
 #include "AccountStorage.h"
 
 class AccountTableModel : public QAbstractTableModelPub {
+  Q_OBJECT
 public:
   explicit AccountTableModel(const QString& encFileFullPath, const QString& aesKey, QObject* parent = nullptr);
 
@@ -35,8 +36,26 @@ public:
 
   void SetEncFileFullPath(const QString& encFileFullPath);
   void SetAesKey(const QString& aesKey);
+  void SetEncFileFullPathAndAesKey(const QString& encFileFullPath, const QString& aesKey);
+
+  bool IsDecryptedOk() const { return mAccountsList.IsValid(); }
+
+signals:
+  void decryptedResultChanged(bool bDecryptedOk);
 
 private:
+  template <typename Action>
+  void ResetWithDecryptedNotify(Action&& action) {
+    const bool before = IsDecryptedOk();
+    beginResetModel();
+    std::forward<Action>(action)();
+    endResetModel();
+    const bool after = IsDecryptedOk();
+    if (after != before) {
+      emit decryptedResultChanged(after);
+    }
+  }
+
   AccountStorage mAccountsList;
 };
 

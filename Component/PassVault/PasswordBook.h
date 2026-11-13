@@ -26,8 +26,7 @@ protected:
 private:
   void Subscribe();
   void SetFilter(const QString& keywords);
-  void SetEncFileFullPath(const QString& encFileFullPath);
-  void SetAesKey(const QString& aesKey);
+  void onDecryptResultChanged(bool bDecryptOk);
 
   enum ViewType {
     LIST_VIEW = 0,

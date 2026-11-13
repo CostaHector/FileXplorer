@@ -16,7 +16,7 @@ PasswordBook::PasswordBook(QWidget* parent)
   : QMainWindow{parent} {
   setObjectName("PasswordBook");
 
-  QToolBar* mTopAreaToolBar = new (std::nothrow) QToolBar{"AccountTopAreaToolBar", this};
+  mTopAreaToolBar = new (std::nothrow) QToolBar{"AccountTopAreaToolBar", this};
   CHECK_NULLPTR_RETURN_VOID(mTopAreaToolBar);
   {
     mTopAreaToolBar->setObjectName(mTopAreaToolBar->windowTitle());
@@ -32,12 +32,12 @@ PasswordBook::PasswordBook(QWidget* parent)
     mSearchText->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mSearchText->setPlaceholderText("Search records by keyword here");
     mSearchText->setClearButtonEnabled(true);
-    mSearchNowAct = mSearchText->addAction(QIcon{":/edit/SEARCH_BY"}, QLineEdit::LeadingPosition);
+    mSearchNowAct = mSearchText->addAction(QIcon{":/pwd/action/SEARCH_BY"}, QLineEdit::LeadingPosition);
     mSearchNowAct->setToolTip("Search now.");
     mTopAreaToolBar->addWidget(mSearchText);
   }
 
-  QToolBar* mLeftAreaToolBar = new (std::nothrow) QToolBar{"AccountLeftAreaToolBar", this};
+  mLeftAreaToolBar = new (std::nothrow) QToolBar{"AccountLeftAreaToolBar", this};
   CHECK_NULLPTR_RETURN_VOID(mLeftAreaToolBar);
   {
     mLeftAreaToolBar->setObjectName(mLeftAreaToolBar->windowTitle());
@@ -53,33 +53,33 @@ PasswordBook::PasswordBook(QWidget* parent)
     mLeftAreaToolBar->addSeparator();
 
     // ---- 行操作 ----
-    mAppendRowAct = mLeftAreaToolBar->addAction(QIcon{":/edit/APPEND_ROWS"}, tr("Append Row"));
+    mAppendRowAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/APPEND_ROW"}, tr("Append Row"));
     mAppendRowAct->setToolTip("Append a new empty row to the end of the list.");
 
     mMarkRowsDeletedAct = mLeftAreaToolBar->addAction(QIcon{":img/DELETE_FROM_TABLE"}, tr("Mark Deleted"));
     mMarkRowsDeletedAct->setToolTip("Mark the selected row(s) as deleted. Changes take effect after saving.");
 
-    mRestoreRowsAct = mLeftAreaToolBar->addAction(QIcon{":img/RESTORE"}, tr("Restore Rows"));
+    mRestoreRowsAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/RESTORE"}, tr("Restore Rows"));
     mRestoreRowsAct->setToolTip("Clear the deleted mark on the selected row(s).");
     mLeftAreaToolBar->addSeparator();
 
     // ---- 导入 / 预览 / 导出 ----
-    mImportFromCsvAct = mLeftAreaToolBar->addAction(QIcon{":/edit/LOAD_FROM_INPUT"}, tr("Import from CSV"));
+    mImportFromCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/LOAD_FROM_INPUT"}, tr("Import from CSV"));
     mImportFromCsvAct->setToolTip("Import account records from CSV text you provide.");
-    mPreviewPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/edit/SHOW_CSV_CONTENTS"}, tr("Preview Plain CSV"));
+    mPreviewPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/SHOW_CSV_CONTENTS"}, tr("Preview Plain CSV"));
     mPreviewPlainCsvAct->setToolTip("Show the account records as plaintext CSV in a message box.");
-    mExportToPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/edit/EXPORT"}, tr("Export as Plain CSV"));
+    mExportToPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/EXPORT"}, tr("Export as Plain CSV"));
     mExportToPlainCsvAct->setToolTip("Export account records to a plaintext CSV file. "
                                      "<b>Unencrypted and human-readable.</b>");
     mLeftAreaToolBar->addSeparator();
 
     // ---- 打开目录 ----
-    mOpenContainingFolderAct = mLeftAreaToolBar->addAction(QIcon{":/OPEN_DIRECTORY"}, tr("Open Containing Folder"));
+    mOpenContainingFolderAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/OPEN_DIRECTORY"}, tr("Open Containing Folder"));
     mOpenContainingFolderAct->setToolTip("Open the folder that contains the data file in the system file explorer.");
     mLeftAreaToolBar->addSeparator();
 
     // ---- 保存 ----
-    mSaveChangesAct = mLeftAreaToolBar->addAction(QIcon{":/edit/SAVE_CHANGES"}, tr("Save Changes"));
+    mSaveChangesAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/SAVE_CHANGES"}, tr("Save Changes"));
     mSaveChangesAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
     mSaveChangesAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Save all changes to the encrypted local file."}.arg(mSaveChangesAct->text(), mSaveChangesAct->shortcut().toString()));
   }
@@ -95,9 +95,11 @@ PasswordBook::PasswordBook(QWidget* parent)
   onAccountViewChanged(mAccountViewSwitcher->currentIndex());
   setCentralWidget(mMainWidget);
 
+  onDecryptResultChanged(mPwdModel->IsDecryptedOk());
+
   Subscribe();
 
-  setWindowIcon(QIcon(":/PASSWORD_TABLE"));
+  setWindowIcon(QIcon(":/pwd/app/PASSWORD_BOOK"));
   SetPWBookName();
 }
 
@@ -125,8 +127,10 @@ void PasswordBook::ReadSettings() {
 }
 
 void PasswordBook::Subscribe() {
-  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::encFileFullPathChanged, this, &PasswordBook::SetEncFileFullPath);
-  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::aesKeyChanged, this, &PasswordBook::SetAesKey);
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::encFileFullPathChanged, mPwdModel, &AccountTableModel::SetEncFileFullPath);
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::aesKeyChanged, mPwdModel, &AccountTableModel::SetAesKey);
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::encFileFullPathAndAesKeyChanged, mPwdModel, &AccountTableModel::SetEncFileFullPathAndAesKey);
+  connect(mPwdModel, &AccountTableModel::decryptedResultChanged, this, &PasswordBook::onDecryptResultChanged);
 
   connect(mSearchNowAct, &QAction::triggered, mSearchText, &QLineEdit::returnPressed);
   connect(mSearchText, &QLineEdit::returnPressed, this, [this]() { SetFilter(mSearchText->text()); });
@@ -191,11 +195,9 @@ void PasswordBook::SetFilter(const QString& keywords) {
   mSortProxyModel->setFilterFixedString(keywords);
 }
 
-void PasswordBook::SetEncFileFullPath(const QString& encFileFullPath) {
-  mPwdModel->SetEncFileFullPath(encFileFullPath);
-}
-void PasswordBook::SetAesKey(const QString& aesKey) {
-  mPwdModel->SetAesKey(aesKey);
+void PasswordBook::onDecryptResultChanged(bool bDecryptOk) {
+  mMainWidget->setEnabled(bDecryptOk);
+  mLeftAreaToolBar->setEnabled(bDecryptOk);
 }
 
 bool PasswordBook::ExportToPlainCSVFile() const {

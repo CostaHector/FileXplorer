@@ -18,7 +18,7 @@ DragDropTextEdit::DragDropTextEdit(const QString& aesKey, QWidget* parent) : QPl
 
   mMenu = createStandardContextMenu();
   mMenu->addSeparator();
-  mSelectEncCsvFile = mMenu->addAction(QIcon{":/edit/PARSE_ENCRYPT_CSV_FILE"}, tr("select encrypt CSV file"));
+  mSelectEncCsvFile = mMenu->addAction(tr("select encrypt CSV file"));
   connect(mSelectEncCsvFile, &QAction::triggered, this, &DragDropTextEdit::onSelectEncCsvFileToParse);
 }
 
@@ -82,7 +82,7 @@ bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString& encryptCsvFile
   return true;
 }
 
-CSVInputDialog::CSVInputDialog(const QString& aesKey, QWidget* parent) : QDialog{parent}, mAesKey{aesKey}
+CSVInputDialog::CSVInputDialog(const QString aesKey, QWidget* parent) : QDialog{parent}, mAesKey{aesKey}
 {
   textEdit = new (std::nothrow) DragDropTextEdit(mAesKey, this);
   textEdit->setProperty("UseCodeFontFamily", true);
@@ -110,7 +110,7 @@ CSVInputDialog::CSVInputDialog(const QString& aesKey, QWidget* parent) : QDialog
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
   connect(pParseBtn, &QPushButton::clicked, this, &CSVInputDialog::onParseRequest);
 
-  setWindowIcon(QIcon(":/edit/LOAD_FROM_INPUT"));
+  setWindowIcon(QIcon(":/pwd/action/LOAD_FROM_INPUT"));
   setWindowTitle("Get record(s) from CSV input");
 }
 

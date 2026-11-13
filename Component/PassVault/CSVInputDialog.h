@@ -31,7 +31,7 @@ private:
 class CSVInputDialog : public QDialog {
   Q_OBJECT
 public:
-  explicit CSVInputDialog(const QString& aesKey, QWidget *parent = nullptr);
+  explicit CSVInputDialog(const QString aesKey, QWidget *parent = nullptr);
   QList<AccountInfo> GetAppendAccounts() const {
     return mAppendAccounts;
   }
@@ -42,7 +42,7 @@ private:
   bool onParseRequest();
   void onAcceptAndQuit();
 
-  const QString& mAesKey;
+  const QString mAesKey;
 
   QList<AccountInfo> mAppendAccounts;
 

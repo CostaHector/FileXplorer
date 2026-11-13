@@ -22,17 +22,16 @@ AccountFileAndAESKey::AccountFileAndAESKey(QWidget *parent) : QWidget{parent} {
   mAesKeyConfirmLE = new QLineEdit{this};
   mAesKeyConfirmLE->setEchoMode(QLineEdit::PasswordEchoOnEdit);
 
-  mResetInputButton = new QPushButton{tr("Reset Input"), this};
-  mResetInputButton->setToolTip("Restore the default file path and clear the AES key fields. Press Enter in QLineEdit to apply.");
-
   mSaveCurrentAesKeyButton = new QPushButton{tr("Save Key"), this};
   mSaveCurrentAesKeyButton->setToolTip("Save the current AES key text to the credential manager immediately. The input is not validated at all.");
+
+  mApplyButton = new QPushButton{tr("Apply"), this};
 
   mLayout = new QFormLayout(this);
   mLayout->addRow(tr("Encrypt File:"), mEncFileFullPathLE);
   mLayout->addRow(tr("AES Key:"), mAesKeyLE);
   mLayout->addRow(tr("Confirm Key:"), mAesKeyConfirmLE);
-  mLayout->addRow(mResetInputButton, mSaveCurrentAesKeyButton);
+  mLayout->addRow(mSaveCurrentAesKeyButton, mApplyButton);
   mLayout->setSpacing(1);
   mLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -63,57 +62,58 @@ void AccountFileAndAESKey::subscribe() {
   connect(mEncFileFullPathLE, &QLineEdit::returnPressed, this, &AccountFileAndAESKey::onEncFileFullPathLineEditChanged);
   connect(mAesKeyLE, &QLineEdit::returnPressed, this, &AccountFileAndAESKey::TryCommitAesKey);
   connect(mAesKeyConfirmLE, &QLineEdit::returnPressed, this, &AccountFileAndAESKey::TryCommitAesKey);
-  connect(mResetInputButton, &QPushButton::clicked, this, &AccountFileAndAESKey::onResetInput);
+  connect(mApplyButton, &QPushButton::clicked, this, &AccountFileAndAESKey::onApply);
   connect(mSaveCurrentAesKeyButton, &QPushButton::clicked, this, &AccountFileAndAESKey::onSaveCurrentInputKey);
 }
 
 void AccountFileAndAESKey::onEncFileFullPathLineEditChanged() {
   const bool bNeedReg{IsNeedRegister()};
   SetReEnterVisible(bNeedReg);
-
-  if (mEncFileFullPath == mEncFileFullPathLE->text()) {
-    return;
-  }
-  mEncFileFullPath = mEncFileFullPathLE->text();
-  emit encFileFullPathChanged(mEncFileFullPath);
+  emit encFileFullPathChanged(mEncFileFullPathLE->text());
 }
 
-bool AccountFileAndAESKey::TryCommitAesKey() {
-  const QString current = mAesKeyLE->text();
+bool AccountFileAndAESKey::ValidateAesKeyPair() {
   const bool bNeedReg = IsNeedRegister();
-
-  if (bNeedReg) {
-    if (current != mAesKeyConfirmLE->text()) {
-      const QString oldStyle = mAesKeyLE->styleSheet();
-      const QString oldReEnterStyle = mAesKeyConfirmLE->styleSheet();
-
-      mAesKeyLE->setStyleSheet("QLineEdit { border: 1px solid red; }");
-      mAesKeyConfirmLE->setStyleSheet("QLineEdit { border: 1px solid red; }");
-
-      QTimer::singleShot(2000, this, [this, oldStyle, oldReEnterStyle]() {
-        mAesKeyLE->setStyleSheet(oldStyle);
-        mAesKeyConfirmLE->setStyleSheet(oldReEnterStyle);
-      });
-      return false;
-    }
+  if (!bNeedReg) {
+    return true;
   }
+  const QString aesKey = mAesKeyLE->text();
+  if (aesKey != mAesKeyConfirmLE->text()) {
+    const QString oldStyle = mAesKeyLE->styleSheet();
+    const QString oldReEnterStyle = mAesKeyConfirmLE->styleSheet();
 
-  if (current == mAESKey) {
-    return true;            // 值没变，不重复 emit
+    mAesKeyLE->setStyleSheet("QLineEdit { border: 1px solid red; }");
+    mAesKeyConfirmLE->setStyleSheet("QLineEdit { border: 1px solid red; }");
+
+    QTimer::singleShot(2000, this, [this, oldStyle, oldReEnterStyle]() {
+      mAesKeyLE->setStyleSheet(oldStyle);
+      mAesKeyConfirmLE->setStyleSheet(oldReEnterStyle);
+    });
+    return false;
   }
-  mAESKey = std::move(current);
-  emit aesKeyChanged(mAESKey);
   return true;
 }
 
-void AccountFileAndAESKey::onResetInput() {
-  QString encFileFullPath = AccountFileHelper::GetSaveToFullPath(true, "");
-  InitAccountFullPath(encFileFullPath);
-  InitAesKey("");
+bool AccountFileAndAESKey::TryCommitAesKey() {
+  if (!ValidateAesKeyPair()) {
+    return false;
+  }
+
+  emit aesKeyChanged(mAesKeyLE->text());
+  return true;
 }
 
 bool AccountFileAndAESKey::onSaveCurrentInputKey() {
-  bool saveResult = CredUtilHelper::savePassword(GetCredTargetName(), mAesKeyLE->text());
-  LOG_OE_P(saveResult, "Save Aes key", "%d char to Credential Manager", mAesKeyLE->text().size());
+  const QString aesKey = GetAesKey();
+  bool saveResult = CredUtilHelper::savePassword(GetCredTargetName(), aesKey);
+  LOG_OE_P(saveResult, "Save Aes key", "%d char to Credential Manager", aesKey.size());
   return saveResult;
+}
+
+bool AccountFileAndAESKey::onApply() {
+  if (!ValidateAesKeyPair()) {
+    return false;
+  }
+  emit encFileFullPathAndAesKeyChanged(GetAccountFileFullPath(), GetAesKey());
+  return true;
 }

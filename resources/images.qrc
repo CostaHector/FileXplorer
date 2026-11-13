@@ -77,6 +77,8 @@
         <file alias="FACE_RECOGNIZE">Media/FACE_RECOGNIZE.svg</file>
         <file alias="FACE_RECOGNIZE_AUTO">Media/FACE_RECOGNIZE_AUTO.svg</file>
         <file alias="AUTO_SAVE">Media/AUTO_SAVE.svg</file>
+        <file alias="SAVED">Media/SAVED.svg</file>
+        <file alias="SAVED_NOT">Media/SAVED_NOT.svg</file>
         <file alias="SILENT_SAVE">Media/SILENT_SAVE.svg</file>
         <file alias="SAND_GLASS">Media/SAND_GLASS.svg</file>
         <file alias="MOVIE_WALL">Media/MOVIE_WALL.html</file>
@@ -330,11 +332,6 @@
         <!--Notification icon here-->
         <file alias="LOADING">Notification/LOADING.gif</file>
         <file alias="BALLOON_CLOSE">Notification/BALLOON_CLOSE.svg</file>
-
-        <file alias="RESTORE">pwd/RESTORE.svg</file>
-        <file alias="MODIFIED">pwd/MODIFIED.svg</file>
-        <file alias="SAVED">pwd/SAVED.svg</file>
-        <file alias="NOT_SAVED">pwd/NOT_SAVED.svg</file>
     </qresource>
 
     <qresource prefix="/FramelessWindow">
@@ -357,7 +354,6 @@
         <file alias="CAST_APPEND_FROM_SENTENCE">JsonEditor/CAST_APPEND_FROM_SENTENCE.svg</file>
         <file alias="CAST_APPEND_FROM_UPPERCASE_SENTENCE">JsonEditor/CAST_APPEND_FROM_UPPERCASE_SENTENCE.svg</file>
         <file alias="RELOAD_FROM_DISK">JsonEditor/RELOAD_FROM_DISK.svg</file>
-        <file alias="NOT_SAVED">JsonEditor/NOT_SAVED.svg</file>
         <file alias="ANCHOR_DROP">JsonEditor/ANCHOR_DROP.svg</file>
         <file alias="ANCHOR_WEIGH">JsonEditor/ANCHOR_WEIGH.svg</file>
         <file alias="AI_IDEA">JsonEditor/AI_IDEA.svg</file>
@@ -436,42 +432,39 @@
         <file alias="BACKGROUND_OVERLAY_OPACITY">styles/BACKGROUND_OVERLAY_OPACITY.svg</file>
     </qresource>
 
-    <qresource prefix="/">
-        <file alias="PASSWORD_MANAGER">pwd/password_manager.ico</file>
-        <file alias="PASSWORD_TABLE">pwd/PASSWORD_TABLE.png</file>
-        <file alias="PASWORD_BOOK_INDEX">pwd/PASWORD_BOOK_INDEX.html</file>
-        <file alias="AES_KEY">pwd/aes_key.png</file>
-        <file alias="WARNING">pwd/warning.png</file>
-        <file alias="LOGIN">pwd/LOGIN.svg</file>
-        <file alias="REGISTER">pwd/REGISTER.svg</file>
-        <file alias="OPEN_DIRECTORY">pwd/OPEN_DIRECTORY.svg</file>
+    <qresource prefix="/pwd/app">
+        <file alias="PASSWORD_BOOK">pwd/PASSWORD_BOOK.svg</file>
+        <file alias="PASSWORD_BOOK_SERVER">pwd/PASSWORD_BOOK_SERVER.svg</file>
+        <file alias="PASSWORD_BOOK_INDEX">pwd/PASSWORD_BOOK_INDEX.html</file>
     </qresource>
 
-    <qresource prefix="/bankcard">
-        <file alias="AMEX">pwd/amex.png</file>
-        <file alias="MASTERCARD">pwd/mastercard.png</file>
-        <file alias="UNIONPAY">pwd/unionpay.png</file>
-        <file alias="VISA">pwd/visa.png</file>
-        <file alias="MASTER_CARD_TEMPLATE">pwd/MASTER_CARD_TEMPLATE.svg</file>
-        <file alias="UNION_CARD_TEMPLATE">pwd/UNION_CARD_TEMPLATE.svg</file>
-        <file alias="VISA_CARD_TEMPLATE">pwd/VISA_CARD_TEMPLATE.svg</file>
+    <qresource prefix="/pwd/status">
+        <file alias="MODIFIED">pwd/MODIFIED.svg</file>
     </qresource>
 
-    <qresource prefix="/type">
-        <file alias="BANK">pwd/credit_card_cvc_hint.png</file>
-        <file alias="GAME">pwd/games.svg</file>
-        <file alias="EMAIL">pwd/email.svg</file>
-        <file alias="SOCIETY">pwd/society.png</file>
-        <file alias="TOOL">pwd/tool.png</file>
-    </qresource>
-    <qresource prefix="/edit">
-        <file alias="APPEND_ROWS">pwd/APPEND_ROWS.svg</file>
-        <file alias="LOAD_FROM_INPUT">pwd/LOAD_FROM_INPUT.svg</file>
-        <file alias="SAVE_CHANGES">pwd/SAVE_CHANGES.svg</file>
+    <qresource prefix="/pwd/action">
         <file alias="SEARCH_BY">pwd/SEARCH_BY.svg</file>
+        <file alias="OPEN_DIRECTORY">pwd/OPEN_DIRECTORY.svg</file>
+
+        <file alias="APPEND_ROW">pwd/APPEND_ROW.svg</file>
+        <file alias="RESTORE">pwd/RESTORE.svg</file>
+
+        <file alias="LOAD_FROM_INPUT">pwd/LOAD_FROM_INPUT.svg</file>
         <file alias="SHOW_CSV_CONTENTS">pwd/SHOW_CSV_CONTENTS.svg</file>
         <file alias="EXPORT">pwd/EXPORT.svg</file>
-        <file alias="PARSE_ENCRYPT_CSV_FILE">pwd/PARSE_ENCRYPT_CSV_FILE.svg</file>
+
+        <file alias="SAVE_CHANGES">pwd/SAVE_CHANGES.svg</file>
+    </qresource>
+
+    <qresource prefix="/pwd/types">
+        <file alias="BANK">pwd/types/bank.png</file>
+        <file alias="EMAIL">pwd/types/email.svg</file>
+        <file alias="GAME">pwd/types/game.svg</file>
+        <file alias="MASTERCARD">pwd/types/mastercard.png</file>
+        <file alias="SOCIETY">pwd/types/society.svg</file>
+        <file alias="TOOL">pwd/types/tool.svg</file>
+        <file alias="UNIONPAY">pwd/types/unionpay.png</file>
+        <file alias="VISA">pwd/types/visa.png</file>
     </qresource>
 
     <qresource prefix="/language">

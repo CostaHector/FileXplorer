@@ -94,7 +94,7 @@ class RenameWidget_ReplaceTest : public PlainTestSuite {
       const QString& sNewExt = pReplace.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
       QCOMPARE(sNewExt, "\n.jpg\n.pson\n.jpg");
-      QCOMPARE(pReplace.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::NOT_SAVED);
+      QCOMPARE(pReplace.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED_NOT);
     }
   }
 

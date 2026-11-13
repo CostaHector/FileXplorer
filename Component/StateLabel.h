@@ -8,7 +8,7 @@ class StateLabel : public QLabel {
  public:
   typedef enum tagLABEL_STATUS_E {
     BEGIN = 0,      //
-    NOT_SAVED = BEGIN,  // false
+    SAVED_NOT = BEGIN,  // false
     SAVED,  // true
     BUTT = 2
   } LABEL_STATUS_E;

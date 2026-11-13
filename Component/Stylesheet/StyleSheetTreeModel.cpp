@@ -49,7 +49,7 @@ QVariant StyleSheetTreeModel::data(const QModelIndex& index, int role) const {
       return {};
     }
     case Qt::DecorationRole: {
-      static QIcon failedIcon{":img/NOT_SAVED"};
+      static QIcon failedIcon{":img/SAVED_NOT"};
       if (column == StyleItemData::EDITABLE_COLUMN && mEditFailedCells.contains(index)) {
         return failedIcon;
       }

@@ -107,7 +107,7 @@ class AccountTableViewTest : public PlainTestSuite {
     {
       // 步骤4: 追加行
       AccountTableViewMock::getIntFromUserInputMock() = std::pair<bool, int>{true, 2};
-      emit ins.APPEND_ROWS->triggered();  // view.AppendNRows(2)
+      emit ins.APPEND_ROW->triggered();  // view.AppendNRows(2)
       QCOMPARE(view.mPwdModel->rowCount(), 4 + 2);
     }
 

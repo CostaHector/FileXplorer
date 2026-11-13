@@ -20,35 +20,32 @@ public:
   void InitAesKey(const QString& aesKey) {
     mAesKeyLE->setText(aesKey);
     mAesKeyConfirmLE->setText(aesKey);
-    mAESKey = aesKey;
   }
 
   QString GetAccountFileFullPath() const { return mEncFileFullPathLE->text(); }
-
-  const QString& GetAesKey() const { return mAESKey; }
+  QString GetAesKey() const { return mAesKeyLE->text(); }
 
 signals:
-  void encFileFullPathChanged(QString);
-  void aesKeyChanged(QString);
+  void encFileFullPathChanged(QString encFullpath);
+  void aesKeyChanged(QString aesKey);
+  void encFileFullPathAndAesKeyChanged(QString encFullpath, QString aesKey);
 
 private:
+  bool ValidateAesKeyPair();
   bool IsNeedRegister() const;
   void SetReEnterVisible(bool visible);
   void subscribe();
 
   void onEncFileFullPathLineEditChanged();
   bool TryCommitAesKey();
-  void onResetInput();
+  bool onApply();
   bool onSaveCurrentInputKey();
-
-  QString mAESKey;
-  QString mEncFileFullPath;
 
   QLineEdit* mEncFileFullPathLE{nullptr};
   QLineEdit* mAesKeyLE{nullptr};
   QLineEdit* mAesKeyConfirmLE{nullptr};
 
-  QPushButton* mResetInputButton{nullptr};
+  QPushButton* mApplyButton{nullptr};
   QPushButton* mSaveCurrentAesKeyButton{nullptr};
   QFormLayout* mLayout{nullptr};
 };

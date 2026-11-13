@@ -242,13 +242,20 @@ const AccountInfo* AccountTableModel::rowDataAt(int index) const {
 }
 
 void AccountTableModel::SetEncFileFullPath(const QString& encFileFullPath) {
-  beginResetModel();
-  mAccountsList.SetEncFileFullPath(encFileFullPath);
-  endResetModel();
+  ResetWithDecryptedNotify([this, encFileFullPath] {
+    mAccountsList.SetEncFileFullPath(encFileFullPath);
+  });
 }
 
 void AccountTableModel::SetAesKey(const QString& aesKey) {
-  beginResetModel();
-  mAccountsList.SetAesKey(aesKey);
-  endResetModel();
+  ResetWithDecryptedNotify([this, aesKey] {
+    mAccountsList.SetAesKey(aesKey);
+  });
+}
+
+void AccountTableModel::SetEncFileFullPathAndAesKey(const QString& encFileFullPath, const QString& aesKey) {
+  ResetWithDecryptedNotify([this, encFileFullPath, aesKey] {
+    AccountStorage temp{encFileFullPath, aesKey};
+    mAccountsList.swap(temp);
+  });
 }

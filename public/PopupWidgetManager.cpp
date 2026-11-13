@@ -29,8 +29,8 @@ template class PopupWidgetManager<ResourceMonitorPanel>;
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent)
     : QObject{notNullptrParent} {
-  CHECK_NULLPTR_RETURN_VOID(notNullptrParent);
   CHECK_NULLPTR_RETURN_VOID(pAction);
+  CHECK_NULLPTR_RETURN_VOID(notNullptrParent);
   m_action = pAction;
 
   if (m_action->isCheckable()) {
@@ -110,6 +110,7 @@ void PopupWidgetManager<WidgetType>::createWidget() {
   if (m_widget == nullptr) {
     LOG_E("Failed to create widget action[%s]", qPrintable(m_action->text()));
     if (m_action->isCheckable()) {
+      QSignalBlocker blocker(m_action);
       m_action->setChecked(false);
     }
     return;

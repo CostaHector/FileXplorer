@@ -128,10 +128,10 @@ bool ExtraEvents::onTogglePasswordServer(bool bLauchServer) {
     LOG_E("Launch failed. port occupied, try another one");
     return false;
   }
-  // qDebug("电脑访问: http://127.0.0.1:%d", server.port());
-  // for (const QString& ip : PasswordServer::lanAddresses()) {
-  //   qDebug("手机访问: http://%s:%d", qPrintable(ip), server.port());
-  // }
+  LOG_D("Computer: %s", qPrintable(mPwdBookServer->urlAddress()));
+  for (const QString& ip : PasswordBookServer::lanAddresses()) {
+    LOG_D("Mobile Phone: http://%s:%d", qPrintable(ip), mPwdBookServer->port());
+  }
   QDesktopServices::openUrl(QUrl(mPwdBookServer->urlAddress()));
   return true;
 }

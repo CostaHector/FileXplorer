@@ -17,10 +17,10 @@ class Response;
 class PasswordBookServer : public QObject {
   Q_OBJECT
 public:
-  static constexpr const char* DEFAULT_HOST = "127.0.0.1";
+  static constexpr const char* DEFAULT_HOST = "0.0.0.0";
   static constexpr int         DEFAULT_PORT = 8767;
 
-  explicit PasswordBookServer(QObject* parent = nullptr);
+  using QObject::QObject;
   ~PasswordBookServer() override;
 
   bool setAccounts(const QString& aesKey);
@@ -31,9 +31,12 @@ public:
   quint16 port()      const { return m_port; }
 
   static QStringList lanAddresses();
-  QString urlAddress() const { return QString::asprintf("http://%s:%d", DEFAULT_HOST, port()); }
+  QString urlAddress() const { return QString::asprintf("http://127.0.0.1:%d", port()); }
 
 private:
+  // 校验 Authorization: Bearer <token>，失败时写 401 并返回 false
+  bool CheckToken(const httplib::Request& req, httplib::Response& res) const;
+
   // GET
   bool onGetAccounts(const httplib::Request& req, httplib::Response& res);
   // POST
@@ -47,8 +50,10 @@ private:
   std::string buildAccountsJson() const;
   static QByteArray indexHtml();
 
-  mutable QMutex       m_accountsMutex;
-  AccountStorage      m_accountStorage;
+  mutable QMutex m_accountsMutex;
+  AccountStorage m_accountStorage;
+  mutable QMutex m_tokenMutex;
+  QString        m_token;
 
   quint16     m_port   = 0;
   std::thread m_thread;

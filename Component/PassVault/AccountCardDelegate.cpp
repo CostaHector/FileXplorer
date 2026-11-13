@@ -94,7 +94,7 @@ void AccountCardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 
   // 修改标记：左上角 "!"，强调“仅在内存中，尚未落盘”
   if (isModified) {
-    static QIcon MODIFIED_SVG{":img/MODIFIED"};
+    static QIcon MODIFIED_SVG{":/pwd/status/MODIFIED"};
     if (!MODIFIED_SVG.isNull()) {
       painter->save();
       const QRect iconRect(cardRect.left() + PADDING, cardRect.top() + PADDING, DELEGATE_ICON_SIZE, DELEGATE_ICON_SIZE);
