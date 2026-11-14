@@ -106,7 +106,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         // sync root index from last valid file-system model root index
         _view->m_fsListView->setRootIndex(newRootIndex);
       }
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::TABLE: {
@@ -120,7 +120,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         // sync root index from last valid file-system model root index
         _view->m_fsTableView->setRootIndex(newRootIndex);
       }
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::TREE: {
@@ -134,7 +134,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         // sync root index from last valid file-system model root index
         _view->m_fsTreeView->setRootIndex(newRootIndex);
       }
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::MOVIE: {
@@ -144,7 +144,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->m_movieView = new (std::nothrow) MovieDBView(*pMovieDb, _view->m_movieDbModel, _view->_movieSearchBar, _view);
         _view->AddView(viewType, _view->m_movieView);
       }
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::SEARCH: {
@@ -159,7 +159,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_searchSrcModel->setRootPath(newPath);
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::SCENE: {
@@ -172,7 +172,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_sceneListView->setRootPath(newPath);
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::CAST: {
@@ -182,7 +182,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
         _view->m_castTableView = new (std::nothrow) CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, *(_view->mCastDb), _view);
         _view->AddView(viewType, _view->m_castTableView);
       }
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     case ViewType::JSON: {
@@ -194,7 +194,7 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
       }
       const QString& newPath = _navigation->m_addressBar->m_addressLine->pathFromLineEdit();
       _view->m_jsonTableView->ReadADirectory(newPath);
-      viewIndex = _view->m_name2ViewIndex[viewType];
+      viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;
     }
     default: {

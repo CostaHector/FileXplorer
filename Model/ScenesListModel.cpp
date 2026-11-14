@@ -309,7 +309,7 @@ bool ScenesListModel::onSubdirectoriesToggled(bool bSubdirectories) {
 }
 
 int ScenesListModel::createFrontImageThumbnail(const QModelIndexList& indexes, bool bSkipIfExist) {
-  QList<QModelIndex> changedIndexes;
+  QModelIndexList changedIndexes;
   for (const QModelIndex& index : indexes) {
     int i = -1;
     if (!mPagedData.isLocalIndexValid(index, i)) {

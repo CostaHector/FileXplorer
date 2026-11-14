@@ -136,7 +136,7 @@ QByteArray EscapeCsv(const QString &value) {
     return value.toUtf8();
   }
   QByteArray escaped;
-  escaped.reserve(value.size() * 4 + 2);
+  escaped.reserve(value.size() * 2 + 2);
   escaped.append('z'); // nothing will be replaced
   escaped += value.toUtf8();
   if (bContainsDoubleQuote) {
@@ -145,6 +145,15 @@ QByteArray EscapeCsv(const QString &value) {
   escaped.front() = '"';
   escaped.push_back('"');
   return escaped;
+}
+
+QString UnescapeCsvField(const QByteArray& raw) {
+  if (raw.size() < 2 || raw.front() != '"' || raw.back() != '"') {
+    return raw;                     // 没被引号包裹 → 原样
+  }
+  QString inner = raw.mid(1, raw.size() - 2);   // 剥首尾 "
+  inner.replace("\"\"", "\"");                  // "" → "
+  return inner;
 }
 
 QRegularExpression GetRegularExpression(const QString& targetStr) {

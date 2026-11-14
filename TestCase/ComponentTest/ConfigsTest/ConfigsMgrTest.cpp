@@ -40,11 +40,6 @@ private slots:
     QShowEvent defaultShowEvent;
     cfgTbl.showEvent(&defaultShowEvent);
 
-    cfgTbl.hideEvent(nullptr);
-    QHideEvent defaultHideEvent;
-    cfgTbl.hideEvent(&defaultHideEvent);
-    QCOMPARE(g_fileLeafActions()._SETTINGS->isChecked(), false);
-
     QSignalSpy dlgAcceptedWhenOkClicked{&cfgTbl, &QDialog::accepted};
     emit cfgTbl.m_dlgBtnBox->button(QDialogButtonBox::Ok)->click();
     QCOMPARE(dlgAcceptedWhenOkClicked.count(), 1);

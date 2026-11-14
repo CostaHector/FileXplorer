@@ -3,9 +3,7 @@
 #include "GeneralDataType.h"
 #include "NotificatorMacro.h"
 #include "PublicCheckMacro.h"
-#include "PublicVariable.h"
 #include "NotificatorMacro.h"
-#include "PathTool.h"
 #include "ComboBoxGeneral.h"
 #include "LineEditGeneral.h"
 #include "PlainTextEditGeneral.h"
@@ -19,14 +17,14 @@
 #include <QFileDialog>
 #include <QPainter>
 
-StyleSheetEditDelegate::StyleSheetEditDelegate(int dataTypeRole, int editableColumn, QObject *parent)
+StyleSheetEditDelegate::StyleSheetEditDelegate(int dataTypeRole, std::initializer_list<int> editableColumns, QObject *parent)
   : QStyledItemDelegate(parent)
   , mDataTypeRole{dataTypeRole}
-  , mEditableColumn{editableColumn} {}
+  , mEditableColumns{editableColumns} {}
 
 QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-  if (index.column() != mEditableColumn) {
-    return nullptr;
+  if (!mEditableColumns.contains(index.column())) {
+    return QStyledItemDelegate::createEditor(parent, option, index);
   }
   const int dataType = index.data(mDataTypeRole).toInt();
 
@@ -45,10 +43,7 @@ QWidget *StyleSheetEditDelegate::createEditor(QWidget *parent, const QStyleOptio
 
 void StyleSheetEditDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
   QStyledItemDelegate::initStyleOption(option, index);
-  if (!index.isValid()) {
-    return;
-  }
-  if (index.column() != mEditableColumn) {
+  if (!mEditableColumns.contains(index.column())) {
     return;
   }
   const int dataType = index.data(mDataTypeRole).toInt();
@@ -63,10 +58,10 @@ void StyleSheetEditDelegate::paint(QPainter* painter, const QStyleOptionViewItem
   CHECK_NULLPTR_RETURN_VOID(painter);
   // 1. plot basic image and text
   QStyledItemDelegate::paint(painter, option, index);
-
-  if (index.column() != mEditableColumn) {
+  if (!mEditableColumns.contains(index.column())) {
     return;
   }
+
   const int dataType = index.data(mDataTypeRole).toInt();
   if (dataType == GeneralDataType::Type::COMMA_SEPERATED_STR_LIST) {
     QRect currentRateTextRect = option.rect;
@@ -81,7 +76,8 @@ void StyleSheetEditDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 // 从模型中获取指定索引（index）的数据，并将其设置到编辑器中，以便用户可以看到当前值并进行编辑。
 void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-  if (index.column() != mEditableColumn) {
+  if (!mEditableColumns.contains(index.column())) {
+    QStyledItemDelegate::setEditorData(editor, index);
     return;
   }
   const int dataType = index.data(mDataTypeRole).toInt();
@@ -109,7 +105,8 @@ void StyleSheetEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 }
 
 void StyleSheetEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-  if (index.column() != mEditableColumn) {
+  if (!mEditableColumns.contains(index.column())) {
+    QStyledItemDelegate::setModelData(editor, model, index);
     return;
   }
   const int dataType = index.data(mDataTypeRole).toInt();

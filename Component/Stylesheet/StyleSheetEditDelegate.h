@@ -5,7 +5,7 @@
 
 class StyleSheetEditDelegate : public QStyledItemDelegate {
 public:
-  explicit StyleSheetEditDelegate(int dataTypeRole = Qt::ItemDataRole::UserRole + 1, int editableColumn = 0, QObject *parent = nullptr);
+  explicit StyleSheetEditDelegate(int dataTypeRole = Qt::ItemDataRole::UserRole + 1, std::initializer_list<int> editableColumns = {0}, QObject *parent = nullptr);
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
@@ -20,6 +20,7 @@ protected:
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
 private:
-  const int mDataTypeRole, mEditableColumn;
+  const int mDataTypeRole;
+  QList<int> mEditableColumns;
 };
 #endif // STYLESHEETEDITDELEGATE_H

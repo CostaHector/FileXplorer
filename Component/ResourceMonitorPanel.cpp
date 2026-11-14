@@ -29,7 +29,7 @@ ResourceMonitorPanel::ResourceMonitorPanel(QWidget* parent)
     mInterval->setToolTip("Sample period(unit: millisecond)");
     mIntervalLabel = new (std::nothrow) QLabel{GetSampleIntervalString(mInterval->value()), this};
 
-    mExportBtn = new (std::nothrow) QPushButton{QIcon(":/edit/EXPORT"), "Export", this};
+    mExportBtn = new (std::nothrow) QPushButton{QIcon(":/pwd/action/EXPORT"), "Export", this};
 
     mCpuSwitch = new (std::nothrow) QCheckBox{"cpu", this};
     mCpuSwitch->setChecked(true);
@@ -108,11 +108,6 @@ ResourceMonitorPanel::ResourceMonitorPanel(QWidget* parent)
 void ResourceMonitorPanel::showEvent(QShowEvent* event) {
   QWidget::showEvent(event);
   StyleSheet::UpdateTitleBar(this);
-}
-
-void ResourceMonitorPanel::hideEvent(QHideEvent* event) {
-  g_fileLeafActions()._CPU_MEMORY_USAGE_MONITOR->setChecked(false);
-  QWidget::hideEvent(event);
 }
 
 void ResourceMonitorPanel::Subscribe() {

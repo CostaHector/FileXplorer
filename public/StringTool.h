@@ -31,6 +31,7 @@ void SearchHistoryListProc(QStringList& hists);
 QString PathJoinPixmapSize(QString path, int width, int height, bool bSmoothTrans);
 
 QByteArray EscapeCsv(const QString& value);
+QString UnescapeCsvField(const QByteArray& raw);
 
 QRegularExpression GetRegularExpression(const QString& targetStr);
 }

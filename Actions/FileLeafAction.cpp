@@ -1,10 +1,14 @@
 #include "FileLeafAction.h"
-#include "PublicVariable.h"
 #include "PublicCheckMacro.h"
 #include "MemoryKey.h"
 #include "Configuration.h"
 #include "ImageTool.h"
 #include <QMenu>
+
+FileLeafActions& FileLeafActions::GetInst() {
+  static FileLeafActions inst;
+  return inst;
+}
 
 FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _SETTINGS = new (std::nothrow) QAction{QIcon(":img/SETTINGS"), tr("Settings"), this};
@@ -13,11 +17,18 @@ FileLeafActions::FileLeafActions(QObject* parent) : QObject(parent) {
   _SETTINGS->setShortcutVisibleInContextMenu(true);
   _SETTINGS->setToolTip(QString("<b>%1 (%2)</b><br/> Show Preference Settings Window.").arg(_SETTINGS->text(), _SETTINGS->shortcut().toString()));
 
-  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/PASSWORD_TABLE"), tr("Password Book"), this};
+  _PWD_BOOK = new (std::nothrow) QAction{QIcon(":/pwd/app/PASSWORD_BOOK"), tr("Password Book"), this};
   CHECK_NULLPTR_RETURN_VOID(_PWD_BOOK);
   _PWD_BOOK->setCheckable(true);
   _PWD_BOOK->setShortcutVisibleInContextMenu(true);
   _PWD_BOOK->setToolTip(QString("<b>%1 (%2)</b><br/> Show Password book.").arg(_PWD_BOOK->text(), _PWD_BOOK->shortcut().toString()));
+
+  _PWD_BOOK_SERVER = new (std::nothrow) QAction{QIcon(":/pwd/app/PASSWORD_BOOK_SERVER"), tr("Password Book Server"), this};
+  CHECK_NULLPTR_RETURN_VOID(_PWD_BOOK_SERVER);
+  _PWD_BOOK_SERVER->setCheckable(true);
+  _PWD_BOOK_SERVER->setChecked(false);
+  _PWD_BOOK_SERVER->setToolTip(QString{"<b>%1 (%2)</b><br/>Browse the password book in your default browser."}
+                                 .arg(_PWD_BOOK_SERVER->text(), _PWD_BOOK_SERVER->shortcut().toString()));
 
   _ABOUT_FILE_EXPLORER = new (std::nothrow) QAction{QIcon(":img/ABOUT"), tr("About")};
   CHECK_NULLPTR_RETURN_VOID(_ABOUT_FILE_EXPLORER);
@@ -59,9 +70,4 @@ QToolButton* FileLeafActions::GetSystemContextMenu(QWidget* parent) {
   systemContextMenuTb->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
   systemContextMenuTb->setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_48, IMAGE_SIZE::TABS_ICON_IN_MENU_48});
   return systemContextMenuTb;
-}
-
-FileLeafActions& g_fileLeafActions() {
-  static FileLeafActions g_fileLeafActions;
-  return g_fileLeafActions;
 }

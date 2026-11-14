@@ -15,6 +15,7 @@ public:
   ~MenuInHeader();
 
   const QString& GetName() const { return m_name; }
+  void InsertActionToMenu(QAction* act = nullptr, int pos = 0);
   void AddActionToMenu(QAction* act);
   void RestoreHeaderState();
   bool checkAndSetDefaultSectionSize(int newSectionSize);

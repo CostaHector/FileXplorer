@@ -9,8 +9,9 @@
 
 #include "PopupWidgetManager.h"
 #ifdef PASSVAULT_ENABLED
-#include "SimpleAES.h"
 #include "PasswordBook.h"
+#include "PasswordBookServer.h"
+#include <QDesktopServices>
 #endif
 
 #include "PreferenceActions.h"
@@ -35,21 +36,18 @@ void ExtraEvents::subscribe() {
 
   auto& torrInst = g_torrActions();
   mTorrentsManager = new (std::nothrow) //
-      PopupWidgetManager<TorrentsManagerWidget>{
-          torrInst.SHOW_TORRENTS_MANAGER, //
-          pParentWidget,                  //
-          "Geometry/TorrentsManagerWidget" //
-      };
+      PopupWidgetManager<TorrentsManagerWidget>{torrInst.SHOW_TORRENTS_MANAGER, pParentWidget};
   CHECK_NULLPTR_RETURN_VOID(mTorrentsManager);
 
-  auto& leafInst = g_fileLeafActions();
-  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsMgr>{leafInst._SETTINGS, pParentWidget, "Geometry/ConfigsTable"};
+  auto& leafInst = FileLeafActions::GetInst();
+  m_settingSys = new (std::nothrow) PopupWidgetManager<ConfigsMgr>{leafInst._SETTINGS, pParentWidget};
   CHECK_NULLPTR_RETURN_VOID(m_settingSys);
 
 #ifdef PASSVAULT_ENABLED
-  mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget, "Geometry/PasswordBook"};
+  mPwdBook = new (std::nothrow) PopupWidgetManager<PasswordBook>{leafInst._PWD_BOOK, pParentWidget};
   CHECK_NULLPTR_RETURN_VOID(mPwdBook);
-  mPwdBook->setWidgetCreator(PasswordBook::Creater);
+
+  connect(leafInst._PWD_BOOK_SERVER, &QAction::toggled, this, &ExtraEvents::onTogglePasswordServer);
 #endif
 
   connect(leafInst._ABOUT_FILE_EXPLORER, &QAction::triggered, this, []() {
@@ -93,8 +91,7 @@ void ExtraEvents::subscribe() {
     msgBox.exec();
   });
 
-  m_resMonitor = new (std::nothrow)
-      PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget, "Geometry/ResMonitor"};
+  m_resMonitor = new (std::nothrow) PopupWidgetManager<ResourceMonitorPanel>{leafInst._CPU_MEMORY_USAGE_MONITOR, pParentWidget};
   CHECK_NULLPTR_RETURN_VOID(m_resMonitor);
 
   auto& prefInst = g_PreferenceActions();
@@ -111,4 +108,30 @@ void ExtraEvents::subscribe() {
 
   connect(leafInst._ADD_THIS_PROGRAM_TO_SYSTEM_CONTEXT_MENU, &QAction::triggered, &SystemContextMenuControl::Add);
   connect(leafInst._RMV_THIS_PROGRAM_FROM_SYSTEM_CONTEXT_MENU, &QAction::triggered, &SystemContextMenuControl::Rmv);
+}
+
+bool ExtraEvents::onTogglePasswordServer(bool bLauchServer) {
+#ifndef PASSVAULT_ENABLED
+  LOG_D("MARCO disabled. skip");
+  return true;
+#endif
+  if (!bLauchServer) {
+    if (mPwdBookServer != nullptr) {
+      mPwdBookServer->stop();
+    }
+    return true;
+  }
+  if (mPwdBookServer == nullptr) {
+    mPwdBookServer = new PasswordBookServer{this};
+  }
+  if (!mPwdBookServer->start(PasswordBookServer::DEFAULT_PORT)) {
+    LOG_E("Launch failed. port occupied, try another one");
+    return false;
+  }
+  LOG_D("Computer: %s", qPrintable(mPwdBookServer->urlAddress()));
+  for (const QString& ip : PasswordBookServer::lanAddresses()) {
+    LOG_D("Mobile Phone: http://%s:%d", qPrintable(ip), mPwdBookServer->port());
+  }
+  QDesktopServices::openUrl(QUrl(mPwdBookServer->urlAddress()));
+  return true;
 }

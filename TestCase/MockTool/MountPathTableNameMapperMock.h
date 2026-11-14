@@ -4,8 +4,8 @@
 #include <QString>
 
 namespace MountPathTableNameMapperMock {
-QString invokeToTableName(const QString& mountPath, bool* bConversionOk = nullptr);
-QString invokeToMountPath(const QString& tableName, bool* bConversionOk = nullptr);
+QString invokeToTableName(const QString& mountPath);
+QString invokeToMountPath(const QString& tableName, bool& bConversionOk);
 }
 
 #endif // MOUNTPATHTABLENAMEMAPPERMOCK_H

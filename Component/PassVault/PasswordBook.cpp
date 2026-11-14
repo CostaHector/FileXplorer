@@ -1,171 +1,186 @@
 #include "PasswordBook.h"
 #include "FileTool.h"
-#include "PwdPublicVariable.h"
-#include "PwdTableEditActions.h"
 #include "NotificatorMacro.h"
-#include "StyleSheet.h"
 #include "Configuration.h"
-#include "LoginQryWidget.h"
-#include <QDateTime>
-#include <QFileInfo>
+#include "CSVInputDialog.h"
+#include "InputDialogHelper.h"
+#include "PublicCheckMacro.h"
+#include "PathTool.h"
+#include "StyleSheet.h"
+#include "SizeTool.h"
+#include "CredentialUtil.h"
 
-PasswordBook* PasswordBook::Creater(QWidget* parent) {
-  LoginQryWidget* loginQryWidget = new (std::nothrow) LoginQryWidget;
-  loginQryWidget->onStartTimer();
-  if (loginQryWidget->exec() != QDialog::DialogCode::Accepted) {
-    LOG_INFO_NP("Cancel", "user skip");
-    return nullptr;
-  }
-  return new (std::nothrow) PasswordBook{parent};
+#include <QFileInfo>
+#include <QDateTime>
+
+PasswordBook::PasswordBook(QWidget* parent, int defaultViewType)
+  : PasswordBook{AccountFileHelper::GetDefaultEncFileFullPath(),
+                 CredUtilHelper::readPassword(GetPasswordBookCredTargetName()),
+                 defaultViewType,
+                 parent} {
 }
 
-PasswordBook::PasswordBook(QWidget* parent)
-  : QMainWindow{parent} {
+PasswordBook::PasswordBook(const QString& specifyEncFileFullPath, const QString& specifyAesKey, int defaultViewType, QWidget* parent) : QMainWindow{parent} {
   setObjectName("PasswordBook");
-  mAccountListView = new (std::nothrow) AccountTableView{this};
-  CHECK_NULLPTR_RETURN_VOID(mAccountListView);
-  if (!mAccountListView->IsLoadSucceed()) {
-    LOG_CRIT_NP("Load failed", "Key error");
-    this->setEnabled(false);
+
+  if (defaultViewType < ViewType::BEGIN_TYPE || defaultViewType >= ViewType::END_BUTT_TYPE) {
+    defaultViewType = ViewType::LIST_VIEW;
   }
 
-  mAccountDetailView = new (std::nothrow) AccountDetailView{"AccountDetailView", this};
-  CHECK_NULLPTR_RETURN_VOID(mAccountDetailView);
-  mAccountDetailView->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-  addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, mAccountDetailView);
+  mTopAreaToolBar = new (std::nothrow) QToolBar{"AccountTopAreaToolBar", this};
+  CHECK_NULLPTR_RETURN_VOID(mTopAreaToolBar);
+  {
+    mTopAreaToolBar->setObjectName(mTopAreaToolBar->windowTitle());
+    addToolBar(Qt::ToolBarArea::TopToolBarArea, mTopAreaToolBar);
+
+    mAccountFileAndAesWid = new (std::nothrow) AccountFileAndAESKey{specifyEncFileFullPath, specifyAesKey, this};
+
+    CHECK_NULLPTR_RETURN_VOID(mAccountFileAndAesWid);
+    mTopAreaToolBar->addWidget(mAccountFileAndAesWid);
+    mTopAreaToolBar->addSeparator();
+
+    mSearchText = new (std::nothrow) QLineEdit{""};
+    CHECK_NULLPTR_RETURN_VOID(mSearchText);
+    mSearchText->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mSearchText->setPlaceholderText("Search records by keyword here");
+    mSearchText->setClearButtonEnabled(true);
+    mSearchNowAct = mSearchText->addAction(QIcon{":/pwd/action/SEARCH_BY"}, QLineEdit::LeadingPosition);
+    mSearchNowAct->setToolTip("Search now.");
+    mTopAreaToolBar->addWidget(mSearchText);
+  }
+
+  mLeftAreaToolBar = new (std::nothrow) QToolBar{"AccountLeftAreaToolBar", this};
+  CHECK_NULLPTR_RETURN_VOID(mLeftAreaToolBar);
+  {
+    mLeftAreaToolBar->setObjectName(mLeftAreaToolBar->windowTitle());
+    mLeftAreaToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+    addToolBar(Qt::ToolBarArea::LeftToolBarArea, mLeftAreaToolBar);
+
+    mAccountViewSwitcher = new QComboBox{this};
+    CHECK_NULLPTR_RETURN_VOID(mAccountViewSwitcher);
+    mAccountViewSwitcher->addItem(tr("List"),  ViewType::LIST_VIEW);
+    mAccountViewSwitcher->addItem(tr("Table"), ViewType::TABLE_VIEW);
+    mAccountViewSwitcher->setCurrentIndex(defaultViewType);
+    mLeftAreaToolBar->addWidget(mAccountViewSwitcher);
+    mLeftAreaToolBar->addSeparator();
+
+    // ---- 行操作 ----
+    mAppendRowAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/APPEND_ROW"}, tr("Append Row"));
+    mAppendRowAct->setToolTip("Append a new empty row to the end of the list.");
+
+    mMarkRowsDeletedAct = mLeftAreaToolBar->addAction(QIcon{":img/DELETE_FROM_TABLE"}, tr("Mark Deleted"));
+    mMarkRowsDeletedAct->setToolTip("Mark the selected row(s) as deleted. Changes take effect after saving.");
+
+    mRestoreRowsAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/RESTORE"}, tr("Restore Rows"));
+    mRestoreRowsAct->setToolTip("Clear the deleted mark on the selected row(s).");
+    mLeftAreaToolBar->addSeparator();
+
+    // ---- 导入 / 预览 / 导出 ----
+    mImportFromCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/LOAD_FROM_INPUT"}, tr("Import from CSV"));
+    mImportFromCsvAct->setToolTip("Import account records from CSV text you provide.");
+    mPreviewPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/SHOW_CSV_CONTENTS"}, tr("Preview Plain CSV"));
+    mPreviewPlainCsvAct->setToolTip("Show the account records as plaintext CSV in a message box.");
+    mExportToPlainCsvAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/EXPORT"}, tr("Export as Plain CSV"));
+    mExportToPlainCsvAct->setToolTip("Export account records to a plaintext CSV file. "
+                                     "<b>Unencrypted and human-readable.</b>");
+    mLeftAreaToolBar->addSeparator();
+
+    // ---- 打开目录 ----
+    mOpenContainingFolderAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/OPEN_DIRECTORY"}, tr("Open Containing Folder"));
+    mOpenContainingFolderAct->setToolTip("Open the folder that contains the data file in the system file explorer.");
+    mLeftAreaToolBar->addSeparator();
+
+    // ---- 保存 ----
+    mSaveChangesAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/SAVE_CHANGES"}, tr("Save Changes"));
+    mSaveChangesAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
+    mSaveChangesAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Save all changes to the encrypted local file."}.arg(mSaveChangesAct->text(), mSaveChangesAct->shortcut().toString()));
+  }
+
+  mPwdModel = new (std::nothrow) AccountTableModel{mAccountFileAndAesWid->GetAccountFileFullPath(), mAccountFileAndAesWid->GetAesKey(), this};
+  CHECK_NULLPTR_RETURN_VOID(mPwdModel);
+
+  mSortProxyModel = new (std::nothrow) AccountSortFilterProxyModel{this};
+  CHECK_NULLPTR_RETURN_VOID(mSortProxyModel);
+  mSortProxyModel->setSourceModel(mPwdModel);
+  mSortProxyModel->initSortSetting(AccountInfo::Role::TYPE_STR_ROLE, false); // 默认按照Name升序
 
   mMainWidget = new QStackedWidget{this};
-  mMainWidget->addWidget(mAccountListView);
-  mMainWidget->setCurrentIndex(ViewType::LIST_VIEW);
+  onAccountViewChanged(defaultViewType);
   setCentralWidget(mMainWidget);
 
-  const auto& tblEditInst = GetTableEditActionsInst();
-  mSearchText = new (std::nothrow) QLineEdit{""};
-  CHECK_NULLPTR_RETURN_VOID(mSearchText);
-  mSearchText->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-  mSearchText->setPlaceholderText("Input to search accounts by keywords here");
-  mSearchText->setClearButtonEnabled(true);
-  mSearchText->addAction(tblEditInst.SEARCH_BY, QLineEdit::ActionPosition::LeadingPosition);
-
-  QToolBar* insertRowsTB = new (std::nothrow) QToolBar{"Insert Rows", this};
-  CHECK_NULLPTR_RETURN_VOID(insertRowsTB);
-  insertRowsTB->setOrientation(Qt::Orientation::Vertical);
-  insertRowsTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  insertRowsTB->addAction(tblEditInst.INSERT_A_ROW);
-  insertRowsTB->addAction(tblEditInst.INSERT_ROWS);
-  SetLayoutAlightment(insertRowsTB->layout(), Qt::AlignmentFlag::AlignLeft);
-
-  mToolBar = new (std::nothrow) QToolBar{"EditToolbar", this};
-  CHECK_NULLPTR_RETURN_VOID(mToolBar);
-  mToolBar->setObjectName(mToolBar->windowTitle());
-  mToolBar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  mToolBar->addWidget(insertRowsTB);
-  mToolBar->addAction(tblEditInst.APPEND_ROWS);
-  mToolBar->addAction(tblEditInst.DELETE_ROWS);
-  mToolBar->addSeparator();
-  mToolBar->addWidget(mSearchText);
-  mToolBar->addSeparator();
-  mToolBar->addAction(tblEditInst.LOAD_FROM_INPUT);
-  mToolBar->addAction(tblEditInst.SHOW_PLAIN_CSV_CONTENT);
-  mToolBar->addAction(tblEditInst.EXPORT_TO_PLAIN_CSV);
-  mToolBar->addAction(tblEditInst.OPEN_DIRECTORY);
-  mToolBar->addAction(tblEditInst.SAVE_CHANGES);
-  addToolBar(Qt::ToolBarArea::TopToolBarArea, mToolBar);
-
-  mStatusBar = new (std::nothrow) QStatusBar{this};
-  CHECK_NULLPTR_RETURN_VOID(mStatusBar);
-  setStatusBar(mStatusBar);
+  onDecryptResultChanged(mPwdModel->IsDecryptedOk());
 
   Subscribe();
 
-  ReadSettings();
-  setWindowIcon(QIcon(":/PASSWORD_TABLE"));
+  setWindowIcon(QIcon(":/pwd/app/PASSWORD_BOOK"));
   SetPWBookName();
+}
+
+void PasswordBook::showEvent(QShowEvent* event) {
+  if (!m_geometryRestoredOnce) {
+    ReadSettings();
+  }
+  StyleSheet::UpdateTitleBar(this);
+  QMainWindow::showEvent(event);
 }
 
 void PasswordBook::closeEvent(QCloseEvent* event) {
   CHECK_NULLPTR_RETURN_VOID(event)
-  Configuration().setValue("PASSWORD_TABLEVIEW_STATE", saveState());
+  Configuration().setValue("Geometry/PasswordBook", saveGeometry());
   QMainWindow::closeEvent(event);
 }
 
 void PasswordBook::ReadSettings() {
-  if (Configuration().contains("PASSWORD_TABLEVIEW_STATE")) {
-    restoreState(Configuration().value("PASSWORD_TABLEVIEW_STATE").toByteArray());
+  m_geometryRestoredOnce = true;
+  if (Configuration().contains("Geometry/PasswordBook")) {
+    restoreGeometry(Configuration().value("Geometry/PasswordBook").toByteArray());
+  } else {
+    setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 }
 
 void PasswordBook::Subscribe() {
-  connect(mAccountListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &PasswordBook::onUpdateDetailView);
-  connect(mSearchText, &QLineEdit::returnPressed, this, [this]() { mAccountListView->SetFilter(mSearchText->text()); });
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::encFileFullPathChanged, mPwdModel, &AccountTableModel::SetEncFileFullPath);
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::aesKeyChanged, mPwdModel, &AccountTableModel::SetAesKey);
+  connect(mAccountFileAndAesWid, &AccountFileAndAESKey::encFileFullPathAndAesKeyChanged, mPwdModel, &AccountTableModel::SetEncFileFullPathAndAesKey);
+  connect(mPwdModel, &AccountTableModel::decryptedResultChanged, this, &PasswordBook::onDecryptResultChanged);
 
-  auto& ins = GetTableEditActionsInst();
-  connect(ins.SHOW_PLAIN_CSV_CONTENT, &QAction::triggered, this, &PasswordBook::ShowPlainCSVContents);
-  connect(ins.EXPORT_TO_PLAIN_CSV, &QAction::triggered, mAccountListView, &AccountTableView::ExportPlainCSV);
-  connect(ins.LOAD_FROM_INPUT, &QAction::triggered, this, &PasswordBook::onGetRecordsFromInput);
-  connect(ins.OPEN_DIRECTORY, &QAction::triggered, this, &PasswordBook::openEncFileLocatedIn);
-  connect(ins.SAVE_CHANGES, &QAction::triggered, this, &PasswordBook::onSave);
-  connect(ins.SEARCH_BY, &QAction::triggered, mSearchText, &QLineEdit::returnPressed);
+  connect(mSearchNowAct, &QAction::triggered, mSearchText, &QLineEdit::returnPressed);
+  connect(mSearchText, &QLineEdit::returnPressed, this, [this]() { SetFilter(mSearchText->text()); });
+  connect(mAccountViewSwitcher, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PasswordBook::onAccountViewChanged);
+
+  connect(mAppendRowAct, &QAction::triggered, this, [this]() { AppendNRows(1); });
+  connect(mMarkRowsDeletedAct, &QAction::triggered, this, [this](){ MarkSelectedRowsDeleted(true); });
+  connect(mRestoreRowsAct, &QAction::triggered, this, [this](){ MarkSelectedRowsDeleted(false); });
+
+  connect(mImportFromCsvAct, &QAction::triggered, this, &PasswordBook::onGetRecordsFromInput);
+  connect(mPreviewPlainCsvAct, &QAction::triggered, this, &PasswordBook::ShowPlainCSVContents);
+  connect(mExportToPlainCsvAct, &QAction::triggered, this, &PasswordBook::ExportToPlainCSVFile);
+
+  connect(mOpenContainingFolderAct, &QAction::triggered, this, &PasswordBook::OpenEncFileLocatedIn);
+  connect(mSaveChangesAct, &QAction::triggered, this, &PasswordBook::onSave);
 }
 
 void PasswordBook::SetPWBookName() {
   QString title;
   title.reserve(40);
-  title += "Pwd";
+  title += "Password Book";
   title += " | ";
-  title += AccountStorage::GetFullEncCsvFilePath();
+  title += mAccountFileAndAesWid->GetAccountFileFullPath();
   setWindowTitle(title);
 }
 
-void PasswordBook::onUpdateDetailView(const QModelIndex& proxyIndex) {
-  mMainWidget->setCurrentIndex(ViewType::DETAIL_VIEW);
-  auto* pData = mAccountListView->GetAccountInfoByCurrentIndex(proxyIndex);
-  mAccountDetailView->UpdateDisplay(pData);
-}
-
 void PasswordBook::onSave() {
-  using namespace PwdPublicVariable;
-  QString changedMessage;
-  SAVE_RESULT saveResult = mAccountListView->mPwdModel->onSave(&changedMessage);
-
-  QString message;
-  message.reserve(30);
-  message += SAVE_RESULT_STR[(int) saveResult];
-  message += ' ';
-  message += "Try save record(s) at ";
-  message += QDateTime::currentDateTime().toString();
-  switch (saveResult) {
-    case SAVE_RESULT::FAILED:
-      LOG_ERR_NP("Failed to save", message);
-      break;
-    case SAVE_RESULT::SKIP:
-      LOG_WARN_NP("Nothing changed(Skip save)", message);
-      break;
-    default:
-      LOG_OK_NP("Save successfully", message);
-      break;
-  }
-  mStatusBar->showMessage(message);
+  const bool saveResult = mPwdModel->onSave();
+  LOG_OE_NP(saveResult, "Save at", QDateTime::currentDateTime().toString());
 }
 
 void PasswordBook::onGetRecordsFromInput() {
-  if (mCsvInputDialog == nullptr) {
-    mCsvInputDialog = new (std::nothrow) CSVInputDialog{this};
-    CHECK_NULLPTR_RETURN_VOID(mCsvInputDialog);
-    mCsvInputDialog->setWindowTitle("Input plain csv accounts info here");
-    connect(mCsvInputDialog, &CSVInputDialog::accepted, this, &PasswordBook::onLoadRecordsFromCSVInput);
-  }
-  mCsvInputDialog->raise();
-  mCsvInputDialog->show();
-}
-
-void PasswordBook::onLoadRecordsFromCSVInput() {
-  CHECK_NULLPTR_RETURN_VOID(mCsvInputDialog);
-  if (mCsvInputDialog->tempAccounts.isEmpty()) {
-    LOG_INFO_NP("Skip", "No record in CSV plain text input");
+  CSVInputDialog dlg{mAccountFileAndAesWid->GetAesKey()};
+  if (dlg.exec() != QDialog::DialogCode::Accepted) {
     return;
   }
-  mAccountListView->mPwdModel->AppendAccountRecords(mCsvInputDialog->tempAccounts);
+  mPwdModel->AppendAccountRecords(dlg.GetAppendAccounts());
 }
 
 void PasswordBook::ShowPlainCSVContents() {
@@ -178,15 +193,146 @@ void PasswordBook::ShowPlainCSVContents() {
     mPlainCSVContentWid->setReadOnly(true);
     mPlainCSVContentWid->setMinimumSize(600, 400);
   }
-  mPlainCSVContentWid->setPlainText(mAccountListView->mPwdModel->GetExportCSVRecords());
+  mPlainCSVContentWid->setPlainText(mPwdModel->GetExportCSVRecords());
   mPlainCSVContentWid->raise();
   mPlainCSVContentWid->show();
 }
 
-bool PasswordBook::openEncFileLocatedIn() const {
-  const QString locatedIn{QFileInfo(AccountStorage::GetFullEncCsvFilePath()).absolutePath()};
-  const QUrl url = QUrl::fromLocalFile(locatedIn);
-  const bool bRet = FileTool::OpenLocalFileUsingDesktopService(url.toLocalFile());
-  LOG_OE_P(bRet, "Open enc located in", "path:%s,ret:%d", qPrintable(locatedIn), bRet);
-  return bRet;
+bool PasswordBook::OpenEncFileLocatedIn() const {
+  const QString locatedInPath = PathTool::absolutePath(mAccountFileAndAesWid->GetAccountFileFullPath());
+  return FileTool::OpenLocalFileUsingDesktopService(locatedInPath);
 }
+
+void PasswordBook::SetFilter(const QString& keywords) {
+  mSortProxyModel->setFilterFixedString(keywords);
+}
+
+void PasswordBook::onDecryptResultChanged(bool bDecryptOk) {
+  mMainWidget->setEnabled(bDecryptOk);
+  mLeftAreaToolBar->setEnabled(bDecryptOk);
+}
+
+bool PasswordBook::ExportToPlainCSVFile() const {
+  if (!InputDialogHelper::YesOrCancelBox(QMessageBox::Warning, QIcon(":/edit/EXPORT"),
+                                         "Export Plaintext List?", "WARNING: This may cause <b>information leakage</b>. Please keep the exported file secure.",
+                                         "", "")) {
+    LOG_INFO_NP("User cancelled plaintext export", "return");
+    return false;
+  }
+  const QString timeStr = QDateTime::currentDateTime().toString();
+  bool exportResult = mPwdModel->ExportToPlainCSVFile();
+  LOG_OE_P(exportResult, "Export plain CSV", "Store the file securely\n%s", qPrintable(timeStr));
+  return true;
+}
+
+bool PasswordBook::onAccountViewChanged(int viewType) {
+  if (viewType == mCurViewType) {
+    return true; // no need change
+  }
+  switch (viewType) {
+    case ViewType::LIST_VIEW: {
+      if (mAccountListView == nullptr) {
+        mAccountListView = new (std::nothrow) AccountListView{mPwdModel, mSortProxyModel, this};
+        mViewType2StackedWidgetIndex[ViewType::LIST_VIEW] = mMainWidget->addWidget(mAccountListView);
+      }
+      mCurViewType = ViewType::LIST_VIEW;
+      break;
+    }
+    case ViewType::TABLE_VIEW: {
+      if (mAccountTableView == nullptr) {
+        mAccountTableView = new (std::nothrow) AccountTableView{mPwdModel, mSortProxyModel, this};
+        mViewType2StackedWidgetIndex[ViewType::TABLE_VIEW] = mMainWidget->addWidget(mAccountTableView);
+        connect(mAccountTableView, &AccountTableView::insertLinesReq, this, &PasswordBook::InsertNRows);
+      }
+      mCurViewType = ViewType::TABLE_VIEW;
+      break;
+    }
+    default:
+      return false;
+  }
+  mMainWidget->setCurrentIndex(mViewType2StackedWidgetIndex[viewType]);
+  return true;
+}
+
+std::pair<bool, QModelIndexList> PasswordBook::GetSelectedRows() const {
+  switch (mCurViewType) {
+    case ViewType::LIST_VIEW: {
+      if (mAccountListView == nullptr) {
+        return {false, {}};
+      }
+      return {true, mAccountListView->selectedRowsSource()};
+      break;
+    }
+    case ViewType::TABLE_VIEW: {
+      if (mAccountTableView == nullptr) {
+        return {false, {}};
+      }
+      return {true, mAccountTableView->selectedRowsSource()};
+      break;
+    }
+    default:
+      return {false, {}};
+  }
+}
+
+int PasswordBook::MarkSelectedRowsDeleted(bool bDeleted) {
+  bool bGetOk{false};
+  QModelIndexList srcIndexes;
+  std::tie(bGetOk, srcIndexes) = GetSelectedRows();
+  if (!bGetOk) {
+    LOG_ERR_NP("Get Selected Rows failed", "Cannot mark");
+    return -1;
+  }
+  if (srcIndexes.isEmpty()) {
+    LOG_INFO_NP("Nothing were selected", "Skip mark");
+    return 0;
+  }
+  const int rowsMarked = mPwdModel->MarkDeletedIndexes(srcIndexes, bDeleted);
+  if (rowsMarked < 0) {
+    LOG_ERR_P("Row(s) mark failed", "selected:%d , code:%d", srcIndexes.size(), rowsMarked);
+    return rowsMarked;
+  }
+  LOG_OK_P("Row(s) marked ok", "All %d row(s) marked successfully", srcIndexes.size());
+  return rowsMarked;
+}
+
+bool PasswordBook::InsertNRows(int insertIndexBefore, int rowCnt) {
+  if (mPwdModel->InsertNRows(insertIndexBefore, rowCnt) <= 0) {
+    return false;
+  }
+  return ScrollToSourceRow(insertIndexBefore);
+}
+
+bool PasswordBook::AppendNRows(int rowCnt) {
+  return InsertNRows(mPwdModel->rowCount(), rowCnt);
+}
+
+bool PasswordBook::ScrollToSourceRow(int sourceRow) {
+  QAbstractItemView* view = nullptr;
+  switch (mCurViewType) {
+    case ViewType::LIST_VIEW:  view = mAccountListView;  break;
+    case ViewType::TABLE_VIEW: view = mAccountTableView; break;
+    default: return false;
+  }
+  if (!view || !mSortProxyModel || !mPwdModel) {
+    return false;
+  }
+
+  const QModelIndex srcIdx = mPwdModel->index(sourceRow, 0);
+  if (!srcIdx.isValid()) {
+    return false;
+  }
+
+  // 关键：source → proxy，排序/过滤后才对应视图里的真实行
+  const QModelIndex proxyIdx = mSortProxyModel->mapFromSource(srcIdx);
+  if (!proxyIdx.isValid()) {
+    // 新行被过滤规则挡掉了，视图里根本不存在，滚动无意义
+    LOG_INFO_NP("New row filtered out", "Skip scroll");
+    return false;
+  }
+
+  view->scrollTo(proxyIdx, QAbstractItemView::EnsureVisible);
+  view->setCurrentIndex(proxyIdx);
+  return true;
+}
+

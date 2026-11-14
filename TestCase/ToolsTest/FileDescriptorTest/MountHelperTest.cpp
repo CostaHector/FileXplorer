@@ -23,11 +23,9 @@ private slots:
 
     {
       // windows platform
-      bool ok = false;
       QCOMPARE(toTableName("C:/DISKS/DD2T4"), "C__DISKS_DD2T4");
-      QVERIFY(ok);
-      ok = false;
 
+      bool ok = false;
       QCOMPARE(toMountPath("C__DISKS_DD2T4", ok), "C:/DISKS/DD2T4");
       QVERIFY(ok);
       ok = false;
@@ -35,16 +33,13 @@ private slots:
       // 表名不满足正则， 但是满足正常路径，回落成功
       QString okTableNameCode{toTableName("C:/AnyFolder/MoviesFolder")};
       QVERIFY(okTableNameCode.startsWith("MoviesFolder_"));
-      QVERIFY(ok);
       ok = false;
 
       // linux platform
       QCOMPARE(toTableName("/mnt/DISKS/DD2T4"), "_mnt_DISKS_DD2T4");
-      QVERIFY(ok);
       ok = false;
 
       QCOMPARE(toTableName("/mnt/DISKS/DD2"), "_mnt_DISKS_DD2");
-      QVERIFY(ok);
       ok = false;
 
       QCOMPARE(toMountPath("_mnt_DISKS_DD2", ok), "/mnt/DISKS/DD2");

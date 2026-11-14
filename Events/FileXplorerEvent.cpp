@@ -474,7 +474,7 @@ void FileXplorerEvent::subsribeCompress() {
   connect(g_AchiveFilesActions().DECOMPRESSED_HERE, &QAction::triggered, this, &FileXplorerEvent::on_deCompress);
   connect(g_AchiveFilesActions().COMPRESSED_IMAGES, &QAction::triggered, this, &FileXplorerEvent::on_compressImgsByGroup);
 
-  m_archivePreview = new (std::nothrow) PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane, "Geometry/AchiveViewer"};
+  m_archivePreview = new (std::nothrow) PopupWidgetManager<Archiver>{g_AchiveFilesActions().ARCHIVE_PREVIEW, _contentPane};
   connect(g_AchiveFilesActions().ARCHIVE_PREVIEW, &QAction::toggled, this, &FileXplorerEvent::on_archivePreview);
 }
 
@@ -561,10 +561,10 @@ void FileXplorerEvent::subscribe() {
     });
     connect(fileOpInst._RMV_FOLDER_BY_KEYWORD, &QAction::triggered, this, &FileXplorerEvent::on_RMV_FOLDER_BY_KEYWORD);
 
-    m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane, "Geometry/DuplicateVideosFinder"};
+    m_duplicateVideosFinder = new (std::nothrow) PopupWidgetManager<DuplicateVideosFinder>{fileOpInst._DUPLICATE_VIDEOS_FINDER, _contentPane};
     CHECK_NULLPTR_RETURN_VOID(m_duplicateVideosFinder);
 
-    m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane, "Geometry/RedundantImageFinder"};
+    m_redundantImageFinder = new (std::nothrow) PopupWidgetManager<DuplicatesImagesFinder>{fileOpInst._DUPLICATE_IMAGES_FINDER, _contentPane};
     CHECK_NULLPTR_RETURN_VOID(m_redundantImageFinder);
     connect(fileOpInst._DUPLICATE_IMAGES_FINDER, &QAction::toggled, this, &FileXplorerEvent::on_RedunImageFinder);
 

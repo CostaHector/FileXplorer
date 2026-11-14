@@ -16,7 +16,7 @@ bool FsNodeEntry::operator<(const FsNodeEntry& rhs) const {
 
 bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   QFile file{absFilePath};
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) { // 不可指定Text, 否则会按照平台替换换行符
     return false;
   }
   file.write(contents);
@@ -106,6 +106,7 @@ QList<FsNodeEntry> TDir::getEntries(bool bFileContentMatter, const QDir::Filters
 }
 
 bool TDir::touch(const QString& relativePathToFile, const QByteArray& contents) const {
+  // 保持换行符不变写入到文件
   if (relativePathToFile.isEmpty()) {
     LOG_W("Relative Path to File cannot be empty");
     return false;

@@ -158,10 +158,6 @@ struct RETURN_TYPE {
 
 BATCH_COMMAND_LIST_TYPE& operator+=(BATCH_COMMAND_LIST_TYPE& lhs, const RETURN_TYPE& rhs);
 
-bool IsReturnErrorCodeUponAnyFailureSw();
-void SetReturnErrorCodeUponAnyFailureSw(bool sw);
-void InitReturnErrorCodeUponAnyFailureSw();
-
 }  // namespace FileOperatorType
 
 #endif  // FILEOPERATORPUB_H

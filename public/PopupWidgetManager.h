@@ -7,7 +7,7 @@
 template<typename WidgetType>
 class PopupWidgetManager : public QObject {
 public:
-  explicit PopupWidgetManager(QAction* action, QWidget* notNullptrParent, const QString& geometryCfgKey);
+  explicit PopupWidgetManager(QAction* action, QWidget* notNullptrParent);
   ~PopupWidgetManager();
 
   void setWidgetCreator(std::function<WidgetType*(QWidget*)> creator) { m_widgetCreator = creator; }
@@ -28,7 +28,6 @@ private:
 
   QAction* m_action{nullptr};
   WidgetType* m_widget{nullptr};
-  const QString m_geometryCfgKey;
 
   std::function<WidgetType*(QWidget*)> m_widgetCreator{nullptr};
   std::function<void()> m_onCloseCallback{nullptr};

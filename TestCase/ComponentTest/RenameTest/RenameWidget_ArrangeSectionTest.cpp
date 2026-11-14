@@ -77,7 +77,7 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
       const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
       QCOMPARE(sNewExt, "\n.jpg\n.json");
-      QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::NOT_SAVED);
+      QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED_NOT);
     }
 
     {  // swap index count invalid
@@ -86,7 +86,7 @@ class RenameWidget_ArrangeSectionTest : public PlainTestSuite {
       const QString& sNewExt = pArrange.m_nExtTE->toPlainText();
       QCOMPARE(sNewName, "");
       QCOMPARE(sNewExt, "\n.jpg\n.json");
-      QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::NOT_SAVED);
+      QCOMPARE(pArrange.regexValidLabel->state(), StateLabel::LABEL_STATUS_E::SAVED_NOT);
     }
 
     {  // rearrange index "2 - 1 - 0" and drop others

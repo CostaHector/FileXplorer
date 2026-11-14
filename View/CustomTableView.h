@@ -25,6 +25,8 @@ class CustomTableView : public QTableView {
 
   int rowHeight() const;
   bool setRowHeight(int newRowHeight);
+  void InsertActionAtHorHeaderMenu(QAction* pAct, int pos);
+  void InsertActionAtVerHeaderMenu(QAction* pAct, int pos);
 
  signals:
   void searchSqlStatementChanged(const QString& sqlStatement);

@@ -7,7 +7,7 @@ QPixmap GetLabelStatusPixmap(StateLabel::LABEL_STATUS_E status) {
     return {};
   }
   static const QPixmap labelSavedStatusPxp[]                      //
-      {QPixmap(":img/NOT_SAVED").scaled(24, 24, Qt::KeepAspectRatio), //
+      {QPixmap(":img/SAVED_NOT").scaled(24, 24, Qt::KeepAspectRatio), //
        QPixmap(":img/SAVED").scaled(24, 24, Qt::KeepAspectRatio)};
   const int clampResult = std::max(0, std::min(1, (int)status));
   return labelSavedStatusPxp[clampResult];
@@ -31,10 +31,10 @@ void StateLabel::ToSaved() {
 #endif
 }
 void StateLabel::ToNotSaved() {
-  if (m_currentState == NOT_SAVED) {
+  if (m_currentState == SAVED_NOT) {
     return;
   }
-  m_currentState = NOT_SAVED;
+  m_currentState = SAVED_NOT;
 #ifndef RUNNING_UNIT_TESTS
   setPixmap(GetLabelStatusPixmap(m_currentState));
 #endif

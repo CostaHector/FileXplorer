@@ -21,8 +21,8 @@ ConfigsTableView::ConfigsTableView(const QString &instName, QWidget *parent)
   setModel(mSortFilterProxy);
   InitTableView();
 
-  mStyleSheetEditDelegate = new StyleSheetEditDelegate{ConfigsModel::ColumnE::DATA_TYPE_ROLE, ConfigsModel::EDITABLE_COLUMN, this};
-  setItemDelegateForColumn(ConfigsModel::EDITABLE_COLUMN, mStyleSheetEditDelegate);
+  mStyleSheetEditDelegate = new StyleSheetEditDelegate{ConfigsModel::ColumnE::DATA_TYPE_ROLE, {ConfigsModel::EDITABLE_COLUMN}, this};
+  setItemDelegate(mStyleSheetEditDelegate);
 
   subscribe();
 }

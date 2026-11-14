@@ -16,15 +16,15 @@
 #include <mockcpp/MockObjectHelper.h>
 USING_MOCKCPP_NS
 
-class CSVInputDialogTest : public PlainTestSuite {
+    class CSVInputDialogTest : public PlainTestSuite {
   Q_OBJECT
- public:
+public:
   TDir mTDir;
   const QList<FsNodeEntry> mNodes{
       {"file1.csv", false, "contents not matter"},  //
       {"file2.mp4", false, "1"},                    //
   };
- private slots:
+private slots:
   void initTestCase() {  //
     QVERIFY(mTDir.IsValid());
     QCOMPARE(mTDir.createEntries(mNodes), 2);
@@ -38,7 +38,9 @@ class CSVInputDialogTest : public PlainTestSuite {
   void cleanup() { GlobalMockObject::reset(); }
 
   void DragDropTextEdit_default_ok() {
-    DragDropTextEdit te;
+    DragDropTextEdit te{"RANDOM_AES_KEY"};
+    QCOMPARE(te.placeholderText(), "Enter your text here or drag encrypt csv file here...");
+
     QVERIFY(te.mSelectEncCsvFile != nullptr);
     QVERIFY(te.mMenu != nullptr);
     QCOMPARE(te.acceptDrops(), true);
@@ -58,178 +60,182 @@ class CSVInputDialogTest : public PlainTestSuite {
   }
 
   void ParseEncryptCsvFileContents_ok() {
-    MOCKER(AccountStorage::ParseEncryptCsvFile)
-        .expects(exactly(2))       //
-        .will(returnValue(false))  // 1st: parse failed
-        .then(returnValue(true));  // 2nd: parse again succeed
+    // 不真正读文件, 假定首次读取失败(文本损坏), 文本恢复后第二次读取成功
+    const AccountInfo acc{"Type","Name","Account","Password","Others"};
+    const QString plainText = acc.toCsvLine() + "\n";
+    const std::pair<bool, QString> failedPair{false, ""}, succeedPair{true, plainText};
+    MOCKER(AccountFileHelper::ParseEncryptCsvFile)
+        .expects(exactly(2))              //
+        .will(returnValue(failedPair))    // 1st: parse failed
+        .then(returnValue(succeedPair));  // 2nd: parse again succeed
 
-    QString parseFailedPath = mTDir.itemPath("file1.csv");
-    DragDropTextEdit te;
-    QCOMPARE(te.ParseEncryptCsvFileContents(parseFailedPath), false);
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), true);
-
-    // here user changed the contents
-    QString parseSucceedPath{"a valid encrypted file"};
-    QCOMPARE(te.ParseEncryptCsvFileContents(parseSucceedPath), true);
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+    const QString encFileFullPath = "enc_file1.csv";
+    DragDropTextEdit te{"RANDOM_AES_KEY"};
+    QCOMPARE(te.ParseEncryptCsvFileContents(encFileFullPath), false);
+    QCOMPARE(te.toPlainText(), "Parse encrypt csv file[enc_file1.csv] failed");
+    // 此处假定文本恢复了
+    QCOMPARE(te.ParseEncryptCsvFileContents(encFileFullPath), true);
+    QCOMPARE(te.toPlainText(), plainText);
   }
 
   void onSelectEncCsvFileToParse_ok() {
-    MOCKER(AccountStorage::ParseEncryptCsvFile)
-        .expects(exactly(1))  //
-        .will(returnValue(true));
-
-    QString validContentsNotInital{"a valid path"};
+    const QString aesKey{"RANDOM_AES_KEY"};
+    const QString encFileFullPath{"File.enc.csv"};
     MOCKER(QFileDialog::getOpenFileName)
-        .expects(exactly(2))                         //
-        .will(returnValue(QString{}))                // 1st: cancel
-        .then(returnValue(validContentsNotInital));  // 2nd: ok
-    DragDropTextEdit te;
-    te.mSelectEncCsvFile->trigger();
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+        .expects(exactly(2))                  //
+        .will(returnValue(QString{}))         // 1st: cancel
+        .then(returnValue(encFileFullPath));  // 2nd: ok
 
-    QCOMPARE(te.onSelectEncCsvFileToParse(), true);
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+    // empty file.enc.csv
+    std::pair<bool, QString> succeedPair{true, ""};
+    MOCKER(AccountFileHelper::ParseEncryptCsvFile)
+        .expects(exactly(1))  //
+        .with(eq(encFileFullPath), eq(aesKey))
+        .will(returnValue(succeedPair));
+
+    DragDropTextEdit te{aesKey};
+    QVERIFY(te.mSelectEncCsvFile != nullptr);
+    QCOMPARE(te.toPlainText(), ""); // no text at initial
+
+    te.mSelectEncCsvFile->trigger();
+    QCOMPARE(te.toPlainText(), "User cancel select encrypt file");
+
+    QVERIFY(te.onSelectEncCsvFileToParse());
+    QCOMPARE(te.toPlainText(), "");
   }
 
   void dragDropEnterEvent_ok() {
-    MOCKER(AccountStorage::ParseEncryptCsvFile)
-        .expects(exactly(2))  //
-        .will(returnValue(false))
-        .then(returnValue(true));
-    DragDropTextEdit te;
+    const QString aesKey{"RANDOM_AES_KEY"};
+
+    DragDropTextEdit te{aesKey};
     QPoint dragEnterPos{te.geometry().center()};
 
-    QMimeData textOnlyMimeData;
-    textOnlyMimeData.setText("0 urls only text");
-    QDragEnterEvent rejectDragEnter(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
-    te.dragEnterEvent(&rejectDragEnter);
-    QCOMPARE(rejectDragEnter.isAccepted(), false);
+    // 没有url, 不走 ParseEncryptCsvFileContents
+    {
+      QMimeData textOnlyMimeData;
+      textOnlyMimeData.setText("0 urls only text");
+      QDragEnterEvent rejectDragEnter(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dragEnterEvent(&rejectDragEnter);
+      QCOMPARE(rejectDragEnter.isAccepted(), false);
 
-    QDropEvent ignoreDropEvent(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
-    te.dropEvent(&ignoreDropEvent);
-    QCOMPARE(ignoreDropEvent.isAccepted(), false);
+      QDropEvent ignoreDropEvent(dragEnterPos, Qt::IgnoreAction, &textOnlyMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dropEvent(&ignoreDropEvent);
+      QCOMPARE(ignoreDropEvent.isAccepted(), false);
+    }
 
-    QMimeData urlsMimeData;
-    urlsMimeData.setText("2 urls");
-    QList<QUrl> urlsList{QUrl::fromLocalFile(mTDir.itemPath("file1.csv"))};
-    urlsMimeData.setUrls(urlsList);
-    QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
-    te.dragEnterEvent(&acceptDragEnter);
-    QCOMPARE(acceptDragEnter.isAccepted(), true);
+    const QString encFileFullPath{"File.enc.csv"};
+    const std::pair<bool, QString> failedPair{false, ""}, succeedPair{true, ""};
+    MOCKER(AccountFileHelper::ParseEncryptCsvFile)
+        .expects(exactly(2))  //
+        .will(returnValue(failedPair))
+        .then(returnValue(succeedPair));
 
-    QDropEvent acceptDropEvent(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
-    te.dropEvent(&acceptDropEvent);  // 1st: parse ok
-    QCOMPARE(acceptDropEvent.isAccepted(), false);
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), true);
+    // 两个url时, 不会接受drag/drop
+    {
+      QMimeData urlsMimeData;
+      urlsMimeData.setText("2 urls");
+      QList<QUrl> urlsList{QUrl::fromLocalFile(encFileFullPath), QUrl::fromLocalFile(encFileFullPath)};
+      urlsMimeData.setUrls(urlsList);
+      QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dragEnterEvent(&acceptDragEnter);
+      QCOMPARE(acceptDragEnter.isAccepted(), false);
 
-    // user fixed file content in "file1.csv"
+      QDropEvent acceptDropEvent(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dropEvent(&acceptDropEvent);
+      QCOMPARE(acceptDropEvent.isAccepted(), false);
+    }
 
-    te.dropEvent(&acceptDropEvent);  // 2nd: parse failed
-    QCOMPARE(acceptDropEvent.isAccepted(), true);
-    QCOMPARE(te.toPlainText().contains("failed", Qt::CaseInsensitive), false);
+    // 有1个url, dropEvent时走 ParseEncryptCsvFileContents
+    {
+      QMimeData urlsMimeData;
+      urlsMimeData.setText("1 urls");
+      QList<QUrl> urlsList{QUrl::fromLocalFile(encFileFullPath)};
+      urlsMimeData.setUrls(urlsList);
+
+      QDragEnterEvent acceptDragEnter(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dragEnterEvent(&acceptDragEnter);
+      QCOMPARE(acceptDragEnter.isAccepted(), true);
+
+      QDropEvent acceptDropEvent(dragEnterPos, Qt::IgnoreAction, &urlsMimeData, Qt::LeftButton, Qt::NoModifier);
+      te.dropEvent(&acceptDropEvent);  // 1st: mocker返回失败, 导致不接受
+      QCOMPARE(acceptDropEvent.isAccepted(), false);
+      QCOMPARE(te.toPlainText(), "Parse encrypt csv file[File.enc.csv] failed");
+
+      // user fixed file content in "file1.csv"
+      te.dropEvent(&acceptDropEvent);  // 2nd: mocker返回成功, 文件内容为空, 显示为空
+      QCOMPARE(acceptDropEvent.isAccepted(), true);
+      QCOMPARE(te.toPlainText(), "");
+    }
   }
 
   void test_initialization() {
-    CSVInputDialog dialog;
+    const QString aesKey{"RANDOM_AES_KEY"};
+
+    CSVInputDialog dialog{aesKey};
     QVERIFY(dialog.textEdit != nullptr);
     QVERIFY(dialog.buttonBox != nullptr);
     QVERIFY(dialog.mainLayout != nullptr);
-
-    QCOMPARE(dialog.textEdit->placeholderText(), "Enter your text here or drag encrypt csv file here...");
 
     QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Ok) != nullptr);
     QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Cancel) != nullptr);
     QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Help) != nullptr);
 
-    QVERIFY(!dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-
     QCOMPARE(dialog.mainLayout->count(), 2);
     QCOMPARE(dialog.mainLayout->itemAt(0)->widget(), dialog.textEdit);
     QCOMPARE(dialog.mainLayout->itemAt(1)->widget(), dialog.buttonBox);
 
-    QCOMPARE(dialog.windowTitle(), "Get record(s) from CSV input");
-    QVERIFY(!dialog.windowIcon().isNull());
-    dialog.sizeHint();
+    QCOMPARE(dialog.windowTitle(), "Append record(s) from CSV input");
   }
 
-  void test_raise_method() {
-    CSVInputDialog dialog;
-    dialog.setWindowTitle("Modified Title");
-    dialog.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+  void onParseRequest_ok() {
+    CSVInputDialog dialog{"RANDOM_AES_KEY"};
+    // empty contens
+    {
+      const QString emptyContents;
+      dialog.textEdit->setPlainText(emptyContents);
+      QVERIFY(dialog.onParseRequest());
+      QVERIFY(dialog.GetAppendAccounts().isEmpty());
+      QCOMPARE(dialog.windowTitle(), "0 line(s) accounts found.");
+    }
 
-    dialog.raise();
+    // all 3 lines ok
+    {
+      const QString validCSV {
+          "Email,Personal,user@example.com,pass123,Additional info\n"
+          "Social Media,Facebook,fb_user,fb_pass,Notes with\\, comma\\nand newline\n"
+          "Bank,Savings,bank_user,bank_pass,"
+      };
+      dialog.textEdit->setPlainText(validCSV);
+      QVERIFY(dialog.onParseRequest());
+      QCOMPARE(dialog.GetAppendAccounts().size(), 3);
+      QCOMPARE(dialog.windowTitle(), "3 line(s) accounts found.");
+    }
 
-    QCOMPARE(dialog.windowTitle(), "Get record(s) from CSV input");
-    QVERIFY(!dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-  }
+    // 1 in 3 lines failed
+    {
+      const QString partialCSV {
+          "Email,Personal,user@example.com,pass123,Additional info\n"
+          "Invalid Line\n"
+          "Bank,Savings,bank_user,bank_pass,"
+      };
+      dialog.textEdit->setPlainText(partialCSV);
+      QVERIFY(!dialog.onParseRequest());
+      QCOMPARE(dialog.GetAppendAccounts().size(), 2);
+      QCOMPARE(dialog.windowTitle(), "1 line(s) incomplete. Need fix at first");
+    }
 
-  void test_onHelpRequest_empty_input() {
-    CSVInputDialog dialog;
-    dialog.textEdit->setText("");
-    dialog.onHelpRequest();
-
-    QVERIFY(dialog.tempAccounts.isEmpty());
-    QCOMPARE(dialog.windowTitle(), "0/0 line(s) are ok. no unexpected line(s) find");
-    QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-  }
-
-  void test_onHelpRequest_valid_input() {
-    QString validCSV =
-        "Email,Personal,user@example.com,pass123,Additional info\n"
-        "Social Media,Facebook,fb_user,fb_pass,Notes with\\, comma\\nand newline\n"
-        "Bank,Savings,bank_user,bank_pass,";
-    CSVInputDialog dialog;
-    dialog.textEdit->setText(validCSV);
-    dialog.onHelpRequest();
-
-    QCOMPARE(dialog.tempAccounts.size(), 3);
-    QCOMPARE(dialog.tempAccounts[0].typeStr, "Email");
-    QCOMPARE(dialog.tempAccounts[1].accountStr, "fb_user");
-    QCOMPARE(dialog.tempAccounts[2].othersStr, "");
-
-    QCOMPARE(dialog.windowTitle(), "3/3 line(s) are ok. no unexpected line(s) find");
-    QVERIFY(dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-  }
-
-  void test_onHelpRequest_partial_valid_input() {
-    CSVInputDialog dialog;
-    QString partialCSV =
-        "Email,Personal,user@example.com,pass123,Additional info\n"
-        "Invalid Line\n"
-        "Bank,Savings,bank_user,bank_pass,";
-    dialog.textEdit->setText(partialCSV);
-    dialog.onHelpRequest();
-
-    QCOMPARE(dialog.tempAccounts.size(), 2);
-    QCOMPARE(dialog.tempAccounts[0].typeStr, "Email");
-    QCOMPARE(dialog.tempAccounts[1].typeStr, "Bank");
-
-    QCOMPARE(dialog.windowTitle(), "2/3 line(s) are ok. Others need fixed at first.");
-    QVERIFY(!dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-  }
-
-  void test_onHelpRequest_invalid_input() {
-    QString invalidCSV =
-        "Invalid Line 1\n"
-        "Invalid Line 2\n"
-        "Invalid Line 3";
-    CSVInputDialog dialog;
-    dialog.textEdit->setText(invalidCSV);
-    dialog.onHelpRequest();
-
-    QVERIFY(dialog.tempAccounts.isEmpty());
-
-    QCOMPARE(dialog.windowTitle(), "0/3 line(s) are ok. Others need fixed at first.");
-    QVERIFY(!dialog.buttonBox->button(QDialogButtonBox::Ok)->isEnabled());
-  }
-
-  void test_button_signals() {
-    CSVInputDialog dialog;
-
-    emit dialog.buttonBox->accepted();
-    emit dialog.buttonBox->rejected();
-    emit dialog.buttonBox->helpRequested();
+    // 3 in 3 lines failed
+    {
+      const QString invalidCSV {
+          "Invalid Line 1\n"
+          "Invalid Line 2\n"
+          "Invalid Line 3"
+      };
+      dialog.textEdit->setPlainText(invalidCSV);
+      QVERIFY(!dialog.onParseRequest());
+      QCOMPARE(dialog.GetAppendAccounts().size(), 0);
+      QCOMPARE(dialog.windowTitle(), "3 line(s) incomplete. Need fix at first");
+    }
   }
 };
 

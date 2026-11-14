@@ -6,169 +6,129 @@
 #include "EndToExposePrivateMember.h"
 
 #include "TDir.h"
-#include "SimpleAES.h"
-#include <openssl/err.h>
-#include <openssl/evp.h>
-// #include <openssl/provider.h>
-#include <openssl/rand.h>
+
+#include <mockcpp/mokc.h>
+#include <mockcpp/GlobalMockObject.h>
+#include <mockcpp/MockObject.h>
+#include <mockcpp/MockObjectHelper.h>
+USING_MOCKCPP_NS
 
 class AccountStorageTest : public PlainTestSuite {
   Q_OBJECT
  public:
-  TDir tDir;
-  QString mEncCsvFilePath{tDir.itemPath("accounts_test.csv")};
-  QString mPlainCsvFilePath{tDir.itemPath("exportedPlainAccounts_test.csv")};
+  TDir mTDir;
+  const QString mEncCsvFileName{"test_accounts.enc.csv"};
+  const QString mPlainCsvFileName{"accounts_export.csv"};
+  const QString mAES_KEY{"0123456789012345"};
  private slots:
   void initTestCase() {
-    QVERIFY(tDir.IsValid());  //
-    QVERIFY(!tDir.exists("accounts_test.csv"));
-    QVERIFY(!tDir.exists("exportedPlainAccounts_test.csv"));
-    AccountStorageMock::clear();
-
-    // register
-    ERR_load_crypto_strings();
-    OpenSSL_add_all_algorithms();
-
-    AccountStorageMock::GetFullEncCsvFilePathMock() = mEncCsvFilePath;
-    AccountStorageMock::GetFullPlainCsvFilePathMock() = mPlainCsvFilePath;
-    QVERIFY(AccountStorage::IsAccountCSVFileInexistOrEmpty());
-
-    // 初始化 AES 密钥
-    SimpleAES::InitInst("TestKey1234567890");  // 16字符密钥
+    QVERIFY(mTDir.IsValid());
   }
 
-  void cleanupTestCase() {
-    // 清理 OpenSSL
-    EVP_cleanup();
-    ERR_free_strings();
-
-    AccountStorageMock::clear();
+  void init() {  //
+    GlobalMockObject::reset();
+  }
+  void cleanup() {  //
+    GlobalMockObject::verify();
   }
 
-  void test_account_storage_operations() {
-    // 1. 创建初始账户数据
-    AccountStorage storage;
-    QVector<AccountInfo> initialAccounts{
-        {"Email", "Personal", "user@example.com", "pass123", "Additional info"},         //
-        {"Social", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline"},  //
-        {"Bank", "Savings", "bank_user", "bank_pass", ""}                                //
-    };
-    storage.mAccounts = initialAccounts;
+  void main_functions_ok() {
+    // 允许默认构造
+    AccountStorage temp;
+    QVERIFY(!temp.IsValid());
 
-    // 2. 验证初始状态
-    QCOMPARE(storage.size(), 3);
-    QCOMPARE(storage[0].typeStr, "Email");
-    QCOMPARE(storage[1].accountStr, "fb_user");
-    QCOMPARE(storage[2].othersStr, "");
+    // 1. 允许注册
+    QVERIFY(!mTDir.exists(mEncCsvFileName));
+    AccountStorage initAnEncFile{mTDir.itemPath(mEncCsvFileName), mAES_KEY};
+    const QList<AccountInfo> emptyListBackUp = initAnEncFile.mAccounts;
+    QVERIFY(emptyListBackUp.isEmpty());
 
-    // 3. 测试保存和加载（加密）
-    QVERIFY(storage.SaveAccounts(true));  // 加密保存
-    QVERIFY(QFile::exists(mEncCsvFilePath));
+    QVERIFY(initAnEncFile.IsValid());
+    QVERIFY(initAnEncFile.empty());
+    QCOMPARE(initAnEncFile.size(), 0);
+    QCOMPARE(initAnEncFile.toPlainCsv(), "");
+    QVERIFY(!initAnEncFile.markRowRangeDeleted(0, 20, true)); // out-of-range not crash
+    QVERIFY(!initAnEncFile.clearRowRangeModified(0, 20)); // out-of-range not crash
 
-    AccountStorage loadedStorage;
-    QVERIFY(loadedStorage.LoadAccounts());
-    QCOMPARE(loadedStorage.size(), 3);
-    QCOMPARE(loadedStorage[0].typeStr, "Email");
-    QCOMPARE(loadedStorage[1].accountStr, "fb_user");
-    QCOMPARE(loadedStorage[2].othersStr, "");
-    loadedStorage[-999];  // will not crash down
+    // 不真实写入文件, 检查转调函数入参就行, 转调函数的正确性由专门的测试用例验证
+    MOCKER(AccountFileHelper::CommitChangesToEncryptedCsvFile).expects(exactly(2))
+        .with(eq(initAnEncFile.mAccounts), eq(mTDir.itemPath(mEncCsvFileName)), eq(mAES_KEY)).will(returnValue(true));
+    MOCKER(AccountFileHelper::ExportAccountsToPlainCsvFile).expects(exactly(2))
+        .with(eq(initAnEncFile.mAccounts), eq(mTDir.itemPath(mPlainCsvFileName))).will(returnValue(true));
+    QVERIFY(initAnEncFile.CommitChangesToEncryptedCsvFile());
+    QVERIFY(initAnEncFile.ExportToPlainCsvFile());
 
-    const AccountStorage* pLoadedStorage = &loadedStorage;
-    QCOMPARE((*pLoadedStorage)[0].typeStr, "Email");
-    QCOMPARE((*pLoadedStorage)[1].accountStr, "fb_user");
-    QCOMPARE((*pLoadedStorage)[2].othersStr, "");
-    (*pLoadedStorage)[-999];  // will not crash down
+    const AccountInfo emptyElement;
+    const AccountInfo acc2{"game", "MineCraft", "DiamondTuber", "123", "..."};
+    initAnEncFile.append(acc2);
+    // acc
+    QVERIFY(initAnEncFile.AppendNRows(2));
+    // acc, Empty, Empty
+    QVERIFY(initAnEncFile.InsertNRows(0, 2));
+    // Empty, Empty, acc2, Empty, Empty
+    const AccountInfo acc5{"game", "Stardew Valley", "BurningFire", "123", "..."};
+    const AccountInfo acc6{"game", "Terraria", "DancingFire", "123", "......"};
+    QList<AccountInfo> parseFromInput{acc5, acc6};
+    initAnEncFile += parseFromInput;
+    // Empty, Empty, acc2, Empty, Empty, acc5, acc6
 
-    // 4. 测试保存和加载（明文）
-    QVERIFY(storage.SaveAccounts(false));  // 明文保存
-    QVERIFY(QFile::exists(mPlainCsvFilePath));
+    QVERIFY(!initAnEncFile.empty());
+    QCOMPARE(initAnEncFile.size(), 7);
+    QCOMPARE(initAnEncFile[0], emptyElement);
+    QCOMPARE(initAnEncFile[1], emptyElement);
+    QCOMPARE(initAnEncFile[2], acc2);
+    QCOMPARE(initAnEncFile[3], emptyElement);
+    QCOMPARE(initAnEncFile[4], emptyElement);
+    QCOMPARE(initAnEncFile[5], acc5);
+    QCOMPARE(initAnEncFile[6], acc6);
 
-    // 读取明文文件内容
-    QFile plainFile(mPlainCsvFilePath);
-    QVERIFY(plainFile.open(QIODevice::ReadOnly | QIODevice::Text));
-    QString plainContent = plainFile.readAll();
-    plainFile.close();
+    initAnEncFile[2].SetDeleted(true);
+    initAnEncFile[5].SetDeleted(true);
+    initAnEncFile[6].SetDeleted(true);
 
-    // 验证明文内容
-    QVERIFY(plainContent.contains("Email,Personal,user@example.com,pass123,Additional info"));
-    QVERIFY(plainContent.contains("Social,Facebook,fb_user,fb_pass,Notes with\\, comma\\nand newline"));
-    QVERIFY(plainContent.contains("Bank,Savings,bank_user,bank_pass,"));
+    initAnEncFile[2].SetModified(true);
+    initAnEncFile[5].SetModified(true);
+    initAnEncFile[6].SetModified(true);
 
-    // 5. 测试修改标志
-    QVERIFY(!storage.IsDataDirty());
-    storage.SetListModified();
-    QVERIFY(storage.IsDataDirty());
-    storage.AfterSave();
-    QVERIFY(!storage.IsDataDirty());
+    QVERIFY(!initAnEncFile.markRowRangeDeleted(-5, 20, false));                  // out-of-range
+    QVERIFY(initAnEncFile.markRowRangeDeleted(0, initAnEncFile.size(), true));   // ok 全部标记为删除
+    QVERIFY(initAnEncFile[0].IsDeleted());
+    QVERIFY(initAnEncFile[1].IsDeleted());
+    QVERIFY(initAnEncFile[2].IsDeleted());
+    QVERIFY(initAnEncFile[3].IsDeleted());
+    QVERIFY(initAnEncFile[4].IsDeleted());
+    QVERIFY(initAnEncFile[5].IsDeleted());
+    QVERIFY(initAnEncFile[6].IsDeleted());
+    QVERIFY(initAnEncFile.markRowRangeDeleted(0, initAnEncFile.size(), false));  // 全部去除删除标记
+    QVERIFY(!initAnEncFile[0].IsDeleted());
+    QVERIFY(!initAnEncFile[1].IsDeleted());
+    QVERIFY(!initAnEncFile[2].IsDeleted());
+    QVERIFY(!initAnEncFile[3].IsDeleted());
+    QVERIFY(!initAnEncFile[4].IsDeleted());
+    QVERIFY(!initAnEncFile[5].IsDeleted());
+    QVERIFY(!initAnEncFile[6].IsDeleted());
 
-    // 6. 测试账户修改标志
-    storage[0].SetDetailModified();
-    QVERIFY(storage.IsDataDirty());
-    storage.ClearAllDetailModified();
-    QVERIFY(!storage.IsDataDirty());
-    QVERIFY(!storage[0].IsDetailModified());
+    QVERIFY(!initAnEncFile.clearRowRangeModified(-5, 20));                    // out-of-range
+    QVERIFY(initAnEncFile.clearRowRangeModified(0, initAnEncFile.size()));    // ok
+    QVERIFY(!initAnEncFile[2].IsModified());
+    QVERIFY(!initAnEncFile[5].IsModified());
+    QVERIFY(!initAnEncFile[6].IsModified());
 
-    // 7. 测试添加和删除账户
-    storage.AppendNRows(1);
-    QCOMPARE(storage.size(), 4);
-    QCOMPARE(storage[3].typeStr, "");  // 新账户为空
+    // 解析失败, 拒绝写入
+    initAnEncFile.SetEncFileFullPath("Inexist/Path/To/accounts.enc.csv");
+    QVERIFY(!initAnEncFile.IsValid());
+    QVERIFY(!initAnEncFile.CommitChangesToEncryptedCsvFile());
+    QVERIFY(!initAnEncFile.ExportToPlainCsvFile());
 
-    std::set<int> rowsToRemove = {1, 3, 999};  // 删除第1和第3行, 999行为无效行
-    int removedCount = storage.RemoveIndexes(rowsToRemove);
-    QCOMPARE(removedCount, 2);
-    QCOMPARE(storage.size(), 2);
-    QCOMPARE(storage[0].typeStr, "Email");
-    QCOMPARE(storage[1].typeStr, "Bank");
+    // 修改回正确的文件
+    initAnEncFile.SetEncFileFullPath(mTDir.itemPath(mEncCsvFileName));
+    initAnEncFile.mAccounts = emptyListBackUp; // 恢复列表, 因为MOCKER中的with检查入参时用的是值拷贝,
+    QVERIFY(initAnEncFile.IsValid());
+    QVERIFY(initAnEncFile.CommitChangesToEncryptedCsvFile());
+    QVERIFY(initAnEncFile.ExportToPlainCsvFile());
 
-    // 8. 测试插入账户
-    QVERIFY(!storage.InsertNRows(0, -999));
-    QVERIFY(storage.InsertNRows(1, 2));  // 在第1行后插入2行
-    QCOMPARE(storage.size(), 4);
-    QCOMPARE(storage[0].typeStr, "Email");
-    QCOMPARE(storage[1].typeStr, "");  // 新插入的空账户
-    QCOMPARE(storage[2].typeStr, "");  // 新插入的空账户
-    QCOMPARE(storage[3].typeStr, "Bank");
-
-    // 9. 测试边界索引访问
-    const AccountInfo& invalid1 = storage[-1];
-    QVERIFY(invalid1.typeStr.isEmpty());
-
-    const AccountInfo& invalid2 = storage[100];
-    QVERIFY(invalid2.typeStr.isEmpty());
-
-    // 10. GetExportCSVRecords
-    QString exportContent = storage.GetExportCSVRecords();
-    QVERIFY(exportContent.contains("Email,Personal,user@example.com,pass123,Additional info"));
-    QVERIFY(exportContent.contains("Bank,Savings,bank_user,bank_pass,"));
-
-    {
-      // insert at -1 =>insert at front
-      QVERIFY(storage.InsertNRows(-1, 1));
-      QCOMPARE(storage.size(), 5);
-      // insert at 999 => insert at back
-      QVERIFY(storage.InsertNRows(999, 1));
-      QCOMPARE(storage.size(), 6);
-    }
-
-    // 11. 测试从字符串加载账户
-    int nonEmptyLines = 0;
-    QVector<AccountInfo> accountsFromString = AccountStorage::GetAccountsFromPlainString(
-        "Type1,Name1,Acc1,Pwd1,Other1\n"
-        "Type2,Name2,Acc2,Pwd2,Other2",
-        &nonEmptyLines);
-    QCOMPARE(accountsFromString.size(), 2);
-    QCOMPARE(nonEmptyLines, 2);
-    QCOMPARE(accountsFromString[0].typeStr, "Type1");
-    QCOMPARE(accountsFromString[1].accountStr, "Acc2");
-
-    // 12. 测试无效CSV行处理
-    QVector<AccountInfo> invalidAccounts = AccountStorage::GetAccountsFromPlainString(
-        "InvalidLine\n"
-        "Type,Name,Acc,Pwd,Other\n"
-        "ShortLine",
-        nullptr);
-    QCOMPARE(invalidAccounts.size(), 1);  // 只有一行有效
-    QCOMPARE(invalidAccounts[0].typeStr, "Type");
+    initAnEncFile.SetAesKey("AnyAesIsAccepted"); // 现在文件还是空的, 可以修改AesKey
+    QVERIFY(initAnEncFile.IsValid());
   }
 };
 

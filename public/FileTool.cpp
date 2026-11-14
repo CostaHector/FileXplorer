@@ -11,6 +11,7 @@
 #include <QAction>
 #include <QDir>
 #include <QFile>
+#include <QSaveFile>
 #include <QFileDialog>
 #include <QCoreApplication>
 #include <QApplication>
@@ -26,7 +27,7 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   }
 
   QFile logFile{logFilePath};
-  if (!logFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+  if (!logFile.open(QIODevice::ReadOnly)) { // 保持换行符号读取, 不可使用Text, 否则会将文件中的换行符统一替换为\n
     LOG_W("Cannot Open file[%s]: %s", qPrintable(logFile.fileName()), qPrintable(logFile.errorString()));
     return "";
   }
@@ -58,7 +59,7 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines) {
   return buffer;
 }
 
-QString StringTextReader(const QString& textPath, bool* bReadOk, bool bToLF) {
+QString StringTextReader(const QString& textPath, bool* bReadOk) {
   QFile file(textPath);
   if (!file.exists()) {
     LOG_D("File[%s] not found", qPrintable(textPath));
@@ -67,7 +68,7 @@ QString StringTextReader(const QString& textPath, bool* bReadOk, bool bToLF) {
     }
     return "";
   }
-  if (!file.open(QIODevice::ReadOnly)) {
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     LOG_D("File[%s] open for read failed", qPrintable(textPath));
     if (bReadOk != nullptr) {
       *bReadOk = false;
@@ -77,9 +78,6 @@ QString StringTextReader(const QString& textPath, bool* bReadOk, bool bToLF) {
   QTextStream stream(&file);
   stream.setCodec("UTF-8");
   QString contents(stream.readAll());
-  if (bToLF) {
-    contents.replace("\r\n", "\n");
-  }
   file.close();
   if (bReadOk != nullptr) {
     *bReadOk = true;
@@ -110,16 +108,55 @@ QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk) {
 
 bool StringTextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
   QFile fi{fileName};
-  if (!fi.open(openMode)) {
+  if (!fi.open(openMode)) { // "\n" will be replace with "\r\n" in windows if QIODevice::OpenMode::Text
     LOG_W("Open [%s] to write failed. mode[%d]", qPrintable(fileName), (int) openMode);
     return false;
   }
 
-  QTextStream stream(&fi); // "\n" will be replace with "\r\n"
+  QTextStream stream(&fi);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  stream.setEncoding(QStringConverter::Utf8);
+#else
   stream.setCodec("UTF-8");
+#endif
   stream << content;
   stream.flush();
   fi.close();
+  return true;
+}
+
+bool CreateABackupFile(const QString& fileName) {
+  if (!QFile::exists(fileName)) {
+    LOG_D("No need backup. source file[%s] not exist", qPrintable(fileName));
+    return true;
+  }
+  QString backupFileName = fileName;
+  backupFileName += QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+  return QFile::copy(fileName, backupFileName);
+}
+
+bool AtomicTextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode) {
+  QSaveFile fi{fileName};
+  // QSaveFile::open 会在同目录下建临时文件，不会 truncate 原文件
+  if (!fi.open(openMode)) {
+    LOG_W("Open [%s] for atomic write failed: %s", qPrintable(fileName), qPrintable(fi.errorString()));
+    return false;
+  }
+
+  // 编码： QSaveFile 不能用 QTextStream + setCodec 了吗？可以，但直接 toUtf8 更简单
+  const QByteArray bytes = content.toUtf8();
+  const qint64 written = fi.write(bytes);
+  if (written != bytes.size()) {
+    LOG_W("Partial write [%s]: %lld/%lld (%s)", qPrintable(fileName), static_cast<long long>(written), static_cast<long long>(bytes.size()), qPrintable(fi.errorString()));
+    fi.cancelWriting();          // 删掉临时文件，原文件保持不动
+    return false;
+  }
+
+  // commit 内部流程：flush → fsync(fd) → 原子 rename → 权限/owner 从原文件复制
+  if (!fi.commit()) {
+    LOG_W("Commit [%s] failed: %s", qPrintable(fileName), qPrintable(fi.errorString()));
+    return false;                // 原文件仍然完好
+  }
   return true;
 }
 
@@ -130,7 +167,11 @@ bool ByteArrayTextWriter(const QString& fileName, const QByteArray& ba) {
     return false;
   }
   QTextStream stream(&fi);
-  stream.setCodec("UTF-8"); // must set here
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  stream.setEncoding(QStringConverter::Utf8);
+#else
+  stream.setCodec("UTF-8");
+#endif
   stream << ba;
   stream.flush();
   fi.close();

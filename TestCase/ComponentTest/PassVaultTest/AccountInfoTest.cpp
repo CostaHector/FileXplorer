@@ -1,92 +1,112 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include "BeginToExposePrivateMember.h"
 #include "AccountInfo.h"
-#include "EndToExposePrivateMember.h"
 
 class AccountInfoTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void test_constructor_and_properties() {
+public:
+private slots:
+  void constructor_properties_swap_ok() {
     // 测试构造函数
     AccountInfo acc("Email", "Personal", "user@example.com", "password123", "Additional info");
-
-    QCOMPARE(acc.typeStr, "Email");
-    QCOMPARE(acc.nameStr, "Personal");
-    QCOMPARE(acc.accountStr, "user@example.com");
-    QCOMPARE(acc.pwdStr, "password123");
-    QCOMPARE(acc.othersStr, "Additional info");
+    {
+      QCOMPARE(acc.typeStr, "Email");
+      QCOMPARE(acc.nameStr, "Personal");
+      QCOMPARE(acc.accountStr, "user@example.com");
+      QCOMPARE(acc.pwdStr, "password123");
+      QCOMPARE(acc.othersStr, "Additional info");
+      QVERIFY(!acc.IsModified());
+      QVERIFY(!acc.IsDeleted());
+    }
+    const AccountInfo acc_bkp{acc};
 
     // 测试默认构造函数
     AccountInfo defaultAcc;
-    QVERIFY(defaultAcc.typeStr.isEmpty());
-    QVERIFY(defaultAcc.nameStr.isEmpty());
-    QVERIFY(defaultAcc.accountStr.isEmpty());
-    QVERIFY(defaultAcc.pwdStr.isEmpty());
-    QVERIFY(defaultAcc.othersStr.isEmpty());
+    {
+      QVERIFY(defaultAcc.typeStr.isEmpty());
+      QVERIFY(defaultAcc.nameStr.isEmpty());
+      QVERIFY(defaultAcc.accountStr.isEmpty());
+      QVERIFY(defaultAcc.pwdStr.isEmpty());
+      QVERIFY(defaultAcc.othersStr.isEmpty());
+      QVERIFY(!defaultAcc.IsModified());
+      QVERIFY(!defaultAcc.IsDeleted());
+      defaultAcc.SetModified(true);
+      defaultAcc.SetDeleted(true);
+    }
+    const AccountInfo defaultAccBkp{defaultAcc};
+
+    defaultAcc.swap(acc);
+    QCOMPARE(defaultAcc, acc_bkp);
+    QCOMPARE(acc, defaultAccBkp);
+
+    QVERIFY( AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE)));
+    QVERIFY( AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::NAME_STR_ROLE)));
+    QVERIFY( AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::ACCOUNT_STR_ROLE)));
+    QVERIFY( AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::PWD_STR_ROLE)));
+    QVERIFY( AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::OTHERS_STR_ROLE)));
+    QVERIFY(!AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE)));
+    QVERIFY(!AccountInfo::IsColumnEditableByUser(AccountInfo::Role2Column(AccountInfo::Role::IS_DELETED_ROLE)));
+
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE), 0);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::NAME_STR_ROLE), 1);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::ACCOUNT_STR_ROLE), 2);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::PWD_STR_ROLE), 3);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::OTHERS_STR_ROLE), 4);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE), 5);
+    QCOMPARE(AccountInfo::Role2Column(AccountInfo::Role::IS_DELETED_ROLE), 6);
   }
 
-  void test_keyword_search() {
-    AccountInfo acc("Email", "Personal Account", "user@example.com", "securePwd", "Additional notes");
+  void keyword_search_ok() {
+    const AccountInfo acc("Email", "Personal Account", "user@example.com", "securePwd", "Additional notes");
 
     // 测试空关键字
     QVERIFY(acc.IsContainsKeyWords(""));
 
-    // 测试类型匹配
-    QVERIFY(acc.IsContainsKeyWords("email"));
-    QVERIFY(acc.IsContainsKeyWords("Email"));
+    // 匹配
+    {
+      QVERIFY(acc.IsContainsKeyWords("email"));
+      QVERIFY(acc.IsContainsKeyWords("Email"));
 
-    // 测试名称匹配
-    QVERIFY(acc.IsContainsKeyWords("personal"));
-    QVERIFY(acc.IsContainsKeyWords("Account"));
+      QVERIFY(acc.IsContainsKeyWords("personal"));
+      QVERIFY(acc.IsContainsKeyWords("Account"));
 
-    // 测试账号匹配
-    QVERIFY(acc.IsContainsKeyWords("user@"));
-    QVERIFY(acc.IsContainsKeyWords("example.com"));
+      QVERIFY(acc.IsContainsKeyWords("user@"));
+      QVERIFY(acc.IsContainsKeyWords("example.com"));
 
-    // 测试密码匹配
-    QVERIFY(acc.IsContainsKeyWords("secure"));
-    QVERIFY(acc.IsContainsKeyWords("Pwd"));
+      QVERIFY(acc.IsContainsKeyWords("secure"));
+      QVERIFY(acc.IsContainsKeyWords("Pwd"));
 
-    // 测试其他信息匹配
-    QVERIFY(acc.IsContainsKeyWords("notes"));
-    QVERIFY(acc.IsContainsKeyWords("Additional"));
+      QVERIFY(acc.IsContainsKeyWords("notes"));
+      QVERIFY(acc.IsContainsKeyWords("Additional"));
+    }
 
-    // 测试不匹配情况
-    QVERIFY(!acc.IsContainsKeyWords("facebook"));
-    QVERIFY(!acc.IsContainsKeyWords("123456"));
+    // 不匹配
+    {
+      QVERIFY(!acc.IsContainsKeyWords("facebook"));
+      QVERIFY(!acc.IsContainsKeyWords("123456"));
+    }
 
-    // 测试部分匹配
-    QVERIFY(acc.IsContainsKeyWords("per"));
-    QVERIFY(acc.IsContainsKeyWords("com"));
+    // 部分匹配
+    {
+      QVERIFY(acc.IsContainsKeyWords("per"));
+      QVERIFY(acc.IsContainsKeyWords("com"));
+    }
   }
 
-  void test_csv_conversion() {
-    // 创建测试数据（包含特殊字符）
-    AccountInfo original("Social Media", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline");
+  void csv_conversion_conversion() {
+    const AccountInfo original("Social Media", "Facebook", "fb_user", "fb_pass", "Notes with, comma\nand newline");
 
-    // 转换为CSV
-    QString csvLine = original.toCsvLine();
-
-    // 验证CSV格式
-    QString expected = "Social Media,Facebook,fb_user,fb_pass,Notes with\\, comma\\nand newline";
+    const QString expected = "Social Media,Facebook,fb_user,fb_pass,Notes with\\, comma\\nand newline";
+    const QString csvLine = original.toCsvLine();
     QCOMPARE(csvLine, expected);
 
-    // 从CSV解析
     AccountInfo parsed;
     QVERIFY(AccountInfo::FromCsvLine(csvLine, parsed));
-
-    // 验证解析结果
-    QCOMPARE(parsed.typeStr, original.typeStr);
-    QCOMPARE(parsed.nameStr, original.nameStr);
-    QCOMPARE(parsed.accountStr, original.accountStr);
-    QCOMPARE(parsed.pwdStr, original.pwdStr);
-    QCOMPARE(parsed.othersStr, original.othersStr);
+    QCOMPARE(parsed, original);
   }
 
-  void test_csv_edge_cases() {
+  void csv_border_cases_ok() {
     // 测试空值
     AccountInfo empty("", "", "", "", "");
     QString emptyCsv = empty.toCsvLine();
@@ -117,45 +137,20 @@ class AccountInfoTest : public PlainTestSuite {
     QVERIFY(!AccountInfo::FromCsvLine("", invalid));                             // 空行
   }
 
-  void test_modification_flag() {
+  void modified_deleted_flag__ok() {
     AccountInfo acc;
 
-    // 初始状态
-    QVERIFY(!acc.IsDetailModified());
+    QVERIFY(!acc.IsModified());
+    acc.SetModified(true);
+    QVERIFY(acc.IsModified());
+    acc.SetModified(false);
+    QVERIFY(!acc.IsModified());
 
-    // 设置修改标志
-    acc.SetDetailModified();
-    QVERIFY(acc.IsDetailModified());
-
-    // 清除修改标志
-    acc.ClearDetailModified();
-    QVERIFY(!acc.IsDetailModified());
-
-    // 多次设置
-    acc.SetDetailModified();
-    acc.SetDetailModified();
-    QVERIFY(acc.IsDetailModified());
-
-    acc.ClearDetailModified();
-    QVERIFY(!acc.IsDetailModified());
-  }
-
-  void test_const_correctness() {
-    // 测试const方法
-    const AccountInfo constAcc("Type", "Name", "Account", "Password", "Others");
-
-    // 调用const方法
-    QVERIFY(constAcc.IsContainsKeyWords("Type"));
-    QString csv = constAcc.toCsvLine();
-    QVERIFY(!csv.isEmpty());
-    QVERIFY(!constAcc.IsDetailModified());
-
-    // 修改标志方法有const限定，但实际修改mutable成员
-    constAcc.SetDetailModified();
-    QVERIFY(constAcc.IsDetailModified());
-
-    constAcc.ClearDetailModified();
-    QVERIFY(!constAcc.IsDetailModified());
+    QVERIFY(!acc.IsDeleted());
+    acc.SetDeleted(true);
+    QVERIFY(acc.IsDeleted());
+    acc.SetDeleted(false);
+    QVERIFY(!acc.IsDeleted());
   }
 };
 

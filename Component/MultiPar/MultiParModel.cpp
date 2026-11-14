@@ -58,7 +58,7 @@ QVariant MultiParModel::data(const QModelIndex& index, int role) const {
             QIcon{":img/SAVED"},             // Par2StatusE::ALL_FILES_COMPLETE
             QIcon{":img/REPAIR"},            // Par2StatusE::READY_TO_REPAIR
             QIcon{":img/RENAME"},            // Par2StatusE::READY_TO_RENAME
-            QIcon{":img/NOT_SAVED"},         // Par2StatusE::NEED_MORE_TO_REPAIR
+            QIcon{":img/SAVED_NOT"},         // Par2StatusE::NEED_MORE_TO_REPAIR
             QIcon{":img/REFRESH_THIS_PATH"}, // Par2StatusE::NEED_VERIFY_AGAIN
             QIcon{":img/QUESTION"},          // Par2StatusE::CANNOT_VERIFY
         };

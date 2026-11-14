@@ -179,7 +179,7 @@ int AdvanceSearchModel::RecycleSomething(const QModelIndexList& recycleIndexes) 
   }
   QList<int> uniqueAscRows = ModelTools::GetSortedUniqueRowsFromIndexes(recycleIndexes);
   for (const auto& pr: ModelTools::MergeList2SectionsRange(uniqueAscRows)) {
-    emit dataChanged(index(pr.first, backCol), index(pr.first, backCol), {Qt::ForegroundRole});
+    emit dataChanged(index(pr.first, backCol), index(pr.second, backCol), {Qt::ForegroundRole});
   }
   return uniqueAscRows.size();
 }

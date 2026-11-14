@@ -14,11 +14,7 @@ class ConfigsMgr : public DialogWithSearchLine {
  public:
   explicit ConfigsMgr(QWidget* parent = nullptr);
   void onRecheck();
-
   bool onEditPreferenceSetting() const;
-
- protected:
-  void hideEvent(QHideEvent* event) override;
 
  private:
   void subscribe();

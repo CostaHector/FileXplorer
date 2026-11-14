@@ -2,19 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
-    <name>AccountDetailView</name>
+    <name>AccountCardEditor</name>
     <message>
-        <location filename="../../Component/PassVault/AccountDetailView.cpp" line="+22"/>
-        <source>Recover</source>
-        <translation>恢复</translation>
+        <location filename="../../Component/PassVault/AccountCardEditor.cpp" line="+16"/>
+        <source>Revert</source>
+        <translation>重置</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Apply</source>
-        <translation>应用</translation>
+        <location line="+1"/>
+        <source>Stage</source>
+        <translation>暂存</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+7"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
@@ -30,7 +30,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Pwd</source>
+        <source>Password</source>
         <translation>密钥</translation>
     </message>
     <message>
@@ -38,10 +38,41 @@
         <source>Others</source>
         <translation>其它</translation>
     </message>
+</context>
+<context>
+    <name>AccountFileAndAESKey</name>
     <message>
-        <location line="+7"/>
-        <source>Detail View</source>
-        <translation>详细内容</translation>
+        <location filename="../../Component/PassVault/AccountFileAndAESKey.cpp" line="+24"/>
+        <source>Save Key</source>
+        <translation>保存密钥</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Encrypt File:</source>
+        <translation>指定密文路径:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>AES Key:</source>
+        <translation>AES密钥:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Confirm Key:</source>
+        <translation>确认密钥:</translation>
+    </message>
+</context>
+<context>
+    <name>AccountTableView</name>
+    <message>
+        <location filename="../../Component/PassVault/AccountTableView.cpp" line="+16"/>
+        <source>Insert a row</source>
+        <translation>插入一行</translation>
     </message>
 </context>
 <context>
@@ -88,7 +119,7 @@
         <translation>正则表达式状态</translation>
     </message>
     <message>
-        <location line="+110"/>
+        <location line="+103"/>
         <source>See commands...</source>
         <translation>查看命令...</translation>
     </message>
@@ -167,6 +198,19 @@
         <location line="+5"/>
         <source>Copy All Selected Text</source>
         <translation>复制所有选中文本</translation>
+    </message>
+</context>
+<context>
+    <name>CSVInputDialog</name>
+    <message>
+        <location filename="../../Component/PassVault/CSVInputDialog.cpp" line="+100"/>
+        <source>Accept and Quit</source>
+        <translation>接受并退出</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Parse</source>
+        <translation>解析</translation>
     </message>
 </context>
 <context>
@@ -260,7 +304,7 @@
 <context>
     <name>CustomListView</name>
     <message>
-        <location filename="../../View/CustomListView.cpp" line="+30"/>
+        <location filename="../../View/CustomListView.cpp" line="+31"/>
         <source>Icon size</source>
         <translation>图标大小</translation>
     </message>
@@ -303,7 +347,7 @@
 <context>
     <name>CustomTableView</name>
     <message>
-        <location filename="../../View/CustomTableView.cpp" line="+40"/>
+        <location filename="../../View/CustomTableView.cpp" line="+41"/>
         <source>Text elide mode</source>
         <translation>文本省略模式</translation>
     </message>
@@ -361,7 +405,7 @@
 <context>
     <name>CustomTreeView</name>
     <message>
-        <location filename="../../View/CustomTreeView.cpp" line="+40"/>
+        <location filename="../../View/CustomTreeView.cpp" line="+42"/>
         <source>Expand All</source>
         <translation>展开所有节点</translation>
     </message>
@@ -422,7 +466,7 @@
 <context>
     <name>DragDropTextEdit</name>
     <message>
-        <location filename="../../Component/PassVault/CSVInputDialog.cpp" line="+20"/>
+        <location filename="../../Component/PassVault/CSVInputDialog.cpp" line="-84"/>
         <source>select encrypt CSV file</source>
         <translation>选择已加密CSV文件</translation>
     </message>
@@ -473,7 +517,7 @@
 <context>
     <name>DuplicateImagesTable</name>
     <message>
-        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+25"/>
+        <location filename="../../Component/DupImages/DuplicateImagesTable.cpp" line="+24"/>
         <source>Select Same Hash Rows(Ignore first one)</source>
         <translation>选中相同哈希行(保留首个)</translation>
     </message>
@@ -494,7 +538,7 @@
 <context>
     <name>FavoritesTreeView</name>
     <message>
-        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+30"/>
+        <location filename="../../Component/Navigation/FavoritesTreeView.cpp" line="+29"/>
         <source>Sort</source>
         <translation>排序</translation>
     </message>
@@ -562,7 +606,7 @@
 <context>
     <name>FileImageViewer</name>
     <message>
-        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+207"/>
+        <location filename="../../Component/ImageView/FileImageViewer.cpp" line="+213"/>
         <source>Open in system application</source>
         <translation>用系统应用打开</translation>
     </message>
@@ -580,7 +624,7 @@
 <context>
     <name>FileLeafActions</name>
     <message>
-        <location filename="../../Actions/FileLeafAction.cpp" line="+10"/>
+        <location filename="../../Actions/FileLeafAction.cpp" line="+14"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -591,6 +635,11 @@
     </message>
     <message>
         <location line="+6"/>
+        <source>Password Book Server</source>
+        <translation>密码服务端</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
@@ -698,7 +747,7 @@
         <translation>永久删除</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+23"/>
         <source>Merged to Front</source>
         <translation>合并到前一个</translation>
     </message>
@@ -743,7 +792,7 @@
         <translation>删除低分辨率图片</translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-53"/>
         <source>Unlock Occupied Files</source>
         <translation>解除占用文件</translation>
     </message>
@@ -763,12 +812,17 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-318"/>
+        <location line="-309"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-9"/>
+        <source>Show recycle confirmation</source>
+        <translation>回收前确认</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Redo</source>
         <translation>撤销</translation>
     </message>
@@ -925,7 +979,7 @@
 <context>
     <name>HarTableView</name>
     <message>
-        <location filename="../../Component/Har/HarTableView.cpp" line="+23"/>
+        <location filename="../../Component/Har/HarTableView.cpp" line="+22"/>
         <source>Export Selections to</source>
         <translation>导出选中</translation>
     </message>
@@ -1293,37 +1347,6 @@
     </message>
 </context>
 <context>
-    <name>LoginQryWidget</name>
-    <message>
-        <location filename="../../Component/PassVault/LoginQryWidget.cpp" line="+240"/>
-        <source>Login</source>
-        <translation>登录</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Register</source>
-        <translation>注册</translation>
-    </message>
-</context>
-<context>
-    <name>LoginWid</name>
-    <message>
-        <location line="-198"/>
-        <source>Remember key</source>
-        <translation>记住密码</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Log in automatically</source>
-        <translation>自动登录</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Decryption Key</source>
-        <translation>密钥</translation>
-    </message>
-</context>
-<context>
     <name>MD5Window</name>
     <message>
         <location filename="../../Component/MD5Window.cpp" line="+27"/>
@@ -1591,7 +1614,7 @@
 <context>
     <name>MultiParView</name>
     <message>
-        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+23"/>
+        <location filename="../../Component/MultiPar/MultiParView.cpp" line="+22"/>
         <source>Repair Broken File</source>
         <translation>修复损坏文件</translation>
     </message>
@@ -1695,6 +1718,59 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
 </context>
 <context>
+    <name>PasswordBook</name>
+    <message>
+        <location filename="../../Component/PassVault/PasswordBook.cpp" line="+61"/>
+        <source>List</source>
+        <translation>列表模式</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Table</source>
+        <translation>表格模式</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Append Row</source>
+        <translation>尾后追加一行</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Mark Deleted</source>
+        <translation>标记删除</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Restore Rows</source>
+        <translation>恢复删除</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Import from CSV</source>
+        <translation>从CSV中导入</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Preview Plain CSV</source>
+        <translation>预览明文CSV</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Export as Plain CSV</source>
+        <translation>导出明文CSV</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Open Containing Folder</source>
+        <translation>打开所在文件夹</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Save Changes</source>
+        <translation>写入变更</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceActions</name>
     <message>
         <location filename="../../Actions/PreferenceActions.cpp" line="+46"/>
@@ -1779,62 +1855,9 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
     </message>
 </context>
 <context>
-    <name>PwdTableEditActions</name>
-    <message>
-        <location filename="../../Component/PassVault/PwdTableEditActions.cpp" line="+5"/>
-        <source>Insert a row</source>
-        <translation>插入一行</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Insert rows</source>
-        <translation>插入多行</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Append Rows</source>
-        <translation>尾后添加多行</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Delete Rows</source>
-        <translation>删除多行</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Load from Input</source>
-        <translation>从输入框导入</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Open Directory</source>
-        <translation>打开存储路径</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Show CSV Contents</source>
-        <translation>展示CSV内容</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Export to Plain File</source>
-        <translation>导出到明文CSV</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Save Changes</source>
-        <translation>写入变更</translation>
-    </message>
-    <message>
-        <location line="-2"/>
-        <source>Search by</source>
-        <translation>查找</translation>
-    </message>
-</context>
-<context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../../Model/QAbstractListModelPub.cpp" line="+16"/>
+        <location filename="../../Model/QAbstractListModelPub.cpp" line="+13"/>
         <source>Smooth Transformation</source>
         <translation>平滑图片</translation>
     </message>
@@ -1925,19 +1948,6 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+21"/>
         <source>Find By Mode</source>
         <translation>查找模式</translation>
-    </message>
-</context>
-<context>
-    <name>RegisterWid</name>
-    <message>
-        <location filename="../../Component/PassVault/LoginQryWidget.cpp" line="+128"/>
-        <source>Encryption Key</source>
-        <translation>设置密钥</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Confirm Key</source>
-        <translation>再次确认密钥</translation>
     </message>
 </context>
 <context>
@@ -2410,7 +2420,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>StyleSheetTreeView</name>
     <message>
-        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+29"/>
+        <location filename="../../Component/Stylesheet/StyleSheetTreeView.cpp" line="+28"/>
         <source>Clear Modified Values</source>
         <translation>清除修改后的值</translation>
     </message>
@@ -2534,7 +2544,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <translation>自动重命名帧</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Auto Rename Video Storyboards</source>
         <translation>自动重命名故事板</translation>
     </message>

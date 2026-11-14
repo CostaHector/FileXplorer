@@ -7,6 +7,7 @@
 #include "PlainTestSuite.h"
 #include "FileOperation.h"
 
+#include "GlobalSwitches.h"
 #include "OnScopeExit.h"
 
 #include "BehaviorKey.h"
@@ -14,17 +15,16 @@
 
 using namespace FileOperatorType;
 
-namespace FileOperatorType {
-extern bool g_bReturnErrorCodeUponAnyFailure;
-}
-
 class FileOperationTest : public PlainTestSuite {
   Q_OBJECT
-
 public:
-  FileOperationTest()
-    : PlainTestSuite{} {}
+  using PlainTestSuite::PlainTestSuite;
+
 private slots:
+  void cleanupTestCase() {
+    GlobalSwitches::SetReturnErrorCodeUponAnyFailureSw(true);
+  }
+
   void ACMD_MemberFunction_Ok() {
     ACMD mkPathCmd = ACMD::GetInstMKPATH("/home", "/home/to/path");
     ACMD mvCmd = ACMD::GetInstMV("/home", "a.mp4", "/home/to/path");
@@ -803,8 +803,7 @@ private slots:
   }
 
   void test_executer_immediate_return_errorCode_if_any_cmd_fail() {
-    GlbDataProtect<bool> fastFailBkp{g_bReturnErrorCodeUponAnyFailure};
-    g_bReturnErrorCodeUponAnyFailure = true;
+    GlobalSwitches::SetReturnErrorCodeUponAnyFailureSw(true);
 
     QString inexistFileA("filea");
     QString existFile("fileb");
@@ -832,8 +831,7 @@ private slots:
   }
 
   void test_executer_continue_executing_remaining_despite_failures() {
-    GlbDataProtect<bool> fastFailBkp{g_bReturnErrorCodeUponAnyFailure};
-    FileOperatorType::g_bReturnErrorCodeUponAnyFailure = false;
+    GlobalSwitches::SetReturnErrorCodeUponAnyFailureSw(false);
 
     QString inexistFileA("filea");
     QString existFile("fileb");
@@ -860,7 +858,7 @@ private slots:
   }
 
   void returnErrorCodeUponAnyFailureSw_ok() {
-    using namespace FileOperatorType;
+    using namespace GlobalSwitches;
     bool bkpUp = IsReturnErrorCodeUponAnyFailureSw();
     OnScopeExit {
       SetReturnErrorCodeUponAnyFailureSw(bkpUp);

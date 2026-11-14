@@ -424,7 +424,7 @@ const char* ViewsStackedWidget::GetCurViewName() const {
 }
 
 int ViewsStackedWidget::AddView(ViewType vt, QWidget* w) {
-  return m_name2ViewIndex[vt] = addWidget(w);
+  return m_name2ViewIndex[(int)vt] = addWidget(w);
 }
 
 bool ViewsStackedWidget::hasSelection() const {

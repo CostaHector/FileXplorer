@@ -1,7 +1,7 @@
 #include "SimpleAES.h"
 #include "Logger.h"
 
-// 未启用PASSVAULT_ENABLED功能时, 将直接存储明文
+// !未启用PASSVAULT_ENABLED功能时, 将直接存储明文
 #ifdef PASSVAULT_ENABLED
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -15,15 +15,6 @@ ls /usr/include/openssl/
 
 constexpr int SimpleAES::MAX_KEY_BYTES_LENGTH;
 
-SimpleAES &SimpleAES::GetInst() {
-  static SimpleAES inst;
-  return inst;
-}
-
-void SimpleAES::InitInst(const QString& key) {
-  GetInst().setKey(key);
-}
-
 SimpleAES::SimpleAES(const QString& key) {
   setKey(key);
 }
@@ -32,6 +23,7 @@ void SimpleAES::setKey(const QString& userInputKey) {
   if (isInited()) {
     LOG_W("password already set. now key changed");
   }
+  // trunc/padding
   QString keyString;
   if (userInputKey.length() > 16) {
     keyString = userInputKey.left(16);
@@ -43,7 +35,7 @@ void SimpleAES::setKey(const QString& userInputKey) {
   }
 
   QByteArray keyBytes = keyString.toUtf8();
-  const int validLen = static_cast<size_t>(std::min<long long>(keyBytes.size(), MAX_KEY_BYTES_LENGTH));
+  const int validLen = static_cast<size_t>(std::min<int>(keyBytes.size(), MAX_KEY_BYTES_LENGTH));
   memcpy(mKeyBytesArray, keyBytes.constData(), validLen);
   mKeyBytesArray[validLen] = '\0';
 

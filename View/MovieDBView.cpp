@@ -119,9 +119,11 @@ bool MovieDBView::setCurrentMovieTable(const QString& movieTableName) {
     InitTableView();
     m_isHeaderStateAlreadyInited = true;
   }
-  Configuration().setValue(BehaviorKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
-  _dbModel->setTable(movieTableName);
-  _dbModel->select();
+  if (!movieTableName.isEmpty()) {
+    Configuration().setValue(BehaviorKey::VIDS_LAST_TABLE_NAME.name, movieTableName);
+    _dbModel->setTable(movieTableName);
+    _dbModel->select();
+  }
   return true;
 }
 
@@ -246,35 +248,29 @@ bool ChooseAMovieTableName(const QStringList& occupiedNames, QString& tableNameS
   const QString kBROWSE_FOLDER = "Browse for a folder...";
   const QStringList candidates = MountPathTableNameMapper::CandidateTableNamesList();
 
-  // 显示项与 candidates 一一对应
+  // 显示项与 candidates 一一对应,  // 已被占用的表名不显示在候选列表
   QStringList displayItems;
   displayItems.reserve(candidates.size() + 1);
-  displayItems << kBROWSE_FOLDER;
+  displayItems += kBROWSE_FOLDER;
   for (const QString& name : candidates) {
-    displayItems << (occupiedNames.contains(name) ? QString("%1 (occupied)").arg(name) : name);
+    if (!occupiedNames.contains(name)) {
+      displayItems << name;
+    }
   }
 
   bool isInputOk = false;
-  const QString selected = QInputDialog::getItem(//
-      nullptr,//
-      "Create a New Table", QString{R"(Select a table name, or choose "%1" to browse a folder:)"}.arg(kBROWSE_FOLDER),//
-      displayItems, /*current=*/0, /*editable=*/false, &isInputOk);
+  const QString labelText{QString{R"(Select a table name, or choose "%1" to browse a folder:)"}.arg(kBROWSE_FOLDER)};
+  tableNameSpecified = QInputDialog::getItem(nullptr,//
+                                                 "Create a New Table", labelText, displayItems,
+                                                 /*current=*/0, /*editable=*/false, &isInputOk);
   if (!isInputOk) {
     LOG_INFO_NP("[Skip]", "User cancelled table creation");
     return false;
   }
 
-  if (selected == kBROWSE_FOLDER) {
+  if (tableNameSpecified == kBROWSE_FOLDER) {
     const QString pathSelected = QFileDialog::getExistingDirectory(nullptr, "Choose a Folder as Table Name", SystemPath::HomePath());
     tableNameSpecified = MountPathTableNameMapper::toTableName(pathSelected);
-  } else {
-    // displayItems 与 candidates 索引一致，用 indexOf 还原原始表名
-    const int idx = displayItems.indexOf(selected);
-    if (idx < 0 || idx >= candidates.size()) {
-      LOG_WARN_P("[Abort]", "Unexpected selection: %s", qPrintable(selected));
-      return false;
-    }
-    tableNameSpecified = selected;
   }
 
   if (tableNameSpecified.isEmpty()) {

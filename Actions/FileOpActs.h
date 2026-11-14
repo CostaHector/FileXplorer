@@ -19,7 +19,6 @@ Q_OBJECT
   explicit FileOpActs(QObject* parent = nullptr);
   FileStructurePolicy::FileStuctureModeE GetCurFileStructurePolicy() const { return mFileStructureIntAction.curVal(); }
 
-  QActionGroup* GetDeleteActions();
   QActionGroup* GetMOVE_COPY_TOActions();
   QActionGroup* GetMOVE_COPY_TO_PATH_HistoryActions(const KV& memoryKey);
   QActionGroup* Get_CUT_COPY_PASTE_OPERATIONS_Actions();
@@ -63,9 +62,10 @@ Q_OBJECT
   void InitFileStructureActions();
 
   QAction* _UNLOCK_OCCUPIED_FILES{nullptr};
+  QActionGroup* GetDeleteActions();
   QList<QAction*> GetDeleteItemsActions() const;
   QWidget* GetDeleteItemsToolButton(QWidget* notNullParent) const;
-  QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr};
+  QAction *MOVE_TO_TRASHBIN{nullptr}, *DELETE_PERMANENTLY{nullptr}, *CONFIRM_BEFORE_MOVE_TO_TRASH;
 
   QAction *UNDO_OPERATION{nullptr}, *REDO_OPERATION{nullptr};
   QActionGroup* UNDO_REDO_RIBBONS{nullptr};

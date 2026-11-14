@@ -136,7 +136,7 @@ class ViewsStackedWidget : public QStackedWidget {
   }
 
  private:
-  QMap<ViewTypeTool::ViewType, int> m_name2ViewIndex;
+  int m_name2ViewIndex[(int)ViewTypeTool::ViewType::VIEW_TYPE_BUTT] {0};
   QMetaObject::Connection mSelectionChangedConn, mCurrentChangedConn, mDoubleClickedConnectConn;
   ViewTypeTool::ViewType mVt{ViewTypeTool::DEFAULT_VIEW_TYPE};
 };

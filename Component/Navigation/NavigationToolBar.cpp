@@ -103,7 +103,7 @@ NavigationToolBar::~NavigationToolBar() { //
 }
 
 void NavigationToolBar::subscribe() {
-  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{DEVICES_AND_DRIVES, this, "Geometry/DevicesDrivesTV"};
+  mDevDriveTV = new (std::nothrow) PopupWidgetManager<DevicesDrivesTV>{DEVICES_AND_DRIVES, this};
   CHECK_NULLPTR_RETURN_VOID(mDevDriveTV);
 
   connect(m_pathActionGroups, &QActionGroup::triggered, this, &NavigationToolBar::onPathActionTriggeredNavi);

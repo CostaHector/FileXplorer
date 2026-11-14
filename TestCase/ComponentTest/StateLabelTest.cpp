@@ -16,7 +16,7 @@ class StateLabelTest : public PlainTestSuite {
 
     // 测试状态转换到未保存
     label.ToNotSaved();
-    QCOMPARE(label.state(), StateLabel::NOT_SAVED);
+    QCOMPARE(label.state(), StateLabel::SAVED_NOT);
 
     // 测试状态转换回已保存
     label.ToSaved();
@@ -24,9 +24,9 @@ class StateLabelTest : public PlainTestSuite {
 
     // 测试多次状态转换
     label.ToNotSaved();
-    QCOMPARE(label.state(), StateLabel::NOT_SAVED);
+    QCOMPARE(label.state(), StateLabel::SAVED_NOT);
     label.ToNotSaved(); // 已经是未保存状态，再次调用
-    QCOMPARE(label.state(), StateLabel::NOT_SAVED); // 状态应保持不变
+    QCOMPARE(label.state(), StateLabel::SAVED_NOT); // 状态应保持不变
 
     label.ToSaved();
     QCOMPARE(label.state(), StateLabel::SAVED);
@@ -35,7 +35,7 @@ class StateLabelTest : public PlainTestSuite {
 
     // will not crash down
     GetLabelStatusPixmap(StateLabel::SAVED);
-    GetLabelStatusPixmap(StateLabel::NOT_SAVED);
+    GetLabelStatusPixmap(StateLabel::SAVED_NOT);
     GetLabelStatusPixmap(StateLabel::BUTT);
   }
 };

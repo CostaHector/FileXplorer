@@ -9,8 +9,6 @@
 #include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "ResourceMonitorPanel.h"
-#include "SizeTool.h"
-#include "Configuration.h"
 #include "Logger.h"
 
 #include <QEvent>
@@ -29,11 +27,10 @@ template class PopupWidgetManager<PasswordBook>;
 template class PopupWidgetManager<ResourceMonitorPanel>;
 
 template<typename WidgetType>
-PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent, const QString& geometryCfgKey)
-    : QObject{notNullptrParent}, m_geometryCfgKey{geometryCfgKey} {
-  CHECK_NULLPTR_RETURN_VOID(notNullptrParent);
+PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent)
+    : QObject{notNullptrParent} {
   CHECK_NULLPTR_RETURN_VOID(pAction);
-  CHECK_FALSE_RETURN_VOID(!geometryCfgKey.isEmpty());
+  CHECK_NULLPTR_RETURN_VOID(notNullptrParent);
   m_action = pAction;
 
   if (m_action->isCheckable()) {
@@ -49,7 +46,6 @@ PopupWidgetManager<WidgetType>::~PopupWidgetManager() {
     return;
   }
   m_widget->removeEventFilter(this);
-  Configuration().setValue(m_geometryCfgKey, m_widget->saveGeometry());
   if (m_widget->parent() != nullptr) {
     return;
   }
@@ -112,17 +108,12 @@ void PopupWidgetManager<WidgetType>::createWidget() {
   }
 
   if (m_widget == nullptr) {
-    LOG_E("Failed to create widget of type: %s", qPrintable(m_geometryCfgKey));
+    LOG_E("Failed to create widget action[%s]", qPrintable(m_action->text()));
     if (m_action->isCheckable()) {
+      QSignalBlocker blocker(m_action);
       m_action->setChecked(false);
     }
     return;
-  }
-
-  if (Configuration().contains(m_geometryCfgKey)) {
-    m_widget->restoreGeometry(Configuration().value(m_geometryCfgKey).toByteArray());
-  } else {
-    m_widget->setGeometry(SizeTool::DEFAULT_GEOMETRY);
   }
 
   // window flag must ahead of event filter; setWindowFlags must ahead of setWindowFlag

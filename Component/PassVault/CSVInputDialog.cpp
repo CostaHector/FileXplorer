@@ -1,7 +1,8 @@
 #include "CSVInputDialog.h"
-#include "AccountStorage.h"
+#include "AccountFileHelper.h"
 #include "PublicCheckMacro.h"
 #include "NotificatorMacro.h"
+#include "SystemPath.h"
 #include "StyleSheet.h"
 
 #include <QIcon>
@@ -12,13 +13,15 @@
 #include <QMenu>
 #include <QFileDialog>
 
-DragDropTextEdit::DragDropTextEdit(QWidget* parent) : QTextEdit(parent) {
+DragDropTextEdit::DragDropTextEdit(const QString& aesKey, QWidget* parent) : QPlainTextEdit(parent), mAesKey{aesKey} {
   setAcceptDrops(true);
 
   mMenu = createStandardContextMenu();
   mMenu->addSeparator();
-  mSelectEncCsvFile = mMenu->addAction(QIcon{":/edit/PARSE_ENCRYPT_CSV_FILE"}, tr("select encrypt CSV file"));
+  mSelectEncCsvFile = mMenu->addAction(tr("select encrypt CSV file"));
   connect(mSelectEncCsvFile, &QAction::triggered, this, &DragDropTextEdit::onSelectEncCsvFileToParse);
+
+  setPlaceholderText("Enter your text here or drag encrypt csv file here...");
 }
 
 void DragDropTextEdit::dragEnterEvent(QDragEnterEvent* event) {
@@ -40,7 +43,8 @@ void DragDropTextEdit::dropEvent(QDropEvent* event) {
     event->ignore();
     return;
   }
-  QString encryptCsvFilePath = mimeData->urls().front().toLocalFile();
+  const QList<QUrl> lst = mimeData->urls();
+  QString encryptCsvFilePath = lst.front().toLocalFile();
   if (!ParseEncryptCsvFileContents(encryptCsvFilePath)) {
     event->ignore();
     return;
@@ -60,95 +64,82 @@ bool DragDropTextEdit::isContainsOneFile(const QMimeData& mimeData) {
 }
 
 bool DragDropTextEdit::onSelectEncCsvFileToParse() {
-  const QString encryptCsvFilePath =
-      QFileDialog::getOpenFileName(this, "Select encrypt csv file", AccountStorage::GetFullEncCsvFilePath(), "CSV Files (*.csv)");
+  const QString encryptCsvFilePath = QFileDialog::getOpenFileName(this, "Select encrypt csv file", SystemPath::RoamingPath(), "CSV Files (*.csv)");
   if (encryptCsvFilePath.isEmpty()) {
-    LOG_INFO_NP("Cancel", "user cancel select encrypt file");
+    setPlainText("User cancel select encrypt file");
     return false;
   }
   return ParseEncryptCsvFileContents(encryptCsvFilePath);
 }
 
 bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString& encryptCsvFilePath) {
+  emit windowTitleChanged(encryptCsvFilePath);
+
+  bool parseResult{false};
   QString plainCsvFileContent;
-  if (!AccountStorage::ParseEncryptCsvFile(encryptCsvFilePath, plainCsvFileContent)) {
-    setText(QString{"Parse encrypt csv file[%1] failed"}.arg(encryptCsvFilePath));
+  std::tie(parseResult, plainCsvFileContent) = AccountFileHelper::ParseEncryptCsvFile(encryptCsvFilePath, mAesKey);
+  if (!parseResult) {
+    setPlainText(QString{"Parse encrypt csv file[%1] failed"}.arg(encryptCsvFilePath));
     return false;
   }
-  setText(plainCsvFileContent);
+  setPlainText(plainCsvFileContent);
   return true;
 }
 
-CSVInputDialog::CSVInputDialog(QWidget* parent)  //
-    : QDialog{parent}                            //
+CSVInputDialog::CSVInputDialog(const QString aesKey, QWidget* parent) : QDialog{parent}, mAesKey{aesKey}
 {
-  textEdit = new (std::nothrow) DragDropTextEdit(this);
+  textEdit = new (std::nothrow) DragDropTextEdit(mAesKey, this);
   textEdit->setProperty("UseCodeFontFamily", true);
   CHECK_NULLPTR_RETURN_VOID(textEdit);
-  textEdit->setPlaceholderText("Enter your text here or drag encrypt csv file here...");
+  textEdit->setPlaceholderText("Enter your csv contents here or drag a encrypt csv file here...");
 
   buttonBox = new (std::nothrow) QDialogButtonBox(this);
   CHECK_NULLPTR_RETURN_VOID(buttonBox);
   buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help);
   pOkBtn = buttonBox->button(QDialogButtonBox::Ok);
-  StyleSheet::UpdateApplyPushButton(pOkBtn);
+  pOkBtn->setText(tr("Accept and Quit"));
+  pOkBtn->setToolTip("Pass the result of csv lines to caller and quit");
 
-  onContentsChanged();
+  StyleSheet::UpdateApplyPushButton(pOkBtn);
+  pParseBtn = buttonBox->button(QDialogButtonBox::Help);
+  pParseBtn->setText(tr("Parse"));
+  pParseBtn->setToolTip("Parse current text in qtextedit");
 
   mainLayout = new (std::nothrow) QVBoxLayout(this);
   CHECK_NULLPTR_RETURN_VOID(mainLayout);
   mainLayout->addWidget(textEdit);
   mainLayout->addWidget(buttonBox);
 
-  connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+  connect(buttonBox, &QDialogButtonBox::accepted, this, &CSVInputDialog::onAcceptAndQuit);
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-  connect(buttonBox, &QDialogButtonBox::helpRequested, this, &CSVInputDialog::onHelpRequest);
-  connect(textEdit->document(), &QTextDocument::contentsChanged, this, &CSVInputDialog::onContentsChanged);
+  connect(pParseBtn, &QPushButton::clicked, this, &CSVInputDialog::onParseRequest);
 
-  setWindowIcon(QIcon(":/edit/LOAD_FROM_INPUT"));
-  setWindowTitle("Get record(s) from CSV input");
+  setWindowIcon(QIcon(":/pwd/action/LOAD_FROM_INPUT"));
+  setWindowTitle("Append record(s) from CSV input");
 }
 
-void CSVInputDialog::raise() {
-  QDialog::raise();
-  setWindowTitle("Get record(s) from CSV input");
-  pOkBtn->setEnabled(false);
-}
+bool CSVInputDialog::onParseRequest() {
+  const QString text = textEdit->toPlainText();
 
-void CSVInputDialog::onHelpRequest() {
-  CHECK_NULLPTR_RETURN_VOID(textEdit);
-  const QString& text = textEdit->toPlainText();
-  int nonEmptyLineCount{0};
-  tempAccounts = AccountStorage::GetAccountsFromPlainString(text, &nonEmptyLineCount);
+  QList<int> incompleteLines;
+  mAppendAccounts = AccountFileHelper::GetAccountsFromPlainString(text, incompleteLines);
+  const bool bAllLinesOk{incompleteLines.isEmpty()};
 
-  if (nonEmptyLineCount != tempAccounts.size()) {
-    QString msg;
-    msg.reserve(40);
-    msg += QString::number(tempAccounts.size());
-    msg += "/";
-    msg += QString::number(nonEmptyLineCount);
-    msg += " line(s) are ok. Others need fixed at first.";
+  QString msg;
+  if (bAllLinesOk) {
+    msg = QString{"%1 line(s) accounts found."}.arg(mAppendAccounts.size());
+    LOG_OK_NP("Parse ok", qPrintable(msg));
+  } else {
+    msg = QString{"%1 line(s) incomplete. Need fix at first"}.arg(incompleteLines.size());
     LOG_ERR_NP("Some unexpected line(s) find", qPrintable(msg));
-    setWindowTitle(msg);
-    onContentsChanged();
+  }
+  setWindowTitle(msg);
+  return bAllLinesOk;
+}
+
+void CSVInputDialog::onAcceptAndQuit() {
+  if (!onParseRequest()) {
     return;
   }
-  const QString msg{QString{"%1/%2 line(s) are ok. no unexpected line(s) find"}.arg(tempAccounts.size()).arg(nonEmptyLineCount)};
-  LOG_OK_NP("Parse ok", qPrintable(msg));
-  setWindowTitle(msg);
-  onCheckPassed();
-}
-
-void CSVInputDialog::onContentsChanged() {
-  if (!pOkBtn->isEnabled()) {
-    return;  // already met requirement. skip
-  }
-  pOkBtn->setEnabled(false);
-  pOkBtn->setToolTip("Click help at first");
-  pOkBtn->setStyleSheet("");
-}
-
-void CSVInputDialog::onCheckPassed() {
-  pOkBtn->setEnabled(true);
-  pOkBtn->setToolTip("");
+  accept();
 }

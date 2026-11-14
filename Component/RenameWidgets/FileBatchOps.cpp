@@ -9,6 +9,7 @@
 #include "ItemsPileCategory.h"
 #include "NotificatorMacro.h"
 #include "RecycleCfmDlg.h"
+#include "GlobalSwitches.h"
 #include <QDir>
 
 namespace FileBatchOps {
@@ -218,7 +219,7 @@ OpStatus MoveToTrashSelectedCore(const QStringList& workPaths, const QStringList
   }
   const QString commonWorkPathMsg{isCommonWorkPath ? workPaths.front() : "Working path varies..."};
 
-  if (rel2names.size() > 1 && !RecycleCfmDlg::recycleQuestion(commonWorkPathMsg, rel2names, false)) {
+  if (rel2names.size() > 1 && GlobalSwitches::IsConfirmBeforeMoveToTrash() && !RecycleCfmDlg::recycleQuestion(commonWorkPathMsg, rel2names, false)) {
     // show dialog only more than one file
     LOG_INFO_P("[Cancel] User cancel recycle", "%d item(s) no change", rel2names.size());
     return OpStatus::SKIP;
