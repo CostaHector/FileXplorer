@@ -13,11 +13,11 @@ AccountTableView::AccountTableView(AccountTableModel* pwdModel, AccountSortFilte
 
   InitTableView();
 
-  QAction* insertAnRowAct = new QAction{QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert a row"), this};
-  insertAnRowAct->setToolTip("Insert a row before current line");
-  InsertActionAtVerHeaderMenu(insertAnRowAct, 0);
+  mInsertAnRowAct = new QAction{QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert a row"), this};
+  mInsertAnRowAct->setToolTip("Insert a row before current line");
+  InsertActionAtVerHeaderMenu(mInsertAnRowAct, 0);
 
-  connect(insertAnRowAct, &QAction::triggered, this, &AccountTableView::EmitInsertLinesReq);
+  connect(mInsertAnRowAct, &QAction::triggered, this, &AccountTableView::EmitInsertLinesReq);
 }
 
 bool AccountTableView::EmitInsertLinesReq() {

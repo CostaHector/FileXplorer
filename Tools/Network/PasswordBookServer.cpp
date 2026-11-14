@@ -14,7 +14,7 @@ PasswordBookServer::~PasswordBookServer() { stop(); }
 bool PasswordBookServer::setAccounts(const QString& aesKey) {
   QMutexLocker lock(&m_accountsMutex);
 
-  QString encFilePath = AccountFileHelper::GetSaveToFullPath(true, "");
+  QString encFilePath = AccountFileHelper::GetDefaultEncFileFullPath();
   AccountStorage temp{encFilePath, aesKey};
 
   {
@@ -118,6 +118,7 @@ bool PasswordBookServer::onGetAccounts(const httplib::Request& req, httplib::Res
   res.set_content(buildAccountsJson(), "application/json; charset=utf-8");
   res.set_header("Cache-Control", "no-store, no-cache, must-revalidate");
   res.set_header("Pragma", "no-cache");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -186,6 +187,7 @@ bool PasswordBookServer::onPostSetKey(const httplib::Request& req, httplib::Resp
   o["ok"] = true;
   o["token"] = token;
   res.set_content(QJsonDocument(o).toJson(QJsonDocument::Compact).toStdString(), "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -222,6 +224,7 @@ bool PasswordBookServer::onPostUpdate(const httplib::Request& req, httplib::Resp
   // 因此无需修改isModified字段
 
   res.set_content(R"({"ok":true})", "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -251,6 +254,7 @@ bool PasswordBookServer::onPostDelete(const httplib::Request& req, httplib::Resp
   m_accountStorage[id].SetModified(true);
 
   res.set_content(R"({"ok":true})", "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -280,6 +284,7 @@ bool PasswordBookServer::onPostRestore(const httplib::Request& req, httplib::Res
   m_accountStorage[id].SetModified(true);   // 恢复也是内存修改，需要落盘
 
   res.set_content(R"({"ok":true})", "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -298,8 +303,8 @@ bool PasswordBookServer::onPostAdd(const httplib::Request& req, httplib::Respons
   QJsonObject o;
   o["ok"] = true;
   o["id"] = newId;
-  res.set_content(QJsonDocument(o).toJson(QJsonDocument::Compact).toStdString(),
-                  "application/json");
+  res.set_content(QJsonDocument(o).toJson(QJsonDocument::Compact).toStdString(), "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 
@@ -317,6 +322,7 @@ bool PasswordBookServer::onPostCommit(const httplib::Request& req, httplib::Resp
     return false;
   }
   res.set_content(R"({"ok":true})", "application/json");
+  if (res.status == -1) res.status = 200;
   return true;
 }
 

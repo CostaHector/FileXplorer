@@ -8,13 +8,24 @@
 #include "PathTool.h"
 #include "StyleSheet.h"
 #include "SizeTool.h"
+#include "CredentialUtil.h"
 
 #include <QFileInfo>
 #include <QDateTime>
 
-PasswordBook::PasswordBook(QWidget* parent)
-  : QMainWindow{parent} {
+PasswordBook::PasswordBook(QWidget* parent, int defaultViewType)
+  : PasswordBook{AccountFileHelper::GetDefaultEncFileFullPath(),
+                 CredUtilHelper::readPassword(GetPasswordBookCredTargetName()),
+                 defaultViewType,
+                 parent} {
+}
+
+PasswordBook::PasswordBook(const QString& specifyEncFileFullPath, const QString& specifyAesKey, int defaultViewType, QWidget* parent) : QMainWindow{parent} {
   setObjectName("PasswordBook");
+
+  if (defaultViewType < ViewType::BEGIN_TYPE || defaultViewType >= ViewType::END_BUTT_TYPE) {
+    defaultViewType = ViewType::LIST_VIEW;
+  }
 
   mTopAreaToolBar = new (std::nothrow) QToolBar{"AccountTopAreaToolBar", this};
   CHECK_NULLPTR_RETURN_VOID(mTopAreaToolBar);
@@ -22,7 +33,8 @@ PasswordBook::PasswordBook(QWidget* parent)
     mTopAreaToolBar->setObjectName(mTopAreaToolBar->windowTitle());
     addToolBar(Qt::ToolBarArea::TopToolBarArea, mTopAreaToolBar);
 
-    mAccountFileAndAesWid = new (std::nothrow) AccountFileAndAESKey{this};
+    mAccountFileAndAesWid = new (std::nothrow) AccountFileAndAESKey{specifyEncFileFullPath, specifyAesKey, this};
+
     CHECK_NULLPTR_RETURN_VOID(mAccountFileAndAesWid);
     mTopAreaToolBar->addWidget(mAccountFileAndAesWid);
     mTopAreaToolBar->addSeparator();
@@ -48,7 +60,7 @@ PasswordBook::PasswordBook(QWidget* parent)
     CHECK_NULLPTR_RETURN_VOID(mAccountViewSwitcher);
     mAccountViewSwitcher->addItem(tr("List"),  ViewType::LIST_VIEW);
     mAccountViewSwitcher->addItem(tr("Table"), ViewType::TABLE_VIEW);
-    mAccountViewSwitcher->setCurrentIndex(ViewType::LIST_VIEW);
+    mAccountViewSwitcher->setCurrentIndex(defaultViewType);
     mLeftAreaToolBar->addWidget(mAccountViewSwitcher);
     mLeftAreaToolBar->addSeparator();
 
@@ -90,9 +102,10 @@ PasswordBook::PasswordBook(QWidget* parent)
   mSortProxyModel = new (std::nothrow) AccountSortFilterProxyModel{this};
   CHECK_NULLPTR_RETURN_VOID(mSortProxyModel);
   mSortProxyModel->setSourceModel(mPwdModel);
+  mSortProxyModel->initSortSetting(AccountInfo::Role::TYPE_STR_ROLE, false); // 默认按照Name升序
 
   mMainWidget = new QStackedWidget{this};
-  onAccountViewChanged(mAccountViewSwitcher->currentIndex());
+  onAccountViewChanged(defaultViewType);
   setCentralWidget(mMainWidget);
 
   onDecryptResultChanged(mPwdModel->IsDecryptedOk());
@@ -186,9 +199,8 @@ void PasswordBook::ShowPlainCSVContents() {
 }
 
 bool PasswordBook::OpenEncFileLocatedIn() const {
-  const QString locatedInPath = QFileInfo{mAccountFileAndAesWid->GetAccountFileFullPath()}.absolutePath();
-  const QUrl url = QUrl::fromLocalFile(PathTool::absolutePath(locatedInPath));
-  return FileTool::OpenLocalFileUsingDesktopService(url.toLocalFile());
+  const QString locatedInPath = PathTool::absolutePath(mAccountFileAndAesWid->GetAccountFileFullPath());
+  return FileTool::OpenLocalFileUsingDesktopService(locatedInPath);
 }
 
 void PasswordBook::SetFilter(const QString& keywords) {
@@ -214,31 +226,36 @@ bool PasswordBook::ExportToPlainCSVFile() const {
 }
 
 bool PasswordBook::onAccountViewChanged(int viewType) {
+  if (viewType == mCurViewType) {
+    return true; // no need change
+  }
   switch (viewType) {
     case ViewType::LIST_VIEW: {
       if (mAccountListView == nullptr) {
         mAccountListView = new (std::nothrow) AccountListView{mPwdModel, mSortProxyModel, this};
-        mMainWidget->addWidget(mAccountListView);
+        mViewType2StackedWidgetIndex[ViewType::LIST_VIEW] = mMainWidget->addWidget(mAccountListView);
       }
+      mCurViewType = ViewType::LIST_VIEW;
       break;
     }
     case ViewType::TABLE_VIEW: {
       if (mAccountTableView == nullptr) {
         mAccountTableView = new (std::nothrow) AccountTableView{mPwdModel, mSortProxyModel, this};
-        mMainWidget->addWidget(mAccountTableView);
+        mViewType2StackedWidgetIndex[ViewType::TABLE_VIEW] = mMainWidget->addWidget(mAccountTableView);
         connect(mAccountTableView, &AccountTableView::insertLinesReq, this, &PasswordBook::InsertNRows);
       }
+      mCurViewType = ViewType::TABLE_VIEW;
       break;
     }
     default:
       return false;
   }
-  mMainWidget->setCurrentIndex(viewType);
+  mMainWidget->setCurrentIndex(mViewType2StackedWidgetIndex[viewType]);
   return true;
 }
 
 std::pair<bool, QModelIndexList> PasswordBook::GetSelectedRows() const {
-  switch (mMainWidget->currentIndex()) {
+  switch (mCurViewType) {
     case ViewType::LIST_VIEW: {
       if (mAccountListView == nullptr) {
         return {false, {}};
@@ -292,7 +309,7 @@ bool PasswordBook::AppendNRows(int rowCnt) {
 
 bool PasswordBook::ScrollToSourceRow(int sourceRow) {
   QAbstractItemView* view = nullptr;
-  switch (mMainWidget->currentIndex()) {
+  switch (mCurViewType) {
     case ViewType::LIST_VIEW:  view = mAccountListView;  break;
     case ViewType::TABLE_VIEW: view = mAccountTableView; break;
     default: return false;
@@ -311,7 +328,7 @@ bool PasswordBook::ScrollToSourceRow(int sourceRow) {
   if (!proxyIdx.isValid()) {
     // 新行被过滤规则挡掉了，视图里根本不存在，滚动无意义
     LOG_INFO_NP("New row filtered out", "Skip scroll");
-    return true;
+    return false;
   }
 
   view->scrollTo(proxyIdx, QAbstractItemView::EnsureVisible);

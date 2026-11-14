@@ -6,10 +6,11 @@
 #include <QFormLayout>
 #include <QPushButton>
 
+QString GetPasswordBookCredTargetName();
 class AccountFileAndAESKey: public QWidget {
   Q_OBJECT
 public:
-  explicit AccountFileAndAESKey(QWidget* parent = nullptr);
+  explicit AccountFileAndAESKey(const QString& specifyEncFileFullPath, const QString& specifyAesKey, QWidget* parent = nullptr);
 
   // 外部初始化
   void InitAccountFullPath(const QString& newAccountFullPath) {
@@ -32,6 +33,7 @@ signals:
 
 private:
   bool ValidateAesKeyPair();
+  static bool IsNeedRegisterCore(const QString& path);
   bool IsNeedRegister() const;
   void SetReEnterVisible(bool visible);
   void subscribe();

@@ -16,6 +16,7 @@ signals:
 private:
   bool EmitInsertLinesReq();
 
+  QAction* mInsertAnRowAct{nullptr};
   AccountTableModel* _pwdModel{nullptr};
   AccountSortFilterProxyModel* _sortProxyModel{nullptr};
 };

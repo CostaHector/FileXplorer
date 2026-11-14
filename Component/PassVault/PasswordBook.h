@@ -13,24 +13,27 @@
 
 class PasswordBook : public QMainWindow {
 public:
-  explicit PasswordBook(QWidget* parent = nullptr);
-
-  void ReadSettings();
-  void SetPWBookName();
-  void SwitchToListView();
+  explicit PasswordBook(QWidget* parent = nullptr, int defaultViewType = ViewType::LIST_VIEW);
 
 protected:
   void showEvent(QShowEvent* event) override;
   void closeEvent(QCloseEvent* event) override;
 
 private:
+  // 仅给测试用例使用
+  PasswordBook(const QString& specifyEncFileFullPath, const QString& specifyAesKey, int defaultViewType, QWidget* parent);
+  void ReadSettings();
+  void SetPWBookName();
+
   void Subscribe();
   void SetFilter(const QString& keywords);
   void onDecryptResultChanged(bool bDecryptOk);
 
   enum ViewType {
-    LIST_VIEW = 0,
-    TABLE_VIEW = 1, // desktop list and detail share one
+    BEGIN_TYPE = 0,
+    LIST_VIEW = BEGIN_TYPE,
+    TABLE_VIEW, // desktop list and detail share one
+    END_BUTT_TYPE,
   };
   void onUpdateDetailView(const QModelIndex& proxyIndex);
   void onSave();
@@ -79,6 +82,8 @@ private:
   AccountListView* mAccountListView{nullptr};
   AccountTableView* mAccountTableView{nullptr};
   QStackedWidget* mMainWidget{nullptr};
+  ViewType mCurViewType{ViewType::END_BUTT_TYPE};
+  int mViewType2StackedWidgetIndex[ViewType::END_BUTT_TYPE]{0};
 
   QTextEdit* mPlainCSVContentWid{nullptr};
 

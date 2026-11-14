@@ -48,7 +48,7 @@ private:
   void ResetWithDecryptedNotify(Action&& action) {
     const bool before = IsDecryptedOk();
     beginResetModel();
-    std::forward<Action>(action)();
+    action();
     endResetModel();
     const bool after = IsDecryptedOk();
     if (after != before) {

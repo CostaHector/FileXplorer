@@ -2,8 +2,11 @@
 #include "AccountCardEditor.h"
 #include "AccountInfo.h"
 #include "AccountFileHelper.h"
-#include <QPainter>
+
+#include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QPushButton>
+#include <QPainter>
 
 constexpr int DELEGATE_ICON_SIZE = 64;
 
@@ -107,15 +110,15 @@ void AccountCardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 }
 
 QWidget *AccountCardDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-  auto* editor = new AccountCardEditor(parent);
-  auto* self = const_cast<AccountCardDelegate*>(this);
+  AccountCardEditor* editor = new AccountCardEditor(parent);
+  AccountCardDelegate* self = const_cast<AccountCardDelegate*>(this);
 
-  connect(editor->saveButton(), &QPushButton::clicked, self, [self, editor]() {
+  connect(editor, &AccountCardEditor::stageCurrentChanges, self, [self, editor]() {
     emit self->commitData(editor);
     emit self->closeEditor(editor, QAbstractItemDelegate::SubmitModelCache);
   });
 
-  connect(editor->cancelButton(), &QPushButton::clicked, self, [self, editor]() {
+  connect(editor, &AccountCardEditor::revertCurrentChanges, self, [self, editor]() {
     emit self->closeEditor(editor, QAbstractItemDelegate::RevertModelCache);
   });
 

@@ -18,7 +18,7 @@ class CredentialUtilTest : public PlainTestSuite {
  public:
   TDir mTDir;
   QString mCredKeyName{"CredentialUtilKey"};
-  QString mSystemDependentCredKeyName{"SystemDependentCredentialUtilKey"};
+  QString mSystemDependentCredKeyName{"SystemDependentCredKeyName"};
  private slots:
   void initTestCase() {
     GlobalMockObject::reset();

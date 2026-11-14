@@ -13,7 +13,6 @@ public:
     mAccounts.swap(rhs.mAccounts);
     mEncCsvFileFullPath.swap(rhs.mEncCsvFileFullPath);
     mAesKey.swap(rhs.mAesKey);
-    mSaveToDirectory.swap(rhs.mSaveToDirectory);
   }
 
   void SetEncFileFullPath(const QString& encFileFullPath);
@@ -39,11 +38,9 @@ public:
   inline int size() const { return mAccounts.size(); }
   inline bool empty() const { return mAccounts.empty(); }
   inline void append(const AccountInfo& ele) { mAccounts.push_back(ele); }
-  bool IsDataDirty() const;
   bool IsValid() const {
     return mIsValid;
   }
-  void SetSaveToDirectory(const QString& saveTo) { mSaveToDirectory = saveTo; }
 
 private:
   AccountStorage(AccountFileHelper::LoadResult&& result, const QString& encFileFullPath, const QString& aesKey);
@@ -52,7 +49,5 @@ private:
   QList<AccountInfo> mAccounts;
   QString mEncCsvFileFullPath;
   QString mAesKey;
-
-  QString mSaveToDirectory;
 };
 #endif  // ACCOUNTSTORAGE_H

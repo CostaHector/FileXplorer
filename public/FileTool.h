@@ -12,7 +12,7 @@ QByteArray GetLastNLinesOfFile(const QString& logFilePath, const int maxLines = 
 QString StringTextReader(const QString& textPath, bool* bReadOk=nullptr);
 QByteArray ByteArrayReader(const QString& baFilePath, bool* bReadOk=nullptr);
 bool CreateABackupFile(const QString& fileName);
-bool AtomicTextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Text);
+bool AtomicTextWriter(const QString& fileName, const QString& content, const QIODevice::OpenMode openMode = QIODevice::WriteOnly);
 bool StringTextWriter(const QString& fileName, const QString& content = "", const QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Text);
 bool ByteArrayTextWriter(const QString& fileName, const QByteArray& ba);
 bool ByteArrayBinaryWriter(const QString& fileName, const QByteArray& ba);

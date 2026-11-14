@@ -461,7 +461,7 @@
         <file alias="EMAIL">pwd/types/email.svg</file>
         <file alias="GAME">pwd/types/game.svg</file>
         <file alias="MASTERCARD">pwd/types/mastercard.png</file>
-        <file alias="SOCIETY">pwd/types/society.svg</file>
+        <file alias="SOCIAL_MEDIA">pwd/types/social_media.svg</file>
         <file alias="TOOL">pwd/types/tool.svg</file>
         <file alias="UNIONPAY">pwd/types/unionpay.png</file>
         <file alias="VISA">pwd/types/visa.png</file>

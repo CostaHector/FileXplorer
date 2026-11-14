@@ -39,12 +39,10 @@ public:
   const QString path1 = mTDir.itemPath("path1");
   const QString path2 = mTDir.itemPath("path2");
   const QString path3 = mTDir.itemPath("ScanJsonsFolder");
-  bool path1ToTableName1Ok{false};
-  bool path2ToTableName2Ok{false};
-  bool path3ToTableName3Ok{false};
-  const QString tableName1 = MountPathTableNameMapperMock::invokeToTableName(path1, &path1ToTableName1Ok);
-  const QString tableName2 = MountPathTableNameMapperMock::invokeToTableName(path2, &path2ToTableName2Ok);
-  const QString tableName3 = MountPathTableNameMapperMock::invokeToTableName(path3, &path3ToTableName3Ok);
+
+  const QString tableName1 = MountPathTableNameMapperMock::invokeToTableName(path1);
+  const QString tableName2 = MountPathTableNameMapperMock::invokeToTableName(path2);
+  const QString tableName3 = MountPathTableNameMapperMock::invokeToTableName(path3);
   const QList<FsNodeEntry> nodes{
                                  // 3 videos in path1, tableName1
                                  {"path1/Chris Evans.mp4", false, "Chris Evans"},
@@ -70,17 +68,13 @@ private slots:
     }
 
     {  // path -> table name -> path. 预期: 路径->表名->路径 可逆
-      QVERIFY(path1ToTableName1Ok);
-      QVERIFY(path2ToTableName2Ok);
-      QVERIFY(path3ToTableName3Ok);
-
       bool tableName1ToPath1Ok = false;
       bool tableName2ToPath2Ok = false;
       bool tableName3ToPath3Ok = false;
       using namespace MountPathTableNameMapperMock;
-      QCOMPARE(invokeToMountPath(tableName1, &tableName1ToPath1Ok), path1);
-      QCOMPARE(invokeToMountPath(tableName2, &tableName2ToPath2Ok), path2);
-      QCOMPARE(invokeToMountPath(tableName3, &tableName3ToPath3Ok), path3);
+      QCOMPARE(invokeToMountPath(tableName1, tableName1ToPath1Ok), path1);
+      QCOMPARE(invokeToMountPath(tableName2, tableName2ToPath2Ok), path2);
+      QCOMPARE(invokeToMountPath(tableName3, tableName3ToPath3Ok), path3);
       QVERIFY(tableName1ToPath1Ok);
       QVERIFY(tableName2ToPath2Ok);
       QVERIFY(tableName3ToPath3Ok);
@@ -177,7 +171,7 @@ private slots:
     QCOMPARE(dbToolBar.m_tablesCB->itemText(0), tableName1);
 
     // 1.4 table name occupied
-    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, QString("%1 (occupied)").arg(tableName1));
+    UserInteractiveMock::InputDialog::getItem_set() = std::pair<bool, QString>(true, tableName1);
     QVERIFY(!movieView.onCreateATable());
     QVERIFY(fdDb.IsTableExist(tableName1));
 

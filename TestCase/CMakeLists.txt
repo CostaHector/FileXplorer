@@ -99,6 +99,7 @@ file(GLOB SOURCES
     pubTestTool/*.cpp
     ToolsTest/*.cpp
     ToolsTest/FileDescriptorTest/*.cpp
+    ToolsTest/NetworkTest/*.cpp
     ViewTest/*.cpp
 )
 

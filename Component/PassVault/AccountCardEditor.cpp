@@ -1,6 +1,8 @@
 #include "AccountCardEditor.h"
 #include <QFormLayout>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QPlainTextEdit>
 
 AccountCardEditor::AccountCardEditor(QWidget *parent) : QWidget(parent) {
   mTypeEdit    = new QLineEdit(this);
@@ -8,16 +10,14 @@ AccountCardEditor::AccountCardEditor(QWidget *parent) : QWidget(parent) {
   mAccountEdit = new QLineEdit(this);
   mPwdEdit     = new QLineEdit(this);
 
-  mOthersEdit = new QTextEdit(this);
-  mOthersEdit->setAcceptRichText(false);
+  mOthersEdit = new QPlainTextEdit(this);
   mOthersEdit->setTabChangesFocus(true);
 
-  mStageButton   = new QPushButton(tr("Stage"), this);
+  mRevertButton = new QPushButton(tr("Revert"), this);
+  mStageButton  = new QPushButton(tr("Stage"), this);
   mStageButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
-  mStageButton->setToolTip(
-      QString{"<b>%1 (%2)</b><br/> Apply changes to this row in the list. Not written to the account file until you save."}
-          .arg(mStageButton->text(), mStageButton->shortcut().toString()));
-  mCancelButton = new QPushButton(tr("Cancel"), this);
+  mStageButton->setToolTip(QString{"<b>%1 (%2)</b><br/> Apply changes to this row in the list. Not written to the account file until you save."}
+                               .arg(mStageButton->text(), mStageButton->shortcut().toString()));
 
   auto* form = new QFormLayout;
   form->setContentsMargins(8, 8, 8, 0);
@@ -26,17 +26,10 @@ AccountCardEditor::AccountCardEditor(QWidget *parent) : QWidget(parent) {
   form->addRow(tr("Account"),  mAccountEdit);
   form->addRow(tr("Password"), mPwdEdit);
   form->addRow(tr("Others"),   mOthersEdit);
-
-  auto* buttonRow = new QHBoxLayout;
-  buttonRow->setContentsMargins(8, 0, 8, 8);
-  buttonRow->addStretch();
-  buttonRow->addWidget(mStageButton);
-  buttonRow->addWidget(mCancelButton);
-
-  auto* root = new QVBoxLayout(this);
-  root->setContentsMargins(0, 0, 0, 0);
-  root->addLayout(form);
-  root->addLayout(buttonRow);
+  form->addRow(mRevertButton,   mStageButton);
 
   setAttribute(Qt::WA_StyledBackground, true);
+
+  connect(mRevertButton, &QPushButton::clicked, this, &AccountCardEditor::revertCurrentChanges);
+  connect(mStageButton, &QPushButton::clicked, this, &AccountCardEditor::stageCurrentChanges);
 }

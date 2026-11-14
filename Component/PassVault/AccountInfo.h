@@ -3,9 +3,9 @@
 
 #include <QString>
 struct AccountInfo {
- public:
+public:
   AccountInfo(const QString& _typeStr, const QString& _nameStr, const QString& _accountStr, const QString& _pwdStr, const QString& _othersStr)
-      : typeStr{_typeStr}, nameStr{_nameStr}, accountStr{_accountStr}, pwdStr{_pwdStr}, othersStr{_othersStr} {}
+    : typeStr{_typeStr}, nameStr{_nameStr}, accountStr{_accountStr}, pwdStr{_pwdStr}, othersStr{_othersStr} {}
   AccountInfo() = default;
 
   bool IsContainsKeyWords(const QString& keywords) const {
@@ -51,16 +51,14 @@ struct AccountInfo {
   QString accountStr;
   QString pwdStr;
   QString othersStr;
-  mutable bool mIsModified{false};
-  mutable bool mIsDeleted{false};
 
-  void SetModified(bool modified) const { mIsModified = modified; }
-  bool IsModified()               const { return mIsModified; }
-  void   SetDeleted(bool deleted) const { mIsDeleted = deleted; }
-  bool   IsDeleted()              const { return mIsDeleted; }
+  void SetModified(bool modified) { mIsModified = modified; }
+  bool IsModified() const { return mIsModified; }
+  void SetDeleted(bool deleted) { mIsDeleted = deleted; }
+  bool IsDeleted() const { return mIsDeleted; }
 
-  static bool IsColumnCannotEditByUser(int column) {
-    return column == Role2Column(Role::IS_MODIFIED_ROLE) || column == Role2Column(Role::IS_DELETED_ROLE);
+  static bool IsColumnEditableByUser(int column) {
+    return column != Role2Column(Role::IS_MODIFIED_ROLE) && column != Role2Column(Role::IS_DELETED_ROLE);
   }
   static constexpr int Role2Column(Role role) {
     return role - Role::DEF_BEGIN_ROLE;
@@ -71,6 +69,14 @@ struct AccountInfo {
   static constexpr int SORT_COLUMN = 0;
   static constexpr Role DEF_SORT_ROLE = TYPE_STR_ROLE;
   static constexpr int DATA_TYPE_ROLE = Role::INVALID_BUTT_ROLE + 1;
+private:
+  // -- 以下的成员不入库
+  bool mIsModified{false};
+  bool mIsDeleted{false};
+  // -- 以上的成员不入库
 };
+
+static_assert(AccountInfo::COLUMN_COUNT > 0, "At least 1 column needed");
+static_assert(AccountInfo::Role::DEF_BEGIN_ROLE > (int)Qt::ItemDataRole::UserRole, "AccountInfo::Role may overlap with Qt built-in Role");
 
 #endif

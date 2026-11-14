@@ -1,13 +1,13 @@
 #include "AccountStorage.h"
 #include "Logger.h"
-#include "SystemPath.h"
+#include "PathTool.h"
 
 AccountStorage::AccountStorage(const QString& encFileFullPath, const QString& aesKey)
   : AccountStorage{AccountFileHelper::ValidateAndLoad(encFileFullPath, aesKey), encFileFullPath, aesKey} {
 }
 
 AccountStorage::AccountStorage(AccountFileHelper::LoadResult&& result, const QString& encFileFullPath, const QString& aesKey)
-  : mIsValid{result.valid}, mAccounts{std::move(result.accounts)}, mEncCsvFileFullPath{encFileFullPath}, mAesKey{aesKey}, mSaveToDirectory{SystemPath::RoamingPath()} {
+  : mIsValid{result.valid}, mAccounts{std::move(result.accounts)}, mEncCsvFileFullPath{encFileFullPath}, mAesKey{aesKey} {
 }
 
 void AccountStorage::SetEncFileFullPath(const QString& encFileFullPath) {
@@ -21,12 +21,18 @@ void AccountStorage::SetAesKey(const QString& aesKey) {
 }
 
 bool AccountStorage::CommitChangesToEncryptedCsvFile() {
-  const QString pth{AccountFileHelper::GetSaveToFullPath(true, mSaveToDirectory)};
-  return AccountFileHelper::CommitChangesToEncryptedCsvFile(mAccounts, pth, mAesKey);
+  if (!IsValid()) {
+    return false; // 拒绝写入
+  }
+  return AccountFileHelper::CommitChangesToEncryptedCsvFile(mAccounts, mEncCsvFileFullPath, mAesKey);
 }
 
 bool AccountStorage::ExportToPlainCsvFile() const {
-  const QString pth{AccountFileHelper::GetSaveToFullPath(false, mSaveToDirectory)};
+  if (!IsValid()) {
+    return false; // 拒绝写入
+  }
+  QString pre = PathTool::absolutePath(mEncCsvFileFullPath);
+  const QString pth{PathTool::Path2Join(pre, "accounts_export.csv")};
   return AccountFileHelper::ExportAccountsToPlainCsvFile(mAccounts, pth);
 }
 
@@ -54,10 +60,6 @@ bool AccountStorage::markRowRangeDeleted(int beginRow, int endRow, bool bDeleted
   }
   std::for_each(mAccounts.begin() + beginRow, mAccounts.begin() + endRow, [bDeleted](AccountInfo& ele) { ele.SetDeleted(bDeleted); });
   return true;
-}
-
-bool AccountStorage::IsDataDirty() const {
-  return std::any_of(mAccounts.cbegin(), mAccounts.cend(), [](const AccountInfo& ele) { return ele.IsModified(); });
 }
 
 bool AccountStorage::InsertNRows(int indexBefore, int cnt) {

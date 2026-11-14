@@ -1,12 +1,11 @@
 #include "AccountFileAndAESKey.h"
-#include "AccountFileHelper.h"
-#include "CredentialUtil.h"
 #include "NotificatorMacro.h"
+#include "CredentialUtil.h"
 
 #include <QFileInfo>
 #include <QTimer>
 
-QString GetCredTargetName() {
+QString GetPasswordBookCredTargetName() {
 #ifdef RUNNING_UNIT_TESTS
   return "PASSWORD_MANAGER_AES_KEY_TEST";
 #else
@@ -14,7 +13,7 @@ QString GetCredTargetName() {
 #endif
 }
 
-AccountFileAndAESKey::AccountFileAndAESKey(QWidget *parent) : QWidget{parent} {
+AccountFileAndAESKey::AccountFileAndAESKey(const QString& specifyEncFileFullPath, const QString& specifyAesKey, QWidget* parent) : QWidget{parent} {
   mEncFileFullPathLE = new QLineEdit{this};
 
   mAesKeyLE = new QLineEdit{this};
@@ -35,26 +34,25 @@ AccountFileAndAESKey::AccountFileAndAESKey(QWidget *parent) : QWidget{parent} {
   mLayout->setSpacing(1);
   mLayout->setContentsMargins(0, 0, 0, 0);
 
-  QString encFileFullPath = AccountFileHelper::GetSaveToFullPath(true, "");
-  InitAccountFullPath(encFileFullPath);
-
-  const QString aesKey = CredUtilHelper::readPassword(GetCredTargetName());
-  if (!aesKey.isEmpty()) {
-    InitAesKey(aesKey);
-  }
+  InitAccountFullPath(specifyEncFileFullPath);
+  InitAesKey(specifyAesKey);
 
   subscribe();
 }
 
-bool AccountFileAndAESKey::IsNeedRegister() const {
-  const QFileInfo fi{GetAccountFileFullPath()};
+bool AccountFileAndAESKey::IsNeedRegisterCore(const QString& path) {
+  const QFileInfo fi{path};
   return !fi.exists() || fi.size() == 0;
 }
 
+bool AccountFileAndAESKey::IsNeedRegister() const {
+  return IsNeedRegisterCore(GetAccountFileFullPath());
+}
+
 void AccountFileAndAESKey::SetReEnterVisible(bool visible) {
-  mAesKeyConfirmLE->setVisible(visible);
+  mAesKeyConfirmLE->setHidden(!visible);
   if (QWidget* label = mLayout->labelForField(mAesKeyConfirmLE)) {
-    label->setVisible(visible);
+    label->setHidden(!visible);
   }
 }
 
@@ -105,7 +103,7 @@ bool AccountFileAndAESKey::TryCommitAesKey() {
 
 bool AccountFileAndAESKey::onSaveCurrentInputKey() {
   const QString aesKey = GetAesKey();
-  bool saveResult = CredUtilHelper::savePassword(GetCredTargetName(), aesKey);
+  bool saveResult = CredUtilHelper::savePassword(GetPasswordBookCredTargetName(), aesKey);
   LOG_OE_P(saveResult, "Save Aes key", "%d char to Credential Manager", aesKey.size());
   return saveResult;
 }

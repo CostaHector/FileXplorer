@@ -35,8 +35,6 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
       default:
         return QVariant();
     }
-  } else if (role == Qt::TextAlignmentRole) {
-    return int(Qt::AlignLeft);
   } else if (role == Qt::DecorationRole) {
     if (section == 0) {
       return AccountFileHelper::IconForType(item.typeStr.toLower());
@@ -142,7 +140,7 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
 }
 
 Qt::ItemFlags AccountTableModel::flags(const QModelIndex& index) const {
-  if (AccountInfo::IsColumnCannotEditByUser(index.column())){
+  if (!AccountInfo::IsColumnEditableByUser(index.column())) {
     return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable;
   }
   if (const AccountInfo* p = rowDataAt(index.row())) {
@@ -242,19 +240,19 @@ const AccountInfo* AccountTableModel::rowDataAt(int index) const {
 }
 
 void AccountTableModel::SetEncFileFullPath(const QString& encFileFullPath) {
-  ResetWithDecryptedNotify([this, encFileFullPath] {
+  ResetWithDecryptedNotify([this, encFileFullPath](){
     mAccountsList.SetEncFileFullPath(encFileFullPath);
   });
 }
 
 void AccountTableModel::SetAesKey(const QString& aesKey) {
-  ResetWithDecryptedNotify([this, aesKey] {
+  ResetWithDecryptedNotify([this, aesKey](){
     mAccountsList.SetAesKey(aesKey);
   });
 }
 
 void AccountTableModel::SetEncFileFullPathAndAesKey(const QString& encFileFullPath, const QString& aesKey) {
-  ResetWithDecryptedNotify([this, encFileFullPath, aesKey] {
+  ResetWithDecryptedNotify([this, encFileFullPath, aesKey](){
     AccountStorage temp{encFileFullPath, aesKey};
     mAccountsList.swap(temp);
   });

@@ -25,7 +25,7 @@ private:
 
   QAction *mSelectEncCsvFile{nullptr};
   QMenu *mMenu{nullptr};
-  const QString& mAesKey;
+  const QString mAesKey;
 };
 
 class CSVInputDialog : public QDialog {

@@ -20,6 +20,8 @@ DragDropTextEdit::DragDropTextEdit(const QString& aesKey, QWidget* parent) : QPl
   mMenu->addSeparator();
   mSelectEncCsvFile = mMenu->addAction(tr("select encrypt CSV file"));
   connect(mSelectEncCsvFile, &QAction::triggered, this, &DragDropTextEdit::onSelectEncCsvFileToParse);
+
+  setPlaceholderText("Enter your text here or drag encrypt csv file here...");
 }
 
 void DragDropTextEdit::dragEnterEvent(QDragEnterEvent* event) {
@@ -64,7 +66,7 @@ bool DragDropTextEdit::isContainsOneFile(const QMimeData& mimeData) {
 bool DragDropTextEdit::onSelectEncCsvFileToParse() {
   const QString encryptCsvFilePath = QFileDialog::getOpenFileName(this, "Select encrypt csv file", SystemPath::RoamingPath(), "CSV Files (*.csv)");
   if (encryptCsvFilePath.isEmpty()) {
-    LOG_INFO_NP("Cancel", "user cancel select encrypt file");
+    setPlainText("User cancel select encrypt file");
     return false;
   }
   return ParseEncryptCsvFileContents(encryptCsvFilePath);
@@ -73,8 +75,10 @@ bool DragDropTextEdit::onSelectEncCsvFileToParse() {
 bool DragDropTextEdit::ParseEncryptCsvFileContents(const QString& encryptCsvFilePath) {
   emit windowTitleChanged(encryptCsvFilePath);
 
+  bool parseResult{false};
   QString plainCsvFileContent;
-  if (!AccountFileHelper::ParseEncryptCsvFile(encryptCsvFilePath, plainCsvFileContent, mAesKey)) {
+  std::tie(parseResult, plainCsvFileContent) = AccountFileHelper::ParseEncryptCsvFile(encryptCsvFilePath, mAesKey);
+  if (!parseResult) {
     setPlainText(QString{"Parse encrypt csv file[%1] failed"}.arg(encryptCsvFilePath));
     return false;
   }
@@ -111,7 +115,7 @@ CSVInputDialog::CSVInputDialog(const QString aesKey, QWidget* parent) : QDialog{
   connect(pParseBtn, &QPushButton::clicked, this, &CSVInputDialog::onParseRequest);
 
   setWindowIcon(QIcon(":/pwd/action/LOAD_FROM_INPUT"));
-  setWindowTitle("Get record(s) from CSV input");
+  setWindowTitle("Append record(s) from CSV input");
 }
 
 bool CSVInputDialog::onParseRequest() {
@@ -123,11 +127,11 @@ bool CSVInputDialog::onParseRequest() {
 
   QString msg;
   if (bAllLinesOk) {
-    msg = QString{"%1 line(s) incomplete. Need fix at first"}.arg(incompleteLines.size());
-    LOG_ERR_NP("Some unexpected line(s) find", qPrintable(msg));
-  } else {
     msg = QString{"%1 line(s) accounts found."}.arg(mAppendAccounts.size());
     LOG_OK_NP("Parse ok", qPrintable(msg));
+  } else {
+    msg = QString{"%1 line(s) incomplete. Need fix at first"}.arg(incompleteLines.size());
+    LOG_ERR_NP("Some unexpected line(s) find", qPrintable(msg));
   }
   setWindowTitle(msg);
   return bAllLinesOk;

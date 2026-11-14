@@ -33,8 +33,10 @@ LoadResult ValidateAndLoad(const QString& encCsvFileFullPath, const QString& aes
     return {true, {}};
   }
   // Parse result
+  bool parseResult{false};
   QString plainCsvFileContent;
-  if (!ParseEncryptCsvFile(encCsvFileFullPath, plainCsvFileContent, aesKey)) {
+  std::tie(parseResult, plainCsvFileContent) = ParseEncryptCsvFile(encCsvFileFullPath, aesKey);
+  if (!parseResult) {
     // aes invalid or corrupted encrypted csv file
     LOG_W("Failed to parse encrypted CSV (wrong AES key or corrupted file): %s", qPrintable(encCsvFileFullPath));
     return {false, {}};
@@ -44,19 +46,20 @@ LoadResult ValidateAndLoad(const QString& encCsvFileFullPath, const QString& aes
   return {true, accounts};
 }
 
-bool ParseEncryptCsvFile(const QString& encryptCsvFilePath, QString& plainCsvFileContent, const QString& aesKey){
+std::pair<bool, QString> ParseEncryptCsvFile(const QString& encryptCsvFilePath, const QString& aesKey){
   bool bReadOk{false};
-  QString encryptedContents = FileTool::StringTextReader(encryptCsvFilePath, &bReadOk);
+  const QString encryptedContents = FileTool::StringTextReader(encryptCsvFilePath, &bReadOk);
   if (!bReadOk) {
     LOG_W("Open file[%s] to read failed", qPrintable(encryptCsvFilePath));
-    return false;
+    return {false, ""};
   }
-  bool decryptResult = SimpleAES(aesKey).decrypt_GCM(encryptedContents, plainCsvFileContent);
+  QString plainCsvFileContent;
+  const bool decryptResult = SimpleAES(aesKey).decrypt_GCM(encryptedContents, plainCsvFileContent);
   if (!decryptResult) {
     LOG_C("Decrypt file[%s] failed! Skip load", qPrintable(encryptCsvFilePath));
-    return false;
+    return {false, ""};
   }
-  return true;
+  return {true, plainCsvFileContent};
 }
 
 QList<AccountInfo> GetAccountsFromPlainString(const QString& contents, QList<int>& incompleteLines) {
@@ -94,7 +97,7 @@ QString GetExportCSVRecords(const QList<AccountInfo>& accounts) {
 // bEncrypt=true:  list<Account> -> plain Utf8 -> plain binary -> encrypted binary -> plain base64 -----> local file
 bool ExportAccountsToPlainCsvFile(const QList<AccountInfo>& accounts, const QString& savedToFileFullPath) {
   QString fullPlainCSVContents = GetExportCSVRecords(accounts);
-  const bool saveRes = FileTool::AtomicTextWriter(savedToFileFullPath, fullPlainCSVContents);
+  const bool saveRes = FileTool::StringTextWriter(savedToFileFullPath, fullPlainCSVContents, QIODevice::WriteOnly);
   if (!saveRes) {
     LOG_C("Open file[%s] to write failed", qPrintable(savedToFileFullPath));
     return false;
@@ -126,29 +129,28 @@ bool CommitChangesToEncryptedCsvFile(QList<AccountInfo>& accounts, const QString
   return true;
 }
 
-QString GetSaveToFullPath(bool bEncrypt, const QString& saveTo) {
-  return PathTool::Path2Join(saveTo.isEmpty() ? SystemPath::RoamingPath() : saveTo,
-                             bEncrypt ? ENCRYPTED_CSV_FILE_NAME : PLAIN_CSV_FILE_NAME);
+QString GetDefaultEncFileFullPath() {
+  return PathTool::Path2Join(SystemPath::RoamingPath(), ENCRYPTED_CSV_FILE_NAME);
 }
 
 const QIcon& IconForType(const QString& typeStr) {
   static const std::array<std::pair<QString, QIcon>, 8> kIcons
       {
-       std::pair<QString, QIcon>{"unionpay",   QIcon(":/bankcard/UNIONPAY")},
-       std::pair<QString, QIcon>{"mastercard", QIcon(":/bankcard/MASTERCARD")},
-       std::pair<QString, QIcon>{"visa",       QIcon(":/bankcard/VISA")},
-       std::pair<QString, QIcon>{"bank",       QIcon(":/type/BANK")},
-       std::pair<QString, QIcon>{"society",    QIcon(":/type/SOCIETY")},
-       std::pair<QString, QIcon>{"email",      QIcon(":/type/EMAIL")},
-       std::pair<QString, QIcon>{"game",       QIcon(":/type/GAME")},
-       std::pair<QString, QIcon>{"tool",       QIcon(":/type/TOOL")},
+       std::pair<QString, QIcon>{"unionpay",   QIcon(":/pwd/types/UNIONPAY")},
+       std::pair<QString, QIcon>{"mastercard", QIcon(":/pwd/types/MASTERCARD")},
+       std::pair<QString, QIcon>{"visa",       QIcon(":/pwd/types/VISA")},
+       std::pair<QString, QIcon>{"bank",       QIcon(":/pwd/types/BANK")},
+       std::pair<QString, QIcon>{"social",     QIcon(":/pwd/types/SOCIAL_MEDIA")},
+       std::pair<QString, QIcon>{"email",      QIcon(":/pwd/types/EMAIL")},
+       std::pair<QString, QIcon>{"game",       QIcon(":/pwd/types/GAME")},
+       std::pair<QString, QIcon>{"tool",       QIcon(":/pwd/types/TOOL")},
        };
-  static const QIcon kEmpty;
   for (int i = 0; i < kIcons.size(); ++i) {
     if (typeStr == kIcons[i].first) {
       return kIcons[i].second;
     }
   }
+  static const QIcon kEmpty;
   return kEmpty;
 }
 

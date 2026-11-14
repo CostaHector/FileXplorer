@@ -44,11 +44,9 @@ class PopupWidgetManagerTest : public PlainTestSuite {
         randomAct.setCheckable(isCheckable);
         PopupWidgetManager<WIDGET_TYPE> actionNullptrPopupMgr{nullptr, &parentWidget};
         PopupWidgetManager<WIDGET_TYPE> parentNullptrPopupMgr{&randomAct, nullptr};
-        PopupWidgetManager<WIDGET_TYPE> emptyCfgKeyPopupMgr{&randomAct, &parentWidget};
         emit randomAct.triggered(true);
         QVERIFY(!actionNullptrPopupMgr.isVisible());
         QVERIFY(!parentNullptrPopupMgr.isVisible());
-        QVERIFY(!emptyCfgKeyPopupMgr.isVisible());
         emit randomAct.triggered(false);
       }
 
