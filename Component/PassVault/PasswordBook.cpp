@@ -102,7 +102,7 @@ PasswordBook::PasswordBook(const QString& specifyEncFileFullPath, const QString&
   mSortProxyModel = new (std::nothrow) AccountSortFilterProxyModel{this};
   CHECK_NULLPTR_RETURN_VOID(mSortProxyModel);
   mSortProxyModel->setSourceModel(mPwdModel);
-  mSortProxyModel->initSortSetting(AccountInfo::Role::TYPE_STR_ROLE, false); // 默认按照Name升序
+  mSortProxyModel->initSortSetting(AccountInfo::Role::TYPE_STR_ROLE, false); // 默认按照Type升序
 
   mMainWidget = new QStackedWidget{this};
   onAccountViewChanged(defaultViewType);

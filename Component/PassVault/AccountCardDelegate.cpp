@@ -3,6 +3,7 @@
 #include "AccountInfo.h"
 #include "AccountFileHelper.h"
 
+#include <QAbstractProxyModel>
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QPushButton>
@@ -128,6 +129,7 @@ QWidget *AccountCardDelegate::createEditor(QWidget *parent, const QStyleOptionVi
 void AccountCardDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
   auto* e = qobject_cast<AccountCardEditor*>(editor);
   if (!e) return;
+
   e->typeEdit()->setText(       index.data(AccountInfo::Role::TYPE_STR_ROLE).toString());
   e->nameEdit()->setText(       index.data(AccountInfo::Role::NAME_STR_ROLE).toString());
   e->accountEdit()->setText(    index.data(AccountInfo::Role::ACCOUNT_STR_ROLE).toString());
@@ -138,11 +140,31 @@ void AccountCardDelegate::setEditorData(QWidget *editor, const QModelIndex &inde
 void AccountCardDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
   auto* e = qobject_cast<AccountCardEditor*>(editor);
   if (!e) return;
-  model->setData(index, e->typeEdit()->text(),          AccountInfo::Role::TYPE_STR_ROLE);
-  model->setData(index, e->nameEdit()->text(),          AccountInfo::Role::NAME_STR_ROLE);
-  model->setData(index, e->accountEdit()->text(),       AccountInfo::Role::ACCOUNT_STR_ROLE);
-  model->setData(index, e->pwdEdit()->text(),           AccountInfo::Role::PWD_STR_ROLE);
-  model->setData(index, e->othersEdit()->toPlainText(), AccountInfo::Role::OTHERS_STR_ROLE);
+
+  QModelIndex srcIndex = index;
+  QAbstractItemModel *targetModel = model;
+  if (auto *proxy = qobject_cast<QAbstractProxyModel *>(model)) {
+    // 如果用了代理， 那就获取原模型和再原模型中的index
+    srcIndex = proxy->mapToSource(index);
+    targetModel = proxy->sourceModel();
+  }
+  if (!srcIndex.isValid() || !targetModel) {
+    return;
+  }
+
+  // 3. 兜底：源模型若内部发生行重排，持久索引会跟随
+  const QPersistentModelIndex pIndex(srcIndex);
+
+  const QString type    = e->typeEdit()->text();
+  const QString name    = e->nameEdit()->text();
+  const QString account = e->accountEdit()->text();
+  const QString pwd     = e->pwdEdit()->text();
+  const QString others  = e->othersEdit()->toPlainText();
+  targetModel->setData(pIndex, type,          AccountInfo::Role::TYPE_STR_ROLE);
+  targetModel->setData(pIndex, name,          AccountInfo::Role::NAME_STR_ROLE);
+  targetModel->setData(pIndex, account,       AccountInfo::Role::ACCOUNT_STR_ROLE);
+  targetModel->setData(pIndex, pwd,           AccountInfo::Role::PWD_STR_ROLE);
+  targetModel->setData(pIndex, others, AccountInfo::Role::OTHERS_STR_ROLE);
 }
 
 void AccountCardDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const {
