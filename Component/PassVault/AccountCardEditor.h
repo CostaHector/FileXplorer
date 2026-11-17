@@ -17,7 +17,9 @@ public:
   QLineEdit*   accountEdit() const   { return mAccountEdit; }
   QLineEdit*   pwdEdit() const       { return mPwdEdit; }
   QPlainTextEdit* othersEdit() const { return mOthersEdit; }
-
+#ifdef RUNNING_UNIT_TESTS
+  QPushButton* GetStageButton()      { return mStageButton; }
+#endif
 signals:
   void stageCurrentChanges();
   void revertCurrentChanges();

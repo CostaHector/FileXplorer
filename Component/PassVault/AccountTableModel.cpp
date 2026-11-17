@@ -119,8 +119,12 @@ bool AccountTableModel::setData(const QModelIndex& index, const QVariant& value,
       return false;
   }
 
-  item.SetModified(true);
   emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+  if (!item.IsModified()) {
+    item.SetModified(true);
+    const QModelIndex modifiedColIndex = index.siblingAtColumn(AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE));
+    emit dataChanged(modifiedColIndex, modifiedColIndex, {Qt::DisplayRole});
+  }
   return true;
 }
 
@@ -177,7 +181,7 @@ int AccountTableModel::InsertNRows(int indexBefore, int cnt) {
   if (indexBefore < 0) {
     indexBefore = 0;
   }
-  if (indexBefore >= rowCount()) {
+  if (indexBefore > rowCount()) {
     indexBefore = rowCount();
   }
   const int before = rowCount();

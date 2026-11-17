@@ -138,21 +138,50 @@ private slots:
     // 4. 测试数据修改 依次修改Type, Name, Account
     {
       dataChangedSpy.clear();
-      {
-        // 未变更, 认为已经修改好了, 不会标记以修改, 不会触发dataChanged
-        QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), false);
-        QVERIFY(model.setData(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE)), "E-mail"));
-        QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), false);
-        QCOMPARE(dataChangedSpy.count(), 0);
-      }
+      // 4.1 未变更, 认为已经修改好了, 不会标记以修改, 不会触发dataChanged
+      QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), false);
+      QVERIFY(model.setData(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE)), "E-mail"));
+      QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), false);
+      QCOMPARE(dataChangedSpy.count(), 0);
       dataChangedSpy.clear();
 
+      // 4.2 type 改到新值 + isModified 从false改到true, 共两次
       QVERIFY(model.setData(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE)), "Social Media")); // 标记已修改
       QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE))).toString(), "Social Media");
       QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), true);
+      QCOMPARE(dataChangedSpy.count(), 2);
+      {
+        const QVariantList typeIndexChangedToNew = dataChangedSpy[0];
+        const QModelIndex typeIndexChangedFrontIndex = typeIndexChangedToNew[0].toModelIndex();
+        const QModelIndex typeIndexChangedBackIndex = typeIndexChangedToNew[1].toModelIndex();
+        QCOMPARE(typeIndexChangedFrontIndex.row(), 0);
+        QCOMPARE(typeIndexChangedFrontIndex.column(), AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE));
+        QCOMPARE(typeIndexChangedFrontIndex, typeIndexChangedBackIndex);
 
+        const QVariantList isModifiedIndexChangedToNew = dataChangedSpy[1];
+        const QModelIndex isModifiedIndexChangedToNewFrontIndex = isModifiedIndexChangedToNew[0].toModelIndex();
+        const QModelIndex isModifiedIndexChangedToNewBackIndex = isModifiedIndexChangedToNew[1].toModelIndex();
+        QCOMPARE(isModifiedIndexChangedToNewFrontIndex.row(), 0);
+        QCOMPARE(isModifiedIndexChangedToNewFrontIndex.column(), AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE));
+        QCOMPARE(isModifiedIndexChangedToNewFrontIndex, isModifiedIndexChangedToNewFrontIndex);
+      }
+      dataChangedSpy.clear();
+
+      // 4.3 type 改到新值， isModified 已经是true了
       QVERIFY(model.setData(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE)), "E-mail"));
       QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE))).toString(), "E-mail"); // 改回去
+      QCOMPARE(model.data(model.index(0, AccountInfo::Role2Column(AccountInfo::Role::IS_MODIFIED_ROLE))).toBool(), true);
+      QCOMPARE(dataChangedSpy.count(), 1);
+      {
+        const QVariantList typeIndexChangedBack = dataChangedSpy[0];
+        QCOMPARE(typeIndexChangedBack.size(), 3);
+        const QModelIndex typeIndexChangedBackFrontIndex = typeIndexChangedBack[0].toModelIndex();
+        const QModelIndex typeIndexChangedBackBackIndex = typeIndexChangedBack[1].toModelIndex();
+        QCOMPARE(typeIndexChangedBackFrontIndex.row(), 0);
+        QCOMPARE(typeIndexChangedBackFrontIndex.column(), AccountInfo::Role2Column(AccountInfo::Role::TYPE_STR_ROLE));
+        QCOMPARE(typeIndexChangedBackFrontIndex, typeIndexChangedBackBackIndex);
+      }
+      dataChangedSpy.clear();
     }
 
     dataChangedSpy.clear();

@@ -19,7 +19,7 @@ AccountCardEditor::AccountCardEditor(QWidget *parent) : QWidget(parent) {
   mStageButton->setToolTip(QString{"<b>%1 (%2)</b><br/> Apply changes to this row in the list. Not written to the account file until you save."}
                                .arg(mStageButton->text(), mStageButton->shortcut().toString()));
 
-  auto* form = new QFormLayout;
+  auto* form = new QFormLayout{this};
   form->setContentsMargins(8, 8, 8, 0);
   form->addRow(tr("Type"),     mTypeEdit);
   form->addRow(tr("Name"),     mNameEdit);
