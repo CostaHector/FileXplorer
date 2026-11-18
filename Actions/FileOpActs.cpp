@@ -33,7 +33,7 @@ FileOpActs::FileOpActs(QObject* parent)
 
   BATCH_NEW_FOLDERS = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), tr("New Folders"), this);
   NEW_DVD_INFO = new (std::nothrow) QAction(QIcon(":img/NEW_DVD_INFO"), tr("New DVD Info"), this);
-  NEW_JSON_FROM_NFO = new (std::nothrow) QAction(QIcon(":img/NEW_DVD_INFO"), tr("new Json from Xml"), this);
+  NEW_JSON_FROM_NFO = new (std::nothrow) QAction(QIcon{":img/NFO_XML_FILE"}, tr("New Json from Nfo"), this);
 
   NEW = GetNEWActions();
 

@@ -727,7 +727,7 @@
         <translation>新建DVD元数据</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+5"/>
         <source>Move to</source>
         <translation>移动到</translation>
     </message>
@@ -797,7 +797,7 @@
         <translation>解除占用文件</translation>
     </message>
     <message>
-        <location line="+323"/>
+        <location line="+325"/>
         <source>Query</source>
         <translation>询问</translation>
     </message>
@@ -812,12 +812,17 @@
         <translation>拉平</translation>
     </message>
     <message>
-        <location line="-309"/>
+        <location line="-311"/>
         <source>Undo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location line="-9"/>
+        <location line="-35"/>
+        <source>New Json from Nfo</source>
+        <translation>根据Nfo生成Json</translation>
+    </message>
+    <message>
+        <location line="+26"/>
         <source>Show recycle confirmation</source>
         <translation>回收前确认</translation>
     </message>
