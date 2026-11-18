@@ -37,6 +37,7 @@ private:
 
   bool on_BatchNewFilesOrFolders(bool isFolder = false);
   bool on_CreateDvdInfoRecursively();
+  bool on_createJsonFromNfoXmlFile();
 
   bool on_CreateVideoStoryBoard(int dimensionX, int dimensionY, int widthPx, bool skipIfExist = true);
   bool on_CreateThumbnailForAPath(bool skipIfExist);

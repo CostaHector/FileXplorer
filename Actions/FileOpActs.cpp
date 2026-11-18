@@ -33,6 +33,8 @@ FileOpActs::FileOpActs(QObject* parent)
 
   BATCH_NEW_FOLDERS = new (std::nothrow) QAction(QIcon(":img/NEW_FOLDERS"), tr("New Folders"), this);
   NEW_DVD_INFO = new (std::nothrow) QAction(QIcon(":img/NEW_DVD_INFO"), tr("New DVD Info"), this);
+  NEW_JSON_FROM_NFO = new (std::nothrow) QAction(QIcon(":img/NEW_DVD_INFO"), tr("new Json from Xml"), this);
+
   NEW = GetNEWActions();
 
   _MOVE_TO = new (std::nothrow) QAction(QIcon(":img/MV_TO_COMMAND_PATH"), tr("Move to"), this);
@@ -286,6 +288,7 @@ QActionGroup* FileOpActs::GetNEWActions() {
                                 "it will create ten folders numbered by Page 001,002,...,009 respectively.");
   NEW_DVD_INFO->setToolTip(QString("<b>%1 (%2)</b><br/>").arg(NEW_DVD_INFO->text(), NEW_DVD_INFO->shortcut().toString()) +
                            "Create a .dvd metadata file that stores total size, total duration, and an MD5 checksum, allowing rapid database rebuilds without rescanning the original DVD files.");
+  NEW_JSON_FROM_NFO->setToolTip("Generate JSON files from the selected NFO files");
 
   QActionGroup* actionGroup = new (std::nothrow) QActionGroup(this);
   actionGroup->addAction(NEW_FOLDER);
@@ -294,6 +297,7 @@ QActionGroup* FileOpActs::GetNEWActions() {
   actionGroup->addAction(BATCH_NEW_FILES);
   actionGroup->addAction(BATCH_NEW_FOLDERS);
   actionGroup->addAction(NEW_DVD_INFO);
+  actionGroup->addAction(NEW_JSON_FROM_NFO);
   return actionGroup;
 }
 

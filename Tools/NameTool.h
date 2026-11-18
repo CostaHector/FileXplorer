@@ -49,6 +49,7 @@ class NameTool {
   static constexpr const char COMMA_SPACE_EXT[] = ", etc";
   static constexpr const int COMMA_SPACE_EXT_LEN = sizeof(COMMA_SPACE_EXT) - 1;
   static constexpr const char* COMMA_SPACE = ", ";
+  static constexpr const char* COLON_SPACE = ": ";
 
   static constexpr char CSV_COMMA = ',';
   static constexpr char CELL_NEW_LINE = '\n';

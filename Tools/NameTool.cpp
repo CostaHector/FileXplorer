@@ -17,6 +17,7 @@ const QSet<QChar> NameTool::INVALID_FILE_NAME_CHAR_SET(INVALID_CHARS.cbegin(), I
 constexpr const char NameTool::COMMA_SPACE_EXT[];
 constexpr const int NameTool::COMMA_SPACE_EXT_LEN;
 constexpr const char* NameTool::COMMA_SPACE;
+constexpr const char* NameTool::COLON_SPACE;
 
 constexpr char NameTool::CELL_NEW_LINE;
 constexpr char NameTool::CSV_COMMA;
