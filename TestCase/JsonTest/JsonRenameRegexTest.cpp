@@ -3,7 +3,6 @@
 #include "PlainTestSuite.h"
 // add necessary includes here
 #include "JsonRenameRegex.h"
-#include "DbManager.h"
 
 using namespace JSON_RENAME_REGEX;
 class JsonRenameRegexTest : public PlainTestSuite {

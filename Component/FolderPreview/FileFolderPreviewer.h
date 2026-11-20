@@ -7,6 +7,7 @@
 #include <QSqlRecord>
 
 class FileFolderPreviewer : public QStackedWidget {
+  Q_OBJECT
 public:
   enum class PANE_TYPE : int { BEGIN = 0, DETAIL = BEGIN, IMG_VID_OTH, BUTT };
   explicit FileFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
@@ -54,6 +55,9 @@ public:
   void UpdateOthers(const QStringList& dataLst) {
     mImgVidOtherPane->UpdateOthers(dataLst);
   }
+
+ signals:
+  void forwardPlaySiblingMediaRequested(int step);
 
 private:
   QString mLastName;

@@ -30,11 +30,12 @@ private:
   void subscribe();
 
   BasicVideoView* mBasicVideoView{nullptr};
+
   QWidget* mExtendedFunctionCtrlBar{nullptr};                          // 扩展功能控制条
   QVBoxLayout* mExtendLeftLayout{nullptr};                             // 扩展左侧布局
   QWidget* mExtendLeftWidget{nullptr};                                 // 扩展左侧Widget
 
-  VideoTableView* mVideoList{nullptr}; // 视频文件列表
+  VideoTableView* mVideoList{nullptr};                                 // 右侧视频文件列表
 
   TFuncFullScreenToggleCallback mFullScreenCallback;
 };

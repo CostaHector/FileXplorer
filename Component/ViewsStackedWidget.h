@@ -58,6 +58,7 @@ class ViewsStackedWidget : public QStackedWidget {
   void on_fsmCurrentRowChanged(const QModelIndex &current, const QModelIndex &/*previous*/);
   void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
+  bool LocateToSpecifiedFile(int step);
 
   void keyPressEvent(QKeyEvent* e) override;
 
@@ -90,6 +91,7 @@ class ViewsStackedWidget : public QStackedWidget {
   QString getCurFilePath(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QString getCurFileName(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QFileInfo getFileInfo(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QAbstractItemView* GetCurViewWidgetByViewType() const;
 
  public:
   struct Anchor {

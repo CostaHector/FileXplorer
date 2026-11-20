@@ -31,6 +31,7 @@
 #include "FileBatchOps.h"
 #include "DuplicateVideosFinder.h"
 #include "HarMgr.h"
+#include "NfoXmlHelper.h"
 
 #include "InputDialogHelper.h"
 #include "ItemsUnpacker.h"
@@ -181,6 +182,20 @@ bool FileXplorerEvent::on_CreateDvdInfoRecursively() {
   int succeedCnt = CreateFileFolderHelper::GenerateDvdFileRecursively(createIn, bOverrideWhenExist);
   LOG_OE_P(succeedCnt >= 0, "Create dvd meta", "%d .dvd file under path:%s created ok", succeedCnt, qPrintable(createIn));
   return succeedCnt >= 0;
+}
+
+bool FileXplorerEvent::on_createJsonFromNfoXmlFile() {
+  if (!__CanNewItem()) {
+    return false;
+  }
+  QStringList fileFullPaths = FsmSelectedItems();
+  if (fileFullPaths.isEmpty()) {
+    LOG_INFO_NP("Skip nothing selected", "selected some nfo file(s) first");
+    return true;
+  }
+  const int succeedCnt = NfoXmlHelper::GenerateJsonsFromNfoXMLs(fileFullPaths);
+  LOG_OE_P(succeedCnt >= 0, "Create json", "%d json file generated from %d selected", succeedCnt, fileFullPaths.size());
+  return succeedCnt > 0;
 }
 
 bool FileXplorerEvent::on_CreateVideoStoryBoard(int dimensionX, int dimensionY, int widthPx, bool skipIfExist) {
@@ -519,6 +534,7 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst.BATCH_NEW_FILES, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(false); });
     connect(fileOpInst.BATCH_NEW_FOLDERS, &QAction::triggered, this, [this]() { FileXplorerEvent::on_BatchNewFilesOrFolders(true); });
     connect(fileOpInst.NEW_DVD_INFO, &QAction::triggered, this, &FileXplorerEvent::on_CreateDvdInfoRecursively);
+    connect(fileOpInst.NEW_JSON_FROM_NFO, &QAction::triggered, this, &FileXplorerEvent::on_createJsonFromNfoXmlFile);
 
     connect(fileOpInst._REVEAL_IN_EXPLORER, &QAction::triggered, this, &FileXplorerEvent::on_revealInExplorer);
     connect(fileOpInst._OPEN_IN_TERMINAL, &QAction::triggered, this, &FileXplorerEvent::on_OpenInTerminal);

@@ -3,7 +3,7 @@
 #include "PathTool.h"
 #include "PublicVariable.h"
 #include "FileTool.h"
-#include "PublicCheckMacro.h"
+#include "Logger.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>

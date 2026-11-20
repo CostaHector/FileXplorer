@@ -12,7 +12,6 @@
 #include "VideoPlayTool.h"
 #include "WindowsSystemVolumeMixer.h"
 #include "VolumeWidget.h"
-#include "FolderNxtAndLastIterator.h"
 #include "FileBatchOps.h"
 
 #include <QFile>
@@ -34,6 +33,7 @@ BasicVideoView::BasicVideoView(bool bBasicMode, QWidget* parent)
   mFunctionCtrlBar = new (std::nothrow) ToolBarWidget{QBoxLayout::Direction::LeftToRight, this};
   mFunctionCtrlBar->addAction(mVideoWidget->mGrabFrame);
   mFunctionCtrlBar->addAction(mVideoWidget->mRenameCurrentMediaAct);
+  mFunctionCtrlBar->addAction(mVideoWidget->mMoveToTrashRelatedFilesAct);
   mFunctionCtrlBar->addSeparator();
   mFunctionCtrlBar->addAction(mVideoWidget->mSelectVideoFileAct);
   mFunctionCtrlBar->addAction(mVideoWidget->mPauseAct);
@@ -83,10 +83,6 @@ BasicVideoView::~BasicVideoView() {
   //   delete mVideoWidget;
   //   mVideoWidget = nullptr;
   // }
-
-  if (isEnableVideoIterate()) {
-    clearVideoIterate();
-  }
 }
 
 void BasicVideoView::subscribe() {
@@ -102,6 +98,7 @@ void BasicVideoView::subscribe() {
   connect(this, &BasicVideoView::userMousePressOrKeyPressHappened, mVideoWidget, &InteractiveVideoWidget::onUserMouseClickOrKeyPressEvent);
 
   connect(mVideoWidget->mRenameCurrentMediaAct, &QAction::triggered, this, &BasicVideoView::on_RenameReplace);
+  connect(mVideoWidget->mMoveToTrashRelatedFilesAct, &QAction::triggered, this, &BasicVideoView::on_RecycleRelated);
   connect(mVideoWidget->mGrabFrame, &QAction::triggered, this, &BasicVideoView::onGrabCurrentFrame);
 
   connect(mVideoWidget->mPauseAct, &QAction::toggled, this, &BasicVideoView::onPauseActionToggled);
@@ -141,6 +138,8 @@ void BasicVideoView::subscribe() {
   connect(&FileOpActs::GetInst(), &FileOpActs::unlockOccupiedFiles, this, &BasicVideoView::onStopPlaying);
 
   connect(this, &BasicVideoView::currentMediaChanged, mOperationStatusLbl, &AutoHideLabel::showPlayingMediaName);
+
+  EnableVideoIterate();
 }
 
 void BasicVideoView::emitFullScreenModeReq(bool bFullScreen) {
@@ -436,44 +435,21 @@ bool BasicVideoView::PlayCore(QMediaPlayer* mediaPlayer) {
 }
 
 void BasicVideoView::EnableVideoIterate() {
-  if (isEnableVideoIterate()) {
-    return; // no need enable. already enabled.
-  }
-  mVideoIterator = FolderNxtAndLastIterator::NewInstsNaviVideos(false);
-  mVideoIterator->setWrapEnabled(false);
-  connect(mVideoWidget->mPlayPrevAct, &QAction::triggered, this, &BasicVideoView::onNavigatePreviousVideo);
-  connect(mVideoWidget->mPlayNextAct, &QAction::triggered, this, &BasicVideoView::onNavigateNextVideo);
+  connect(mVideoWidget->mPlayPrevInActiveViewAct, &QAction::triggered, this, &BasicVideoView::onNavigatePreviousVideo);
+  connect(mVideoWidget->mPlayNextInActiveViewAct, &QAction::triggered, this, &BasicVideoView::onNavigateNextVideo);
 }
 
-void BasicVideoView::DisableVideoIterate() {
-  if (!isEnableVideoIterate()) {
-    return; // no need disable. already disabled
+bool BasicVideoView::navigateVideo(int step) {
+  if (step == 0) {
+    return false;
   }
-  disconnect(mVideoWidget->mPlayPrevAct, &QAction::triggered, this, &BasicVideoView::onNavigatePreviousVideo);
-  disconnect(mVideoWidget->mPlayNextAct, &QAction::triggered, this, &BasicVideoView::onNavigateNextVideo);
-  clearVideoIterate();
-}
-
-void BasicVideoView::clearVideoIterate() {
-  if (mVideoIterator != nullptr) {
-    delete mVideoIterator;
-    mVideoIterator = nullptr;
-  }
-}
-
-bool BasicVideoView::navigateVideo(bool bForward) {
   if (mCurrentPlayingMediaPath.isEmpty()) {
     return false;
   }
-  QString prepath;
-  const QString vidName = PathTool::GetPrepathAndFileName(mCurrentPlayingMediaPath, prepath);
-  const QString targetVidName = bForward ? mVideoIterator->next(prepath, vidName)
-                                         : mVideoIterator->last(prepath, vidName);
-  if (targetVidName == vidName) {
-    mOperationStatusLbl->setStatusMessage(bForward ? "Reached Last" : "Reached First");
-    return false;
-  }
-  return PlayAVideo(PathTool::Path2Join(prepath, targetVidName), true);
+  const int normalizedStep{step > 0 ? +1 : -1};
+  // 目标文件由视图侧(currentIndex +/- 1 找视频)决定; 这里只负责发方向
+  emit reqPlaySiblingMedia(normalizedStep);
+  return true;
 }
 
 void BasicVideoView::DisableRenameShortcut() {
@@ -488,6 +464,16 @@ bool BasicVideoView::on_RenameReplace() {
   const QString vidName = PathTool::GetPrepathAndFileName(mCurrentPlayingMediaPath, prepath);
   const int relatedFilesCnt = FileBatchOps::RenameWithPatternReplace(prepath, {vidName});
   return relatedFilesCnt > 0;
+}
+
+bool BasicVideoView::on_RecycleRelated() {
+  if (mCurrentPlayingMediaPath.isEmpty()) {
+    return false;
+  }
+  QString prepath;
+  const QString vidName = PathTool::GetPrepathAndFileName(mCurrentPlayingMediaPath, prepath);
+  const FileBatchOps::OpOutcome recycleResult = FileBatchOps::MoveToTrashSelectedWithRelated(prepath, {vidName});
+  return recycleResult.result != FileBatchOps::OpStatus::PARTIAL_FAILED;
 }
 
 /*

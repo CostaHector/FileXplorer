@@ -34,7 +34,7 @@ Q_OBJECT
   QActionGroup* COPY_PATH_AG{nullptr};
 
   QActionGroup* GetNEWActions();
-  QAction *NEW_FOLDER{nullptr}, *NEW_TEXT_FILE{nullptr}, *NEW_JSON_FILE{nullptr}, *BATCH_NEW_FILES{nullptr}, *BATCH_NEW_FOLDERS{nullptr}, *NEW_DVD_INFO{nullptr};
+  QAction *NEW_FOLDER{nullptr}, *NEW_TEXT_FILE{nullptr}, *NEW_JSON_FILE{nullptr}, *BATCH_NEW_FILES{nullptr}, *BATCH_NEW_FOLDERS{nullptr}, *NEW_DVD_INFO{nullptr}, *NEW_JSON_FROM_NFO{nullptr};
   QActionGroup* NEW{nullptr};
 
   QActionGroup* Get_Advance_Search_Actions();

@@ -50,12 +50,14 @@ private:
   void tryStartAutoHideTimer();
 
   QAction* mRenameCurrentMediaAct{nullptr};                            // 重命名当前媒体及相关文件
+  QAction* mMoveToTrashRelatedFilesAct{nullptr};                       // 回收当前媒体及相关文件
   QAction* mGrabFrame{nullptr};                                        // 抓取当前帧
   QAction* mPauseAct{nullptr};                                         // 通用暂停/继续动作
   QAction* mStopAct{nullptr};                                          // 停止播放
   QAction *mSeekBackwardAct{nullptr}, *mSeekForwardAct{nullptr};       // 快退10s, 快进10s
   QAction *mSeekBackwardHotAct{nullptr}, *mSeekForwardHotAct{nullptr}; // 上一个热点, 下一个热点
-  QAction *mPlayPrevAct{nullptr}, *mPlayNextAct{nullptr};              // 上一首, 下一首
+  QAction *mPlayPrevInActiveViewAct{nullptr}, *mPlayNextInActiveViewAct{nullptr};              // 修改当前视图的选中行到 上一个/下一个 含有视频的行, 并播放该视频
+  QAction *mPlayPrevInPlaylistAct{nullptr}, *mPlayNextInPlaylistAct{nullptr};                 // 播放右侧播放列表中的 上一个/下一个 视频
   RateActions* mRateActions{nullptr};                                  // 单文件/路径内文件递归评分
   QAction* mShowFrames{nullptr};                                       // 展示帧截图
   QAction* mShowVideoList{nullptr};                                    // 显示视频文件列表

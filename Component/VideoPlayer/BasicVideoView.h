@@ -10,7 +10,6 @@
 #include "ToolBarWidget.h"
 #include "InteractiveVideoWidget.h"
 
-class FolderNxtAndLastIterator;
 class BasicVideoView : public QWidget {
   Q_OBJECT
 public:
@@ -34,11 +33,10 @@ public:
   bool on_RenameReplace();
   void DisableRenameShortcut();
 
+  bool on_RecycleRelated();
+
   /* 访问 前一个/后一个 视频 */
   void EnableVideoIterate();
-  bool isEnableVideoIterate() { return mVideoIterator != nullptr; }
-  void DisableVideoIterate();
-  void clearVideoIterate();
 
 signals:
   void reqFunctionModeChange(bool bBasicMode);
@@ -46,6 +44,7 @@ signals:
   void reqPlayNextOneMedia();
   void userMousePressOrKeyPressHappened();
   void currentMediaChanged(const QString& mediaPath);
+  void reqPlaySiblingMedia(int step);
 
 protected:
   void showEvent(QShowEvent* event) override;
@@ -90,10 +89,9 @@ private:
 
   QTimer mProgressSliderUpdateTimer;
   QString mCurrentPlayingMediaPath;
-  FolderNxtAndLastIterator* mVideoIterator{nullptr};
-  bool onNavigatePreviousVideo() { return navigateVideo(false); }
-  bool onNavigateNextVideo()     { return navigateVideo(true);  }
-  bool navigateVideo(bool bForward);
+  bool onNavigatePreviousVideo() { return navigateVideo(-1); }
+  bool onNavigateNextVideo()     { return navigateVideo(1);  }
+  bool navigateVideo(int step);
 
   mutable QMediaPlayer::Error mError{QMediaPlayer::Error::NoError};
 };

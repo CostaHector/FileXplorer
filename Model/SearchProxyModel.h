@@ -7,6 +7,7 @@
 #include "SearchTools.h"
 
 class SearchProxyModel : public QSortFilterProxyModel {
+  Q_OBJECT
 public:
   using QSortFilterProxyModel::QSortFilterProxyModel;
   // only set value, no trigger filter

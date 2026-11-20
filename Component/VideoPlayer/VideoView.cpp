@@ -52,12 +52,9 @@ void VideoView::onReqModeChange(bool bBasicMode) {
 
 void VideoView::subscribe() {
   const InteractiveVideoWidget* inst = mBasicVideoView->GetVideoWidget();
-  if (mBasicVideoView->isEnableVideoIterate()) {
-    LOG_W("Video iterate navigation slot callback handed over: BasicVideoView -> VideoTableView");
-    mBasicVideoView->DisableVideoIterate();
-  }
-  connect(inst->mPlayPrevAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
-  connect(inst->mPlayNextAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
+  connect(inst->mPlayPrevInPlaylistAct, &QAction::triggered, mVideoList, &VideoTableView::PlayPreviousVideo);
+  connect(inst->mPlayNextInPlaylistAct, &QAction::triggered, mVideoList, &VideoTableView::PlayNextVideo);
+
   connect(inst->mShowVideoList, &QAction::toggled, this, &VideoView::onChangeListVisibility);
   // InteractiveVideoWidget select folder, tableview&model filter medias, BasicVideoView play it
   connect(inst, &InteractiveVideoWidget::newFolderSelectedChangedByUser, this, &VideoView::PlayAPath);
@@ -67,7 +64,7 @@ void VideoView::subscribe() {
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
 
   connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);
-  connect(mBasicVideoView, &BasicVideoView::reqPlayNextOneMedia, inst->mPlayNextAct, &QAction::trigger);
+  connect(mBasicVideoView, &BasicVideoView::reqPlayNextOneMedia, inst->mPlayNextInActiveViewAct, &QAction::trigger);
 }
 
 int VideoView::PlayAPath(const QString& folderPath, bool bPlayInstantly) {

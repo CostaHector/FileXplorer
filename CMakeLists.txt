@@ -32,8 +32,8 @@ set(CMAKE_AUTOMOC_MOC_OPTIONS "-DLOG_MACRO_IS_SAFE")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Search for Qt libraries in the order of Qt6, Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Sql Widgets Network Charts LinguistTools Multimedia MultimediaWidgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Network Charts LinguistTools Multimedia MultimediaWidgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Sql Widgets Network Charts LinguistTools Multimedia MultimediaWidgets Xml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Sql Widgets Network Charts LinguistTools Multimedia MultimediaWidgets Xml)
 
 
 file(GLOB SOURCES
@@ -192,6 +192,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Charts
     Qt${QT_VERSION_MAJOR}::Multimedia
     Qt${QT_VERSION_MAJOR}::MultimediaWidgets
+    Qt${QT_VERSION_MAJOR}::Xml
 )
 
 if(WIN32)

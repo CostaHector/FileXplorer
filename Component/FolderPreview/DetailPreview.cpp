@@ -9,7 +9,6 @@ DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_P
 
   mDetailTextBrowser = new (std::nothrow) ClickableTextBrowser{this};
   mBasicVideoView = new (std::nothrow) BasicVideoView{true, this};
-  mBasicVideoView->EnableVideoIterate();
 
   mBasicVideoView->setVisible(false);
   addWidget(mDetailTextBrowser);
@@ -17,6 +16,8 @@ DetailPreview::DetailPreview(QWidget* parent) : FullScreenableSplitter{"DETAIL_P
 
   mBasicVideoView->registerFullScreenToggleCallback(std::bind(&DetailPreview::onReqFullscreenModeChange, this, std::placeholders::_1));
   restoreState(Configuration().value(GetMemoryName() + "/STATE").toByteArray());
+
+  connect(mBasicVideoView, &BasicVideoView::reqPlaySiblingMedia, this, &DetailPreview::forwardPlaySiblingMediaRequested);
 }
 
 DetailPreview::~DetailPreview() {  //

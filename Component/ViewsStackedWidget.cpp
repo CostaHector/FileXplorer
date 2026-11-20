@@ -151,6 +151,7 @@ auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
 
 void ViewsStackedWidget::subscribe() {
   connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ViewsStackedWidget::onAfterDirectoryLoaded);
+  connect(_previewFolder, &CurrentRowPreviewer::forwardPlaySiblingMediaRequested, this, &ViewsStackedWidget::LocateToSpecifiedFile);
 }
 
 void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
@@ -359,7 +360,58 @@ bool ViewsStackedWidget::onAfterDirectoryLoaded(const QString& loadedPath) {
   return true;
 }
 
-auto ViewsStackedWidget::keyPressEvent(QKeyEvent* e) -> void {
+bool ViewsStackedWidget::LocateToSpecifiedFile(int step) {
+  if (step == 0) {
+    LOG_D("step is 0, ignore");
+    return false;
+  }
+  QAbstractItemView* viewWid = GetCurViewWidgetByViewType();
+  CHECK_NULLPTR_RETURN_FALSE(viewWid);
+  QAbstractItemModel* pModel = viewWid->model();
+  CHECK_NULLPTR_RETURN_FALSE(pModel);
+
+  const int direction{step > 0 ? +1 : -1};  // 归一化, 只支持"前一个/后一个"
+  const QModelIndex curIndex{viewWid->currentIndex()};
+
+  // TREE 当前行可能在展开的子目录里 -> 用它自己的 parent; 若无选中 -> 退回视图 rootIndex
+  const QModelIndex parentIndex{curIndex.isValid() ? curIndex.parent() : viewWid->rootIndex()};
+  const int rowCnt{pModel->rowCount(parentIndex)};
+  const int col{curIndex.isValid() ? curIndex.column() : 0};
+
+  // 仅 FS 三视图与 SEARCH 里混有非视频; MOVIE 全是视频, SCENE/CAST/JSON 一行就是一条记录
+  const auto vt{GetVt()};
+
+  // 若当前没有选中行, 则根据遍历方向, 从第一行或者最后一行开始找
+  const int startRow{curIndex.isValid() ? curIndex.row() : (direction > 0 ? -1 : rowCnt)};
+  for (int r = startRow + direction; 0 <= r && r < rowCnt; r += direction) {
+    const QModelIndex ind{pModel->index(r, col, parentIndex)};
+    if (!ind.isValid()) {
+      continue;
+    }
+    // 仅 FS 三视图与 SEARCH 里混有非视频; 其余视图一行即一条记录, 因此默认行r就是视频行
+    bool bIsVideoRow{true};
+    if (ViewTypeTool::isFSView(vt)) { // FS 三视图需要检查行r是否为视频行
+      QString vidFullPath = m_fsModel->filePath(ind);
+      bIsVideoRow = TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(vidFullPath));
+    } else if (vt == ViewType::SEARCH) {
+      QModelIndex srcIndex = m_searchProxyModel->mapToSource(ind); // SEARCH 视图需要检查行r是否为视频行
+      QString vidFullPath = m_searchSrcModel->filePath(srcIndex);
+      bIsVideoRow = TYPE_FILTER::isDotExtVideo(PathTool::GetDotFileExtension(vidFullPath));
+    }
+    if (!bIsVideoRow) {
+      continue;
+    }
+    viewWid->setCurrentIndex(ind);
+    viewWid->scrollTo(ind, QAbstractItemView::EnsureVisible);
+    LOG_D("Locate row[%d/%d] step[%d] in view[%s]", r, rowCnt, direction, GetCurViewName());
+    return true;
+  }
+
+  LOG_INFO_P("Reach First/Last", "No more video found in view[%s][step=%d]", GetCurViewName(), step);
+  return false;
+}
+
+void ViewsStackedWidget::keyPressEvent(QKeyEvent* e) {
   if (e->modifiers() == Qt::KeyboardModifier::NoModifier) {
     switch (e->key()) {
       case Qt::Key_Backspace: {
@@ -1018,4 +1070,22 @@ QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind, SelectionUsage
     }
   }
   return {};
+}
+
+QAbstractItemView* ViewsStackedWidget::GetCurViewWidgetByViewType() const {
+  const auto vt = GetVt();
+  switch (vt) {
+    case ViewType::LIST:   return m_fsListView;
+    case ViewType::TABLE:  return m_fsTableView;
+    case ViewType::TREE:   return m_fsTreeView;
+    case ViewType::SEARCH: return m_advanceSearchView;
+    case ViewType::MOVIE:  return m_movieView;
+    case ViewType::SCENE:  return m_sceneListView;
+    case ViewType::CAST:   return m_castTableView;
+    case ViewType::JSON:   return m_jsonTableView;
+    default: {
+      LOG_W("No view widget in ViewType[%d:%s]", (int)vt, ViewTypeTool::c_str(vt));
+      return nullptr;
+    }
+  }
 }
