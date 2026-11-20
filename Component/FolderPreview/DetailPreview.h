@@ -6,6 +6,7 @@
 #include "FullScreenableSplitter.h"
 
 class DetailPreview : public FullScreenableSplitter {
+  Q_OBJECT
  public:
   explicit DetailPreview(QWidget* parent = nullptr);
   virtual ~DetailPreview();
@@ -16,6 +17,9 @@ class DetailPreview : public FullScreenableSplitter {
 
   void onStopPlaying();
   void UpdateWhenSelectAFile(const QString& pth);
+
+ signals:
+  void forwardPlaySiblingMediaRequested(int step);
 
  protected:
   QWidget* GetFullScreenableWidget() const override {

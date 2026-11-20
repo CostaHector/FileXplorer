@@ -13,6 +13,7 @@
 
 
 class AdvanceSearchModel : public QAbstractTableModelPub {
+  Q_OBJECT
 public:
   using QAbstractTableModelPub::QAbstractTableModelPub;
   void initFilter(QDir::Filters initialFilters) {m_filters = initialFilters;} // must called before setRootPath

@@ -23,6 +23,9 @@ FileFolderPreviewer::FileFolderPreviewer(const QString& memoryName, QWidget* par
 
   ReadSettings();
   setWindowIcon(QIcon(":img/FLOATING_PREVIEW"));
+
+  connect(mDetailsPane, &DetailPreview::forwardPlaySiblingMediaRequested, this, &FileFolderPreviewer::forwardPlaySiblingMediaRequested);
+  connect(mImgVidOtherPane, &ImgVidOthInFolderPreviewer::forwardPlaySiblingMediaRequested, this, &FileFolderPreviewer::forwardPlaySiblingMediaRequested);
 }
 
 FileFolderPreviewer::~FileFolderPreviewer() {

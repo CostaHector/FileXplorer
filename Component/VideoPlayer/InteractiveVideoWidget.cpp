@@ -27,6 +27,10 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mRenameCurrentMediaAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Rename current media playing and its related files."}//
                              .arg(mRenameCurrentMediaAct->text(), mRenameCurrentMediaAct->shortcut().toString()));
 
+  mMoveToTrashRelatedFilesAct = new QAction{QIcon(":img/MOVE_TO_TRASH_BIN"), tr("Recycle Related Files"), this};
+  mMoveToTrashRelatedFilesAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Recycle current media playing and its related files."}//
+                             .arg(mMoveToTrashRelatedFilesAct->text(), mMoveToTrashRelatedFilesAct->shortcut().toString()));
+
   mPauseAct = DualIconCheckableAction::CreatePauseAction(this, true);
 
   mStopAct = new QAction{QIcon{":/VideoPlayer/STOP_VIDEO"}, tr("stop"), this};
@@ -35,8 +39,33 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mSeekForwardAct = new QAction{QIcon{":/VideoPlayer/SEEK_FORWARD"}, tr("seek forward 10s"), this};
   mSeekBackwardHotAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/JUMP_LAST_HOT_SCENE"}, tr("previous hot point"), this};
   mSeekForwardHotAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/JUMP_NEXT_HOT_SCENE"}, tr("next hot point"), this};
-  mPlayPrevAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_PREVIOUS"}, tr("play previous video"), this};
-  mPlayNextAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_NEXT"}, tr("play next video"), this};
+  mPlayPrevInActiveViewAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAY_PREV_IN_ACTIVE_VIEW"}, tr("Current View: Previous"), this};
+  mPlayPrevInActiveViewAct->setToolTip(
+      QString{"<b>%1 (PageUp)</b><br/>Move the selection in the active file view to the previous "
+              "row that has a video and play it.<br/>Non-video rows are skipped in File System "
+              "and Search views."}
+          .arg(mPlayPrevInActiveViewAct->text()));
+
+  mPlayNextInActiveViewAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/PLAY_NEXT_IN_ACTIVE_VIEW"}, tr("Current View: Next"), this};
+  mPlayNextInActiveViewAct->setToolTip(
+      QString{"<b>%1 (PageDown)</b><br/>Move the selection in the active file view to the next "
+              "row that has a video and play it.<br/>Non-video rows are skipped in File System "
+              "and Search views."}
+          .arg(mPlayNextInActiveViewAct->text()));
+
+  mPlayPrevInPlaylistAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_PREVIOUS"}, tr("Playlist: Previous"), this};
+  mPlayPrevInPlaylistAct->setToolTip(
+      QString{"<b>%1</b><br/>Play the previous item in the right-side playlist.<br/>"
+              "Behavior follows the current playback mode: Sequential stops at the first item, "
+              "Loop wraps to the last, Random picks a random one, Repeat-one replays the current one."}
+          .arg(mPlayPrevInPlaylistAct->text()));
+
+  mPlayNextInPlaylistAct = new (std::nothrow) QAction{QIcon{":/VideoPlayer/VIDEO_NEXT"}, tr("Playlist: Next"), this};
+  mPlayNextInPlaylistAct->setToolTip(
+      QString{"<b>%1</b><br/>Play the next item in the right-side playlist.<br/>"
+              "Behavior follows the current playback mode: Sequential stops at the last item, "
+              "Loop wraps to the first, Random picks a random one, Repeat-one replays the current one."}
+          .arg(mPlayNextInPlaylistAct->text()));
 
   mShowFrames = new (std::nothrow) QAction{QIcon{""}, tr("show frames"), this};
   mShowFrames->setCheckable(true);
@@ -78,6 +107,7 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addAction(mShowVideoList);
   mContextMenu->addAction(mGrabFrame);
   mContextMenu->addAction(mRenameCurrentMediaAct);
+  mContextMenu->addAction(mMoveToTrashRelatedFilesAct);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mPauseAct);
   mContextMenu->addAction(mStopAct);
@@ -87,8 +117,11 @@ InteractiveVideoWidget::InteractiveVideoWidget(bool bBasicMode, QWidget* parent)
   mContextMenu->addAction(mSeekBackwardHotAct);
   mContextMenu->addAction(mSeekForwardHotAct);
   mContextMenu->addSeparator();
-  mContextMenu->addAction(mPlayPrevAct);
-  mContextMenu->addAction(mPlayNextAct);
+  mContextMenu->addAction(mPlayPrevInActiveViewAct);
+  mContextMenu->addAction(mPlayNextInActiveViewAct);
+  mContextMenu->addSeparator();
+  mContextMenu->addAction(mPlayPrevInPlaylistAct);
+  mContextMenu->addAction(mPlayNextInPlaylistAct);
   mContextMenu->addSeparator();
   mContextMenu->addAction(mSelectVideoFileAct);
   mContextMenu->addAction(mSelectVideoFolder);
@@ -128,12 +161,14 @@ QWidget* InteractiveVideoWidget::GetExtendedFunctionCtrlBar(QWidget* notNullPare
   extendedFunctionCtrlBar->addAction(mSeekBackwardHotAct);
   extendedFunctionCtrlBar->addAction(mSeekForwardHotAct);
   extendedFunctionCtrlBar->addSeparator();
-  extendedFunctionCtrlBar->addAction(mPlayPrevAct);
-  extendedFunctionCtrlBar->addAction(mPlayNextAct);
+  extendedFunctionCtrlBar->addAction(mPlayPrevInActiveViewAct);
+  extendedFunctionCtrlBar->addAction(mPlayNextInActiveViewAct);
   extendedFunctionCtrlBar->addSeparator();
   extendedFunctionCtrlBar->addAction(mShowFrames);
   extendedFunctionCtrlBar->addStretch();
   extendedFunctionCtrlBar->addAction(mDisableAutoHideToolBar);
+  extendedFunctionCtrlBar->addAction(mPlayPrevInPlaylistAct);
+  extendedFunctionCtrlBar->addAction(mPlayNextInPlaylistAct);
   extendedFunctionCtrlBar->addAction(mShowVideoList);
   return extendedFunctionCtrlBar;
 }
@@ -250,11 +285,11 @@ void InteractiveVideoWidget::keyPressEvent(QKeyEvent* event) {
       break;
     }
     case Qt::Key::Key_PageUp: {
-      mPlayPrevAct->trigger();
+      mPlayPrevInActiveViewAct->trigger();
       break;
     }
     case Qt::Key::Key_PageDown: {
-      mPlayNextAct->trigger();
+      mPlayNextInActiveViewAct->trigger();
       break;
     }
     case Qt::Key::Key_Space: {

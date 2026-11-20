@@ -9,6 +9,7 @@
 #include "FullScreenableSplitter.h"
 
 class ImgVidOthInFolderPreviewer: public FullScreenableSplitter {
+  Q_OBJECT
 public:
   explicit ImgVidOthInFolderPreviewer(const QString& memoryName, QWidget* parent = nullptr);
   virtual ~ImgVidOthInFolderPreviewer();
@@ -26,6 +27,9 @@ public:
   inline bool NeedUpdateOthers() const { return m_bOthVisible; }
 
   void subscribe();
+
+signals:
+  void forwardPlaySiblingMediaRequested(int step);
 
 private:
   void onImgBtnClicked(bool checked);

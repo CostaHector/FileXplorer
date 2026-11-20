@@ -97,6 +97,7 @@ bool CurrentRowPreviewer::InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E 
       m_fileFolderPreviewStackedWid = new (std::nothrow) FileFolderPreviewer{"DockerList", this};
       CHECK_NULLPTR_RETURN_FALSE(m_fileFolderPreviewStackedWid);
       AddView(previewType, m_fileFolderPreviewStackedWid);
+      connect(m_fileFolderPreviewStackedWid, &FileFolderPreviewer::forwardPlaySiblingMediaRequested, this, &CurrentRowPreviewer::forwardPlaySiblingMediaRequested);
       break;
     }
     case PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD: {

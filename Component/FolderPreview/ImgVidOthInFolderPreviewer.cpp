@@ -162,7 +162,6 @@ QString ImgVidOthInFolderPreviewer::GetActionText(PREVIEW_ITEM_TYPE itemType, in
 void ImgVidOthInFolderPreviewer::subscribe() {
   connect(mTypeToDisplayTB, &ReorderableToolBar::widgetMoved, this, &ImgVidOthInFolderPreviewer::onReorder);
   connect(mTypeToDisplayTB->mCollectPathAgs, &QActionGroup::triggered, this, &ImgVidOthInFolderPreviewer::onImgVidOthActTriggered);
-  mVidTv->registerFullScreenToggleCallback(std::bind(&ImgVidOthInFolderPreviewer::onReqFullscreenModeChange, this, std::placeholders::_1));
 }
 
 void ImgVidOthInFolderPreviewer::onImgBtnClicked(bool checked) {
@@ -193,6 +192,9 @@ void ImgVidOthInFolderPreviewer::onVidBtnClicked(bool checked) {
     CHECK_NULLPTR_RETURN_VOID(mVidTv)
     mVidTv->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
     addWidget(mVidTv);
+
+    mVidTv->registerFullScreenToggleCallback(std::bind(&ImgVidOthInFolderPreviewer::onReqFullscreenModeChange, this, std::placeholders::_1));
+    connect(mVidTv->GetBasicVideoView(), &BasicVideoView::reqPlaySiblingMedia, this, &ImgVidOthInFolderPreviewer::forwardPlaySiblingMediaRequested);
   }
   setConfig(BrowserKey::FLOATING_VIDEO_VIEW_SHOW, checked);
   if (mVidTv->isHidden() == checked) {

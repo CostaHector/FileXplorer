@@ -148,7 +148,7 @@ QModelIndex VideoTableView::iteratorCore(int step) const {
 void VideoTableView::PlayPreviousVideo() {
   const QModelIndex proIndex = previousIndex();
   if (!proIndex.isValid()) {
-    LOG_W("No previous index");
+    LOG_D("No previous index");
     return;
   }
   LOG_OK_P("select", "previous: %d", proIndex.row());
@@ -159,7 +159,7 @@ void VideoTableView::PlayPreviousVideo() {
 void VideoTableView::PlayNextVideo() {
   const QModelIndex proIndex = nextIndex();
   if (!proIndex.isValid()) {
-    LOG_W("No next index");
+    LOG_D("No next index");
     return;
   }
   LOG_OK_P("select", "next: %d", proIndex.row());

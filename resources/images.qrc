@@ -387,6 +387,8 @@
         <file alias="SEEK_FORWARD">VideoPlayer/SEEK_FORWARD.svg</file>
         <file alias="VIDEO_PREVIOUS">VideoPlayer/VIDEO_PREVIOUS.svg</file>
         <file alias="VIDEO_NEXT">VideoPlayer/VIDEO_NEXT.svg</file>
+        <file alias="PLAY_PREV_IN_ACTIVE_VIEW">VideoPlayer/PLAY_PREV_IN_ACTIVE_VIEW.svg</file>
+        <file alias="PLAY_NEXT_IN_ACTIVE_VIEW">VideoPlayer/PLAY_NEXT_IN_ACTIVE_VIEW.svg</file>
         <file alias="JUMP_LAST_HOT_SCENE">VideoPlayer/JUMP_LAST_HOT_SCENE.svg</file>
         <file alias="JUMP_NEXT_HOT_SCENE">VideoPlayer/JUMP_NEXT_HOT_SCENE.svg</file>
         <file alias="VOLUME_PLUS">VideoPlayer/VOLUME_PLUS.svg</file>

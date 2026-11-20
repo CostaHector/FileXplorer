@@ -80,6 +80,9 @@ public:
 
   bool NeedInitPreviewWidget(PreviewTypeTool::PREVIEW_TYPE_E previewType) const;
 
+signals:
+  void forwardPlaySiblingMediaRequested(int step);
+
 public slots:
   bool InitPreviewAndAddView(PreviewTypeTool::PREVIEW_TYPE_E previewType);
   bool setCurrentPreviewType(PreviewTypeTool::PREVIEW_TYPE_E previewType);

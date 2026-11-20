@@ -1046,7 +1046,7 @@
 <context>
     <name>InteractiveVideoWidget</name>
     <message>
-        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+32"/>
+        <location filename="../../Component/VideoPlayer/InteractiveVideoWidget.cpp" line="+36"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
@@ -1071,17 +1071,7 @@
         <translation>下一热点</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>play previous video</source>
-        <translation>上一视频</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>play next video</source>
-        <translation>下一视频</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+29"/>
         <source>show frames</source>
         <translation>帧图组</translation>
     </message>
@@ -1096,7 +1086,7 @@
         <translation>显示列表</translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-57"/>
         <source>Grab a Frame</source>
         <translation>抓取一帧</translation>
     </message>
@@ -1106,7 +1096,32 @@
         <translation>重命名</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+5"/>
+        <source>Recycle Related Files</source>
+        <translation>回收相关文件</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Current View: Previous</source>
+        <translation>当前视图: 前一个</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Current View: Next</source>
+        <translation>当前视图: 后一个</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Playlist: Previous</source>
+        <translation>播放列表: 前一个</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Playlist: Next</source>
+        <translation>播放列表: 下一个</translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>basic mode</source>
         <translation>简洁模式</translation>
     </message>
