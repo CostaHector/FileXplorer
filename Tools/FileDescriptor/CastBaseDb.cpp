@@ -6,6 +6,7 @@
 #include "PublicStringMacro.h"
 #include "StringTool.h"
 #include "JsonRenameRegex.h"
+#include "ItemsPileCategory.h"
 #include "Logger.h"
 
 #include <QSqlRecord>
@@ -269,7 +270,15 @@ bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& ima
     LOG_D("cast path[%s] not exist", qPrintable(castDir.absolutePath()));
     return false;  // no need update
   }
-  const QString newImages = castDir.entryList().join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
+  QString folderName = sqlRecord.value(CastDbModelField::Name).toString();
+  QStringList usefullImages;
+  for (const QFileInfo& imgFi: castDir.entryInfoList()) {
+    const QString bn = imgFi.baseName();
+    if (bn == folderName || ItemsPileCategory::IMG_PILE_NAME_PATTERN_STRICT.match(bn).hasMatch()) {
+      usefullImages.push_back(imgFi.fileName());
+    }
+  }
+  const QString newImages = usefullImages.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
   if (sqlRecord.value(CastDbModelField::Imgs).toString() == newImages) {
     return false;  // no need update
   }
