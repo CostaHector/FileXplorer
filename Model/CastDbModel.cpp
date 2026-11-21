@@ -2,6 +2,7 @@
 #include "CastBaseDb.h"
 #include "PathKey.h"
 #include "Configuration.h"
+#include "PathTool.h"
 #include "PublicVariable.h"
 #include "CastPsonFileHelper.h"
 #include "RateHelper.h"
@@ -92,8 +93,7 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
   if (!curIndex.isValid()) {
     return "";
   }
-  const QModelIndex& nameIndex = curIndex.siblingAtColumn(CastDbModelField::Name);
-  return nameIndex.data(Qt::ItemDataRole::DisplayRole).toString();
+  return curIndex.siblingAtColumn(CastDbModelField::Name).data(Qt::ItemDataRole::DisplayRole).toString();
 }
 
 QString CastDbModel::filePath(const QModelIndex& curIndex) const {
@@ -122,7 +122,61 @@ QString CastDbModel::psonFilePath(const QModelIndex& curIndex) const {
   return filePath(curIndex) + '/' + fileName(curIndex) + ".pson";
 }
 
-QStringList CastDbModel::foldersRelativePath2RootPath(const QModelIndexList& selectedRows) {
+QString CastDbModel::tagsAtIndex(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return "";
+  }
+  // newline \n seperated string
+  return curIndex.siblingAtColumn(CastDbModelField::Tags).data(Qt::ItemDataRole::DisplayRole).toString();
+}
+
+int CastDbModel::rateAtIndex(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return -1;
+  }
+  return curIndex.siblingAtColumn(CastDbModelField::Rate).data(Qt::ItemDataRole::DisplayRole).toInt();
+}
+
+int CastDbModel::sizeAtIndex(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return -1;
+  }
+  return curIndex.siblingAtColumn(CastDbModelField::Size).data(Qt::ItemDataRole::DisplayRole).toInt();
+}
+
+int CastDbModel::heightAtIndex(const QModelIndex& curIndex) const {
+  if (!curIndex.isValid()) {
+    return -1;
+  }
+  return curIndex.siblingAtColumn(CastDbModelField::Height).data(Qt::ItemDataRole::DisplayRole).toInt();
+}
+
+QString CastDbModel::coverImageFullPath(const QModelIndex& curIndex, bool bUseThumbnail) const {
+  if (!curIndex.isValid()) {
+    return "";
+  }
+
+  QString coverImageFullPath{m_imageHostPath};
+  coverImageFullPath += '/';
+  coverImageFullPath += curIndex.siblingAtColumn(CastDbModelField::Ori).data(Qt::ItemDataRole::DisplayRole).toString();
+  coverImageFullPath += '/';
+  const QString folderName = curIndex.siblingAtColumn(CastDbModelField::Name).data(Qt::ItemDataRole::DisplayRole).toString();
+  coverImageFullPath += folderName;
+  if (bUseThumbnail) {
+    return PathTool::GetThumbnailDecorationImgPathFromFolder(coverImageFullPath, folderName);
+  }
+  const QString imgsSepratedInNewLine = curIndex.siblingAtColumn(CastDbModelField::Imgs).data(Qt::DisplayRole).toString();
+  if (imgsSepratedInNewLine.isEmpty()) {
+    return "";
+  }
+  const int firstNewLineIndex = imgsSepratedInNewLine.indexOf(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
+  const QString imageFileName = firstNewLineIndex == -1 ? imgsSepratedInNewLine : imgsSepratedInNewLine.left(firstNewLineIndex);
+  coverImageFullPath += '/';
+  coverImageFullPath += imageFileName;
+  return coverImageFullPath;
+}
+
+QStringList CastDbModel::foldersRelativePath2RootPath(const QModelIndexList& selectedRows) const {
   QStringList oriSlashFolders;
   for (const auto& ind: selectedRows) {
     const QModelIndex& oriIndex = ind.siblingAtColumn(CastDbModelField::Ori);

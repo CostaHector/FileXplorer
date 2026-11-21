@@ -29,6 +29,7 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   auto* castAppendToolbutton = inst.GetAppendCastToolButton(this);
 
   addAction(ViewActions::GetInst()._CAST_VIEW);
+  addAction(inst.m_ShowCastsInCardsListAct);
   addSeparator();
   addAction(inst._MODEL_SUBMIT_ALL);
   addAction(inst._MODEL_REPOPULATE);

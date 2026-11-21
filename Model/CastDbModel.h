@@ -35,7 +35,13 @@ public:
 
   QString psonFilePath(const QModelIndex& curIndex) const;
 
-  QStringList foldersRelativePath2RootPath(const QModelIndexList& selectedRows);
+  QStringList foldersRelativePath2RootPath(const QModelIndexList& selectedRows) const;
+
+  QString tagsAtIndex(const QModelIndex& curIndex) const;
+  int rateAtIndex(const QModelIndex& curIndex) const;
+  int sizeAtIndex(const QModelIndex& curIndex) const;
+  int heightAtIndex(const QModelIndex& curIndex) const;
+  QString coverImageFullPath(const QModelIndex& curIndex, bool bUseThumbnail) const;
 
   QModelIndexList GetAllRowsIndexes() const;
   int SyncImageFieldsFromImageHost(const QModelIndexList& selectedRows);

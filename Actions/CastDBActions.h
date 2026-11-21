@@ -37,6 +37,7 @@ class CastDBActions : public QObject {
   QAction* DUMP_SELECTED_RECORDS_INTO_PSON_FILE{nullptr};
   QAction* DUMP_ALL_RECORDS_INTO_PSON_FILE{nullptr};
 
+  QAction* m_ShowCastsInCardsListAct{nullptr};
   QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
 };
 

@@ -287,6 +287,11 @@
     </message>
     <message>
         <location line="+4"/>
+        <source>Card View</source>
+        <translation>卡片视图</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Open Database</source>
         <translation>用本地应用打开数据库</translation>
     </message>
@@ -299,6 +304,14 @@
         <location line="+6"/>
         <source>Dump all records</source>
         <translation>写入所有变更到pson</translation>
+    </message>
+</context>
+<context>
+    <name>CastDBListView</name>
+    <message>
+        <location filename="../../View/CastDBListView.cpp" line="+31"/>
+        <source>Card View</source>
+        <translation>卡片视图</translation>
     </message>
 </context>
 <context>
@@ -329,17 +342,17 @@
         <translation>缩放模式: 自动</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+10"/>
         <source>Wrapping</source>
         <translation>卷绕</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-5"/>
         <source>Uniform items sizes</source>
         <translation>统一项大小</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+10"/>
         <source>Use thumbnail as decoration</source>
         <translation>使用缩略图装饰</translation>
     </message>
@@ -1005,6 +1018,14 @@
         <location line="+2"/>
         <source>Enable column sort</source>
         <translation>允许按列排序</translation>
+    </message>
+</context>
+<context>
+    <name>IconSizeMenu</name>
+    <message>
+        <location filename="../../Actions/IconSizeMenu.cpp" line="+12"/>
+        <source>Vertical Long Image</source>
+        <translation>竖直长图模式</translation>
     </message>
 </context>
 <context>
@@ -1877,7 +1898,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>QAbstractListModelPub</name>
     <message>
-        <location filename="../../Model/QAbstractListModelPub.cpp" line="+13"/>
+        <location filename="../../Model/QAbstractListModelPub.cpp" line="+15"/>
         <source>Smooth Transformation</source>
         <translation>平滑图片</translation>
     </message>

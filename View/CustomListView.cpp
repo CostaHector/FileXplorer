@@ -49,19 +49,17 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
     _RESIZED_MODE_ADJUST = new (std::nothrow) QAction{QIcon{":img/RESIZE_MODE_FIXED"}, CustomListView::tr("Resize Mode: Adjust"), this};
     CHECK_NULLPTR_RETURN_VOID(_RESIZED_MODE_ADJUST);
     _RESIZED_MODE_ADJUST->setCheckable(true);
-    _RESIZED_MODE_ADJUST->setChecked(Configuration().value(GetName() + "/RESIZED_MODE_FIXED_OR_ADJUST", true).toBool());
     _RESIZED_MODE_ADJUST->setToolTip("The items will be laid out again when the view is resized if enabled, otherwise fixed. by default: adjust");
+
+    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, CustomListView::tr("Uniform items sizes"), this};
+    CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
+    _UNIFORM_ITEM_SIZES->setCheckable(true);
+    _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
 
     _WRAPPING_ACTIONS = new (std::nothrow) QAction{QIcon{":img/LIST_WRAPPING"}, CustomListView::tr("Wrapping"), this};
     CHECK_NULLPTR_RETURN_VOID(_WRAPPING_ACTIONS);
     _WRAPPING_ACTIONS->setCheckable(true);
     _WRAPPING_ACTIONS->setToolTip("The layout should wrap when there is no more space in the visible area if enabled, by default: no wrap false");
-
-    _UNIFORM_ITEM_SIZES = new (std::nothrow) QAction{QIcon{":img/UNIFORM_ITEM_SIZES"}, CustomListView::tr("Uniform items sizes"), this};
-    CHECK_NULLPTR_RETURN_VOID(_UNIFORM_ITEM_SIZES);
-    _UNIFORM_ITEM_SIZES->setCheckable(true);
-    _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "/UNIFORM_ITEM_SIZES", false).toBool());
-    _UNIFORM_ITEM_SIZES->setToolTip("all items in the listview have the same size, by default: false");
 
     _THUMBNAIL_AS_DECORATION = new (std::nothrow) QAction{QIcon{":img/THUMBNAIL_FOR_FOLDER"}, CustomListView::tr("Use thumbnail as decoration"), this};
     CHECK_NULLPTR_RETURN_VOID(_THUMBNAIL_AS_DECORATION);
@@ -79,6 +77,7 @@ CustomListView::CustomListView(const QString& instName, QWidget* parent)  //
 
 void CustomListView::SubscribePublicActions() {
   connect(_ICON_SIZE_MENU, &IconSizeMenu::iconScaledIndexChanged, this, &CustomListView::onIconScaledIndexChanged);
+  connect(_ICON_SIZE_MENU, &IconSizeMenu::iconVerticalLongerModeChanged, this, &CustomListView::onIconVerticalLongerModeChanged);
   connect(_TEXT_ELIDE_MODE_MENU, &TextElideModeMenu::reqTextElideModeChanged, this, &QListView::setTextElideMode);
 
   connect(_FLOW_ORIENTATION_LTR, &QAction::toggled, this, &CustomListView::onFlowOrientationChanged);
@@ -128,10 +127,15 @@ void CustomListView::wheelEvent(QWheelEvent* event) {
 }
 
 void CustomListView::onIconScaledIndexChanged(int newScaledIndex) {
-  const QSize newIconSize = IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex];
+  const QSize newIconSize = IMAGE_SIZE::CandidateSize(newScaledIndex, _ICON_SIZE_MENU->isVerticalLongerMode());
+  setIconSize(newIconSize); // emit iconSizeChanged(newIconSize) automatically just like slot toggle() of Checkable QAction
+  LOG_OK_P("[Change] Icon size", "%dx%d", newIconSize.width(), newIconSize.height());
+}
+
+void CustomListView::onIconVerticalLongerModeChanged(bool bIconVerticalLongerMode) {
+  const QSize newIconSize = IMAGE_SIZE::CandidateSize(_ICON_SIZE_MENU->GetScaledIndex(), bIconVerticalLongerMode);
   setIconSize(newIconSize);
-  emit iconSizeChanged(IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex]);
-  LOG_OK_NP("[Change] Icon size", IMAGE_SIZE::HumanReadFriendlySize(newScaledIndex));
+  LOG_OK_P("[Change] Icon vertical longer mode changed", "bool:%d, %dx%d", bIconVerticalLongerMode, newIconSize.width(), newIconSize.height());
 }
 
 void CustomListView::PushFrontExclusiveActions(const QList<QAction*>& acts) {
@@ -179,11 +183,15 @@ void CustomListView::InitListView() {
   // top2bottom, list
   _FLOW_ORIENTATION_LTR->setChecked(Configuration().value(GetName() + "/FLOW_ORIENTATION", m_defaultFlowLeft2Right).toBool());
   _VIEW_MODE_LIST_ICON->setChecked(Configuration().value(GetName() + "/VIEW_MODE_LIST_ICON", m_defaultViewModeIcon).toBool());
+  _RESIZED_MODE_ADJUST->setChecked(Configuration().value(GetName() + "/RESIZED_MODE_FIXED_OR_ADJUST", m_resizeModeAdjustFixed).toBool());
   _WRAPPING_ACTIONS->setChecked(Configuration().value(GetName() + "/WRAPPING_ACTIONS", m_defaultWrapping).toBool());
+  _UNIFORM_ITEM_SIZES->setChecked(Configuration().value(GetName() + "/UNIFORM_ITEM_SIZES", m_uniformItemSize).toBool());
 
   const int sizeScaledIndex = _ICON_SIZE_MENU->GetScaledIndex();
-  setIconSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[sizeScaledIndex]);
-  // setGridSize(IMAGE_SIZE::ICON_SIZE_CANDIDATES[newScaledIndex]);
+  const bool bIconVerticalLongerMode = _ICON_SIZE_MENU->isVerticalLongerMode();
+  const QSize iconSz = IMAGE_SIZE::CandidateSize(sizeScaledIndex, bIconVerticalLongerMode);
+  setIconSize(iconSz);
+  // setGridSize(iconSz);
   setTextElideMode(_TEXT_ELIDE_MODE_MENU->GetTextElideMode());
 
   onFlowOrientationChanged(_FLOW_ORIENTATION_LTR->isChecked());

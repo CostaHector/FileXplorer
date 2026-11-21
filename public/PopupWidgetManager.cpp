@@ -9,6 +9,7 @@
 #include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "ResourceMonitorPanel.h"
+#include "CastDBListView.h"
 #include "Logger.h"
 
 #include <QEvent>
@@ -25,6 +26,7 @@ template class PopupWidgetManager<Archiver>;
 template class PopupWidgetManager<PasswordBook>;
 #endif
 template class PopupWidgetManager<ResourceMonitorPanel>;
+template class PopupWidgetManager<CastDBListView>;
 
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent)
@@ -99,11 +101,12 @@ bool PopupWidgetManager<WidgetType>::eventFilter(QObject* watched, QEvent* event
 
 template<typename WidgetType>
 void PopupWidgetManager<WidgetType>::createWidget() {
-  QWidget* pParentWidget = static_cast<QWidget*>(parent());
-  CHECK_NULLPTR_RETURN_VOID(pParentWidget);
   if (m_widgetCreator != nullptr) {
-    m_widget = m_widgetCreator(pParentWidget);
+    // 注意 m_widget 挂载哪个QWidget下由外部自行决定,
+    m_widget = m_widgetCreator();
   } else {
+    QWidget* pParentWidget = static_cast<QWidget*>(parent());
+    CHECK_NULLPTR_RETURN_VOID(pParentWidget);
     m_widget = new WidgetType(pParentWidget);
   }
 

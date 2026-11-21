@@ -6,8 +6,10 @@
 QAbstractListModelPub::QAbstractListModelPub(const QString& listViewName, QObject* parent)  //
     : QAbstractListModel{parent}, mMemoryName{listViewName} {
   const int scaledIndex{IMAGE_SIZE::GetInitialScaledSize(GetName())};
-  setPixmapWidth(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].width());
-  setPixmapHeight(IMAGE_SIZE::ICON_SIZE_CANDIDATES[scaledIndex].height());
+  const bool iconVerticalLongerMode{IMAGE_SIZE::GetInitialVerticalLongerMode(GetName())};
+  const QSize iconSize{IMAGE_SIZE::CandidateSize(scaledIndex, iconVerticalLongerMode)};
+  setPixmapWidth(iconSize.width());
+  setPixmapHeight(iconSize.height());
 
   m_isSmooth = Configuration().value(GetName() + "/PIXMAP_TRANSFORMATION_SMOOTH", false).toBool();
   _PIXMAP_TRANSFORMATION_SMOOTH = new (std::nothrow) QAction{QIcon{":img/IMAGE_TRANSFORMATION_SMOOTH"}, tr("Smooth Transformation"), this};

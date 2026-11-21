@@ -1,4 +1,5 @@
 #include "CastDBView.h"
+#include "CastDBListView.h"
 #include "CastDBActions.h"
 #include "FdBasedDb.h"
 #include "NotificatorMacro.h"
@@ -18,26 +19,33 @@ void CastDBView::setQueryConfirmIfRowSelectedCountAbove(int modifiedToValue) {
 }
 
 CastDBView::CastDBView(CastDbModel* castDbModel_, CastDatabaseSearchToolBar* castDbSearchBar_, CastBaseDb& castDb_, QWidget* parent)
-    : CustomTableView{"ACTORS_TABLE", parent},  //
-      _castDbSearchBar{castDbSearchBar_},
-      _castModel{castDbModel_},
-      _castDb{castDb_},
-      mImageHost{castDbModel_->rootPath()} {
-  if (!QFileInfo{mImageHost}.isDir()) {
-    LOG_WARN_P("ImageHostPath not exist", "Fix it[%s] in .ini file", qPrintable(mImageHost));
+  : CustomTableView{"ACTORS_TABLE", parent},  //
+  _castDbSearchBar{castDbSearchBar_},
+  _castModel{castDbModel_},
+  _castDb{castDb_} {
+  CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
+  CHECK_NULLPTR_RETURN_VOID(_castModel);
+  QString imageHostFullPath = castDbModel_->rootPath();
+  if (!QFileInfo{imageHostFullPath}.isDir()) {
+    LOG_WARN_P("ImageHostPath not exist", "Fix it[%s] in .ini file", qPrintable(imageHostFullPath));
     return;
   }
 
-  CHECK_NULLPTR_RETURN_VOID(_castDbSearchBar);
-  CHECK_NULLPTR_RETURN_VOID(_castModel);
-
   {
     auto& inst = CastDBActions::GetInst();
-    QList<QAction*> exclusiveActs{inst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB, //
-                                  inst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK, //
-                                  inst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, //
+    QList<QAction*> exclusiveActs {
+        inst.SYNC_SELECTED_RECORDS_VIDS_FROM_DB,   //
+        inst.SYNC_SELECTED_RECORDS_IMGS_FROM_DISK, //
+        inst.DUMP_SELECTED_RECORDS_INTO_PSON_FILE, //
     };
     PushFrontExclusiveActions(exclusiveActs);
+
+    // 可同步以卡片的方式展示演员列表
+    m_castsCardsList = new (std::nothrow) PopupWidgetManager<CastDBListView>{inst.m_ShowCastsInCardsListAct, this};
+    CHECK_NULLPTR_RETURN_VOID(m_castsCardsList);
+    m_castsCardsList->setWidgetCreator([this, castDbModel_]() -> CastDBListView* {
+      return new CastDBListView{castDbModel_, this};
+    });
   }
 
   setModel(_castModel);
@@ -174,7 +182,8 @@ int CastDBView::onLoadFromFileSystemStructure() {
     LOG_ERR_NP("[Abort] Table dirty", "submit before load from file-system structure");
     return 0;
   }
-  int succeedCnt = _castDb.ReadFromImageHost(mImageHost);
+  QString imageHostFullPath = _castModel->rootPath();
+  int succeedCnt = _castDb.ReadFromImageHost(imageHostFullPath);
   LOG_OE_P(succeedCnt >= 0, "Load Performers", "count: %d", succeedCnt);
   if (succeedCnt >= 0) {
     onModelRepopulate();
@@ -216,8 +225,9 @@ int CastDBView::onLoadFromPsonDirectory() {
     LOG_INFO_NP("[Skip] User cancel load records from pson", "return");
     return 0;
   }
-  int succeedCnt = _castDb.LoadFromPsonFile(mImageHost);
-  LOG_OE_P(succeedCnt >= 0, "Load perfs from pJson", "[%s/*.pson] count:%d", qPrintable(mImageHost), succeedCnt);
+  QString imageHostFullPath = _castModel->rootPath();
+  int succeedCnt = _castDb.LoadFromPsonFile(imageHostFullPath);
+  LOG_OE_P(succeedCnt >= 0, "Load perfs from pJson", "[%s/*.pson] count:%d", qPrintable(imageHostFullPath), succeedCnt);
   onModelRepopulate();
   return succeedCnt;
 }
@@ -321,7 +331,8 @@ void CastDBView::EmitCurrentCastRecordChanged(const QModelIndex& current, const 
     return;
   }
   const QSqlRecord& record = _castModel->record(current.row());
-  emit currentRecordChanged(record, mImageHost);
+  QString imageHostFullPath = _castModel->rootPath();
+  emit currentRecordChanged(record, imageHostFullPath);
 }
 
 void CastDBView::RefreshCurrentRowHtmlContents() {
@@ -330,7 +341,8 @@ void CastDBView::RefreshCurrentRowHtmlContents() {
     return;
   }
   const QSqlRecord& record = _castModel->record(current.row());
-  emit currentRecordChanged(record, mImageHost);
+  QString imageHostFullPath = _castModel->rootPath();
+  emit currentRecordChanged(record, imageHostFullPath);
 }
 
 void IndexRecoverHelper::stashPop(QAbstractItemView& itemView, const QModelIndex& currentIndex) {

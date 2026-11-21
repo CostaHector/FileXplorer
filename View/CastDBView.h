@@ -5,8 +5,7 @@
 #include "CastDbModel.h"
 #include "CustomTableView.h"
 #include "DatabaseSearchToolBar.h"
-#include <QToolBar>
-#include <QLineEdit>
+#include "PopupWidgetManager.h"
 
 #ifdef RUNNING_UNIT_TESTS
 namespace CastDbViewMocker {
@@ -51,8 +50,6 @@ private:
   bool mNeedRecover{false};
 };
 
-class FileFolderPreviewer;
-
 class CastDBView : public CustomTableView {
   Q_OBJECT
  public:
@@ -96,11 +93,12 @@ class CastDBView : public CustomTableView {
   CastDatabaseSearchToolBar* _castDbSearchBar{nullptr};
   CastDbModel* _castModel{nullptr};
 
-  const QString mImageHost;
   CastBaseDb& _castDb;
   static int QUERY_CONFIRM_IF_ROW_SELECTED_COUNT_ABOVE;
 
   IndexRecoverHelper mIndexRecover;
+
+  PopupWidgetManager<CastDBListView>* m_castsCardsList{nullptr};
 };
 
 #endif  // CASTDBVIEW_H

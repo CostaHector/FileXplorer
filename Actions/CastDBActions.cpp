@@ -73,6 +73,10 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_VIDS_FROM_DB);
   SYNC_ALL_RECORDS_VIDS_FROM_DB->setToolTip("Sync all record(s) Vids field from db");
 
+  m_ShowCastsInCardsListAct = new (std::nothrow) QAction{QIcon{":img/SHOW_CASTS_IN_CARDS_LIST"}, tr("Card View"), this};
+  m_ShowCastsInCardsListAct->setCheckable(true);
+  m_ShowCastsInCardsListAct->setChecked(false);
+
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("Open Database"), this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
