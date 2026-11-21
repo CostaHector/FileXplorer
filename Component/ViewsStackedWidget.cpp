@@ -586,7 +586,7 @@ QModelIndexList ViewsStackedWidget::getSelectedRows(SelectionUsage usage) const 
   }
 }
 
-QStringList ViewsStackedWidget::getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback, SelectionUsage usage) const {
+QStringList ViewsStackedWidget::getFileNames(SelectionUsage usage) const {
   QStringList names;
   auto vt = GetVt();
   switch (vt) {
@@ -617,12 +617,6 @@ QStringList ViewsStackedWidget::getFileNames(std::function<int()>* pAfterOperati
     case ViewType::SCENE: {
       QModelIndexList srcIndexes = m_sceneListView->selectedRowsSource();
       names = m_scenesModel->RelativePath2RelatedFiles(srcIndexes);
-      if (pAfterOperationUpdateModelCallback != nullptr && m_scenesModel != nullptr && !srcIndexes.isEmpty()) {
-        ScenesListModel* localSceneModel = m_scenesModel;
-        *pAfterOperationUpdateModelCallback = [srcIndexes, localSceneModel]() -> int {
-          return localSceneModel->AfterJsonFilesNameRenamed(srcIndexes);
-        };
-      }
       break;
     }
     case ViewType::MOVIE: {
@@ -634,12 +628,6 @@ QStringList ViewsStackedWidget::getFileNames(std::function<int()>* pAfterOperati
     case ViewType::JSON: {
       QModelIndexList srcIndexes = m_jsonTableView->selectedRowsSource();
       names = m_jsonModel->RelativePath2RelatedFiles(srcIndexes);
-      if (pAfterOperationUpdateModelCallback != nullptr && m_jsonModel != nullptr && !srcIndexes.isEmpty()) {
-        JsonTableModel* localJsonModel = m_jsonModel;
-        *pAfterOperationUpdateModelCallback = [srcIndexes, localJsonModel]() -> int {
-          return localJsonModel->AfterJsonFilesNameRenamed(srcIndexes);
-        };
-      }
       break;
     }
     case ViewType::CAST:

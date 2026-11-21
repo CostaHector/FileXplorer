@@ -81,7 +81,7 @@ class ViewsStackedWidget : public QStackedWidget {
 
   QString getFilePath(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QModelIndexList getSelectedRows(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getFileNames(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QStringList getFilePaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QStringList getFilePrepaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   std::pair<QString, QStringList> getWorkPathAndRel2Name(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
