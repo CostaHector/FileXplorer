@@ -93,7 +93,7 @@ QString CastDbModel::fileName(const QModelIndex& curIndex) const {
     return "";
   }
   const QModelIndex& nameIndex = curIndex.siblingAtColumn(CastDbModelField::Name);
-  return data(nameIndex, Qt::ItemDataRole::DisplayRole).toString();
+  return nameIndex.data(Qt::ItemDataRole::DisplayRole).toString();
 }
 
 QString CastDbModel::filePath(const QModelIndex& curIndex) const {
@@ -112,7 +112,7 @@ QString CastDbModel::oriPath(const QModelIndex& curIndex) const {
     return "";
   }
   const QModelIndex& oriIndex = curIndex.siblingAtColumn(CastDbModelField::Ori);
-  return m_imageHostPath + '/' + data(oriIndex, Qt::ItemDataRole::DisplayRole).toString();
+  return m_imageHostPath + '/' + oriIndex.data(Qt::ItemDataRole::DisplayRole).toString();
 }
 
 QString CastDbModel::psonFilePath(const QModelIndex& curIndex) const {
@@ -120,6 +120,16 @@ QString CastDbModel::psonFilePath(const QModelIndex& curIndex) const {
     return "";
   }
   return filePath(curIndex) + '/' + fileName(curIndex) + ".pson";
+}
+
+QStringList CastDbModel::foldersRelativePath2RootPath(const QModelIndexList& selectedRows) {
+  QStringList oriSlashFolders;
+  for (const auto& ind: selectedRows) {
+    const QModelIndex& oriIndex = ind.siblingAtColumn(CastDbModelField::Ori);
+    const QModelIndex& nameIndex = ind.siblingAtColumn(CastDbModelField::Name);
+    oriSlashFolders.push_back(oriIndex.data(Qt::ItemDataRole::DisplayRole).toString() + '/' + nameIndex.data(Qt::ItemDataRole::DisplayRole).toString());
+  }
+  return oriSlashFolders;
 }
 
 QModelIndexList CastDbModel::GetAllRowsIndexes() const {

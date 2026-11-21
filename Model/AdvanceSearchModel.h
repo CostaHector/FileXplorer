@@ -22,7 +22,7 @@ public:
 
   QDir::Filters filter() const { return m_filters; }
   const QString& rootPath() const { return m_rootPath; }
-  QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir{rootPath()}; }
+  QDir rootDirectory() const { return QDir{rootPath()}; }
 
   void updateSearchResultList();
   void forceRefresh();

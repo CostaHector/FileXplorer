@@ -184,7 +184,7 @@ auto ViewsStackedWidget::on_cellDoubleClicked(const QModelIndex& clickedIndex) -
     return false;
   }
   const SelectionUsage usage {GetVt() == ViewTypeTool::ViewType::SCENE ? SelectionUsage::RELATED_VIDEO_ONLY : SelectionUsage::DEFAULT};
-  QFileInfo fi = getFileInfo(clickedIndex, usage);
+  QFileInfo fi = getFileInfoAtIndex(clickedIndex, usage);
   QString absItemPath{fi.absoluteFilePath()};
   LOG_I("Enter(%d, %d) [%s]", clickedIndex.row(), clickedIndex.column(), qPrintable(fi.fileName()));
   if (!fi.exists()) {
@@ -250,7 +250,7 @@ void ViewsStackedWidget::on_fsmCurrentRowChanged(const QModelIndex& current, con
   if (!current.isValid()) {
     return;
   }
-  const QFileInfo fi = getFileInfo(current);
+  const QFileInfo fi = getFileInfoAtIndex(current);
   if (auto* pStatusBar = CustomStatusBar::GInstance()) {
     if (fi.isFile()) {
       pStatusBar->onMsgChanged(DataFormatter::formatFileSizeWithBytes(fi.size()));
@@ -524,35 +524,37 @@ QString ViewsStackedWidget::getRootPath() const {
     case ViewType::CAST: {
       return m_castDbModel->rootPath();
     }
-    case ViewType::MOVIE:
+    case ViewType::MOVIE: {
+      return m_movieDbModel->rootPath();
+    }
     default:
       LOG_W("No rootpath in ViewType[%d]", int(vt));
       return "";
   }
 }
 
-// In SEARCH/SCENE/JSON ind is proxyIndex
-QString ViewsStackedWidget::getFilePath(const QModelIndex& ind, SelectionUsage usage) const {
+// In SEARCH/SCENE/JSON proxyInd is proxyIndex
+QString ViewsStackedWidget::getFileFullPathAtIndex(const QModelIndex& proxyInd) const {
   auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
     case ViewType::LIST:
     case ViewType::TREE:
-      return m_fsModel->filePath(ind);
+      return m_fsModel->filePath(proxyInd);
     case ViewType::SEARCH: {
-      const auto srcIndex = m_searchProxyModel->mapToSource(ind);
+      const auto srcIndex = m_searchProxyModel->mapToSource(proxyInd);
       return m_searchSrcModel->filePath(srcIndex);
     }
     case ViewType::MOVIE:
-      return m_movieDbModel->filePath(ind);
+      return m_movieDbModel->filePath(proxyInd);
     case ViewType::SCENE: {
-      const auto srcIndex = m_sceneProxyModel->mapToSource(ind);
+      const auto srcIndex = m_sceneProxyModel->mapToSource(proxyInd);
       return m_scenesModel->filePath(srcIndex);
     }
     case ViewType::CAST:
-      return m_castDbModel->filePath(ind);
+      return m_castDbModel->filePath(proxyInd);
     case ViewType::JSON: {
-      const auto& srcIndex = m_jsonProxyModel->mapToSource(ind);
+      const auto srcIndex = m_jsonProxyModel->mapToSource(proxyInd);
       return m_jsonModel->filePath(srcIndex);
     }
     default:
@@ -561,7 +563,7 @@ QString ViewsStackedWidget::getFilePath(const QModelIndex& ind, SelectionUsage u
   }
 }
 
-QModelIndexList ViewsStackedWidget::getSelectedRows(SelectionUsage usage) const {
+QModelIndexList ViewsStackedWidget::getSelectedRows() const {
   auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:
@@ -586,7 +588,8 @@ QModelIndexList ViewsStackedWidget::getSelectedRows(SelectionUsage usage) const 
   }
 }
 
-QStringList ViewsStackedWidget::getFileNames(SelectionUsage usage) const {
+// 返回相对于 rootPath 的文件名
+QStringList ViewsStackedWidget::getFileNamesRelativeToRootPath() const {
   QStringList names;
   auto vt = GetVt();
   switch (vt) {
@@ -621,7 +624,7 @@ QStringList ViewsStackedWidget::getFileNames(SelectionUsage usage) const {
     }
     case ViewType::MOVIE: {
       for (const auto& ind : m_movieView->selectedRowsSource()) {
-        names.append(m_movieDbModel->fileName(ind));
+        names.append(m_movieDbModel->pathRelative2RootPath(ind));
       }
       break;
     }
@@ -630,7 +633,11 @@ QStringList ViewsStackedWidget::getFileNames(SelectionUsage usage) const {
       names = m_jsonModel->RelativePath2RelatedFiles(srcIndexes);
       break;
     }
-    case ViewType::CAST:
+    case ViewType::CAST: {
+      QModelIndexList srcIndexes = m_castTableView->selectedRowsSource();
+      names = m_castDbModel->foldersRelativePath2RootPath(srcIndexes);
+      break;
+    }
     default:
       LOG_W("No FileNames in ViewType[%d]", int(vt));
       return {};
@@ -638,7 +645,7 @@ QStringList ViewsStackedWidget::getFileNames(SelectionUsage usage) const {
   return names;
 }
 
-QStringList ViewsStackedWidget::getFullRecords(SelectionUsage usage) const {
+QStringList ViewsStackedWidget::getFullRecords() const {
   QStringList fullRecords;
   auto vt = GetVt();
   switch (vt) {
@@ -694,7 +701,7 @@ QStringList ViewsStackedWidget::getFullRecords(SelectionUsage usage) const {
   return fullRecords;
 }
 
-QStringList ViewsStackedWidget::getFilePaths(SelectionUsage usage) const {
+QStringList ViewsStackedWidget::getFileFullPaths(SelectionUsage usage) const {
   QStringList filePaths;
   auto vt = GetVt();
   switch (vt) {
@@ -754,97 +761,81 @@ QStringList ViewsStackedWidget::getFilePaths(SelectionUsage usage) const {
   return filePaths;
 }
 
-QStringList ViewsStackedWidget::getFilePrepaths(SelectionUsage usage) const {
-  QStringList prepaths;
+QStringList ViewsStackedWidget::getModelRootPath() const {
+  QString rootPath;
+  int cnt{0};
   auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE: {
-      int rowCnt = m_fsTableView->selectedRowsSource().size();
-      const QString& prepath = m_fsModel->rootPath();
-      prepaths.reserve(rowCnt);
-      while (rowCnt-- > 0) {
-        prepaths.append(prepath);
-      }
+      rootPath = m_fsModel->rootPath();
+      cnt = m_fsTableView->selectedRowsSource().size();
       break;
     }
     case ViewType::LIST: {
-      int rowCnt = m_fsListView->selectedRowsSource().size();
-      const QString& prepath = m_fsModel->rootPath();
-      prepaths.reserve(rowCnt);
-      while (rowCnt-- > 0) {
-        prepaths.append(prepath);
-      }
+      rootPath = m_fsModel->rootPath();
+      cnt = m_fsListView->selectedRowsSource().size();
       break;
     }
     case ViewType::TREE: {
-      int rowCnt = m_fsTreeView->selectedRowsSource().size();
-      const QString& prepath = m_fsModel->rootPath();
-      prepaths.reserve(rowCnt);
-      while (rowCnt-- > 0) {
-        prepaths.append(prepath);
-      }
+      rootPath = m_fsModel->rootPath();
+      cnt = m_fsTreeView->selectedRowsSource().size();
       break;
     }
     case ViewType::SEARCH: {
-      for (const auto& ind : m_advanceSearchView->selectedRowsSource()) {
-        prepaths.append(m_searchSrcModel->absolutePath(ind));
-      }
+      rootPath = m_searchSrcModel->rootPath();
+      cnt = m_advanceSearchView->selectedRowsSource().size();
       break;
     }
     case ViewType::SCENE: {
-      const QString prepath = m_scenesModel->rootPath();
+      rootPath = m_scenesModel->rootPath();
       const QModelIndexList srcIndexes = m_sceneListView->selectedRowsSource();
-      const int filesCnt = m_scenesModel->RelativePath2RelatedFiles(srcIndexes).size();
-      prepaths.reserve(filesCnt);
-      std::fill_n(std::back_inserter(prepaths), filesCnt, prepath);
+      cnt = m_scenesModel->RelativePath2RelatedFiles(srcIndexes).size();
       break;
     }
     case ViewType::MOVIE: {
-      for (const auto& ind : m_movieView->selectedRowsSource()) {
-        prepaths.append(m_movieDbModel->absolutePath(ind));
-      }
+      rootPath = m_movieDbModel->rootPath();
+      cnt = m_movieView->selectedRowsSource().size();
       break;
     }
     case ViewType::JSON: {
-      const QString prepath = m_jsonModel->rootPath();
+      rootPath = m_jsonModel->rootPath();
       const QModelIndexList srcIndexes = m_jsonTableView->selectedRowsSource();
-      const int filesCnt = m_jsonModel->RelativePath2RelatedFiles(srcIndexes).size();
-      prepaths.reserve(filesCnt);
-      std::fill_n(std::back_inserter(prepaths), filesCnt, prepath);
+      cnt = m_jsonModel->RelativePath2RelatedFiles(srcIndexes).size();
       break;
     }
-    case ViewType::CAST:
+    case ViewType::CAST: {
+      rootPath = m_castDbModel->rootPath();
+      cnt = m_castTableView->selectedRowsSource().size();
+      break;
+    }
     default: {
       LOG_D("No getFilePrepaths ViewType:%d", (int)vt);
-      break;
+      return {};
     }
+  }
+  QStringList prepaths;
+  if (cnt > 0) {
+    prepaths.reserve(cnt);
+    std::fill_n(std::back_inserter(prepaths), cnt, rootPath);
   }
   return prepaths;
 }
 
-MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt::DropAction dropAct, SelectionUsage usage) const {
+MimeDataHelper::MimeDataMember ViewsStackedWidget::getFileFullPathsAndUrls() const {
   using namespace MimeDataHelper;
   auto vt = GetVt();
   switch (vt) {
     case ViewType::LIST: {
-      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsListView->selectedRowsSource());
-      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
-      return ret;
+      return GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsListView->selectedRowsSource());
     }
     case ViewType::TABLE: {
-      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTableView->selectedRowsSource());
-      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
-      return ret;
+      return GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTableView->selectedRowsSource());
     }
     case ViewType::TREE: {
-      MimeDataMember ret = GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTreeView->selectedRowsSource());
-      FillCutCopySomething<FileSystemModel>(*m_fsModel, ret.srcIndexes, dropAct);
-      return ret;
+      return GetMimeDataMemberFromSourceModel<FileSystemModel>(*m_fsModel, m_fsTreeView->selectedRowsSource());
     }
     case ViewType::SEARCH: {
-      MimeDataMember ret = GetMimeDataMemberFromSearchModel(*m_searchSrcModel, m_advanceSearchView->selectedRowsSource());
-      FillCutCopySomething<AdvanceSearchModel>(*m_searchSrcModel, ret.srcIndexes, dropAct);
-      return ret;
+      return GetMimeDataMemberFromSourceModel<AdvanceSearchModel>(*m_searchSrcModel, m_advanceSearchView->selectedRowsSource());
     }
     case ViewType::SCENE: {
       LOG_D("SCENE type not support getFilePathsAndUrls");
@@ -862,98 +853,14 @@ MimeDataHelper::MimeDataMember ViewsStackedWidget::getFilePathsAndUrls(const Qt:
   }
 }
 
-// {workpath, {rel2names}}
-// 对于MOVIE试图, rel2names 就是全路径
-// 其余视图下, rel2names 是相对于 workpath 的路径, 拼接 workpath + '/' + rel2names 得到全路径
-std::pair<QString, QStringList> ViewsStackedWidget::getWorkPathAndRel2Name(std::function<int()>* pAfterOperationUpdateModelCallback, SelectionUsage usage) const {
-  QString workpath;
-  QStringList rel2names;
-  rel2names.reserve(10);
-  auto vt = GetVt();
-  switch (vt) {
-    case ViewType::TABLE: {
-      workpath = m_fsModel->rootPath();
-      const auto& inds = m_fsTableView->selectedRowsSource();
-      for (const auto& ind : inds) {
-        rel2names.append(m_fsModel->fileName(ind));
-      }
-      break;
-    }
-    case ViewType::LIST: {
-      workpath = m_fsModel->rootPath();
-      const auto& inds = m_fsListView->selectedRowsSource();
-      for (const auto& ind : inds) {
-        rel2names.append(m_fsModel->fileName(ind));
-      }
-      break;
-    }
-    case ViewType::TREE: {
-      workpath = m_fsModel->rootPath();
-      const auto& inds = m_fsTreeView->selectedRowsSource();
-      for (const auto& ind : inds) {
-        rel2names.append(m_fsModel->fileName(ind));
-      }
-      break;
-    }
-    case ViewType::SEARCH: {
-      workpath = m_searchSrcModel->rootPath();
-
-      const QModelIndexList srcIndexes = m_advanceSearchView->selectedRowsSource();
-      for (const auto& ind : srcIndexes) {
-        rel2names.append(m_searchSrcModel->fileName(ind));
-      }
-      if (pAfterOperationUpdateModelCallback != nullptr && m_searchSrcModel != nullptr && !srcIndexes.isEmpty()) {
-        AdvanceSearchModel* localSearchModel = m_searchSrcModel;
-        *pAfterOperationUpdateModelCallback = [srcIndexes, localSearchModel]() -> int {
-          return localSearchModel->RecycleSomething(srcIndexes);
-        };
-      }
-      break;
-    }
-    case ViewType::SCENE: {
-      workpath = m_scenesModel->rootPath();
-      const QModelIndexList& srcIndexes = m_sceneListView->selectedRowsSource();
-      rel2names = m_scenesModel->RelativePath2RelatedFiles(srcIndexes);
-
-      if (pAfterOperationUpdateModelCallback != nullptr && m_scenesModel != nullptr && !srcIndexes.isEmpty()) {
-        ScenesListModel* localSceneModel = m_scenesModel;
-        *pAfterOperationUpdateModelCallback = [srcIndexes, localSceneModel]() -> int {
-          return localSceneModel->AfterJsonFilesNameRenamed(srcIndexes);
-        };
-      }
-      break;
-    }
-    case ViewType::MOVIE: {
-      workpath = m_movieDbModel->rootPath();
-      for (const auto& ind : m_movieView->selectedRowsSource()) {
-        rel2names.append(m_movieDbModel->pathRelative2RootPath(ind));
-      }
-      break;
-    }
-    case ViewType::JSON: {
-      workpath = m_jsonModel->rootPath();
-      const QModelIndexList& srcIndexes = m_jsonTableView->selectedRowsSource();
-      rel2names = m_jsonModel->RelativePath2RelatedFiles(srcIndexes);
-
-      if (pAfterOperationUpdateModelCallback != nullptr && m_jsonModel != nullptr && !srcIndexes.isEmpty()) {
-        JsonTableModel* localJsonModel = m_jsonModel;
-        *pAfterOperationUpdateModelCallback = [srcIndexes, localJsonModel]() -> int {
-          return localJsonModel->AfterJsonFilesNameRenamed(srcIndexes);
-        };
-      }
-      break;
-    }
-    case ViewType::CAST:
-    default: {
-      LOG_D("No getFilePrepathsAndName");
-      break;
-    }
-  }
-
-  return {workpath, rel2names};
+// {rootpath, {rel2names}}
+// rel2names 是相对于 rootpath 的路径, 拼接 rootpath + '/' + rel2names 得到全路径
+std::pair<QString, QStringList> ViewsStackedWidget::getRootPathAndRel2Name(QModelIndexList& srcIndexes) const {
+  srcIndexes = getSelectedRows();
+  return {getRootPath(), getFileNamesRelativeToRootPath()};
 }
 
-int ViewsStackedWidget::getSelectedRowsCount(SelectionUsage usage) const {
+int ViewsStackedWidget::getSelectedRowsCount() const {
   auto* curView = GetCurView();
   if (curView == nullptr) {
     LOG_D("curView[%s] is nullptr", ViewTypeTool::c_str(GetVt()));
@@ -962,39 +869,9 @@ int ViewsStackedWidget::getSelectedRowsCount(SelectionUsage usage) const {
   return curView->selectionModel()->selectedRows().size();
 }
 
-QString ViewsStackedWidget::getCurFilePath(SelectionUsage usage) const {
-  auto vt = GetVt();
-  switch (vt) {
-    case ViewType::TABLE: {
-      return m_fsModel->filePath(m_fsTableView->currentIndex());
-    }
-    case ViewType::LIST: {
-      return m_fsModel->filePath(m_fsListView->currentIndex());
-    }
-    case ViewType::TREE: {
-      return m_fsModel->filePath(m_fsTreeView->currentIndex());
-    }
-    case ViewType::SEARCH: {
-      return m_searchSrcModel->filePath(m_searchProxyModel->mapToSource(m_advanceSearchView->currentIndex()));
-    }
-    case ViewType::SCENE: {
-      return m_scenesModel->filePath(m_sceneProxyModel->mapToSource(m_sceneListView->currentIndex()), usage);
-    }
-    case ViewType::CAST: {
-      return m_castDbModel->filePath(m_castTableView->currentIndex());
-    }
-    case ViewType::MOVIE: {
-      return m_movieDbModel->filePath(m_movieView->currentIndex());
-    }
-    case ViewType::JSON: {
-      return m_jsonModel->filePath(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
-    }
-    default: {
-      LOG_W("No getCurFilePath");
-    }
-  }
-  LOG_W("nothing selected in viewType[%d]", (int)vt);
-  return "";
+QString ViewsStackedWidget::getCurFileFullPath() const {
+  auto* pView = GetCurViewWidgetByViewType();
+  return pView != nullptr ? getFileFullPathAtIndex(pView->currentIndex()) : "";
 }
 
 QString ViewsStackedWidget::getCurFileName(SelectionUsage usage) const {
@@ -1022,6 +899,7 @@ QString ViewsStackedWidget::getCurFileName(SelectionUsage usage) const {
       return m_jsonModel->fileName(m_jsonProxyModel->mapToSource(m_jsonTableView->currentIndex()));
     }
     case ViewType::CAST:
+      return m_castDbModel->fileName(m_castTableView->currentIndex());
     default: {
       LOG_W("No getCurFileName");
     }
@@ -1029,7 +907,7 @@ QString ViewsStackedWidget::getCurFileName(SelectionUsage usage) const {
   return "";
 }
 
-QFileInfo ViewsStackedWidget::getFileInfo(const QModelIndex& ind, SelectionUsage usage) const {
+QFileInfo ViewsStackedWidget::getFileInfoAtIndex(const QModelIndex& ind, SelectionUsage usage) const {
   const auto vt = GetVt();
   switch (vt) {
     case ViewType::TABLE:

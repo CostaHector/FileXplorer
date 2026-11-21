@@ -21,9 +21,9 @@ public:
     return QSqlTableModel::headerData(section, orientation, role);
   }
 
-  QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir{rootPath()}; }
+  QDir rootDirectory() const { return QDir{rootPath()}; }
 
-  QString rootPath(const QString& /*placeHolder*/ = "") const { return m_imageHostPath; }
+  QString rootPath() const { return m_imageHostPath; }
 
   QString fileName(const QModelIndex& curIndex) const;
 
@@ -34,6 +34,8 @@ public:
   QString oriPath(const QModelIndex& curIndex) const;
 
   QString psonFilePath(const QModelIndex& curIndex) const;
+
+  QStringList foldersRelativePath2RootPath(const QModelIndexList& selectedRows);
 
   QModelIndexList GetAllRowsIndexes() const;
   int SyncImageFieldsFromImageHost(const QModelIndexList& selectedRows);

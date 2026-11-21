@@ -79,18 +79,18 @@ class ViewsStackedWidget : public QStackedWidget {
   bool hasSelection() const;
   QString getRootPath() const;
 
-  QString getFilePath(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QModelIndexList getSelectedRows(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFileNames(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFilePaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFilePrepaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  std::pair<QString, QStringList> getWorkPathAndRel2Name(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFullRecords(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  int getSelectedRowsCount(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QString getCurFilePath(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QString getFileFullPathAtIndex(const QModelIndex& proxyInd) const;
+  QModelIndexList getSelectedRows() const;
+  QStringList getFileNamesRelativeToRootPath() const;
+  QStringList getFileFullPaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getModelRootPath() const;
+  std::pair<QString, QStringList> getRootPathAndRel2Name(QModelIndexList& srcIndexes) const;
+  MimeDataHelper::MimeDataMember getFileFullPathsAndUrls() const;
+  QStringList getFullRecords() const;
+  int getSelectedRowsCount() const;
+  QString getCurFileFullPath() const;
   QString getCurFileName(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QFileInfo getFileInfo(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QFileInfo getFileInfoAtIndex(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QAbstractItemView* GetCurViewWidgetByViewType() const;
 
  public:

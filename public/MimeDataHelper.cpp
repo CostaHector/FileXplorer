@@ -1,44 +1,29 @@
 #include "MimeDataHelper.h"
 #include "FileSystemModel.h"
 #include "AdvanceSearchModel.h"
-#include "SearchProxyModel.h"
 #include "FdBasedDbModel.h"
 #include <QApplication>
 #include <QClipboard>
 
 namespace MimeDataHelper {
-template MimeDataMember GetMimeDataMemberFromSourceModel(const QFileSystemModel& srcModel, const QModelIndexList& indexes);
-template MimeDataMember GetMimeDataMemberFromSourceModel(const FileSystemModel& srcModel, const QModelIndexList& indexes);
-template MimeDataMember GetMimeDataMemberFromSourceModel(const FdBasedDbModel& srcModel, const QModelIndexList& indexes);
+template MimeDataMember GetMimeDataMemberFromSourceModel(const QFileSystemModel& srcModel, const QModelIndexList& srcIndexes);
+template MimeDataMember GetMimeDataMemberFromSourceModel(const FileSystemModel& srcModel, const QModelIndexList& srcIndexes);
+template MimeDataMember GetMimeDataMemberFromSourceModel(const FdBasedDbModel& srcModel, const QModelIndexList& srcIndexes);
+template MimeDataMember GetMimeDataMemberFromSourceModel(const AdvanceSearchModel& srcModel, const QModelIndexList& srcIndexes);
 
 template bool FillCutCopySomething(FileSystemModel& fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct);
 template bool FillCutCopySomething(AdvanceSearchModel& fsModel, const QModelIndexList& indexes, const Qt::DropAction dropAct);
 
 template <typename TSrcModel>
-MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& indexes) {
-  QStringList filePaths;
-  filePaths.reserve(indexes.size());
-
-  QList<QUrl> urls;
-  urls.reserve(indexes.size());
-
-  for (const auto& ind : indexes) {
-    QString absFilePath{srcModel.filePath(ind)};
-    filePaths.append(absFilePath);
-    urls.append(QUrl::fromLocalFile(absFilePath));
-  }
-  return {filePaths, urls, indexes};
-}
-
-MimeDataMember GetMimeDataMemberFromSearchModel(const AdvanceSearchModel& searchSrcModel, const QModelIndexList& srcIndexes) {
+MimeDataMember GetMimeDataMemberFromSourceModel(const TSrcModel& srcModel, const QModelIndexList& srcIndexes) {
   QStringList filePaths;
   filePaths.reserve(srcIndexes.size());
 
   QList<QUrl> urls;
   urls.reserve(srcIndexes.size());
 
-  for (const auto& srcInd : srcIndexes) {
-    const QString absFilePath = searchSrcModel.filePath(srcInd);
+  for (const auto& ind : srcIndexes) {
+    QString absFilePath{srcModel.filePath(ind)};
     filePaths.append(absFilePath);
     urls.append(QUrl::fromLocalFile(absFilePath));
   }
