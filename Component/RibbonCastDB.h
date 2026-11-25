@@ -7,8 +7,8 @@ class RibbonCastDB : public QToolBar {
 public:
   explicit RibbonCastDB(const QString& title, QWidget* parent = nullptr);
 
-  QToolBar* m_BasicTableOp{nullptr};
-  QToolBar* m_SyncVidsFromDbOp{nullptr};
+  QToolBar* m_basicTableOp{nullptr};
+  QToolBar* m_syncFieldsValueOp{nullptr};
 };
 
 

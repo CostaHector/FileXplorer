@@ -6,7 +6,7 @@
 class RibbonMovieDB : public QToolBar {
  public:
   explicit RibbonMovieDB(const QString& title, QWidget* parent = nullptr);
-  QToolBar* m_dbControlTB{nullptr};
+  QToolBar* m_basicTableOp{nullptr};
   QToolBar* m_extraFunctionTB{nullptr};
   QToolBar* m_functionsTB{nullptr};
   QToolBar* m_dbViewHideShowTB{nullptr};

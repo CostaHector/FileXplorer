@@ -11,14 +11,11 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
 {
   auto& inst = MovieDBActions::GetInst();
 
-  m_dbControlTB = new (std::nothrow) QToolBar{"DB Control", this};
-  CHECK_NULLPTR_RETURN_VOID(m_dbControlTB);
-  m_dbControlTB->addActions(inst.DB_CONTROL_ACTIONS->actions());
-  m_dbControlTB->addWidget(inst.GetScanFilesToolButton(this));
-  m_dbControlTB->addSeparator();
-  m_dbControlTB->addAction(inst.EXPORT_TO_EFU_FILE);
-  m_dbControlTB->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  m_dbControlTB->setOrientation(Qt::Orientation::Horizontal);
+  m_basicTableOp = new (std::nothrow) QToolBar{"DB Control", this};
+  CHECK_NULLPTR_RETURN_VOID(m_basicTableOp);
+  m_basicTableOp->addActions(inst.BASIC_TABLE_OP->actions());
+  m_basicTableOp->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
+  m_basicTableOp->setOrientation(Qt::Orientation::Horizontal);
 
   m_extraFunctionTB = new (std::nothrow) QToolBar{"Video DB Extra Function", this};
   CHECK_NULLPTR_RETURN_VOID(m_extraFunctionTB);
@@ -73,27 +70,21 @@ RibbonMovieDB::RibbonMovieDB(const QString& title, QWidget* parent)  //
   m_dbViewHideShowTB->setOrientation(Qt::Orientation::Vertical);
   m_dbViewHideShowTB->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
 
-  addWidget(m_dbViewHideShowTB);
+
+  addWidget(m_dbViewHideShowTB); // 显示/隐藏
   addSeparator();
-  addWidget(m_dbControlTB);
+  addAction(inst._MODEL_PENDING_CHANGES_ACTION); // 数据库状态
   addSeparator();
-  addWidget(m_extraFunctionTB);
+  addWidget(inst.GetScanFilesToolButton(this)); // 插入/导出/基础功能
+  addAction(inst.EXPORT_TO_EFU_FILE);
+  addWidget(m_basicTableOp);
   addSeparator();
-  addWidget(m_functionsTB);
+  addWidget(m_extraFunctionTB); // 同步字段
   addSeparator();
-  addWidget(m_studioTB);
+  addWidget(m_functionsTB); // 统计， 打开
+  addSeparator();
+  addWidget(m_studioTB);   // 编辑
   addWidget(m_castEditTB);
   addWidget(m_tagsEditTB);
+  setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
 }
-
-// #define __NAME__EQ__MAIN__ 1
-#ifdef __NAME__EQ__MAIN__
-#include <QApplication>
-
-int main(int argc, char* argv[]) {
-  QApplication a(argc, argv);
-  RibbonMovieDB dbTB("Database Toolbar");
-  dbTB.show();
-  return a.exec();
-}
-#endif

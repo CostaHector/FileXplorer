@@ -4,7 +4,6 @@
 #include "Configuration.h"
 #include "CastKey.h"
 #include <QToolBar>
-#include <QMenu>
 #include <QActionGroup>
 
 CastDBActions& CastDBActions::GetInst() {
@@ -93,23 +92,18 @@ CastDBActions::CastDBActions(QObject* parent)  //
   DUMP_ALL_RECORDS_INTO_PSON_FILE->setToolTip("Dump all records to its pson file");
 }
 
-QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* notNullParent) {
+#include "MenuToolButton.h"
+QWidget* CastDBActions::GetAppendCastToolButton(QWidget* notNullParent) {
   CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
-
-  auto* menu = new (std::nothrow) QMenu{notNullParent};
-  CHECK_NULLPTR_RETURN_NULLPTR(menu);
-  menu->addAction(INSERT_A_ROW_BEFORE_CURRENT_INDEX);
-  menu->addAction(APPEND_FROM_PSON_FILES);
-  menu->addAction(APPEND_FROM_FILE_SYSTEM_STRUCTURE);
-
-  auto* tb = new (std::nothrow) QToolButton{notNullParent};
-  CHECK_NULLPTR_RETURN_NULLPTR(tb);
-  tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
-  tb->setPopupMode(QToolButton::ToolButtonPopupMode::MenuButtonPopup);
-  tb->setIcon(QIcon(":img/INSERT_INTO_TABLE"));
-  tb->setText(tr("Insert"));
-  tb->setMenu(menu);
-  return tb;
+  QList<QAction*> acts{INSERT_A_ROW_BEFORE_CURRENT_INDEX, APPEND_FROM_PSON_FILES, APPEND_FROM_FILE_SYSTEM_STRUCTURE};
+  MenuToolButton* insertToolButton = new (std::nothrow) MenuToolButton(acts,                           //
+                                                                     QToolButton::InstantPopup,               //
+                                                                     Qt::ToolButtonStyle::ToolButtonTextUnderIcon, //
+                                                                     IMAGE_SIZE::TABS_ICON_IN_MENU_48,
+                                                                     notNullParent);
+  CHECK_NULLPTR_RETURN_NULLPTR(insertToolButton);
+  insertToolButton->SetCaption(QIcon{":img/INSERT_INTO_TABLE"}, tr("Insert"), "");
+  return insertToolButton;
 }
 
 QWidget* CastDBActions::GetCastsDisplayMethodToolBar(QWidget* notNullParent) {

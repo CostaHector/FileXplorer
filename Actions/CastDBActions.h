@@ -4,7 +4,6 @@
 #include <QAction>
 #include <QMenuBar>
 #include <QObject>
-#include <QToolButton>
 #include "PendingChangesAction.h"
 
 class CastDBActions : public QObject {
@@ -14,7 +13,7 @@ class CastDBActions : public QObject {
 
   PendingChangesAction* _MODEL_PENDING_CHANGES_ACTION{nullptr};
 
-  QToolButton* GetAppendCastToolButton(QWidget* notNullParent);
+  QWidget* GetAppendCastToolButton(QWidget* notNullParent);
 
   QAction* INSERT_A_ROW_BEFORE_CURRENT_INDEX{nullptr};
   QAction* APPEND_FROM_PSON_FILES{nullptr};

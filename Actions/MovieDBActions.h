@@ -27,7 +27,7 @@ public:
   QAction* DELETE_FROM_TABLE{nullptr};
   QAction* RECONSTRUCT_MOVIES_TABLE{nullptr};
   QAction* AUDIT_A_TABLE{nullptr};
-  QActionGroup* DB_CONTROL_ACTIONS{nullptr};
+  QActionGroup* BASIC_TABLE_OP{nullptr};
 
   QAction* EXPORT_TO_EFU_FILE{nullptr};
 

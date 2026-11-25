@@ -63,16 +63,14 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(AUDIT_A_TABLE);
   AUDIT_A_TABLE->setToolTip("Audit a table (Principle: Compare video records in table with an online disk);");
 
-  DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup{this};
-  CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
-  DB_CONTROL_ACTIONS->addAction(_MODEL_PENDING_CHANGES_ACTION);
-  DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
-  DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);
-  DB_CONTROL_ACTIONS->addAction(DROP_A_TABLE);
-  DB_CONTROL_ACTIONS->addAction(RECONSTRUCT_MOVIES_TABLE);
-  DB_CONTROL_ACTIONS->addAction(AUDIT_A_TABLE);
-  DB_CONTROL_ACTIONS->setExclusionPolicy(QActionGroup::ExclusionPolicy::None);
+  BASIC_TABLE_OP = new (std::nothrow) QActionGroup{this};
+  CHECK_NULLPTR_RETURN_VOID(BASIC_TABLE_OP);
+  BASIC_TABLE_OP->addAction(DELETE_FROM_TABLE);
+  BASIC_TABLE_OP->addAction(INIT_A_DATABASE);
+  BASIC_TABLE_OP->addAction(INIT_A_TABLE);
+  BASIC_TABLE_OP->addAction(DROP_A_TABLE);
+  BASIC_TABLE_OP->addAction(RECONSTRUCT_MOVIES_TABLE);
+  BASIC_TABLE_OP->addAction(AUDIT_A_TABLE);
 
   EXPORT_TO_EFU_FILE = new (std::nothrow) QAction(QIcon(":img/EXPORT_TO_EFU_FILE"), tr("Export to EFU"), this);
   CHECK_NULLPTR_RETURN_VOID(EXPORT_TO_EFU_FILE);
