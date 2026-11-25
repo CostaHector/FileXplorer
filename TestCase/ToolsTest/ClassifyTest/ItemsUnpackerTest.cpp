@@ -6,7 +6,7 @@
 #include "ItemsUnpacker.h"
 #include "EndToExposePrivateMember.h"
 
-class ExtractPileItemsOutFolderTest : public PlainTestSuite {
+class ItemsUnpackerTest : public PlainTestSuite {
   Q_OBJECT
  public:
  private slots:
@@ -65,5 +65,5 @@ class ExtractPileItemsOutFolderTest : public PlainTestSuite {
   }
 };
 
-#include "ExtractPileItemsOutFolderTest.moc"
-REGISTER_TEST(ExtractPileItemsOutFolderTest, false)
+#include "ItemsUnpackerTest.moc"
+REGISTER_TEST(ItemsUnpackerTest, false)

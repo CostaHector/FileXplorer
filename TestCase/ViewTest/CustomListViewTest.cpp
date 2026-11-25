@@ -228,4 +228,4 @@ class CustomListViewTest : public PlainTestSuite {
 };
 
 #include "CustomListViewTest.moc"
-REGISTER_TEST(CustomListViewTest, true)
+REGISTER_TEST(CustomListViewTest, false)

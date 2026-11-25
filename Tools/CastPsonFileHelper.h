@@ -5,13 +5,17 @@
 #include <QVariantHash>
 class QSqlRecord;
 
+namespace CastPsonFileHelper {
+constexpr int DEFAULT_RATE{0};
+}
+
 // enum/memeber/parameter name, enumValue, defaultValueAndType, sqlRecordToType, tblFieldDefinition
 #define PSON_MODEL_FIELD_MAPPING \
   PSON_KEY_ITEM(Name, 0, QString{}, toString, QString{R"(`%1` TEXT NOT NULL %2,)"}) \
-  PSON_KEY_ITEM(Rate, 1, (int) 0, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \
+  PSON_KEY_ITEM(Rate, 1, (int) CastPsonFileHelper::DEFAULT_RATE, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \
   PSON_KEY_ITEM(ALIAS, 2, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Tags, 3, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
-  PSON_KEY_ITEM(Ori, 4, QString{"Football"}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
+  PSON_KEY_ITEM(Ori, 4, QString{"Football"}, toString, QString{R"(`%1` TEXT NOT NULL DEFAULT "%2",)"}) \
   PSON_KEY_ITEM(Height, 5, (int) -1, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \
   PSON_KEY_ITEM(Size, 6, (int) -1, toInt, QString{R"(`%1` INT DEFAULT %2,)"}) \
   PSON_KEY_ITEM(Birth, 7, QString{}, toString, QString{R"(`%1` TEXT DEFAULT "%2",)"}) \
@@ -36,7 +40,6 @@ constexpr int CAST_TABLE_HEADERS_COUNT = sizeof(CAST_TABLE_HEADERS) / sizeof(CAS
 } // namespace PERFORMER_DB_HEADER_KEY
 
 namespace CastPsonFileHelper {
-constexpr int DEFAULT_RATE{0};
 
 QString PsonPath(const QString& imageHostPath, const QVariantHash& pson);
 

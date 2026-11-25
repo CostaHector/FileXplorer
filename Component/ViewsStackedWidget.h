@@ -13,7 +13,7 @@
 #include "JsonTableView.h"
 #include "MovieDBView.h"
 #include "SceneListView.h"
-#include "CastDBView.h"
+#include "CastDBViewSplitter.h"
 
 #include "ViewTypeTool.h"
 #include "MimeDataHelper.h"
@@ -69,9 +69,6 @@ class ViewsStackedWidget : public QStackedWidget {
 
   std::pair<QModelIndex, QModelIndex> getTopLeftAndRightDownRectangleIndex() const;
   QModelIndex getRootIndex() const;
-  inline QAbstractItemView* GetCurView() const {  //
-    return dynamic_cast<QAbstractItemView*>(currentWidget());
-  }
   const char* GetCurViewName() const;
 
   int AddView(ViewTypeTool::ViewType vt, QWidget* w);
@@ -91,7 +88,7 @@ class ViewsStackedWidget : public QStackedWidget {
   QString getCurFileFullPath() const;
   QString getCurFileName(SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QFileInfo getFileInfoAtIndex(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QAbstractItemView* GetCurViewWidgetByViewType() const;
+  QAbstractItemView* GetCurView() const;
 
  public:
   struct Anchor {
@@ -120,9 +117,9 @@ class ViewsStackedWidget : public QStackedWidget {
   SceneListView* m_sceneListView{nullptr};
 
   CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus
-  CastBaseDb* mCastDb{nullptr};
+  CastDBViewSplitter* m_castDbViewSplitter{nullptr};
   CastDbModel* m_castDbModel{nullptr};
-  CastDBView* m_castTableView{nullptr};
+  CastDBTableView* m_castTableView{nullptr};
 
   QSortFilterProxyModel* m_jsonProxyModel{nullptr};
   JsonTableModel* m_jsonModel{nullptr};

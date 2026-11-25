@@ -97,7 +97,7 @@ private slots:
 
     mTDir.ClearAll();
     QVERIFY(touchOrDeleteMP4File(mTDir, true));
-    ScenesMixed sMixed;
+    SceneMixed sMixed;
     sMixed.m_img2Name["Lewandowski 1024"] = QStringList{"Lewandowski 1024 1.jpg", "Lewandowski 1024 2.jpg"};
     sMixed.m_vid2Name["Lewandowski 1024"] = QStringList{"Lewandowski 1024.mp4"};
     sMixed.m_json2Name = QSet<QString>{"Lewandowski 1024"}; // Lewandowski 1024.json

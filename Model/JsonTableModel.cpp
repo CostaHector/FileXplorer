@@ -912,14 +912,14 @@ int JsonTableModel::SetRecordContentsFixed(const QModelIndexList& rowIndexes, bo
 JsonOp::Counter JsonTableModel::UpdateJsonKeyValuePair() {
   JsonOp::Counter counter;
 
-  QMap<QString, ScenesMixed> prePath2SceneMixed;
+  QMap<QString, SceneMixed> prePath2SceneMixed;
 
   int minRow{INT_MAX}, maxRow{-1};
   for (int row = 0; row < rowCount(); ++row) {
     const QString& prePath = mCachedJsons[row].GetJsonPrepath();
     decltype(prePath2SceneMixed)::const_iterator it = prePath2SceneMixed.find(prePath);
     if (it == prePath2SceneMixed.cend()) {
-      ScenesMixed sMixed;
+      SceneMixed sMixed;
       sMixed(prePath);
       it = prePath2SceneMixed.insert(prePath, sMixed);
     }

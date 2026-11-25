@@ -41,7 +41,6 @@ class TorrentsManagerWidget;
 class ConfigsMgr;
 class Archiver;
 class ResourceMonitorPanel;
-class CastDBListView;
 
 extern template class PopupWidgetManager<QWidget>;
 extern template class PopupWidgetManager<DevicesDrivesTV>;
@@ -55,5 +54,4 @@ class PasswordBook;
 extern template class PopupWidgetManager<PasswordBook>;
 #endif
 extern template class PopupWidgetManager<ResourceMonitorPanel>;
-extern template class PopupWidgetManager<CastDBListView>;
 #endif // POPUPWIDGETMANAGER_H

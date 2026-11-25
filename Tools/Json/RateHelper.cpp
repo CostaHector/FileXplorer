@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "JsonModelField.h"
 #include "JsonFieldBoundary.h"
+#include "VideoTierTool.h"
 #include "RelatedHelper.h"
 #include <QPainter>
 #include <QFile>
@@ -12,6 +13,7 @@
 #include <QSet>
 
 constexpr int RateHelper::RATING_BAR_X, RateHelper::RATING_BAR_HEIGHT;
+constexpr QColor RateHelper::STD_ORANGE;
 
 bool RateHelper::SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce) {
   using namespace JsonModelField;
@@ -161,7 +163,7 @@ int RateHelper::AdjustFileRateRecursively(const QString& folderAbsPath, int delt
   return succeedCnt;
 }
 
-QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder) {
+QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder, QColor color) {
   if (r < 0 || r > sliceCount) {
     LOG_D("rate[%d] out bound", r);
     return {};
@@ -175,9 +177,8 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
 
   QPainter painter{&mp};
   {
-    static constexpr QColor STD_ORANGE{255, 165, 0, 255};
-    painter.setPen(STD_ORANGE);
-    painter.setBrush(STD_ORANGE);
+    painter.setPen(color);
+    painter.setBrush(color);
     painter.drawRect(0, 0, orangeWidth, HEIGHT);
   }
 
@@ -203,17 +204,17 @@ QPixmap RateHelper::GenerateRatePixmap(int r, const int sliceCount, const bool h
 const QPixmap& RateHelper::GetRatePixmap(int rate) {
   static const QPixmap SCORE_BOARD[JsonFieldBoundary::RATE_BUTT_V] //
       {
-          GenerateRatePixmap(0,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(1,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(2,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(3,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(4,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(5,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(6,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(7,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(8,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(9,  JsonFieldBoundary::RATE_MAX_V),  //
-          GenerateRatePixmap(10, JsonFieldBoundary::RATE_MAX_V), //
+          GenerateRatePixmap(0,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(0))),  //
+          GenerateRatePixmap(1,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(1))),  //
+          GenerateRatePixmap(2,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(2))),  //
+          GenerateRatePixmap(3,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(3))),  //
+          GenerateRatePixmap(4,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(4))),  //
+          GenerateRatePixmap(5,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(5))),  //
+          GenerateRatePixmap(6,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(6))),  //
+          GenerateRatePixmap(7,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(7))),  //
+          GenerateRatePixmap(8,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(8))),  //
+          GenerateRatePixmap(9,  JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(9))),  //
+          GenerateRatePixmap(10, JsonFieldBoundary::RATE_MAX_V, false, VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(10))), //
       };
   return SCORE_BOARD[JsonFieldBoundary::clampRate(rate)];
 }

@@ -25,7 +25,8 @@ class RateHelper {
   static bool SetJsonRateValueCore(const QString& jsonPath, int newRateVal, bool bOverrideForce);
   static bool AdjustJsonRateValueCore(const QString& jsonPath, int delta = 1, int* newRateValue = nullptr);
 
-  static QPixmap GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder = false);
+  static constexpr QColor STD_ORANGE{255, 165, 0, 255};
+  static QPixmap GenerateRatePixmap(int r, const int sliceCount, const bool hasBorder = false, QColor color = STD_ORANGE);
 };
 
 #endif  // RATEHELPER_H

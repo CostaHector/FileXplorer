@@ -56,9 +56,8 @@ void MovieDBView::subscribe() {
 
   auto& inst = MovieDBActions::GetInst();
   // control actions
-  connect(inst.SUBMIT, &QAction::triggered, this, &MovieDBView::onSubmit);
-  connect(inst._MODEL_REPOPULATE, &QAction::triggered, _dbModel, &FdBasedDbModel::repopulate);
-  connect(inst.REVERT, &QAction::triggered, this, &MovieDBView::onRevert);
+  connect(inst._MODEL_PENDING_CHANGES_ACTION->mSubmitAct, &QAction::triggered, this, &MovieDBView::onSubmitAll);
+  connect(inst._MODEL_PENDING_CHANGES_ACTION->mRevertAct, &QAction::triggered, this, &MovieDBView::onRevertAll);
   connect(inst.INIT_A_DATABASE, &QAction::triggered, this, &MovieDBView::onInitDataBase);
   connect(inst.INIT_A_TABLE, &QAction::triggered, this, &MovieDBView::onCreateATable);
   connect(inst.DROP_A_TABLE, &QAction::triggered, this, &MovieDBView::onDropATable);
@@ -208,7 +207,7 @@ bool MovieDBView::onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesTy
   return true;
 }
 
-bool MovieDBView::onSubmit() {
+bool MovieDBView::onSubmitAll() {
   const QString& curTableName{_movieDbSearchBar->GetCurrentTableName()};
   if (!_dbModel->isDirty()) {
     LOG_OK_NP("[Skip submit] Table not dirty", curTableName);
@@ -222,7 +221,7 @@ bool MovieDBView::onSubmit() {
   return true;
 }
 
-bool MovieDBView::onRevert() {
+bool MovieDBView::onRevertAll() {
   const QString& curTableName{_movieDbSearchBar->GetCurrentTableName()};
   if (!_dbModel->isDirty()) {
     LOG_OK_NP("Table not dirty. Skip revert", curTableName);

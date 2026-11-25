@@ -4,15 +4,19 @@
 #include <QSqlTableModel>
 
 class SqlTableModelPub : public QSqlTableModel {
+  Q_OBJECT
 public:
-  using QSqlTableModel::QSqlTableModel;
+  explicit SqlTableModelPub(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase());
   bool SetFilterAndSelect(const QString &filter);
-  bool repopulate() {
-    return select();
-  }
+  void sort(int column, Qt::SortOrder order) override;
+
+signals:
+  void dirtyStatesChanged(bool bDirty);
+
 private:
-  void ResetLastFilter(const QString &filter, bool bIsLastSucceed);
+  void EmitDirtyState();
   QString m_lastFilter;
   bool m_lastFilterSucceed {false};
+  bool m_isLastDirty{false};
 };
 #endif // SQLTABLEMODELPUB_H

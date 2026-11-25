@@ -4,7 +4,13 @@
 #include "JsonFieldBoundary.h"
 #include "StringTool.h"
 #include "VideoTierTool.h"
+#include "CastDBCardEditor.h"
+#include "CastPsonFileHelper.h"
 
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QPlainTextEdit>
+#include <QAbstractProxyModel>
 #include <QFileInfo>
 #include <QFontMetrics>
 #include <QLinearGradient>
@@ -73,9 +79,9 @@ void CastCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   // GetPixmapFromCached 内部等比内接缩放(细长图 scaledToWidth, 扁平图 scaledToHeight), 且自带
   // QPixmapCache。千万不要在这里写 QImage{path}, 滚动时会疯狂读盘。
   painter->fillRect(faceRect, QColor{0x22, 0x22, 0x22});
-  QString imgAbsPath{pModel->coverImageFullPath(index, true)};  // 优先缩略图
+  QString imgAbsPath{pModel->coverImageFullPathAtIndex(index, true)};  // 优先缩略图
   if (!QFileInfo{imgAbsPath}.isFile()) {
-    imgAbsPath = pModel->coverImageFullPath(index, false);  // 缩略图未生成时退回首图
+    imgAbsPath = pModel->coverImageFullPathAtIndex(index, false);  // 缩略图未生成时退回首图
   }
   const QPixmap cover{ImageTool::GetPixmapFromCached(imgAbsPath, innerW, innerH, true)};
   if (!cover.isNull()) {
@@ -118,24 +124,32 @@ void CastCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     painter->fillRect(footerRect, grad);
   }
 
-  // ---------- 4. 评分徽章(左上角), 配色复用 VideoTierTool, 与场景视图评分条一致 ----------
+  // ---------- 4. 评分徽章(左上角 正方形/等腰直角三角形), 配色复用 VideoTierTool, 与场景视图评分条一致 ----------
   const int rate{pModel->rateAtIndex(index)};
   {
     const int badgeSide{qBound(22, innerW / 4, 96)};
-    const QRect badgeRect{faceRect.left() + pad, faceRect.top() + pad, badgeSide, badgeSide};
     QColor badgeColor{VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(rate))};
     badgeColor.setAlpha(235);
     painter->setPen(Qt::NoPen);
     painter->setBrush(badgeColor);
-    painter->drawRoundedRect(QRectF{badgeRect}, RADIUS, RADIUS);
+    // const QRect badgeRect{faceRect.left() + pad, faceRect.top() + pad, badgeSide, badgeSide};
+    const QRect badgeRect{faceRect.left(), faceRect.top(), badgeSide, badgeSide};
+    {
+      // painter->drawRoundedRect(QRectF{badgeRect}, RADIUS, RADIUS);
+    }
+    {
+      const qreal triSide = badgeSide * 1.7; // in theory 2
+      const QPointF origin = badgeRect.topLeft();
+      QPolygonF tri{{origin, QPointF(origin.x() + triSide, origin.y()), QPointF(origin.x(), origin.y() + triSide)}};
+      painter->drawPolygon(tri);
+    }
 
     QFont badgeFont{option.font};
     badgeFont.setPixelSize(badgeSide * 2 / 3);
     badgeFont.setBold(true);
     painter->setFont(badgeFont);
     painter->setPen(Qt::white);
-    painter->drawText(badgeRect, Qt::AlignCenter,
-                      rate == JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V ? QStringLiteral("-") : QString::number(rate));
+    painter->drawText(badgeRect, Qt::AlignCenter, QString::number(rate));
   }
 
   // ---------- 5. 文案区: 姓名 / 身高+尺码 / 标签, 自下而上堆叠 ----------
@@ -210,4 +224,85 @@ void CastCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   }
 
   painter->restore();
+}
+
+QWidget *CastCardDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
+  CastDBCardEditor* editor = new CastDBCardEditor(parent);
+  CastCardDelegate* self = const_cast<CastCardDelegate*>(this);
+
+  connect(editor, &CastDBCardEditor::stageCurrentChanges, self, [self, editor]() {
+    emit self->commitData(editor);
+    emit self->closeEditor(editor, QAbstractItemDelegate::SubmitModelCache);
+  });
+
+  connect(editor, &CastDBCardEditor::revertCurrentChanges, self, [self, editor]() {
+    emit self->closeEditor(editor, QAbstractItemDelegate::RevertModelCache);
+  });
+
+  return editor;
+}
+
+void CastCardDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+  auto* e = qobject_cast<CastDBCardEditor*>(editor);
+  if (!e) return;
+
+  e->mActorNameEdit->setText(index.siblingAtColumn(  CastDbModelField::FIELD_E::Name).data(Qt::DisplayRole).toString());
+  e->mRateEdit->setValue(index.siblingAtColumn(      CastDbModelField::FIELD_E::Rate).data(Qt::DisplayRole).toInt());
+  e->mAliasEdit->setText(index.siblingAtColumn(      CastDbModelField::FIELD_E::ALIAS).data(Qt::DisplayRole).toString());
+  e->mTagsEdit->setText(index.siblingAtColumn(       CastDbModelField::FIELD_E::Tags).data(Qt::DisplayRole).toString());
+  e->mOriBelongToEdit->setText(index.siblingAtColumn(CastDbModelField::FIELD_E::Ori).data(Qt::DisplayRole).toString());
+  e->mHeightEdit->setValue(index.siblingAtColumn(    CastDbModelField::FIELD_E::Height).data(Qt::DisplayRole).toInt());
+  e->mSizeEdit->setValue(index.siblingAtColumn(      CastDbModelField::FIELD_E::Size).data(Qt::DisplayRole).toInt());
+  e->mDetailEdit->setPlainText(index.siblingAtColumn(CastDbModelField::FIELD_E::Detail).data(Qt::DisplayRole).toString());
+}
+
+void CastCardDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+  auto* e = qobject_cast<CastDBCardEditor*>(editor);
+  if (!e) return;
+
+  QModelIndex srcIndex = index;
+  QAbstractItemModel *targetModel = model;
+  if (auto *proxy = qobject_cast<QAbstractProxyModel *>(model)) {
+    // 如果用了代理， 那就获取原模型和再原模型中的index
+    srcIndex = proxy->mapToSource(index);
+    targetModel = proxy->sourceModel();
+  }
+  if (!srcIndex.isValid() || !targetModel) {
+    return;
+  }
+
+  // 3. 兜底：源模型若内部发生行重排，持久索引会跟随
+  const QPersistentModelIndex pIndex(srcIndex);
+
+  const QString newName    = e->mActorNameEdit->text();
+  const int newRateValue   = e->mRateEdit->value();
+  const QString newAlias   = e->mAliasEdit->text();
+  const QString newTags    = e->mTagsEdit->text();
+  const QString newOri     = e->mOriBelongToEdit->text();
+  const int newHeightValue = e->mHeightEdit->value();
+  const int newSizeValue   = e->mSizeEdit->value();
+  const QString newDetail  = e->mDetailEdit->toPlainText();
+
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Name), newName);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Rate), newRateValue);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::ALIAS), newAlias);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Tags), newTags);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Ori), newOri);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Height), newHeightValue);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Size), newSizeValue);
+  srcIndex = pIndex;
+  targetModel->setData(srcIndex.siblingAtColumn(CastDbModelField::FIELD_E::Detail), newDetail);
+}
+
+void CastCardDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const {
+  QRect r = option.rect.adjusted(CARD_MARGIN, CARD_MARGIN, -CARD_MARGIN, -CARD_MARGIN);;
+  r.setHeight(qMax(r.height(), editor->sizeHint().height()));
+  editor->setGeometry(r);
 }

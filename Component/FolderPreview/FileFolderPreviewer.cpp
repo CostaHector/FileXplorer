@@ -91,9 +91,6 @@ bool FileFolderPreviewer::DisplayCastInformation(const QSqlRecord& record, const
   CHECK_NULLPTR_RETURN_FALSE(mDetailsPane)
   mDetailsPane->setHtml("");
   QString newName = CastBrowserHelper::GetWindowTitleName(record);
-  if (!NeedUpdate(newName)) {
-    return false;
-  }
   StopVideoPlay();
   mLastName = newName;
   setWindowTitle(mLastName);

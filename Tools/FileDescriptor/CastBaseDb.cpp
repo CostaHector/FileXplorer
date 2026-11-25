@@ -5,7 +5,6 @@
 #include "PublicVariable.h"
 #include "PublicStringMacro.h"
 #include "StringTool.h"
-#include "JsonRenameRegex.h"
 #include "ItemsPileCategory.h"
 #include "Logger.h"
 
@@ -263,39 +262,21 @@ int CastBaseDb::AppendCastFromMultiLineInput(const QString& perfsText) {
   return succeedCnt;
 }
 
-bool CastBaseDb::UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  QDir castDir{GetCastPath(sqlRecord, imageHostPath), "", QDir::SortFlag::Name, QDir::Filter::Files};
+QString CastBaseDb::GetImgsFieldNewValue(const QString& oriFullPath, const QString& actorName) {
+  QDir castDir{oriFullPath + '/' + actorName, "", QDir::SortFlag::Name, QDir::Filter::Files};
   castDir.setNameFilters(TYPE_FILTER::IMAGE_TYPE_SET);
   if (!castDir.exists()) {
     LOG_D("cast path[%s] not exist", qPrintable(castDir.absolutePath()));
-    return false;  // no need update
+    return "";
   }
-  QString folderName = sqlRecord.value(CastDbModelField::Name).toString();
   QStringList usefullImages;
   for (const QFileInfo& imgFi: castDir.entryInfoList()) {
     const QString bn = imgFi.baseName();
-    if (bn == folderName || ItemsPileCategory::IMG_PILE_NAME_PATTERN_STRICT.match(bn).hasMatch()) {
+    if (bn == actorName || ItemsPileCategory::IMG_PILE_NAME_PATTERN_STRICT.match(bn).hasMatch()) {
       usefullImages.push_back(imgFi.fileName());
     }
   }
-  const QString newImages = usefullImages.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
-  if (sqlRecord.value(CastDbModelField::Imgs).toString() == newImages) {
-    return false;  // no need update
-  }
-  sqlRecord.setValue(CastDbModelField::Imgs, newImages);
-  return true;
-}
-
-QString CastBaseDb::GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  return imageHostPath + '/'                                                                        //
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Ori).value().toString() + '/'  //
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString();              //
-}
-
-QString CastBaseDb::GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath) {
-  return GetCastPath(sqlRecord, imageHostPath) + '/'                                   //
-         + sqlRecord.field(INSERT_FULL_FIELDS_TEMPLATE_FIELD_Name).value().toString()  //
-         + ".pson";
+  return usefullImages.join(StringTool::PERFS_VIDS_IMGS_SPLIT_CHAR);
 }
 
 auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCast2OriImgs {
@@ -326,55 +307,4 @@ auto CastBaseDb::FromFileSystemStructure(const QString& imgsHostOriPath) -> TCas
     ImgsSortNameFirst(it.value().second);
   }
   return cast2OriImgs;
-}
-
-int CastBaseDb::WhenCastNameRenamed(const QString& imgsHostOriPath, const QString& oldName, const QString& newName) {
-  if (oldName == newName) {
-    return 0;
-  }
-  if (NameTool::IsFileNameInvalid(newName)) {
-    LOG_W("New name[%s] invalid", qPrintable(newName));
-    return -1;
-  }
-
-  if (newName.contains(JSON_RENAME_REGEX::INVALID_CHARS_IN_FILENAME)) {
-    LOG_W("New name[%s] invalid should not contain invalid chars", qPrintable(newName));
-    return -1;
-  }
-
-  QDir oriDir{imgsHostOriPath};
-  if (!oriDir.exists()) {
-    LOG_D("Host Image Path[%s] does not exist.", qPrintable(imgsHostOriPath));
-    return -1;
-  }
-  if (oriDir.exists(newName)) {
-    LOG_D("New Name[%s] already been occupied.", qPrintable(newName));
-    return -1;
-  }
-  int renameCount = 0;
-
-  // 1. rename files under ori. imgsHostOriPath/oldName/oldNameXX -> imgsHostOriPath/oldName/newNameXX
-  QDir oldir{imgsHostOriPath + "/" + oldName, "", QDir::SortFlag::Name, QDir::Filter::Files};  // oldName + "*", QDir::SortFlag::Name
-  oldir.setNameFilters({oldName + "*"});
-  for (const QString& oldFileName : oldir.entryList()) {
-    QString newFileName = oldFileName;
-    newFileName.replace(oldName, newName);
-    if (newFileName == oldFileName) {
-      continue;
-    }
-    if (!oldir.rename(oldFileName, newFileName)) {
-      LOG_W("Rename file from %s->%s failed.", qPrintable(oldFileName), qPrintable(newFileName));
-      return -1;
-    }
-    ++renameCount;
-  }
-
-  // 2. rename ori itself,  imgsHostOriPath/oldName -> imgsHostOriPath/newName
-  if (!oriDir.rename(oldName, newName)) {
-    LOG_W("Renamed directory from %s->%s failed.", qPrintable(oldName), qPrintable(newName));
-    return -1;
-  }
-  ++renameCount;
-
-  return renameCount;
 }

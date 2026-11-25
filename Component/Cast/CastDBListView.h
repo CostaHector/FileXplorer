@@ -7,22 +7,19 @@
 class CastCardDelegate;
 class CastDBListView : public CustomListView {
 public:
-  explicit CastDBListView(QWidget* parent = nullptr);
-  explicit CastDBListView(CastDbModel* castDbModel_, QWidget* parent = nullptr);
+  explicit CastDBListView(CastDbModel* castDbModel_, QItemSelectionModel* selectionModel_, QWidget* parent = nullptr);
+#ifdef RUNNING_UNIT_TESTS
+  CastCardDelegate* GetCardDelegate() { return m_castCardDel; }
+#endif
 
 protected:
   void initExclusivePreferenceSetting() override;
-  void showEvent(QShowEvent* event) override;
-  void closeEvent(QCloseEvent* event) override;
 
 private slots:
   void onIconSizeChanged(const QSize& iconSize);
 
 private:
-  void ReadSettings();
-
   CastCardDelegate* m_castCardDel{nullptr};
-  bool m_geometryRestoredOnce{false};
 };
 
 #endif // CASTDBLISTVIEW_H

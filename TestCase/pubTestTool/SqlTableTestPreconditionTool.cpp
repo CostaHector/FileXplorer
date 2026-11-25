@@ -1,5 +1,4 @@
 #include "SqlTableTestPreconditionTool.h"
-#include "JsonHelper.h"
 #include "CastPsonFileHelper.h"
 #include "Logger.h"
 #include <QDebug>
@@ -7,50 +6,28 @@
 namespace SqlTableTestPreconditionTool {
 bool CheckIndexesDisplayRoleIgnoreOrder(const QSqlTableModel& model,  //
                                         const QModelIndexList& indexes,
-                                        QStringList expectsList,
+                                        QVariantList expectsList,
                                         Qt::ItemDataRole role) {
-  QStringList actualsList;
+  QVariantList actualsList;
   for (const QModelIndex& ind : indexes) {
-    actualsList.push_back(model.data(ind, role).toString());
+    actualsList.push_back(model.data(ind, role));
   }
   std::sort(actualsList.begin(), actualsList.end());
   std::sort(expectsList.begin(), expectsList.end());
-  int n1 = actualsList.size(), n2 = expectsList.size();
-  if (actualsList == expectsList) {
-    return true;
-  }
+
+  const int n1 = actualsList.size(), n2 = expectsList.size();
   if (n1 != n2) {
     LOG_W("list length[%d, %d] not equal", n1, n2);
     return false;
   }
-
-  qDebug() << "expects:" << expectsList;
-  qDebug() << "actuals:" << actualsList;
-  return false;
-}
-
-bool CheckIndexesDisplayRoleIgnoreOrder(const QSqlTableModel& model,  //
-                                        const QModelIndexList& indexes,
-                                        QList<int> expectsList,
-                                        Qt::ItemDataRole role) {
-  QList<int> actualsList;
-  for (const QModelIndex& ind : indexes) {
-    actualsList.push_back(model.data(ind, role).toInt());
+  bool bDifferMet{false};
+  for (int i = 0; i < n1; ++i) {
+    if (expectsList[i] != actualsList[i]) {
+      qDebug() << "The element at index[" << i << "] differ. Expects:" << expectsList[i] << "Actuals:" << actualsList[i];
+      bDifferMet = true;
+    }
   }
-  std::sort(actualsList.begin(), actualsList.end());
-  std::sort(expectsList.begin(), expectsList.end());
-  int n1 = actualsList.size(), n2 = expectsList.size();
-  if (actualsList == expectsList) {
-    return true;
-  }
-  if (n1 != n2) {
-    LOG_W("list length[%d, %d] not equal", n1, n2);
-    return false;
-  }
-
-  qDebug() << "expects:" << expectsList;
-  qDebug() << "actuals:" << actualsList;
-  return false;
+  return !bDifferMet;
 }
 
 QModelIndexList GetIndexessAtOneRow(const QSqlTableModel& model, int rowBegin, int rowEnd, int column) {
@@ -71,7 +48,7 @@ QModelIndexList GetIndexessAtOneRow(const QSqlTableModel& model, int rowBegin, i
   return indexesNames;
 }
 
-bool CreateFileStructure(TDir& tDir) {
+bool CreateFileStructure(TDir& tDir, const QString& rel2FileEndWithSlash) {
   // imageHostPath/ori/name/name.pson
   // tDir.path()/.../.../...
   if (!tDir.IsValid()) {
@@ -79,17 +56,17 @@ bool CreateFileStructure(TDir& tDir) {
     return false;
   }
   const QList<FsNodeEntry> structureNodes{
-      {"SuperHero/Chris Evans/Chris Evans 1.jpg", false, "Chris Evans 1"},
-      {"SuperHero/Chris Evans/Chris Evans 2.jpg", false, "Chris Evans 2"},
-      {"SuperHero/Chris Hemsworth/Chris Hemsworth.jpg", false, "Chris Hemsworth"},
-      {"SuperHero/Chris Pine/Chris Pine.jpg", false, "Chris Pine"},
-      {"X-MEN/Michael Fassbender/Michael Fassbender.jpg", false, "Michael Fassbender"},
-      {"Football/Cristiano Ronaldo/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
+      {rel2FileEndWithSlash + "SuperHero/Chris Evans/Chris Evans 1.jpg", false, "Chris Evans 1"},
+      {rel2FileEndWithSlash + "SuperHero/Chris Evans/Chris Evans 2.jpg", false, "Chris Evans 2"},
+      {rel2FileEndWithSlash + "SuperHero/Chris Hemsworth/Chris Hemsworth.jpg", false, "Chris Hemsworth"},
+      {rel2FileEndWithSlash + "SuperHero/Chris Pine/Chris Pine.jpg", false, "Chris Pine"},
+      {rel2FileEndWithSlash + "X-MEN/Michael Fassbender/Michael Fassbender.jpg", false, "Michael Fassbender"},
+      {rel2FileEndWithSlash + "Football/Cristiano Ronaldo/Cristiano Ronaldo.jpg", false, "Cristiano Ronaldo"},
   };
   return tDir.createEntries(structureNodes) == 6;  // 6 files in total
 }
 
-bool CreateFileStructurePsonFiles(TDir& tDir) {
+bool CreateFileStructurePsonFiles(TDir& tDir, const QString& rel2FileEndWithSlash) {
   if (!tDir.IsValid()) {
     LOG_W("tDir invalid");
     return false;
@@ -105,10 +82,10 @@ bool CreateFileStructurePsonFiles(TDir& tDir) {
                                                                                 "James Caviezel in Man of Steel - General Zod.mp4",
                                                                                 "James Caviezel portait.jpg", "James Caviezel, American movie star");
 
-  const QList<FsNodeEntry> psonNodes{
-      {"SuperHero/Chris Evans/Chris Evans.pson", false, chrisEvansPsonContents},
-      {"SuperHero/Chris Hemsworth/Chris Hemsworth.pson", false, chrisHemesworthPsonContents},
-      {"Action/James Caviezel/James Caviezel.pson", false, jamesCaviezelPsonContents},
+  const QList<FsNodeEntry> psonNodes {
+      {rel2FileEndWithSlash + "SuperHero/Chris Evans/Chris Evans.pson", false, chrisEvansPsonContents},
+      {rel2FileEndWithSlash + "SuperHero/Chris Hemsworth/Chris Hemsworth.pson", false, chrisHemesworthPsonContents},
+      {rel2FileEndWithSlash + "Action/James Caviezel/James Caviezel.pson", false, jamesCaviezelPsonContents},
   };
   return tDir.createEntries(psonNodes) == 3;
 }

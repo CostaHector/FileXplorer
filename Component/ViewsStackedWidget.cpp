@@ -96,7 +96,7 @@ bool ViewsStackedWidget::onAddressToolbarPathChanged(QString newPath, bool isNew
   return true;
 }
 
-auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool {
+bool ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) {
   const ViewTypeTool::ViewType vt{GetVt()};
 
   switch (vt) {
@@ -125,7 +125,7 @@ auto ViewsStackedWidget::on_searchTextChanged(const QString& targetStr) -> bool 
   return true;
 }
 
-auto ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) -> bool {
+bool ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) {
   const ViewTypeTool::ViewType vt{GetVt()};
   switch (vt) {
     case ViewType::LIST:
@@ -327,7 +327,7 @@ void ViewsStackedWidget::connectSelectionChanged(ViewTypeTool::ViewType vt) {
       break;
     }
     case ViewType::CAST: {
-      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBView::currentRecordChanged, _previewFolder, &CurrentRowPreviewer::DisplayCastRecord);
+      mCurrentChangedConn = ViewsStackedWidget::connect(m_castTableView, &CastDBTableView::currentRecordChanged, _previewFolder, &CurrentRowPreviewer::DisplayCastRecord);
       break;
     }
     case ViewType::JSON: {
@@ -365,7 +365,7 @@ bool ViewsStackedWidget::LocateToSpecifiedFile(int step) {
     LOG_D("step is 0, ignore");
     return false;
   }
-  QAbstractItemView* viewWid = GetCurViewWidgetByViewType();
+  QAbstractItemView* viewWid = GetCurView();
   CHECK_NULLPTR_RETURN_FALSE(viewWid);
   QAbstractItemModel* pModel = viewWid->model();
   CHECK_NULLPTR_RETURN_FALSE(pModel);
@@ -870,7 +870,7 @@ int ViewsStackedWidget::getSelectedRowsCount() const {
 }
 
 QString ViewsStackedWidget::getCurFileFullPath() const {
-  auto* pView = GetCurViewWidgetByViewType();
+  auto* pView = GetCurView();
   return pView != nullptr ? getFileFullPathAtIndex(pView->currentIndex()) : "";
 }
 
@@ -938,7 +938,7 @@ QFileInfo ViewsStackedWidget::getFileInfoAtIndex(const QModelIndex& ind, Selecti
   return {};
 }
 
-QAbstractItemView* ViewsStackedWidget::GetCurViewWidgetByViewType() const {
+QAbstractItemView* ViewsStackedWidget::GetCurView() const {
   const auto vt = GetVt();
   switch (vt) {
     case ViewType::LIST:   return m_fsListView;

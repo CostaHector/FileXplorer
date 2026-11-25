@@ -5,20 +5,18 @@
 #include <QMenuBar>
 #include <QObject>
 #include <QToolButton>
+#include "PendingChangesAction.h"
 
 class CastDBActions : public QObject {
   Q_OBJECT
  public:
   static CastDBActions& GetInst();
 
-  explicit CastDBActions(QObject* parent = nullptr);
+  PendingChangesAction* _MODEL_PENDING_CHANGES_ACTION{nullptr};
 
-  QAction* _MODEL_SUBMIT_ALL{nullptr};
-  QAction* _MODEL_REPOPULATE{nullptr};
+  QToolButton* GetAppendCastToolButton(QWidget* notNullParent);
 
-  QToolButton* GetAppendCastToolButton(QWidget* parent);
-
-  QAction* APPEND_FROM_MULTILINES_INPUT{nullptr};
+  QAction* INSERT_A_ROW_BEFORE_CURRENT_INDEX{nullptr};
   QAction* APPEND_FROM_PSON_FILES{nullptr};
   QAction* APPEND_FROM_FILE_SYSTEM_STRUCTURE{nullptr};
   QAction* DELETE_RECORDS{nullptr};
@@ -37,8 +35,14 @@ class CastDBActions : public QObject {
   QAction* DUMP_SELECTED_RECORDS_INTO_PSON_FILE{nullptr};
   QAction* DUMP_ALL_RECORDS_INTO_PSON_FILE{nullptr};
 
-  QAction* m_ShowCastsInCardsListAct{nullptr};
+  QWidget* GetCastsDisplayMethodToolBar(QWidget* notNullParent);
+  QAction* m_showCastsTableAct{nullptr};
+  QAction* m_showCastsCardsListAct{nullptr};
+
   QAction* OPEN_DB_WITH_LOCAL_APP{nullptr};
+
+private:
+  explicit CastDBActions(QObject* parent = nullptr);
 };
 
 #endif  // CASTDBACTIONS_H

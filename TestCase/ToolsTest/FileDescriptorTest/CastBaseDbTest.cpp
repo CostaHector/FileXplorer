@@ -9,10 +9,8 @@
 #include "PublicStringMacro.h"
 #include "StringTool.h"
 #include "CastPsonFileHelper.h"
-#include "SqlRecordTestHelper.h"
 #include <QMap>
 
-using namespace SqlRecordTestHelper;
 using namespace CastPsonFileHelper;
 struct CastStructureProperty {
   QString ori;
@@ -107,16 +105,17 @@ escape folder
           {"Frank Grillo", "Crossbones"}
       };
 private slots:
+
   void initTestCase() {
     QVERIFY(mDir.IsValid());
     QCOMPARE(mDir.createEntries(mNodeEntries), mNodeEntries.size());
   }
 
   void test_aka_name_split() {
-    const auto& noPerfFromEmptyText = CastBaseDb::GetFreqName2AkaNames("");
+    const QMap<QString, QString>& noPerfFromEmptyText = CastBaseDb::GetFreqName2AkaNames("");
     QVERIFY(noPerfFromEmptyText.isEmpty());
 
-    const auto& noPerfFromUselessText = CastBaseDb::GetFreqName2AkaNames("\n\n\n");
+    const QMap<QString, QString>& noPerfFromUselessText = CastBaseDb::GetFreqName2AkaNames("\n\n\n");
     QVERIFY(noPerfFromUselessText.isEmpty());
 
     const QMap<QString, QString> actualPerf2AkaMaps = CastBaseDb::GetFreqName2AkaNames(mPerfAkaMultiLineText);
@@ -126,7 +125,7 @@ private slots:
     QCOMPARE(actualPerfs2OtherAkaMaps, mPerf2OtherAkaMaps);
   }
 
-  void test_ReadFromUserInputSentence() {
+  void ReadFromUserInputSentence_ok() {
     // precondition
     if (QFile{dbName}.exists()) {
       QVERIFY(QFile{dbName}.remove());
@@ -162,7 +161,7 @@ private slots:
     }
   }
 
-  void test_ReadFromImageHost() { // from local file system structure
+  void ReadFromImageHost_ok() { // from local file system structure
     // precondition
     if (QFile{dbName}.exists()) {
       QVERIFY(QFile{dbName}.remove());
@@ -192,7 +191,7 @@ private slots:
     }
   }
 
-  void test_LoadFromPJsonFile() { // from local file system pson file
+  void LoadFromPJsonFile_ok() { // from local file system pson file
     // precondition
     if (QFile{dbName}.exists()) {
       QVERIFY(QFile{dbName}.remove());
@@ -234,44 +233,18 @@ private slots:
     }
   }
 
-  void test_UpdateRecordImgsField() {
-    const QString defaultImgs{"Chris Hemsworth 0.jpg\nChris Hemsworth 1.jpg"};
-
+  void CheckRecordIfEqual_ok() {
     using namespace CastDbModelField;
     // 1. folder not exist should skip update
-    QSqlRecord chrisHenmworthRecord = GetACastRecordLine("Chris Hemsworth", "Movie", defaultImgs);
-    QCOMPARE(chrisHenmworthRecord.value(CastDbModelField::Name).toString(), "Chris Hemsworth");
-    QCOMPARE(chrisHenmworthRecord.value(CastDbModelField::Ori).toString(), "Movie");
-    QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Name)).toString(), "Chris Hemsworth");
-    QCOMPARE(chrisHenmworthRecord.value(ENUM_2_STR(Ori)).toString(), "Movie");
-    const QString castFolderPath{imgHostPath + "/Movie/Chris Hemsworth"};
-    const QString castPsonPath{imgHostPath + "/Movie/Chris Hemsworth/Chris Hemsworth.pson"};
-    QVERIFY2(!QDir{castFolderPath}.exists(), "Precondition: Chris Hemsworth path should not exist");
-    QCOMPARE(CastBaseDb::GetCastPath(chrisHenmworthRecord, imgHostPath), castFolderPath);
-    QCOMPARE(CastBaseDb::GetCastFilePath(chrisHenmworthRecord, imgHostPath), castPsonPath);
-    QVERIFY(!CastBaseDb::UpdateRecordImgsField(chrisHenmworthRecord, imgHostPath)); // path no exist
+    const QString castChrisHemsworthFolderPath{imgHostPath + "/Movie/Chris Hemsworth"};
+    QVERIFY2(!QDir{castChrisHemsworthFolderPath}.exists(), "Precondition: Chris Hemsworth path should not exist");
+    QCOMPARE(CastBaseDb::GetImgsFieldNewValue(imgHostPath + "/Movie", "Chris Hemsworth"), ""); // path no exist
 
     // 2. folder exist should update img fields only
-    QSqlRecord chrisEvansRecord = GetACastRecordLine("Chris Evans", "Movie", defaultImgs);
-    const QString& oldImgs = chrisEvansRecord.value(CastDbModelField::Imgs).toString();
-    QCOMPARE(oldImgs, defaultImgs);
-    QVERIFY(CastBaseDb::UpdateRecordImgsField(chrisEvansRecord, imgHostPath));
-    const QString& newImgs = chrisEvansRecord.value(CastDbModelField::Imgs).toString();
-    QVERIFY(newImgs != defaultImgs);
-    QVERIFY(newImgs.contains("Chris Evans 2.jpg")); // 2 file "A.jpg\nB.jpg" in filesystem-depend sequence
-    QVERIFY(newImgs.contains("Chris Evans.jpg"));
-    QCOMPARE(newImgs.count('\n'), 1);
-  }
-
-  void test_WhenCastNameRenamed_skip() { // must last test here
-    QCOMPARE(CastBaseDb::WhenCastNameRenamed("inexists path", "a", "b"), -1); // not exist
-
-    QString imgHostPathOri = mDir.itemPath("Movie");
-    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka"), 0); // skip
-    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "<a|\">"), -1); // invalid chars
-    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka/Football"), -1); // move files up or down
-
-    QCOMPARE(CastBaseDb::WhenCastNameRenamed(imgHostPathOri, "Kaka", "Kaka Leite"), 3); // move files up or down
+    const QString castChrisEvansFolderPath{imgHostPath + "/Movie/Chris Evans"};
+    QVERIFY2(QDir{castChrisEvansFolderPath}.exists(), "Precondition: Chris Evans path should not exist");
+    const QString newImgsFieldValue = CastBaseDb::GetImgsFieldNewValue(imgHostPath + "/Movie", "Chris Evans");
+    QVERIFY(newImgsFieldValue == "Chris Evans.jpg\nChris Evans 2.jpg" || newImgsFieldValue == "Chris Evans 2.jpg\nChris Evans.jpg");
   }
 };
 

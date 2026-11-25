@@ -42,6 +42,7 @@ file(GLOB SOURCES
     Model/*.cpp
     View/*.cpp
     Component/*.cpp
+    Component/Cast/*.cpp
     Component/Configs/*.cpp
     Component/DupImages/*.cpp
     Component/DupVideos/*.cpp
@@ -76,6 +77,7 @@ set(SRV_HEADER_PATH
     Model
     View
     Component
+    Component/Cast
     Component/Configs
     Component/FolderPreview
     Component/GeneralDataEditor
@@ -118,6 +120,7 @@ file(GLOB HEADERS
     Model/*.h
     View/*.h
     Component/*.h
+    Component/Cast/*.h
     Component/Configs/*.h
     Component/DupImages/*.h
     Component/DupVideos/*.h

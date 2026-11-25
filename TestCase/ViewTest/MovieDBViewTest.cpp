@@ -697,7 +697,7 @@ private slots:
 
       // 4.2 not dirty export ok
       // export to json, json file should be changed updated if (must field studio/cast/tags all valid will get updated)
-      QVERIFY(movieView.onSubmit());
+      QVERIFY(movieView.onSubmitAll());
       QVERIFY(!dbModel.isDirty());
       movieView.selectionModel()->clear();
       QVERIFY(!mTDir.exists("path2/Michael Fassbender.json"));
@@ -726,7 +726,7 @@ private slots:
       QVERIFY(fdDb.QueryPK(tableName2, ENUM_2_STR(Studio), actualStudiosInDatabase));
       QCOMPARE(actualStudiosInDatabase, expectStudiosInDatabase);
       QVERIFY(dbModel.isDirty());
-      QVERIFY(movieView.onRevert());  // revert can also let it not dirty
+      QVERIFY(movieView.onRevertAll());  // revert can also let it not dirty
       QVERIFY(!dbModel.isDirty());
       QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Real Madrid");
       QCOMPARE(dbModel.record(1).value(MovieDBModelField::Studio).toString(), "Real Madrid");
@@ -742,7 +742,7 @@ private slots:
       QCOMPARE(movieView.onUpdateByJson(), -1);
 
       // 5.3 Update By Json, contents of studio/cast/tags in table should in consistence with json
-      QVERIFY(movieView.onSubmit());
+      QVERIFY(movieView.onSubmitAll());
       QVERIFY(!dbModel.isDirty());
       QCOMPARE(movieView.onUpdateByJson(), 2);
       QCOMPARE(dbModel.record(0).value(MovieDBModelField::Studio).toString(), "Real Madrid");
@@ -903,8 +903,8 @@ private slots:
     }
 
     {
-      movieView.onSubmit();
-      movieView.onRevert();
+      movieView.onSubmitAll();
+      movieView.onRevertAll();
     }
     movieView.close();
   }

@@ -15,7 +15,6 @@
 #include "DuplicateImagesHelper.h"
 #include "FileStructurePolicy.h"
 #include "SceneInfo.h"
-#include "ScenePageNaviHelper.h"
 #include <QCryptographicHash>
 #include <QMediaPlaylist>
 #include "VideoPlayTool.h"
@@ -29,7 +28,6 @@ extern template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 extern template struct EnumIntAction<QCryptographicHash::Algorithm>;
 extern template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 extern template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
-extern template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 extern template struct EnumIntAction<SceneInfo::Role>;
 extern template struct EnumIntAction<Qt::TextElideMode>;
 extern template struct EnumIntAction<QHeaderView::ResizeMode>;
@@ -177,18 +175,6 @@ class EnumIntActionTest : public PlainTestSuite {
         PreviewTypeTool::PREVIEW_TYPE_E::PROGRESSIVE_LOAD,  //
         PreviewTypeTool::DEFULT_PREVIEW_TYPE_E,             //
         QActionGroup::ExclusionPolicy::Exclusive);  //
-  }
-
-  void enum_in_action_exclusive_optional() {
-
-  }
-
-  void enum_in_action_exclusive_none() {
-    EnumIntActionChecker<ScenePageNaviHelper::PageNaviE>(  //
-        ScenePageNaviHelper::PageNaviE::FRONT,             //
-        ScenePageNaviHelper::PageNaviE::PREVIOUS,          //
-        ScenePageNaviHelper::PageNaviE::BEGIN_DEFAULT,     //
-        QActionGroup::ExclusionPolicy::None);
   }
 };
 

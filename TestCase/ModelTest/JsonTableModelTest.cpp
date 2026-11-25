@@ -847,7 +847,7 @@ private slots:
     QCOMPARE(jtm.setRootPath(mTDir.itemPath("updateJsonKeyValuePair")), 4);
     QCOMPARE(jtm.rowCount(), 4);
 
-    using UpdateJsonKeyValuePairVariantHash = JsonOp::Counter (*)(const ScenesMixed&, JsonPr&);
+    using UpdateJsonKeyValuePairVariantHash = JsonOp::Counter (*)(const SceneMixed&, JsonPr&);
     // {是否更新, 是否有效, ImgName是否更新, VidName是否更新}
     MOCKER((UpdateJsonKeyValuePairVariantHash)JsonUpdater::UpdateJsonKeyValuePair)//
         .expects(exactly(4))

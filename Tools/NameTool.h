@@ -29,11 +29,6 @@ class NameTool {
   static const char* FREQUENT_NAME_PATTER;
   static const QRegularExpression NAME_COMP;
 
-  static inline bool IsFileNameInvalid(const QString& filename) {
-    QSet<QChar> nameSet{filename.cbegin(), filename.cend()};
-    return nameSet.intersects(INVALID_FILE_NAME_CHAR_SET);
-  }
-
   typedef std::function<QString(const QString&)> SentenceProcessorFunc;
   static bool ReplaceAndUpdateSelection(QPlainTextEdit& te, SentenceProcessorFunc fTrans);
   static bool ReplaceAndUpdateSelection(QTextEdit& te, SentenceProcessorFunc fTrans);

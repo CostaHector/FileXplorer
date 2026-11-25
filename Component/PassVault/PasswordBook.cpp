@@ -92,7 +92,7 @@ PasswordBook::PasswordBook(const QString& specifyEncFileFullPath, const QString&
 
     // ---- 保存 ----
     mSaveChangesAct = mLeftAreaToolBar->addAction(QIcon{":/pwd/action/SAVE_CHANGES"}, tr("Save Changes"));
-    mSaveChangesAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
+    mSaveChangesAct->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
     mSaveChangesAct->setToolTip(QString{"<b>%1 (%2)</b><br/>Save all changes to the encrypted local file."}.arg(mSaveChangesAct->text(), mSaveChangesAct->shortcut().toString()));
   }
 

@@ -2,14 +2,12 @@
 #include "CastCardDelegate.h"
 #include "PublicCheckMacro.h"
 #include "StyleSheet.h"
-#include "Configuration.h"
-#include "SizeTool.h"
 
-CastDBListView::CastDBListView(QWidget *parent) : CustomListView{"CAST_DB_LISTVIEW", parent}  {}
-
-CastDBListView::CastDBListView(CastDbModel* castDbModel_, QWidget* parent) : CastDBListView{parent}  {
+CastDBListView::CastDBListView(CastDbModel* castDbModel_, QItemSelectionModel* selectionModel_, QWidget* parent) : CustomListView{"CAST_DB_LISTVIEW", parent}  {
   CHECK_NULLPTR_RETURN_VOID(castDbModel_)
+  CHECK_NULLPTR_RETURN_VOID(selectionModel_)
   setModel(castDbModel_);
+  setSelectionModel(selectionModel_);
 
   // IconMode 默认 Movement::Free, 用户能把卡片拖走, 布局会散掉
   setMovement(QListView::Movement::Static);
@@ -47,27 +45,4 @@ void CastDBListView::onIconSizeChanged(const QSize& iconSize) {
   m_castCardDel->setCardSize(iconSize);
   // gridSize 一变, QListView 就会做一次全量重新布局。 不要"对每个 index emit sizeHintChanged"
   setGridSize(iconSize);
-}
-
-void CastDBListView::showEvent(QShowEvent* event) {
-  if (!m_geometryRestoredOnce) {
-    ReadSettings();
-  }
-  StyleSheet::UpdateTitleBar(this);
-  CustomListView::showEvent(event);
-}
-
-void CastDBListView::closeEvent(QCloseEvent* event) {
-  CHECK_NULLPTR_RETURN_VOID(event)
-  Configuration().setValue("Geometry/CastDBListView", saveGeometry());
-  CustomListView::closeEvent(event);
-}
-
-void CastDBListView::ReadSettings() {
-  m_geometryRestoredOnce = true;
-  if (Configuration().contains("Geometry/CastDBListView")) {
-    restoreGeometry(Configuration().value("Geometry/CastDBListView").toByteArray());
-  } else {
-    setGeometry(SizeTool::DEFAULT_GEOMETRY);
-  }
 }

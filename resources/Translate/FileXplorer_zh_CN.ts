@@ -216,22 +216,12 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../../Actions/CastDBActions.cpp" line="+16"/>
-        <source>Submit All</source>
-        <translation>提交全部</translation>
+        <location filename="../../Actions/CastDBActions.cpp" line="+19"/>
+        <source>Insert a row</source>
+        <translation>插入一行</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Repopulate</source>
-        <translation>重新填充</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Append Casts</source>
-        <translation>读取自输入列表</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Append from pson files</source>
         <translation>读取自pson文件</translation>
     </message>
@@ -287,11 +277,16 @@
     </message>
     <message>
         <location line="+4"/>
+        <source>Table View</source>
+        <translation>表格视图</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Card View</source>
         <translation>卡片视图</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Open Database</source>
         <translation>用本地应用打开数据库</translation>
     </message>
@@ -305,11 +300,69 @@
         <source>Dump all records</source>
         <translation>写入所有变更到pson</translation>
     </message>
+    <message>
+        <location line="+19"/>
+        <source>Insert</source>
+        <translation>插入</translation>
+    </message>
+</context>
+<context>
+    <name>CastDBCardEditor</name>
+    <message>
+        <location filename="../../Component/Cast/CastDBCardEditor.cpp" line="+29"/>
+        <source>Revert</source>
+        <translation>重置</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stage</source>
+        <translation>暂存</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rate</source>
+        <translation>评分</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Alias</source>
+        <translation>别名</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Tags</source>
+        <translation>标签</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ori</source>
+        <translation>归属</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Height</source>
+        <translation>身高</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Detail</source>
+        <translation>详情</translation>
+    </message>
 </context>
 <context>
     <name>CastDBListView</name>
     <message>
-        <location filename="../../View/CastDBListView.cpp" line="+31"/>
+        <location filename="../../Component/Cast/CastDBListView.cpp" line="+29"/>
         <source>Card View</source>
         <translation>卡片视图</translation>
     </message>
@@ -1456,22 +1509,7 @@
 <context>
     <name>MovieDBActions</name>
     <message>
-        <location filename="../../Actions/MovieDBActions.cpp" line="+12"/>
-        <source>Submit</source>
-        <translation>提交变更</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Repopulate</source>
-        <translation>重新填充</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Revert</source>
-        <translation>重置</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location filename="../../Actions/MovieDBActions.cpp" line="+15"/>
         <source>Init Database</source>
         <translation>初始化数据库</translation>
     </message>
@@ -1516,7 +1554,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+15"/>
         <source>Export to EFU</source>
         <translation>导出到EFU</translation>
     </message>
@@ -1809,6 +1847,29 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
         <location line="+5"/>
         <source>Save Changes</source>
         <translation>写入变更</translation>
+    </message>
+</context>
+<context>
+    <name>PendingChangesAction</name>
+    <message>
+        <location filename="../../Actions/PendingChangesAction.cpp" line="+63"/>
+        <source>Submit All</source>
+        <translation>提交全部</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Revert all</source>
+        <translation>回撤全部</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>There are uncommitted changes in this table. Use Submit All to save them, or Revert All to discard them.</source>
+        <translation>表内有未提交变更. 使用提交全部来保存变更或者回撤全部来丢弃.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>All changes are saved. There are no pending edits to submit.</source>
+        <translation>所有变更已保存. 无需提交.</translation>
     </message>
 </context>
 <context>

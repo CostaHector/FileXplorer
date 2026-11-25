@@ -2,11 +2,11 @@
 #define TORRENTSMANAGERWIDGET_H
 
 #include <QMainWindow>
-#include <QSqlTableModel>
 #include <QLineEdit>
-#include "CustomTableView.h"
-#include "TorrDb.h"
 #include <QToolBar>
+#include "CustomTableView.h"
+#include "SqlTableModelPub.h"
+#include "TorrDb.h"
 
 namespace TorrentsManagerWidgetMock {
 inline std::pair<QString, QString>& MockTorrDatabase() {
@@ -34,7 +34,7 @@ class TorrentsManagerWidget : public QMainWindow {
   bool onDropATable();
   bool onDeleteFromTable();
 
-  bool onSubmit();
+  bool onSubmitAll();
 
   void showEvent(QShowEvent *event) override;
 
@@ -43,7 +43,7 @@ private:
   QLineEdit* m_searchLE {nullptr};
   QToolBar* m_searchToobar {nullptr};
   CustomTableView* m_torrentsListView {nullptr};
-  QSqlTableModel* m_torrentsDBModel {nullptr};
+  SqlTableModelPub* m_torrentsDBModel {nullptr};
 };
 
 #endif  // TORRENTSMANAGERWIDGET_H

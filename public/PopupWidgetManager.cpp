@@ -9,7 +9,6 @@
 #include "ConfigsMgr.h"
 #include "Archiver.h"
 #include "ResourceMonitorPanel.h"
-#include "CastDBListView.h"
 #include "Logger.h"
 
 #include <QEvent>
@@ -26,7 +25,6 @@ template class PopupWidgetManager<Archiver>;
 template class PopupWidgetManager<PasswordBook>;
 #endif
 template class PopupWidgetManager<ResourceMonitorPanel>;
-template class PopupWidgetManager<CastDBListView>;
 
 template<typename WidgetType>
 PopupWidgetManager<WidgetType>::PopupWidgetManager(QAction* pAction, QWidget* notNullptrParent)

@@ -29,7 +29,7 @@ void FileXplorer::initGlobalInstance() {
   auto* mRatingStarsWid = new (std::nothrow) RatingStarsWidget(this);
   RatingStarsWidget::GInstance(mRatingStarsWid, true);
 
-  auto* m_scenePageControl = new (std::nothrow) ScenePageControl{"PaginationControl", this};
+  auto* m_scenePageControl = new (std::nothrow) ScenePageControl{this};
   ScenePageControl::GInstance(m_scenePageControl, true);
 
   auto* m_tagEditorSideBar = new (std::nothrow) TagEditorSideBar{"TagEditor SideBar", this};

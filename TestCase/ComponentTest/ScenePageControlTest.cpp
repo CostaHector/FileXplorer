@@ -1,140 +1,113 @@
 #include <QtTest/QtTest>
 #include "PlainTestSuite.h"
 
-#include <QSignalSpy>
 
 #include "BeginToExposePrivateMember.h"
 #include "ScenePageControl.h"
 #include "EndToExposePrivateMember.h"
+#include "Configuration.h"
+
+#include <QSignalSpy>
+#include <QSpinBox>
 
 class ScenePageControlTest : public PlainTestSuite {
   Q_OBJECT
- public:
- private slots:
-  void initialized_ok() {
-    ScenePageControl spc{"Page Navigation Control"};
+private slots:
 
+  void init() {
+    Configuration().clear();
+  }
+
+  void initialized_ok() {
+    ScenePageControl spc;
+
+    // 重构后仅保留首页、末页Action
     QVERIFY(spc._THE_FRONT_PAGE != nullptr);
-    QVERIFY(spc._PREVIOUS_PAGE != nullptr);
-    QVERIFY(spc._NEXT_PAGE != nullptr);
     QVERIFY(spc._THE_BACK_PAGE != nullptr);
-    QVERIFY(spc.mScenesPerPageLE != nullptr);
-    QVERIFY(spc.mPageIndexInputLE != nullptr);
+    QVERIFY(spc.mScenesPerPageInputSB != nullptr);
+    QVERIFY(spc.mPageIndexInputSB != nullptr);
+
+    QCOMPARE(spc.mScenesPerPageInputSB->value(), 40); // initial=40 if no config
+
+    QCOMPARE(spc.mPageIndexInputSB->prefix(), "0<=");
+    QCOMPARE(spc.mPageIndexInputSB->suffix(), "<1");
     spc.onPagesCountChanged(99);
-    QCOMPARE(spc.mPagesCount, 99);
+    QCOMPARE(spc.mPageIndexInputSB->prefix(), "0<=");
+    QCOMPARE(spc.mPageIndexInputSB->suffix(), "<99");
   }
 
   void navigation_front_back_ok() {
     ScenePageControl spc;
-    spc.onPagesCountChanged(5); // 总页数=5
-    spc.mPageIndexInputLE->setText("2"); // 当前页=2（第3页）
+    spc.onPagesCountChanged(5); // 总页数=5, [0, 5)
+    // ->2
+    spc.mPageIndexInputSB->setValue(2); // 当前页=2
 
-    // 跳转到首页
-    spc.PageIndexIncDec(spc._THE_FRONT_PAGE);
-    QCOMPARE(spc.mPageIndexInputLE->text(), "0");
+    // ->0
+    spc.onPageIndexFrontBackActTriggered(spc._THE_FRONT_PAGE);
+    QCOMPARE(spc.mPageIndexInputSB->value(), 0);
 
-    // 跳转到末页
-    spc.PageIndexIncDec(spc._THE_BACK_PAGE);
-    QCOMPARE(spc.mPageIndexInputLE->text(), "4");
+    // ->4
+    spc.onPageIndexFrontBackActTriggered(spc._THE_BACK_PAGE);
+    QCOMPARE(spc.mPageIndexInputSB->value(), 4);
 
-    // 再次跳转到首页
-    spc.PageIndexIncDec(spc._THE_FRONT_PAGE);
-    QCOMPARE(spc.mPageIndexInputLE->text(), "0");
+    // ->0
+    spc.onPageIndexFrontBackActTriggered(spc._THE_FRONT_PAGE);
+    QCOMPARE(spc.mPageIndexInputSB->value(), 0);
 
-    // 测试零页情况
-    spc.onPagesCountChanged(0);
-    spc.PageIndexIncDec(spc._THE_FRONT_PAGE);
-    QCOMPARE(spc.mPageIndexInputLE->text(), "0");
-    spc.PageIndexIncDec(spc._THE_BACK_PAGE);
-    QCOMPARE(spc.mPageIndexInputLE->text(), "0");
-  }
+    {
+      QAction invalidAction;
+      const bool result1 = spc.onPageIndexFrontBackActTriggered(&invalidAction);
+      QVERIFY(!result1);
+      QCOMPARE(spc.mPageIndexInputSB->value(), 0);
 
-  void navigation_previous_next_wrap_ok() {
-    ScenePageControl spc;
-    spc.onPagesCountChanged(5); // 总页数=5
-    spc.mPageIndexInputLE->setText("2"); // 当前页=2（第3页）
-
-    // 连续点击3次PREVIOUS
-    spc.PageIndexIncDec(spc._PREVIOUS_PAGE); // 2 -> 1
-    spc.PageIndexIncDec(spc._PREVIOUS_PAGE); // 1 -> 0
-    spc.PageIndexIncDec(spc._PREVIOUS_PAGE); // 0 -> 4（卷绕到最后一页）
-
-    QCOMPARE(spc.mPageIndexInputLE->text(), "4");
-
-    // 重置到第2页
-    spc.mPageIndexInputLE->setText("2");
-
-    // 连续点击3次NEXT
-    spc.PageIndexIncDec(spc._NEXT_PAGE); // 2 -> 3
-    spc.PageIndexIncDec(spc._NEXT_PAGE); // 3 -> 4
-    spc.PageIndexIncDec(spc._NEXT_PAGE); // 4 -> 0（卷绕到第一页）
-
-    QCOMPARE(spc.mPageIndexInputLE->text(), "0");
-  }
-
-  void navigation_invalid_action() {
-    ScenePageControl spc;
-    spc.onPagesCountChanged(5);
-    spc.mPageIndexInputLE->setText("2");
-
-    // 创建无效动作
-    QAction invalidAction;
-
-    // 触发无效动作
-    bool result = spc.PageIndexIncDec(&invalidAction);
-
-    QVERIFY(!result);                              // 应返回false
-    QCOMPARE(spc.mPageIndexInputLE->text(), "2");  // 页码不应改变
+      const bool result2 = spc.onPageIndexFrontBackActTriggered(nullptr);
+      QVERIFY(!result2);
+      QCOMPARE(spc.mPageIndexInputSB->value(), 0);
+    }
   }
 
   void currentPageIndexChanged_signal_ok() {
     ScenePageControl spc;
     QSignalSpy spy(&spc, &ScenePageControl::currentPageIndexChanged);
-
+    QCOMPARE(spc.mPageIndexInputSB->value(), 0);
     spc.onPagesCountChanged(5);
-    spc.mPageIndexInputLE->setText("2");
 
-    // 触发下一页
-    spc.PageIndexIncDec(spc._NEXT_PAGE);
+    spc.mPageIndexInputSB->setValue(2);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), QVariantList{QVariant{2}});
+    spy.clear();
 
-    QCOMPARE(spy.count(), 1);                    // 信号应被触发一次
-    QCOMPARE(spy.takeFirst().at(0).toInt(), 3);  // 信号参数应为3
+    // 直接操作spinbox赋值代替
+    spc.mPageIndexInputSB->setValue(3);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), QVariantList{QVariant{3}});
+    spy.clear();
+
+    // SpinBox自动钳位，超出最大值直接clamp到最大值
+    const int maxVal = spc.mPageIndexInputSB->maximum();
+    spc.mPageIndexInputSB->setValue(maxVal + 1);
+    QCOMPARE(spc.mPageIndexInputSB->value(), maxVal);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), QVariantList{QVariant{maxVal}});
+    spy.clear();
   }
 
   void maxScenesCountPerPageChanged_signal_ok() {
     ScenePageControl spc;
     QSignalSpy spy(&spc, &ScenePageControl::maxScenesCountPerPageChanged);
 
-    // 设置有效值
-    spc.mScenesPerPageLE->setText("50");
-    spc.SetScenesCountPerPage();
+    // 修改spinbox，触发valueChanged信号
+    spc.mScenesPerPageInputSB->setValue(50);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), QVariantList{QVariant{50}});
+    spy.clear();
 
-    QCOMPARE(spy.count(), 1);                     // 信号应被触发一次
-    QCOMPARE(spy.takeFirst().at(0).toInt(), 50);  // 信号参数应为50
-
-    // 设置无效值
-    spc.mScenesPerPageLE->setText("invalid");
-    bool result = spc.SetScenesCountPerPage();
-
-    QVERIFY(!result);          // 应返回false
-    QCOMPARE(spy.count(), 0);  // 不应触发信号
-  }
-
-  void page_index_input_validation() {
-    ScenePageControl spc;
-    spc.onPagesCountChanged(5);
-
-    // 设置有效值
-    spc.mPageIndexInputLE->setText("3");
-    spc.SetPageIndex();
-
-    // 设置无效值
-    spc.mPageIndexInputLE->setText("invalid");
-    spc.SetPageIndex();  // 不应触发信号
-
-    // 设置超出范围的值
-    spc.mPageIndexInputLE->setText("10");
-    spc.SetPageIndex();  // 会触发信号，但应由接收方处理
+    // SpinBox越界自动钳位, 也会不触发信号
+    const int maxVal = spc.mScenesPerPageInputSB->maximum();
+    spc.mScenesPerPageInputSB->setValue(maxVal + 1);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.takeLast(), QVariantList{QVariant{maxVal}});
+    spy.clear();
   }
 };
 

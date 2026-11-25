@@ -6,14 +6,11 @@
 namespace SqlTableTestPreconditionTool {
 bool CheckIndexesDisplayRoleIgnoreOrder(const QSqlTableModel& model,  //
                                         const QModelIndexList& indexes,
-                                        QStringList expectsList, Qt::ItemDataRole role=Qt::DisplayRole);
-bool CheckIndexesDisplayRoleIgnoreOrder(const QSqlTableModel& model,  //
-                                        const QModelIndexList& indexes,
-                                        QList<int> expectsList, Qt::ItemDataRole role=Qt::DisplayRole);
+                                        QVariantList expectsList, Qt::ItemDataRole role=Qt::DisplayRole);
 QModelIndexList GetIndexessAtOneRow(const QSqlTableModel& model, int rowBegin, int rowEnd, int column);
 
-bool CreateFileStructure(TDir& tDir);
-bool CreateFileStructurePsonFiles(TDir& tDir);
+bool CreateFileStructure(TDir& tDir, const QString& rel2FileEndWithSlash);
+bool CreateFileStructurePsonFiles(TDir& tDir, const QString& rel2FileEndWithSlash);
 }
 
 #endif  // SQLTABLETESTPRECONDITIONTOOL_H
