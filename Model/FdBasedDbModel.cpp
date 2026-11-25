@@ -11,7 +11,6 @@
 
 FdBasedDbModel::FdBasedDbModel(QObject* parent, QSqlDatabase con)  //
     : SqlTableModelPub{parent, con} {
-  setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
 }
 
 void FdBasedDbModel::setTable(const QString& tableName) {

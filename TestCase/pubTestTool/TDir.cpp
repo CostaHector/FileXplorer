@@ -17,6 +17,7 @@ bool FsNodeEntry::operator<(const FsNodeEntry& rhs) const {
 bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
   QFile file{absFilePath};
   if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) { // 不可指定Text, 否则会按照平台替换换行符
+    LOG_W("open file[%s] write and truncate failed", qPrintable(absFilePath));
     return false;
   }
   file.write(contents);
@@ -27,6 +28,7 @@ bool CreateAFile(const QString& absFilePath, const QByteArray& contents) {
 QByteArray ReadAFile(const QString& absFilePath) {
   QFile file{absFilePath};
   if (!file.open(QIODevice::ReadOnly)) {
+    LOG_W("open file[%s] readonly failed", qPrintable(absFilePath));
     return {};
   }
   return file.readAll();

@@ -29,7 +29,7 @@ signals:
   void mousePressEvent(QMouseEvent* event) override;
   virtual void initExclusivePreferenceSetting() {}
   EditTriggers m_defaultEditTrigger{EditTrigger::EditKeyPressed};
-  bool m_defaultFlowLeft2Right{false}, m_defaultViewModeIcon{false}, m_defaultWrapping{false};
+  bool m_defaultFlowLeft2Right{false}, m_defaultViewModeIcon{false}, m_defaultWrapping{false}, m_resizeModeAdjustFixed{true}, m_uniformItemSize{false};
 
  private:
   void SubscribePublicActions();
@@ -42,6 +42,7 @@ signals:
   void onUniformItemSizedToggled(const bool bUniform);
 
   void onIconScaledIndexChanged(int newScaledIndex);
+  void onIconVerticalLongerModeChanged(bool bIconVerticalLongerMode);
 
   const QString m_name;
 

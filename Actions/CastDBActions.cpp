@@ -1,7 +1,9 @@
 #include "CastDBActions.h"
-#include "PublicVariable.h"
 #include "PublicCheckMacro.h"
-
+#include "ImageTool.h"
+#include "Configuration.h"
+#include "CastKey.h"
+#include <QToolBar>
 #include <QMenu>
 #include <QActionGroup>
 
@@ -11,24 +13,15 @@ CastDBActions& CastDBActions::GetInst() {
 }
 
 CastDBActions::CastDBActions(QObject* parent)  //
-    : QObject{parent}                          //
+  : QObject{parent}                          //
 {
-  _MODEL_SUBMIT_ALL = new (std::nothrow) QAction{QIcon(":img/MANUAL_SUBMIT"), tr("Submit All"), this};
-  CHECK_NULLPTR_RETURN_VOID(_MODEL_SUBMIT_ALL);
-  _MODEL_SUBMIT_ALL->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
-  _MODEL_SUBMIT_ALL->setShortcutVisibleInContextMenu(true);
-  _MODEL_SUBMIT_ALL->setToolTip(QString{"<b>%1 (%2)</b><br/>Submits all pending changes. Model will be repopulated. Any views presenting it will lose their selections"}.arg(
-      _MODEL_SUBMIT_ALL->text(), _MODEL_SUBMIT_ALL->shortcut().toString()));
+  _MODEL_PENDING_CHANGES_ACTION = PendingChangesAction::GetDefault(this);
+  CHECK_NULLPTR_RETURN_VOID(_MODEL_PENDING_CHANGES_ACTION);
 
-  _MODEL_REPOPULATE = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), tr("Repopulate"), this};
-  CHECK_NULLPTR_RETURN_VOID(_MODEL_REPOPULATE);
-  _MODEL_REPOPULATE->setShortcutVisibleInContextMenu(true);
-  _MODEL_REPOPULATE->setToolTip(QString{"<b>%1 (%2)</b><br/>Repopulates the model with data from the table via setTable"}.arg(
-      _MODEL_REPOPULATE->text(), _MODEL_REPOPULATE->shortcut().toString()));
+  INSERT_A_ROW_BEFORE_CURRENT_INDEX = new (std::nothrow) QAction{QIcon(":img/INSERT_INTO_TABLE"), tr("Insert a row"), this};
+  CHECK_NULLPTR_RETURN_VOID(INSERT_A_ROW_BEFORE_CURRENT_INDEX);
+  INSERT_A_ROW_BEFORE_CURRENT_INDEX->setToolTip("Insert a row before current index in the DbTableView");
 
-  APPEND_FROM_MULTILINES_INPUT = new (std::nothrow) QAction{QIcon(":img/INSERT_INTO_TABLE"), tr("Append Casts"), this};
-  CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_MULTILINES_INPUT);
-  APPEND_FROM_MULTILINES_INPUT->setToolTip("Append casts records from user input multi-lines");
   APPEND_FROM_PSON_FILES = new (std::nothrow) QAction{tr("Append from pson files"), this};
   CHECK_NULLPTR_RETURN_VOID(APPEND_FROM_PSON_FILES);
   APPEND_FROM_PSON_FILES->setToolTip(
@@ -73,6 +66,15 @@ CastDBActions::CastDBActions(QObject* parent)  //
   CHECK_NULLPTR_RETURN_VOID(SYNC_ALL_RECORDS_VIDS_FROM_DB);
   SYNC_ALL_RECORDS_VIDS_FROM_DB->setToolTip("Sync all record(s) Vids field from db");
 
+  m_showCastsTableAct = new QAction(QIcon{":img/DISPLAY_DETAIL_INFOMATIONS"}, tr("Table View"), this);
+  CHECK_NULLPTR_RETURN_VOID(m_showCastsTableAct);
+  m_showCastsTableAct->setCheckable(true);
+  m_showCastsTableAct->setChecked(true);
+  m_showCastsCardsListAct = new QAction(QIcon{":img/SHOW_CASTS_IN_CARDS_LIST"}, tr("Card View"), this);
+  CHECK_NULLPTR_RETURN_VOID(m_showCastsCardsListAct);
+  m_showCastsCardsListAct->setCheckable(true);
+  m_showCastsCardsListAct->setChecked(getConfig(CastKey::SHOW_CASTS_IN_CARD_VIEW).toBool());
+
   OPEN_DB_WITH_LOCAL_APP = new (std::nothrow) QAction{QIcon(":img/SQLITE_APP"), tr("Open Database"), this};
   CHECK_NULLPTR_RETURN_VOID(OPEN_DB_WITH_LOCAL_APP);
   OPEN_DB_WITH_LOCAL_APP->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
@@ -82,7 +84,7 @@ CastDBActions::CastDBActions(QObject* parent)  //
 
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE = new (std::nothrow) QAction{QIcon{":img/DUMP_INTO_PSON_FILE"}, tr("Dump records"), this};
   CHECK_NULLPTR_RETURN_VOID(DUMP_SELECTED_RECORDS_INTO_PSON_FILE);
-  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key::Key_S));
+  DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key::Key_S));
   DUMP_SELECTED_RECORDS_INTO_PSON_FILE->setToolTip(
       QString{"<b>%1 (%2)</b><br/> Dump selected records to its pson file"}  //
           .arg(DUMP_SELECTED_RECORDS_INTO_PSON_FILE->text(), DUMP_SELECTED_RECORDS_INTO_PSON_FILE->shortcut().toString()));
@@ -91,15 +93,32 @@ CastDBActions::CastDBActions(QObject* parent)  //
   DUMP_ALL_RECORDS_INTO_PSON_FILE->setToolTip("Dump all records to its pson file");
 }
 
-QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* parent) {
-  auto* menu = new (std::nothrow) QMenu{parent};
+QToolButton* CastDBActions::GetAppendCastToolButton(QWidget* notNullParent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+
+  auto* menu = new (std::nothrow) QMenu{notNullParent};
+  CHECK_NULLPTR_RETURN_NULLPTR(menu);
+  menu->addAction(INSERT_A_ROW_BEFORE_CURRENT_INDEX);
   menu->addAction(APPEND_FROM_PSON_FILES);
   menu->addAction(APPEND_FROM_FILE_SYSTEM_STRUCTURE);
 
-  auto* tb = new (std::nothrow) QToolButton{parent};
+  auto* tb = new (std::nothrow) QToolButton{notNullParent};
+  CHECK_NULLPTR_RETURN_NULLPTR(tb);
   tb->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
   tb->setPopupMode(QToolButton::ToolButtonPopupMode::MenuButtonPopup);
-  tb->setDefaultAction(APPEND_FROM_MULTILINES_INPUT);
+  tb->setIcon(QIcon(":img/INSERT_INTO_TABLE"));
+  tb->setText(tr("Insert"));
   tb->setMenu(menu);
   return tb;
+}
+
+QWidget* CastDBActions::GetCastsDisplayMethodToolBar(QWidget* notNullParent) {
+  CHECK_NULLPTR_RETURN_NULLPTR(notNullParent);
+  auto* displayViewToolBar = new (std::nothrow) QToolBar{"CastDBViewSplitterViewSwitch", notNullParent};
+  displayViewToolBar->setOrientation(Qt::Orientation::Vertical);
+  displayViewToolBar->addAction(m_showCastsTableAct);
+  displayViewToolBar->addAction(m_showCastsCardsListAct);
+  displayViewToolBar->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24));
+  displayViewToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  return displayViewToolBar;
 }

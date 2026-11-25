@@ -1,5 +1,5 @@
 ﻿#include "ViewSwitchHelper.h"
-#include "CastDBView.h"
+#include "CastDBViewSplitter.h"
 #include "NavigationToolBar.h"
 #include "SceneListView.h"
 #include "ScenesListModel.h"
@@ -177,10 +177,11 @@ void ViewSwitchHelper::onSwitchByViewType(ViewTypeTool::ViewType viewType) {
     }
     case ViewType::CAST: {
       if (_view->m_castTableView == nullptr) {
-        _view->mCastDb = new (std::nothrow) CastBaseDb{SystemPath::PEFORMERS_DATABASE(), SystemPath::CastDBConnection(), _view},
-        _view->m_castDbModel = new (std::nothrow) CastDbModel{_view, _view->mCastDb->GetDb()};
-        _view->m_castTableView = new (std::nothrow) CastDBView(_view->m_castDbModel, _navigation->m_castSearchBar, *(_view->mCastDb), _view);
-        _view->AddView(viewType, _view->m_castTableView);
+        auto* pCastViewSplitter = new (std::nothrow) CastDBViewSplitter{_navigation->m_castSearchBar, _view};
+        _view->m_castDbViewSplitter = pCastViewSplitter;
+        _view->m_castDbModel = pCastViewSplitter->GetModel();
+        _view->m_castTableView = pCastViewSplitter->GetTableView();
+        _view->AddView(viewType, _view->m_castDbViewSplitter);
       }
       viewIndex = _view->m_name2ViewIndex[(int)viewType];
       break;

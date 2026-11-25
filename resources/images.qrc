@@ -293,6 +293,7 @@
         <file alias="ROOT_DECORATION">View/ROOT_DECORATION.svg</file>
         <file alias="ICON_SIZE">View/ICON_SIZE.svg</file>
         <file alias="TAG_EDITOR">View/TAG_EDITOR.svg</file>
+        <file alias="VERTICAL_LONG_IMAGE_MODE">View/VERTICAL_LONG_IMAGE_MODE.svg</file>
 
         <!--Database icon here-->
         <file alias="CREATE_DATABASE">Database/CREATE_DATABASE.svg</file>
@@ -323,6 +324,7 @@
         <file alias="SYNC_FROM_DB">Database/SYNC_FROM_DB.svg</file>
         <file alias="MIGRATE_CAST_TO">Database/MIGRATE_CAST_TO.svg</file>
         <file alias="EXPORT_TO_EFU_FILE">Database/EXPORT_TO_EFU_FILE.svg</file>
+        <file alias="SHOW_CASTS_IN_CARDS_LIST">Database/SHOW_CASTS_IN_CARDS_LIST.svg</file>
 
         <!--ConfigsTable icon here-->
         <file alias="SETTINGS">ConfigsTable/SETTINGS.svg</file>

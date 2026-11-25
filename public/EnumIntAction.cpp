@@ -10,7 +10,6 @@
 #include "VideoPlayTool.h"
 #include "FavoriteItemData.h"
 #include "SceneInfo.h"
-#include "ScenePageNaviHelper.h"
 #include <QHeaderView>
 #include <QCryptographicHash>
 #include <QMediaPlaylist>
@@ -24,7 +23,6 @@ template struct EnumIntAction<BytesRangeTool::BytesRangeE>;
 template struct EnumIntAction<QCryptographicHash::Algorithm>;
 template struct EnumIntAction<DuplicateImageDetectionCriteria::DICriteriaE>;
 template struct EnumIntAction<FileStructurePolicy::FileStuctureModeE>;
-template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
 template struct EnumIntAction<Qt::TextElideMode>;
 template struct EnumIntAction<QHeaderView::ResizeMode>;
 template struct EnumIntAction<Qt::ScrollBarPolicy>;

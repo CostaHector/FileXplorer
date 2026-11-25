@@ -8,8 +8,8 @@
 
 namespace JsonUpdater {
 bool MergeTextContentsIntoDetailAndRecycleTxt(const QString& txtAbsPath, QString& detailContent);
-JsonOp::Counter UpdateJsonKeyValuePair(const ScenesMixed& sMixed, QVariantHash& rawJsonDict, const QString& parentPath, const QString& jsonFileBaseName);
-JsonOp::Counter UpdateJsonKeyValuePair(const ScenesMixed& sMixed, JsonPr& jsonPr);
+JsonOp::Counter UpdateJsonKeyValuePair(const SceneMixed& sMixed, QVariantHash& rawJsonDict, const QString& parentPath, const QString& jsonFileBaseName);
+JsonOp::Counter UpdateJsonKeyValuePair(const SceneMixed& sMixed, JsonPr& jsonPr);
 };
 
 #endif // JSONUPDATER_H

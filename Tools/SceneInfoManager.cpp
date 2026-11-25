@@ -20,7 +20,7 @@ JsonOp::Counter ScnMgr::UpdateJsonUnderAPath(const QString& path) {
   int jsonUpdatedCnt = 0, jsonUsedCnt = 0;
   int imgNameKeyFieldUpdatedCnt = 0, vidNameKeyFieldUpdatedCnt = 0;
 
-  ScenesMixed sMixed;
+  SceneMixed sMixed;
   sMixed(path);
 
   for (const QString& jsonFileBaseName: sMixed.m_json2Name) {

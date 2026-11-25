@@ -2,7 +2,6 @@
 #include "PublicVariable.h"
 #include "SystemPath.h"
 #include "PathKey.h"
-#include "SizeTool.h"
 #include "Configuration.h"
 #include "StyleSheet.h"
 #include "PublicCheckMacro.h"
@@ -36,9 +35,8 @@ TorrentsManagerWidget::TorrentsManagerWidget(QWidget* parent)
   addToolBar(Qt::ToolBarArea::TopToolBarArea, m_searchToobar);
 
   QSqlDatabase con = mDb.GetDb();
-  m_torrentsDBModel = new (std::nothrow) QSqlTableModel{this, con};
+  m_torrentsDBModel = new (std::nothrow) SqlTableModelPub{this, con};
   CHECK_NULLPTR_RETURN_VOID(m_torrentsDBModel);
-  m_torrentsDBModel->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
   if (con.tables().contains(DB_TABLE::TORRENTS)) {
     m_torrentsDBModel->setTable(DB_TABLE::TORRENTS);
     m_torrentsDBModel->select();
@@ -67,7 +65,7 @@ void TorrentsManagerWidget::subscribe() {
   connect(g_torrActions().INSERT_INTO_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onInsertIntoTable);
   connect(g_torrActions().DROP_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDropATable);
   connect(g_torrActions().DELETE_FROM_TABLE, &QAction::triggered, this, &TorrentsManagerWidget::onDeleteFromTable);
-  connect(g_torrActions().SUBMIT, &QAction::triggered, this, &TorrentsManagerWidget::onSubmit);
+  connect(g_torrActions().SUBMIT, &QAction::triggered, this, &TorrentsManagerWidget::onSubmitAll);
 }
 
 bool TorrentsManagerWidget::onInitDataBase() {
@@ -234,7 +232,7 @@ bool TorrentsManagerWidget::onDeleteFromTable() {
   return deleteRes;
 }
 
-bool TorrentsManagerWidget::onSubmit() {
+bool TorrentsManagerWidget::onSubmitAll() {
   CHECK_NULLPTR_RETURN_FALSE(m_torrentsDBModel)
 
   if (!m_torrentsDBModel->isDirty()) {

@@ -99,11 +99,12 @@ bool PopupWidgetManager<WidgetType>::eventFilter(QObject* watched, QEvent* event
 
 template<typename WidgetType>
 void PopupWidgetManager<WidgetType>::createWidget() {
-  QWidget* pParentWidget = static_cast<QWidget*>(parent());
-  CHECK_NULLPTR_RETURN_VOID(pParentWidget);
   if (m_widgetCreator != nullptr) {
-    m_widget = m_widgetCreator(pParentWidget);
+    // 注意 m_widget 挂载哪个QWidget下由外部自行决定,
+    m_widget = m_widgetCreator();
   } else {
+    QWidget* pParentWidget = static_cast<QWidget*>(parent());
+    CHECK_NULLPTR_RETURN_VOID(pParentWidget);
     m_widget = new WidgetType(pParentWidget);
   }
 

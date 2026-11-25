@@ -15,7 +15,7 @@ AccountCardEditor::AccountCardEditor(QWidget *parent) : QWidget(parent) {
 
   mRevertButton = new QPushButton(tr("Revert"), this);
   mStageButton  = new QPushButton(tr("Stage"), this);
-  mStageButton->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
+  mStageButton->setShortcut(QKeySequence(Qt::Key::Key_F10));
   mStageButton->setToolTip(QString{"<b>%1 (%2)</b><br/> Apply changes to this row in the list. Not written to the account file until you save."}
                                .arg(mStageButton->text(), mStageButton->shortcut().toString()));
 

@@ -1,6 +1,5 @@
 #include "SqlRecordTestHelper.h"
 #include "CastPsonFileHelper.h"
-#include "PublicCheckMacro.h"
 #include "MovieDBModelField.h"
 #include "FdBasedDb.h"
 #include "PathTool.h"
@@ -27,7 +26,7 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   rec.append(QSqlField(ENUM_2_STR(Detail), QVariant::String));
 
   rec.setValue(Name, castName);
-  rec.setValue(Rate, 9);
+  rec.setValue(Rate, CastPsonFileHelper::DEFAULT_RATE);
   rec.setValue(ALIAS, "Thor");
   rec.setValue(Tags, "Man");
   rec.setValue(Ori, ori);

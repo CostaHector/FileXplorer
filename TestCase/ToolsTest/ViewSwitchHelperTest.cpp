@@ -81,7 +81,7 @@ class ViewSwitchHelperTest : public PlainTestSuite {
     QVERIFY(m_fsPanel.m_castTableView == nullptr);
     m_viewSwitchHelper.onSwitchByViewType(ViewTypeTool::ViewType::CAST);
     QVERIFY(m_fsPanel.m_castTableView != nullptr);
-    QCOMPARE(m_fsPanel.currentWidget(), m_fsPanel.m_castTableView);
+    QCOMPARE(m_fsPanel.currentWidget(), m_fsPanel.m_castDbViewSplitter);
     QCOMPARE(m_fsPanel.GetVt(), ViewTypeTool::ViewType::CAST);
     QCOMPARE(m_fsPanel.GetCurViewName(), "CAST");
 

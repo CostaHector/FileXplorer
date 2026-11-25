@@ -21,11 +21,11 @@ public:
     return QSqlTableModel::headerData(section, orientation, role);
   }
 
-  QDir rootDirectory(const QString& /*placeHolder*/ = "") const { return QDir{rootPath()}; }
+  QDir rootDirectory() const { return QDir{rootPath()}; }
 
-  QString rootPath(const QString& /*placeHolder*/ = "") const { return m_rootPath; }
+  QString rootPath() const { return m_rootPath; }
 
-  QString GUID(const QModelIndex& /*curIndex*/ = {}) const { return tableName().replace('_', '-'); }
+  QString GUID() const { return tableName().replace('_', '-'); }
 
   QString absolutePath(const QModelIndex& curIndex) const;
 
@@ -51,7 +51,7 @@ public:
   QList<qint64> GetSelectionFileSizes(const QModelIndexList& indexes) const;
   QList<int> GetSelectionDurations(const QModelIndexList& indexes) const;
 private:
-  QString m_rootPath;
+  QString m_rootPath; // 从表名解析出来的磁盘路径
 };
 
 #endif  // FDBASEDDBMODEL_H

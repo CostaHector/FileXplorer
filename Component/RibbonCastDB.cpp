@@ -26,12 +26,13 @@ RibbonCastDB::RibbonCastDB(const QString& title, QWidget* parent)  //
   m_SyncVidsFromDbOp->setIconSize(QSize(IMAGE_SIZE::TABS_ICON_IN_MENU_16, IMAGE_SIZE::TABS_ICON_IN_MENU_16));
   SetLayoutAlightment(m_SyncVidsFromDbOp->layout(), Qt::AlignmentFlag::AlignLeft);
 
+  auto* dispViewWidget = inst.GetCastsDisplayMethodToolBar(this);
   auto* castAppendToolbutton = inst.GetAppendCastToolButton(this);
 
   addAction(ViewActions::GetInst()._CAST_VIEW);
+  addWidget(dispViewWidget);
   addSeparator();
-  addAction(inst._MODEL_SUBMIT_ALL);
-  addAction(inst._MODEL_REPOPULATE);
+  addAction(inst._MODEL_PENDING_CHANGES_ACTION);
   addSeparator();
   addWidget(castAppendToolbutton);
   addWidget(m_BasicTableOp);

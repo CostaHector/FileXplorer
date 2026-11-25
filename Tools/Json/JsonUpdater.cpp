@@ -35,7 +35,7 @@ bool MergeTextContentsIntoDetailAndRecycleTxt(const QString& txtAbsPath, QString
   return true;
 }
 
-JsonOp::Counter UpdateJsonKeyValuePair(const ScenesMixed& sMixed, QVariantHash& rawJsonDict, const QString& parentPath, const QString& jsonFileBaseName) {
+JsonOp::Counter UpdateJsonKeyValuePair(const SceneMixed& sMixed, QVariantHash& rawJsonDict, const QString& parentPath, const QString& jsonFileBaseName) {
   // will update m_Name, m_ImgName, m_VidName, m_Size, m_Rate
   bool bJsonNeedUpdate{false}, bJsonUsed{false}, bImgNameUpdate{false}, bVidNameUpdated{false};
   if (rawJsonDict.isEmpty()) {
@@ -106,7 +106,7 @@ JsonOp::Counter UpdateJsonKeyValuePair(const ScenesMixed& sMixed, QVariantHash& 
 }
 
 
-JsonOp::Counter UpdateJsonKeyValuePair(const ScenesMixed& sMixed, JsonPr& jsonPr) {
+JsonOp::Counter UpdateJsonKeyValuePair(const SceneMixed& sMixed, JsonPr& jsonPr) {
   // will update m_Name, m_ImgName, m_VidName, m_Size
   bool bJsonNeedUpdate{false}, bJsonUsed{false}, bImgNameUpdate{false}, bVidNameUpdated{false};
   if (!jsonPr.isLocalFile()) {

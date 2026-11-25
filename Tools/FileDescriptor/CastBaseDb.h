@@ -16,11 +16,8 @@ class CastBaseDb : public DbManager {
 
   static QMap<QString, QString> GetFreqName2AkaNames(const QStringList& perfsList);
   static QMap<QString, QString> GetFreqName2AkaNames(const QString& perfsText);
-  static bool UpdateRecordImgsField(QSqlRecord& sqlRecord, const QString& imageHostPath);
-  static QString GetCastPath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
-  static QString GetCastFilePath(const QSqlRecord& sqlRecord, const QString& imageHostPath);
-  static auto FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs;
-  static int WhenCastNameRenamed(const QString& imgsHostOriPath, const QString& oldName, const QString& newName);
+  static QString GetImgsFieldNewValue(const QString& oriFullPath, const QString& actorName);
+  static auto FromFileSystemStructure(const QString& imgsHostPath) -> TCast2OriImgs;  
 };
 
 #endif  // CASTBASEDB_H

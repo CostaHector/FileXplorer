@@ -8,6 +8,7 @@
 #include "ViewActions.h"
 #include "ThumbnailActions.h"
 #include "TSFilesMerger.h"
+#include "ScenesListModel.h"
 
 #include "Archiver.h"
 #include "CustomStatusBar.h"
@@ -302,7 +303,7 @@ bool FileXplorerEvent::on_createFilePar2(int rateOfRedundancy) {
     LOG_INFO_NP("[Abort] Current view not support Create Par2", ViewTypeTool::c_str(vt));
     return false;
   }
-  const QStringList mixedFiles = _contentPane->getFilePaths();
+  const QStringList mixedFiles = _contentPane->getFileFullPaths();
   if (mixedFiles.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false;
@@ -319,7 +320,7 @@ bool FileXplorerEvent::on_createFilePar2Automatic() {
     LOG_INFO_NP("[Abort] Current view not support Create Par2", ViewTypeTool::c_str(vt));
     return false;
   }
-  const QStringList mixedFiles = _contentPane->getFilePaths();
+  const QStringList mixedFiles = _contentPane->getFileFullPaths();
   if (mixedFiles.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false;
@@ -354,7 +355,7 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
 }
 
 bool FileXplorerEvent::onRateMovie(int newRate) const {
-  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
+  const QStringList& paths = _contentPane->getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false; // selection some row first
@@ -370,7 +371,7 @@ bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
 }
 
 bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
-  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
+  const QStringList& paths = _contentPane->getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false;
@@ -391,7 +392,7 @@ int FileXplorerEvent::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck)
   if (_contentPane->GetVt() == ViewTypeTool::ViewType::JSON) {
     return _contentPane->m_jsonTableView->onAddRemoveTags(tags, bCheckOrUncheck);
   }
-  const QStringList& paths = _contentPane->getFilePaths(SelectionUsage::RELATED_JSON_ONLY);
+  const QStringList& paths = _contentPane->getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY);
   if (paths.isEmpty()) {
     LOG_INFO_NP("[Skip] No selection", "Select some items first");
     return false; // selection some row first
@@ -426,7 +427,7 @@ bool FileXplorerEvent::on_searchKeywordInSystemDefaultExplorer() const {
     LOG_WARN_NP("Current View type not support search keyword", ViewTypeTool::c_str(vt));
     return false;
   }
-  QString absFilePath = _contentPane->getCurFilePath();
+  QString absFilePath = _contentPane->getCurFileFullPath();
   QString noExtAbsFilePath = PathTool::GetFileNameExtRemoved(absFilePath);
   QString imgFileAbsPathGuess = QDir::toNativeSeparators(noExtAbsFilePath) + ' ';
   m_clipboard->setText(imgFileAbsPathGuess, QClipboard::Mode::Clipboard);
@@ -542,9 +543,9 @@ void FileXplorerEvent::subscribe() {
     connect(fileOpInst.UNDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Undo);
     connect(fileOpInst.REDO_OPERATION, &QAction::triggered, this, &UndoRedo::on_Redo);
 
-    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePaths(), "absolute-file-path"); });
-    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFilePrepaths(), "absolute-path"); });
-    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNames(), "file-name"); });
+    connect(fileOpInst.COPY_FULL_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileFullPaths(), "absolute-file-path"); });
+    connect(fileOpInst.COPY_PATH, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getModelRootPath(), "absolute-path"); });
+    connect(fileOpInst.COPY_NAME, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFileNamesRelativeToRootPath(), "file-name"); });
     connect(fileOpInst.COPY_RECORDS, &QAction::triggered, _contentPane, [this]() { CopyStringListToClipboard::PathStringListCopy(_contentPane->getFullRecords(), "full-record"); });
 
     connect(fileOpInst.MOVE_TO_TRASHBIN, &QAction::triggered, this, &FileXplorerEvent::on_moveToTrashBin);
@@ -729,7 +730,7 @@ void FileXplorerEvent::on_Rename(AdvanceRenamer& renameWid) {
     return;
   }
 
-  const QStringList& preNames = _contentPane->getFileNames();
+  const QStringList& preNames = _contentPane->getFileNamesRelativeToRootPath();
   if (preNames.isEmpty()) {
     LOG_WARN_NP("[Skip] Nothing selected", "return");
     return;
@@ -782,7 +783,7 @@ bool FileXplorerEvent::on_revealInExplorer() const {
     return FileTool::OpenLocalFileUsingDesktopService(absPth);
   } else {
     const QModelIndex curIndex{view->selectionModel()->currentIndex()};
-    QString absPth = _contentPane->getFilePath(curIndex);
+    QString absPth = _contentPane->getFileFullPathAtIndex(curIndex);
     return FileTool::RevealInSystemExplorer(absPth);
   }
 }
@@ -835,7 +836,7 @@ bool FileXplorerEvent::on_compress() {
     LOG_WARN_P("[Skip] Invalid workPath", "workPath:%s", qPrintable(workPath));
     return false;
   }
-  const QStringList& fileNames = _contentPane->getFileNames();
+  const QStringList& fileNames = _contentPane->getFileNamesRelativeToRootPath();
   if (fileNames.isEmpty()) {
     LOG_INFO_NP("[Skip] Compress", "nothing selected");
     return false;
@@ -860,7 +861,7 @@ bool FileXplorerEvent::on_deCompress() {
     return false;
   }
 
-  const QStringList& filesPath = _contentPane->getFilePaths();
+  const QStringList& filesPath = _contentPane->getFileFullPaths();
   if (filesPath.isEmpty()) {
     LOG_INFO_P("Skip Decompress", "Nothing selected");
     return true;
@@ -903,7 +904,7 @@ bool FileXplorerEvent::on_archivePreview(bool bChecked) {
   if (!ViewTypeTool::IsDecompressHereAvail(vt)) {
     return false;
   }
-  const QString filePath = _contentPane->getCurFilePath();
+  const QString filePath = _contentPane->getCurFileFullPath();
   if (filePath.isEmpty()) {
     LOG_INFO_NP("[Abort ArchivePreivew]", "nothing selected. empty path");
     return false;
@@ -940,13 +941,25 @@ bool FileXplorerEvent::on_moveToTrashBin() {
     return false;
   }
 
-  std::function<int()> afterOperationUpdateModelCallback;
   QString workpath;
   QStringList rel2names;
-  std::tie(workpath, rel2names) = _contentPane->getWorkPathAndRel2Name(&afterOperationUpdateModelCallback);
+  QModelIndexList srcIndexes;
+  std::tie(workpath, rel2names) = _contentPane->getRootPathAndRel2Name(srcIndexes);
   FileBatchOps::OpStatus recycleStatus = FileBatchOps::MoveToTrashSelected(workpath, rel2names);
-  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED && afterOperationUpdateModelCallback) {
-    afterOperationUpdateModelCallback();
+  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED) {
+    switch (vt) {
+      case ViewTypeTool::ViewType::SEARCH:
+        _contentPane->m_searchSrcModel->RecycleSomething(srcIndexes);
+        break;
+      case ViewTypeTool::ViewType::SCENE:
+        _contentPane->m_scenesModel->AfterJsonFilesNameRenamed(srcIndexes);
+        break;
+      case ViewTypeTool::ViewType::JSON:
+        _contentPane->m_jsonModel->AfterJsonFilesNameRenamed(srcIndexes);
+        break;
+      default:
+        break;
+    }
   }
   return recycleStatus != FileBatchOps::OpStatus::PARTIAL_FAILED;
 }
@@ -963,13 +976,25 @@ bool FileXplorerEvent::on_deletePermanently() {
     return false;
   }
 
-  std::function<int()> afterOperationUpdateModelCallback;
   QString workpath;
   QStringList rel2names;
-  std::tie(workpath, rel2names) = _contentPane->getWorkPathAndRel2Name(&afterOperationUpdateModelCallback);
+  QModelIndexList srcIndexes;
+  std::tie(workpath, rel2names) = _contentPane->getRootPathAndRel2Name(srcIndexes);
   FileBatchOps::OpStatus recycleStatus = FileBatchOps::DeletePermanentlySelected(workpath, rel2names);
-  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED && afterOperationUpdateModelCallback) {
-    afterOperationUpdateModelCallback();
+  if (recycleStatus == FileBatchOps::OpStatus::ALL_SUCCEED) {
+    switch (vt) {
+      case ViewTypeTool::ViewType::SEARCH:
+        _contentPane->m_searchSrcModel->RecycleSomething(srcIndexes);
+        break;
+      case ViewTypeTool::ViewType::SCENE:
+        _contentPane->m_scenesModel->AfterJsonFilesNameRenamed(srcIndexes);
+        break;
+      case ViewTypeTool::ViewType::JSON:
+        _contentPane->m_jsonModel->AfterJsonFilesNameRenamed(srcIndexes);
+        break;
+      default:
+        break;
+    }
   }
   return recycleStatus != FileBatchOps::OpStatus::PARTIAL_FAILED;
 }
@@ -1009,7 +1034,7 @@ bool FileXplorerEvent::on_HarView() {
     LOG_INFO_NP("Nothing selected", "return");
     return false;
   }
-  const QString& fileAbsPath = _contentPane->getCurFilePath();
+  const QString& fileAbsPath = _contentPane->getCurFileFullPath();
   if (!fileAbsPath.endsWith(".har", Qt::CaseInsensitive)) {
     LOG_INFO_NP("File extension is not .har", fileAbsPath);
     return false;
@@ -1032,7 +1057,7 @@ bool FileXplorerEvent::on_PlayVideo() const {
     return false;
   }
   // if select an item, path selected path
-  QString playPath = _contentPane->getCurFilePath();
+  QString playPath = _contentPane->getCurFileFullPath();
   if (playPath.isEmpty() && ViewTypeTool::isFSView(vt)) {
     // if select nothing and file-system model, play current path
     playPath = _fileSysModel->rootPath();
@@ -1124,7 +1149,7 @@ void FileXplorerEvent::on_TsFilesMerge() {
     LOG_INFO_P("[Skip] User select nothing", "return");
     return;
   }
-  const QStringList& tsNames = _contentPane->getFileNames();
+  const QStringList& tsNames = _contentPane->getFileNamesRelativeToRootPath();
   if (tsNames.size() < 2) {
     LOG_INFO_P("[Skip] User select too less file", "%d file", tsNames.size());
     return;
@@ -1143,7 +1168,14 @@ void FileXplorerEvent::on_TsFilesMerge() {
 
 bool FileXplorerEvent::on_Copy() {
   using namespace MimeDataHelper;
-  MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::CopyAction);
+  MimeDataMember mimeDataRet = _contentPane->getFileFullPathsAndUrls();
+  const auto vt = _contentPane->GetVt();
+  if (ViewTypeTool::isFSView(vt)) {
+    FillCutCopySomething<FileSystemModel>(*_contentPane->m_fsModel, mimeDataRet.srcIndexes, Qt::CopyAction);
+  } else if (vt == ViewTypeTool::ViewType::SEARCH) {
+    FillCutCopySomething<AdvanceSearchModel>(*_contentPane->m_searchSrcModel, mimeDataRet.srcIndexes, Qt::CopyAction);
+  }
+
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::CopyAction);
   _logger->onMsgChanged(QString("%1 path(s) been copied").arg(pathCnt), (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
   return pathCnt >= 0;
@@ -1151,7 +1183,13 @@ bool FileXplorerEvent::on_Copy() {
 
 bool FileXplorerEvent::on_Cut() {
   using namespace MimeDataHelper;
-  MimeDataMember mimeDataRet = _contentPane->getFilePathsAndUrls(Qt::MoveAction);
+  MimeDataMember mimeDataRet = _contentPane->getFileFullPathsAndUrls();
+  const auto vt = _contentPane->GetVt();
+  if (ViewTypeTool::isFSView(vt)) {
+    FillCutCopySomething<FileSystemModel>(*_contentPane->m_fsModel, mimeDataRet.srcIndexes, Qt::MoveAction);
+  } else if (vt == ViewTypeTool::ViewType::SEARCH) {
+    FillCutCopySomething<AdvanceSearchModel>(*_contentPane->m_searchSrcModel, mimeDataRet.srcIndexes, Qt::MoveAction);
+  }
   const int pathCnt = WriteIntoSystemClipboard(mimeDataRet, Qt::MoveAction);
   _logger->onMsgChanged(QString("%1 path(s) been cut").arg(pathCnt), (pathCnt >= 0 ? STATUS_ALERT_LEVEL::NORMAL : STATUS_ALERT_LEVEL::ABNORMAL));
   return pathCnt >= 0;

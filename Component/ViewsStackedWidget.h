@@ -13,7 +13,7 @@
 #include "JsonTableView.h"
 #include "MovieDBView.h"
 #include "SceneListView.h"
-#include "CastDBView.h"
+#include "CastDBViewSplitter.h"
 
 #include "ViewTypeTool.h"
 #include "MimeDataHelper.h"
@@ -69,9 +69,6 @@ class ViewsStackedWidget : public QStackedWidget {
 
   std::pair<QModelIndex, QModelIndex> getTopLeftAndRightDownRectangleIndex() const;
   QModelIndex getRootIndex() const;
-  inline QAbstractItemView* GetCurView() const {  //
-    return dynamic_cast<QAbstractItemView*>(currentWidget());
-  }
   const char* GetCurViewName() const;
 
   int AddView(ViewTypeTool::ViewType vt, QWidget* w);
@@ -79,19 +76,19 @@ class ViewsStackedWidget : public QStackedWidget {
   bool hasSelection() const;
   QString getRootPath() const;
 
-  QString getFilePath(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QModelIndexList getSelectedRows(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFileNames(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFilePaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFilePrepaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  std::pair<QString, QStringList> getWorkPathAndRel2Name(std::function<int()>* pAfterOperationUpdateModelCallback=nullptr, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  MimeDataHelper::MimeDataMember getFilePathsAndUrls(const Qt::DropAction dropAct = Qt::IgnoreAction, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QStringList getFullRecords(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  int getSelectedRowsCount(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QString getCurFilePath(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QString getFileFullPathAtIndex(const QModelIndex& proxyInd) const;
+  QModelIndexList getSelectedRows() const;
+  QStringList getFileNamesRelativeToRootPath() const;
+  QStringList getFileFullPaths(SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QStringList getModelRootPath() const;
+  std::pair<QString, QStringList> getRootPathAndRel2Name(QModelIndexList& srcIndexes) const;
+  MimeDataHelper::MimeDataMember getFileFullPathsAndUrls() const;
+  QStringList getFullRecords() const;
+  int getSelectedRowsCount() const;
+  QString getCurFileFullPath() const;
   QString getCurFileName(SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QFileInfo getFileInfo(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
-  QAbstractItemView* GetCurViewWidgetByViewType() const;
+  QFileInfo getFileInfoAtIndex(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
+  QAbstractItemView* GetCurView() const;
 
  public:
   struct Anchor {
@@ -120,9 +117,9 @@ class ViewsStackedWidget : public QStackedWidget {
   SceneListView* m_sceneListView{nullptr};
 
   CastDatabaseSearchToolBar* _castSearchBar{nullptr}; // Only for F3 to get focus
-  CastBaseDb* mCastDb{nullptr};
+  CastDBViewSplitter* m_castDbViewSplitter{nullptr};
   CastDbModel* m_castDbModel{nullptr};
-  CastDBView* m_castTableView{nullptr};
+  CastDBTableView* m_castTableView{nullptr};
 
   QSortFilterProxyModel* m_jsonProxyModel{nullptr};
   JsonTableModel* m_jsonModel{nullptr};

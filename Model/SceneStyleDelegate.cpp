@@ -68,9 +68,16 @@ void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentR
 
   painter->save();
 
-  QColor bg{VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(rating))};
-  bg.setAlpha(210);
-  painter->fillRect(currentRateTextRect, bg);
+  QColor badgeColor{VideoTierTool::GetVideoTierColorRgb(VideoTierTool::MovieRate2VideoTierE(rating))};
+  badgeColor.setAlpha(235);
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(badgeColor);
+  {
+    const qreal triSide = RateHelper::RATING_BAR_HEIGHT * 1.7; // in theory 2
+    const QPointF origin = currentRateTextRect.topLeft();
+    QPolygonF tri{{origin, QPointF(origin.x() + triSide, origin.y()), QPointF(origin.x(), origin.y() + triSide)}};
+    painter->drawPolygon(tri);
+  }
 
   painter->setPen(Qt::white);
   painter->drawText(currentRateTextRect, Qt::AlignCenter, QString::number(rating));

@@ -21,8 +21,8 @@ public:
   bool InitMoviesTables();
   bool setCurrentMovieTable(const QString& movieTableName);
 
-  bool onSubmit();
-  bool onRevert();
+  bool onSubmitAll();
+  bool onRevertAll();
   bool onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE filesType);
   bool onInitDataBase();
   bool onCreateATable();

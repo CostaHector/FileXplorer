@@ -7,10 +7,7 @@
 #include "PathTool.h"
 #include "FileBatchOps.h"
 
-#include <QObject>
 #include <QPixmap>
-#include <QDirIterator>
-#include <QDir>
 #include <QBrush>
 
 ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object) //

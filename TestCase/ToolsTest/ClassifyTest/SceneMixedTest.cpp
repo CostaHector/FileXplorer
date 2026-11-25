@@ -3,10 +3,10 @@
 #include "PlainTestSuite.h"
 #include "SceneMixed.h"
 
-class ScenesMixedTest : public PlainTestSuite {
+class SceneMixedTest : public PlainTestSuite {
   Q_OBJECT
 public:
-  ScenesMixedTest() : PlainTestSuite{} {}
+  SceneMixedTest() : PlainTestSuite{} {}
 private slots:
   void test_basicFileNames() {
     const QStringList files{
@@ -20,8 +20,8 @@ private slots:
         "X-Man - The Last Stand - 2.png", //
     };
 
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 1); // batch count = 1
     QCOMPARE(grps["X-Man - The Last Stand"].size(), 1 + 1 + 5);
     QCOMPARE(sMixed.m_json2Name.size(), 1);
@@ -76,8 +76,8 @@ private slots:
         "another Tarzan.jpg",
     };
 
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 2); // batch count = 2
     QCOMPARE(grps["Tarzan"].size(), 8);
     QCOMPARE(grps["another Tarzan"].size(), 8);
@@ -102,8 +102,8 @@ private slots:
           << "Superman - The Inked Meat Part 2.jpg"
           << "Superman - The Inked Meat Part 2 - 0.jpg"
           << "Superman - The Inked Meat Part 2 - 33.jpg";
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 2); // batch count = 2
     const QStringList expectGrpNames{"Superman - The Inked Meat Part 1", "Superman - The Inked Meat Part 2"};
     QCOMPARE(grps.keys(), expectGrpNames);
@@ -138,8 +138,8 @@ private slots:
           << "Captain America - Henry Carvill, Chris Evans 2.jpg"
           << "Captain America - Henry Carvill, Chris Evans Part 2.json"
           << "Captain America - Henry Carvill, Chris Evans Part 2.mp4";
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 2); // batch count = 2
     const QStringList expectGrpNames{"Captain America - Henry Carvill, Chris Evans", "Captain America - Henry Carvill, Chris Evans Part 2"};
     QCOMPARE(grps.keys(), expectGrpNames);
@@ -167,8 +167,8 @@ private slots:
           << "Captain America - Henry Carvill, Chris Evans Sc 3.mkv"
           << "Captain America - Henry Carvill, Chris Evans HD.avi"
           << "Captain America - Henry Carvill, Chris Evans HD 1.jpg";
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& grps = sMixed(files);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& grps = sMixed(files);
     QCOMPARE(grps.size(), 1); // batch count = 1
     QCOMPARE(grps["Captain America - Henry Carvill, Chris Evans"].size(), 11);
     const QStringList expectGrpsNames{"Captain America - Henry Carvill, Chris Evans"};
@@ -190,8 +190,8 @@ private slots:
         "lam 3.jpg",
         "beyond.json",
     };
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& folder2Items = sMixed(vidAndFolders);
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& folder2Items = sMixed(vidAndFolders);
     QCOMPARE(folder2Items.size(), 6);
   }
 
@@ -204,10 +204,10 @@ private slots:
          << "Fox - Sporty - Chris Evans, Henry.png"      // Fox - Sporty - Chris Evans, Henry
          << "Fox - Sporty - Chris Evans, Henry - 1.png"  // Fox - Sporty - Chris Evans, Henry
          << "Fox - Sporty - Chris Evans, Henry - 2.png"; // Fox - Sporty - Chris Evans, Henry
-    ScenesMixed sMixed;
+    SceneMixed sMixed;
     const auto& folder2Items = sMixed(imgs);
     QCOMPARE(folder2Items.size(), 4);
-    const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items //
+    const SceneMixed::GROUP_MAP_TYPE& expectsFolder2Items //
         {
          {"Name", {"Name 1.png", "Name - 1.png"}},
          {"Name 1", {"Name 1 - 1.png"}},
@@ -236,9 +236,9 @@ private slots:
 #endif
         "C.R..jpg",
     };
-    ScenesMixed sMixed;
-    const ScenesMixed::GROUP_MAP_TYPE& folder2Items = sMixed(items);
-    const ScenesMixed::GROUP_MAP_TYPE& expectsFolder2Items{
+    SceneMixed sMixed;
+    const SceneMixed::GROUP_MAP_TYPE& folder2Items = sMixed(items);
+    const SceneMixed::GROUP_MAP_TYPE& expectsFolder2Items{
         {"H", {"H"}},
         {"H.C", {"H.C.json", "H.C.jpg"}},  // image append behind json, behind videos
         {"Michael", {"Michael"}},
@@ -257,5 +257,5 @@ private slots:
   }
 };
 
-#include "ScenesMixedTest.moc"
-REGISTER_TEST(ScenesMixedTest, false)
+#include "SceneMixedTest.moc"
+REGISTER_TEST(SceneMixedTest, false)

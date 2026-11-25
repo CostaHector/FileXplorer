@@ -131,7 +131,7 @@ class TorrentsManagerWidgetTest : public PlainTestSuite {
       QVERIFY(!torrWid.mDb.IsTableExist(DB_TABLE::TORRENTS));  // tables now not exist
     }
 
-    QVERIFY(torrWid.onSubmit());
+    QVERIFY(torrWid.onSubmitAll());
 
     torrWid.showEvent(nullptr);
     QShowEvent defaultShowEvent;

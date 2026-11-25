@@ -8,35 +8,42 @@ IconSizeMenu::IconSizeMenu(const QString& menuName, const QString& belongedToNam
   CHECK_NULLPTR_RETURN_VOID(parent);
   CHECK_FALSE_RETURN_VOID(!mBelongToName.isEmpty());
 
+  mIconVerticalLongerMode = IMAGE_SIZE::GetInitialVerticalLongerMode(GetName());
+  mIconVerticalLongerModeAct = addAction(QIcon{":img/VERTICAL_LONG_IMAGE_MODE"}, tr("Vertical Long Image"));
+  mIconVerticalLongerModeAct->setCheckable(true);
+  mIconVerticalLongerModeAct->setChecked(mIconVerticalLongerMode);
+  mIconVerticalLongerModeAct->setToolTip("Use icon sizes for vertical long images (height is the long side, height > width).");
+  addSeparator();
+
   mSizeActGroup = new QActionGroup{this};
   mSizeActGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-
   mIconSizeScaledIndex = IMAGE_SIZE::GetInitialScaledSize(GetName());
-
   for (int i = 0; i < IMAGE_SIZE::ICON_SIZE_CANDIDATES_N; ++i) {
     const QString actName = IMAGE_SIZE::HumanReadFriendlySize(i);
-    QAction* pSizeAct = new QAction(actName, this);
+    QAction* pSizeAct = addAction(actName);
     pSizeAct->setData(i);
     pSizeAct->setCheckable(true);
     if (i == mIconSizeScaledIndex) {
       pSizeAct->setChecked(true);
     }
     mSizeActGroup->addAction(pSizeAct);
-    addAction(pSizeAct);
     // not the first and the last element, every five element add a separator
     if ((i + 1) % 5 == 0 && i + 1 != IMAGE_SIZE::ICON_SIZE_CANDIDATES_N) {
       addSeparator();
     }
   }
-  setIcon(QIcon{":img/ICON_SIZE"});
   setToolTipsVisible(true);
-
   mSizeActsList = mSizeActGroup->actions();
-  connect(this, &QMenu::triggered, this, &IconSizeMenu::EmitIconScaledIndexChanged);
+
+  connect(mSizeActGroup, &QActionGroup::triggered, this, &IconSizeMenu::EmitIconScaledIndexChanged);
+  connect(mIconVerticalLongerModeAct, &QAction::toggled, this, &IconSizeMenu::EmitIconVerticalLongerModeChanged);
+
+  setIcon(QIcon{":img/ICON_SIZE"});
 }
 
 IconSizeMenu::~IconSizeMenu() {
   IMAGE_SIZE::SaveInitialScaledSize(GetName(), mIconSizeScaledIndex);
+  IMAGE_SIZE::SaveInitialVerticalLongerMode(GetName(), mIconVerticalLongerMode);
 }
 
 bool IconSizeMenu::EmitIconScaledIndexChanged(const QAction* pAct) {
@@ -54,6 +61,15 @@ bool IconSizeMenu::EmitIconScaledIndexChanged(const QAction* pAct) {
   }
   mIconSizeScaledIndex = newScaledSize;
   emit iconScaledIndexChanged(mIconSizeScaledIndex);
+  return true;
+}
+
+bool IconSizeMenu::EmitIconVerticalLongerModeChanged(bool bIconVerticalLongerMode) {
+  if (bIconVerticalLongerMode == mIconVerticalLongerMode) {
+    return false;
+  }
+  mIconVerticalLongerMode = bIconVerticalLongerMode;
+  emit iconVerticalLongerModeChanged(bIconVerticalLongerMode);
   return true;
 }
 

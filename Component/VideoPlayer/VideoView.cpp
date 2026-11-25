@@ -64,7 +64,7 @@ void VideoView::subscribe() {
   connect(inst->mHideToolBarAct, &QAction::toggled, this, &VideoView::onChangeToolBarVisibility);
 
   connect(mBasicVideoView, &BasicVideoView::reqFunctionModeChange, this, &VideoView::onReqModeChange);
-  connect(mBasicVideoView, &BasicVideoView::reqPlayNextOneMedia, inst->mPlayNextInActiveViewAct, &QAction::trigger);
+  connect(mBasicVideoView, &BasicVideoView::reqPlayNextOneMedia, inst->mPlayNextInPlaylistAct, &QAction::trigger);
 }
 
 int VideoView::PlayAPath(const QString& folderPath, bool bPlayInstantly) {

@@ -132,16 +132,16 @@ private slots:
       QModelIndex index4Studio{movieModel.index(4, MovieDBModelField::Studio)};
       QModelIndex index5Studio{movieModel.index(5, MovieDBModelField::Studio)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
-                                                 QStringList{"", ""}));                     // todo: use GetIndexessAtOneRow
+                                                 QVariantList{"", ""}));                     // todo: use GetIndexessAtOneRow
       movieModel.SetStudio({index4Studio, index5Studio}, "Marvel");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
-                                                 QStringList{"Marvel", "Marvel"}));
+                                                 QVariantList{"Marvel", "Marvel"}));
       movieModel.SetStudio({index4Studio}, "Century");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
-                                                 QStringList{"Century", "Marvel"}));
+                                                 QVariantList{"Century", "Marvel"}));
       movieModel.SetStudio({index5Studio}, "");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Studio, index5Studio},  //
-                                                 QStringList{"Century", ""}));
+                                                 QVariantList{"Century", ""}));
     }
 
     // 2.2 Cast modified
@@ -149,34 +149,34 @@ private slots:
       QModelIndex index4Cast{movieModel.index(4, MovieDBModelField::Cast)};
       QModelIndex index5Cast{movieModel.index(5, MovieDBModelField::Cast)};
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"", ""}));
+                                                 QVariantList{"", ""}));
       movieModel.SetCastOrTags({index4Cast, index5Cast}, "Cristiano Ronaldo&Kaka");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"Cristiano Ronaldo,Kaka", "Cristiano Ronaldo,Kaka"}));
+                                                 QVariantList{"Cristiano Ronaldo,Kaka", "Cristiano Ronaldo,Kaka"}));
       movieModel.SetCastOrTags({index4Cast}, "Kaka");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"Cristiano Ronaldo,Kaka", "Kaka"}));
+                                                 QVariantList{"Cristiano Ronaldo,Kaka", "Kaka"}));
       movieModel.SetCastOrTags({index5Cast}, "");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"", "Kaka"}));
+                                                 QVariantList{"", "Kaka"}));
 
       movieModel.AddCastOrTags({index4Cast, index5Cast}, "");  // add empty nothing happend
       movieModel.AddCastOrTags({index4Cast, index5Cast}, "Levi,Michael Fassbender");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
 
       movieModel.AddCastOrTags({index4Cast, index5Cast}, "Levi,Michael");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  // again no change
-                                                 QStringList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
 
       movieModel.RmvCastOrTags({index4Cast, index5Cast}, "");                           // remove empty nothing changed
       movieModel.RmvCastOrTags({index4Cast, index5Cast}, "Ronaldo");                    // not exists at all
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
 
       movieModel.RmvCastOrTags({index4Cast, index5Cast}, "Michael");                    // remove full match. not exists at all
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Cast, index5Cast},  //
-                                                 QStringList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
     }
     // 2.3 Tags modified
     {
@@ -184,34 +184,34 @@ private slots:
       QModelIndex index5Tags{movieModel.index(5, MovieDBModelField::Tags)};
 
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"", ""}));
+                                                 QVariantList{"", ""}));
       movieModel.SetCastOrTags({index4Tags, index5Tags}, "Cristiano Ronaldo&Kaka");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"Cristiano Ronaldo,Kaka", "Cristiano Ronaldo,Kaka"}));
+                                                 QVariantList{"Cristiano Ronaldo,Kaka", "Cristiano Ronaldo,Kaka"}));
       movieModel.SetCastOrTags({index4Tags}, "Kaka");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"Cristiano Ronaldo,Kaka", "Kaka"}));
+                                                 QVariantList{"Cristiano Ronaldo,Kaka", "Kaka"}));
       movieModel.SetCastOrTags({index5Tags}, "");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"", "Kaka"}));
+                                                 QVariantList{"", "Kaka"}));
 
       movieModel.AddCastOrTags({index4Tags, index5Tags}, "");  // add empty nothing happend
       movieModel.AddCastOrTags({index4Tags, index5Tags}, "Levi,Michael Fassbender");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
 
       movieModel.AddCastOrTags({index4Tags, index5Tags}, "Levi,Michael");
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  // again no change
-                                                 QStringList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
 
       movieModel.RmvCastOrTags({index4Tags, index5Tags}, "");                           // remove empty nothing changed
       movieModel.RmvCastOrTags({index4Tags, index5Tags}, "Ronaldo");                    // not exists at all
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael,Michael Fassbender", "Kaka,Levi,Michael,Michael Fassbender"}));
 
       movieModel.RmvCastOrTags({index4Tags, index5Tags}, "Michael");                    // remove full match. not exists at all
       QVERIFY(CheckIndexesDisplayRoleIgnoreOrder(movieModel, {index4Tags, index5Tags},  //
-                                                 QStringList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
+                                                 QVariantList{"Levi,Michael Fassbender", "Kaka,Levi,Michael Fassbender"}));
     }
   }
 

@@ -6,7 +6,6 @@
 #include "PaginatedList.h"
 #include "JsonFieldBoundary.h"
 #include "SelectionUsage.h"
-#include <QSet>
 #include <QFileInfo>
 
 extern template class PaginatedList<SceneInfo>;

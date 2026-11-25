@@ -5,6 +5,7 @@
 #include <QActionGroup>
 #include <QObject>
 #include "MovieDBModelField.h"
+#include "PendingChangesAction.h"
 
 class MovieDBActions : public QObject {
   Q_OBJECT
@@ -17,9 +18,8 @@ signals:
   void reqScanFiles(MovieDBModelField::ScanFilesTypeE filesType);
 
 public:
-  QAction* SUBMIT{nullptr};
-  QAction* _MODEL_REPOPULATE{nullptr};
-  QAction* REVERT{nullptr};
+  PendingChangesAction* _MODEL_PENDING_CHANGES_ACTION{nullptr};
+
   QAction* INIT_A_DATABASE{nullptr};
   QAction* INIT_A_TABLE{nullptr};
   QAction* DROP_A_TABLE{nullptr};

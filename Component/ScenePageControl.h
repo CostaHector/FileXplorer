@@ -1,44 +1,33 @@
 #ifndef SCENEPAGECONTROL_H
 #define SCENEPAGECONTROL_H
 
-#include <QAction>
-#include <QLineEdit>
-#include <QToolBar>
-#include "EnumIntAction.h"
-#include "ScenePageNaviHelper.h"
+#include <QWidget>
+#include <QSpinBox>
+#include <QActionGroup>
 
-extern template struct EnumIntAction<ScenePageNaviHelper::PageNaviE>;
-
-class QLabel;
-class ScenePageControl: public QToolBar {
+class ScenePageControl : public QWidget {
   Q_OBJECT
- public:
+public:
   static ScenePageControl* GInstance(ScenePageControl* pInitValue=nullptr, bool bReset=false);
-  explicit ScenePageControl(const QString &title = "Pagination display", QWidget *parent = nullptr);
+  explicit ScenePageControl(QWidget *parent = nullptr);
+
   void subscribe();
 
-  bool SetScenesCountPerPage();
   void SetPageIndex();
-  bool PageIndexIncDec(const QAction* pageAct);
- signals:
+  bool onPageIndexFrontBackActTriggered(const QAction* pageAct);
+signals:
   void currentPageIndexChanged(int newPageIndex);
   void maxScenesCountPerPageChanged(int newMaxScenesCountEachPage);
- public slots:
+public slots:
+  bool EmitScenesCountPerPageChanged(int scenesPerPageCnt);
   void onPagesCountChanged(int newPagesCount);
 
- private:
+private:
   QAction* _THE_FRONT_PAGE{nullptr};
-  QAction* _PREVIOUS_PAGE{nullptr};
-  QAction* _NEXT_PAGE{nullptr};
   QAction* _THE_BACK_PAGE{nullptr};
+  QActionGroup* _PAGE_NAVI_AG{nullptr};
 
-  QLabel* mPageInfoLabel{nullptr};
-  int mPagesCount {1};
-
-  QLineEdit* mScenesPerPageLE{nullptr};
-  QLineEdit* mPageIndexInputLE{nullptr};
-  QToolBar* mPagesSelectTB{nullptr};
-  EnumIntAction<ScenePageNaviHelper::PageNaviE> mPageNaviIntAction;
+  QSpinBox* mScenesPerPageInputSB{nullptr};
+  QSpinBox* mPageIndexInputSB{nullptr};
 };
-
 #endif  // SCENEPAGECONTROL_H

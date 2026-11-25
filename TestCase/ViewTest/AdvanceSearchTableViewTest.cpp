@@ -48,7 +48,7 @@ class AdvanceSearchTableViewTest : public PlainTestSuite {
       advSearch.selectAll(); // the index of selection is discrete
       QModelIndexList rowsSelected2 = advSearch.selectedRowsSource(); // the name row
       QCOMPARE(rowsSelected2.size(), 2);
-      auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSearchModel(sourceModel, rowsSelected2);
+      auto mimeDataMember = MimeDataHelper::GetMimeDataMemberFromSourceModel<AdvanceSearchModel>(sourceModel, rowsSelected2);
       QCOMPARE(mimeDataMember.texts.size(), 2);
       QCOMPARE(mimeDataMember.urls.size(), 2);
       QCOMPARE(mimeDataMember.srcIndexes.size(), 2);

@@ -6,3 +6,4 @@ build/*
 TestCase/build/*
 *.pro.user
 *.pro.user.*
+.continue/*

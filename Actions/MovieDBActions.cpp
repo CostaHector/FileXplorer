@@ -9,19 +9,8 @@ MovieDBActions& MovieDBActions::GetInst() {
 MovieDBActions::MovieDBActions(QObject* parent)  //
   : QObject{parent}                            //
 {
-  SUBMIT = new (std::nothrow) QAction(QIcon(":img/MANUAL_SUBMIT"), tr("Submit"), this);
-  CHECK_NULLPTR_RETURN_VOID(SUBMIT);
-  SUBMIT->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_S));
-  SUBMIT->setToolTip(QString("<b>%1 (%2)</b><br/> Manual Submit.").arg(SUBMIT->text(), SUBMIT->shortcut().toString()));
-
-  _MODEL_REPOPULATE = new (std::nothrow) QAction{QIcon(":img/REFRESH_THIS_PATH"), tr("Repopulate"), this};
-  CHECK_NULLPTR_RETURN_VOID(_MODEL_REPOPULATE);
-  _MODEL_REPOPULATE->setShortcutVisibleInContextMenu(true);
-  _MODEL_REPOPULATE->setToolTip(QString{"<b>%1 (%2)</b><br/>Repopulates the model with data from the table via setTable"}.arg(
-      _MODEL_REPOPULATE->text(), _MODEL_REPOPULATE->shortcut().toString()));
-
-  REVERT = new (std::nothrow) QAction(QIcon(":img/REVERT"), tr("Revert"), this);
-  CHECK_NULLPTR_RETURN_VOID(REVERT);
+  _MODEL_PENDING_CHANGES_ACTION = PendingChangesAction::GetDefault(this);
+  CHECK_NULLPTR_RETURN_VOID(_MODEL_PENDING_CHANGES_ACTION);
 
   INIT_A_DATABASE = new (std::nothrow) QAction(QIcon(":img/CREATE_DATABASE"), tr("Init Database"), this);
   CHECK_NULLPTR_RETURN_VOID(INIT_A_DATABASE);
@@ -76,9 +65,7 @@ MovieDBActions::MovieDBActions(QObject* parent)  //
 
   DB_CONTROL_ACTIONS = new (std::nothrow) QActionGroup{this};
   CHECK_NULLPTR_RETURN_VOID(DB_CONTROL_ACTIONS);
-  DB_CONTROL_ACTIONS->addAction(SUBMIT);
-  DB_CONTROL_ACTIONS->addAction(_MODEL_REPOPULATE);
-  DB_CONTROL_ACTIONS->addAction(REVERT);
+  DB_CONTROL_ACTIONS->addAction(_MODEL_PENDING_CHANGES_ACTION);
   DB_CONTROL_ACTIONS->addAction(INIT_A_TABLE);
   DB_CONTROL_ACTIONS->addAction(DELETE_FROM_TABLE);
   DB_CONTROL_ACTIONS->addAction(INIT_A_DATABASE);

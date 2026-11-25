@@ -19,10 +19,6 @@
 #include "TagsHelper.h"
 #include "JsonParser.h"
 #include "InputDialogHelper.h"
-
-#include <QDesktopServices>
-#include <QHeaderView>
-#include <QMessageBox>
 #include <QMouseEvent>
 
 SceneListView::SceneListView(ScenesListModel* sceneModel,
@@ -93,6 +89,7 @@ void SceneListView::subscribe() {
     connect(pScenePageCtrl, &ScenePageControl::maxScenesCountPerPageChanged, _sceneModel, &ScenesListModel::onScenesCountsPerPageChanged);
     connect(_sceneModel, &ScenesListModel::pagesCountChanged, pScenePageCtrl, &ScenePageControl::onPagesCountChanged);
   }
+
   SceneInPageActions& sceneActInst = SceneInPageActions::GetInst();
   {
     // initial signal-slot connection

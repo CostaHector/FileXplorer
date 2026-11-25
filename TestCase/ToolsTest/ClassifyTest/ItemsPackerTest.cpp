@@ -35,7 +35,7 @@ private slots:
          };
     QCOMPARE(tDir.createEntries(baseNameWithDotNodes), baseNameWithDotNodes.size());
 
-    ScenesMixed sMixed;
+    SceneMixed sMixed;
     const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
     const QMap<QString, QStringList> expectGrps{
         //
@@ -131,7 +131,7 @@ private slots:
             {"Forbes - Movie Name - Chris Evans, John Reese.json", "Forbes - Movie Name - Chris Evans, John Reese 1.jpg"}  //
         },                                                                                                                 //
     };
-    ScenesMixed sMixed;
+    SceneMixed sMixed;
     const QMap<QString, QStringList>& actualGrps = sMixed(tPath);
     QCOMPARE(expectGrps, actualGrps);
 

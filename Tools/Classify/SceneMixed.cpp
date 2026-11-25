@@ -10,13 +10,13 @@
 using namespace ItemsPileCategory;
 
 // Used for Floating Preview
-ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QString& path) {
+SceneMixed::GROUP_MAP_TYPE SceneMixed::operator()(const QString& path) {
   QDir mediaDir(path, "", QDir::SortFlag::Name, QDir::Filter::Files);
   mediaDir.setNameFilters(TYPE_FILTER::VIDEO_TYPE_SET + TYPE_FILTER::IMAGE_TYPE_SET + TYPE_FILTER::JSON_TYPE_SET);
   return operator()(mediaDir.entryList());
 }
 
-bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& dstGrpName) const {
+bool SceneMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& dstGrpName) const {
   // dstGrpName: "movie", srcGrpName: "movie part 2" and without "movie part 2.json"
   // combine "movie part 2" into movie
   static const QSet<QString> ignoreDifferenceSet{
@@ -46,7 +46,7 @@ bool ScenesMixed::NeedCombine2Folder(const QString& srcGrpName, const QString& d
   return ignoreDifferenceSet.contains(differenceStr);
 }
 
-void Merge2ValuesInMapByKey(ScenesMixed::GROUP_MAP_TYPE& mp, const QString& srcKey, const QString& destKey) {
+void Merge2ValuesInMapByKey(SceneMixed::GROUP_MAP_TYPE& mp, const QString& srcKey, const QString& destKey) {
   auto srcIt = mp.find(srcKey);
   if (srcIt == mp.end()) {
     return;
@@ -61,7 +61,7 @@ struct stImg {
 };
 
 // Used for Name Ruler
-ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
+SceneMixed::GROUP_MAP_TYPE SceneMixed::operator()(const QStringList& files) {
   QList<stImg> imageNames;
 
   GROUP_MAP_TYPE batches;
@@ -151,7 +151,7 @@ ScenesMixed::GROUP_MAP_TYPE ScenesMixed::operator()(const QStringList& files) {
   return batches;
 }
 
-const QStringList& ScenesMixed::GetAllImgs(const QString& baseName) const {
+const QStringList& SceneMixed::GetAllImgs(const QString& baseName) const {
   auto it = m_img2Name.find(baseName);
   if (it == m_img2Name.cend()) {
     static QStringList tempEmpty;
@@ -160,7 +160,7 @@ const QStringList& ScenesMixed::GetAllImgs(const QString& baseName) const {
   return it.value();
 }
 
-const QString& ScenesMixed::GetFirstVid(const QString& baseName) const {
+const QString& SceneMixed::GetFirstVid(const QString& baseName) const {
   auto it = m_vid2Name.find(baseName);
   if (it == m_vid2Name.cend()) {
     static QString vidNoExist;

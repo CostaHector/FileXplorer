@@ -258,6 +258,10 @@ int IMAGE_SIZE::clampScaledIndex(int newScaledIndex) {
   return newScaledIndex;
 }
 
+QSize IMAGE_SIZE::CandidateSize(int scaledIndex, bool bIconVerticalLongerMode) {
+  return bIconVerticalLongerMode ? QSize{ICON_SIZE_CANDIDATES[scaledIndex].height(), ICON_SIZE_CANDIDATES[scaledIndex].width()} : ICON_SIZE_CANDIDATES[scaledIndex];
+}
+
 int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
   const bool isImageRelated{
       name.contains("img", Qt::CaseSensitivity::CaseInsensitive)        //
@@ -272,4 +276,15 @@ int IMAGE_SIZE::GetInitialScaledSize(const QString& name) {
 
 void IMAGE_SIZE::SaveInitialScaledSize(const QString& name, int scaledIndex) {
   Configuration().setValue(name + "/ICON_SIZE_INDEX", scaledIndex);
+}
+
+bool IMAGE_SIZE::GetInitialVerticalLongerMode(const QString& name) {
+  const bool isDefaultVertialLonger {
+    name.contains("cast", Qt::CaseSensitivity::CaseInsensitive)
+  }; //
+  return Configuration().value(name + "/ICON_VERTICAL_LONGER_MODE", isDefaultVertialLonger).toBool();
+}
+
+void IMAGE_SIZE::SaveInitialVerticalLongerMode(const QString& name, bool bIconVerticalLongerMode) {
+  Configuration().setValue(name + "/ICON_VERTICAL_LONGER_MODE", bIconVerticalLongerMode);
 }

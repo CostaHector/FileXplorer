@@ -5,10 +5,10 @@
 #include <QMap>
 #include <QSet>
 
-class ScenesMixed {
+class SceneMixed {
  public:
   using GROUP_MAP_TYPE = QMap<QString, QStringList>;
-  explicit ScenesMixed() = default;
+  explicit SceneMixed() = default;
   GROUP_MAP_TYPE operator()(const QString& path);
   GROUP_MAP_TYPE operator()(const QStringList& files);
   const QStringList& GetAllImgs(const QString& baseName) const;

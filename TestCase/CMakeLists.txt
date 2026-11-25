@@ -47,6 +47,7 @@ file(GLOB SOURCES
     ${PARENT_DIR}/Model/*.cpp
     ${PARENT_DIR}/View/*.cpp
     ${PARENT_DIR}/Component/*.cpp
+    ${PARENT_DIR}/Component/Cast/*.cpp
     ${PARENT_DIR}/Component/Configs/*.cpp
     ${PARENT_DIR}/Component/DupImages/*.cpp
     ${PARENT_DIR}/Component/DupVideos/*.cpp
@@ -76,6 +77,7 @@ file(GLOB SOURCES
     main_ut.cpp
     ActionsTest/*.cpp
     ComponentTest/*.cpp
+    ComponentTest/CastTest/*.cpp
     ComponentTest/ConfigsTest/*.cpp
     ComponentTest/DupImagesTest/*.cpp
     ComponentTest/DupVideosTest/*.cpp
@@ -92,13 +94,14 @@ file(GLOB SOURCES
     ComponentTest/StylesheetTest/*.cpp
     ComponentTest/VideoPlayerTest/*.cpp
     FileOperationTest/*.cpp
-    JsonTest/*.cpp
     MockTool/*.cpp
     ModelTest/*.cpp
     publicTest/*.cpp
     pubTestTool/*.cpp
     ToolsTest/*.cpp
+    ToolsTest/ClassifyTest/*.cpp
     ToolsTest/FileDescriptorTest/*.cpp
+    ToolsTest/JsonTest/*.cpp
     ToolsTest/NetworkTest/*.cpp
     ViewTest/*.cpp
 )
@@ -114,6 +117,7 @@ set(SRV_HEADER_PATH
     ${PARENT_DIR}/Model
     ${PARENT_DIR}/View
     ${PARENT_DIR}/Component
+    ${PARENT_DIR}/Component/Cast
     ${PARENT_DIR}/Component/Configs
     ${PARENT_DIR}/Component/DupImages
     ${PARENT_DIR}/Component/DupVideos
@@ -158,6 +162,7 @@ file(GLOB HEADERS
     ${PARENT_DIR}/Model/*.h
     ${PARENT_DIR}/View/*.h
     ${PARENT_DIR}/Component/*.h
+    ${PARENT_DIR}/Component/Cast/*.h
     ${PARENT_DIR}/Component/Configs/*.h
     ${PARENT_DIR}/Component/DupImages/*.h
     ${PARENT_DIR}/Component/DupVideos/*.h

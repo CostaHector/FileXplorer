@@ -49,7 +49,7 @@ int ItemsPacker::operator()(const QString& path) {
     LOG_D("path[%s] is not an existed directory", qPrintable(path));
     return {};
   }
-  ScenesMixed sMixed;
+  SceneMixed sMixed;
   const auto& pilesMap = sMixed(pathdir.entryList());
   return operator()(path, pilesMap);
 }

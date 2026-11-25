@@ -10,7 +10,7 @@ public:
   explicit PopupWidgetManager(QAction* action, QWidget* notNullptrParent);
   ~PopupWidgetManager();
 
-  void setWidgetCreator(std::function<WidgetType*(QWidget*)> creator) { m_widgetCreator = creator; }
+  void setWidgetCreator(std::function<WidgetType*()> creator) { m_widgetCreator = creator; }
 
   void setOnCloseCallback(std::function<void()> callback) { m_onCloseCallback = callback; }
   bool isVisible() const { return widget() != nullptr && widget()->isVisible(); }
@@ -29,7 +29,7 @@ private:
   QAction* m_action{nullptr};
   WidgetType* m_widget{nullptr};
 
-  std::function<WidgetType*(QWidget*)> m_widgetCreator{nullptr};
+  std::function<WidgetType*()> m_widgetCreator{nullptr};
   std::function<void()> m_onCloseCallback{nullptr};
 };
 
