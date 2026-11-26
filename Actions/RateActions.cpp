@@ -119,7 +119,7 @@ bool RateActions::onRateActionTriggered(const QAction* pActTriggered) {
     LOG_W("data property in QAction is not a number");
     return false;
   }
-  emit RateMovieReq(newRate, false);
+  emit RateMovieReq(newRate, true);
   return true;
 }
 

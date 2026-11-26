@@ -143,7 +143,7 @@ void RatingStarsWidget::mousePressEvent(QMouseEvent *event) {
     if (m_currentRating != newRating) {
       m_currentRating = newRating;
       update();
-      emit RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER).RateMovieReq(m_currentRating, false);
+      emit RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER).RateMovieReq(m_currentRating, true);
     }
   }
 }
