@@ -110,7 +110,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QVERIFY(defModel.fileInfo(invalidIndex).fileName().isEmpty());
     QCOMPARE(defModel.filePath(invalidIndex), "");
     QCOMPARE(defModel.fileName(invalidIndex), "");
-    QCOMPARE(defModel.GetRate(invalidIndex), 0);
+    QCOMPARE(defModel.rateAtIndex(invalidIndex), 0);
     QCOMPARE(defModel.baseName(invalidIndex), "");
     QCOMPARE(defModel.absolutePath(invalidIndex), "");
     QCOMPARE(defModel.GetImgs(invalidIndex), (QStringList{}));
@@ -236,7 +236,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.fileInfo(slm.index(0)), QFileInfo("inexist/path/Kaka.json")); // fall back to json
     QCOMPARE(slm.filePath(slm.index(0)), "inexist/path/Kaka.json"); // fall back to json
     QCOMPARE(slm.fileName(slm.index(0)), "Kaka.json"); // fall back to json base name
-    QCOMPARE(slm.GetRate(slm.index(0)), 9);
+    QCOMPARE(slm.rateAtIndex(slm.index(0)), 9);
     QCOMPARE(slm.baseName(slm.index(0)), "Kaka");
     QCOMPARE(slm.absolutePath(slm.index(0)), "inexist/path/");
     QCOMPARE(slm.GetImgs(slm.index(0)), (QStringList{"inexist/path/Kaka.png"}));
@@ -247,7 +247,7 @@ class ScenesListModelTest : public PlainTestSuite {
     QCOMPARE(slm.fileInfo(slm.index(1)), QFileInfo("inexist/path/Cristiano Ronaldo.mp4"));
     QCOMPARE(slm.filePath(slm.index(1)), "inexist/path/Cristiano Ronaldo.json");
     QCOMPARE(slm.fileName(slm.index(1)), "Cristiano Ronaldo.json");
-    QCOMPARE(slm.GetRate(slm.index(1)), 10);
+    QCOMPARE(slm.rateAtIndex(slm.index(1)), 10);
     QCOMPARE(slm.baseName(slm.index(1)), "Cristiano Ronaldo");
     QCOMPARE(slm.absolutePath(slm.index(1)), "inexist/path/");
     QCOMPARE(slm.GetImgs(slm.index(1)), (QStringList{}));
@@ -278,7 +278,7 @@ class ScenesListModelTest : public PlainTestSuite {
 
     QCOMPARE(slm.rowCount(), 1);
     QModelIndex kakaInd = slm.index(0);
-    QCOMPARE(slm.GetRate(kakaInd), 9);
+    QCOMPARE(slm.rateAtIndex(kakaInd), 9);
 
     QCOMPARE(slm.setData(kakaInd, 6, Qt::EditRole), false);               // role unmatch
     QCOMPARE(slm.setData({}, 6, Qt::EditRole), false);                    // index invalid unmatch
@@ -327,10 +327,10 @@ class ScenesListModelTest : public PlainTestSuite {
 
       // 强化用例: 只更改维度, 不改变降序(aka 在Rate+降序情况下), 预期按照Rate降序
       sspm.setSortRole(SceneInfo::Role::RATE_ROLE);
-      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(0, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(1, 0))));
-      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(1, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(2, 0))));
-      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(2, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(3, 0))));
-      QVERIFY(slm.GetRate(sspm.mapToSource(sspm.index(8, 0))) >= slm.GetRate(sspm.mapToSource(sspm.index(9, 0))));
+      QVERIFY(slm.rateAtIndex(sspm.mapToSource(sspm.index(0, 0))) >= slm.rateAtIndex(sspm.mapToSource(sspm.index(1, 0))));
+      QVERIFY(slm.rateAtIndex(sspm.mapToSource(sspm.index(1, 0))) >= slm.rateAtIndex(sspm.mapToSource(sspm.index(2, 0))));
+      QVERIFY(slm.rateAtIndex(sspm.mapToSource(sspm.index(2, 0))) >= slm.rateAtIndex(sspm.mapToSource(sspm.index(3, 0))));
+      QVERIFY(slm.rateAtIndex(sspm.mapToSource(sspm.index(8, 0))) >= slm.rateAtIndex(sspm.mapToSource(sspm.index(9, 0))));
     }
 
     // 测试MOVIE_SIZE排序

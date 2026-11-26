@@ -237,7 +237,7 @@ private slots:
     castModel.sort(CastDbModelField::Name, Qt::SortOrder::AscendingOrder);
     QCOMPARE(headerDataChangedSpy.count(), 0);
 
-    QCOMPARE(CastPsonFileHelper::DEFAULT_RATE, 0);
+    QCOMPARE(JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, 0);
 
     QModelIndex firstLineInd{castModel.index(0, 0)};
     QCOMPARE(castModel.fileName(firstLineInd), "Chris Evans");
@@ -323,10 +323,10 @@ private slots:
       QVERIFY(!castModel.isDirty());
       QCOMPARE(dirtyStatesChangedSpy.count(), 0);
 
-      // DEFAULT_RATE-> 5 save -> 9 revert -> 5
+      // JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V-> 5 save -> 9 revert -> 5
       {
         const QModelIndex line4RateIndex{castModel.index(4, CastDbModelField::Rate)};
-        QCOMPARE(line4RateIndex.data(Qt::DisplayRole).toInt(), CastPsonFileHelper::DEFAULT_RATE);
+        QCOMPARE(line4RateIndex.data(Qt::DisplayRole).toInt(), JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
 
         QVERIFY(castModel.setData(line4RateIndex, 5, Qt::EditRole));  // rate: 5
         QCOMPARE(line4RateIndex.data(Qt::DisplayRole).toInt(), 5);
@@ -623,7 +623,7 @@ private slots:
     }
 
     { // 未设置的字段落到建表时的DEFAULT值
-      QCOMPARE(castModel.rateAtIndex(castModel.index(0, CastDbModelField::Height)), CastPsonFileHelper::DEFAULT_RATE);
+      QCOMPARE(castModel.rateAtIndex(castModel.index(0, CastDbModelField::Height)), JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
     }
 
     { // 只改Height(不会触发文件迁移的字段), 提交后落库
@@ -652,7 +652,7 @@ private slots:
       QVERIFY(castModel.revertAllChanges());
       QVERIFY(!castModel.isDirty());
       QCOMPARE(castModel.heightAtIndex(castModel.index(0, CastDbModelField::Height)), 180);
-      QCOMPARE(castModel.rateAtIndex(castModel.index(0, CastDbModelField::Rate)), CastPsonFileHelper::DEFAULT_RATE);
+      QCOMPARE(castModel.rateAtIndex(castModel.index(0, CastDbModelField::Rate)), JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
     }
   }
 };

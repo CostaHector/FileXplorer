@@ -10,8 +10,8 @@ public:
   explicit FdBasedDbModel(QObject* parent = nullptr, QSqlDatabase con = QSqlDatabase());
 
   void setTable(const QString& tableName) override;
-  static void setDataStatic(FdBasedDbModel& self, const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) {
-    self.setData(index, value, role);
+  static bool setDataStatic(FdBasedDbModel& self, const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) {
+    return self.setData(index, value, role);
   }
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {

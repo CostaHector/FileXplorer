@@ -359,6 +359,37 @@ int CastDbModel::DumpRecordsIntoPsonFile(const QModelIndexList& selectedRowsInde
   return succeedCnt;
 }
 
+int CastDbModel::onSetCastRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    if (oldRate > JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V && !bOverrideAlreadyInitialized) {
+      continue;
+    }
+    if (newRate == oldRate) {
+      continue;
+    }
+    affectedRowsCnt += (int)setData(index.siblingAtColumn(CastDbModelField::FIELD_E::Rate), newRate, Qt::EditRole);
+  }
+  return affectedRowsCnt;
+}
+
+int CastDbModel::onAdjustCastRateForSelectedIndexes(const QModelIndexList& indexes, int delta) {
+  if (indexes.isEmpty() || delta == 0) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    const int newRate = oldRate + delta;
+    affectedRowsCnt += (int)setData(index.siblingAtColumn(CastDbModelField::FIELD_E::Rate), newRate, Qt::EditRole);
+  }
+  return affectedRowsCnt;
+}
+
 bool CastDbModel::submitSaveAllChanges() {
   // 在 OnManualSubmit 模式下，submitAll() 成功后，模型会被重新填充（repopulated），任何展示该模型的视图都会丢失其选中项
   // 会重新执行查询（select())来刷新模型, modelBeginReset级别的, 所以索引即使时 QPersistentModelIndex 也会失效

@@ -26,7 +26,7 @@ QSqlRecord GetACastRecordLine(const QString& castName, const QString& ori, const
   rec.append(QSqlField(ENUM_2_STR(Detail), QVariant::String));
 
   rec.setValue(Name, castName);
-  rec.setValue(Rate, CastPsonFileHelper::DEFAULT_RATE);
+  rec.setValue(Rate, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V);
   rec.setValue(ALIAS, "Thor");
   rec.setValue(Tags, "Man");
   rec.setValue(Ori, ori);

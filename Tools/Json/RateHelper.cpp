@@ -90,20 +90,18 @@ bool RateHelper::SetFileRate(const QString& fileAbsPath, int rate) {
   return SetJsonRateValueCore(jsonPath, rate, true);
 }
 
-int RateHelper::SetFilesRate(const QStringList& fileAbsPathList, int rate) {
+std::pair<int, int> RateHelper::SetFilesRate(const QStringList& fileAbsPathList, int rate, bool bOverrideForce) {
   const QSet<QString> uniqueJsons{RelatedHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
   if (uniqueJsons.isEmpty()) {
-    return 0;
+    return {0, 0};
   }
-  int succeedCnt{0}, totalCnt{0};
+  int succeedCnt{0};
   for (const QString& jsonAbsPath: uniqueJsons) {
-    if (RateHelper::SetJsonRateValueCore(jsonAbsPath, rate, true)) {
-      ++succeedCnt;
-    }
-    ++totalCnt;
+    succeedCnt += (int)RateHelper::SetJsonRateValueCore(jsonAbsPath, rate, true);
   }
+  const int totalCnt{uniqueJsons.size()};
   LOG_OE(succeedCnt == totalCnt, "%d/%d json(s) have been updated to rate %d", succeedCnt, totalCnt, rate);
-  return succeedCnt;
+  return {succeedCnt, totalCnt};
 }
 
 int RateHelper::SetFileRateRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce) {
@@ -133,19 +131,17 @@ bool RateHelper::AdjustFileRate(const QString& fileAbsPath, int delta, int* newR
   return AdjustJsonRateValueCore(jsonPath, delta, newRateValue);
 }
 
-int RateHelper::AdjustFilesRate(const QStringList& fileAbsPathList, int delta) {
+// return <affected files count, need affected files count>
+std::pair<int, int> RateHelper::AdjustFilesRate(const QStringList& fileAbsPathList, int delta) {
   const QSet<QString> uniqueJsons{RelatedHelper::GetRelatedJsonAbsPaths(fileAbsPathList)};
   if (uniqueJsons.isEmpty()) {
-    return 0;
+    return {0, 0};
   }
-  int succeedCnt{0}, totalCnt{0};
+  int succeedCnt{0};
   for (const QString& jsonAbsPath: uniqueJsons) {
-    if (RateHelper::AdjustJsonRateValueCore(jsonAbsPath, delta)) {
-      ++succeedCnt;
-    }
-    ++totalCnt;
+    succeedCnt += (int)RateHelper::AdjustJsonRateValueCore(jsonAbsPath, delta);
   }
-  return succeedCnt;
+  return {succeedCnt, uniqueJsons.size()};
 }
 
 int RateHelper::AdjustFileRateRecursively(const QString& folderAbsPath, int delta) {

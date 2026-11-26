@@ -18,10 +18,11 @@ public:
   QMenu* GetVideoWidRateMenu(QWidget* notNullParent) const;
   QMenu* GetRibbonRateMenu(QWidget* notNullParent) const;
 
+  static std::pair<bool, int> AskUserForNewRateValue(const QString& rootPath, bool bOverrideForce, QWidget* parent);
   static int onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent);
 
 signals:
-  void RateMovieReq(int newRate);
+  void RateMovieReq(int newRate, bool bOverrideForce);
   void RateMovieRecursivelyReq(bool bOverrideForce);
   void AdjustRateMovieReq(int delta = 1);
   void AdjustRateMovieRecursivelyReq(int delta = 1);

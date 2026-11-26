@@ -18,6 +18,7 @@
 #include "RatingStarsWidget.h"
 #include "TagEditorSideBar.h"
 #include "StringTool.h"
+#include "RateHelper.h"
 
 using namespace ViewTypeTool;
 ViewsStackedWidget::ViewsStackedWidget(CurrentRowPreviewer* previewFolder, QWidget* parent)
@@ -152,6 +153,12 @@ bool ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) {
 void ViewsStackedWidget::subscribe() {
   connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ViewsStackedWidget::onAfterDirectoryLoaded);
   connect(_previewFolder, &CurrentRowPreviewer::forwardPlaySiblingMediaRequested, this, &ViewsStackedWidget::LocateToSpecifiedFile);
+
+  auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
+  connect(&rateInst, &RateActions::RateMovieReq, this, &ViewsStackedWidget::setRatingForCurrentSelection);
+  connect(&rateInst, &RateActions::RateMovieRecursivelyReq, this, &ViewsStackedWidget::setRatingForCurrentViewRoot);
+  connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &ViewsStackedWidget::adjustRatingForCurrentSelection);
+  connect(&rateInst, &RateActions::AdjustRateMovieRecursivelyReq, this, &ViewsStackedWidget::adjustRatingForCurrentViewRoot);
 }
 
 void ViewsStackedWidget::BindNavigationAddressBar(NavigationAndAddressBar* addressBar) {
@@ -954,4 +961,117 @@ QAbstractItemView* ViewsStackedWidget::GetCurView() const {
       return nullptr;
     }
   }
+}
+
+int ViewsStackedWidget::setRatingForCurrentSelection(int newRating, bool overwriteExisting) {
+  int affectedRows{0}, shouldAffectedRows{0};
+  auto vt = GetVt();
+  switch (vt) {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE:
+    case ViewType::SEARCH:
+    case ViewType::MOVIE: {
+      // LIST/TABLE/TREE三视图和SEARCH都去直接改json就行
+      // MOVIE本身数据来自于json, 直接去修改字段还是需要写入json, 否则删表后无法恢复, 没有收益, 建议写入json再重新载入
+      const QStringList paths = getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY);
+      std::tie(affectedRows, shouldAffectedRows) = RateHelper::SetFilesRate(paths, newRating, overwriteExisting);
+      break;
+    }
+    case ViewType::SCENE: {
+      // 自动写入内存, json, scn
+      QModelIndexList sourceIndexes = m_sceneListView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_scenesModel->onSetSceneRateForSelectedIndexes(sourceIndexes, newRating, overwriteExisting);
+      break;
+    }
+    case ViewType::JSON: {
+      // 暂时写入内存, 需要用户自行保存
+      QModelIndexList sourceIndexes = m_jsonTableView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_jsonModel->onSetJsonRateForSelectedIndexes(sourceIndexes, newRating, overwriteExisting);
+      break;
+    }
+    case ViewType::CAST: {
+      // 暂时写入内存, 需要用户自行提交
+      QModelIndexList sourceIndexes = m_castTableView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_castDbModel->onSetCastRateForSelectedIndexes(sourceIndexes, newRating, overwriteExisting);
+      break;
+    }
+    default: {
+      LOG_D("ViewType[%s] does not support setRatingForCurrentSelection", ViewTypeTool::c_str(vt));
+      return 0;
+    }
+  }
+  LOG_OE_P(affectedRows >= 0, "Set Rate", "%d/%d movie(s) have been rate to %d", affectedRows, shouldAffectedRows, newRating);
+  return affectedRows;
+}
+
+int ViewsStackedWidget::setRatingForCurrentViewRoot(bool overwriteExisting) {
+  QAbstractItemView* pView = GetCurView();
+  CHECK_NULLPTR_RETURN_INT(pView, -1)
+
+  const QString rootPath{getRootPath()};
+  bool bUserConfirm{false};
+  int newRating{-1};
+  std::tie(bUserConfirm, newRating) = RateActions::AskUserForNewRateValue(rootPath, overwriteExisting, this);
+  if (!bUserConfirm) {
+    LOG_INFO_NP("User cancel rate recursively", rootPath);
+    return 0;
+  }
+  pView->selectAll();
+  return setRatingForCurrentSelection(newRating, overwriteExisting);
+}
+
+int ViewsStackedWidget::adjustRatingForCurrentSelection(int deltaRating) {
+  int affectedRows{0}, shouldAffectedRows{0};
+  auto vt = GetVt();
+  switch (vt) {
+    case ViewType::LIST:
+    case ViewType::TABLE:
+    case ViewType::TREE:
+    case ViewType::SEARCH:
+    case ViewType::MOVIE: {
+      // LIST/TABLE/TREE三视图和SEARCH都去直接改json就行
+      // MOVIE本身数据来自于json, 直接去修改字段还是需要写入json, 否则删表后无法恢复, 没有收益, 建议写入json再重新载入
+      const QStringList paths = getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY);
+      std::tie(affectedRows, shouldAffectedRows) = RateHelper::AdjustFilesRate(paths, deltaRating);
+      break;
+    }
+    case ViewType::SCENE: {
+      // 自动写入内存, json, scn
+      QModelIndexList sourceIndexes = m_sceneListView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_scenesModel->onAdjustSceneRateForSelectedIndexes(sourceIndexes, deltaRating);
+      break;
+    }
+    case ViewType::JSON: {
+      // 暂时写入内存, 需要用户自行保存
+      QModelIndexList sourceIndexes = m_jsonTableView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_jsonModel->onAdjustJsonRateForSelectedIndexes(sourceIndexes, deltaRating);
+      break;
+    }
+    case ViewType::CAST: {
+      // 暂时写入内存, 需要用户自行提交
+      QModelIndexList sourceIndexes = m_castTableView->selectedRowsSource();
+      shouldAffectedRows = sourceIndexes.size();
+      affectedRows = m_castDbModel->onAdjustCastRateForSelectedIndexes(sourceIndexes, deltaRating);
+      break;
+    }
+    default: {
+      LOG_D("ViewType[%s] does not support setRatingForCurrentSelection", ViewTypeTool::c_str(vt));
+      return 0;
+    }
+  }
+  LOG_OE_P(affectedRows >= 0, "Adjust Rate", "%d/%d movie(s) rate += (%d)", affectedRows, shouldAffectedRows, deltaRating);
+  return affectedRows;
+}
+int ViewsStackedWidget::adjustRatingForCurrentViewRoot(int deltaRating) {
+  if (QAbstractItemView* pView = GetCurView()) {
+    pView->selectAll();
+    return adjustRatingForCurrentSelection(deltaRating);
+  }
+  return -1;
 }

@@ -9,6 +9,7 @@
 #include "FileBatchOps.h"
 #include "SceneMixed.h"
 #include "JsonUpdater.h"
+#include "JsonFieldBoundary.h"
 #include "Logger.h"
 
 #include <QIcon>
@@ -210,6 +211,15 @@ QString JsonTableModel::fullInfo(const QModelIndex& index) const {
     return {};
   }
   return mCachedJsons[row].GetJsonBA();
+}
+
+int JsonTableModel::rateAtIndex(const QModelIndex& index) const {
+  int row = index.row();
+  if (row < 0 || row >= rowCount()) {
+    LOG_W("row: %d out of range", row);
+    return -1;
+  }
+  return mCachedJsons[row].m_Rate;
 }
 
 QStringList JsonTableModel::RelativePath2JsonFile(const QModelIndexList& indexes) const {
@@ -949,4 +959,35 @@ JsonOp::Counter JsonTableModel::UpdateJsonKeyValuePair() {
   emit dataChanged(frontInd, backInd, {Qt::DisplayRole | Qt::ForegroundRole});
   emit headerDataChanged(Qt::Vertical, minRow, maxRow);
   return counter;
+}
+
+int JsonTableModel::onSetJsonRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    if (oldRate > JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V && !bOverrideAlreadyInitialized) {
+      continue;
+    }
+    if (newRate == oldRate) {
+      continue;
+    }
+    affectedRowsCnt += (int)setData(index.siblingAtColumn(JsonModelField::FIELD_E::Rate), newRate, Qt::EditRole);
+  }
+  return affectedRowsCnt;
+}
+
+int JsonTableModel::onAdjustJsonRateForSelectedIndexes(const QModelIndexList& indexes, int delta) {
+  if (indexes.isEmpty() || delta == 0) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    const int newRate = oldRate + delta;
+    affectedRowsCnt += (int)setData(index.siblingAtColumn(JsonModelField::FIELD_E::Rate), newRate, Qt::EditRole);
+  }
+  return affectedRowsCnt;
 }

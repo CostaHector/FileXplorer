@@ -119,11 +119,11 @@ bool RateActions::onRateActionTriggered(const QAction* pActTriggered) {
     LOG_W("data property in QAction is not a number");
     return false;
   }
-  emit RateMovieReq(newRate);
+  emit RateMovieReq(newRate, false);
   return true;
 }
 
-int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) {
+std::pair<bool, int> RateActions::AskUserForNewRateValue(const QString& rootPath, bool bOverrideForce, QWidget* parent) {
   const QString title{bOverrideForce ? "Rate All Movies - Overwrite Existing" : "Rate Unrated Movies Only"};
   QString message{QString::asprintf("Set rating for movies in:\n%s\n\n", qPrintable(rootPath))};
   message += bOverrideForce ? "This will overwrite ALL existing ratings." : "Only movies without ratings or current rating value is 0 will be affected.";
@@ -134,13 +134,23 @@ int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverride
   int newRate{defaultRate};
   std::tie(bAccept, newRate) = InputDialogHelper::GetIntWithInitial(parent, title, message, defaultRate, JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, JsonFieldBoundary::RATE_MAX_V, 1);
   if (!bAccept) {
-    LOG_INFO_NP("User cancel rate recursively", rootPath);
-    return 0;
+    return {false, 0};
   }
   if (newRate != defaultRate) {
     setConfig(VideoPlayerKey::RATE_MOVIE_DEFAULT_VALUE, newRate);
   }
-  const int succeedCnt = RateHelper::SetFileRateRecursively(rootPath, newRate, bOverrideForce);
-  LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRate, bOverrideForce);
+  return {true, newRate};
+}
+
+int RateActions::onRateMoviesRecursively(const QString& rootPath, bool bOverrideForce, QWidget* parent) {
+  bool userConfirm{false};
+  int newRateValue{-1};
+  std::tie(userConfirm, newRateValue) = AskUserForNewRateValue(rootPath, bOverrideForce, parent);
+  if (!userConfirm) {
+    LOG_INFO_NP("User cancel rate recursively", rootPath);
+    return 0;
+  }
+  const int succeedCnt = RateHelper::SetFileRateRecursively(rootPath, newRateValue, bOverrideForce);
+  LOG_OE_P(succeedCnt > 0, "Rate movie(s)", "%d item(s) have been rate to %d, override: %d", succeedCnt, newRateValue, bOverrideForce);
   return succeedCnt;
 }

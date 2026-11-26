@@ -90,6 +90,18 @@ class ViewsStackedWidget : public QStackedWidget {
   QFileInfo getFileInfoAtIndex(const QModelIndex& ind, SelectionUsage usage=SelectionUsage::DEFAULT) const;
   QAbstractItemView* GetCurView() const;
 
+  /// set rating for (currently selected items)/(all items under current view root path)
+  /// @param overwriteExisting: true = overwrite when rating field already exists and it's value > 0; false = skip existing rating
+  /// return: affected item count
+  /// return: affected item count
+  int setRatingForCurrentSelection(int newRating, bool overwriteExisting=false);
+  int setRatingForCurrentViewRoot(bool overwriteExisting);
+  /// adjust rating (+/- delta) for (currently selected items)/(all items under current view root path)
+  /// if rating field missing, treat original rating as 0
+  /// return: affected item count
+  int adjustRatingForCurrentSelection(int deltaRating);
+  int adjustRatingForCurrentViewRoot(int deltaRating);
+
  public:
   struct Anchor {
     int row;

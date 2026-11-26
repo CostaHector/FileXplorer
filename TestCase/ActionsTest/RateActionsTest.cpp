@@ -52,7 +52,7 @@ class RateActionsTest : public PlainTestSuite {
 
       QVERIFY(inst.onRateActionTriggered(firstAct));
       QCOMPARE(rateMovieReqSpy.count(), 1);
-      QCOMPARE(rateMovieReqSpy.takeLast(), (QVariantList{expectNewRate}));
+      QCOMPARE(rateMovieReqSpy.takeLast(), (QVariantList{QVariant{expectNewRate}, QVariant{false}}));
 
       bool bNotContainData{false};
       QAction emptyAct;

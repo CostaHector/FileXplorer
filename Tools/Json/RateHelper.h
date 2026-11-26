@@ -7,11 +7,11 @@
 class RateHelper {
  public:
   static bool SetFileRate(const QString& fileAbsPath, int rate);
-  static int SetFilesRate(const QStringList& fileAbsPathList, int rate);
+  static std::pair<int, int> SetFilesRate(const QStringList& fileAbsPathList, int rate, bool bOverrideForce);
   static int SetFileRateRecursively(const QString& folderAbsPath, int rate, bool bOverrideForce = true);
 
   static bool AdjustFileRate(const QString& fileAbsPath, int delta = 1, int* newRateValue = nullptr);
-  static int AdjustFilesRate(const QStringList& fileAbsPathList, int delta = 1);
+  static std::pair<int, int> AdjustFilesRate(const QStringList& fileAbsPathList, int delta = 1);
   static int AdjustFileRateRecursively(const QString& folderAbsPath, int delta = 1);
 
   static const QPixmap& GetRatePixmap(int rate);

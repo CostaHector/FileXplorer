@@ -47,6 +47,9 @@ public:
 
   int DumpRecordsIntoPsonFile(const QModelIndexList& selectedRows);
 
+  int onSetCastRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized);
+  int onAdjustCastRateForSelectedIndexes(const QModelIndexList& indexes, int delta);
+
   bool submitSaveAllChanges();
   bool revertAllChanges();
 

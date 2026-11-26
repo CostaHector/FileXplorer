@@ -36,7 +36,7 @@ class ScenesListModel : public QAbstractListModelPub {
   QStringList RelativePath2JsonFile(const QModelIndexList& indexes) const;
   QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes) const;
 
-  int GetRate(const QModelIndex& index) const;
+  int rateAtIndex(const QModelIndex& index) const;
   QStringList GetImgs(const QModelIndex& index) const;
   QStringList GetVids(const QModelIndex& index) const;
   QString GetVid(const QModelIndex& index) const;
@@ -52,6 +52,8 @@ class ScenesListModel : public QAbstractListModelPub {
   void pagesCountChanged(int newPagesCount);
 
  public slots:
+  int onSetSceneRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized);
+  int onAdjustSceneRateForSelectedIndexes(const QModelIndexList& indexes, int delta);
   bool onScenesCountsPerPageChanged(int scenesCntInAPage);
   bool onPageIndexChanged(int newPageIndex);
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);

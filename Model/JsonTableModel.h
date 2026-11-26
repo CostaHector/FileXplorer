@@ -25,6 +25,7 @@ class JsonTableModel : public QAbstractTableModelPub {
   QString fileBaseName(const QModelIndex& index) const;
   QString absolutePath(const QModelIndex& index) const;
   QString fullInfo(const QModelIndex& index) const;
+  int rateAtIndex(const QModelIndex& index) const;
   QStringList RelativePath2JsonFile(const QModelIndexList& indexes) const;
   QStringList RelativePath2RelatedFiles(const QModelIndexList& indexes, QMap<QString, QString>* pFile2Json=nullptr) const;
   QMap<QString, QStringList> RelativePath2JsonFile2CastList(const QModelIndexList& indexes) const;
@@ -44,6 +45,8 @@ class JsonTableModel : public QAbstractTableModelPub {
   int AppendCastFromSentence(const QModelIndex& ind, const QString& sentence, bool isUpperCaseSentence);
   int SetRecordContentsFixed(const QModelIndexList& rowIndexes, bool bFixed=true);
   JsonOp::Counter UpdateJsonKeyValuePair();
+  int onSetJsonRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized);
+  int onAdjustJsonRateForSelectedIndexes(const QModelIndexList& indexes, int delta);
 
   int AfterJsonFilesNameRenamed(const QModelIndexList& indexes);
   int SaveCurrentChanges(const QModelIndexList& rowIndexes);

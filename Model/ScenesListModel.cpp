@@ -20,7 +20,7 @@ ScenesListModel::ScenesListModel(const QString& listViewName, QObject* object) /
       std::bind(&ScenesListModel::beginResetModel, this),                             //
       std::bind(&ScenesListModel::endResetModel, this),                               //
       std::bind(&ScenesListModel::EmitPagesCountChanged, this, std::placeholders::_1) //
-  );
+      );
 }
 
 bool ScenesListModel::initSortSetting(SceneInfo::Role newSortDimension, bool bResultReverse) {
@@ -102,33 +102,27 @@ bool ScenesListModel::ModifySceneInfoRateValue(const QModelIndex& index, int new
     return false;
   }
   SceneInfo& item = mPagedData[i];
-  const int beforeRate = item.rate;
-  if (beforeRate == newRate) {
-    LOG_INFO_P("Rate no need change", "value remains %d", beforeRate);
+  if (item.rate == newRate) {
+    LOG_INFO_P("Rate no need change", "value remains %d", item.rate);
     return true;
   }
-  item.rate = newRate;
-  emit dataChanged(index, index, {SceneInfo::Role::RATE_ROLE});
+
+  const QString jsonAbsFilePath = GetJson(index);
+  if (!RateHelper::SetFileRate(jsonAbsFilePath, newRate)) {
+    LOG_ERR_P("Set rate failed", "Json[%s] RateValue %d to %d", qPrintable(jsonAbsFilePath), item.rate, newRate);
+    return false;
+  }
 
   const QString scnAbsFilePath = GetScn(index);
-  const QString eleRel2Scn = item.rel2scn;
-  const QString eleBaseName = item.name;
+  const QString sceneName = item.name;
+  if (!SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, sceneName, newRate)) {
+    LOG_ERR_P("Set rate failed", "SceneFile[%s] NameField[%s] RateValue %d to %d", qPrintable(scnAbsFilePath), qPrintable(sceneName), item.rate, newRate);
+    return false;
+  }
 
-  const bool bScnUpdatedOk = SceneHelper::UpdateNameWithNewRate(scnAbsFilePath, eleBaseName, newRate);
-  const QString jsonAbsFilePath = GetJson(index);
-  const bool bJsonUpdatedOk = RateHelper::SetFileRate(jsonAbsFilePath, newRate);
-  const bool bothUpdatedOk{bScnUpdatedOk && bJsonUpdatedOk};
-
-  LOG_OE_P(bothUpdatedOk,
-           "Rate Modify",
-           "[%s%s] from %d to %d [bScnOk: %d, bJsonOk: %d]", //
-           qPrintable(eleRel2Scn),
-           qPrintable(eleBaseName), //
-           beforeRate,
-           newRate,
-           bScnUpdatedOk,
-           bJsonUpdatedOk);
-  return bothUpdatedOk;
+  item.rate = newRate;
+  emit dataChanged(index, index, {SceneInfo::Role::RATE_ROLE});
+  return true;
 }
 
 QFileInfo ScenesListModel::fileInfo(const QModelIndex& index, SelectionUsage usage) const {
@@ -225,7 +219,7 @@ bool ScenesListModel::setRootPath(const QString& rootPath, bool bSubdirectories,
   return true;
 }
 
-int ScenesListModel::GetRate(const QModelIndex& index) const {
+int ScenesListModel::rateAtIndex(const QModelIndex& index) const {
   int i{-1};
   if (!mPagedData.isLocalIndexValid(index, i)) {
     return 0;
@@ -270,7 +264,7 @@ std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> ScenesListModel::movieRa
   const int N = rootPath().size();
   for (const QModelIndex& index : indexes) {
     const QString& fullPath = GetJson(index);
-    const int rate = GetRate(index);
+    const int rate = rateAtIndex(index);
     if (rate == JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V) {
       continue;
     }
@@ -278,6 +272,38 @@ std::array<QStringList, JsonFieldBoundary::RATE_BUTT_V> ScenesListModel::movieRa
     movieRate2JsonsArr[rate].push_back(PathTool::relativePath(fullPath, N));
   }
   return movieRate2JsonsArr;
+}
+
+// return value: changed or not
+int ScenesListModel::onSetSceneRateForSelectedIndexes(const QModelIndexList& indexes, int newRate, bool bOverrideAlreadyInitialized) {
+  if (indexes.isEmpty()) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    if (oldRate > JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V && !bOverrideAlreadyInitialized) {
+      continue;
+    }
+    if (newRate == oldRate) {
+      continue;
+    }
+    affectedRowsCnt += (int)setData(index, newRate, SceneInfo::Role::RATE_ROLE);
+  }
+  return affectedRowsCnt;
+}
+
+int ScenesListModel::onAdjustSceneRateForSelectedIndexes(const QModelIndexList& indexes, int delta) {
+  if (indexes.isEmpty() || delta == 0) {
+    return 0;
+  }
+  int affectedRowsCnt = 0;
+  for (const QModelIndex& index : indexes) {
+    const int oldRate = rateAtIndex(index);
+    const int newRate = oldRate + delta;
+    affectedRowsCnt += (int)setData(index, newRate, SceneInfo::Role::RATE_ROLE);
+  }
+  return affectedRowsCnt;
 }
 
 bool ScenesListModel::onScenesCountsPerPageChanged(int newPerPage) {

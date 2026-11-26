@@ -262,7 +262,7 @@ void SceneListView::mousePressEvent(QMouseEvent* event) {
     const QRect imageRect{mAlignDelegate->GetRatingAreaRect(visualRect(proIndex))};
     emit sceneGridClicked(proIndex, imageRect, pos);
   }
-  QListView::mousePressEvent(event);
+  CustomListView::mousePressEvent(event);
 }
 
 void SceneListView::keyPressEvent(QKeyEvent* e) {

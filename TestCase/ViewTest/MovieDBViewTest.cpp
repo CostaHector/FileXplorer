@@ -466,7 +466,7 @@ private slots:
     QVERIFY(movieView.onScanFilesUnderPath(MovieDBModelField::ScanFilesTypeE::VIDEOS));
     QCOMPARE(dbModel.rowCount(), 2);
 
-    MOCKER(FdBasedDbModel::setDataStatic).expects(never());
+    MOCKER(FdBasedDbModel::setDataStatic).expects(never()).will(ignoreReturnValue());
 
     movieView.selectionModel()->clear();
     auto& inst = MovieDBActions::GetInst();

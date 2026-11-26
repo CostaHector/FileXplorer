@@ -58,12 +58,9 @@
 #include "ComplexOperation.h"
 #include "CreateFileFolderHelper.h"
 #include "JsonRenameRegex.h"
-#include "RateActions.h"
-#include "RateHelper.h"
 #include "RelatedHelper.h"
 #include "TagsHelper.h"
 #include "JsonHelper.h"
-#include "RecycleCfmDlg.h"
 #include "RowHeightRegistry.h"
 
 #include "ImageTool.h"
@@ -354,40 +351,6 @@ bool FileXplorerEvent::on_verifyFileByPar2() {
   return bSucceed2VryInfo.first;
 }
 
-bool FileXplorerEvent::onRateMovie(int newRate) const {
-  const QStringList& paths = _contentPane->getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
-  if (paths.isEmpty()) {
-    LOG_INFO_NP("[Skip] No selection", "Select some items first");
-    return false; // selection some row first
-  }
-  const int succeedCnt{RateHelper::SetFilesRate(paths, newRate)};
-  LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been rate to %d", succeedCnt, newRate);
-  return succeedCnt > 0;
-}
-
-bool FileXplorerEvent::onRateMoviesRecursively(bool bOverrideForce) const {
-  const QString rootPath{_contentPane->getRootPath()};
-  return RateActions::onRateMoviesRecursively(rootPath, bOverrideForce, _contentPane) > 0;
-}
-
-bool FileXplorerEvent::onAdjustRateMovie(int delta) const {
-  const QStringList& paths = _contentPane->getFileFullPaths(SelectionUsage::RELATED_JSON_ONLY); // based on json
-  if (paths.isEmpty()) {
-    LOG_INFO_NP("[Skip] No selection", "Select some items first");
-    return false;
-  }
-
-  const int succeedCnt{RateHelper::AdjustFilesRate(paths, delta)};
-
-  LOG_OE_P(succeedCnt > 0, "Rated", "%d movie(s) have been adjust[%d]", succeedCnt, delta);
-  return succeedCnt > 0;
-}
-
-bool FileXplorerEvent::onAdjustRateMoviesRecursively(int delta) const {
-  const QString rootPath{_contentPane->getRootPath()};
-  return RateHelper::AdjustFileRateRecursively(rootPath, delta) > 0;
-}
-
 int FileXplorerEvent::onAddRemoveTags(const QString& tags, bool bCheckOrUncheck) {
   if (_contentPane->GetVt() == ViewTypeTool::ViewType::JSON) {
     return _contentPane->m_jsonTableView->onAddRemoveTags(tags, bCheckOrUncheck);
@@ -661,14 +624,6 @@ void FileXplorerEvent::subscribe() {
     connect(viewInst._HAR_VIEW, &QAction::triggered, this, &FileXplorerEvent::on_HarView);
     connect(viewInst._SYS_VIDEO_PLAYERS, &QAction::triggered, this, &FileXplorerEvent::on_PlayVideo);
     connect(viewInst._ROW_HEIGHT, &QAction::triggered, this, &FileXplorerEvent::on_RowHeightChanged);
-  }
-
-  {
-    auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
-    connect(&rateInst, &RateActions::RateMovieReq, this, &FileXplorerEvent::onRateMovie);
-    connect(&rateInst, &RateActions::RateMovieRecursivelyReq, this, &FileXplorerEvent::onRateMoviesRecursively);
-    connect(&rateInst, &RateActions::AdjustRateMovieReq, this, &FileXplorerEvent::onAdjustRateMovie);
-    connect(&rateInst, &RateActions::AdjustRateMovieRecursivelyReq, this, &FileXplorerEvent::onAdjustRateMoviesRecursively);
   }
 
   connect(&TagsHelper::GetInst(), &TagsHelper::reqAddRmvTags, this, &FileXplorerEvent::onAddRemoveTags);

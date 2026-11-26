@@ -91,15 +91,20 @@ void RatingStateMachine::ClickSameOneRateBarWhenShow(SceneStyleDelegate& delegat
                                                      const QRect& visualRect,
                                                      const QPoint& clickedPnt) {
   mRateData.newRateValue = RateHelper::ratingAtPosition(clickedPnt, visualRect);
-  if (mRateData.newRateValue != mRateData.oldRateValue) {  // 评分真实改变了
-    // 去修改json/scn 二进制
-    if (QAbstractItemModel* model = const_cast<QAbstractItemModel*>(nowInd.model())) {
-      bool bResult = model->setData(nowInd, mRateData.newRateValue, SceneInfo::Role::RATE_ROLE);
-      if (bResult) {
-        emit delegate.cellVisualUpdateRequested(nowInd);
-      }
-    }
+  if (mRateData.newRateValue == mRateData.oldRateValue) {
+    return;
   }
+  // 评分真实改变了, 去修改json/scn 二进制
+  QAbstractItemModel* model = const_cast<QAbstractItemModel*>(nowInd.model());
+  if (model == nullptr) {
+    return;
+  }
+  const bool bResult = model->setData(nowInd, mRateData.newRateValue, SceneInfo::Role::RATE_ROLE);
+  if (!bResult) {
+    return;
+  }
+  mRateData.oldRateValue = mRateData.newRateValue;
+  emit delegate.cellVisualUpdateRequested(nowInd);
 }
 void RatingStateMachine::ClickSameOneNotRateBarWhenShow(SceneStyleDelegate& delegate,
                                                         const QModelIndex& nowInd,

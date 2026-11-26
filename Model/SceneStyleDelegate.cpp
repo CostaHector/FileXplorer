@@ -59,6 +59,22 @@ void SceneStyleDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   // 4. Current rate
   const int rating = index.data(SceneInfo::Role::RATE_ROLE).toInt();
   drawCurrentRateSquare(painter, option.rect, rating);
+
+  // 5. Select/Hover Indicator
+  {
+    painter->save();
+    const bool bSelected{(option.state & QStyle::State_Selected) != 0};
+    const bool bHovered{(option.state & QStyle::State_MouseOver) != 0};
+    painter->setBrush(Qt::NoBrush);
+    if (bSelected) {
+      painter->setPen(QPen{QColor{0xFF, 0xC8, 0x00}, 2});
+      painter->drawRect(option.rect);
+    } else if (bHovered) {
+      painter->setPen(QPen{QColor{255, 255, 255, 150}, 1});
+      painter->drawRect(option.rect);
+    }
+    painter->restore();
+  }
 }
 
 void SceneStyleDelegate::drawCurrentRateSquare(QPainter* painter, QRect currentRateTextRect, int rating) {

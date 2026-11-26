@@ -50,10 +50,6 @@ private:
   bool on_createFilePar2Automatic();
   bool on_verifyFileByPar2();
 
-  bool onRateMovie(int newRate) const;
-  bool onRateMoviesRecursively(bool bOverrideForce) const;
-  bool onAdjustRateMovie(int delta) const;
-  bool onAdjustRateMoviesRecursively(int delta) const;
   int onAddRemoveTags(const QString& tags, bool bCheckOrUncheck);
 
   QStringList FsmSelectedItems() const;
