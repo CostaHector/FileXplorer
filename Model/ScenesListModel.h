@@ -26,6 +26,9 @@ class ScenesListModel : public QAbstractListModelPub {
   int rowCount(const QModelIndex& /*parent*/ = {}) const override { return mPagedData.GetLocalEleCnt(); }
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+  Qt::ItemFlags flags(const QModelIndex& /*index*/) const override {
+    return Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable | Qt::ItemFlag::ItemIsEditable;
+  }
 
   /* Anchor: SceneInfo */
   QFileInfo fileInfo(const QModelIndex& index, SelectionUsage usage = SelectionUsage::DEFAULT) const;

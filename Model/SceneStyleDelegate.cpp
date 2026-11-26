@@ -6,8 +6,10 @@
 #include "DataFormatter.h"
 #include "VideoTierTool.h"
 
+#include <QAbstractProxyModel>
 #include <QApplication>
 #include <QPainter>
+#include <QSpinBox>
 
 void SceneStyleDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
   CHECK_NULLPTR_RETURN_VOID(option);
@@ -171,4 +173,48 @@ void SceneStyleDelegate::drawMeta(QPainter* painter, const QRect& rect, const QM
   painter->drawText(rect, Qt::AlignRight | Qt::AlignVCenter, DataFormatter::formatFileSizeGMKB(vidSize));
 
   painter->restore();
+}
+
+QWidget *SceneStyleDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
+  QSpinBox* editor = new QSpinBox(parent);
+  editor->setRange(JsonFieldBoundary::RATE_MIN_UNINITIALIZED_V, JsonFieldBoundary::RATE_MAX_V);
+  editor->setPrefix(QString::number(editor->minimum()) + "<=");
+  editor->setSuffix("<" + QString::number(editor->maximum() + 1));
+
+  SceneStyleDelegate* self = const_cast<SceneStyleDelegate*>(this);
+
+  using VALUE_CHANGED_PARMS_INT_VERSION = void(QSpinBox::*)(int);
+  connect(editor, (VALUE_CHANGED_PARMS_INT_VERSION)&QSpinBox::editingFinished, self, [self, editor]() {
+    emit self->commitData(editor);
+    emit self->closeEditor(editor, QAbstractItemDelegate::SubmitModelCache);
+  });
+
+  return editor;
+}
+
+void SceneStyleDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+  auto* e = qobject_cast<QSpinBox*>(editor);
+  if (!e) return;
+  e->setValue(index.data(SceneInfo::Role::RATE_ROLE).toInt());
+}
+
+void SceneStyleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+  auto* e = qobject_cast<QSpinBox*>(editor);
+  if (!e) return;
+
+  QModelIndex srcIndex = index;
+  QAbstractItemModel *targetModel = model;
+  if (auto *proxy = qobject_cast<QAbstractProxyModel *>(model)) {
+    // 如果用了代理， 那就获取原模型和再原模型中的index
+    srcIndex = proxy->mapToSource(index);
+    targetModel = proxy->sourceModel();
+  }
+  if (!srcIndex.isValid() || !targetModel) {
+    return;
+  }
+  targetModel->setData(srcIndex, e->value(), SceneInfo::Role::RATE_ROLE);
+}
+
+void SceneStyleDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const {
+  editor->setGeometry(option.rect);
 }

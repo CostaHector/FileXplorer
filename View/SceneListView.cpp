@@ -249,6 +249,7 @@ bool SceneListView::onClickEvent(const QModelIndex& current) {
 }
 
 void SceneListView::initExclusivePreferenceSetting() {
+  CustomListView::m_defaultEditTrigger = EditTrigger::EditKeyPressed;
   CustomListView::m_defaultFlowLeft2Right = true;
   CustomListView::m_defaultViewModeIcon = true;
   CustomListView::m_defaultWrapping = true;
