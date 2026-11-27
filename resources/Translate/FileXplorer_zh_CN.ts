@@ -216,7 +216,7 @@
 <context>
     <name>CastDBActions</name>
     <message>
-        <location filename="../../Actions/CastDBActions.cpp" line="+19"/>
+        <location filename="../../Actions/CastDBActions.cpp" line="+20"/>
         <source>Insert a row</source>
         <translation>插入一行</translation>
     </message>
@@ -301,7 +301,7 @@
         <translation>写入所有变更到pson</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+15"/>
         <source>Insert</source>
         <translation>插入</translation>
     </message>
@@ -803,7 +803,12 @@
         <translation>复制到</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+8"/>
+        <source>Restart watcher</source>
+        <translation>重启监控</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Recycle</source>
         <translation>回收</translation>
     </message>
@@ -883,12 +888,12 @@
         <translation>重做</translation>
     </message>
     <message>
-        <location line="-35"/>
+        <location line="-41"/>
         <source>New Json from Nfo</source>
         <translation>根据Nfo生成Json</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+32"/>
         <source>Show recycle confirmation</source>
         <translation>回收前确认</translation>
     </message>
@@ -1554,7 +1559,7 @@
         <translation>审计</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+13"/>
         <source>Export to EFU</source>
         <translation>导出到EFU</translation>
     </message>
@@ -2440,7 +2445,7 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>SceneListView</name>
     <message>
-        <location filename="../../View/SceneListView.cpp" line="+45"/>
+        <location filename="../../View/SceneListView.cpp" line="+41"/>
         <source>Play this folder</source>
         <translation>播放此文件夹</translation>
     </message>
@@ -2448,22 +2453,12 @@ You may need &apos;Sync PAR2 Built-in Source File List&apos; instead.</source>
 <context>
     <name>ScenePageControl</name>
     <message>
-        <location filename="../../Component/ScenePageControl.cpp" line="+30"/>
+        <location filename="../../Component/ScenePageControl.cpp" line="+63"/>
         <source>First Page</source>
         <translation>首页</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Previous Page</source>
-        <translation>前一页</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Next Page</source>
-        <translation>后一页</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Last Page</source>
         <translation>尾页</translation>
     </message>

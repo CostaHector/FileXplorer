@@ -259,6 +259,7 @@ QToolBar* RibbonMenu::LeafHome() const {
   leafHomeWid->addSeparator();
   leafHomeWid->addWidget(moveCopyItemsToTB);
   leafHomeWid->addSeparator();
+  leafHomeWid->addAction(fileOpInst._RESTART_FILE_SYSTEM_WATCHER);
   leafHomeWid->addAction(fileOpInst._UNLOCK_OCCUPIED_FILES);
   leafHomeWid->addWidget(fileOpInst.GetDeleteItemsToolButton(leafHomeWid));
   leafHomeWid->addWidget(renameItemsTB);

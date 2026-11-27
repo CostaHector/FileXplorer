@@ -46,6 +46,12 @@ FileOpActs::FileOpActs(QObject* parent)
 
   InitFileStructureActions();
 
+  _RESTART_FILE_SYSTEM_WATCHER = new (std::nothrow) QAction{QIcon{":img/REFRESH_THIS_PATH"}, tr("Restart watcher"), this};
+  _RESTART_FILE_SYSTEM_WATCHER->setShortcutVisibleInContextMenu(true);
+  _RESTART_FILE_SYSTEM_WATCHER->setToolTip("Restart the internal file system watcher for the current root path."
+                                           "This releases any file handles held by the watcher, "
+                                           "which may unlock files that remain 'in use' after a failed rename or delete operation.");
+
   _UNLOCK_OCCUPIED_FILES = new (std::nothrow) QAction{QIcon{":img/_UNLOCK_OCCUPIED_FILES"}, tr("Unlock Occupied Files"), this};
   _UNLOCK_OCCUPIED_FILES->setShortcutVisibleInContextMenu(true);
   _UNLOCK_OCCUPIED_FILES->setToolTip("Release occupied files and folders to allow renaming, moving, recycling, or deleting them.");

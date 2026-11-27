@@ -59,6 +59,7 @@ class ViewsStackedWidget : public QStackedWidget {
   void on_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
   bool onAfterDirectoryLoaded(const QString& loadedPath);
   bool LocateToSpecifiedFile(int step);
+  void RestartFileSystemWatcher();
 
   void keyPressEvent(QKeyEvent* e) override;
 

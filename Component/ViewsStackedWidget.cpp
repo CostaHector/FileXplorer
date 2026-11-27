@@ -2,6 +2,7 @@
 #include "ViewActions.h"
 #include "ArchiveFiles.h"
 #include "ArchiveFilesActions.h"
+#include "FileOpActs.h"
 #include "NotificatorMacro.h"
 #include "HarFiles.h"
 #include "FileImageViewer.h"
@@ -153,6 +154,11 @@ bool ViewsStackedWidget::on_searchEnterKey(const QString& targetStr) {
 void ViewsStackedWidget::subscribe() {
   connect(m_fsModel, &FileSystemModel::directoryLoaded, this, &ViewsStackedWidget::onAfterDirectoryLoaded);
   connect(_previewFolder, &CurrentRowPreviewer::forwardPlaySiblingMediaRequested, this, &ViewsStackedWidget::LocateToSpecifiedFile);
+
+  {
+    auto& fileOpInst = FileOpActs::GetInst();
+    connect(fileOpInst._RESTART_FILE_SYSTEM_WATCHER, &QAction::triggered, this, &ViewsStackedWidget::RestartFileSystemWatcher);
+  }
 
   auto& rateInst = RateActions::GetInst(RateActions::RateRequestFrom::FILE_XPLORER);
   connect(&rateInst, &RateActions::RateMovieReq, this, &ViewsStackedWidget::setRatingForCurrentSelection);
@@ -416,6 +422,20 @@ bool ViewsStackedWidget::LocateToSpecifiedFile(int step) {
 
   LOG_INFO_P("Reach First/Last", "No more video found in view[%s][step=%d]", GetCurViewName(), step);
   return false;
+}
+
+void ViewsStackedWidget::RestartFileSystemWatcher() {
+  if (!IsCurFSView()) {
+    return;
+  }
+  const QString bkpPath = m_fsModel->rootPath();
+  if (bkpPath.isEmpty()) {
+    return;
+  }
+  m_fsModel->setRootPath("");
+  m_fsModel->setRootPath(bkpPath);
+  LOG_OK_NP("Restart ok", "FileSystemWatcher");
+  return;
 }
 
 void ViewsStackedWidget::keyPressEvent(QKeyEvent* e) {

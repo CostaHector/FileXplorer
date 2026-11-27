@@ -61,7 +61,7 @@ Q_OBJECT
   QAction *FILE_STRUCTURE_QRY_BEFORE_PASTE{nullptr}, *FILE_STRUCTURE_PRESERVE{nullptr}, *FILE_STRUCTURE_FLATTEN{nullptr};
   void InitFileStructureActions();
 
-  QAction* _UNLOCK_OCCUPIED_FILES{nullptr};
+  QAction* _RESTART_FILE_SYSTEM_WATCHER{nullptr}, *_UNLOCK_OCCUPIED_FILES{nullptr};
   QActionGroup* GetDeleteActions();
   QList<QAction*> GetDeleteItemsActions() const;
   QWidget* GetDeleteItemsToolButton(QWidget* notNullParent) const;
