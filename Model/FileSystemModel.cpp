@@ -2,11 +2,10 @@
 #include "PathTool.h"
 #include "CustomStatusBar.h"
 #include "FileSystemModelField.h"
+#include "ImageTool.h"
 #include "PublicCheckMacro.h"
 #include <QMimeData>
 #include <QUrl>
-#include <QApplication>
-#include <QStyle>
 
 FileSystemModel::FileSystemModel(QObject* parent)
   : QFileSystemModel{parent} {
@@ -129,11 +128,9 @@ QVariant FileSystemModel::data(const QModelIndex& index, int role) const {
     } else if (mCopyIndexes.contains(rootPath(), index.row())) {
       static const QIcon COPY_ICON{":img/COPY_ITEM"};
       return COPY_ICON;
-    } else if (m_bThumbnailAsDecoration && isDir(index)) {
-      const QString decorationImgPath = PathTool::GetThumbnailDecorationImgPathFromFolder(filePath(index), fileName(index));
-      if (QFile::exists(decorationImgPath)) {
-        return QPixmap(decorationImgPath);
-      }
+    } else if (m_bThumbnailAsDecoration) {
+      const QString imgFullPath = coverImageFullPathAtIndex(index);
+      return ImageTool::GetPixmapFromCached(imgFullPath, 32, 32, true);
     }
     // if (QFileSystemModel::data(index, Qt::DisplayRole).toString() == "MultiPar.exe") {
     //   QVariant var = QFileSystemModel::data(index, role);
@@ -165,4 +162,11 @@ void FileSystemModel::whenDirectoryLoaded(const QString& path) {
   if (auto* pStatusBar = CustomStatusBar::GInstance()) {
     pStatusBar->onPathInfoChanged(rowCount(GetRootIndex()), 0);
   }
+}
+
+QString FileSystemModel::coverImageFullPathAtIndex(const QModelIndex& index) const {
+  if (isDir(index)) {
+    return PathTool::GetThumbnailDecorationImgPathFromFolder(filePath(index), fileName(index));
+  }
+  return filePath(index);
 }

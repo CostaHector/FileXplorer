@@ -79,6 +79,8 @@ public slots:
   void whenDirectoryLoaded(const QString& path);
 
 private:
+  QString coverImageFullPathAtIndex(const QModelIndex& index) const;
+
   void EmitBeforeDecorationRoleRevert(const SelectionsRangeHelper::ROW_RANGES_LST& beRngLst) {
     foreach (auto beRng, beRngLst) {
       if (checkIndex(beRng.first, CheckIndexOption::DoNotUseParent) || checkIndex(beRng.second, CheckIndexOption::DoNotUseParent)) {
