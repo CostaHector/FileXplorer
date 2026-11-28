@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "PublicCheckMacro.h"
 #include "SizeChangeAnimation.h"
+#include "StyleSheet.h"
 #include "SystemPath.h"
 #include "ImageTool.h"
 #include <QDir>
@@ -11,28 +12,28 @@
 constexpr int NavigationToolBar::MAXIMUM_WIDTH_WHEN_NOT_EXPAND, NavigationToolBar::MAXIMUM_WIDTH_WHEN_EXPAND;
 
 NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
-  : ToolBarWidget{QBoxLayout::Direction::Down, parent}               //
+  : QToolBar{title, parent}               //
 {
-  setObjectName(title);
-
+  setOrientation(Qt::Orientation::Vertical);
+  setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
   const bool bExpandSideBar{getConfig(CompoVisKey::EXPAND_NAVIGATION_SIDEBAR).toBool()};
 
   // 0. expand and minimum
   {
-    EXPAND_SIDEBAR = new (std::nothrow) QAction{QIcon(":img/EXPAND_SIDEBAR"), tr("Expand sidebar"), this};
+    EXPAND_SIDEBAR = addAction(QIcon(":img/EXPAND_SIDEBAR"), tr("Expand sidebar"));
     CHECK_NULLPTR_RETURN_VOID(EXPAND_SIDEBAR);
     EXPAND_SIDEBAR->setCheckable(true);
     EXPAND_SIDEBAR->setChecked(bExpandSideBar);
-    addAction(EXPAND_SIDEBAR);
+    widgetForAction(EXPAND_SIDEBAR)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
     addSeparator();
   }
 
   // 1. devices and drives
   {
-    DEVICES_AND_DRIVES = new (std::nothrow) QAction{QIcon(":img/DISKS"), tr("Devices and Drives"), this};
+    DEVICES_AND_DRIVES = addAction(QIcon(":img/DISKS"), tr("Devices and Drives"));
     CHECK_NULLPTR_RETURN_VOID(DEVICES_AND_DRIVES);
     DEVICES_AND_DRIVES->setCheckable(true);
-    addAction(DEVICES_AND_DRIVES);
+    widgetForAction(DEVICES_AND_DRIVES)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
     addSeparator();
   }
 
@@ -50,6 +51,13 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
     CHECK_NULLPTR_RETURN_VOID(pPictures)
     CHECK_NULLPTR_RETURN_VOID(pVideos)
     CHECK_NULLPTR_RETURN_VOID(pRoamingDataFolder)
+    widgetForAction(pDesktop)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    widgetForAction(pDocument)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    widgetForAction(pDownloads)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    widgetForAction(pPictures)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    widgetForAction(pVideos)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    widgetForAction(pRoamingDataFolder)->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+
     pDesktop->setData(SystemPath::HomePath() + "/Desktop");
     pDocument->setData(SystemPath::HomePath() + "/Documents");
     pDownloads->setData(SystemPath::HomePath() + "/Downloads");
@@ -85,17 +93,16 @@ NavigationToolBar::NavigationToolBar(const QString& title, QWidget* parent) //
     }
     addSeparator();
   }
-
-  setIconSize(QSize{IMAGE_SIZE::TABS_ICON_IN_MENU_24, IMAGE_SIZE::TABS_ICON_IN_MENU_24});
-  setToolButtonSizePolicy(QSizePolicy{QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum});
+  SetLayoutAlightment(layout(), Qt::AlignmentFlag());
 
   // 4. all collections
   m_favorites = new (std::nothrow) NavigationFavorites{this};
   CHECK_NULLPTR_RETURN_VOID(m_favorites);
+  m_favorites->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
   addWidget(m_favorites);
 
-  updateToolbarButtonStyle(EXPAND_SIDEBAR->isChecked(), false);
   subscribe();
+  updateToolbarButtonStyle(bExpandSideBar, false);
 }
 
 NavigationToolBar::~NavigationToolBar() { //

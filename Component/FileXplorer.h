@@ -19,7 +19,6 @@ public:
   void InitComponentVisibility();
   void subscribe();
 
-  QDockWidget* m_naviSideBarDock{nullptr};
   PreviewDockWidget* m_previewHtmlDock{nullptr};
 
   CurrentRowPreviewer* m_previewFolder{nullptr};

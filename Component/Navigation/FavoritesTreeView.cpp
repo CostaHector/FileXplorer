@@ -91,8 +91,8 @@ FavoritesTreeView::FavoritesTreeView(QWidget* parent)  //
   exclusiveActs.push_back(mSaveRightNow);
 
   PushFrontExclusiveActions(exclusiveActs);
-  subscribe();
   InitTreeView();
+  subscribe();
 }
 
 FavoritesTreeView::~FavoritesTreeView() {

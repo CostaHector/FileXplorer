@@ -5,9 +5,9 @@
 #include "DevicesDrivesTV.h"
 #include "PopupWidgetManager.h"
 #include "PublicVariable.h"
-#include "ToolBarWidget.h"
+#include <QToolBar>
 
-class NavigationToolBar : public ToolBarWidget {
+class NavigationToolBar : public QToolBar {
   Q_OBJECT
  public:
   explicit NavigationToolBar(const QString& title = "NavigationToolBar", QWidget* parent = nullptr);

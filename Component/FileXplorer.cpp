@@ -66,13 +66,7 @@ FileXplorer::FileXplorer(const QStringList& args, QWidget* parent) //
   m_viewSwitchHelper = new (std::nothrow) ViewSwitchHelper{m_stackedBar, m_fsPanel, m_navigationToolBar, this}; // view/searchToolBar switcher
 
   {
-    m_naviSideBarDock = new (std::nothrow) QDockWidget{"Navigation Sidebar", this};
-    auto pNaviTitle = new QLabel{"Navi", this};
-    pNaviTitle->setFixedHeight(12);
-    m_naviSideBarDock->setTitleBarWidget(pNaviTitle);
-    m_naviSideBarDock->setWidget(m_navigationToolBar);
-    m_naviSideBarDock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
-    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, m_naviSideBarDock);
+    addToolBar(Qt::ToolBarArea::LeftToolBarArea, m_navigationToolBar);
   }
   {
     m_previewHtmlDock = new (std::nothrow) PreviewDockWidget{"PreviewDockWidget", this}; // docker
@@ -176,7 +170,7 @@ void FileXplorer::RestoreWindowStateAndSetupUI() {
 void FileXplorer::InitComponentVisibility() {
   const bool showNavi{getConfig(CompoVisKey::SHOW_NAVIGATION_SIDEBAR).toBool()};
   if (!showNavi) {
-    m_naviSideBarDock->setHidden(true);
+    m_navigationToolBar->setHidden(true);
   }
 
   const bool showFolderPreview = getConfig(CompoVisKey::SHOW_PREVIEW_DOCKER).toBool();
@@ -195,7 +189,7 @@ void FileXplorer::InitComponentVisibility() {
 
 void FileXplorer::subscribe() {
   auto& vA = ViewActions::GetInst();
-  connect(vA._NAVIGATION_PANE, &QAction::toggled, m_naviSideBarDock, &QWidget::setVisible);
+  connect(vA._NAVIGATION_PANE, &QAction::toggled, m_navigationToolBar, &NavigationToolBar::setVisible);
   connect(vA._PREVIEW_PANEL, &QAction::toggled, m_previewHtmlDock, &PreviewDockWidget::setVisible);
   connect(m_previewHtmlDock, &PreviewDockWidget::previewTypeChanged, m_previewSwitcher, &FolderPreviewSwitcher::onSwitchByPreviewType);
 
